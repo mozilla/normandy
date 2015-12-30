@@ -10,6 +10,11 @@ class Core(Configuration):
 
     # Application definition
     INSTALLED_APPS = [
+        'normandy.classifier',
+        'normandy.recipes',
+
+        'product_details',
+
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -19,6 +24,7 @@ class Core(Configuration):
     ]
 
     MIDDLEWARE_CLASSES = [
+        'normandy.classifier.middleware.RequestReceivedAtMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
@@ -59,6 +65,9 @@ class Core(Configuration):
     # Static files (CSS, JavaScript, Images)
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+    # Product-details
+    PROD_DETAILS_STORAGE = 'product_details.storage.PDDatabaseStorage'
 
 
 class Base(Core):

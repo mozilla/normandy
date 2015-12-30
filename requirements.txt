@@ -4,3 +4,5 @@ https://github.com/jazzband/django-configurations/archive/afb057f33bc27311b44883
 wheel==0.24.0
 whitenoise==2.0.6
 psycopg2==2.6.1
+django-mozilla-product-details==0.9
+django-countries==3.4.1
