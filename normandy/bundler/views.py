@@ -18,7 +18,10 @@ class BundlerView(View):
             return HttpResponseBadRequest('Malformed "ids" parameter.')
 
         recipes = Recipe.objects.filter(enabled=True, id__in=recipe_ids).order_by('filename')
-        return HttpResponse(''.join(recipe.content for recipe in recipes))
+        return HttpResponse(
+            ''.join(recipe.content for recipe in recipes),
+            content_type='application/javascript',
+        )
 
     @classmethod
     def url_for(cls, bundle):
