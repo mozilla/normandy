@@ -3,3 +3,4 @@ db.sqlite3
 .DS_Store
 /static/
 /media/
+GeoLite2-Country.mmdb

@@ -93,6 +93,8 @@ class Base(Core):
         },
     ]
 
+    GEOIP2_DATABASE = values.Value()
+
 
 class Development(Base):
     """Settings for local development."""
@@ -100,6 +102,8 @@ class Development(Base):
     SECRET_KEY = values.Value('not a secret')
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
+
+    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
 
 
 class Production(Base):
