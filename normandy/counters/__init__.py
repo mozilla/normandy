@@ -1,4 +1,4 @@
-class CounterBackend:
+class CounterBackend(object):
     """Base class for counter backends."""
 
     def increment(name):
@@ -17,6 +17,14 @@ class CounterBackend:
         """
         raise NotImplemented
 
+    def reset(name):
+        """
+        Reset the value of a counter to 0.
+
+        If no such counter exists, this is a no-op.
+        """
+        raise NotImplemented
+
 
 class InMemoryCounterBackend(CounterBackend):
 
@@ -31,19 +39,28 @@ class InMemoryCounterBackend(CounterBackend):
         val = self.counts.get(name, 0)
         return val
 
+    def reset(self, name):
+        if name in self.counts:
+            self.counts[name] = 0
+
 
 # TODO: This should probably be a setting.
 _counter_backend = InMemoryCounterBackend
 
-class Counter:
+class Counter(object):
 
     def __init__(self):
         self.backend = _counter_backend()
 
-    def _recipe_name(self, recipe):
+    def _counter_key(self, recipe):
         return 'recipe-{}'.format(recipe.pk)
 
-    def check(self, recipe):
+    def can_deliver(self, recipe):
+        """
+        Check a recipe against the counters.
+
+        @returns True if the counter is not full, False if it is.
+        """
         if not recipe.has_counter:
             return True
 
@@ -52,8 +69,13 @@ class Counter:
         return count < recipe.count_limit
 
     def increment(self, recipe):
+        """
+        Increment the counter for a recipe.
+
+        This is a no-op if the recipe doesn't need counters.
+        """
         if not recipe.has_counter:
-            return True
+            return
 
         name = self._recipe_name(recipe)
         self.backend.increment(name)
