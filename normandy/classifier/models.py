@@ -5,12 +5,9 @@ from normandy.classifier.geolocation import get_country_code
 
 class Client(object):
     """A client attempting to fetch a set of recipes."""
-    def __init__(self, request):
+    def __init__(self, request, locale=None):
         self.request = request
-
-    @property
-    def locale(self):
-        pass
+        self.locale = locale
 
     @cached_property
     def country(self):

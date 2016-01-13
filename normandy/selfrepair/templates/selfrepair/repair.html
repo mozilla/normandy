@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <link rel="icon" href="data:;base64,=">
+   </head>
+   <body>
+      <script>
+        {% for recipe in bundle %}
+            {{ recipe.implementation|safe }}
+        {% endfor %}
+      </script>
+   </body>
+</html>

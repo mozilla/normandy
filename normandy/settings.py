@@ -12,7 +12,9 @@ class Core(Configuration):
     INSTALLED_APPS = [
         'normandy.classifier',
         'normandy.recipes',
+        'normandy.selfrepair',
 
+        'adminsortable',
         'product_details',
 
         'django.contrib.admin',
@@ -48,6 +50,7 @@ class Core(Configuration):
                     'django.template.context_processors.request',
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
+                    'django.core.context_processors.static',
                 ],
             },
         },
@@ -72,7 +75,7 @@ class Base(Core):
     SECRET_KEY = values.SecretValue()
     DEBUG = values.BooleanValue(False)
     ALLOWED_HOSTS = values.ListValue([])
-    DATABASES = values.DatabaseURLValue('sqlite:///db.sqlite3')
+    DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
 
     # Password validation
     AUTH_PASSWORD_VALIDATORS = [
@@ -102,6 +105,8 @@ class Development(Base):
     SECRET_KEY = values.Value('not a secret')
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
+    INSTALLED_APPS = Base.INSTALLED_APPS + ['sslserver']
+
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
 
 
