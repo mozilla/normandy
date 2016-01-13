@@ -66,9 +66,6 @@ class Core(Configuration):
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-    # Product-details
-    PROD_DETAILS_STORAGE = 'product_details.storage.PDDatabaseStorage'
-
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
@@ -95,6 +92,9 @@ class Base(Core):
 
     GEOIP2_DATABASE = values.Value()
 
+    # Product-details
+    PROD_DETAILS_STORAGE = values.Value('product_details.storage.PDDatabaseStorage')
+
 
 class Development(Base):
     """Settings for local development."""
@@ -102,10 +102,16 @@ class Development(Base):
     SECRET_KEY = values.Value('not a secret')
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
-
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
 
 
 class Production(Base):
     """Settings for the production environment."""
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+
+class Test(Base):
+    SECRET_KEY = values.Value('not a secret')
+    PROD_DETAILS_STORAGE = values.Value('product_details.storage.PDFileStorage')
+    DATABASES = values.DatabaseURLValue('sqlite://:memory:')
+    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))

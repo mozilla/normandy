@@ -5,3 +5,4 @@ db.sqlite3
 /media/
 GeoLite2-Country.mmdb
 _build
+/.cache/

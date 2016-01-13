@@ -8,3 +8,4 @@ django-mozilla-product-details==0.9
 django-countries==3.4.1
 geoip2==2.2.0
 Sphinx==1.3.3
+pytest-django==2.9.1
