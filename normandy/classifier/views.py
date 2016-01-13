@@ -4,6 +4,7 @@ from normandy.bundler.models import Bundle
 from normandy.bundler.views import BundlerView
 from normandy.classifier.models import Client
 from normandy.recipes.models import Recipe
+from normandy.counters import get_counter
 
 
 def classify(request):
@@ -12,8 +13,12 @@ def classify(request):
     redirect to the bundler URL for it.
     """
     client = Client(request)
-    bundle = Bundle(
-        recipe for recipe in Recipe.objects.filter(enabled=True) if recipe.matches(client)
-    )
+    counter = get_counter()
+
+    enabled = Recipe.objects.filter(enabled=True)
+    matched = [r for r in enabled if r.matches(client)]
+    for r in matched:
+        counter.increment(r)
+    bundle = Bundle(matched)
 
     return HttpResponseRedirect(BundlerView.url_for(bundle))

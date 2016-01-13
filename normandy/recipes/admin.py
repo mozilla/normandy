@@ -18,7 +18,15 @@ class RecipeAdmin(admin.ModelAdmin):
             'fields': ['filename', 'content', 'content_hash']
         }],
         ['Delivery Rules', {
-            'fields': ['enabled', 'locale', 'country', 'sample_rate', 'start_time', 'end_time']
+            'fields': [
+              'enabled',
+              'locale',
+              'country',
+              'sample_rate',
+              'start_time',
+              'end_time',
+              'count_limit',
+            ]
         }],
     ]
     readonly_fields = ['content_hash']
