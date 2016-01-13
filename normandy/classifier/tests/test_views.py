@@ -1,5 +1,6 @@
-import pytest
 from django.core.urlresolvers import reverse
+
+import pytest
 
 
 @pytest.mark.django_db()
