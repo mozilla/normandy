@@ -14,3 +14,6 @@ class Bundle(object):
     def hash(self):
         recipe_hashes = '_'.join([recipe.content_hash for recipe in self.recipes])
         return hashlib.sha1(recipe_hashes.encode('utf-8')).hexdigest()
+
+    def __repr__(self):
+        return '<Bundle ids={!r}>'.format(self.recipes)
