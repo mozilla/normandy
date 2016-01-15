@@ -1,4 +1,4 @@
-from random import random
+import logging
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -8,6 +8,8 @@ from django_countries.fields import CountryField
 
 from normandy.counters import get_counter
 from normandy.recipes.fields import AutoHashField, LocaleField, PercentField
+
+logger = logging.getLogger()
 
 
 class Recipe(models.Model):
@@ -28,35 +30,52 @@ class Recipe(models.Model):
     def implementation(self):
         return ';'.join(action.implementation for action in self.actions.all())
 
+    def log_rejection(self, client=None, field=None, msg=None, op='!='):
+        if msg is None:
+            msg = (
+                'recipe {field} ({recipe!r}) != client {field} ({client!r})'
+                .format(
+                    field=field,
+                    recipe=getattr(self, field),
+                    client=getattr(client, field)))
+        logger.debug('{} rejected: {}'.format(self, msg))
+
     def matches(self, client):
         """
         Return whether this Recipe should be sent to the given client.
         """
         if not self.enabled:
+            self.log_rejection(msg='not enabled')
             return False
 
         if self.locale and self.locale != client.locale:
+            self.log_rejection(client, 'locale')
             return False
 
         if self.country and self.country != client.country:
+            self.log_rejection(client, 'country')
             return False
 
         if self.start_time and self.start_time > client.request_time:
+            self.log_rejection(client, msg='start time not met ({})'.format(self.start_time))
             return False
 
         if self.end_time and self.end_time < client.request_time:
+            self.log_rejection(msg='end time already passed ({})'.format(self.end_time))
             return False
 
         if self.sample_rate and random() > self.sample_rate:
+            self.log_rejection(msg='did not match sample')
             return False
 
         if self.count_limit is not None and not get_counter().check(self):
+            self.log_rejection(msg='over counter')
             return False
 
         return True
 
     def __repr__(self):
-        return '<Recipe "{filename}">'.format(filename=self.filename)
+        return '<Recipe "{name}">'.format(name=self.name)
 
     def __str__(self):
         return self.name
