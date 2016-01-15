@@ -12,9 +12,7 @@ def fraction_to_key(frac):
     mult = 2 ** 256 - 1
     in_decimal = int(frac * mult)
 
-    # Saturate at 0
-    if in_decimal < 0:
-        in_decimal = 0
+    assert in_decimal >= 0
 
     hex_digits = hex(in_decimal)[2:]  # Strip off leading "0x"
     padded = "{:0<64}".format(hex_digits)
