@@ -1,3 +1,5 @@
+import uuid
+
 from django.utils.functional import cached_property
 
 from normandy.classifier.geolocation import get_country_code
@@ -17,3 +19,13 @@ class Client(object):
     @property
     def request_time(self):
         return self.request.received_at
+
+    @property
+    def user_id(self):
+        """
+        A UUID unique to a user, sent to us from Firefox.
+
+        If the user did not provide an ID, this returns a random UUID.
+        """
+        # TODO: Eventually this will be something from the request.
+        return str(uuid.uuid4())

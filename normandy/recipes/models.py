@@ -8,6 +8,7 @@ from django_countries.fields import CountryField
 
 from normandy.counters import get_counter
 from normandy.recipes.fields import AutoHashField, LocaleField, PercentField
+from normandy.recipes import utils
 
 logger = logging.getLogger()
 
@@ -64,9 +65,11 @@ class Recipe(models.Model):
             self.log_rejection(msg='end time already passed ({})'.format(self.end_time))
             return False
 
-        if self.sample_rate and random() > self.sample_rate:
-            self.log_rejection(msg='did not match sample')
-            return False
+        if self.sample_rate:
+            inputs = [self.pk, client.user_id]
+            if not utils.deterministic_sample(self.sample_rate / 100.0, inputs):
+                self.log_rejection(msg='did not match sample')
+                return False
 
         if self.count_limit is not None and not get_counter().check(self):
             self.log_rejection(msg='over counter')
