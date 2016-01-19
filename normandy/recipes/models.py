@@ -31,14 +31,7 @@ class Recipe(models.Model):
     def implementation(self):
         return ';'.join(action.implementation for action in self.actions.all())
 
-    def log_rejection(self, client=None, field=None, msg=None, op='!='):
-        if msg is None:
-            msg = (
-                'recipe {field} ({recipe!r}) != client {field} ({client!r})'
-                .format(
-                    field=field,
-                    recipe=getattr(self, field),
-                    client=getattr(client, field)))
+    def log_rejection(self, msg):
         logger.debug('{} rejected: {}'.format(self, msg))
 
     def matches(self, client):
@@ -46,33 +39,35 @@ class Recipe(models.Model):
         Return whether this Recipe should be sent to the given client.
         """
         if not self.enabled:
-            self.log_rejection(msg='not enabled')
+            self.log_rejection('not enabled')
             return False
 
         if self.locale and self.locale != client.locale:
-            self.log_rejection(client, 'locale')
+            self.log_rejection('recipe locale ({self.locale!r}) != '
+                               'client locale ({client.locale!r})')
             return False
 
         if self.country and self.country != client.country:
-            self.log_rejection(client, 'country')
+            self.log_rejection('recipe country ({self.country!r}) != '
+                               'client country ({client.country!r})')
             return False
 
         if self.start_time and self.start_time > client.request_time:
-            self.log_rejection(client, msg='start time not met ({})'.format(self.start_time))
+            self.log_rejection('start time not met ({})'.format(self.start_time))
             return False
 
         if self.end_time and self.end_time < client.request_time:
-            self.log_rejection(msg='end time already passed ({})'.format(self.end_time))
+            self.log_rejection('end time already passed ({})'.format(self.end_time))
             return False
 
         if self.sample_rate:
             inputs = [self.pk, client.user_id]
             if not utils.deterministic_sample(self.sample_rate / 100.0, inputs):
-                self.log_rejection(msg='did not match sample')
+                self.log_rejection('did not match sample')
                 return False
 
         if self.count_limit is not None and not get_counter().check(self):
-            self.log_rejection(msg='over counter')
+            self.log_rejection('over counter')
             return False
 
         return True

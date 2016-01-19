@@ -3,8 +3,8 @@ import hashlib
 
 def fraction_to_key(frac):
     """Map from the range [0, 1] to [0, max(sha256)]. The result is a string."""
-    # SHA 256 hashes are 64 hexadecimal numbers. The largest possible SHA 256
-    # hash is 2^64 - 1
+    # SHA 256 hashes are 64-digit hexadecimal numbers. The largest possible SHA 256
+    # hash is 2^256 - 1
 
     if frac < 0 or frac > 1:
         raise ValueError('frac must be between 0 and 1 inclusive (got {})'.format(frac))
@@ -31,9 +31,9 @@ def deterministic_sample(rate, inputs):
     Internally, converts `rate` into a point in the sha256 hash space. If the
     hash of `inputs` is less than that point, it returns True.
 
-    @parameter rate The probability of returning True
-    @parameter input A list of hashable data to feed to decide True or False about
-    @return True with probability `rate` and False otherwise
+    :param rate: The probability of returning True
+    :param input: A list of hashable data to feed to decide True or False about
+    :returns: True with probability `rate` and False otherwise
     """
     hasher = hashlib.sha256()
     for inp in inputs:
