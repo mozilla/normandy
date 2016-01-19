@@ -21,7 +21,10 @@ class Bundle(object):
 
     @property
     def hash(self):
-        recipe_hashes = '_'.join([recipe.content_hash for recipe in self.recipes])
+        hash_parts = []
+        for recipe in self.recipes:
+            hash_parts.extend(action.implementation_hash for action in recipe.actions.all())
+        recipe_hashes = '_'.join(hash_parts)
         return hashlib.sha1(recipe_hashes.encode('utf-8')).hexdigest()
 
     def __repr__(self):

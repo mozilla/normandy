@@ -17,7 +17,7 @@ class BundlerView(View):
         except ValueError:
             return HttpResponseBadRequest('Malformed "ids" parameter.')
 
-        recipes = Recipe.objects.filter(enabled=True, id__in=recipe_ids).order_by('filename')
+        recipes = Recipe.objects.filter(enabled=True, id__in=recipe_ids).order_by('name')
         return HttpResponse(
             ''.join(recipe.content for recipe in recipes),
             content_type='application/javascript',
