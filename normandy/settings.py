@@ -101,7 +101,9 @@ class Base(Core):
 
 class Development(Base):
     """Settings for local development."""
-    DOTENV = '.env'
+    DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, '.env'))
+    DOTENV = '.env' if DOTENV_EXISTS else None
+
     SECRET_KEY = values.Value('not a secret')
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
