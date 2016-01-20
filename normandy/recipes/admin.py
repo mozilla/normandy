@@ -38,7 +38,6 @@ class RecipeAdmin(NonSortableParentAdmin):
               'sample_rate',
               'start_time',
               'end_time',
-              'count_limit',
             ]
         }],
     ]
