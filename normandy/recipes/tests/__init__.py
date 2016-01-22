@@ -25,7 +25,7 @@ class ActionFactory(factory.DjangoModelFactory):
         model = Action
 
     name = FuzzyUnicode()
-    implementation = FuzzyUnicode(prefix='// ')
+    implementation = factory.django.FileField(data=b'console.log("test");')
 
 
 class RecipeActionFactory(factory.DjangoModelFactory):

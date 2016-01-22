@@ -16,6 +16,8 @@ class Core(Configuration):
 
         'adminsortable',
         'product_details',
+        'rest_framework',
+        'storages',
 
         'django.contrib.admin',
         'django.contrib.auth',
@@ -69,6 +71,10 @@ class Core(Configuration):
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+    # User-uploaded Media
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
@@ -85,6 +91,9 @@ class Base(Core):
     EMAIL_HOST_PASSWORD = values.Value()
 
     EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
+
+    # Overwrite old files when uploading media.
+    DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
 
     # Password validation
     AUTH_PASSWORD_VALIDATORS = [
@@ -125,6 +134,11 @@ class Development(Base):
 class Production(Base):
     """Settings for the production environment."""
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_ACCESS_KEY_ID = values.SecretValue()
+    AWS_SECRET_ACCESS_KEY = values.SecretValue()
+    AWS_STORAGE_BUCKET_NAME = values.SecretValue()
 
 
 class Test(Base):

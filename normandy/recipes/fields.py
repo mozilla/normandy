@@ -20,6 +20,8 @@ class AutoHashField(models.CharField):
     """
     Generates and stores a hash of another field on the model instance
     when saved.
+
+    Unused field leftover to make earlier migrations work.
     """
     def __init__(self, field_to_hash, *args, **kwargs):
         self.field_to_hash = field_to_hash

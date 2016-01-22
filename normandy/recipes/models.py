@@ -1,12 +1,16 @@
+import hashlib
 import logging
+from contextlib import closing
+from urllib.parse import urljoin
 
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from adminsortable.models import SortableMixin
 from django_countries.fields import CountryField
 
-from normandy.recipes.fields import AutoHashField, PercentField
+from normandy.recipes.fields import PercentField
 from normandy.recipes import utils
 
 
@@ -87,19 +91,31 @@ class Recipe(models.Model):
         return self.name
 
 
+def action_implementation_filename(instance, filename):
+    return 'actions/{instance.name}.js'.format(instance=instance)
+
+
 class Action(models.Model):
     """A single executable action that can take arguments."""
-    name = models.CharField(max_length=255, unique=True)
+    name = models.SlugField(max_length=255, unique=True)
 
-    implementation = models.TextField()
-    implementation_hash = AutoHashField('implementation', unique=True)
+    implementation = models.FileField(upload_to=action_implementation_filename)
+    implementation_hash = models.CharField(max_length=40, editable=False, unique=True)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        # TODO this is fake.
-        return '/action/{}'.format(self.name)
+        return self.implementation.url
+
+    def save(self, *args, **kwargs):
+        # Save first so the upload is available.
+        super().save(*args, **kwargs)
+
+        # Update hash
+        with closing(self.implementation) as f:
+            self.implementation_hash = hashlib.sha1(f.read()).hexdigest()
+        super().save(update_fields=['implementation_hash'])
 
 
 class RecipeAction(SortableMixin):

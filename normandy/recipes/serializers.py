@@ -5,7 +5,7 @@ from normandy.recipes.models import Recipe, RecipeAction
 
 class ImplementationSerializer(serializers.Serializer):
     hash = serializers.CharField(source='implementation_hash', read_only=True)
-    url = serializers.URLField(source='get_absolute_url', read_only=True)
+    url = serializers.FileField(source='implementation', read_only=True)
 
 
 class RecipeActionSerializer(serializers.Serializer):
