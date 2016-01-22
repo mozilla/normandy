@@ -6,10 +6,24 @@ from django.db import models
 from adminsortable.models import SortableMixin
 from django_countries.fields import CountryField
 
-from normandy.recipes.fields import AutoHashField, LocaleField, PercentField
+from normandy.recipes.fields import AutoHashField, PercentField
 from normandy.recipes import utils
 
+
 logger = logging.getLogger()
+
+
+class Locale(models.Model):
+    """Database table for locales from product_details."""
+    code = models.CharField(max_length=255, unique=True)
+    english_name = models.CharField(max_length=255, blank=True)
+    native_name = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ['code']
+
+    def __str__(self):
+        return '{self.code} ({self.english_name})'.format(self=self)
 
 
 class Recipe(models.Model):
@@ -19,7 +33,7 @@ class Recipe(models.Model):
 
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
-    locale = LocaleField(blank=True, default='')
+    locale = models.ForeignKey(Locale, blank=True, null=True)
     country = CountryField(blank=True, null=True, default=None)
     start_time = models.DateTimeField(blank=True, null=True, default=None)
     end_time = models.DateTimeField(blank=True, null=True, default=None)
@@ -40,7 +54,7 @@ class Recipe(models.Model):
             self.log_rejection('not enabled')
             return False
 
-        if self.locale and self.locale != client.locale:
+        if self.locale and client.locale and self.locale.code.lower() != client.locale.lower():
             self.log_rejection('recipe locale ({self.locale!r}) != '
                                'client locale ({client.locale!r})')
             return False

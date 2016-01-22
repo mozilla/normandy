@@ -7,6 +7,7 @@ from product_details import product_details
 
 
 class LocaleField(models.CharField):
+    """Legacy field leftover to make earlier migrations work."""
     CHOICES = {
         code: names['English']
         for code, names in product_details.languages.items()

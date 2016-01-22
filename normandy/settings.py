@@ -96,7 +96,7 @@ class Base(Core):
     GEOIP2_DATABASE = values.Value()
 
     # Product-details
-    PROD_DETAILS_STORAGE = values.Value('product_details.storage.PDDatabaseStorage')
+    PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
 
 
 class Development(Base):
@@ -119,5 +119,4 @@ class Production(Base):
 
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
-    PROD_DETAILS_STORAGE = values.Value('product_details.storage.PDFileStorage')
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
