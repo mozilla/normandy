@@ -25,3 +25,6 @@ class ProductDetailsRelationalStorage(PDDatabaseStorage):
                     'english_name': names['English'],
                     'native_name': names['native'],
                 })
+
+            # Remove obsolete locales.
+            Locale.objects.exclude(code__in=languages.keys()).delete()
