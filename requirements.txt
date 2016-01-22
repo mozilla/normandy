@@ -1,6 +1,6 @@
 dj-database-url==0.3.0
 Django==1.9
-https://github.com/jazzband/django-configurations/archive/afb057f33bc27311b448832fb9eede8935faec87.zip#egg=django-configurations==0.9dev
+django-configurations==1.0
 wheel==0.24.0
 whitenoise==2.0.6
 psycopg2==2.6.1
