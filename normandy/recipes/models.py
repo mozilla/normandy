@@ -83,6 +83,10 @@ class Action(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        # TODO this is fake.
+        return '/action/{}'.format(self.name)
+
 
 class RecipeAction(SortableMixin):
     """

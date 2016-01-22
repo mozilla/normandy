@@ -18,3 +18,12 @@ def urlparams(url, fragment=None, **kwargs):
         urlencode(query, doseq=True),
         fragment if fragment is not None else parsed.fragment
     ))
+
+
+class Whatever(object):
+
+    def __init__(self, test=lambda x: True):
+        self.test = test
+
+    def __eq__(self, other):
+        return self.test(other)

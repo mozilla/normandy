@@ -120,5 +120,4 @@ class Production(Base):
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
     PROD_DETAILS_STORAGE = values.Value('product_details.storage.PDFileStorage')
-    DATABASES = values.DatabaseURLValue('sqlite://:memory:')
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))

@@ -36,7 +36,7 @@ Retrieving Recipes
 The Self-Repair addon retrieves a list of recipes by making an HTTP POST request
 to the URL::
 
-   https://shield.mozilla.org/api/v1/fetch_bundle
+   https://shield.mozilla.org/api/v1/fetch_bundle/
 
 The request should contain a JSON object of the form:
 
@@ -58,7 +58,7 @@ The API will respond with a JSON object:
             "actions": [
                {
                   "name": "show_survey",
-                  "selfRepairImpl": {
+                  "implementation": {
                      "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
                      "url": "https://shield.mozilla.org/api/v1/actions/show_survey/"
                   },
@@ -73,7 +73,7 @@ The API will respond with a JSON object:
             "actions": [
                {
                   "name": "check_for_bad_toolbar",
-                  "selfRepairImpl": {
+                  "implementation": {
                      "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
                      "url": "https://shield.mozilla.org/api/v1/actions/check_for_bad_toolbar/"
                   },
@@ -83,7 +83,7 @@ The API will respond with a JSON object:
                },
                {
                   "name": "telemetry_ping",
-                  "impl_hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
+                  "implementation_hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
                   "arguments": {
                      "id": "shady_tim_strikes_again"
                   }
@@ -98,14 +98,14 @@ Retrieving an Action
 The Self-Repair addon retrieves the code necessary to execute an action by
 making an HTTP GET to the URL::
 
-   https://shield.mozilla.org/api/v1/get_action_impl?name=action_name
+   https://shield.mozilla.org/api/v1/get_action_implementation?name=action_name
 
 The API will respond with a JSON object of the form:
 
 .. code-block:: json
 
    {
-      "impl": "function action(selfRepairAPI, args) { /* Do something */ }"
+      "implementation": "function action(selfRepairAPI, args) { /* Do something */ }"
    }
 
 Legacy Self-Repair
