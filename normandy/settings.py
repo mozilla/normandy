@@ -76,6 +76,15 @@ class Base(Core):
     DEBUG = values.BooleanValue(False)
     ALLOWED_HOSTS = values.ListValue([])
     DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
+    ADMINS = values.SingleNestedListValue([])
+
+    EMAIL_HOST_USER = values.Value()
+    EMAIL_HOST = values.Value()
+    EMAIL_PORT = values.IntegerValue(587)
+    EMAIL_USE_TLS = values.BooleanValue(True)
+    EMAIL_HOST_PASSWORD = values.Value()
+
+    EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
 
     # Password validation
     AUTH_PASSWORD_VALIDATORS = [
@@ -108,6 +117,7 @@ class Development(Base):
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
     INSTALLED_APPS = Base.INSTALLED_APPS + ['sslserver']
+    EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
 
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
 
