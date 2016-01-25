@@ -23,5 +23,5 @@ class FetchBundle(views.APIView):
 
         client = Client(request, locale=params.data['locale'])
         bundle = Bundle.for_client(client)
-        serializer = self.serializer_class(bundle)
+        serializer = self.serializer_class(bundle, context={'request': request})
         return Response(serializer.data)

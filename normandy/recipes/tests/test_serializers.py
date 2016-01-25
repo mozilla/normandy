@@ -8,14 +8,14 @@ from normandy.recipes.serializers import RecipeActionSerializer, RecipeSerialize
 @pytest.mark.django_db()
 def test_recipe_action_serializer():
     recipe_action = RecipeActionFactory(arguments={'foo': 'bar'})
-    serializer = RecipeActionSerializer(recipe_action)
 
+    serializer = RecipeActionSerializer(recipe_action)
     action = recipe_action.action
     assert serializer.data == {
         "name": action.name,
         "implementation": {
             "hash": action.implementation_hash,
-            "url": action.get_absolute_url(),
+            "url": Whatever(lambda url: url.endswith(action.implementation.url)),
         },
         "arguments": {
             'foo': 'bar',
@@ -37,7 +37,7 @@ def test_recipe_serializer():
                 "name": action.name,
                 "implementation": {
                     "hash": Whatever(lambda h: len(h) == 40),
-                    "url": action.get_absolute_url(),
+                    "url": Whatever(lambda url: url.endswith(action.implementation.url)),
                 },
                 "arguments": {
                     'foo': 'bar',
