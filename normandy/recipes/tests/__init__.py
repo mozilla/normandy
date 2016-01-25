@@ -1,7 +1,7 @@
 import factory
 
 from normandy.base.tests import FuzzyUnicode
-from normandy.recipes.models import Action, Recipe, RecipeAction
+from normandy.recipes.models import Action, Locale, Recipe, RecipeAction
 
 
 class RecipeFactory(factory.DjangoModelFactory):
@@ -10,6 +10,14 @@ class RecipeFactory(factory.DjangoModelFactory):
 
     name = FuzzyUnicode()
     enabled = True
+
+    @factory.post_generation
+    def locale(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted and isinstance(extracted, str):
+            self.locale, _ = Locale.objects.get_or_create(code=extracted)
 
 
 class ActionFactory(factory.DjangoModelFactory):
@@ -26,3 +34,8 @@ class RecipeActionFactory(factory.DjangoModelFactory):
 
     action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
+
+
+class LocaleFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Locale
