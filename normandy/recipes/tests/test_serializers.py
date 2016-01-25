@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.base.utils import Whatever
+from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeActionFactory
 from normandy.recipes.serializers import RecipeActionSerializer, RecipeSerializer
 

@@ -11,5 +11,4 @@ def test_bundle_serializer():
     bundle = BundleFactory(recipes=[recipe])
     serializer = BundleSerializer(bundle)
 
-    assert len(serializer.data['recipes']) == 1
-    assert serializer.data['recipes'][0] == {'name': recipe.name, 'actions': []}
+    assert serializer.data['recipes'] == [{'name': recipe.name, 'actions': []}]

@@ -1,7 +1,8 @@
 import pytest
 
-from normandy.base.utils import Whatever
+from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeActionFactory, RecipeFactory
+
 
 @pytest.mark.django_db
 class TestFetchBundleAPI(object):
