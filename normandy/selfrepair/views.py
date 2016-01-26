@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
-from normandy.bundler.models import Bundle
-from normandy.classifier.models import Client
+from normandy.classifier.models import Bundle, Client
 
 
 def repair(request, locale):

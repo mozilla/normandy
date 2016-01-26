@@ -1,9 +1,8 @@
 from rest_framework import serializers, views, status
 from rest_framework.response import Response
 
-from normandy.bundler.serializers import BundleSerializer
-from normandy.classifier.models import Client
-from normandy.bundler.models import Bundle
+from normandy.classifier.serializers import BundleSerializer
+from normandy.classifier.models import Bundle, Client
 
 
 class FetchBundle(views.APIView):

@@ -1,7 +1,7 @@
 import pytest
 
-from normandy.bundler.tests import BundleFactory
-from normandy.bundler.serializers import BundleSerializer
+from normandy.classifier.tests import BundleFactory
+from normandy.classifier.serializers import BundleSerializer
 from normandy.recipes.tests import RecipeFactory
 
 
