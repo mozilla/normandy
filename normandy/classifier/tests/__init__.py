@@ -1,6 +1,6 @@
 import factory
 
-from normandy.bundler.models import Bundle
+from normandy.classifier.models import Bundle
 
 
 class BundleFactory(factory.Factory):
