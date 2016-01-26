@@ -1,0 +1,15 @@
+{
+  "title": "Recipe Client",
+  "name": "recipe-client",
+  "version": "0.0.1",
+  "description": "Client to download and run recipes for SHIELD, Heartbeat, etc.",
+  "main": "index.js",
+  "author": "Mike Cooper <mythmon@gmail.com>",
+  "engines": {
+    "firefox": ">=38.0a1"
+  },
+  "license": "MPLv2",
+  "keywords": [
+    "jetpack"
+  ]
+}
