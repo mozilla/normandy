@@ -15,7 +15,7 @@ function xhr(method, url, options={}) {
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
         req.addEventListener('load', e => {
-            if (req.status !== 200) {
+            if (req.status >= 400) {
                 reject(req);
             } else {
                 resolve(req);
@@ -54,7 +54,7 @@ window.Normandy = {
  * Download the implementation of the given action from the server.
  *
  * @param {Action} action  - Action taken from a Recipe.
- * @promise Resolves once the action has been loaded and registered.
+ * @promise {Function} The implementation function for the given action.
  * @rejects {Error} Rejects if the action could not be loaded or did not
  *     register itself.
  */
@@ -67,12 +67,12 @@ function loadAction(action) {
                 if (!registeredActions[action.name]) {
                     reject(new Error(`Could not find action with name ${action.name}.`));
                 } else {
-                    resolve();
+                    resolve(registeredActions[action.name]);
                 }
             };
             document.head.appendChild(script);
         } else {
-            resolve();
+            resolve(registeredActions[action.name]);
         }
     });
 }
@@ -83,9 +83,9 @@ function loadAction(action) {
  * @promise {Array<Recipe>} List of recipes.
  */
 function fetchRecipes() {
-    let {recipe_url, locale} = document.documentElement.dataset;
+    let {recipeUrl, locale} = document.documentElement.dataset;
 
-    return xhr.post(recipe_url, {
+    return xhr.post(recipeUrl, {
         data: {locale: locale},
         headers: {Accept: 'application/json'}
     }).then(request => {
@@ -101,11 +101,12 @@ function fetchRecipes() {
  * @promise Resolves once all actions are complete.
  */
 function runRecipe(recipe) {
-    return Promise.all(recipe.actions.map(loadAction)).then(() => {
+    return Promise.all(recipe.actions.map(loadAction)).then((funcs) => {
         let recipePromise = Promise.resolve();
 
-        for (let action of recipe.actions) {
-            let func = registeredActions[action.name];
+        for (let k = 0; k < recipe.actions.length; k++) {
+            let action = recipe.actions[k];
+            let func = funcs[k];
             recipePromise = recipePromise.then(() => {
                 return func(null, action.arguments);
             });
