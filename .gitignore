@@ -6,3 +6,4 @@ db.sqlite3
 GeoLite2-Country.mmdb
 _build
 /.cache/
+/etc/ssl
