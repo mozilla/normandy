@@ -6,7 +6,8 @@ from normandy.classifier.models import Bundle, Client
 
 
 class FetchBundle(views.APIView):
-
+    authentication_classes = []
+    permission_classes = []
     serializer_class = BundleSerializer
 
     class Parameters(serializers.Serializer):

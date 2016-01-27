@@ -60,7 +60,7 @@ The API will respond with a JSON object:
                   "name": "show_survey",
                   "implementation": {
                      "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
-                     "url": "https://shield.mozilla.org/api/v1/actions/show_survey/"
+                     "url": "https://shield.mozilla.org/media/actions/show_survey.js"
                   },
                   "arguments": {
                      "url": "https://somesurvey.com/blah"
@@ -75,7 +75,7 @@ The API will respond with a JSON object:
                   "name": "check_for_bad_toolbar",
                   "implementation": {
                      "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
-                     "url": "https://shield.mozilla.org/api/v1/actions/check_for_bad_toolbar/"
+                     "url": "https://shield.mozilla.org/media/actions/check_for_bad_toolbar.js"
                   },
                   "arguments": {
                      "toolbar_name": "Shady Tim's Totally Legit Search"
@@ -83,7 +83,10 @@ The API will respond with a JSON object:
                },
                {
                   "name": "telemetry_ping",
-                  "implementation_hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
+                  "implementation": {
+                     "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
+                     "url": "https://shield.mozilla.org/media/actions/telemetry_ping.js"
+                  },
                   "arguments": {
                      "id": "shady_tim_strikes_again"
                   }
@@ -96,17 +99,8 @@ The API will respond with a JSON object:
 Retrieving an Action
 ^^^^^^^^^^^^^^^^^^^^
 The Self-Repair addon retrieves the code necessary to execute an action by
-making an HTTP GET to the URL::
-
-   https://shield.mozilla.org/api/v1/get_action_implementation?name=action_name
-
-The API will respond with a JSON object of the form:
-
-.. code-block:: json
-
-   {
-      "implementation": "function action(selfRepairAPI, args) { /* Do something */ }"
-   }
+making an HTTP GET to the URL provided in the ``implementation`` property of an
+action. The response is the JavaScript code for the requested action.
 
 Legacy Self-Repair
 ------------------

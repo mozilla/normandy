@@ -1,14 +1,13 @@
+{% load staticfiles %}
+
 <!DOCTYPE html>
-<html lang="en">
-   <head>
-      <meta charset="utf-8">
-      <link rel="icon" href="data:;base64,=">
-   </head>
-   <body>
-      <script>
-        {% for recipe in bundle %}
-            {{ recipe.implementation|safe }}
-        {% endfor %}
-      </script>
-   </body>
+<html lang="en" data-locale="{{ locale }}" data-recipe-url="{% url 'api.v1.fetch_bundle' %}">
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" href="data:;base64,=">
+  </head>
+  <body>
+    <!-- Cheat so that we get let and other version-limited JavaScript features. -->
+    <script type="application/javascript;version=1.8" src="{% static 'js/self_repair_driver.js' %}"></script>
+  </body>
 </html>
