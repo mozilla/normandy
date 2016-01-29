@@ -11,3 +11,4 @@ JavaScript to various clients based on certain rules.
    dev/install
    dev/workflow
    dev/architecture
+   dev/troubleshooting

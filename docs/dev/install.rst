@@ -17,7 +17,7 @@ theory, run on Windows as well. All the example commands given below are
 intended to be run in a terminal.
 
 .. _Git: https://git-scm.com/
-.. _Python 2.7: https://www.python.org/
+.. _Python 3.5: https://www.python.org/
 .. _pip 8: https://pip.pypa.io/en/stable/
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
 .. _Postgres 9.4: http://www.postgresql.org/
@@ -28,7 +28,7 @@ Installation
 
    .. code-block:: bash
 
-      git clone --recursive https://github.com/mozilla/normandy.git
+      git clone https://github.com/mozilla/normandy.git
       cd normandy
 
 2. Create a virtualenv for Normandy and activate it:
@@ -50,31 +50,10 @@ Installation
 
       pip install -r requirements.txt
 
-   .. note::
+   .. seealso::
 
-      If you get an error like `pip: error: no such option: --hash`, you are
-      using too old a version of Pip. Please upgrade to Pip 8 or above.
-
-      If you get an error like this, the solution is harder::
-
-         THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE. If you have
-         updated the package versions, please update the hashes. Otherwise, examine the
-         package contents carefully; someone may have tampered with them.
-            alabaster==0.7.7 from https://pypi.python.org/packages/py2.py3/a/alabaster/alabaster-0.7.7-py2.py3-none-any.whl
-                Expected sha256 d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544
-                      Got        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-      Normandy pins requirements with both a package version, and also a package
-      hash. This gives reproducibility in builds. If you are sure that there is
-      a good reason for your packages to have a different hash, add another hash
-      line to requirements.txt for the requirement in question, like this::
-
-         alabaster==0.7.7 \
-            --hash d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544 \
-            --hash xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-      A good reason for the hash to be different is if you use a platform that
-      isn't covered by the existing hashes for a package that has wheels.
+      :ref:`pip-install-error`
+         How to troubleshoot errors during ``pip install``.
 
 
 4. Create a Postgres database for Normandy. By default it is assumed to be named
@@ -113,6 +92,13 @@ Installation
    .. code-block:: bash
 
       python manage.py update_product_details
+
+8. Pull the latest geolocation database using the ``download_geolite2.sh``
+   script:
+
+   .. code-block:: bash
+
+      ./bin/download_geolite2.sh
 
 Once you've finished these steps, you should be able to start the site by
 running:
