@@ -7,6 +7,7 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
+    url(r'', include('normandy.recipes.urls')),
     url(r'', include('normandy.classifier.urls')),
     url(r'', include('normandy.selfrepair.urls')),
 ]
