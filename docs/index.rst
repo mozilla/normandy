@@ -8,4 +8,7 @@ JavaScript to various clients based on certain rules.
 .. toctree::
    :maxdepth: 2
 
+   dev/install
+   dev/workflow
    dev/architecture
+   dev/troubleshooting
