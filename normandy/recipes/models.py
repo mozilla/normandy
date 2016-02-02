@@ -100,7 +100,7 @@ class Action(models.Model):
     name = models.SlugField(max_length=255, unique=True)
 
     implementation = models.FileField(upload_to=action_implementation_filename)
-    implementation_hash = models.CharField(max_length=40, editable=False, unique=True)
+    implementation_hash = models.CharField(max_length=40, editable=False)
 
     def __str__(self):
         return self.name

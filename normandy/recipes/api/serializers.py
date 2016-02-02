@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from normandy.recipes.api.fields import ContentFileField
 from normandy.recipes.models import Action, Recipe, RecipeAction
 
 
@@ -26,6 +27,8 @@ class RecipeSerializer(serializers.Serializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
+    implementation = ContentFileField(filename='implementation.js')
+
     class Meta:
         model = Action
         fields = ('name', 'implementation')
