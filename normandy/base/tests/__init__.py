@@ -1,4 +1,6 @@
-from factory import fuzzy
+from django.contrib.auth.models import User
+
+from factory import DjangoModelFactory, fuzzy, Sequence
 
 
 class Whatever(object):
@@ -15,3 +17,11 @@ class FuzzyUnicode(fuzzy.FuzzyText):
     def __init__(self, prefix=u'', **kwargs):
         prefix = '%sđ' % prefix
         super(FuzzyUnicode, self).__init__(prefix=prefix, **kwargs)
+
+
+class UserFactory(DjangoModelFactory):
+    username = FuzzyUnicode()
+    email = Sequence(lambda n: 'test%s@example.com' % n)
+
+    class Meta:
+        model = User
