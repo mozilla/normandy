@@ -121,3 +121,5 @@ wheel==0.26.0 \
 whitenoise==2.0.6 \
     --hash=sha256:826ffe5d608c9dc8daebef1b0b43d01f7958f17c2fce36e75c80e26160172c4f \
     --hash=sha256:5aea935dfc09ef2beeb76960b4a808b0bbe65e85fb0b0312434b9c365ca02a41
+dj-inmemorystorage==1.4.0 \
+    --hash=sha256:35a37fac5955c3d9519fcab0cc7d88b43dc9bc95ffd2a6312badfa489ed30fd2

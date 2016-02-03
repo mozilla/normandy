@@ -144,3 +144,4 @@ class Production(Base):
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
+    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
