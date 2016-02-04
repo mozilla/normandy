@@ -104,7 +104,7 @@ class Action(models.Model):
     def implementation_content(self):
         self.implementation.open()
         with closing(self.implementation):
-            return self.implementation.read().decode('utf-8')
+            return self.implementation.read()
 
     def __str__(self):
         return self.name

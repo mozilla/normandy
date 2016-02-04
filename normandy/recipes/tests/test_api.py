@@ -1,5 +1,3 @@
-from contextlib import closing
-
 import pytest
 
 from normandy.recipes.models import Action
@@ -14,7 +12,7 @@ class TestActionAPI(object):
         assert res.data == []
 
     def test_it_serves_actions(self, api_client):
-        ActionFactory(name='foo', implementation__data='foobar')
+        ActionFactory(name='foo', implementation__data=b'foobar')
 
         res = api_client.get('/api/v1/action/')
         assert res.status_code == 200
@@ -28,20 +26,20 @@ class TestActionAPI(object):
 
         action = Action.objects.all()[0]
         assert action.name == 'foo'
-        assert action.implementation_content == 'foobar'
+        assert action.implementation_content == b'foobar'
 
     def test_it_can_edit_actions(self, api_client):
-        ActionFactory(name='foo', implementation__data='original')
+        ActionFactory(name='foo', implementation__data=b'original')
 
         res = api_client.patch('/api/v1/action/foo/', {'implementation': 'changed'})
         assert res.status_code == 200
 
         action = Action.objects.all()[0]
         assert action.name == 'foo'
-        assert action.implementation_content == 'changed'
+        assert action.implementation_content == b'changed'
 
     def test_it_can_delete_actions(self, api_client):
-        ActionFactory(name='foo', implementation__data='foobar')
+        ActionFactory(name='foo', implementation__data=b'foobar')
         assert Action.objects.exists()
 
         res = api_client.delete('/api/v1/action/foo/')
