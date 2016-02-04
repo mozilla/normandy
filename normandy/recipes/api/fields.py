@@ -6,7 +6,7 @@ from rest_framework.fields import CharField
 
 
 class ContentFileField(CharField):
-    """Serilizer field that deserializes text into a ContentFile."""
+    """Serializer field that deserializes text into a ContentFile."""
     def __init__(self, **kwargs):
         self.filename = kwargs.pop('filename', 'file.txt')
         super().__init__(**kwargs)
