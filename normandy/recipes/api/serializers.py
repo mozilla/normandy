@@ -28,7 +28,8 @@ class RecipeSerializer(serializers.Serializer):
 
 class ActionSerializer(serializers.ModelSerializer):
     implementation = ContentFileField(filename='implementation.js')
+    arguments_schema = serializers.JSONField()
 
     class Meta:
         model = Action
-        fields = ('name', 'implementation')
+        fields = ('name', 'implementation', 'arguments_schema')
