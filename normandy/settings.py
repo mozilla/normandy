@@ -17,6 +17,7 @@ class Core(Configuration):
         'adminsortable',
         'product_details',
         'rest_framework',
+        'rest_framework.authtoken',
         'storages',
 
         'django.contrib.admin',
@@ -115,6 +116,12 @@ class Base(Core):
 
     # Product-details
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.TokenAuthentication',
+        )
+    }
 
 
 class Development(Base):

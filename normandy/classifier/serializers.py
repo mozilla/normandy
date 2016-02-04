@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from normandy.recipes.serializers import RecipeSerializer
+from normandy.recipes.api.serializers import RecipeSerializer
 
 
 class BundleSerializer(serializers.Serializer):

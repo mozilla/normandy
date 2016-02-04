@@ -2,7 +2,7 @@ import pytest
 
 from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeActionFactory
-from normandy.recipes.serializers import RecipeActionSerializer, RecipeSerializer
+from normandy.recipes.api.serializers import RecipeActionSerializer, RecipeSerializer
 
 
 @pytest.mark.django_db()

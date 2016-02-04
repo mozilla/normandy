@@ -1,9 +1,7 @@
 import hashlib
 import logging
 from contextlib import closing
-from urllib.parse import urljoin
 
-from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
@@ -100,7 +98,13 @@ class Action(models.Model):
     name = models.SlugField(max_length=255, unique=True)
 
     implementation = models.FileField(upload_to=action_implementation_filename)
-    implementation_hash = models.CharField(max_length=40, editable=False, unique=True)
+    implementation_hash = models.CharField(max_length=40, editable=False)
+
+    @property
+    def implementation_content(self):
+        self.implementation.open()
+        with closing(self.implementation):
+            return self.implementation.read().decode('utf-8')
 
     def __str__(self):
         return self.name
