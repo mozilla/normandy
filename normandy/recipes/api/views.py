@@ -11,4 +11,4 @@ class ActionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.DjangoModelPermissions]
 
     lookup_field = 'name'
-    lookup_value_regex = r'[_\w]+'
+    lookup_value_regex = r'[_\-\w]+'
