@@ -67,6 +67,10 @@ class ActionAdmin(admin.ModelAdmin):
     recipe_list.short_description = 'Used in Recipes'
 
     def in_use(self, action):
-        """Callable on the ModelAdmin so we can set boolean=True."""
+        """
+        Wrapper around the Action.in_use property so that we can set the
+        boolean attribute to display a nice checkmark for the field in
+        the admin.
+        """
         return action.in_use
     in_use.boolean = True
