@@ -1,0 +1,35 @@
+extends: 'eslint:recommended'
+
+parserOptions:
+  ecmaVersion: 6
+  sourceType: 'module'
+
+env:
+  es6: true
+
+globals:
+  require: false
+  exports: true
+  uneval: false
+
+plugins:
+  - mozilla
+
+rules:
+  eqeqeq: [2]
+  generator-star-spacing: [2, 'after']
+  indent: [2, 2, {SwitchCase: 1}]
+  jsx-quotes: [2, 'prefer-double']
+  semi: [2, 'always']
+
+  comma-dangle: [1, 'always-multiline']
+  quotes: [1, 'single', 'avoid-escape']
+  no-unused-vars: [1]
+  prefer-const: [1]
+  semi: [1]
+  no-console: [1]
+
+  mozilla/balanced-listeners: [1]
+  mozilla/components-imports: [1]
+  mozilla/no-aArgs: [1]
+  mozilla/this-top-level-scope: [1]

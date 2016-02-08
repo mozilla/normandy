@@ -11,5 +11,9 @@
   "license": "MPLv2",
   "keywords": [
     "jetpack"
-  ]
+  ],
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-plugin-mozilla": "0.0.3"
+  }
 }
