@@ -45,3 +45,16 @@ class TestActionAPI(object):
         res = api_client.delete('/api/v1/action/foo/')
         assert res.status_code == 204
         assert not Action.objects.exists()
+
+    def test_name_validation(self, api_client):
+        """Ensure the name field accepts _any_ valid slug."""
+        # Slugs can contain alphanumerics plus _ and -.
+        res = api_client.post('/api/v1/action/', {
+            'name': 'foo-bar_baz2',
+            'implementation': 'foobar',
+        })
+        assert res.status_code == 201
+
+        action = Action.objects.all()[0]
+        assert action.name == 'foo-bar_baz2'
+        assert action.implementation_content == b'foobar'
