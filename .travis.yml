@@ -10,7 +10,7 @@ after_success:
     ([ "$TRAVIS_BRANCH" == master ] && TAG=latest || TAG="$TRAVIS_BRANCH" &&
     docker tag normandy:build "mozilla/normandy:$TAG" &&
     docker push "mozilla/normandy:$TAG")'
-  - '[ -z "$DOCKER_EMAIL" -o -z "$TRAVIS_TAG ] ||
+  - '[ -z "$DOCKER_EMAIL" -o -z "$TRAVIS_TAG" ] ||
     (docker tag normandy:build "mozilla/normandy:$TRAVIS_TAG" &&
     docker push "mozilla/normandy:$TRAVIS_TAG")'
 
