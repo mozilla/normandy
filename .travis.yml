@@ -7,9 +7,7 @@ deploy:
   provider: script
   script: bin/deploy/dockerhub.sh
   on:
-    all_branches: true
     repo: mozilla/normandy
-    tags: true
 
 addons:
   postgresql: "9.4"
