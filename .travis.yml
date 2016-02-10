@@ -3,16 +3,7 @@ language: python
 
 install: docker build -t normandy:build .
 script: docker run --net host normandy:build py.test
-after_success:
-  - '[ -z "$DOCKER_EMAIL" ] ||
-    docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"'
-  - '[ -z "$DOCKER_EMAIL" ] ||
-    ([ "$TRAVIS_BRANCH" == master ] && TAG=latest || TAG="$TRAVIS_BRANCH" &&
-    docker tag normandy:build "mozilla/normandy:$TAG" &&
-    docker push "mozilla/normandy:$TAG")'
-  - '[ -z "$DOCKER_EMAIL" -o -z "$TRAVIS_TAG" ] ||
-    (docker tag normandy:build "mozilla/normandy:$TRAVIS_TAG" &&
-    docker push "mozilla/normandy:$TRAVIS_TAG")'
+after_success: bash bin/deploy/dockerhub.sh
 
 addons:
   postgresql: "9.4"
