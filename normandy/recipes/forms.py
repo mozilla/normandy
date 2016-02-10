@@ -24,10 +24,15 @@ class RecipeActionInlineForm(forms.ModelForm):
     def clean(self):
         """Validate the arguments against their schema."""
         schema = self.cleaned_data['action'].arguments_schema
-        arguments = json.loads(self.cleaned_data['arguments'])
+        try:
+            arguments = json.loads(self.cleaned_data['arguments_json'])
+        except json.JSONDecodeError as err:
+            msg = 'Invalid argument JSON: {err}'.format(err=err)
+            self.add_error('arguments_json', ValidationError(msg))
+            return
 
         try:
             jsonschema.validate(arguments, schema)
         except jsonschema.ValidationError as err:
             msg = 'Argument validation failed: {err}'.format(err=err.message)
-            self.add_error('arguments', ValidationError(msg))
+            self.add_error('arguments_json', ValidationError(msg))
