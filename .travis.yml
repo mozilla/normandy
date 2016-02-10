@@ -3,7 +3,12 @@ language: python
 
 install: docker build -t normandy:build .
 script: docker run --net host normandy:build py.test
-after_success: bash bin/deploy/dockerhub.sh
+deploy:
+  provider: script
+  script: bin/deploy/dockerhub.sh
+  on:
+    tags: true
+    all_branches: true
 
 addons:
   postgresql: "9.4"
