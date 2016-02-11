@@ -1,3 +1,3 @@
 # Recipe Client
 
-Client to download and run recipes for SHIELD, Heartbeat, etc.
+Client to download and run recipes from [Normandy](https://github.com/mozilla/normandy).
