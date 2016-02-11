@@ -5,6 +5,9 @@
   "description": "Client to download and run recipes for SHIELD, Heartbeat, etc.",
   "main": "index.js",
   "author": "Mike Cooper <mythmon@gmail.com>",
+  "scripts": {
+    "build": "jpm xpi"
+  },
   "engines": {
     "firefox": ">=38.0a1"
   },
@@ -14,6 +17,7 @@
   ],
   "devDependencies": {
     "eslint": "^1.10.3",
-    "eslint-plugin-mozilla": "0.0.3"
+    "eslint-plugin-mozilla": "0.0.3",
+    "jpm": "^1.0.5"
   }
 }
