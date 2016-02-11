@@ -21,6 +21,7 @@ rules:
   indent: [2, 2, {SwitchCase: 1}]
   jsx-quotes: [2, 'prefer-double']
   semi: [2, 'always']
+  consistent-return: [2]
 
   comma-dangle: [1, 'always-multiline']
   quotes: [1, 'single', 'avoid-escape']
