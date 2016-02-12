@@ -11,14 +11,13 @@
   "engines": {
     "firefox": ">=38.0a1"
   },
-  "license": "MPLv2",
+  "license": "MPL-2.0",
   "keywords": [
     "jetpack"
   ],
   "devDependencies": {
-    "babel-eslint": "^4.1.8",
     "eslint": "^1.10.3",
-    "eslint-plugin-babel": "^3.1.0",
+    "eslint-config-normandy": "^1.0.0",
     "eslint-plugin-mozilla": "0.0.3",
     "jpm": "^1.0.5"
   }
