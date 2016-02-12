@@ -112,7 +112,7 @@ class Base(Core):
         },
     ]
 
-    GEOIP2_DATABASE = values.Value()
+    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
 
     # Product-details
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
@@ -138,7 +138,6 @@ class Development(Base):
     INSTALLED_APPS = Base.INSTALLED_APPS + ['sslserver']
     EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
 
-    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(True)
 
 
@@ -147,12 +146,11 @@ class Production(Base):
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_ACCESS_KEY_ID = values.SecretValue()
-    AWS_SECRET_ACCESS_KEY = values.SecretValue()
-    AWS_STORAGE_BUCKET_NAME = values.SecretValue()
+    AWS_ACCESS_KEY_ID = values.Value(None)
+    AWS_SECRET_ACCESS_KEY = values.Value(None)
+    AWS_STORAGE_BUCKET_NAME = values.Value(None)
 
 
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
-    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
