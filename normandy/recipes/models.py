@@ -1,15 +1,16 @@
 import hashlib
+import json
 import logging
 from contextlib import closing
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from adminsortable.models import SortableMixin
 from django_countries.fields import CountryField
 
-from normandy.recipes.fields import PercentField
 from normandy.recipes import utils
+from normandy.recipes.fields import PercentField
+from normandy.recipes.validators import validate_json
 
 
 logger = logging.getLogger()
@@ -100,11 +101,31 @@ class Action(models.Model):
     implementation = models.FileField(upload_to=action_implementation_filename)
     implementation_hash = models.CharField(max_length=40, editable=False)
 
+    arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
+
     @property
     def implementation_content(self):
         self.implementation.open()
         with closing(self.implementation):
             return self.implementation.read()
+
+    @property
+    def arguments_schema(self):
+        return json.loads(self.arguments_schema_json)
+
+    @arguments_schema.setter
+    def arguments_schema(self, value):
+        self.arguments_schema_json = json.dumps(value)
+
+    @property
+    def in_use(self):
+        """True if this action is being used by any active recipes."""
+        return self.recipes_used_by.exists()
+
+    @property
+    def recipes_used_by(self):
+        """Set of enabled recipes that are using this action."""
+        return self.recipe_set.filter(enabled=True)
 
     def __str__(self):
         return self.name
@@ -128,8 +149,16 @@ class RecipeAction(SortableMixin):
     """
     recipe = models.ForeignKey(Recipe)
     action = models.ForeignKey(Action)
-    arguments = JSONField(default=dict, blank=True)
+    arguments_json = models.TextField(default='{}', validators=[validate_json])
     order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
+
+    @property
+    def arguments(self):
+        return json.loads(self.arguments_json)
+
+    @arguments.setter
+    def arguments(self, value):
+        self.arguments_json = json.dumps(value)
 
     class Meta:
         ordering = ['order']
