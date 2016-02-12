@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 import jsonschema
+from jsonschema import SchemaError, ValidationError as JSONValidationError
 
 
 class ActionAdminForm(forms.ModelForm):
@@ -23,6 +24,8 @@ class ActionAdminForm(forms.ModelForm):
 class RecipeActionInlineForm(forms.ModelForm):
     def clean(self):
         """Validate the arguments against their schema."""
+        super().clean()
+
         schema = self.cleaned_data['action'].arguments_schema
         try:
             arguments = json.loads(self.cleaned_data['arguments_json'])
@@ -33,6 +36,6 @@ class RecipeActionInlineForm(forms.ModelForm):
 
         try:
             jsonschema.validate(arguments, schema)
-        except jsonschema.ValidationError as err:
+        except (JSONValidationError, SchemaError) as err:
             msg = 'Argument validation failed: {err}'.format(err=err.message)
             self.add_error('arguments_json', ValidationError(msg))
