@@ -1,7 +1,7 @@
 const {RecipeRunner} = require('./lib/RecipeRunner.js');
 const {SelfRepairInteraction} = require('./lib/SelfRepairInteraction.js');
 
-exports.main = function({loadReason}) {
+exports.main = function() {
   SelfRepairInteraction.disableSelfRepair();
   RecipeRunner.init();
 };
