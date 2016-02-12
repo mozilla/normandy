@@ -124,6 +124,8 @@ class Base(Core):
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     }
 
+    CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
+
 
 class Development(Base):
     """Settings for local development."""
@@ -137,6 +139,7 @@ class Development(Base):
     EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
 
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
+    CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(True)
 
 
 class Production(Base):
