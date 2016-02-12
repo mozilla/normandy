@@ -70,11 +70,22 @@ class TestActionAPI(object):
         assert action.implementation_content == b'foobar'
         assert action.arguments_schema == {'type': 'object'}
 
-    def test_it_cant_edit_actions_in_use(self, api_client):
+    def test_it_cant_edit_actions_in_use(self, api_client, settings):
         RecipeActionFactory(action__name='active', recipe__enabled=True)
+        settings.CAN_EDIT_ACTIONS_IN_USE = False
 
         res = api_client.patch('/api/v1/action/active/', {'implementation': 'foobar'})
         assert res.status_code == 403
 
         res = api_client.delete('/api/v1/action/active/')
         assert res.status_code == 403
+
+    def test_it_can_edit_actions_in_use_with_setting(self, api_client, settings):
+        RecipeActionFactory(action__name='active', recipe__enabled=True)
+        settings.CAN_EDIT_ACTIONS_IN_USE = True
+
+        res = api_client.patch('/api/v1/action/active/', {'implementation': 'foobar'})
+        assert res.status_code == 200
+
+        res = api_client.delete('/api/v1/action/active/')
+        assert res.status_code == 204
