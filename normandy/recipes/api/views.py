@@ -1,3 +1,5 @@
+from django.http import Http404
+
 from rest_framework import permissions, viewsets
 
 from normandy.recipes.models import Action
@@ -13,3 +15,16 @@ class ActionViewSet(viewsets.ModelViewSet):
 
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
+
+    def update(self, request, *args, **kwargs):
+        """
+        Intercept PUT requests and have them create instead of update
+        if the object does not exist.
+        """
+        if request.method == 'PUT':
+            try:
+                self.get_object()
+            except Http404:
+                return self.create(request, *args, **kwargs)
+
+        return super().update(request, *args, **kwargs)
