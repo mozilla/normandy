@@ -101,9 +101,15 @@ class TestActionAPI(object):
 
         res = api_client.patch('/api/v1/action/active/', {'implementation': 'foobar'})
         assert res.status_code == 403
+        assert res.data == {
+            'detail': 'Cannot edit this object while it is in use'
+        }
 
         res = api_client.delete('/api/v1/action/active/')
         assert res.status_code == 403
+        assert res.data == {
+            'detail': 'Cannot edit this object while it is in use'
+        }
 
     def test_it_can_edit_actions_in_use_with_setting(self, api_client, settings):
         RecipeActionFactory(action__name='active', recipe__enabled=True)
@@ -114,3 +120,17 @@ class TestActionAPI(object):
 
         res = api_client.delete('/api/v1/action/active/')
         assert res.status_code == 204
+
+    def test_available_if_admin_enabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = True
+        res = api_client.get('/api/v1/action/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_unavailable_if_admin_disabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+        res = api_client.get('/api/v1/action/')
+        assert res.status_code == 403
+        assert res.data == {
+            'detail': 'This API is unavailable on non-admin servers',
+        }
