@@ -46,8 +46,40 @@ let registeredActions = {};
 window.Normandy = {
     registerAction(name, func) {
         registeredActions[name] = func;
-    }
+    },
+
+    heartbeatCallbacks: [],
+    showHeartbeat(options) {
+        return new Promise((resolve, reject) => {
+            // TODO: Validate arguments and reject if some are missing.
+            this.heartbeatCallbacks[options.flowId] = () => {
+                resolve();
+            };
+
+            Mozilla.UITour.showHeartbeat(
+                options.message,
+                options.thanksMessage,
+                options.flowId,
+                options.postAnswerUrl,
+                options.learnMoreMessage,
+                options.learnMoreUrl
+            );
+        });
+
+    },
 };
+
+
+// Trigger heartbeat callbacks when the UITour tells us that Heartbeat
+// happened.
+Mozilla.UITour.observe((eventName, data) => {
+    if (eventName.startsWith('Heartbeat')) {
+        let flowId = data.flowId;
+        if (flowId in Normandy.heartbeatCallbacks) {
+            Normandy.heartbeatCallbacks[flowId](data);
+        }
+    }
+});
 
 
 /**
