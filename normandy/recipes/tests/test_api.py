@@ -47,6 +47,31 @@ class TestActionAPI(object):
         assert action.name == 'foo'
         assert action.implementation_content == b'changed'
 
+    def test_put_creates_and_edits(self, api_client):
+        """
+        PUT requests should create objects, or edit them if they already
+        exist.
+        """
+        res = api_client.put('/api/v1/action/foo/', {
+            'name': 'foo',
+            'implementation': 'original',
+            'arguments_schema': {}
+        })
+        assert res.status_code == 201
+
+        action = Action.objects.all()[0]
+        assert action.implementation_content == b'original'
+
+        res = api_client.put('/api/v1/action/foo/', {
+            'name': 'foo',
+            'implementation': 'changed',
+            'arguments_schema': {}
+        })
+        assert res.status_code == 200
+
+        action.refresh_from_db()
+        assert action.implementation_content == b'changed'
+
     def test_it_can_delete_actions(self, api_client):
         ActionFactory(name='foo', implementation__data=b'foobar')
         assert Action.objects.exists()
