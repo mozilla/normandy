@@ -39,3 +39,9 @@ class RecipeActionInlineForm(forms.ModelForm):
         except (JSONValidationError, SchemaError) as err:
             msg = 'Argument validation failed: {err}'.format(err=err.message)
             self.add_error('arguments_json', ValidationError(msg))
+
+    class Media:
+        css = {
+            'all': ('css/arguments_editor.css',)
+        }
+        js = ('js/jsoneditor.js', 'js/arguments_editor.js')
