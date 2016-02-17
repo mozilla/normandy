@@ -1,6 +1,8 @@
 import pytest
 
+from normandy.base.api.permissions import AdminEnabled
 from normandy.recipes.models import Action
+from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.tests import ActionFactory, RecipeActionFactory
 
 
@@ -101,15 +103,11 @@ class TestActionAPI(object):
 
         res = api_client.patch('/api/v1/action/active/', {'implementation': 'foobar'})
         assert res.status_code == 403
-        assert res.data == {
-            'detail': 'Cannot edit this object while it is in use'
-        }
+        assert res.data['detail'] == NotInUse.message
 
         res = api_client.delete('/api/v1/action/active/')
         assert res.status_code == 403
-        assert res.data == {
-            'detail': 'Cannot edit this object while it is in use'
-        }
+        assert res.data['detail'] == NotInUse.message
 
     def test_it_can_edit_actions_in_use_with_setting(self, api_client, settings):
         RecipeActionFactory(action__name='active', recipe__enabled=True)
@@ -131,6 +129,4 @@ class TestActionAPI(object):
         settings.ADMIN_ENABLED = False
         res = api_client.get('/api/v1/action/')
         assert res.status_code == 403
-        assert res.data == {
-            'detail': 'This API is unavailable on non-admin servers',
-        }
+        assert res.data['detail'] == AdminEnabled.message
