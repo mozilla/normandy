@@ -96,10 +96,6 @@ class Action(models.Model):
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
 
     @property
-    def implementation_content(self):
-        return self.implementation
-
-    @property
     def arguments_schema(self):
         return json.loads(self.arguments_schema_json)
 

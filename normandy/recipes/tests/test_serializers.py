@@ -18,7 +18,7 @@ def test_recipe_action_serializer(rf):
         "name": action.name,
         "implementation": {
             "hash": action.implementation_hash,
-            "url": Whatever(lambda url: url.endswith(action_url)),
+            "url": Whatever.endswith(action_url),
         },
         "arguments": {
             'foo': 'bar',
@@ -41,7 +41,7 @@ def test_recipe_serializer(rf):
                 "name": action.name,
                 "implementation": {
                     "hash": Whatever(lambda h: len(h) == 40),
-                    "url": Whatever(lambda url: url.endswith(action_url)),
+                    "url": Whatever.endswith(action_url),
                 },
                 "arguments": {
                     'foo': 'bar',

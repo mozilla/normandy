@@ -7,6 +7,10 @@ class Whatever(object):
     def __init__(self, test=lambda x: True):
         self.test = test
 
+    @classmethod
+    def endswith(cls, suffix):
+        return cls(lambda s: s.endswith(suffix))
+
     def __eq__(self, other):
         return self.test(other)
 

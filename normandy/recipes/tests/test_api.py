@@ -28,7 +28,7 @@ class TestActionAPI(object):
         assert res.data == [
             {
                 'name': 'foo',
-                'implementation_url': Whatever(lambda url: url.endswith(action_url)),
+                'implementation_url': Whatever.endswith(action_url),
                 'implementation_hash': Whatever(),
                 'arguments_schema': {'type': 'object'}
             }
@@ -44,7 +44,7 @@ class TestActionAPI(object):
 
         action = Action.objects.all()[0]
         assert action.name == 'foo'
-        assert action.implementation_content == 'foobar'
+        assert action.implementation == 'foobar'
         assert action.arguments_schema == {'type': 'object'}
 
     def test_it_can_edit_actions(self, api_client):
@@ -55,7 +55,7 @@ class TestActionAPI(object):
 
         action = Action.objects.all()[0]
         assert action.name == 'foo'
-        assert action.implementation_content == 'changed'
+        assert action.implementation == 'changed'
 
     def test_put_creates_and_edits(self, api_client):
         """
@@ -70,7 +70,7 @@ class TestActionAPI(object):
         assert res.status_code == 201
 
         action = Action.objects.all()[0]
-        assert action.implementation_content == 'original'
+        assert action.implementation == 'original'
 
         res = api_client.put('/api/v1/action/foo/', {
             'name': 'foo',
@@ -80,7 +80,7 @@ class TestActionAPI(object):
         assert res.status_code == 200
 
         action.refresh_from_db()
-        assert action.implementation_content == 'changed'
+        assert action.implementation == 'changed'
 
     def test_it_can_delete_actions(self, api_client):
         ActionFactory(name='foo', implementation='foobar')
@@ -102,7 +102,7 @@ class TestActionAPI(object):
 
         action = Action.objects.all()[0]
         assert action.name == 'foo-bar_baz2'
-        assert action.implementation_content == 'foobar'
+        assert action.implementation == 'foobar'
         assert action.arguments_schema == {'type': 'object'}
 
     def test_it_cant_edit_actions_in_use(self, api_client, settings):

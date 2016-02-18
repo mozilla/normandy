@@ -28,7 +28,7 @@ class TestFetchBundleAPI(object):
                     "name": action.name,
                     "implementation": {
                         "hash": Whatever(lambda h: len(h) == 40),
-                        "url": Whatever(lambda url: url.endswith(impl_url)),
+                        "url": Whatever.endswith(impl_url),
                     },
                     "arguments": {
                         'foo': 'bar',
