@@ -19,10 +19,16 @@ class RecipeActionInline(SortableTabularInline):
 
 @admin.register(models.Recipe)
 class RecipeAdmin(NonSortableParentAdmin):
-    list_display = ['name', 'enabled', 'locale', 'country', 'start_time', 'end_time']
-    list_filter = ['enabled', 'locale', 'country']
-    search_fields = ['name', 'locale', 'country']
+    list_display = ['name', 'enabled', 'get_locales', 'get_countries', 'start_time', 'end_time']
+    search_fields = ['name', 'locales', 'countries']
     inlines = [RecipeActionInline]
+    filter_horizontal = ['locales', 'countries']
+
+    list_filter = [
+        ('enabled', admin.BooleanFieldListFilter),
+        ('locales', admin.RelatedOnlyFieldListFilter),
+        ('countries', admin.RelatedOnlyFieldListFilter),
+    ]
 
     fieldsets = [
         [None, {
@@ -31,8 +37,8 @@ class RecipeAdmin(NonSortableParentAdmin):
         ['Delivery Rules', {
             'fields': [
               'enabled',
-              'locale',
-              'country',
+              'locales',
+              'countries',
               'release_channels',
               'sample_rate',
               'start_time',
@@ -40,6 +46,18 @@ class RecipeAdmin(NonSortableParentAdmin):
             ]
         }],
     ]
+
+    def get_locales(self, obj):
+        val = ', '.join(l.code for l in obj.locales.all())
+        if not val:
+            val = self.get_empty_value_display()
+        return val
+
+    def get_countries(self, obj):
+        val = ', '.join(l.name for l in obj.countries.all())
+        if not val:
+            val = self.get_empty_value_display()
+        return val
 
 
 @admin.register(models.Action)

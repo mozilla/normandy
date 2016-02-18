@@ -1,7 +1,8 @@
 import pytest
 
 from normandy.recipes.tests import (
-    ActionFactory, RecipeActionFactory, RecipeFactory, ReleaseChannelFactory)
+    ActionFactory, CountryFactory, LocaleFactory, RecipeActionFactory, RecipeFactory,
+    ReleaseChannelFactory)
 from normandy.classifier.tests import ClientFactory
 
 
@@ -62,3 +63,59 @@ class TestRecipe(object):
         assert recipe.matches(release_client)
         assert recipe.matches(beta_client)
         assert not recipe.matches(aurora_client)
+
+    def test_filter_by_locale_none(self):
+        recipe = RecipeFactory(locales=[])
+        client = ClientFactory(locale='en-US')
+        assert recipe.matches(client)
+
+    def test_filter_by_locale_one(self):
+        locale1 = LocaleFactory()
+        locale2 = LocaleFactory()
+        recipe = RecipeFactory(locales=[locale1])
+        client1 = ClientFactory(locale=locale1.code)
+        client2 = ClientFactory(locale=locale2.code)
+
+        assert recipe.matches(client1)
+        assert not recipe.matches(client2)
+
+    def test_filter_by_locale_many(self):
+        locale1 = LocaleFactory()
+        locale2 = LocaleFactory()
+        locale3 = LocaleFactory()
+        recipe = RecipeFactory(locales=[locale1, locale2])
+        client1 = ClientFactory(locale=locale1.code)
+        client2 = ClientFactory(locale=locale2.code)
+        client3 = ClientFactory(locale=locale3.code)
+
+        assert recipe.matches(client1)
+        assert recipe.matches(client2)
+        assert not recipe.matches(client3)
+
+    def test_filter_by_country_none(self):
+        recipe = RecipeFactory(countries=[])
+        client = ClientFactory(country='US')
+        assert recipe.matches(client)
+
+    def test_filter_by_country_one(self):
+        country1 = LocaleFactory()
+        country2 = LocaleFactory()
+        recipe = RecipeFactory(locales=[country1])
+        client1 = ClientFactory(locale=country1.code)
+        client2 = ClientFactory(locale=country2.code)
+
+        assert recipe.matches(client1)
+        assert not recipe.matches(client2)
+
+    def test_filter_by_country_many(self):
+        country1 = CountryFactory()
+        country2 = CountryFactory()
+        country3 = CountryFactory()
+        recipe = RecipeFactory(countries=[country1, country2])
+        client1 = ClientFactory(country=country1.code)
+        client2 = ClientFactory(country=country2.code)
+        client3 = ClientFactory(country=country3.code)
+
+        assert recipe.matches(client1)
+        assert recipe.matches(client2)
+        assert not recipe.matches(client3)

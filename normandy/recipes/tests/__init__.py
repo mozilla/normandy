@@ -3,7 +3,7 @@ import factory
 from django.template.defaultfilters import slugify
 
 from normandy.base.tests import FuzzyUnicode
-from normandy.recipes.models import Action, Locale, Recipe, RecipeAction, ReleaseChannel
+from normandy.recipes.models import Action, Country, Locale, Recipe, RecipeAction, ReleaseChannel
 
 
 class RecipeFactory(factory.DjangoModelFactory):
@@ -14,12 +14,22 @@ class RecipeFactory(factory.DjangoModelFactory):
     enabled = True
 
     @factory.post_generation
-    def locale(self, create, extracted, **kwargs):
+    def countries(self, create, extracted, **kwargs):
         if not create:
             return
 
-        if extracted and isinstance(extracted, str):
-            self.locale, _ = Locale.objects.get_or_create(code=extracted)
+        if extracted:
+            for country in extracted:
+                self.countries.add(country)
+
+    @factory.post_generation
+    def locales(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for locale in extracted:
+                self.locales.add(locale)
 
     @factory.post_generation
     def release_channels(self, create, extracted, **kwargs):
@@ -47,9 +57,18 @@ class RecipeActionFactory(factory.DjangoModelFactory):
     recipe = factory.SubFactory(RecipeFactory)
 
 
+class CountryFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Country
+
+    code = factory.fuzzy.FuzzyText(length=3)
+
+
 class LocaleFactory(factory.DjangoModelFactory):
     class Meta:
         model = Locale
+
+    code = factory.fuzzy.FuzzyText(length=2)
 
 
 class ReleaseChannelFactory(factory.DjangoModelFactory):

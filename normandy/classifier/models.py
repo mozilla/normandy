@@ -2,23 +2,24 @@ import hashlib
 
 import uuid
 
-from django.utils.functional import cached_property
-
 from normandy.classifier.geolocation import get_country_code
 from normandy.recipes.models import Recipe
 
 
 class Client(object):
     """A client attempting to fetch a set of recipes."""
-    def __init__(self, request, locale=None, release_channel=None):
+    def __init__(self, request, locale=None, release_channel=None, country=None):
         self.request = request
         self.locale = locale
         self.release_channel = release_channel
+        self._country = country
 
-    @cached_property
+    @property
     def country(self):
-        ip_address = self.request.META.get('REMOTE_ADDR')
-        return get_country_code(ip_address)
+        if not self._country:
+            ip_address = self.request.META.get('REMOTE_ADDR')
+            self._country = get_country_code(ip_address)
+        return self._country
 
     @property
     def request_time(self):
