@@ -5,7 +5,6 @@ import logging
 from django.db import models
 
 from adminsortable.models import SortableMixin
-from django_countries.fields import CountryField
 from rest_framework.reverse import reverse
 
 from normandy.recipes import utils
@@ -21,12 +20,26 @@ class Locale(models.Model):
     code = models.CharField(max_length=255, unique=True)
     english_name = models.CharField(max_length=255, blank=True)
     native_name = models.CharField(max_length=255, blank=True)
+    order = models.IntegerField()
 
     class Meta:
-        ordering = ['code']
+        ordering = ['order', 'code']
 
     def __str__(self):
         return '{self.code} ({self.english_name})'.format(self=self)
+
+
+class Country(models.Model):
+    """Database table for countries from django_countries."""
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    order = models.IntegerField()
+
+    class Meta:
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return '{self.name} ({self.code})'.format(self=self)
 
 
 class Recipe(models.Model):
@@ -36,8 +49,8 @@ class Recipe(models.Model):
 
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
-    locale = models.ForeignKey(Locale, blank=True, null=True)
-    country = CountryField(blank=True, null=True, default=None)
+    locales = models.ManyToManyField(Locale, blank=True)
+    countries = models.ManyToManyField(Country, blank=True)
     start_time = models.DateTimeField(blank=True, null=True, default=None)
     end_time = models.DateTimeField(blank=True, null=True, default=None)
     sample_rate = PercentField(default=100)

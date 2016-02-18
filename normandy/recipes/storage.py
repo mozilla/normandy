@@ -21,9 +21,15 @@ class ProductDetailsRelationalStorage(PDDatabaseStorage):
         if name == 'languages.json':
             languages = json.loads(content)
             for locale_code, names in languages.items():
+                if locale_code == 'en-US':
+                    order = 0
+                else:
+                    order = 100
+
                 Locale.objects.update_or_create(code=locale_code, defaults={
                     'english_name': names['English'],
                     'native_name': names['native'],
+                    'order': order,
                 })
 
             # Remove obsolete locales.
