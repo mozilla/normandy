@@ -1,0 +1,19 @@
+textarea[name$="-arguments_json"] {
+    display: none;
+}
+
+.inline-group .tabular td.original p {
+    display: none;
+}
+
+.inline-group .tabular tr.has_original td {
+    padding-top: 1em;
+}
+
+form .form-row .form-control p {
+    padding-left: 1em;
+}
+
+.inline-related fieldset.module h3 {
+    background: #79AEC8;
+}
