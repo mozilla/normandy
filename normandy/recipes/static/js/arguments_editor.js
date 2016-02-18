@@ -1,4 +1,4 @@
-(function($) {
+(function($, JSONEditor) {
     'use strict';
 
     /**
@@ -34,11 +34,36 @@
             $.getJSON('/api/v1/action/' + actionName + '/', function(action) {
                 editor = new JSONEditor($editorElement[0], {
                     schema: action.arguments_schema,
-                    startval: JSON.parse($argumentsJson.val())
+                    iconlib: 'fontawesome4',
+                    disable_properties: true,
+                    disable_collapse: true,
+                    theme: 'django'
                 });
+
+                // Only assign data if it validates.
+                // In the future we might be smarter about this.
+                var data = JSON.parse($argumentsJson.val());
+                if (!editor.validate(data).length) {
+                    editor.setValue(data);
+                }
             });
         });
     }
+
+    // Tweaks to the normal theme that aren't possible via CSS.
+    JSONEditor.defaults.themes.django = JSONEditor.defaults.themes.html.extend({
+        getIndentedPanel: function() {
+            var el = this._super();
+            el.style.border = 'none';
+            return el;
+        },
+
+        getTab: function(span) {
+            var el = this._super(span);
+            $(el).prepend('<i class="fa fa-file-text-o"></i>');
+            return el;
+        }
+    });
 
     // Initialize existing rows.
     $(function() {
@@ -53,4 +78,4 @@
             initialize($row);
         }
     });
-})(django.jQuery);
+})(django.jQuery, window.JSONEditor);
