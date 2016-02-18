@@ -147,11 +147,6 @@ class Production(Base):
     """Settings for the production environment."""
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_ACCESS_KEY_ID = values.Value(None)
-    AWS_SECRET_ACCESS_KEY = values.Value(None)
-    AWS_STORAGE_BUCKET_NAME = values.Value(None)
-
 
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')

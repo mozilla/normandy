@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
-from normandy.recipes.api.fields import ContentFileField
 from normandy.recipes.models import Action, Recipe, RecipeAction
 
 
 class ImplementationSerializer(serializers.Serializer):
     hash = serializers.CharField(source='implementation_hash', read_only=True)
-    url = serializers.FileField(source='implementation', read_only=True)
+    url = serializers.HyperlinkedIdentityField(
+        view_name='action-implementation',
+        lookup_field='name')
 
 
 class RecipeActionSerializer(serializers.Serializer):
@@ -27,9 +28,18 @@ class RecipeSerializer(serializers.Serializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
-    implementation = ContentFileField(filename='implementation.js')
     arguments_schema = serializers.JSONField()
+    implementation = serializers.CharField(write_only=True)
+    implementation_url = serializers.HyperlinkedIdentityField(
+        view_name='action-implementation',
+        lookup_field='name')
 
     class Meta:
         model = Action
-        fields = ('name', 'implementation', 'arguments_schema')
+        fields = [
+            'name',
+            'implementation',
+            'implementation_url',
+            'implementation_hash',
+            'arguments_schema',
+        ]

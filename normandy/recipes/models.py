@@ -1,12 +1,12 @@
 import hashlib
 import json
 import logging
-from contextlib import closing
 
 from django.db import models
 
 from adminsortable.models import SortableMixin
 from django_countries.fields import CountryField
+from rest_framework.reverse import reverse
 
 from normandy.recipes import utils
 from normandy.recipes.fields import PercentField
@@ -41,10 +41,6 @@ class Recipe(models.Model):
     start_time = models.DateTimeField(blank=True, null=True, default=None)
     end_time = models.DateTimeField(blank=True, null=True, default=None)
     sample_rate = PercentField(default=100)
-
-    @property
-    def implementation(self):
-        return ';'.join(action.implementation for action in self.actions.all())
 
     def log_rejection(self, msg):
         logger.debug('{} rejected: {}'.format(self, msg))
@@ -90,24 +86,14 @@ class Recipe(models.Model):
         return self.name
 
 
-def action_implementation_filename(instance, filename):
-    return 'actions/{instance.name}.js'.format(instance=instance)
-
-
 class Action(models.Model):
     """A single executable action that can take arguments."""
     name = models.SlugField(max_length=255, unique=True)
 
-    implementation = models.FileField(upload_to=action_implementation_filename)
+    implementation = models.TextField()
     implementation_hash = models.CharField(max_length=40, editable=False)
 
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
-
-    @property
-    def implementation_content(self):
-        self.implementation.open()
-        with closing(self.implementation):
-            return self.implementation.read()
 
     @property
     def arguments_schema(self):
@@ -131,15 +117,14 @@ class Action(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return self.implementation.url
+        return reverse('action-detail', args=[self.name])
 
     def save(self, *args, **kwargs):
         # Save first so the upload is available.
         super().save(*args, **kwargs)
 
         # Update hash
-        with closing(self.implementation) as f:
-            self.implementation_hash = hashlib.sha1(f.read()).hexdigest()
+        self.implementation_hash = hashlib.sha1(self.implementation.encode()).hexdigest()
         super().save(update_fields=['implementation_hash'])
 
 

@@ -6,6 +6,10 @@ from django.db import migrations, models
 import normandy.recipes.models
 
 
+def action_implementation_filename(instance, filename):
+    return 'actions/{instance.name}.js'.format(instance=instance)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='action',
             name='implementation',
-            field=models.FileField(upload_to=normandy.recipes.models.action_implementation_filename),
+            field=models.FileField(upload_to=action_implementation_filename),
         ),
         migrations.AlterField(
             model_name='action',
