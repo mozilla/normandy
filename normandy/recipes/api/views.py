@@ -1,8 +1,11 @@
 from django.http import Http404
 
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import detail_route
+from rest_framework.response import Response
 
 from normandy.base.api.permissions import AdminEnabled
+from normandy.base.api.renders import JavaScriptRenderer
 from normandy.recipes.models import Action
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import ActionSerializer
@@ -33,3 +36,8 @@ class ActionViewSet(viewsets.ModelViewSet):
                 return self.create(request, *args, **kwargs)
 
         return super().update(request, *args, **kwargs)
+
+    @detail_route(permission_classes=[], renderer_classes=[JavaScriptRenderer])
+    def implementation(self, request, name=None):
+        obj = self.get_object()
+        return Response(obj.implementation)

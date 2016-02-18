@@ -1,4 +1,5 @@
 import pytest
+from rest_framework.reverse import reverse
 
 from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeActionFactory, RecipeFactory
@@ -14,28 +15,27 @@ class TestFetchBundleAPI(object):
 
     def test_it_serves_recipes(self, client):
         recipe_action = RecipeActionFactory(arguments={'foo': 'bar'})
-
         res = client.post('/api/v1/fetch_bundle/')
 
         action = recipe_action.action
         recipe = recipe_action.recipe
+        impl_url = reverse('action-implementation', args=[action.name])
         assert res.status_code == 200
-        assert len(res.data['recipes']) == 1
-        assert res.data['recipes'][0] == {
+        assert res.data['recipes'] == [{
             'name': recipe.name,
             'actions': [
                 {
                     "name": action.name,
                     "implementation": {
                         "hash": Whatever(lambda h: len(h) == 40),
-                        "url": Whatever(lambda url: url.endswith(action.implementation.url)),
+                        "url": Whatever(lambda url: url.endswith(impl_url)),
                     },
                     "arguments": {
                         'foo': 'bar',
                     },
                 },
             ],
-        }
+        }]
 
     def test_it_filters_by_locale(self, client):
         RecipeFactory(name='english', enabled=True, locale='en-US')

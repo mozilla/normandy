@@ -1,6 +1,8 @@
 import pytest
+from rest_framework.reverse import reverse
 
 from normandy.base.api.permissions import AdminEnabled
+from normandy.base.tests import Whatever
 from normandy.recipes.models import Action
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.tests import ActionFactory, RecipeActionFactory
@@ -16,14 +18,20 @@ class TestActionAPI(object):
     def test_it_serves_actions(self, api_client):
         ActionFactory(
             name='foo',
-            implementation__data=b'foobar',
+            implementation='foobar',
             arguments_schema={'type': 'object'}
         )
 
         res = api_client.get('/api/v1/action/')
+        action_url = reverse('action-implementation', args=['foo'])
         assert res.status_code == 200
         assert res.data == [
-            {'name': 'foo', 'implementation': 'foobar', 'arguments_schema': {'type': 'object'}}
+            {
+                'name': 'foo',
+                'implementation_url': Whatever(lambda url: url.endswith(action_url)),
+                'implementation_hash': Whatever(),
+                'arguments_schema': {'type': 'object'}
+            }
         ]
 
     def test_it_can_create_actions(self, api_client):
@@ -36,18 +44,18 @@ class TestActionAPI(object):
 
         action = Action.objects.all()[0]
         assert action.name == 'foo'
-        assert action.implementation_content == b'foobar'
+        assert action.implementation_content == 'foobar'
         assert action.arguments_schema == {'type': 'object'}
 
     def test_it_can_edit_actions(self, api_client):
-        ActionFactory(name='foo', implementation__data=b'original')
+        ActionFactory(name='foo', implementation='original')
 
         res = api_client.patch('/api/v1/action/foo/', {'implementation': 'changed'})
         assert res.status_code == 200
 
         action = Action.objects.all()[0]
         assert action.name == 'foo'
-        assert action.implementation_content == b'changed'
+        assert action.implementation_content == 'changed'
 
     def test_put_creates_and_edits(self, api_client):
         """
@@ -62,7 +70,7 @@ class TestActionAPI(object):
         assert res.status_code == 201
 
         action = Action.objects.all()[0]
-        assert action.implementation_content == b'original'
+        assert action.implementation_content == 'original'
 
         res = api_client.put('/api/v1/action/foo/', {
             'name': 'foo',
@@ -72,10 +80,10 @@ class TestActionAPI(object):
         assert res.status_code == 200
 
         action.refresh_from_db()
-        assert action.implementation_content == b'changed'
+        assert action.implementation_content == 'changed'
 
     def test_it_can_delete_actions(self, api_client):
-        ActionFactory(name='foo', implementation__data=b'foobar')
+        ActionFactory(name='foo', implementation='foobar')
         assert Action.objects.exists()
 
         res = api_client.delete('/api/v1/action/foo/')
@@ -94,7 +102,7 @@ class TestActionAPI(object):
 
         action = Action.objects.all()[0]
         assert action.name == 'foo-bar_baz2'
-        assert action.implementation_content == b'foobar'
+        assert action.implementation_content == 'foobar'
         assert action.arguments_schema == {'type': 'object'}
 
     def test_it_cant_edit_actions_in_use(self, api_client, settings):
@@ -130,3 +138,10 @@ class TestActionAPI(object):
         res = api_client.get('/api/v1/action/')
         assert res.status_code == 403
         assert res.data['detail'] == AdminEnabled.message
+
+    def test_it_serves_implementations(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{}/implementation/'.format(action.name))
+        assert res.status_code == 200
+        assert res.content.decode() == action.implementation
+        assert res['Content-Type'] == 'application/javascript; charset=utf-8'
