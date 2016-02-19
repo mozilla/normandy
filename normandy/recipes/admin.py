@@ -33,6 +33,7 @@ class RecipeAdmin(NonSortableParentAdmin):
               'enabled',
               'locale',
               'country',
+              'release_channels',
               'sample_rate',
               'start_time',
               'end_time',
@@ -74,3 +75,8 @@ class ActionAdmin(admin.ModelAdmin):
         """
         return action.in_use
     in_use.boolean = True
+
+
+@admin.register(models.ReleaseChannel)
+class ReleaseChannelAdmin(admin.ModelAdmin):
+    fields = ['name', 'slug']

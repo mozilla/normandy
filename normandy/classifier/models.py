@@ -10,9 +10,10 @@ from normandy.recipes.models import Recipe
 
 class Client(object):
     """A client attempting to fetch a set of recipes."""
-    def __init__(self, request, locale=None):
+    def __init__(self, request, locale=None, release_channel=None):
         self.request = request
         self.locale = locale
+        self.release_channel = release_channel
 
     @cached_property
     def country(self):

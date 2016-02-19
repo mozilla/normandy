@@ -29,6 +29,18 @@ class Locale(models.Model):
         return '{self.code} ({self.english_name})'.format(self=self)
 
 
+class ReleaseChannel(models.Model):
+    """Release channel of Firefox"""
+    slug = models.SlugField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ['slug']
+
+    def __str__(self):
+        return self.name
+
+
 class Recipe(models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
@@ -41,6 +53,7 @@ class Recipe(models.Model):
     start_time = models.DateTimeField(blank=True, null=True, default=None)
     end_time = models.DateTimeField(blank=True, null=True, default=None)
     sample_rate = PercentField(default=100)
+    release_channels = models.ManyToManyField(ReleaseChannel, blank=True)
 
     def log_rejection(self, msg):
         logger.debug('{} rejected: {}'.format(self, msg))
@@ -55,12 +68,14 @@ class Recipe(models.Model):
 
         if self.locale and client.locale and self.locale.code.lower() != client.locale.lower():
             self.log_rejection('recipe locale ({self.locale!r}) != '
-                               'client locale ({client.locale!r})')
+                               'client locale ({client.locale!r})'
+                               .format(self=self, client=client))
             return False
 
         if self.country and self.country != client.country:
             self.log_rejection('recipe country ({self.country!r}) != '
-                               'client country ({client.country!r})')
+                               'client country ({client.country!r})'
+                               .format(self=self, client=client))
             return False
 
         if self.start_time and self.start_time > client.request_time:
@@ -75,6 +90,21 @@ class Recipe(models.Model):
             inputs = [self.pk, client.user_id]
             if not utils.deterministic_sample(self.sample_rate / 100.0, inputs):
                 self.log_rejection('did not match sample')
+                return False
+
+        recipe_channels = list(self.release_channels.all())
+        if recipe_channels:
+            match = False
+            for channel in recipe_channels:
+                if channel.slug == client.release_channel:
+                    match = True
+                    break
+            if not match:
+                channels = ', '.join(c.slug for c in self.release_channels.all())
+                self.log_rejection(
+                    'client channel ({client.release_channel}) not in '
+                    'recipe channels ({channels})'
+                    .format(channels=channels, client=client))
                 return False
 
         return True
