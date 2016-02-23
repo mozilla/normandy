@@ -127,6 +127,7 @@ class Base(Core):
 
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
     ADMIN_ENABLED = values.BooleanValue(True)
+    USE_X_FORWARDED_HOST = values.BooleanValue(True)
 
 
 class Development(Base):
