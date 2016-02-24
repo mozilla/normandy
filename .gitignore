@@ -7,3 +7,4 @@ GeoLite2-Country.mmdb
 _build
 /.cache/
 /etc/ssl
+/__version__/
