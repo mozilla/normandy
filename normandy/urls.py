@@ -3,11 +3,17 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 
+from normandy.base.admin import site as admin_site
+
+
+# Register modeladmins.
+admin.autodiscover()
+
 
 urlpatterns = []
 
 if settings.ADMIN_ENABLED:
-    urlpatterns += [url(r'^admin/', admin.site.urls)]
+    urlpatterns += [url(r'^admin/', admin_site.urls)]
 
 urlpatterns += [
     url(r'', include('normandy.recipes.urls')),

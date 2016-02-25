@@ -10,10 +10,12 @@ class Core(Configuration):
 
     # Application definition
     INSTALLED_APPS = [
+        'normandy.base',
         'normandy.classifier',
         'normandy.recipes',
         'normandy.selfrepair',
 
+        'adminplus',
         'adminsortable',
         'product_details',
         'rest_framework',
@@ -21,7 +23,7 @@ class Core(Configuration):
         'storages',
         'raven.contrib.django.raven_compat',
 
-        'django.contrib.admin',
+        'django.contrib.admin.apps.SimpleAdminConfig',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -164,3 +166,4 @@ class Build(Production):
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+    STATICFILES_STORAGE = values.Value('django.contrib.staticfiles.storage.StaticFilesStorage')

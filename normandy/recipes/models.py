@@ -87,16 +87,39 @@ class Recipe(models.Model):
     @classmethod
     def register_matcher(cls, func):
         cls._registered_matchers.append(func)
+        return func
 
-    def matches(self, client):
+    def matches(self, client, exclude=None):
         """
         Return whether this Recipe should be sent to the given client.
+
+        :param client:
+            Client to match this recipe against.
+        :param exclude:
+            List of registered matcher functions to exclude from this
+            match call.
         """
         for matcher in self._registered_matchers:
+            # Skip matchers that are explicitly excluded.
+            if exclude and matcher in exclude:
+                continue
+
             if not matcher(self, client):
                 return False
 
         return True
+
+    def get_locales_display(self):
+        return ', '.join(str(l) for l in self.locales.all())
+    get_locales_display.short_description = 'Locales'
+
+    def get_countries_display(self):
+        return ', '.join(str(l) for l in self.countries.all())
+    get_countries_display.short_description = 'Countries'
+
+    def get_release_channels_display(self):
+        return ', '.join(str(l) for l in self.release_channels.all())
+    get_release_channels_display.short_description = 'Release Channels'
 
     def __repr__(self):
         return '<Recipe "{name}">'.format(name=self.name)
@@ -123,7 +146,7 @@ def match_times(recipe, client):
 
 @Recipe.register_matcher
 def match_sample_rate(recipe, client):
-    if recipe.sample_rate:
+    if recipe.sample_rate is not None:
         inputs = [recipe.pk, client.user_id]
         if not utils.deterministic_sample(recipe.sample_rate / 100.0, inputs):
             return False
@@ -139,6 +162,7 @@ def multivalue_matcher(field_getter):
         `match` method which will be passed the client to decide if the
         object accepts the client.
     """
+    @Recipe.register_matcher
     def matcher(recipe, client):
         field_vals = list(field_getter(recipe))
 
@@ -150,7 +174,7 @@ def multivalue_matcher(field_getter):
                 return True
         return False
 
-    Recipe.register_matcher(matcher)
+    return matcher
 
 
 @multivalue_matcher

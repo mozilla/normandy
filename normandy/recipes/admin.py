@@ -3,12 +3,9 @@ from django.template.loader import render_to_string
 
 from adminsortable.admin import NonSortableParentAdmin, SortableTabularInline
 
+from normandy.base.admin import site as admin_site
 from normandy.recipes import models
 from normandy.recipes.forms import ActionAdminForm, RecipeActionInlineForm
-
-
-admin.site.site_header = 'SHIELD Server Admin'
-admin.site.site_title = 'SHIELD Server Admin'
 
 
 class RecipeActionInline(SortableTabularInline):
@@ -17,9 +14,9 @@ class RecipeActionInline(SortableTabularInline):
     form = RecipeActionInlineForm
 
 
-@admin.register(models.Recipe)
+@admin.register(models.Recipe, site=admin_site)
 class RecipeAdmin(NonSortableParentAdmin):
-    list_display = ['name', 'enabled', 'get_locales', 'get_countries', 'start_time', 'end_time']
+    list_display = ['name', 'enabled', 'get_locales_display', 'get_countries_display', 'start_time', 'end_time']
     search_fields = ['name', 'locales', 'countries']
     inlines = [RecipeActionInline]
     filter_horizontal = ['locales', 'countries']
@@ -47,20 +44,8 @@ class RecipeAdmin(NonSortableParentAdmin):
         }],
     ]
 
-    def get_locales(self, obj):
-        val = ', '.join(l.code for l in obj.locales.all())
-        if not val:
-            val = self.get_empty_value_display()
-        return val
 
-    def get_countries(self, obj):
-        val = ', '.join(l.name for l in obj.countries.all())
-        if not val:
-            val = self.get_empty_value_display()
-        return val
-
-
-@admin.register(models.Action)
+@admin.register(models.Action, site=admin_site)
 class ActionAdmin(admin.ModelAdmin):
     form = ActionAdminForm
     list_display = ['name', 'implementation_hash', 'in_use']

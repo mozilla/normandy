@@ -33,6 +33,9 @@ steps, as they don't affect your setup if nothing has changed:
    # Run database migrations.
    python manage.py migrate
 
+   # Add any new initial data (does not duplicate data).
+   python manage.py initial_data
+
 Building the Documentation
 --------------------------
 You can build the documentation with the following command:
