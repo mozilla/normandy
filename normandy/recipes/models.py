@@ -130,11 +130,17 @@ def match_sample_rate(recipe, client):
 
 
 def multivalue_matcher(field_getter):
-    """Make a matcher that accepts the client if any of the recipe's values accept the client."""
+    """
+    Makes matcher that accepts if any of the recipe's values accept.
+
+    :param field_getter: A function that returns an object with a
+        `match` method which will be passed the client to decide if the
+        object accepts the client.
+    """
     def matcher(recipe, client):
         field_vals = list(field_getter(recipe))
 
-        if field_vals == []:
+        if not field_vals:
             return True
 
         for val in field_vals:
