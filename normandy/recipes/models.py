@@ -28,8 +28,9 @@ class Locale(models.Model):
     def __str__(self):
         return '{self.code} ({self.english_name})'.format(self=self)
 
-    def matches(self, other):
-        return self.code.lower() == other.lower()
+    def matches(self, client):
+        client_val = client.locale
+        return self.code.lower() == client_val.lower()
 
 
 class ReleaseChannel(models.Model):
@@ -43,8 +44,9 @@ class ReleaseChannel(models.Model):
     def __str__(self):
         return self.name
 
-    def matches(self, other):
-        return self.slug == other or self.name == other
+    def matches(self, client):
+        client_val = client.release_channel
+        return self.slug == client_val or self.name == client_val
 
 
 class Country(models.Model):
@@ -59,8 +61,9 @@ class Country(models.Model):
     def __str__(self):
         return '{self.name} ({self.code})'.format(self=self)
 
-    def matches(self, other):
-        return self.code == other or self.name == other
+    def matches(self, client):
+        client_val = client.country
+        return self.code == client_val or self.name == client_val
 
 
 class Recipe(models.Model):
@@ -77,56 +80,19 @@ class Recipe(models.Model):
     sample_rate = PercentField(default=100)
     release_channels = models.ManyToManyField(ReleaseChannel, blank=True)
 
-    def log_rejection(self, msg):
-        logger.debug('{} rejected: {}'.format(self, msg))
+    _registered_matchers = []
 
-    def check_many(self, name, field_qs, client_val):
-        field_vals = list(field_qs.all())
-
-        if field_vals == []:
-            return True
-
-        for val in field_vals:
-            if val.matches(client_val):
-                return True
-
-        field_vals_str = ', '.join(str(o) for o in field_vals)
-        self.log_rejection('client {name} ({client_val}) does not match recipe '
-                           '(choices are {field_vals})'
-                           .format(name=name, client_val=client_val, field_vals=field_vals_str))
-        return False
+    @classmethod
+    def register_matcher(cls, func):
+        cls._registered_matchers.append(func)
 
     def matches(self, client):
         """
         Return whether this Recipe should be sent to the given client.
         """
-        # This should be ordered roughly by performance cost
-        if not self.enabled:
-            self.log_rejection('not enabled')
-            return False
-
-        if self.start_time and self.start_time > client.request_time:
-            self.log_rejection('start time not met ({})'.format(self.start_time))
-            return False
-
-        if self.end_time and self.end_time < client.request_time:
-            self.log_rejection('end time already passed ({})'.format(self.end_time))
-            return False
-
-        if self.sample_rate:
-            inputs = [self.pk, client.user_id]
-            if not utils.deterministic_sample(self.sample_rate / 100.0, inputs):
-                self.log_rejection('did not match sample')
+        for matcher in self._registered_matchers:
+            if not matcher(self, client):
                 return False
-
-        if not self.check_many('locale', self.locales, client.locale):
-            return False
-
-        if not self.check_many('country', self.countries, client.country):
-            return False
-
-        if not self.check_many('channel', self.release_channels, client.release_channel):
-            return False
 
         return True
 
@@ -135,6 +101,69 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@Recipe.register_matcher
+def match_enabled(recipe, client):
+    return recipe.enabled
+
+
+@Recipe.register_matcher
+def match_times(recipe, client):
+    if recipe.start_time and recipe.start_time > client.request_time:
+        return False
+
+    if recipe.end_time and recipe.end_time < client.request_time:
+        return False
+
+    return True
+
+
+@Recipe.register_matcher
+def match_sample_rate(recipe, client):
+    if recipe.sample_rate:
+        inputs = [recipe.pk, client.user_id]
+        if not utils.deterministic_sample(recipe.sample_rate / 100.0, inputs):
+            return False
+
+    return True
+
+
+def multivalue_matcher(field_getter):
+    """
+    Makes matcher that accepts if any of the recipe's values accept.
+
+    :param field_getter: A function that returns an object with a
+        `match` method which will be passed the client to decide if the
+        object accepts the client.
+    """
+    def matcher(recipe, client):
+        field_vals = list(field_getter(recipe))
+
+        if not field_vals:
+            return True
+
+        for val in field_vals:
+            if val.matches(client):
+                return True
+        return False
+
+    Recipe.register_matcher(matcher)
+
+
+@multivalue_matcher
+def get_locales(recipe):
+    return recipe.locales.all()
+
+
+@multivalue_matcher
+def get_country(recipe):
+    return recipe.countries.all()
+
+
+@multivalue_matcher
+def get_release_channels(recipe):
+    return recipe.release_channels.all()
 
 
 class Action(models.Model):
