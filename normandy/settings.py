@@ -84,6 +84,7 @@ class Base(Core):
     ALLOWED_HOSTS = values.ListValue([])
     DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
     ADMINS = values.SingleNestedListValue([])
+    STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
 
     EMAIL_HOST_USER = values.Value()
     EMAIL_HOST = values.Value()
@@ -146,7 +147,6 @@ class Development(Base):
 
 class Production(Base):
     """Settings for the production environment."""
-    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
 class Test(Base):
