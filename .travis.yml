@@ -2,7 +2,7 @@ sudo: required
 language: python
 
 install: docker build -t normandy:build .
-script: docker run --net host normandy:build py.test
+script: docker run --net host -e DJANGO_CONFIGURATION=Test normandy:build py.test
 deploy:
   provider: script
   script: bin/deploy/dockerhub.sh
