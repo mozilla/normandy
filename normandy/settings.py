@@ -149,6 +149,11 @@ class Production(Base):
     """Settings for the production environment."""
 
 
+class Build(Production):
+    """Settings for building the Docker image for production."""
+    SECRET_KEY = values.Value('not a secret')
+
+
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
