@@ -5,7 +5,7 @@ install: docker build -t normandy:build .
 script: docker run --net host -e DJANGO_CONFIGURATION=Test normandy:build py.test
 deploy:
   provider: script
-  script: bin/deploy/dockerhub.sh
+  script: bin/deploy/dockerhub.sh "${TRAVIS_TAG:-$TRAVIS_BRANCH}"
   on:
     repo: mozilla/normandy
 
