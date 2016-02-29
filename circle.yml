@@ -9,7 +9,7 @@ dependencies:
   override:
     - docker info
     # use circleci's docker cache workaround
-    - if [ -e ~/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/docker/image.tar; fi
+    - if [ -e ~/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/docker/image.tar || rm ~/docker/image.tar; fi
     # build image
     - docker build -t normandy:build .
     # Clean up old image and save the new one
