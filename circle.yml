@@ -1,0 +1,13 @@
+machine:
+  services:
+    - postgresql
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker build -t normandy:build .
+
+test:
+  override:
+    - docker run --net host -e DJANGO_CONFIGURATION=Test normandy:build py.test
