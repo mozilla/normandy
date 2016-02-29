@@ -19,6 +19,7 @@ class Core(Configuration):
         'rest_framework',
         'rest_framework.authtoken',
         'storages',
+        'raven',
 
         'django.contrib.admin',
         'django.contrib.auth',
@@ -129,6 +130,9 @@ class Base(Core):
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
     ADMIN_ENABLED = values.BooleanValue(True)
     USE_X_FORWARDED_HOST = values.BooleanValue(True)
+    RAVEN_CONFIG = {
+        'dsn': values.URLValue(None, environ_name='DJANGO_RAVEN_CONFIG_DSN'),
+    }
 
 
 class Development(Base):
