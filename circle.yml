@@ -16,8 +16,13 @@ dependencies:
     - mkdir -p ~/docker; test '!' -e ~/docker/image.tar || rm ~/docker/image.tar; docker save normandy:build > ~/docker/image.tar; ls -l ~/docker
 
 test:
+  pre:
+    - chmod -R 777 $CIRCLE_TEST_REPORTS
   override:
-    - docker run --net host -e DJANGO_CONFIGURATION=Test normandy:build py.test
+    - >
+      docker run --net host -e DJANGO_CONFIGURATION=Test
+      -v $CIRCLE_TEST_REPORTS:/test_artifacts
+      normandy:build py.test --junitxml=/test_artifacts/pytest.xml
 
 # appropriately tag and push the container to dockerhub
 deployment:
