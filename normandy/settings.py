@@ -131,7 +131,7 @@ class Base(Core):
     ADMIN_ENABLED = values.BooleanValue(True)
     USE_X_FORWARDED_HOST = values.BooleanValue(True)
     RAVEN_CONFIG = {
-        'dsn': values.URLValue(None, environ_name='DJANGO_RAVEN_CONFIG_DSN'),
+        'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
     }
 
 
