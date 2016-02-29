@@ -19,7 +19,7 @@ class Core(Configuration):
         'rest_framework',
         'rest_framework.authtoken',
         'storages',
-        'raven',
+        'raven.contrib.django.raven_compat',
 
         'django.contrib.admin',
         'django.contrib.auth',
