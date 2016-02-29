@@ -4,10 +4,34 @@ machine:
     - docker
 
 dependencies:
+  cache_directories:
+    - "~/docker"
   override:
     - docker info
+    # use circleci's docker cache workaround
+    - if [ -e ~/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/docker/image.tar || rm ~/docker/image.tar; fi
+    # build image
     - docker build -t normandy:build .
+    # Clean up old image and save the new one
+    - mkdir -p ~/docker; test '!' -e ~/docker/image.tar || rm ~/docker/image.tar; docker save normandy:build > ~/docker/image.tar; ls -l ~/docker
 
 test:
   override:
     - docker run --net host -e DJANGO_CONFIGURATION=Test normandy:build py.test
+
+# appropriately tag and push the container to dockerhub
+deployment:
+  latest:
+    branch: master
+    commands:
+      # set DOCKER_DEPLOY=true in Circle UI to do deploys
+      - "${DOCKER_DEPLOY:-false}"
+      - bin/deploy/dockerhub.sh latest
+
+  tags:
+    # push all tags
+    tag: /.*/
+    commands:
+      # set DOCKER_DEPLOY=true in Circle UI to do deploys
+      - "${DOCKER_DEPLOY:-false}"
+      - bin/deploy/dockerhub.sh "$CIRCLE_TAG"
