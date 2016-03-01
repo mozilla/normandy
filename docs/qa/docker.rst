@@ -88,33 +88,40 @@ Running Normandy
 
    .. code-block:: bash
 
-     CID=$(docker run -d -t mozilla/normandy:latest --env-file=.env)
+     # Initialize the DB
+     docker run -it --env-file=.env mozilla/normandy:latest ./manage.py migrate
+     # Create a super user
+     docker run -t --env-file=.env mozilla/normandy:latest ./manage.py createsuperuser
+     # Run the web server
+     docker run -t -p 8000 --env-file=.env mozilla/normandy:latest
 
-   This runs Normandy in the background and stores the container in the variable
-   ``CID``.
+   This process will run until it is manually stopped with Ctrl-c. Open another
+   terminal for the remaining steps.
 
-2. Get the IP address of the container:
+2. Get the IP to connect to:
 
-   .. code-block:: bash
+   For Linux:
+     Get the container ID by running:
 
-     docker inspect --format '{{ .NetworkSettings.IPAddress }}' $CID
+     .. code-block:: bash
+
+       CID=$(docker ps -q | head -n 1)
+
+     Use the container ID to get the IP address
+
+     .. code-block:: bash
+
+       docker inspect --format '{{ .NetworkSettings.IPAddress }}' $CID
+
+   For Docker Machine (OSX or Windows):
+     Use the IP address that Docker Machine assigned to the VM:
+
+     .. code-block:: bash
+
+       docker-machine ip
 
 3. Open that IP address in a browser, on port 8000. For example,
-   ``http://172.17.0.3:8000``.
+   ``http://172.17.0.3:8000/admin/``.
 
 You should now have an instance of Normandy running in a Docker container.
 Congratulations!
-
-Cleaning up
------------
-To shut down the Docker container running in the backgruond, use the command:
-
-.. code-block:: bash
-
-  docker kill $CID
-
-If you lose the CID variable, you can see all running Docker containers with
-
-.. code-block:: bash
-
-  docker ps
