@@ -17,12 +17,11 @@ Preparing an environment file
 -----------------------------
 Normandy gets all of its configuration via environment variables. Docker
 has built in support for this pattern. For this set up, we will be using
-and environment file to specifiy this configuration, and having Docker
+an environment file to specifiy this configuration, and having Docker
 read that file.
 
-The file can be named anything, but canonically is named ``.env``. The
-only thing that is required is a database config, which looks something
-like the below. We'll go over how to fill in the blanks next.
+Make a file named ``.env``, and put the following in it. We'll go over
+how to fill in the blanks next.
 
 .. code-block:: ini
 
@@ -33,13 +32,18 @@ Postgres. ``<db_name>`` is the name of the database to connect to, and
 is usually ``normandy``.
 
 ``<host>`` is more complicated. This needs to be something that the
-Docker container can use to connect to Postgres. There are a few options here:
+Docker container can use to connect to Postgres. This needs to be the IP
+address of the machine running Postgres, on a network that the Docker
+can access. This can be figured out by looking at the IP address of the
+host on the bridge network device.
+
+The defaults for this are *usually* one of these two values:
 
 Linux with local Postgres
-  Use ``172.17.0.1``
+  ``172.17.0.1``
 
 _`Docker Toolbox` with local Postgres (OSX or Windows)
-  Use ``192.168.99.1``
+  ``192.168.99.1``
 
 .. _the Docker Toolbox: https://docs.docker.com/engine/installation/mac/
 
