@@ -1,5 +1,6 @@
 import pytest
 
+from normandy.recipes.models import Country
 from normandy.recipes.tests import (
     ActionFactory, CountryFactory, LocaleFactory, RecipeActionFactory, RecipeFactory,
     ReleaseChannelFactory)
@@ -119,3 +120,49 @@ class TestRecipe(object):
         assert recipe.matches(client1)
         assert recipe.matches(client2)
         assert not recipe.matches(client3)
+
+
+@pytest.mark.django_db
+class TestLocale(object):
+    def test_matches_works(self):
+        locale = LocaleFactory(code='en-US')
+        client1 = ClientFactory(locale='en-US')
+        client2 = ClientFactory(locale='de')
+        assert locale.matches(client1)
+        assert not locale.matches(client2)
+
+    def test_matches_deals_with_none(self):
+        locale = LocaleFactory(code='en-US')
+        client = ClientFactory(locale=None)
+        assert not locale.matches(client)
+
+
+@pytest.mark.django_db
+class TestCountry(object):
+    def test_matches_works(self):
+        # Countries are always made in migrations
+        country = Country.objects.get(code='US')
+        client1 = ClientFactory(country='US')
+        client2 = ClientFactory(country='DE')
+        assert country.matches(client1)
+        assert not country.matches(client2)
+
+    def test_matches_deals_with_none(self):
+        country = LocaleFactory(code='US')
+        client = ClientFactory(country=None)
+        assert not country.matches(client)
+
+
+@pytest.mark.django_db
+class TestReleaseChannel(object):
+    def test_matches_works(self):
+        channel = ReleaseChannelFactory(slug='release')
+        client1 = ClientFactory(release_channel='release')
+        client2 = ClientFactory(release_channel='beta')
+        assert channel.matches(client1)
+        assert not channel.matches(client2)
+
+    def test_matches_deals_with_none(self):
+        channel = ReleaseChannelFactory(slug='release')
+        client = ClientFactory(release_channel=None)
+        assert not channel.matches(client)

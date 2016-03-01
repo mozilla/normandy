@@ -30,6 +30,8 @@ class Locale(models.Model):
 
     def matches(self, client):
         client_val = client.locale
+        if client_val is None:
+            return False
         return self.code.lower() == client_val.lower()
 
 
