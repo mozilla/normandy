@@ -12,3 +12,4 @@ JavaScript to various clients based on certain rules.
    dev/workflow
    dev/architecture
    dev/troubleshooting
+   qa/docker
