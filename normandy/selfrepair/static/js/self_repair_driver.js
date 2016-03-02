@@ -149,14 +149,30 @@ function runRecipe(recipe) {
 }
 
 
+/**
+ * Returns a function that executes the given recipe when called and returns
+ * it's results.
+ *
+ * This is used to avoid issues when building the promise chain below; if we
+ * built the callback there directly, it'd use the loop variable, which has
+ * changed value by the time this callback is called.
+ *
+ * @param  {Recipe} recipe   Recipe retrieved from server.
+ * @return {function}        Callback to use in promise chain.
+ */
+function buildRecipeCallback(recipe) {
+    return function() {
+        return runRecipe(recipe);
+    };
+}
+
+
 // Actually fetch and run the recipes.
 fetchRecipes().then((recipes) => {
     let chain = Promise.resolve();
 
     for (let recipe of recipes) {
-        chain.then(() => {
-            return runRecipe(recipe);
-        });
+        chain.then(buildRecipeCallback(recipe));
     }
 
     return chain;
