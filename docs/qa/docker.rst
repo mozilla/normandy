@@ -93,7 +93,7 @@ Running Normandy
      # Create a super user
      docker run -t --env-file=.env mozilla/normandy:latest ./manage.py createsuperuser
      # Run the web server
-     docker run -t -p 8000 --env-file=.env mozilla/normandy:latest
+     docker run -t -p 8000:8000 --env-file=.env mozilla/normandy:latest
 
    This process will run until it is manually stopped with Ctrl-c. Open another
    terminal for the remaining steps.
