@@ -154,9 +154,10 @@ fetchRecipes().then((recipes) => {
     let chain = Promise.resolve();
 
     for (let recipe of recipes) {
-        chain.then(() => {
-            return runRecipe(recipe);
-        });
+        let cb = function(recipeToRun) {
+            return runRecipe(recipeToRun);
+        };
+        chain.then(cb.bind(null, recipe));
     }
 
     return chain;
