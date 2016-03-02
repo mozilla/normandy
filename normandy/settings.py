@@ -129,7 +129,8 @@ class Base(Core):
 
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
     ADMIN_ENABLED = values.BooleanValue(True)
-    USE_X_FORWARDED_HOST = values.BooleanValue(True)
+    USE_X_FORWARDED_HOST = values.BooleanValue(False)
+    SECURE_PROXY_SSL_HEADER = values.TupleValue()
     RAVEN_CONFIG = {
         'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
     }
@@ -151,6 +152,8 @@ class Development(Base):
 
 class Production(Base):
     """Settings for the production environment."""
+    USE_X_FORWARDED_HOST = values.BooleanValue(True)
+    SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
 
 
 class Build(Production):
