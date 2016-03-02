@@ -137,10 +137,9 @@ class TestRecipe(object):
         assert recipe.matches(client, exclude=[match_enabled])
 
     def test_filter_exclude_many(self):
-        locale1, locale2 = LocaleFactory.create_batch(2)
-        locale2 = LocaleFactory()
-        recipe = RecipeFactory(locales=[locale1])
-        client = ClientFactory(locale=locale2.code)
+        locale_match1, locale_match2, locale_not = LocaleFactory.create_batch(3)
+        recipe = RecipeFactory(locales=[locale_match1, locale_match2])
+        client = ClientFactory(locale=locale_not.code)
 
         assert not recipe.matches(client)
         assert recipe.matches(client, exclude=[get_locales])

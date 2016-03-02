@@ -13,6 +13,7 @@ def classifier_preview(request):
         client = form.save()
         bundle = Bundle.for_client(client, exclude=[match_sample_rate])
     else:
+        client = None
         bundle = None
 
     ctx = admin_site.each_context(request)

@@ -10,6 +10,10 @@ from normandy.recipes.tests import (
 
 @pytest.mark.django_db
 class TestClientClassifier(object):
+    def test_classify_initial(self, admin_client):
+        response = admin_client.get('/admin/classifier_preview')
+        assert response.status_code == 200
+
     def test_classify(self, admin_client):
         locale, other_locale = LocaleFactory.create_batch(2)
         country = CountryFactory()
