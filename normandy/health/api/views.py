@@ -1,5 +1,4 @@
 import os
-from collections import Counter
 
 from django.conf import settings
 from django.core.checks.registry import registry as checks_registry
@@ -36,30 +35,18 @@ def version(request):
 
 @api_view(['GET'])
 def health(request):
-    include_deployment_checks = not settings.DEBUG
-    all_checks = checks_registry.get_checks(include_deployment_checks)
-
+    all_checks = checks_registry.get_checks(include_deployment_checks=not settings.DEBUG)
     details = {check.__name__: health_check_detail(check) for check in all_checks}
 
-    counts = Counter()
-    for detail in details.values():
-        counts[detail['status']] += 1
-
-    if all(detail['status'] == 'ok' for detail in details.values()):
+    if all(detail['level'] < checks_messages.WARNING for detail in details.values()):
         res_status = status.HTTP_200_OK
     else:
         res_status = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    return Response({
-        'details': details,
-        'counts': counts,
-    }, status=res_status)
+    return Response(details, status=res_status)
 
 
-def health_check_detail(check):
-    errors = check(app_configs=None)
-    level = 0
-
+def health_level_to_text(level):
     statuses = {
         0: 'ok',
         checks_messages.DEBUG: 'debug',
@@ -68,10 +55,16 @@ def health_check_detail(check):
         checks_messages.ERROR: 'errors',
         checks_messages.CRITICAL: 'critical',
     }
+    return statuses.get(level, 'unknown')
 
+
+def health_check_detail(check):
+    errors = check(app_configs=None)
+    level = 0
     level = max([level] + [e.level for e in errors])
 
     return {
-        'status': statuses[level],
+        'status': health_level_to_text(level),
+        'level': level,
         'messages': [e.msg for e in errors],
     }
