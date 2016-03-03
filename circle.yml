@@ -21,9 +21,6 @@ test:
   override:
     - >
       docker run --net host -e DJANGO_CONFIGURATION=Test
-      normandy:build ./manage.py check
-    - >
-      docker run --net host -e DJANGO_CONFIGURATION=Test
       -v $CIRCLE_TEST_REPORTS:/test_artifacts
       normandy:build py.test --junitxml=/test_artifacts/pytest.xml
 
