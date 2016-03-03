@@ -58,3 +58,35 @@ wheel supports, as they will all have different hashes. Tools like hashin_ can
 make adding these hashes easier.
 
 .. _hashin: https://github.com/peterbe/hashin
+
+Self-Repair Setup
+-----------------
+Normandy has a self-support-compatible endpoint. If you want to test out using
+Normandy as a self-support server, you can point Firefox to it by setting the
+``browser.selfsupport.url`` value in ``about:config`` to
+``https://localhost:8000/%LOCALE%/repair``.
+
+You can also do this to test development and staging servers; simply replace
+``localhost:8000`` in the URL above with the URL for the server you wish to test
+against.
+
+After changing the setting, close and reopen Firefox, and after a 5 second
+delay, Firefox will download and execute actions from the server you pointed it
+to.
+
+UITour Whitelist
+----------------
+Actions that use UITour_ (such as Heartbeat surveys) require you to add the URL
+for the Normandy instance to a whitelist in ``about:config``.
+
+To do this, open up ``about:config`` and search for a value named
+``browser.uitour.testingOrigins``. If it doesn't exist, create it by
+right-clicking the page and selecting ``New -> String``. The preference should
+be set to a comma-separated list of server addresses, including the protocol.
+For example, ``https://localhost:8000,https://normandy.dev.mozaws.net`` would
+whitelist both local instances and the development server.
+
+After creating this value, restart Firefox and UITour actions should function
+normally.
+
+.. _UITour: http://bedrock.readthedocs.org/en/latest/uitour.html
