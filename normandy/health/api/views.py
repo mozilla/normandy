@@ -34,9 +34,9 @@ def version(request):
 
 
 @api_view(['GET'])
-def health(request):
+def heartbeat(request):
     all_checks = checks_registry.get_checks(include_deployment_checks=not settings.DEBUG)
-    details = {check.__name__: health_check_detail(check) for check in all_checks}
+    details = {check.__name__: heartbeat_check_detail(check) for check in all_checks}
 
     if all(detail['level'] < checks_messages.WARNING for detail in details.values()):
         res_status = status.HTTP_200_OK
@@ -46,7 +46,7 @@ def health(request):
     return Response(details, status=res_status)
 
 
-def health_level_to_text(level):
+def heartbeat_level_to_text(level):
     statuses = {
         0: 'ok',
         checks_messages.DEBUG: 'debug',
@@ -58,13 +58,13 @@ def health_level_to_text(level):
     return statuses.get(level, 'unknown')
 
 
-def health_check_detail(check):
+def heartbeat_check_detail(check):
     errors = check(app_configs=None)
     level = 0
     level = max([level] + [e.level for e in errors])
 
     return {
-        'status': health_level_to_text(level),
+        'status': heartbeat_level_to_text(level),
         'level': level,
         'messages': [e.msg for e in errors],
     }
