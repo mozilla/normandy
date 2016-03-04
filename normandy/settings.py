@@ -77,48 +77,6 @@ class Core(Configuration):
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-class Base(Core):
-    """Settings that may change per-environment, some with defaults."""
-    SECRET_KEY = values.SecretValue()
-    DEBUG = values.BooleanValue(False)
-    ALLOWED_HOSTS = values.ListValue([])
-    DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
-    ADMINS = values.SingleNestedListValue([])
-    STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
-
-    EMAIL_HOST_USER = values.Value()
-    EMAIL_HOST = values.Value()
-    EMAIL_PORT = values.IntegerValue(587)
-    EMAIL_USE_TLS = values.BooleanValue(True)
-    EMAIL_HOST_PASSWORD = values.Value()
-
-    EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
-
-    # Overwrite old files when uploading media.
-    DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
-
-    # Password validation
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-        },
-    ]
-
-    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
-
-    # Product-details
-    PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
-
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.TokenAuthentication',
@@ -127,13 +85,49 @@ class Base(Core):
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     }
 
-    CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
-    ADMIN_ENABLED = values.BooleanValue(True)
-    USE_X_FORWARDED_HOST = values.BooleanValue(False)
-    SECURE_PROXY_SSL_HEADER = values.TupleValue()
+
+
+class Base(Core):
+    """Settings that may change per-environment, some with defaults."""
+    # General settings
+    DEBUG = values.BooleanValue(False)
+    ADMINS = values.SingleNestedListValue([])
+
+    # Remote services
+    DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
+    GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
+    # Email settings
+    EMAIL_HOST_USER = values.Value()
+    EMAIL_HOST = values.Value()
+    EMAIL_PORT = values.IntegerValue(587)
+    EMAIL_USE_TLS = values.BooleanValue(True)
+    EMAIL_HOST_PASSWORD = values.Value()
+    EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
     RAVEN_CONFIG = {
         'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
     }
+    PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
+
+    # Security settings
+    SECRET_KEY = values.SecretValue()
+    ALLOWED_HOSTS = values.ListValue([])
+    AUTH_PASSWORD_VALIDATORS = [
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    ]
+    USE_X_FORWARDED_HOST = values.BooleanValue(False)
+    SECURE_PROXY_SSL_HEADER = values.TupleValue()
+
+    # Media and static settings
+    STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
+    # Overwrite old files when uploading media.
+    DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
+
+    # Normandy settings
+    CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
+    ADMIN_ENABLED = values.BooleanValue(True)
 
 
 class Development(Base):
