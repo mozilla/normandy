@@ -170,3 +170,4 @@ class Build(Production):
 class Test(Base):
     SECRET_KEY = values.Value('not a secret')
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+    SECURE_SSL_REDIRECT = values.BooleanValue(False)
