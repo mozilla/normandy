@@ -122,6 +122,15 @@ class Base(Core):
     ]
     USE_X_FORWARDED_HOST = values.BooleanValue(False)
     SECURE_PROXY_SSL_HEADER = values.TupleValue()
+    SECURE_HSTS_SECONDS = values.IntegerValue(1)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
+    CSRF_COOKIE_HTTPONLY = values.BooleanValue(True)
+    CSRF_COOKIE_SECURE = values.BooleanValue(True)
+    SECURE_SSL_REDIRECT = values.BooleanValue(True)
+    SESSION_COOKIE_SECURE = values.BooleanValue(True)
+    SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
+    SECURE_CONTENT_TYPE_NOSNIFF = values.BooleanValue(True)
+    X_FRAME_OPTIONS = values.Value('DENY')
 
     # Media and static settings
     STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
