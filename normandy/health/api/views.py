@@ -5,8 +5,10 @@ from django.core.checks.registry import registry as checks_registry
 from django.core.checks import messages as checks_messages
 
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
+
+from normandy.base.decorators import short_circuit_middlewares
 
 
 _commit = None
@@ -41,7 +43,9 @@ def lbheartbeat(request):
     return Response('', status=status.HTTP_200_OK)
 
 
+@short_circuit_middlewares
 @api_view(['GET'])
+@authentication_classes([])
 def heartbeat(request):
     all_checks = checks_registry.get_checks(include_deployment_checks=not settings.DEBUG)
     details = {check.__name__: heartbeat_check_detail(check) for check in all_checks}
