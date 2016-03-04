@@ -5,5 +5,5 @@ from normandy.health.api import views
 urlpatterns = [
     url(r'^__version__', views.version, name='normandy.version'),
     url(r'^__heartbeat__', views.heartbeat, name='normandy.heartbeat'),
-    url(r'^__lbheartbeat__', views.heartbeat, name='normandy.lbheartbeat'),
+    url(r'^__lbheartbeat__', views.lbheartbeat, name='normandy.lbheartbeat'),
 ]
