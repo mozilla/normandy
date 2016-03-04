@@ -34,6 +34,14 @@ def version(request):
 
 
 @api_view(['GET'])
+def lbheartbeat(request):
+    # lets the load balancer know the application is running and available
+    # must return 200 (not 204) for ELB
+    # http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/elb-healthchecks.html
+    return Response('', status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def heartbeat(request):
     all_checks = checks_registry.get_checks(include_deployment_checks=not settings.DEBUG)
     details = {check.__name__: heartbeat_check_detail(check) for check in all_checks}
