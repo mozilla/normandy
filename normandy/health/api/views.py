@@ -34,6 +34,12 @@ def version(request):
 
 
 @api_view(['GET'])
+def lbheartbeat(request):
+    # lets the load balancer know the application is running and available
+    return Response('', status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def heartbeat(request):
     all_checks = checks_registry.get_checks(include_deployment_checks=not settings.DEBUG)
     details = {check.__name__: heartbeat_check_detail(check) for check in all_checks}
