@@ -23,4 +23,4 @@ def classifier_preview(request):
         'bundle': bundle,
         'title': 'Classifier Preview'
     })
-    return render(request, 'admin/classifier_preview.html', ctx)
+    return render(request, 'admin/classifier/preview.html', ctx)

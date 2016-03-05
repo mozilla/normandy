@@ -1,5 +1,5 @@
 {% extends 'admin/base_site.html' %}
-{% load static %}
+{% load static normandy_classifier_admin %}
 
 {% block extrastyle %}
   {{ block.super }}
@@ -21,31 +21,16 @@
   <form method="get">
     {{ form.non_field_errors }}
     <div class="client-properties">
-      <div class="field">
-        {{ form.locale.errors }}
-        {{ form.locale.label_tag }}
-        {{ form.locale }}
-      </div>
-      <div class="field">
-        {{ form.country.errors }}
-        {{ form.country.label_tag }}
-        {{ form.country }}
-      </div>
-      <div class="field">
-        {{ form.release_channel.errors }}
-        {{ form.release_channel.label_tag }}
-        {{ form.release_channel }}
-      </div>
-      <div class="field">
-        {{ form.request_time.errors }}
-        {{ form.request_time.label_tag }}
-        {{ form.request_time }}
-      </div>
+      {% form_field form.locale %}
+      {% form_field form.country %}
+      {% form_field form.release_channel %}
+      {% form_field form.request_time %}
     </div>
     <div class="submit-row">
       <input class="default" type="submit" value="Match Recipes"></input>
     </div>
   </form>
+
   {% if bundle %}
     <h2>Matched Recipes</h2>
     <table class="matched-recipes">
@@ -70,6 +55,10 @@
             <td>{{ recipe.get_countries_display }}</td>
             <td>{{ recipe.get_release_channels_display }}</td>
             <td>{{ recipe.sample_rate }}%</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">No recipes matched</td>
           </tr>
         {% endfor %}
       </tbody>
