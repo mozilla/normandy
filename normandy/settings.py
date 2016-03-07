@@ -122,7 +122,7 @@ class Base(Core):
     ]
     USE_X_FORWARDED_HOST = values.BooleanValue(False)
     SECURE_PROXY_SSL_HEADER = values.TupleValue()
-    SECURE_HSTS_SECONDS = values.IntegerValue(1)
+    SECURE_HSTS_SECONDS = values.IntegerValue(3600)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
     CSRF_COOKIE_HTTPONLY = values.BooleanValue(True)
     CSRF_COOKIE_SECURE = values.BooleanValue(True)
