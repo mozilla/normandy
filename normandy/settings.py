@@ -159,6 +159,7 @@ class Development(Base):
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
     INSTALLED_APPS = Base.INSTALLED_APPS + ['sslserver']
     EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
+    SECURE_SSL_REDIRECT = values.Value(False)
 
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(True)
 
