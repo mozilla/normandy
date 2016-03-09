@@ -110,6 +110,12 @@ class Base(Core):
         'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
     }
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
+    # statsd
+    STATSD_HOST = values.Value('localhost')
+    STATSD_PORT = values.IntegerValue(8125)
+    STATSD_IPV6 = values.BooleanValue(False)
+    STATSD_PREFIX = values.Value(None)
+    STATSD_MAXUDPSIZE = values.IntegerValue(512)
 
     # Security settings
     SECRET_KEY = values.SecretValue()

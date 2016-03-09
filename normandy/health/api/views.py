@@ -7,6 +7,7 @@ from django.core.checks import messages as checks_messages
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
+from statsd.defaults.django import statsd
 
 from normandy.base.decorators import short_circuit_middlewares
 
@@ -52,8 +53,10 @@ def heartbeat(request):
 
     if all(detail['level'] < checks_messages.WARNING for detail in details.values()):
         res_status = status.HTTP_200_OK
+        statsd.incr('heartbeat.pass')
     else:
         res_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        statsd.incr('heartbeat.fail')
 
     return Response(details, status=res_status)
 
