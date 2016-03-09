@@ -127,6 +127,7 @@ class Base(Core):
     CSRF_COOKIE_HTTPONLY = values.BooleanValue(True)
     CSRF_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_SSL_REDIRECT = values.BooleanValue(True)
+    SECURE_REDIRECT_EXEMPT = values.ListValue([])
     SESSION_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
     SECURE_CONTENT_TYPE_NOSNIFF = values.BooleanValue(True)
