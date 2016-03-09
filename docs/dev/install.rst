@@ -100,6 +100,13 @@ Installation
 
       ./bin/download_geolite2.sh
 
+9. Add some useful initial data to your database using the ``initial_data``
+   command:
+
+   .. code-block:: bash
+
+      python manage.py initial_data
+
 Once you've finished these steps, you should be able to start the site by
 running:
 

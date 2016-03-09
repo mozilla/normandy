@@ -43,10 +43,16 @@ class Bundle(object):
         self.recipes = sorted(recipes, key=lambda r: r.name) or []
 
     @classmethod
-    def for_client(cls, client):
-        """Return a bundle of recipes matching the given HTTPRequest."""
+    def for_client(cls, client, exclude=None):
+        """
+        Return a bundle of recipes matching the given HTTPRequest.
+
+        :param exclude:
+            List of registered recipe matchers to exclude from matching.
+        """
         return cls(
-            recipe for recipe in Recipe.objects.filter(enabled=True) if recipe.matches(client)
+            recipe for recipe in Recipe.objects.filter(enabled=True)
+            if recipe.matches(client, exclude=exclude)
         )
 
     @property

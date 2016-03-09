@@ -131,3 +131,6 @@ contextlib2==0.5.1 \
 statsd==3.2.1 \
     --hash=sha256:7aff40c6cdda703193fac6231410c6c0ad5939ce053a168016501e982c755c84 \
     --hash=sha256:3fa92bf0192af926f7a0d9be031fe3fd0fbaa1992d42cf2f07e68f76ac18288e
+django-adminplus==0.5 \
+    --hash=sha256:e9497b409b28466e0f24119e3bc62d668a0eeec9229660ea3ae7d14dbc3c6353 \
+    --hash=sha256:40a31a797ee26c8fc11fea6c8e2f02d29483a22a0a5ecde4fa10b39f3b2f1942

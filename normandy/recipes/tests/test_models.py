@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.recipes.models import Country
+from normandy.recipes.models import Country, get_locales, match_enabled
 from normandy.recipes.tests import (
     ActionFactory, CountryFactory, LocaleFactory, RecipeActionFactory, RecipeFactory,
     ReleaseChannelFactory)
@@ -120,6 +120,29 @@ class TestRecipe(object):
         assert recipe.matches(client1)
         assert recipe.matches(client2)
         assert not recipe.matches(client3)
+
+    def test_filter_by_sample_rate(self):
+        always_match = RecipeFactory(sample_rate=100)
+        never_match = RecipeFactory(sample_rate=0)
+        client = ClientFactory()
+
+        assert always_match.matches(client)
+        assert not never_match.matches(client)
+
+    def test_filter_exclude(self):
+        recipe = RecipeFactory(enabled=False)
+        client = ClientFactory()
+
+        assert not recipe.matches(client)
+        assert recipe.matches(client, exclude=[match_enabled])
+
+    def test_filter_exclude_many(self):
+        locale_match1, locale_match2, locale_not = LocaleFactory.create_batch(3)
+        recipe = RecipeFactory(locales=[locale_match1, locale_match2])
+        client = ClientFactory(locale=locale_not.code)
+
+        assert not recipe.matches(client)
+        assert recipe.matches(client, exclude=[get_locales])
 
 
 @pytest.mark.django_db
