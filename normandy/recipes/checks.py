@@ -1,5 +1,5 @@
 from django.apps import apps
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 from django.core.checks import Warning, Info, register as register_check
 from django.template.defaultfilters import pluralize
 
@@ -13,7 +13,7 @@ def actions_have_consistent_hashes(app_configs, **kwargs):
     try:
         Action = apps.get_model('recipes', 'Action')
         actions = list(Action.objects.all())
-    except OperationalError:
+    except (ProgrammingError, OperationalError):
         errors.append(Info('Could not retrieve actions', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
     else:
         bad_actions = []
