@@ -3,16 +3,20 @@ from django.db import connection
 from django.db.utils import OperationalError
 
 
+ERROR_CANNOT_CONNECT_DATABASE = 'normandy.health.E001'
+ERROR_UNUSABLE_DATABASE = 'normandy.health.E002'
+
+
 def database_connected(app_configs, **kwargs):
     errors = []
 
     try:
         connection.ensure_connection()
     except OperationalError:
-        errors.append(Error('Could not connect to database', id='normandy.E001'))
+        errors.append(Error('Could not connect to database', id=ERROR_CANNOT_CONNECT_DATABASE))
     else:
         if not connection.is_usable():
-            errors.append(Error('Database connection is not usable', id='normandy.E002'))
+            errors.append(Error('Database connection is not usable', id=ERROR_UNUSABLE_DATABASE))
 
     return errors
 

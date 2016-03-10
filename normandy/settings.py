@@ -13,7 +13,7 @@ class Core(Configuration):
         'normandy.base',
         'normandy.classifier',
         'normandy.health.apps.HealthApp',
-        'normandy.recipes',
+        'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
 
         'adminplus',
