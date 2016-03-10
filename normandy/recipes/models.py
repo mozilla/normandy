@@ -225,12 +225,15 @@ class Action(models.Model):
     def get_absolute_url(self):
         return reverse('action-detail', args=[self.name])
 
+    def compute_hash(self):
+        return hashlib.sha1(self.implementation.encode()).hexdigest()
+
     def save(self, *args, **kwargs):
         # Save first so the upload is available.
         super().save(*args, **kwargs)
 
         # Update hash
-        self.implementation_hash = hashlib.sha1(self.implementation.encode()).hexdigest()
+        self.implementation_hash = self.compute_hash()
         super().save(update_fields=['implementation_hash'])
 
 
