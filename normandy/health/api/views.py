@@ -49,16 +49,30 @@ def lbheartbeat(request):
 @authentication_classes([])
 def heartbeat(request):
     all_checks = checks_registry.get_checks(include_deployment_checks=not settings.DEBUG)
-    details = {check.__name__: heartbeat_check_detail(check) for check in all_checks}
 
-    if all(detail['level'] < checks_messages.WARNING for detail in details.values()):
+    details = {}
+    statuses = {}
+    level = 0
+
+    for check in all_checks:
+        detail = heartbeat_check_detail(check)
+        statuses[check.__name__] = detail['status']
+        level = max(level, detail['level'])
+        if detail['level'] > 0:
+            details[check.__name__] = detail
+
+    if level < checks_messages.WARNING:
         res_status = status.HTTP_200_OK
         statsd.incr('heartbeat.pass')
     else:
         res_status = status.HTTP_500_INTERNAL_SERVER_ERROR
         statsd.incr('heartbeat.fail')
 
-    return Response(details, status=res_status)
+    return Response({
+        'status': heartbeat_level_to_text(level),
+        'checks': statuses,
+        'details': details,
+    }, status=res_status)
 
 
 def heartbeat_level_to_text(level):
@@ -67,7 +81,7 @@ def heartbeat_level_to_text(level):
         checks_messages.DEBUG: 'debug',
         checks_messages.INFO: 'info',
         checks_messages.WARNING: 'warning',
-        checks_messages.ERROR: 'errors',
+        checks_messages.ERROR: 'error',
         checks_messages.CRITICAL: 'critical',
     }
     return statuses.get(level, 'unknown')
