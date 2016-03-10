@@ -225,7 +225,7 @@ class Action(models.Model):
     def get_absolute_url(self):
         return reverse('action-detail', args=[self.name])
 
-    def compute_hash(self):
+    def compute_implementation_hash(self):
         return hashlib.sha1(self.implementation.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
@@ -233,7 +233,7 @@ class Action(models.Model):
         super().save(*args, **kwargs)
 
         # Update hash
-        self.implementation_hash = self.compute_hash()
+        self.implementation_hash = self.compute_implementation_hash()
         super().save(update_fields=['implementation_hash'])
 
 

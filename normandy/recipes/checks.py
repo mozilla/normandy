@@ -18,7 +18,7 @@ def actions_have_consistent_hashes(app_configs, **kwargs):
     else:
         bad_actions = []
         for action in actions:
-            if action.compute_hash() != action.implementation_hash:
+            if action.compute_implementation_hash() != action.implementation_hash:
                 bad_actions.append(action)
 
         for action in bad_actions:
