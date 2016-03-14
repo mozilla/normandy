@@ -3,6 +3,7 @@ from django.db import connection
 from django.db.utils import OperationalError
 
 
+INFO_CANT_CHECK_MIGRATIONS = 'normandy.health.I001'
 WARNING_UNAPPLIED_MIGRATION = 'normandy.health.W001'
 ERROR_CANNOT_CONNECT_DATABASE = 'normandy.health.E001'
 ERROR_UNUSABLE_DATABASE = 'normandy.health.E002'
@@ -27,7 +28,11 @@ def migrations_applied(app_configs, **kwargs):
     errors = []
 
     # Load migrations from disk/DB
-    loader = MigrationLoader(connection, ignore_no_migrations=True)
+    try:
+        loader = MigrationLoader(connection, ignore_no_migrations=True)
+    except OperationalError:
+        msg = "Can't connect to database to check migrations"
+        return [Info(msg, id=INFO_CANT_CHECK_MIGRATIONS)]
     graph = loader.graph
 
     if app_configs:

@@ -91,7 +91,6 @@ class Core(Configuration):
     }
 
 
-
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
     # General settings
