@@ -14,7 +14,7 @@ class TestClientClassifier(object):
         response = admin_client.get('/admin/classifier_preview')
         assert response.status_code == 200
 
-    def test_classify(self, admin_client):
+    def test_classify(self, admin_client, django_cache):
         locale, other_locale = LocaleFactory.create_batch(2)
         country = CountryFactory()
         release_channel = ReleaseChannelFactory()
@@ -36,7 +36,7 @@ class TestClientClassifier(object):
         assert response.status_code == 200
         assert list(response.context['bundle']) == [matching_recipe]
 
-    def test_classify_no_sample(self, admin_client):
+    def test_classify_no_sample(self, admin_client, django_cache):
         """The classify view should ignore sampling."""
         locale = LocaleFactory()
         country = CountryFactory()
