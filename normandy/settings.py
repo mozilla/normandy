@@ -115,7 +115,7 @@ class Base(Core):
     STATSD_HOST = values.Value('localhost')
     STATSD_PORT = values.IntegerValue(8125)
     STATSD_IPV6 = values.BooleanValue(False)
-    STATSD_PREFIX = values.Value(None)
+    STATSD_PREFIX = values.Value('normandy')
     STATSD_MAXUDPSIZE = values.IntegerValue(512)
 
     # Security settings
