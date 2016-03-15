@@ -36,6 +36,7 @@ def version(request):
     })
 
 
+@short_circuit_middlewares
 @api_view(['GET'])
 def lbheartbeat(request):
     # lets the load balancer know the application is running and available

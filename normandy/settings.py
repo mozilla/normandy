@@ -34,9 +34,9 @@ class Core(Configuration):
 
     MIDDLEWARE_CLASSES = [
         'normandy.classifier.middleware.RequestReceivedAtMiddleware',
+        'django.middleware.security.SecurityMiddleware',
         'normandy.base.middleware.ShortCircuitMiddleware',
 
-        'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
