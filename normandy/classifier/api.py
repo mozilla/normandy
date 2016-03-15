@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from normandy.classifier.serializers import BundleSerializer
 from normandy.classifier.models import Bundle, Client
+from normandy.base.decorators import short_circuit_middlewares
 
 
 class FetchBundle(views.APIView):
@@ -12,6 +13,12 @@ class FetchBundle(views.APIView):
 
     class Parameters(serializers.Serializer):
         locale = serializers.CharField(default=None)
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super().as_view(**initkwargs)
+        # Apply the short circuit middleware
+        return short_circuit_middlewares(view)
 
     def post(self, request, format=None):
         """

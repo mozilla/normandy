@@ -20,4 +20,6 @@ ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
     PORT=8000
 EXPOSE $PORT
-CMD gunicorn normandy.wsgi:application --log-file -
+CMD gunicorn normandy.wsgi:application \
+    --log-file - \
+    --worker-class ${WORKER_CLASS:-sync}
