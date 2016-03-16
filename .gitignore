@@ -1,6 +1,7 @@
 .env
 db.sqlite3
 .DS_Store
+__pycache__/
 /static/
 /media/
 GeoLite2-Country.mmdb
