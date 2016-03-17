@@ -2,6 +2,7 @@ import hashlib
 
 import uuid
 
+from django.core.cache import caches
 from django.utils.functional import cached_property
 
 from normandy.classifier.geolocation import get_country_code
@@ -37,6 +38,18 @@ class Client(object):
         return str(uuid.uuid4())
 
 
+def enabled_recipes():
+    key = 'normandy.classifer.enabled_recipes'
+    cache = caches['recipes']
+    recipes = cache.get(key)
+    if recipes is None:
+        recipes = (
+            Recipe.objects.filter(enabled=True)
+            .prefetch_related('locales', 'countries', 'release_channels'))
+        cache.set(key, recipes)
+    return recipes
+
+
 class Bundle(object):
     """A bundle of recipes to be sent to the client."""
     def __init__(self, recipes=None):
@@ -51,7 +64,7 @@ class Bundle(object):
             List of registered recipe matchers to exclude from matching.
         """
         return cls(
-            recipe for recipe in Recipe.objects.filter(enabled=True)
+            recipe for recipe in enabled_recipes()
             if recipe.matches(client, exclude=exclude)
         )
 

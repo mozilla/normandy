@@ -1,5 +1,7 @@
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+
 import pytest
-from rest_framework.reverse import reverse
 
 
 def test_version(client, mocker):
@@ -12,3 +14,12 @@ def test_version(client, mocker):
         'source': 'https://github.com/mozilla/normandy',
         'commit': '<git hash>',
     }
+
+
+@pytest.mark.django_db
+def test_lbheartbeat_makes_no_db_queries(client):
+    queries = CaptureQueriesContext(connection)
+    with queries:
+        res = client.get('/__lbheartbeat__')
+        assert res.status_code == 200
+    assert len(queries) == 0

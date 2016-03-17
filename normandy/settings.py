@@ -90,6 +90,17 @@ class Core(Configuration):
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     }
 
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'default',
+        },
+        'recipes': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'recipes',
+        },
+    }
+
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""

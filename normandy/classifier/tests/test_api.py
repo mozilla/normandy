@@ -1,3 +1,6 @@
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+
 import pytest
 from rest_framework.reverse import reverse
 
@@ -52,3 +55,22 @@ class TestFetchBundleAPI(object):
 
         recipe_names = set(r['name'] for r in res.data['recipes'])
         assert recipe_names == {'german', 'any', 'both'}
+
+    @pytest.mark.xfail
+    def test_it_makes_no_db_queries(self, client):
+        # Prepare some interesting data
+        recipe_action = RecipeActionFactory(recipe__enabled=True)
+        recipe = recipe_action.recipe
+
+        # Warm up the cache
+        res1 = client.post('/api/v1/fetch_bundle/', {'locale': 'de'})
+        assert res1.status_code == 200
+        assert res1.data['recipes'][0]['name'] == recipe.name
+
+        # Fire!
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res2 = client.post('/api/v1/fetch_bundle/', {'locale': 'de'})
+            assert res2.status_code == 200
+        assert res1.data == res2.data
+        assert list(queries) == []
