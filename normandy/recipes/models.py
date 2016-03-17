@@ -4,7 +4,6 @@ import logging
 
 from django.db import models
 
-from adminsortable.models import SortableMixin
 from rest_framework.reverse import reverse
 
 from normandy.recipes import utils
@@ -71,8 +70,10 @@ class Country(models.Model):
 class Recipe(models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
-    actions = models.ManyToManyField('Action', through='RecipeAction')
     revision_id = models.IntegerField(default=0, editable=False)
+
+    action = models.ForeignKey('Action')
+    arguments_json = models.TextField(default='{}', validators=[validate_json])
 
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
@@ -82,6 +83,14 @@ class Recipe(models.Model):
     end_time = models.DateTimeField(blank=True, null=True, default=None)
     sample_rate = PercentField(default=100)
     release_channels = models.ManyToManyField(ReleaseChannel, blank=True)
+
+    @property
+    def arguments(self):
+        return json.loads(self.arguments_json)
+
+    @arguments.setter
+    def arguments(self, value):
+        self.arguments_json = json.dumps(value)
 
     _registered_matchers = []
 
@@ -240,24 +249,3 @@ class Action(models.Model):
         # Update hash
         self.implementation_hash = self.compute_implementation_hash()
         super().save(update_fields=['implementation_hash'])
-
-
-class RecipeAction(SortableMixin):
-    """
-    An instance of an action within a recipe with associated arguments.
-    """
-    recipe = models.ForeignKey(Recipe)
-    action = models.ForeignKey(Action)
-    arguments_json = models.TextField(default='{}', validators=[validate_json])
-    order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
-
-    @property
-    def arguments(self):
-        return json.loads(self.arguments_json)
-
-    @arguments.setter
-    def arguments(self, value):
-        self.arguments_json = json.dumps(value)
-
-    class Meta:
-        ordering = ['order']

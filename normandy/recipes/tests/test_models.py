@@ -2,36 +2,40 @@ import pytest
 
 from normandy.recipes.models import Country, get_locales, match_enabled
 from normandy.recipes.tests import (
-    ActionFactory, CountryFactory, LocaleFactory, RecipeActionFactory, RecipeFactory,
-    ReleaseChannelFactory)
+    ActionFactory,
+    CountryFactory,
+    LocaleFactory,
+    RecipeFactory,
+    ReleaseChannelFactory
+)
 from normandy.classifier.tests import ClientFactory
 
 
 @pytest.mark.django_db
 class TestAction(object):
     def test_recipes_used_by(self):
-        recipe_action = RecipeActionFactory(recipe__enabled=True)
-        assert [recipe_action.recipe] == list(recipe_action.action.recipes_used_by)
+        recipe = RecipeFactory(enabled=True)
+        assert [recipe] == list(recipe.action.recipes_used_by)
 
         action = ActionFactory()
-        recipe_actions = RecipeActionFactory.create_batch(2, action=action, recipe__enabled=True)
-        assert set(action.recipes_used_by) == set([ra.recipe for ra in recipe_actions])
+        recipes = RecipeFactory.create_batch(2, action=action, enabled=True)
+        assert set(action.recipes_used_by) == set(recipes)
 
     def test_recipes_used_by_empty(self):
         assert list(ActionFactory().recipes_used_by) == []
 
         action = ActionFactory()
-        RecipeActionFactory.create_batch(2, action=action, recipe__enabled=False)
+        RecipeFactory.create_batch(2, action=action, enabled=False)
         assert list(action.recipes_used_by) == []
 
     def test_in_use(self):
         action = ActionFactory()
         assert not action.in_use
 
-        RecipeActionFactory(action=action, recipe__enabled=False)
+        RecipeFactory(action=action, enabled=False)
         assert not action.in_use
 
-        RecipeActionFactory(action=action, recipe__enabled=True)
+        RecipeFactory(action=action, enabled=True)
         assert action.in_use
 
 

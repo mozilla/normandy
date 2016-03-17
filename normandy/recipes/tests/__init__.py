@@ -3,7 +3,15 @@ import factory
 from django.template.defaultfilters import slugify
 
 from normandy.base.tests import FuzzyUnicode
-from normandy.recipes.models import Action, Country, Locale, Recipe, RecipeAction, ReleaseChannel
+from normandy.recipes.models import Action, Country, Locale, Recipe, ReleaseChannel
+
+
+class ActionFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Action
+
+    name = FuzzyUnicode()
+    implementation = 'console.log("test");'
 
 
 class RecipeFactory(factory.DjangoModelFactory):
@@ -11,6 +19,7 @@ class RecipeFactory(factory.DjangoModelFactory):
         model = Recipe
 
     name = FuzzyUnicode()
+    action = factory.SubFactory(ActionFactory)
     enabled = True
 
     @factory.post_generation
@@ -39,22 +48,6 @@ class RecipeFactory(factory.DjangoModelFactory):
         if extracted:
             for channel in extracted:
                 self.release_channels.add(channel)
-
-
-class ActionFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Action
-
-    name = FuzzyUnicode()
-    implementation = 'console.log("test");'
-
-
-class RecipeActionFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = RecipeAction
-
-    action = factory.SubFactory(ActionFactory)
-    recipe = factory.SubFactory(RecipeFactory)
 
 
 class CountryFactory(factory.DjangoModelFactory):
