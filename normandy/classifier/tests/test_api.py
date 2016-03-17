@@ -73,4 +73,4 @@ class TestFetchBundleAPI(object):
             res2 = client.post('/api/v1/fetch_bundle/', {'locale': 'de'})
             assert res2.status_code == 200
         assert res1.data == res2.data
-        assert (len(queries), list(queries)) == (0, [])
+        assert list(queries) == []
