@@ -144,6 +144,16 @@ class TestRecipe(object):
         assert not recipe.matches(client)
         assert recipe.matches(client, exclude=[get_locales])
 
+    def test_revision_id_increments(self):
+        """Ensure that the revision id is incremented on each save"""
+        recipe = RecipeFactory()
+
+        # The factory saves a couple times so revision id is not 0
+        revision_id = recipe.revision_id
+
+        recipe.save()
+        assert recipe.revision_id == revision_id + 1
+
 
 @pytest.mark.django_db
 class TestLocale(object):

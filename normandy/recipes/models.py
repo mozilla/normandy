@@ -72,6 +72,7 @@ class Recipe(models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
     actions = models.ManyToManyField('Action', through='RecipeAction')
+    revision_id = models.IntegerField(default=0, editable=False)
 
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
@@ -127,6 +128,10 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        self.revision_id += 1
+        super(Recipe, self).save(*args, **kwargs)
+
 
 @Recipe.register_matcher
 def match_enabled(recipe, client):
@@ -147,7 +152,7 @@ def match_times(recipe, client):
 @Recipe.register_matcher
 def match_sample_rate(recipe, client):
     if recipe.sample_rate is not None:
-        inputs = [recipe.pk, client.user_id]
+        inputs = [recipe.pk, recipe.revision_id, client.user_id]
         if not utils.deterministic_sample(recipe.sample_rate / 100.0, inputs):
             return False
 
