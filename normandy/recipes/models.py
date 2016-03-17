@@ -129,9 +129,7 @@ class Recipe(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.revision_id is not None:
-            self.revision_id += 1
-
+        self.revision_id += 1
         super(Recipe, self).save(*args, **kwargs)
 
 
