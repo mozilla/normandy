@@ -1,5 +1,6 @@
 from contextlib import closing
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 
 from rest_framework.fields import CharField
@@ -25,10 +26,19 @@ class ContentFileField(CharField):
 class ActionImplementationHyperlinkField(HyperlinkedIdentityField):
     """
     Serializer field for actions that links to their implementation.
+
+    This includes hashes and possibly redirects to the CDN.
     """
     def __init__(self, view_name='action-implementation', **kwargs):
         super().__init__(view_name=view_name, **kwargs)
 
     def get_url(self, obj, view_name, request, format):
         kwargs = {'name': obj.name, 'impl_hash': obj.implementation_hash}
-        return reverse(view_name, kwargs=kwargs, request=request, format=format)
+
+        if settings.CDN_URL is None:
+            return reverse(view_name, kwargs=kwargs, request=request, format=format)
+        else:
+            request = None
+            url = reverse(view_name, kwargs=kwargs, request=request, format=format)
+            assert url[0] == '/'
+            return settings.CDN_URL + url[1:]
