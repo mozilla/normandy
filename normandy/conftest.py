@@ -16,13 +16,9 @@ def api_client():
     return client
 
 
-@pytest.yield_fixture()
+@pytest.yield_fixture(autouse=True)
 def django_cache(request):
     """Require a django test cache"""
-    for cache_name in settings.CACHES.keys():
-        caches[cache_name].clear()
-
     yield None
-
     for cache_name in settings.CACHES.keys():
         caches[cache_name].clear()

@@ -16,7 +16,7 @@ class TestFetchBundleAPI(object):
         assert res.status_code == 200
         assert res.data == {'recipes': []}
 
-    def test_it_serves_recipes(self, client, django_cache):
+    def test_it_serves_recipes(self, client):
         recipe_action = RecipeActionFactory(arguments={'foo': 'bar'})
         res = client.post('/api/v1/fetch_bundle/')
 
@@ -40,7 +40,7 @@ class TestFetchBundleAPI(object):
             ],
         }]
 
-    def test_it_filters_by_locale(self, client, django_cache):
+    def test_it_filters_by_locale(self, client):
         english = LocaleFactory(code='en-US')
         german = LocaleFactory(code='de')
 
@@ -57,7 +57,7 @@ class TestFetchBundleAPI(object):
         assert recipe_names == {'german', 'any', 'both'}
 
     @pytest.mark.xfail
-    def test_it_makes_no_db_queries(self, client, django_cache):
+    def test_it_makes_no_db_queries(self, client):
         # Prepare some interesting data
         recipe_action = RecipeActionFactory(recipe__enabled=True)
         recipe = recipe_action.recipe
