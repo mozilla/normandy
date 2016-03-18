@@ -52,6 +52,10 @@ class TestFetchBundleAPI(object):
         assert recipe_names == {'german', 'any', 'both'}
 
     def test_it_filters_by_locale_with_json(self, api_client):
+        """
+        Ensure that we correctly pull data from the request such that
+        both form-encoded and JSON-encoded requests work.
+        """
         english = LocaleFactory(code='en-US')
         german = LocaleFactory(code='de')
 
