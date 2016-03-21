@@ -6,9 +6,19 @@ class TextRenderer(renderers.BaseRenderer):
     format = 'txt'
 
     def render(self, data, media_type=None, renderer_context=None):
+        response = renderer_context.get('response') if renderer_context else None
+        if response and response.exception:
+            return self.render_error(data)
+
         return data.encode(self.charset)
+
+    def render_error(self, data):
+        return data['detail'].encode(self.charset)
 
 
 class JavaScriptRenderer(TextRenderer):
     media_type = 'application/javascript'
     format = 'js'
+
+    def render_error(self, data):
+        return '/* {} */'.format(data['detail'])

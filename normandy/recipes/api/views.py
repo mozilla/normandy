@@ -1,11 +1,11 @@
 from django.http import Http404
 
-from rest_framework import permissions, viewsets
-from rest_framework.decorators import detail_route
+from rest_framework import generics, permissions, viewsets
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from normandy.base.api.permissions import AdminEnabled
-from normandy.base.api.renders import JavaScriptRenderer
+from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.recipes.models import Action
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import ActionSerializer
@@ -37,7 +37,21 @@ class ActionViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
-    @detail_route(permission_classes=[], renderer_classes=[JavaScriptRenderer])
-    def implementation(self, request, name=None):
-        obj = self.get_object()
-        return Response(obj.implementation)
+
+class ActionImplementationView(generics.RetrieveAPIView):
+    """
+    Retrieves the implementation code for an action. Raises a 404 if the
+    given hash doesn't match the has we've stored.
+    """
+    queryset = Action.objects.all()
+    lookup_field = 'name'
+
+    permission_classes = ()
+    renderer_classes = (JavaScriptRenderer,)
+
+    def retrieve(self, request, name, impl_hash):
+        action = self.get_object()
+        if impl_hash != action.implementation_hash:
+            raise NotFound('Hash does not match current stored action.')
+
+        return Response(action.implementation)

@@ -21,7 +21,10 @@ class TestFetchBundleAPI(object):
         res = client.post('/api/v1/fetch_bundle/')
 
         action = recipe.action
-        impl_url = reverse('action-implementation', args=[action.name])
+        impl_url = reverse('action-implementation', kwargs={
+            'name': action.name,
+            'impl_hash': action.implementation_hash,
+        })
         assert res.status_code == 200
         assert res.data['recipes'] == [{
             'name': recipe.name,

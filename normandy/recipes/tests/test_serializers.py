@@ -13,7 +13,10 @@ def test_recipe_serializer(rf):
     action = recipe.action
     serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
 
-    action_url = reverse('action-implementation', args=[action.name])
+    action_url = reverse('action-implementation', kwargs={
+        'name': action.name,
+        'impl_hash': action.implementation_hash,
+    })
     assert serializer.data == {
         'name': recipe.name,
         'implementation': {
