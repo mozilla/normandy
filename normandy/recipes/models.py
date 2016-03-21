@@ -68,6 +68,7 @@ class Country(models.Model):
         return self.code == client_val or self.name == client_val
 
 
+@reversion.register()
 class Recipe(models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
@@ -207,6 +208,7 @@ def get_release_channels(recipe):
     return recipe.release_channels.all()
 
 
+@reversion.register()
 class Action(models.Model):
     """A single executable action that can take arguments."""
     name = models.SlugField(max_length=255, unique=True)

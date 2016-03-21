@@ -44,6 +44,8 @@ class Core(Configuration):
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+        'reversion.middleware.RevisionMiddleware',
     ]
 
     ROOT_URLCONF = 'normandy.urls'
