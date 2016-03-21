@@ -5,6 +5,7 @@ import logging
 from django.db import models
 
 from rest_framework.reverse import reverse
+from reversion import revisions as reversion
 
 from normandy.recipes import utils
 from normandy.recipes.fields import PercentField

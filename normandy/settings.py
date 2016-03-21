@@ -20,6 +20,7 @@ class Core(Configuration):
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
+        'reversion',
         'storages',
         'raven.contrib.django.raven_compat',
 
