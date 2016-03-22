@@ -5,9 +5,11 @@ from normandy.base.admin import site as admin_site
 from normandy.recipes import models
 from normandy.recipes.forms import ActionAdminForm, RecipeAdminForm
 
+from reversion.admin import VersionAdmin
+
 
 @admin.register(models.Recipe, site=admin_site)
-class RecipeAdmin(admin.ModelAdmin):
+class RecipeAdmin(VersionAdmin):
     form = RecipeAdminForm
     list_display = [
         'name',
@@ -54,7 +56,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Action, site=admin_site)
-class ActionAdmin(admin.ModelAdmin):
+class ActionAdmin(VersionAdmin):
     form = ActionAdminForm
     list_display = ['name', 'implementation_hash', 'in_use']
     fieldsets = [
