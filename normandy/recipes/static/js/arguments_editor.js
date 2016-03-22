@@ -2,17 +2,19 @@
     'use strict';
 
     /**
-     * Initialize a recipe action row for the arguments editor.
-     * @param  {jQuery object} $row
+     * Initialize the arguments editor.
+     * @param  {jQuery object} $actionSelect
+     * @param  {jQuery object} $argumentsJson
      */
-    function initialize($row) {
-        var $actionSelect = $row.find('[name$="-action"]');
-        var $argumentsJson = $row.find('[name$="-arguments_json"]');
-        var $editorElement = $('<div class="arguments-editor"></div>').insertBefore($argumentsJson);
+    function initialize($actionSelect, $argumentsJson) {
+        var $editorElement = $('<div class="arguments-editor"></div>');
         var editor = null;
 
+        // Insert editor next to field.
+        $editorElement.insertBefore($argumentsJson);
+
         // Update the backing textarea before submitting.
-        $row.parents('form').submit(function() {
+        $actionSelect.parents('form').submit(function() {
             if (editor !== null) {
                 $argumentsJson.val(JSON.stringify(editor.getValue()));
             }
@@ -55,6 +57,7 @@
         getIndentedPanel: function() {
             var el = this._super();
             el.style.border = 'none';
+            el.style.overflow = 'hidden';
             return el;
         },
 
@@ -62,20 +65,17 @@
             var el = this._super(span);
             $(el).prepend('<i class="fa fa-file-text-o"></i>');
             return el;
-        }
+        },
+
+        getFormInputDescription: function(text) {
+            var el = this._super(text);
+            el.style.marginLeft = '5px';
+            return el;
+        },
     });
 
-    // Initialize existing rows.
+    // Initialize the editor.
     $(function() {
-        $('#recipeaction_set-group tr.form-row:not(.empty-form)').each(function(i, row) {
-            initialize($(row));
-        });
-    });
-
-    // Whenever a new row is added, initialize it.
-    $(document).on('formset:added', function(ev, $row, formsetName) {
-        if (formsetName === 'recipeaction_set') {
-            initialize($row);
-        }
+        initialize($('#id_action'), $('#id_arguments_json'));
     });
 })(django.jQuery, window.JSONEditor);

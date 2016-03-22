@@ -21,7 +21,7 @@ class ActionAdminForm(forms.ModelForm):
             )
 
 
-class RecipeActionInlineForm(forms.ModelForm):
+class RecipeAdminForm(forms.ModelForm):
     def clean(self):
         """Validate the arguments against their schema."""
         super().clean()
@@ -42,6 +42,6 @@ class RecipeActionInlineForm(forms.ModelForm):
 
     class Media:
         css = {
-            'all': ('css/arguments_editor.css',)
+            'all': ('css/font-awesome.css', 'css/arguments_editor.css',)
         }
         js = ('js/jsoneditor.js', 'js/arguments_editor.js')

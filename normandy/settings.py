@@ -17,7 +17,6 @@ class Core(Configuration):
         'normandy.selfrepair',
 
         'adminplus',
-        'adminsortable',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',

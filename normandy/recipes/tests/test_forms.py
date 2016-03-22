@@ -2,15 +2,15 @@ from django.forms import modelform_factory
 
 import pytest
 
-from normandy.recipes.forms import ActionAdminForm, RecipeActionInlineForm
-from normandy.recipes.models import Action, RecipeAction
-from normandy.recipes.tests import ActionFactory, RecipeActionFactory
+from normandy.recipes.forms import ActionAdminForm, RecipeAdminForm
+from normandy.recipes.models import Action, Recipe
+from normandy.recipes.tests import ActionFactory, RecipeFactory
 
 
 @pytest.mark.django_db()
 def test_action_admin_form_in_use():
     """Actions that are in-use cannot be edited."""
-    action = RecipeActionFactory(recipe__enabled=True).action
+    action = RecipeFactory(enabled=True).action
 
     FormClass = modelform_factory(Action, form=ActionAdminForm, fields=['name'])
     form = FormClass({'name': 'foo'}, instance=action)
@@ -21,7 +21,7 @@ def test_action_admin_form_in_use():
 @pytest.mark.django_db()
 def test_action_admin_form_not_in_use():
     """Actions that are not in-use can be edited."""
-    action = RecipeActionFactory(recipe__enabled=False).action
+    action = RecipeFactory(enabled=False).action
 
     FormClass = modelform_factory(Action, form=ActionAdminForm, fields=['name'])
     form = FormClass({'name': 'foo'}, instance=action)
@@ -29,10 +29,10 @@ def test_action_admin_form_not_in_use():
 
 
 @pytest.mark.django_db()
-class TestRecipeActionInlineForm(object):
+class TestRecipeAdminForm(object):
     FormClass = modelform_factory(
-        RecipeAction,
-        form=RecipeActionInlineForm,
+        Recipe,
+        form=RecipeAdminForm,
         fields=['action', 'arguments_json']
     )
 

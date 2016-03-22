@@ -55,43 +55,25 @@ The API will respond with a JSON object:
       "recipes": [
          {
             "name": "heartbeat.australis.1",
-            "actions": [
-               {
-                  "name": "show_survey",
-                  "implementation": {
-                     "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
-                     "url": "https://shield.mozilla.org/media/actions/show_survey.js"
-                  },
-                  "arguments": {
-                     "url": "https://somesurvey.com/blah"
-                  }
-               }
-            ]
+            "implementation": {
+               "name": "show_survey",
+               "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
+               "url": "https://shield.mozilla.org/media/actions/show_survey.js"
+            },
+            "arguments": {
+               "url": "https://somesurvey.com/blah"
+            }
          },
          {
             "name": "remove.bad.toolbar",
-            "actions": [
-               {
-                  "name": "check_for_bad_toolbar",
-                  "implementation": {
-                     "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
-                     "url": "https://shield.mozilla.org/media/actions/check_for_bad_toolbar.js"
-                  },
-                  "arguments": {
-                     "toolbar_name": "Shady Tim's Totally Legit Search"
-                  }
-               },
-               {
-                  "name": "telemetry_ping",
-                  "implementation": {
-                     "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
-                     "url": "https://shield.mozilla.org/media/actions/telemetry_ping.js"
-                  },
-                  "arguments": {
-                     "id": "shady_tim_strikes_again"
-                  }
-               }
-            ]
+            "implementation": {
+               "name": "check_for_bad_toolbar",
+               "hash": "4011cf569f3639b9069fc2c50117d3f8597e83c61be2014081ad06ee0fe427c2",
+               "url": "https://shield.mozilla.org/media/actions/check_for_bad_toolbar.js"
+            },
+            "arguments": {
+               "toolbar_name": "Shady Tim's Totally Legit Search"
+            }
          }
       ]
    }

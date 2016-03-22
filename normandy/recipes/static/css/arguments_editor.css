@@ -1,21 +1,16 @@
-/* Hide object __str__ and fix padding on inline RecipeActions. */
-.inline-group .tabular td.original p {
+/* Hide the field for the argument JSON. */
+#id_arguments_json {
     display: none;
-}
-.inline-group .tabular tr.has_original td {
-    padding-top: 1em;
-}
-form .form-row .form-control p {
-    padding-left: 1em;
 }
 
-/* Hide the textarea storing the argument JSON. */
-textarea[name$="-arguments_json"] {
-    display: none;
+/* Show argument JSON label above arguments editor. */
+.field-arguments_json label[for="id_arguments_json"] {
+    display: block;
+    float: none;
 }
 
 /* Styling tweaks to the argument editor. */
-.inline-related .field-arguments_json .arguments-editor h3 {
+.field-arguments_json .arguments-editor h3 {
     background: #79AEC8;
     font-size: 12px;
     font-weight: 400;
@@ -25,7 +20,16 @@ textarea[name$="-arguments_json"] {
 }
 
 .arguments-editor h3 span {
+    color: #FFF;
     float: left;
+}
+
+.arguments-editor .row {
+    clear: both;
+}
+
+.arguments-editor .form-control label {
+    text-align: right;
 }
 
 .arguments-editor .tabs div {

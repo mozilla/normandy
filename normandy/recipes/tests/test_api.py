@@ -5,7 +5,7 @@ from normandy.base.api.permissions import AdminEnabled
 from normandy.base.tests import Whatever
 from normandy.recipes.models import Action
 from normandy.recipes.api.permissions import NotInUse
-from normandy.recipes.tests import ActionFactory, RecipeActionFactory
+from normandy.recipes.tests import ActionFactory, RecipeFactory
 
 
 @pytest.mark.django_db
@@ -106,7 +106,7 @@ class TestActionAPI(object):
         assert action.arguments_schema == {'type': 'object'}
 
     def test_it_cant_edit_actions_in_use(self, api_client, settings):
-        RecipeActionFactory(action__name='active', recipe__enabled=True)
+        RecipeFactory(action__name='active', enabled=True)
         settings.CAN_EDIT_ACTIONS_IN_USE = False
 
         res = api_client.patch('/api/v1/action/active/', {'implementation': 'foobar'})
@@ -118,7 +118,7 @@ class TestActionAPI(object):
         assert res.data['detail'] == NotInUse.message
 
     def test_it_can_edit_actions_in_use_with_setting(self, api_client, settings):
-        RecipeActionFactory(action__name='active', recipe__enabled=True)
+        RecipeFactory(action__name='active', enabled=True)
         settings.CAN_EDIT_ACTIONS_IN_USE = True
 
         res = api_client.patch('/api/v1/action/active/', {'implementation': 'foobar'})

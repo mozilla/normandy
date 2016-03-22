@@ -24,7 +24,7 @@ class FetchBundle(views.APIView):
         """
         Determine the recipes that matches the requesting client.
         """
-        params = self.Parameters(data=request.POST)
+        params = self.Parameters(data=request.data)
         if not params.is_valid():
             return Response(params.errors, status=status.HTTP_400_BAD_REQUEST)
 
