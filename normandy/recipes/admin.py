@@ -9,6 +9,7 @@ from normandy.recipes.forms import ActionAdminForm, RecipeAdminForm
 @admin.register(models.Recipe, site=admin_site)
 class RecipeAdmin(admin.ModelAdmin):
     form = RecipeAdminForm
+    save_as = True
     list_display = [
         'name',
         'enabled',
