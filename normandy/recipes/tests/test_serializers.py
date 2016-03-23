@@ -16,6 +16,7 @@ def test_recipe_serializer(rf):
     action_url = reverse('action-implementation', args=[action.name])
     assert serializer.data == {
         'name': recipe.name,
+        'id': recipe.id,
         'implementation': {
             'name': action.name,
             'hash': Whatever(lambda h: len(h) == 40),

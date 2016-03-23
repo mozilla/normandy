@@ -86,7 +86,9 @@ class Core(Configuration):
     ]
     NPM_DESTINATION_PREFIX = 'npm'
     NPM_FILE_PATTERNS = {
+        'babel-polyfill': ['dist/*.js'],
         'font-awesome': ['css/*.css', 'fonts/*'],
+        'node-uuid': ['uuid.js'],
         'json-editor': ['dist/*.js'],
     }
 

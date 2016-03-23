@@ -34,5 +34,6 @@ class RecipeSerializer(serializers.Serializer):
         model = Recipe
 
     name = serializers.CharField()
+    id = serializers.IntegerField()
     implementation = ImplementationSerializer(source='action')
     arguments = serializers.JSONField()

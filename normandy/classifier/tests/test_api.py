@@ -25,6 +25,7 @@ class TestFetchBundleAPI(object):
         assert res.status_code == 200
         assert res.data['recipes'] == [{
             'name': recipe.name,
+            'id': recipe.id,
             'implementation': {
                 'name': action.name,
                 'hash': Whatever(lambda h: len(h) == 40),
