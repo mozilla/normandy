@@ -189,3 +189,5 @@ greenlet==0.4.9 \
     --hash=sha256:b406a659290cc9aa47ead4dec238ad07b04b53bf8a7545fb940ee4f46667b105 \
     --hash=sha256:79f9b8bbbb1c599c66aed5e643e8b53bae697cae46e0acfc4ee461df48a90012 \
     --hash=sha256:58b2f3a2e7075c655616bf95e82868db4980f3bb6661db70ad02a51e4ddd2252
+django-npm==0.1.4 \
+    --hash=sha256:4ace771ef76bf6a9430278d0f23a23d1a7083ec2b00240c4400d3c5a5cd7cea6

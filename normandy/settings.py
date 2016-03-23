@@ -79,6 +79,16 @@ class Core(Configuration):
     # Static files (CSS, JavaScript, Images)
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'npm.finders.NpmFinder',
+    ]
+    NPM_DESTINATION_PREFIX = 'npm'
+    NPM_FILE_PATTERNS = {
+        'font-awesome': ['css/*.css', 'fonts/*'],
+        'json-editor': ['dist/*.js'],
+    }
 
     # User-uploaded Media
     MEDIA_URL = '/media/'

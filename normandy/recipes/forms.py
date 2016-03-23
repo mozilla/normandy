@@ -42,6 +42,6 @@ class RecipeAdminForm(forms.ModelForm):
 
     class Media:
         css = {
-            'all': ('css/font-awesome.css', 'css/arguments_editor.css',)
+            'all': ('npm/font-awesome/css/font-awesome.css', 'css/arguments_editor.css')
         }
-        js = ('js/jsoneditor.js', 'js/arguments_editor.js')
+        js = ('npm/json-editor/dist/jsoneditor.js', 'js/arguments_editor.js')

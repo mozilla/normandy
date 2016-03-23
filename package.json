@@ -1,0 +1,14 @@
+{
+  "name": "normandy",
+  "description": "Mozilla Recipe Server",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mozilla/normandy.git"
+  },
+  "license": "MPL-2.0",
+  "dependencies": {
+    "font-awesome": "^4.5.0",
+    "json-editor": "^0.7.23"
+  }
+}
