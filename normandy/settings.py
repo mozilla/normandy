@@ -10,7 +10,7 @@ class Core(Configuration):
 
     # Application definition
     INSTALLED_APPS = [
-        'normandy.base',
+        'normandy.base.apps.BaseApp',
         'normandy.classifier',
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
@@ -77,8 +77,6 @@ class Core(Configuration):
     USE_TZ = True
 
     # Static files (CSS, JavaScript, Images)
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -91,10 +89,6 @@ class Core(Configuration):
         'node-uuid': ['uuid.js'],
         'json-editor': ['dist/*.js'],
     }
-
-    # User-uploaded Media
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -166,9 +160,15 @@ class Base(Core):
     X_FRAME_OPTIONS = values.Value('DENY')
 
     # Media and static settings
+    STATIC_URL = values.Value('/static/')
+    STATIC_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'static'))
+    MEDIA_URL = values.Value('/media/')
+    MEDIA_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'media'))
     STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
     # Overwrite old files when uploading media.
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
+    # URL that the CDN exists at to front cached parts of the site, if any.
+    CDN_URL = values.URLValue(None)
 
     # Normandy settings
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
