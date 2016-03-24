@@ -26,20 +26,20 @@ window.registerAction = function(name, ActionClass) {
  */
 function loadAction(recipe) {
     return new Promise((resolve, reject) => {
-        let actionName = recipe.implementation.name;
-        if (!registeredActions[actionName]) {
+        let action = recipe.action;
+        if (!registeredActions[action.name]) {
             let script = document.createElement('script');
-            script.src = recipe.implementation.url;
+            script.src = action.implementation_url;
             script.onload = () => {
-                if (!registeredActions[actionName]) {
-                    reject(new Error(`Could not find action with name ${actionName}.`));
+                if (!registeredActions[action.name]) {
+                    reject(new Error(`Could not find action with name ${action.name}.`));
                 } else {
-                    resolve(registeredActions[actionName]);
+                    resolve(registeredActions[action.name]);
                 }
             };
             document.head.appendChild(script);
         } else {
-            resolve(registeredActions[actionName]);
+            resolve(registeredActions[action.name]);
         }
     });
 }

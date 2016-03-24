@@ -15,22 +15,16 @@ class ActionSerializer(serializers.ModelSerializer):
             'name',
             'implementation',
             'implementation_url',
-            'implementation_hash',
             'arguments_schema',
         ]
-
-
-class ImplementationSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    hash = serializers.CharField(source='implementation_hash', read_only=True)
-    url = ActionImplementationHyperlinkField()
 
 
 class RecipeSerializer(serializers.Serializer):
     class Meta:
         model = Recipe
 
-    name = serializers.CharField()
     id = serializers.IntegerField()
-    implementation = ImplementationSerializer(source='action')
+    name = serializers.CharField()
+    revision_id = serializers.IntegerField()
+    action = ActionSerializer()
     arguments = serializers.JSONField()

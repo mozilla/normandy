@@ -15,6 +15,7 @@ def test_bundle_serializer(rf):
     assert serializer.data['recipes'] == [{
         'name': recipe.name,
         'id': recipe.id,
-        'implementation': Whatever(),
+        'revision_id': recipe.revision_id,
+        'action': Whatever(),
         'arguments': Whatever(),
     }]
