@@ -126,8 +126,8 @@ class TestRecipe(object):
         assert not recipe.matches(client3)
 
     def test_filter_by_sample_rate(self):
-        always_match = RecipeFactory(sample_rate=100)
-        never_match = RecipeFactory(sample_rate=0)
+        always_match = RecipeFactory(sample_rate=1.0)
+        never_match = RecipeFactory(sample_rate=0.0)
         client = ClientFactory()
 
         assert always_match.matches(client)
