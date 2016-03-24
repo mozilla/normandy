@@ -34,7 +34,6 @@ class TestActionAPI(object):
             {
                 'name': 'foo',
                 'implementation_url': Whatever.endswith(action_url),
-                'implementation_hash': Whatever(),
                 'arguments_schema': {'type': 'object'}
             }
         ]

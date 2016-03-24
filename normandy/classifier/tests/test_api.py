@@ -29,10 +29,11 @@ class TestFetchBundleAPI(object):
         assert res.data['recipes'] == [{
             'name': recipe.name,
             'id': recipe.id,
-            'implementation': {
+            'revision_id': recipe.revision_id,
+            'action': {
                 'name': action.name,
-                'hash': Whatever(lambda h: len(h) == 40),
-                'url': Whatever.endswith(impl_url),
+                'implementation_url': Whatever.endswith(impl_url),
+                'arguments_schema': action.arguments_schema,
             },
             'arguments': {
                 'foo': 'bar',

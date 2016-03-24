@@ -20,10 +20,11 @@ def test_recipe_serializer(rf):
     assert serializer.data == {
         'name': recipe.name,
         'id': recipe.id,
-        'implementation': {
+        'revision_id': recipe.revision_id,
+        'action': {
             'name': action.name,
-            'hash': Whatever(lambda h: len(h) == 40),
-            'url': Whatever.endswith(action_url),
+            'implementation_url': Whatever.endswith(action_url),
+            'arguments_schema': action.arguments_schema,
         },
         'arguments': {
             'foo': 'bar',
