@@ -8,7 +8,11 @@
   </head>
   <body>
     <script src="{% static 'js/uitour.js' %}"></script>
+    <script src="{% static 'npm/node-uuid/uuid.js' %}"></script>
+    <script src="{% static 'npm/babel-polyfill/dist/polyfill.js' %}"></script>
     <!-- Cheat so that we get let and other version-limited JavaScript features. -->
-    <script type="application/javascript;version=1.8" src="{% static 'js/self_repair_driver.js' %}"></script>
+    <script type="application/javascript;version=1.8" src="{% static 'js/xhr.js' %}"></script>
+    <script type="application/javascript;version=1.8" src="{% static 'js/normandy_driver.js' %}"></script>
+    <script type="application/javascript;version=1.8" src="{% static 'js/self_repair_runner.js' %}"></script>
   </body>
 </html>
