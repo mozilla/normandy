@@ -41,13 +41,13 @@ class ActionViewSet(viewsets.ModelViewSet):
 class ActionImplementationView(generics.RetrieveAPIView):
     """
     Retrieves the implementation code for an action. Raises a 404 if the
-    given hash doesn't match the has we've stored.
+    given hash doesn't match the hash we've stored.
     """
     queryset = Action.objects.all()
     lookup_field = 'name'
 
-    permission_classes = ()
-    renderer_classes = (JavaScriptRenderer,)
+    permission_classes = []
+    renderer_classes = [JavaScriptRenderer]
 
     def retrieve(self, request, name, impl_hash):
         action = self.get_object()

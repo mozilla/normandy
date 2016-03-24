@@ -7,7 +7,7 @@ from normandy.recipes.models import Action, Recipe
 class ActionSerializer(serializers.ModelSerializer):
     arguments_schema = serializers.JSONField()
     implementation = serializers.CharField(write_only=True)
-    implementation_url = ActionImplementationHyperlinkField(view_name='action-implementation')
+    implementation_url = ActionImplementationHyperlinkField()
 
     class Meta:
         model = Action
@@ -23,7 +23,7 @@ class ActionSerializer(serializers.ModelSerializer):
 class ImplementationSerializer(serializers.Serializer):
     name = serializers.CharField()
     hash = serializers.CharField(source='implementation_hash', read_only=True)
-    url = ActionImplementationHyperlinkField(view_name='action-implementation')
+    url = ActionImplementationHyperlinkField()
 
 
 class RecipeSerializer(serializers.Serializer):
