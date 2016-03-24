@@ -106,6 +106,7 @@ class Core(Configuration):
         'recipes': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'recipes',
+            'TIMEOUT': values.IntegerValue(300, environ_name='CACHES_RECIPES_TIMEOUT'),
         },
     }
 
