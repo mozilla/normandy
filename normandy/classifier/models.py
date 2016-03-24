@@ -45,7 +45,12 @@ def enabled_recipes():
     if recipes is None:
         recipes = (
             Recipe.objects.filter(enabled=True)
-            .prefetch_related('locales', 'countries', 'release_channels'))
+            .prefetch_related(
+                'locales',
+                'countries',
+                'release_channels',
+                'action',
+            ))
         cache.set(key, recipes)
     return recipes
 

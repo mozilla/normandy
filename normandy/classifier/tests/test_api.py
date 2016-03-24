@@ -76,7 +76,6 @@ class TestFetchBundleAPI(object):
         recipe_names = set(r['name'] for r in res.data['recipes'])
         assert recipe_names == {'german', 'any', 'both'}
 
-    @pytest.mark.xfail
     def test_it_makes_no_db_queries(self, client):
         # Prepare some interesting data
         recipe = RecipeFactory(enabled=True)
