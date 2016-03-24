@@ -1,3 +1,5 @@
+import hashlib
+
 import pytest
 from rest_framework.reverse import reverse
 
@@ -16,14 +18,17 @@ class TestActionAPI(object):
         assert res.data == []
 
     def test_it_serves_actions(self, api_client):
-        ActionFactory(
+        action = ActionFactory(
             name='foo',
             implementation='foobar',
             arguments_schema={'type': 'object'}
         )
 
         res = api_client.get('/api/v1/action/')
-        action_url = reverse('action-implementation', args=['foo'])
+        action_url = reverse('action-implementation', kwargs={
+            'name': action.name,
+            'impl_hash': action.implementation_hash,
+        })
         assert res.status_code == 200
         assert res.data == [
             {
@@ -139,9 +144,26 @@ class TestActionAPI(object):
         assert res.status_code == 403
         assert res.data['detail'] == AdminEnabled.message
 
+
+@pytest.mark.django_db
+class TestImplementationAPI(object):
     def test_it_serves_implementations(self, api_client):
         action = ActionFactory()
-        res = api_client.get('/api/v1/action/{}/implementation/'.format(action.name))
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=action.implementation_hash,
+        ))
         assert res.status_code == 200
         assert res.content.decode() == action.implementation
+        assert res['Content-Type'] == 'application/javascript; charset=utf-8'
+
+    def test_it_404s_if_hash_doesnt_match(self, api_client):
+        action = ActionFactory(implementation='asdf')
+        bad_hash = hashlib.sha1('nomatch'.encode()).hexdigest()
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=bad_hash,
+        ))
+        assert res.status_code == 404
+        assert res.content.decode() == '/* Hash does not match current stored action. */'
         assert res['Content-Type'] == 'application/javascript; charset=utf-8'
