@@ -197,6 +197,21 @@ class Production(Base):
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
 
 
+class ProductionInsecure(Production):
+    """
+    Settings for a production-like environment that lacks many security features.
+
+    Useful for testing and setups where security is provided by other means.
+    Not intended for general use on the public internet.
+    """
+    SECRET_KEY = values.Value('not a secret')
+    ALLOWED_HOSTS = values.ListValue(['*'])
+    SECURE_SSL_REDIRECT = values.BooleanValue(False)
+    CSRF_COOKIE_SECURE = values.BooleanValue(False)
+    SECURE_HSTS_SECONDS = values.IntegerValue(0)
+    SESSION_COOKIE_SECURE = values.BooleanValue(False)
+
+
 class Build(Production):
     """Settings for building the Docker image for production."""
     SECRET_KEY = values.Value('not a secret')
