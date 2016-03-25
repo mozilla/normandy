@@ -1,4 +1,4 @@
-from rest_framework import serializers, views, status
+from rest_framework import views
 from rest_framework.response import Response
 
 from normandy.classifier.serializers import BundleSerializer
@@ -11,9 +11,6 @@ class FetchBundle(views.APIView):
     permission_classes = []
     serializer_class = BundleSerializer
 
-    class Parameters(serializers.Serializer):
-        locale = serializers.CharField(default=None)
-
     @classmethod
     def as_view(cls, **initkwargs):
         view = super().as_view(**initkwargs)
@@ -24,11 +21,7 @@ class FetchBundle(views.APIView):
         """
         Determine the recipes that matches the requesting client.
         """
-        params = self.Parameters(data=request.data)
-        if not params.is_valid():
-            return Response(params.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        client = Client(request, locale=params.data['locale'])
+        client = Client(request)
         bundle = Bundle.for_client(client)
         serializer = self.serializer_class(bundle, context={'request': request})
         return Response(serializer.data)
