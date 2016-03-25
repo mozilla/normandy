@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
@@ -16,7 +18,7 @@ class TestFetchBundleAPI(object):
         data = ClientParametersFactory()
         res = client.post('/api/v1/fetch_bundle/', data)
         assert res.status_code == 200
-        assert res.data == {'recipes': []}
+        assert res.data == {'recipes': [], 'country': None}
 
     def test_it_serves_recipes(self, client):
         recipe = RecipeFactory(arguments={'foo': 'bar'})
@@ -106,3 +108,12 @@ class TestFetchBundleAPI(object):
         res = client.post('/api/v1/fetch_bundle/', data)
         assert res.status_code == 400
         assert res.data == {name: ['This field is required.']}
+
+    def test_it_includes_the_client_country(self, client):
+        with patch('normandy.classifier.models.get_country_code') as get_country_code:
+            get_country_code.return_value = 'fr'
+
+            data = ClientParametersFactory()
+            res = client.post('/api/v1/fetch_bundle/', data)
+            assert res.status_code == 200
+            assert res.data == {'recipes': [], 'country': 'fr'}

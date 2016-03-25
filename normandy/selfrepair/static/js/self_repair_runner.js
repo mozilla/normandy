@@ -1,15 +1,3 @@
-// Trigger heartbeat callbacks when the UITour tells us that Heartbeat
-// happened.
-Mozilla.UITour.observe((eventName, data) => {
-    if (eventName.startsWith('Heartbeat')) {
-        let flowId = data.flowId;
-        if (flowId in Normandy.heartbeatCallbacks) {
-            Normandy.heartbeatCallbacks[flowId](data);
-        }
-    }
-});
-
-
 let registeredActions = {};
 window.registerAction = function(name, ActionClass) {
     registeredActions[name] = ActionClass;
@@ -90,15 +78,15 @@ function getUserId() {
 /**
  * Fetch recipes from the Recipe server.
  *
- * @promise {Array<Recipe>} List of recipes.
+ * @promise {Object} Bundle object, containing recipes and client data.
  */
-function fetchRecipes() {
+function fetchBundle() {
     let {recipeUrl} = document.documentElement.dataset;
     let headers = {Accept: 'application/json'};
 
     return getFetchRecipePayload()
     .then(data => xhr.post(recipeUrl, {data, headers}))
-    .then(request => JSON.parse(request.responseText).recipes);
+    .then(request => JSON.parse(request.responseText));
 }
 
 
@@ -116,14 +104,15 @@ function runRecipe(recipe) {
 
 
 // Actually fetch and run the recipes.
-fetchRecipes().then((recipes) => {
-    let chain = Promise.resolve();
+fetchBundle().then(bundle => {
+    // Update Normandy driver with user's country.
+    Normandy._location.countryCode = bundle.country;
 
-    for (let recipe of recipes) {
-        chain.then(runRecipe.bind(null, recipe));
+    for (let recipe of bundle.recipes) {
+        runRecipe(recipe).catch(err => {
+            console.error(err);
+        });
     }
-
-    return chain;
 }).catch((err) => {
     console.error(err);
 });
