@@ -1,7 +1,11 @@
 Docker for QA
 =============
 The following describes how to get a prebuilt instance of Normandy for
-testing. This is not suitable for development.
+testing. This is not suitable for development, or serving traffic on the
+public internet.
+
+This guide largely concerns itself with setting up an external
+PostgreSQL installation to be useable from Docker.
 
 Prerequisites
 -------------
@@ -25,6 +29,7 @@ how to fill in the blanks next.
 
 .. code-block:: ini
 
+  DJANGO_CONFIGURATION=ProductionInsecure
   DATABASE_URL=postgresql://<username>:<password>@<host>/<db_name>
 
 ``<username>`` and ``<password>`` are the details to authenticate with
@@ -55,8 +60,8 @@ Configuring Postgres
   By default Postgres only listens on localhost, and so Docker containers
   won't be able to connect to it. To change this, edit your Postgres config
   (it is in the Postgres data directory, often at
-  ``/var/lib/postgres/postgresql.conf`` or similar). There should be a commented
-  out line like:
+  ``/var/lib/postgres/postgresql.conf`` or similar). There should be a
+  commented out line like:
 
   .. code-block:: ini
 
@@ -67,7 +72,7 @@ Configuring Postgres
 
   .. code-block:: ini
 
-    listen_addresses = 'localhost,172.17.0.1'
+    listen_addresses = 'localhost,192.168.99.1'
 
 2. Allowing connections from the Docker subnet:
 
@@ -91,11 +96,11 @@ Running Normandy
      # Initialize the DB
      docker run -it --env-file=.env mozilla/normandy:latest ./manage.py migrate
      # Create a super user
-     docker run -t --env-file=.env mozilla/normandy:latest ./manage.py createsuperuser
+     docker run -it --env-file=.env mozilla/normandy:latest ./manage.py createsuperuser
      # Load inital database data
-     docker run -t --env-file=.env mozilla/normandy:latest ./manage.py initial_data
+     docker run -it --env-file=.env mozilla/normandy:latest ./manage.py initial_data
      # Run the web server
-     docker run -t -p 8000:8000 --env-file=.env mozilla/normandy:latest
+     docker run -it -p 8000:8000 --env-file=.env mozilla/normandy:latest
 
    This process will run until it is manually stopped with Ctrl-c. Open another
    terminal for the remaining steps.
