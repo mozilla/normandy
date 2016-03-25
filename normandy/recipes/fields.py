@@ -1,6 +1,5 @@
 import hashlib
 
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
@@ -10,10 +9,6 @@ class LocaleField(models.CharField):
         kwargs.setdefault('max_length', 255)
         kwargs.setdefault('choices', {})
         return super().__init__(*args, **kwargs)
-
-
-class PercentField(models.FloatField):
-    default_validators = [MinValueValidator(0), MaxValueValidator(100)]
 
 
 class AutoHashField(models.CharField):

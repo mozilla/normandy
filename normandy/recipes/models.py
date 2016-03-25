@@ -8,7 +8,6 @@ from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
 from normandy.recipes import utils
-from normandy.recipes.fields import PercentField
 from normandy.recipes.validators import validate_json
 
 
@@ -83,7 +82,10 @@ class Recipe(models.Model):
     countries = models.ManyToManyField(Country, blank=True)
     start_time = models.DateTimeField(blank=True, null=True, default=None)
     end_time = models.DateTimeField(blank=True, null=True, default=None)
-    sample_rate = PercentField(default=100)
+    sample_rate = models.FloatField(
+        default=1.0,
+        help_text=('A number between 0.0 and 1.0. A value of 0.0 will '
+                   'select no users. A value of 1.0 will select all users'))
     release_channels = models.ManyToManyField(ReleaseChannel, blank=True)
 
     @property
@@ -164,7 +166,7 @@ def match_times(recipe, client):
 def match_sample_rate(recipe, client):
     if recipe.sample_rate is not None:
         inputs = [recipe.pk, recipe.revision_id, client.user_id]
-        if not utils.deterministic_sample(recipe.sample_rate / 100.0, inputs):
+        if not utils.deterministic_sample(recipe.sample_rate, inputs):
             return False
 
     return True
