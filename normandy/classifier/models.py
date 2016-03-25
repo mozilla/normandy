@@ -1,9 +1,10 @@
 import hashlib
-
 import uuid
 
 from django.core.cache import caches
 from django.utils.functional import cached_property
+
+from rest_framework import serializers
 
 from normandy.classifier.geolocation import get_country_code
 from normandy.recipes.models import Recipe
@@ -11,31 +12,55 @@ from normandy.recipes.models import Recipe
 
 class Client(object):
     """A client attempting to fetch a set of recipes."""
-    def __init__(self, request, locale=None, release_channel=None, country=None):
+
+    class Parameters(serializers.Serializer):
+        """For parsing the bodies of requests to retrieve client data"""
+        locale = serializers.CharField(default=None)
+        user_id = serializers.CharField(default=None)
+
+    def __init__(self, request=None, **kwargs):
         self.request = request
-        self.locale = locale
-        self.release_channel = release_channel
-        if country is not None:
-            self.country = country
+
+        if self.request and hasattr(self.request, 'data'):
+            serializer = self.Parameters(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.data = serializer.data
+        else:
+            self.data = {}
+
+        fields = ['locale', 'release_channel', 'country', 'user_id', 'request_time']
+        for field in fields:
+            val = kwargs.get(field)
+            if val is not None:
+                setattr(self, field, kwargs[field])
+
+    @cached_property
+    def locale(self):
+        return self.data.get('locale')
 
     @cached_property
     def country(self):
         ip_address = self.request.META.get('REMOTE_ADDR')
         return get_country_code(ip_address)
 
-    @property
+    @cached_property
     def request_time(self):
         return self.request.received_at
 
-    @property
+    @cached_property
     def user_id(self):
         """
         A UUID unique to a user, sent to us from Firefox.
 
         If the user did not provide an ID, this returns a random UUID.
         """
-        # TODO: Eventually this will be something from the request.
+        if self.data.get('user_id'):
+            return self.data['user_id']
         return str(uuid.uuid4())
+
+    @cached_property
+    def release_channel(self):
+        return self.data.get('release_channel')
 
 
 def enabled_recipes():
