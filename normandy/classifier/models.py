@@ -16,6 +16,7 @@ class Client(object):
     class Parameters(serializers.Serializer):
         """For parsing the bodies of requests to retrieve client data"""
         locale = serializers.CharField(default=None)
+        user_id = serializers.CharField(default=None)
 
     def __init__(self, request=None, **kwargs):
         self.request = request
@@ -27,7 +28,7 @@ class Client(object):
         else:
             self.data = {}
 
-        fields = ['locale', 'release_channel', 'country', 'request_time']
+        fields = ['locale', 'release_channel', 'country', 'user_id', 'request_time']
         for field in fields:
             val = kwargs.get(field)
             if val is not None:
@@ -53,7 +54,8 @@ class Client(object):
 
         If the user did not provide an ID, this returns a random UUID.
         """
-        # TODO: Eventually this will be something from the request.
+        if self.data.get('user_id'):
+            return self.data['user_id']
         return str(uuid.uuid4())
 
     @cached_property

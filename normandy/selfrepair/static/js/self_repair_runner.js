@@ -45,6 +45,19 @@ function loadAction(recipe) {
 }
 
 /**
+ * Get a user_id. If one doesn't exist yet, make one up and store it in local storage.
+ * @return {String} A stored or generated UUID
+ */
+function get_user_id() {
+    let user_id = localStorage.getItem('user_id');
+    if (user_id === null) {
+        user_id = uuid.v4();
+        localStorage.setItem('user_id', user_id);
+    }
+    return user_id;
+}
+
+/**
  * Fetch recipes from the Recipe server.
  *
  * @promise {Array<Recipe>} List of recipes.
@@ -53,7 +66,10 @@ function fetchRecipes() {
     let {recipeUrl, locale} = document.documentElement.dataset;
 
     return xhr.post(recipeUrl, {
-        data: {locale: locale},
+        data: {
+            locale: locale,
+            user_id: get_user_id(),
+        },
         headers: {Accept: 'application/json'}
     }).then(request => {
         return JSON.parse(request.responseText).recipes;
