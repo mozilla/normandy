@@ -166,3 +166,18 @@ class TestImplementationAPI(object):
         assert res.status_code == 404
         assert res.content.decode() == '/* Hash does not match current stored action. */'
         assert res['Content-Type'] == 'application/javascript; charset=utf-8'
+
+    def test_it_includes_cache_headers(self, api_client, settings):
+        # Note: Can't override the cache time setting, since it is read
+        # when invoking the decorator at import time. Changing it would
+        # require mocking, and that isn't worth it.
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=action.implementation_hash,
+        ))
+        assert res.status_code == 200
+
+        max_age = 'max-age={}'.format(settings.ACTION_IMPLEMENTATION_CACHE_TIME)
+        assert max_age in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
