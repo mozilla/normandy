@@ -166,3 +166,12 @@ class TestImplementationAPI(object):
         assert res.status_code == 404
         assert res.content.decode() == '/* Hash does not match current stored action. */'
         assert res['Content-Type'] == 'application/javascript; charset=utf-8'
+
+    def test_it_includes_cache_headers(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=action.implementation_hash,
+        ))
+        assert res.status_code == 200
+        assert res['Cache-Control'].startswith('public, max-age=')

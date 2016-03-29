@@ -54,4 +54,9 @@ class ActionImplementationView(generics.RetrieveAPIView):
         if impl_hash != action.implementation_hash:
             raise NotFound('Hash does not match current stored action.')
 
-        return Response(action.implementation)
+        max_age = 60 * 60 * 24 * 365  # one year in seconds
+        headers = {
+            'Cache-Control': 'public, max-age={}'.format(max_age),
+        }
+
+        return Response(action.implementation, headers=headers)
