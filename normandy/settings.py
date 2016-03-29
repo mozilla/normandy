@@ -178,6 +178,7 @@ class Base(Core):
     # Normandy settings
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
     ADMIN_ENABLED = values.BooleanValue(True)
+    ACTION_IMPLEMENTATION_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
 
 
 class Development(Base):

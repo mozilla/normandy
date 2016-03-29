@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.http import Http404
+from django.views.decorators.cache import cache_control
 
 from rest_framework import generics, permissions, viewsets
 from rest_framework.exceptions import NotFound
@@ -49,14 +51,10 @@ class ActionImplementationView(generics.RetrieveAPIView):
     permission_classes = []
     renderer_classes = [JavaScriptRenderer]
 
+    @cache_control(public=True, max_age=settings.ACTION_IMPLEMENTATION_CACHE_TIME)
     def retrieve(self, request, name, impl_hash):
         action = self.get_object()
         if impl_hash != action.implementation_hash:
             raise NotFound('Hash does not match current stored action.')
 
-        max_age = 60 * 60 * 24 * 365  # one year in seconds
-        headers = {
-            'Cache-Control': 'public, max-age={}'.format(max_age),
-        }
-
-        return Response(action.implementation, headers=headers)
+        return Response(action.implementation)
