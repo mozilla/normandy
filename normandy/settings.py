@@ -147,6 +147,10 @@ class Base(Core):
         {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
         {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
     ]
+    PASSWORD_HASHERS = values.ListValue([
+        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    ])
     USE_X_FORWARDED_HOST = values.BooleanValue(False)
     SECURE_PROXY_SSL_HEADER = values.TupleValue()
     SECURE_HSTS_SECONDS = values.IntegerValue(3600)
