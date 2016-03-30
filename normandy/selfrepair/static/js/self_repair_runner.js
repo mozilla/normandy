@@ -45,6 +45,36 @@ function loadAction(recipe) {
 }
 
 /**
+ * @promise {Object} The data to send to fetch_bundle to identify this client.
+ */
+function get_fetch_recipe_payload() {
+    let data = {
+        locale: document.documentElement.dataset.locale,
+        user_id: get_user_id(),
+        release_channel: null,
+        version: null,
+    };
+
+    return get_uitour_appinfo()
+    .then(uitour_data => {
+        data['release_channel'] = uitour.defaultUpdateChannel;
+        data['version'] = uitour.version;
+        return data;
+    });
+}
+
+/**
+ * @promise {Object} The appinfo from UITour
+ */
+function get_uitour_appinfo() {
+    return new Promise((resolve, reject) => {
+        Mozilla.UITour.getConfiguration('appinfo', appinfo => {
+            resolve(appinfo);
+        });
+    });
+}
+
+/**
  * Get a user_id. If one doesn't exist yet, make one up and store it in local storage.
  * @return {String} A stored or generated UUID
  */
@@ -63,17 +93,12 @@ function get_user_id() {
  * @promise {Array<Recipe>} List of recipes.
  */
 function fetchRecipes() {
-    let {recipeUrl, locale} = document.documentElement.dataset;
+    let {recipeUrl} = document.documentElement.dataset;
+    let headers = {Accept: 'application/json'};
 
-    return xhr.post(recipeUrl, {
-        data: {
-            locale: locale,
-            user_id: get_user_id(),
-        },
-        headers: {Accept: 'application/json'}
-    }).then(request => {
-        return JSON.parse(request.responseText).recipes;
-    });
+    get_fetch_recipe_payload()
+    .then(data => xhr.post(recipeUrl, {data, headers}))
+    .then(request => JSON.parse(request.responseText).recipes);
 }
 
 
