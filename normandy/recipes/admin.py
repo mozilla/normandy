@@ -29,6 +29,7 @@ class RecipeAdmin(VersionAdmin):
         ('locales', admin.RelatedOnlyFieldListFilter),
         ('countries', admin.RelatedOnlyFieldListFilter),
         ('action', admin.RelatedOnlyFieldListFilter),
+        ('release_channels', admin.RelatedFieldListFilter),
     ]
 
     fieldsets = [
