@@ -98,3 +98,11 @@ class TestFetchBundleAPI(object):
             assert res2.status_code == 200
         assert res1.data == res2.data
         assert list(queries) == []
+
+    @pytest.mark.parametrize('name', ['locale', 'user_id', 'release_channel', 'version'])
+    def test_required_parameters_are_required(self, client, name):
+        data = ClientParametersFactory()
+        del data[name]
+        res = client.post('/api/v1/fetch_bundle/', data)
+        assert res.status_code == 400
+        assert res.data == {name: ['This field is required.']}

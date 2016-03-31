@@ -47,18 +47,18 @@ function loadAction(recipe) {
 /**
  * @promise {Object} The data to send to fetch_bundle to identify this client.
  */
-function get_fetch_recipe_payload() {
+function getFetchRecipePayload() {
     let data = {
         locale: document.documentElement.dataset.locale,
-        user_id: get_user_id(),
+        user_id: getUserId(),
         release_channel: null,
         version: null,
     };
 
-    return get_uitour_appinfo()
-    .then(uitour_data => {
-        data['release_channel'] = uitour.defaultUpdateChannel;
-        data['version'] = uitour.version;
+    return getUitourAppinfo()
+    .then(uitourData => {
+        data.release_channel = uitourData.defaultUpdateChannel;
+        data.version = uitourData.version;
         return data;
     });
 }
@@ -66,7 +66,7 @@ function get_fetch_recipe_payload() {
 /**
  * @promise {Object} The appinfo from UITour
  */
-function get_uitour_appinfo() {
+function getUitourAppinfo() {
     return new Promise((resolve, reject) => {
         Mozilla.UITour.getConfiguration('appinfo', appinfo => {
             resolve(appinfo);
@@ -75,16 +75,16 @@ function get_uitour_appinfo() {
 }
 
 /**
- * Get a user_id. If one doesn't exist yet, make one up and store it in local storage.
+ * Get a user id. If one doesn't exist yet, make one up and store it in local storage.
  * @return {String} A stored or generated UUID
  */
-function get_user_id() {
-    let user_id = localStorage.getItem('user_id');
-    if (user_id === null) {
-        user_id = uuid.v4();
-        localStorage.setItem('user_id', user_id);
+function getUserId() {
+    let userId = localStorage.getItem('userId');
+    if (userId === null) {
+        userId = uuid.v4();
+        localStorage.setItem('userId', userId);
     }
-    return user_id;
+    return userId;
 }
 
 /**
@@ -96,7 +96,7 @@ function fetchRecipes() {
     let {recipeUrl} = document.documentElement.dataset;
     let headers = {Accept: 'application/json'};
 
-    get_fetch_recipe_payload()
+    return getFetchRecipePayload()
     .then(data => xhr.post(recipeUrl, {data, headers}))
     .then(request => JSON.parse(request.responseText).recipes);
 }
