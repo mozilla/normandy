@@ -1,0 +1,16 @@
+{% extends "control/admin/base.html" %}
+
+{% block content %}
+  <div class="box">
+    <h2>Recipes</h2>
+    {% if all_recipes_list %}
+      <ul>
+        {% for recipe in all_recipes_list %}
+            <li><a href="{% url 'edit_recipe' recipe.id %}">{{ recipe.name }}</a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No recipes exist.</p>
+    {% endif %}
+  </div>
+{% endblock %}

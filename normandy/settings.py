@@ -12,6 +12,7 @@ class Core(Configuration):
     INSTALLED_APPS = [
         'normandy.base.apps.BaseApp',
         'normandy.classifier',
+        'normandy.control.apps.ControlApp',
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',

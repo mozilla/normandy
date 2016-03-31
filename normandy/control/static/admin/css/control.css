@@ -1,0 +1,73 @@
+body {
+  background: #f8f8f8;
+}
+
+#header {
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0px 3px 3px #ddd;
+  color: #555;
+  height: 40px;
+}
+
+#user-tools a:link, #user-tools a:visited {
+  color: #ff647f;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+#user-tools a:hover {
+  color: #447e9b;
+  text-decoration: none;
+  border-bottom: 0px;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+  color: #555;
+  font-size: 16px;
+}
+
+/* just hiding these for now, they might be a little overkill */
+div.breadcrumbs {
+  background: rgba(0,0,0,0);
+  font-size: 13px;
+  padding: 8px 40px 5px 40px;
+}
+
+div.breadcrumbs a {
+  color: rgb(152, 102, 14);
+}
+
+h2 {
+  background: #ff647f;
+  border-bottom: 1px solid #e7526c;
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 1em 0 .5em 0;
+  padding: 8px 20px;
+}
+
+ul {
+  padding: 0px 20px;
+}
+
+ul li {
+  list-style-type: none;
+  padding: 5px 0px;
+}
+
+.box {
+  padding: 0 0 20px 0;
+  max-width: 40%;
+  border-bottom-left-radius: 1px;
+  border-bottom-right-radius: 1px;
+  background-color: #fff;
+}
+
+#content {
+  padding: 50px 70px;
+}

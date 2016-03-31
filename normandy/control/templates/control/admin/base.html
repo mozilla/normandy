@@ -1,0 +1,42 @@
+{% load i18n admin_static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+  <head>
+    <title>SHIELD Control Panel</title>
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/control.css" %}" />
+    <meta name="robots" content="NONE,NOARCHIVE" />
+  </head>
+
+  <body class="{% block bodyclass %}{% endblock %}">
+
+    <!-- Container -->
+    <div id="container">
+
+      <!-- Header -->
+      <div id="header">
+        <div id="branding">
+          <h1 id="site-name"><a href="/control">SHIELD Control Panel</a></h1>
+        </div>
+        {% if user.is_authenticated %}
+          <div id="user-tools">
+            {% firstof user.get_short_name user.get_username %} //
+            <a href="{% url 'logout' %}">Log Out</a>
+          </div>
+        {% endif %}
+      </div>
+      <!-- END Header -->
+
+      <!-- Content -->
+      <div id="content">
+        {% block content %}{% endblock %}
+      </div>
+      <!-- END Content -->
+
+    </div>
+    <!-- END Container -->
+
+  </body>
+</html>
