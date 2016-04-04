@@ -5,6 +5,7 @@ import pytest
 from rest_framework.reverse import reverse
 
 from normandy.base.tests import Whatever
+from normandy.classifier.tests import ClientParametersFactory
 from normandy.recipes.tests import RecipeFactory, LocaleFactory
 
 
@@ -12,13 +13,15 @@ from normandy.recipes.tests import RecipeFactory, LocaleFactory
 class TestFetchBundleAPI(object):
 
     def test_it_works(self, client):
-        res = client.post('/api/v1/fetch_bundle/')
+        data = ClientParametersFactory()
+        res = client.post('/api/v1/fetch_bundle/', data)
         assert res.status_code == 200
         assert res.data == {'recipes': []}
 
     def test_it_serves_recipes(self, client):
         recipe = RecipeFactory(arguments={'foo': 'bar'})
-        res = client.post('/api/v1/fetch_bundle/')
+        data = ClientParametersFactory()
+        res = client.post('/api/v1/fetch_bundle/', data)
 
         action = recipe.action
         impl_url = reverse('action-implementation', kwargs={
@@ -50,7 +53,8 @@ class TestFetchBundleAPI(object):
         RecipeFactory(name='both', enabled=True, locales=[english, german])
         RecipeFactory(name='disabled', enabled=False, locales=[german])
 
-        res = client.post('/api/v1/fetch_bundle/', {'locale': 'de'})
+        data = ClientParametersFactory(locale='de')
+        res = client.post('/api/v1/fetch_bundle/', data)
         assert res.status_code == 200
 
         recipe_names = set(r['name'] for r in res.data['recipes'])
@@ -70,7 +74,8 @@ class TestFetchBundleAPI(object):
         RecipeFactory(name='both', enabled=True, locales=[english, german])
         RecipeFactory(name='disabled', enabled=False, locales=[german])
 
-        res = api_client.post('/api/v1/fetch_bundle/', {'locale': 'de'}, format='json')
+        data = ClientParametersFactory(locale='de')
+        res = api_client.post('/api/v1/fetch_bundle/', data, format='json')
         assert res.status_code == 200
 
         recipe_names = set(r['name'] for r in res.data['recipes'])
@@ -81,14 +86,23 @@ class TestFetchBundleAPI(object):
         recipe = RecipeFactory(enabled=True)
 
         # Warm up the cache
-        res1 = client.post('/api/v1/fetch_bundle/', {'locale': 'de'})
+        data = ClientParametersFactory()
+        res1 = client.post('/api/v1/fetch_bundle/', data)
         assert res1.status_code == 200
         assert res1.data['recipes'][0]['name'] == recipe.name
 
         # Fire!
         queries = CaptureQueriesContext(connection)
         with queries:
-            res2 = client.post('/api/v1/fetch_bundle/', {'locale': 'de'})
+            res2 = client.post('/api/v1/fetch_bundle/', data)
             assert res2.status_code == 200
         assert res1.data == res2.data
         assert list(queries) == []
+
+    @pytest.mark.parametrize('name', ['locale', 'user_id', 'release_channel', 'version'])
+    def test_required_parameters_are_required(self, client, name):
+        data = ClientParametersFactory()
+        del data[name]
+        res = client.post('/api/v1/fetch_bundle/', data)
+        assert res.status_code == 400
+        assert res.data == {name: ['This field is required.']}

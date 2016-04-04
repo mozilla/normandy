@@ -15,8 +15,10 @@ class Client(object):
 
     class Parameters(serializers.Serializer):
         """For parsing the bodies of requests to retrieve client data"""
-        locale = serializers.CharField(default=None)
-        user_id = serializers.CharField(default=None)
+        locale = serializers.CharField()
+        user_id = serializers.CharField()
+        release_channel = serializers.CharField()
+        version = serializers.CharField()
 
     def __init__(self, request=None, **kwargs):
         self.request = request

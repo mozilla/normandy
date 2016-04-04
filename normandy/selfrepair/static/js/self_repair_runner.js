@@ -45,16 +45,46 @@ function loadAction(recipe) {
 }
 
 /**
- * Get a user_id. If one doesn't exist yet, make one up and store it in local storage.
+ * @promise {Object} The data to send to fetch_bundle to identify this client.
+ */
+function getFetchRecipePayload() {
+    let data = {
+        locale: document.documentElement.dataset.locale,
+        user_id: getUserId(),
+        release_channel: null,
+        version: null,
+    };
+
+    return getUitourAppinfo()
+    .then(uitourData => {
+        data.release_channel = uitourData.defaultUpdateChannel;
+        data.version = uitourData.version;
+        return data;
+    });
+}
+
+/**
+ * @promise {Object} The appinfo from UITour
+ */
+function getUitourAppinfo() {
+    return new Promise((resolve, reject) => {
+        Mozilla.UITour.getConfiguration('appinfo', appinfo => {
+            resolve(appinfo);
+        });
+    });
+}
+
+/**
+ * Get a user id. If one doesn't exist yet, make one up and store it in local storage.
  * @return {String} A stored or generated UUID
  */
-function get_user_id() {
-    let user_id = localStorage.getItem('user_id');
-    if (user_id === null) {
-        user_id = uuid.v4();
-        localStorage.setItem('user_id', user_id);
+function getUserId() {
+    let userId = localStorage.getItem('userId');
+    if (userId === null) {
+        userId = uuid.v4();
+        localStorage.setItem('userId', userId);
     }
-    return user_id;
+    return userId;
 }
 
 /**
@@ -63,17 +93,12 @@ function get_user_id() {
  * @promise {Array<Recipe>} List of recipes.
  */
 function fetchRecipes() {
-    let {recipeUrl, locale} = document.documentElement.dataset;
+    let {recipeUrl} = document.documentElement.dataset;
+    let headers = {Accept: 'application/json'};
 
-    return xhr.post(recipeUrl, {
-        data: {
-            locale: locale,
-            user_id: get_user_id(),
-        },
-        headers: {Accept: 'application/json'}
-    }).then(request => {
-        return JSON.parse(request.responseText).recipes;
-    });
+    return getFetchRecipePayload()
+    .then(data => xhr.post(recipeUrl, {data, headers}))
+    .then(request => JSON.parse(request.responseText).recipes);
 }
 
 
