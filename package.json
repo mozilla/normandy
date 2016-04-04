@@ -11,6 +11,7 @@
     "babel-polyfill": "^6.7.2",
     "font-awesome": "^4.5.0",
     "json-editor": "^0.7.23",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "^1.4.7",
+    "wolfy87-eventemitter": "^4.3.0"
   }
 }

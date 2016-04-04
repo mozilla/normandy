@@ -84,8 +84,9 @@ def enabled_recipes():
 
 class Bundle(object):
     """A bundle of recipes to be sent to the client."""
-    def __init__(self, recipes=None):
+    def __init__(self, recipes=None, country=None):
         self.recipes = sorted(recipes, key=lambda r: r.name) or []
+        self.country = country
 
     @classmethod
     def for_client(cls, client, exclude=None):
@@ -95,10 +96,12 @@ class Bundle(object):
         :param exclude:
             List of registered recipe matchers to exclude from matching.
         """
-        return cls(
+        recipes = (
             recipe for recipe in enabled_recipes()
             if recipe.matches(client, exclude=exclude)
         )
+
+        return cls(recipes=recipes, country=client.country)
 
     @property
     def ids(self):

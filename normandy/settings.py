@@ -88,6 +88,7 @@ class Core(Configuration):
         'font-awesome': ['css/*.css', 'fonts/*'],
         'node-uuid': ['uuid.js'],
         'json-editor': ['dist/*.js'],
+        'wolfy87-eventemitter': ['EventEmitter.js'],
     }
 
     REST_FRAMEWORK = {

@@ -37,12 +37,23 @@ Object.assign(LocalStorage.prototype, {
  * Implementation of the Normandy driver.
  */
 let Normandy = {
+    locale: document.documentElement.dataset.locale || navigator.language,
+
     get testing() {
         return new URL(window.location.href).searchParams.has('testing');
     },
 
-    log(message, testOnly=true) {
-        if (!(testOnly && !this.testing)) {
+    _location: {countryCode: null},
+    location() {
+        return Promise.resolve(this._location);
+    },
+
+    log(message, level='debug') {
+        if (level === 'debug' && !this.testing) {
+            return;
+        } else if (level === 'error') {
+            console.error(message);
+        } else {
             console.log(message);
         }
     },
@@ -55,20 +66,59 @@ let Normandy = {
         return new LocalStorage(prefix);
     },
 
-    getAppInfo() {
+    client() {
         return new Promise(resolve => {
-            Mozilla.UITour.getConfiguration('appinfo', function(config) {
-                resolve(config);
+            let client = {};
+
+            // Keys are UITour configs, functions are given the data
+            // returned by UITour for that config.
+            let wantedConfigs = {
+                appinfo(data) {
+                    client.version = data.version;
+                    client.channel = data.defaultUpdateChannel;
+                    client.isDefaultBrowser = data.defaultBrowser;
+                },
+                selectedSearchEngine(data) {
+                    client.searchEngine = data.searchEngineIdentifier;
+                },
+                sync(data) {
+                    client.syncSetup = data.setup;
+                },
+            };
+
+            let retrievedConfigs = 0;
+            let wantedConfigNames = Object.keys(wantedConfigs);
+            wantedConfigNames.forEach(configName => {
+                Mozilla.UITour.getConfiguration(configName, function(data) {
+                    wantedConfigs[configName](data);
+                    retrievedConfigs++;
+                    if (retrievedConfigs >= wantedConfigNames.length) {
+                        resolve(client);
+                    }
+                });
             });
         });
     },
 
+    saveHeartbeatFlow(data) {
+        if (this.testing) {
+            this.log('Pretending to send flow to Input');
+            this.log(data);
+            return Promise.resolve({});
+        } else {
+            return xhr('POST', 'https://input.mozilla.org/api/v2/hb/', {
+                data: data,
+                headers: {Accept: 'application/json'},
+            }).then(request => JSON.parse(request.responseText));
+        }
+    },
+
     heartbeatCallbacks: [],
     showHeartbeat(options) {
-        return new Promise((resolve, reject) => {
-            // TODO: Validate arguments and reject if some are missing.
-            this.heartbeatCallbacks[options.flowId] = () => {
-                resolve();
+        return new Promise(resolve => {
+            let emitter = new EventEmitter();
+            this.heartbeatCallbacks[options.flowId] = function(eventName, data) {
+                emitter.emit(eventName, data);
             };
 
             Mozilla.UITour.showHeartbeat(
@@ -79,7 +129,22 @@ let Normandy = {
                 options.learnMoreMessage,
                 options.learnMoreUrl
             );
+
+            resolve(emitter);
         });
 
     },
 };
+
+
+// Trigger heartbeat callbacks when the UITour tells us that Heartbeat
+// happened.
+Mozilla.UITour.observe((eventName, data) => {
+    if (eventName.startsWith('Heartbeat:')) {
+        let flowId = data.flowId;
+        eventName = eventName.slice(10); // Chop off "Heartbeat:"
+        if (flowId in Normandy.heartbeatCallbacks) {
+            Normandy.heartbeatCallbacks[flowId](eventName, data);
+        }
+    }
+});
