@@ -18,6 +18,7 @@ class Core(Configuration):
         'normandy.selfrepair',
 
         'adminplus',
+        'pipeline',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
@@ -82,6 +83,7 @@ class Core(Configuration):
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'npm.finders.NpmFinder',
+        'pipeline.finders.PipelineFinder',
     ]
     NPM_DESTINATION_PREFIX = 'npm'
     NPM_FILE_PATTERNS = {
@@ -111,6 +113,25 @@ class Core(Configuration):
             'TIMEOUT': values.IntegerValue(300, environ_name='CACHES_RECIPES_TIMEOUT'),
         },
     }
+
+    PIPELINE = {
+        'COMPILERS': (
+            'pipeline.compilers.sass.SASSCompiler',
+        ),
+        'SASS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/node-sass'),
+        'STYLESHEETS': {
+            'control': {
+                'source_filenames': (
+                  'admin/css/base.css',
+                  'control/admin/sass/*.scss',
+                ),
+                'output_filename': 'build/css/control-min.css',
+            },
+        },
+        'CSS_COMPRESSOR': 'pipeline.compressors.cssmin.CSSMinCompressor',
+        'CSSMIN_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/cssmin'),
+    }
+
 
 
 class Base(Core):

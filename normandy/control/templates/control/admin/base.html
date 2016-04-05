@@ -1,12 +1,11 @@
-{% load i18n admin_static %}
+{% load i18n pipeline %}
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
   <head>
     <title>SHIELD Control Panel</title>
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/control.css" %}" />
+    {% stylesheet 'control' %}
     <meta name="robots" content="NONE,NOARCHIVE" />
   </head>
 
