@@ -29,7 +29,7 @@ exports['test set and remove and get'] = promiseTest(assert => {
   .then(value => assert.equal(value, null));
 });
 
-exports['test tests are independent 1'] = promiseTest(assert => {
+exports['test tests are independent 1 of 2'] = promiseTest(assert => {
   let store = new Storage('prefix');
   return store.getItem('counter')
   .then(value => store.setItem('counter', (value || 0) + 1))
@@ -37,23 +37,7 @@ exports['test tests are independent 1'] = promiseTest(assert => {
   .then(value => assert.equal(value, 1));
 });
 
-exports['test tests are independent 2'] = promiseTest(assert => {
-  let store = new Storage('prefix');
-  return store.getItem('counter')
-  .then(value => store.setItem('counter', (value || 0) + 1))
-  .then(() => store.getItem('counter'))
-  .then(value => assert.equal(value, 1));
-});
-
-exports['test tests are independent 3'] = promiseTest(assert => {
-  let store = new Storage('prefix');
-  return store.getItem('counter')
-  .then(value => store.setItem('counter', (value || 0) + 1))
-  .then(() => store.getItem('counter'))
-  .then(value => assert.equal(value, 1));
-});
-
-exports['test tests are independent 4'] = promiseTest(assert => {
+exports['test tests are independent 2 of 2'] = promiseTest(assert => {
   let store = new Storage('prefix');
   return store.getItem('counter')
   .then(value => store.setItem('counter', (value || 0) + 1))
@@ -71,4 +55,4 @@ before(exports, (name, assert, done) => {
   });
 });
 
-require('sdk/test').run(exports);
+testRunner.run(exports);
