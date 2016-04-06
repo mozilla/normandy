@@ -42,12 +42,10 @@
                     theme: 'django'
                 });
 
-                // Only assign data if it validates.
-                // In the future we might be smarter about this.
+                // Assign data regardless of validation to avoid data
+                // loss.
                 var data = JSON.parse($argumentsJson.val());
-                if (!editor.validate(data).length) {
-                    editor.setValue(data);
-                }
+                editor.setValue(data);
             });
         });
     }
@@ -70,6 +68,12 @@
         getFormInputDescription: function(text) {
             var el = this._super(text);
             el.style.marginLeft = '5px';
+            return el;
+        },
+
+        getModal: function(text) {
+            var el = this._super(text);
+            el.classList.add('modal');
             return el;
         },
     });
