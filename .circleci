@@ -1,0 +1,3 @@
+test:
+  override:
+    - jpm test --tbpl | woodchipper > $CIRCLE_TEST_REPORTS/jpm
