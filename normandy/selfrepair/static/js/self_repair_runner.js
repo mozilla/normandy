@@ -81,11 +81,11 @@ function getUserId() {
  * @promise {Object} Bundle object, containing recipes and client data.
  */
 function fetchBundle() {
-    let {recipeUrl} = document.documentElement.dataset;
+    let {bundleUrl} = document.documentElement.dataset;
     let headers = {Accept: 'application/json'};
 
     return getFetchRecipePayload()
-    .then(data => xhr.post(recipeUrl, {data, headers}))
+    .then(data => xhr.post(bundleUrl, {data, headers}))
     .then(request => JSON.parse(request.responseText));
 }
 
