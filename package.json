@@ -6,6 +6,7 @@
   "main": "index.js",
   "author": "Mike Cooper <mythmon@gmail.com>",
   "scripts": {
+    "test": "jpm test",
     "build": "jpm xpi"
   },
   "engines": {
