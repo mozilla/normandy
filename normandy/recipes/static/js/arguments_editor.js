@@ -45,7 +45,9 @@
                 // Assign data regardless of validation to avoid data
                 // loss.
                 var data = JSON.parse($argumentsJson.val());
-                editor.setValue(data);
+                if (!$.isEmptyObject(data)) {
+                    editor.setValue(data);
+                }
             });
         });
     }
