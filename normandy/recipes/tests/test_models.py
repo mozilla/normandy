@@ -103,11 +103,11 @@ class TestRecipe(object):
         assert recipe.matches(client)
 
     def test_filter_by_country_one(self):
-        country1 = LocaleFactory()
-        country2 = LocaleFactory()
-        recipe = RecipeFactory(locales=[country1])
-        client1 = ClientFactory(locale=country1.code)
-        client2 = ClientFactory(locale=country2.code)
+        country1 = CountryFactory()
+        country2 = CountryFactory()
+        recipe = RecipeFactory(countries=[country1])
+        client1 = ClientFactory(country=country1.code)
+        client2 = ClientFactory(country=country2.code)
 
         assert recipe.matches(client1)
         assert not recipe.matches(client2)
