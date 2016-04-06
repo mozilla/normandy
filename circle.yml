@@ -1,3 +1,3 @@
 test:
   override:
-    - jpm test --tbpl | woodchipper --timeout 600000 > $CIRCLE_TEST_REPORTS/jpm
+    - jpm test --tbpl | woodchipper --timeout 600000 > $CIRCLE_TEST_REPORTS/jpm.xml
