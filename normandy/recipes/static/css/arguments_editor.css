@@ -39,3 +39,14 @@
 .arguments-editor .tabs span {
     margin-left: 5px;
 }
+
+/* The JSON editor modal hangs off the button, which is floated right.
+   It's absolutely positioned, so we set it's right edge to the button's
+   right edge to be able to see it.
+
+   We use !important because these are set as style attributes on the DOM
+   nodes in question in a place we can't easily override. */
+.arguments-editor .modal {
+    left: unset !important;
+    right: 0 !important;
+}
