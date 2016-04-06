@@ -1,5 +1,7 @@
 {% extends "control/admin/base.html" %}
 
+{% block bodyclass %}login{% endblock %}
+
 {% block content %}
   {% if form.errors and not form.non_field_errors %}
     <p class="errornote">Please correct the errors below.</p>

@@ -1,75 +1,100 @@
+@import 'partials/layout';
+
+
 body {
-  background: #f8f8f8;
+  background: $cream;
 }
 
 #header {
-  background: #fff;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0px 3px 3px #ddd;
-  color: #555;
-  height: 40px;
+  background: $darkRed;
+  border-bottom: 1px solid $darkOrange;
+  color: #fff;
+  height: 45px;
+  line-height: 25px;
+  padding: 10px 40px;
+
+  h1 {
+    font-size: 16px;
+
+    a:link, a:visited {
+      color: $cream;
+    }
+  }
 }
 
 #user-tools {
+  text-transform: none;
+
   a:link, a:visited {
-    color: #ff647f;
+    border-bottom: 0px;
+    color: $orange;
     font-size: 11px;
-    font-weight: 400;
-    text-transform: none;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 
   a:hover {
-    color: #447e9b;
-    text-decoration: none;
     border-bottom: 0px;
+    color: #fff;
+    text-decoration: none;
   }
 }
 
-#branding h1, #branding h1 a:link, #branding h1 a:visited {
-  color: #555;
-  font-size: 16px;
-}
-
-/* just hiding these for now, they might be a little overkill */
 div.breadcrumbs {
-  background: rgba(0,0,0,0);
+  background: $orange;
+  border-bottom: 1px solid #fff;
+  color: $darkOrange;
   font-size: 13px;
-  padding: 8px 40px 5px 40px;
-}
+  font-weight: 600;
+  line-height: 30px;
+  margin-bottom: 35px;
+  padding: 0px 40px;
 
-div.breadcrumbs a {
-  color: rgb(152, 102, 14);
+  a:link, a:visited {
+    color: $darkOrange;
+    font-weight: 400;
+    opacity: 0.75;
+  }
+
+  a:hover {
+    opacity: 1;
+  }
+
+  .separator {
+    display: inline-block;
+    font-weight: 300;
+    padding: 0px 5px;
+  }
+
 }
 
 h2 {
-  background: #ff647f;
-  border-bottom: 1px solid #e7526c;
-  border-top-left-radius: 1px;
-  border-top-right-radius: 1px;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 400;
-  margin: 1em 0 .5em 0;
-  padding: 8px 20px;
-}
+  border-bottom: 1px solid $orange;
+  color: $darkBrown;
+  font-size: 20px;
+  font-weight: 300;
+  margin: 0px;
+  padding: 8px 0px;
 
-ul {
-  padding: 0px 20px;
-}
-
-ul li {
-  list-style-type: none;
-  padding: 5px 0px;
-}
-
-.box {
-  padding: 0 0 20px 0;
-  max-width: 40%;
-  border-bottom-left-radius: 1px;
-  border-bottom-right-radius: 1px;
-  background-color: #fff;
+  span.bold {
+    font-weight: 600;
+  }
 }
 
 #content {
-  padding: 50px 70px;
+  margin: 40px;
+  min-height: 100%;
+  padding: 0px;
+
+  ul.table-list {
+    margin: 0px;
+    padding: 0px;
+
+    li {
+      background: #fff;
+      list-style-type: none;
+      margin-bottom: 1px;
+      padding: 15px 30px;
+    }
+  }
 }

@@ -1,6 +1,14 @@
 {% extends "control/admin/base.html" %}
 
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="/control">Recipes</a> <span class="separator">//</span> {{ recipe.name }}
+  </div>
+{% endblock %}
+
 {% block content %}
-  <h2>{{ recipe.name }}</h2>
+  <div class="fluid-8">
+    <h2>edit recipe // <span class="bold">{{ recipe.name }}</span></h2>
+  </div>
 {% endblock %}
 

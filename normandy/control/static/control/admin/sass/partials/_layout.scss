@@ -1,0 +1,74 @@
+/* colors */
+$cream: #F6F4EF;
+$orange: #EBC221;
+$darkOrange: #746015;
+$darkRed: #864141;
+$darkBrown: #585755;
+
+
+/* grid helpers */
+$grid-columns: 8;
+
+@mixin border-box {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*, *:after, *:before {
+  margin: 0;
+  padding: 0;
+  @include border-box;
+}
+
+[class*='fluid-'] {
+  float: left;
+  padding: 1em;
+  width: 100%;
+  min-height: 1px;
+}
+
+%clearfix {
+  *zoom: 1;
+
+  &:before, &:after {
+    content: " ";
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+.wrapper, .row {
+  @extend %clearfix;
+}
+
+@for $i from 1 through $grid-columns {
+  .fluid-#{$i} {
+    width: 100% / $grid-columns * $i;
+  }
+}
+
+
+
+.button, input[type="submit"], input[type="button"], .submit-row input, a.button {
+  background: $orange;
+  text-transform: uppercase;
+  font-weight: 600;
+  border: 0px;
+  color: $darkBrown;
+  font-family: 'OpenSans';
+  font-size: 11px;
+  border-radius: 0px;
+  padding: 10px 40px;
+}
+
+.button:active, input[type="submit"]:active, input[type="button"]:active, .button:focus, input[type="submit"]:focus, input[type="button"]:focus, .button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+  background: #FFCB00;
+}
+
+input[type="text"], input[type="password"], input[type="email"], input[type="url"], input[type="number"], textarea, select, .vTextField {
+  border-radius: 0px;
+}
