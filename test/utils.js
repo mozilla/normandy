@@ -4,7 +4,7 @@ exports.promiseTest = function(test) {
     test(assert)
     .catch(err => {
       console.error(err);
-      assert.ok(false);
+      assert.ok(false, err);
     })
     .then(() => done());
   };

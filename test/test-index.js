@@ -1,4 +1,7 @@
-const {Storage} = require('../lib/Storage.js');
+const testRunner = require('sdk/test');
+const {before, after} = require('sdk/test/utils');
+
+const {Storage, clearAllStorage} = require('../lib/Storage.js');
 const {promiseTest} = require('./utils.js');
 
 exports['test set and get'] = promiseTest(assert => {
@@ -56,6 +59,16 @@ exports['test tests are independent 4'] = promiseTest(assert => {
   .then(value => store.setItem('counter', (value || 0) + 1))
   .then(() => store.getItem('counter'))
   .then(value => assert.equal(value, 1));
+});
+
+before(exports, (name, assert, done) => {
+  clearAllStorage()
+  .then(() => done())
+  .catch(err => {
+    console.error(err);
+    assert.ok(false, err);
+    done();
+  });
 });
 
 require('sdk/test').run(exports);
