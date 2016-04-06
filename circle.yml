@@ -1,3 +1,5 @@
 test:
   override:
-    - jpm test --tbpl | woodchipper --timeout 600000 > $CIRCLE_TEST_REPORTS/jpm.xml
+    - >
+      ./node_modules/.bin/jpm test --tbpl --binary /usr/bin/firefox |
+      woodchipper --timeout 600000 > $CIRCLE_TEST_REPORTS/jpm.xml
