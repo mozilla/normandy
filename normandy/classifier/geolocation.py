@@ -18,7 +18,7 @@ def load_geoip_database():
 
     try:
         geoip_reader = Reader(settings.GEOIP2_DATABASE)
-    except IOError as e:
+    except IOError:
         log.warning('Geolocation is disabled: Cannot load database.')
 
 
@@ -28,8 +28,8 @@ def get_country_code(ip_address):
             return geoip_reader.country(ip_address).country.iso_code
         except AddressNotFoundError:
             pass
-        except GeoIP2Error as e:
-            log.warning(e)
+        except GeoIP2Error as exc:
+            log.warning(exc)
             pass
 
     return None
