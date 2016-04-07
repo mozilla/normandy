@@ -5,15 +5,17 @@ machine:
 
 dependencies:
   cache_directories:
-    - "~/docker"
+    - "~/cache/"
   override:
     - docker info
     # use circleci's docker cache workaround
-    - if [ -e ~/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/docker/image.tar || rm ~/docker/image.tar; fi
+    - if [ -e ~/cache/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/cache/docker/image.tar || rm ~/cache/docker/image.tar; fi
     # build image
     - docker build -t normandy:build .
     # Clean up old image and save the new one
-    - mkdir -p ~/docker; test '!' -e ~/docker/image.tar || rm ~/docker/image.tar; docker save normandy:build > ~/docker/image.tar; ls -l ~/docker
+    - mkdir -p ~/cache/docker; test '!' -e ~/cache/docker/image.tar || rm ~/cache/docker/image.tar; docker save normandy:build > ~/cache/docker/image.tar; ls -l ~/cache/docker
+    # Get MaxMind GeoIP database
+    - cd ~/cache/ && ~/normandy/bin/download_geolite2.sh
 
 test:
   pre:
@@ -22,6 +24,7 @@ test:
     - >
       docker run --net host -e DJANGO_CONFIGURATION=Test
       -v $CIRCLE_TEST_REPORTS:/test_artifacts
+      -v ~/cache/GeoLite2-Country.mmdb:/app/GeoLite2-Country.mmdb
       normandy:build py.test --junitxml=/test_artifacts/pytest.xml
 
 # appropriately tag and push the container to dockerhub

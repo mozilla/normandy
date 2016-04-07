@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from geoip2.database import Reader
-from geoip2.errors import GeoIP2Error
+from geoip2.errors import GeoIP2Error, AddressNotFoundError
 
 
 log = logging.getLogger('normandy.classifier')
@@ -25,8 +25,11 @@ def load_geoip_database():
 def get_country_code(ip_address):
     if geoip_reader and ip_address:
         try:
-            return geoip_reader.country(ip_address).iso_code
-        except GeoIP2Error:
+            return geoip_reader.country(ip_address).country.iso_code
+        except AddressNotFoundError:
+            pass
+        except GeoIP2Error as exc:
+            log.warning(exc)
             pass
 
     return None

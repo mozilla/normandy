@@ -1,6 +1,9 @@
+import os
+
 from django.contrib.auth.models import User
 
 from factory import DjangoModelFactory, fuzzy, Sequence
+import pytest
 
 
 class Whatever(object):
@@ -29,3 +32,10 @@ class UserFactory(DjangoModelFactory):
 
     class Meta:
         model = User
+
+
+def skip_except_in_ci():
+    if 'CI' in os.environ:
+        raise Exception("This test isn't allowed to be skipped in CI")
+    else:
+        pytest.skip()
