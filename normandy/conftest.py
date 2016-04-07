@@ -5,6 +5,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from normandy.base.tests import UserFactory
+from normandy.classifier import geolocation as geolocation_module
 
 
 @pytest.fixture
@@ -22,3 +23,13 @@ def django_cache(request):
     yield None
     for cache_name in settings.CACHES.keys():
         caches[cache_name].clear()
+
+
+@pytest.fixture
+def geolocation():
+    """Fixture to load geolocation data."""
+    geolocation_module.load_geoip_database()
+    if geolocation_module.geoip_reader is None:
+        pytest.skip()
+    else:
+        return geolocation_module
