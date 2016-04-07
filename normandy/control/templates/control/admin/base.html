@@ -17,7 +17,7 @@
       <!-- Header -->
       <div id="header">
         <div id="branding">
-          <h1 id="site-name"><a href="/control">SHIELD Control Panel</a></h1>
+          <h1 id="site-name"><a href="{% url 'index' %}">SHIELD Control Panel</a></h1>
         </div>
         {% if user.is_authenticated %}
           <div id="user-tools">

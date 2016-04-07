@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
   <div class="breadcrumbs">
-    <a href="/control">Recipes</a> <span class="separator">//</span> {{ recipe.name }}
+    <a href="{% url 'index' %}">Recipes</a> <span class="separator">//</span> {{ recipe.name }}
   </div>
 {% endblock %}
 
