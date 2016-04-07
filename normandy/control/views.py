@@ -10,7 +10,7 @@ class IndexView(LoginRequiredMixin, generic.ListView):
   login_url = '/control/login/'
 
   def get_queryset(self):
-    return Recipe.objects.order_by('-start_time')[:5]
+    return Recipe.objects.all()
 
 
 class EditView(LoginRequiredMixin, generic.DetailView):
