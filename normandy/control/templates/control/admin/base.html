@@ -17,12 +17,12 @@
       <!-- Header -->
       <div id="header">
         <div id="branding">
-          <h1 id="site-name"><a href="{% url 'index' %}">SHIELD Control Panel</a></h1>
+          <h1 id="site-name"><a href="{% url 'control:index' %}">SHIELD Control Panel</a></h1>
         </div>
         {% if user.is_authenticated %}
           <div id="user-tools">
             {% firstof user.get_short_name user.get_username %} //
-            <a href="{% url 'logout' %}">Log Out</a>
+            <a href="{% url 'control:logout' %}">Log Out</a>
           </div>
         {% endif %}
       </div>

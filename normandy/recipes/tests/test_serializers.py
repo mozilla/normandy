@@ -14,7 +14,7 @@ class TestRecipeSerializer:
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
 
-        action_url = reverse('action-implementation', kwargs={
+        action_url = reverse('recipes:action-implementation', kwargs={
             'name': action.name,
             'impl_hash': action.implementation_hash,
         })

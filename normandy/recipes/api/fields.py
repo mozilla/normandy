@@ -29,7 +29,7 @@ class ActionImplementationHyperlinkField(HyperlinkedIdentityField):
 
     This includes hashes and possibly redirects to the CDN.
     """
-    def __init__(self, view_name='action-implementation', **kwargs):
+    def __init__(self, view_name='recipes:action-implementation', **kwargs):
         super().__init__(view_name=view_name, **kwargs)
 
     def get_url(self, obj, view_name, request, format):

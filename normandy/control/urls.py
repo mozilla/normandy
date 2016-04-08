@@ -4,6 +4,7 @@ from django.conf.urls import url, include
 from normandy.control import views as control_views
 from django.contrib.auth.views import login, logout_then_login
 
+app_name = 'control'
 urlpatterns = []
 
 if settings.ADMIN_ENABLED:

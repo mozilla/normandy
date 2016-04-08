@@ -9,7 +9,7 @@ import pytest
 def test_selfrepair_makes_no_db_queries(client):
     queries = CaptureQueriesContext(connection)
     with queries:
-        url = reverse('normandy.selfrepair', args={'locale': 'en-US'})
+        url = reverse('selfrepair:index', args={'locale': 'en-US'})
         res = client.get(url)
         assert res.status_code == 200
     assert len(queries) == 0

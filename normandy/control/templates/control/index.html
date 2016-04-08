@@ -12,7 +12,7 @@
     {% if all_recipes_list %}
       <ul class="table-list">
         {% for recipe in all_recipes_list %}
-            <li><a href="{% url 'edit_recipe' recipe.id %}">{{ recipe.name }}</a></li>
+            <li><a href="{% url 'control:edit_recipe' recipe.id %}">{{ recipe.name }}</a></li>
         {% endfor %}
       </ul>
     {% else %}

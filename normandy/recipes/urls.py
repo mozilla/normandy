@@ -9,6 +9,8 @@ router = DefaultRouter()
 router.register(r'action', ActionViewSet)
 
 
+app_name = 'recipes'
+
 urlpatterns = [
     url(r'^api/v1/', include(router.urls)),
     url(
