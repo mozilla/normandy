@@ -94,3 +94,14 @@ After creating this value, restart Firefox and UITour actions should function
 normally.
 
 .. _UITour: http://bedrock.readthedocs.org/en/latest/uitour.html
+
+Generating an API Key
+---------------------
+To generate an API key for privillaged API access:
+
+1. Sign in to the admin interface.
+2. Click the "AuthToken -> Token" link on the index page.
+3. Click the "Add Token" button.
+4. Select the user account you wish to generate a key for in the user list
+   dropdown and click the Save button.
+5. Retrieve the API token from the list view under the "Key" column.
