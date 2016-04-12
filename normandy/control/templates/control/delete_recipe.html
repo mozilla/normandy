@@ -8,11 +8,11 @@
 
 {% block content %}
   <div class="fluid-8">
-    <h2>edit recipe // <span class="bold">{{ recipe.name }}</span></h2>
-    <form action="" method="post">{% csrf_token %}
-      {{ form.as_p }}
-      <input type="submit" value="Save" />
+    <h2>delete recipe</h2>
+    <form action="" method="post">
+      {% csrf_token %}
+      <p>Are you sure you want to delete "{{ object }}"?</p>
+      <input type="submit" value="Confirm" />
     </form>
   </div>
 {% endblock %}
-
