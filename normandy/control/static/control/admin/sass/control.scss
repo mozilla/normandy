@@ -1,99 +1,182 @@
-@import 'partials/layout';
+@import 'partials/common';
 
-body {
-  background: $cream;
-}
+/* Layout */
+#container { margin: 0 auto; }
+#content { background: #fff; }
 
 #header {
-  background: $darkRed;
-  border-bottom: 1px solid $darkOrange;
-  color: #fff;
-  height: 45px;
-  line-height: 25px;
-  padding: 10px 40px;
+  color: $darkBrown;
+  line-height: 55px;
 
   h1 {
-    font-size: 16px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 300;
 
-    a:link, a:visited {
-      color: $cream;
+    a:link, a:visited { color: $darkBrown; }
+  }
+
+  span {
+    float: right;
+    font-size: 11px;
+
+    a:link, a:visited { font-weight: 600; }
+  }
+}
+
+
+#page-header {
+  background: $darkBrown;
+  padding: 15px 30px;
+  position: relative;
+
+  h2 {
+    color: $cream;
+    font: normal normal 300 20px/30px $SourceSansPro;
+
+    span {
+      font-weight: 400;
+      margin-left: 5px;
+    }
+
+    a:link, a:visited { color: $cream; }
+  }
+
+  .button {
+    border-left: 1px solid #fff;
+    height: 100%;
+    line-height: 40px;
+    min-width: 165px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+}
+
+
+#secondary-header {
+  background-color: $secondaryColor;
+  border-top: 1px solid #fff;
+  padding: 0px;
+
+  h3 {
+    color: $darkBrown;
+    display: inline-block;
+    float: left;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 15px;
+    padding: 0px 15px;
+  }
+
+  h4 {
+    display: inline-block;
+    line-height: 35px;
+    margin: 0 0 0 35px;
+  }
+
+  input, .switch {
+    background: rgba(0, 0, 0, 0.1);
+    border: 0px;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+    font: normal normal 300 13px/22px $OpenSans;
+    min-width: 210px;
+    padding: 5px;
+    position: relative;
+
+    &[type='text'] { padding: 7px 14px; }
+  }
+
+  #filters-container {
+    text-align: right;
+
+    > div {
+      display: inline-block;
+      float: right;
+      margin: 0 0 0 16px;
     }
   }
 }
 
-#user-tools {
-  text-transform: none;
 
-  a:link, a:visited {
-    border-bottom: 0px;
-    color: $orange;
+/* Add & Edit Forms */
+.crud-form {
+  padding: 30px 45px;
+
+  input[type="checkbox"] { opacity: 0; }
+  input[type="number"] { width: 20%; }
+
+  .fluid-1 { width: 6.25%; }
+  .fluid-3 { width: 46.875%; }
+
+  .help {
+    font-size: 11px;
+    margin: 5px 0px;
+    opacity: 0.5;
+  }
+
+  /* Custom checkbox toggle for enabled/disabled state */
+  .checkbox-container {
+    border: 1px solid;
+    border-radius: 3px;
+    float: right;
+    font-size: 12px;
+    line-height: 30px;
+    margin-top: 10px;
+    min-width: 110px;
+    padding: 5px 15px;
+    text-transform: uppercase;
+
+    &:hover { cursor: pointer; }
+  }
+
+  /* Select arrows for toggling locales & countries */
+  .select-arrows {
+    line-height: 35px;
+    margin-top: 30px;
+    text-align: center;
+    width: 6.25%;
+
+    i {
+      display: block;
+      padding: 10px 0px;
+    }
+  }
+
+  a.batch-select {
+    display: block;
     font-size: 11px;
     font-weight: 600;
+    padding: 8px 0px;
+    text-align: center;
     text-transform: uppercase;
   }
 
-  a:hover {
-    border-bottom: 0px;
-    color: #fff;
-    text-decoration: none;
-  }
-}
+  /* Action buttons (submit, delete, etc) */
+  .form-action-buttons {
+    border-top: 1px solid $darkCream;
+    line-height: 30px;
+    margin-top: 30px;
+    padding-top: 15px;
 
-div.breadcrumbs {
-  background: $orange;
-  border-bottom: 1px solid #fff;
-  color: $darkOrange;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 30px;
-  margin-bottom: 35px;
-  padding: 0px 40px;
+    a.delete, input[type="submit"].delete {
+      background-color: $red;
+      display: inline-block;
 
-  a:link, a:visited {
-    color: $darkOrange;
-    font-weight: 400;
-    opacity: 0.75;
-  }
-
-  a:hover {
-    opacity: 1;
-  }
-
-  .separator {
-    display: inline-block;
-    font-weight: 300;
-    padding: 0px 5px;
-  }
-
-}
-
-h2 {
-  border-bottom: 1px solid $orange;
-  color: $darkBrown;
-  font-size: 20px;
-  font-weight: 300;
-  margin: 0px;
-  padding: 8px 0px;
-
-  span.bold {
-    font-weight: 600;
-  }
-}
-
-#content {
-  margin: 40px;
-  min-height: 100%;
-  padding: 0px;
-
-  ul.table-list {
-    margin: 0px;
-    padding: 0px;
-
-    li {
-      background: #fff;
-      list-style-type: none;
-      margin-bottom: 1px;
-      padding: 15px 30px;
+      &:hover {
+        background-color: $redHover;
+      }
     }
   }
+}
+
+
+/* Login Page */
+.login {
+  padding: 100px 0px;
+
+  #container { width: 28em; }
+  #header { display: none; }
+  #content { padding: 20px; }
 }

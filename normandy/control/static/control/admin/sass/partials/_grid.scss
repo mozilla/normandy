@@ -1,0 +1,47 @@
+$grid-columns: 8;
+
+@mixin border-box {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*, *:after, *:before {
+  margin: 0;
+  padding: 0;
+  @include border-box;
+}
+
+[class*='fluid-'] {
+  float: left;
+  padding: 1em;
+  width: 100%;
+  min-height: 1px;
+
+  &.float-right {
+    float: right;
+  }
+}
+
+%clearfix {
+  *zoom: 1;
+
+  &:before, &:after {
+    content: " ";
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+.row, .wrapper {
+  @extend %clearfix;
+}
+
+@for $i from 1 through $grid-columns {
+  .fluid-#{$i} {
+    width: 100% / $grid-columns * $i;
+  }
+}
