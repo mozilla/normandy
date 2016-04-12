@@ -12,11 +12,13 @@ class Core(Configuration):
     INSTALLED_APPS = [
         'normandy.base.apps.BaseApp',
         'normandy.classifier',
+        'normandy.control.apps.ControlApp',
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
 
         'adminplus',
+        'pipeline',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
@@ -81,6 +83,7 @@ class Core(Configuration):
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'npm.finders.NpmFinder',
+        'pipeline.finders.PipelineFinder',
     ]
     NPM_DESTINATION_PREFIX = 'npm'
     NPM_FILE_PATTERNS = {
@@ -110,6 +113,25 @@ class Core(Configuration):
             'TIMEOUT': values.IntegerValue(300, environ_name='CACHES_RECIPES_TIMEOUT'),
         },
     }
+
+    PIPELINE = {
+        'COMPILERS': (
+            'pipeline.compilers.sass.SASSCompiler',
+        ),
+        'SASS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/node-sass'),
+        'STYLESHEETS': {
+            'control': {
+                'source_filenames': (
+                  'admin/css/base.css',
+                  'control/admin/sass/*.scss',
+                ),
+                'output_filename': 'control/css/control-min.css',
+            },
+        },
+        'CSS_COMPRESSOR': 'pipeline.compressors.cssmin.CSSMinCompressor',
+        'CSSMIN_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/cssmin'),
+    }
+
 
 
 class Base(Core):
@@ -170,7 +192,7 @@ class Base(Core):
     STATIC_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'static'))
     MEDIA_URL = values.Value('/media/')
     MEDIA_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'media'))
-    STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
+    STATICFILES_STORAGE = values.Value('normandy.storage.GzipManifestPipelineStorage')
     # Overwrite old files when uploading media.
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.

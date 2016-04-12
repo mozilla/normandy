@@ -9,8 +9,10 @@
   "license": "MPL-2.0",
   "dependencies": {
     "babel-polyfill": "^6.7.2",
+    "cssmin": "^0.4.3",
     "font-awesome": "^4.5.0",
     "json-editor": "^0.7.23",
+    "node-sass": "^3.4.2",
     "node-uuid": "^1.4.7",
     "wolfy87-eventemitter": "^4.3.0"
   }

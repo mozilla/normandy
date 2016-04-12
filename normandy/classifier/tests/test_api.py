@@ -26,7 +26,7 @@ class TestFetchBundleAPI(object):
         res = client.post('/api/v1/fetch_bundle/', data)
 
         action = recipe.action
-        impl_url = reverse('action-implementation', kwargs={
+        impl_url = reverse('recipes:action-implementation', kwargs={
             'name': action.name,
             'impl_hash': action.implementation_hash,
         })
