@@ -1,8 +1,10 @@
 const testRunner = require('sdk/test');
 const {before, after} = require('sdk/test/utils');
 
-const {Storage, clearAllStorage} = require('../lib/Storage.js');
+const {Storage} = require('../lib/Storage.js');
 const {promiseTest} = require('./utils.js');
+
+let store;
 
 exports['test set and get'] = promiseTest(assert => {
   let store = new Storage('prefix');
@@ -45,11 +47,15 @@ exports['test tests are independent 2 of 2'] = promiseTest(assert => {
   .then(value => assert.equal(value, 1));
 });
 
-before(exports, (name, assert, done) => {
-  clearAllStorage()
+before(exports, () => {
+  store = new Storage('prefix');
+});
+
+after(exports, (name, assert, done) => {
+  store.clear()
   .then(() => done())
   .catch(err => {
-    console.error(err);
+    console.error(err); // eslint-disable-line no-console
     assert.ok(false, err);
     done();
   });
