@@ -8,6 +8,10 @@ from normandy.classifier.models import Client
 
 class ClientForm(forms.Form):
     """Form to specify client configurations for testing purposes."""
+    def __init__(self, *args, request=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
     locale = forms.ModelChoiceField(Locale.objects.all(), empty_label=None, to_field_name='code')
     release_channel = forms.ModelChoiceField(
         ReleaseChannel.objects.all(),
@@ -24,6 +28,7 @@ class ClientForm(forms.Form):
 
     def save(self):
         return Client(
+            request=self.request,
             locale=self.cleaned_data['locale'].code,
             country=self.cleaned_data['country'].code,
             request_time=self.cleaned_data.get('request_time', timezone.now()),

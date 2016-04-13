@@ -1,4 +1,12 @@
+from datetime import datetime
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
+from django.utils import timezone
+
+
+def aware_datetime(*args, **kwargs):
+    """Return an aware datetime using Django's configured timezone."""
+    return timezone.make_aware(datetime(*args, **kwargs))
 
 
 def urlparams(url, fragment=None, **kwargs):
