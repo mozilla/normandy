@@ -23,16 +23,20 @@ def get_commit():
             with open(path) as f:
                 _commit = f.read().strip()
         except OSError:
-            _commit = 'unknown'
+            _commit = None
 
     return _commit
 
 
 @api_view(['GET'])
 def version(request):
+    repo_url = 'https://github.com/mozilla/normandy'
+    commit = get_commit()
+
     return Response({
-        'source': 'https://github.com/mozilla/normandy',
-        'commit': get_commit(),
+        'source': repo_url,
+        'commit': commit,
+        'commit_link': '{0}/commit/{1}'.format(repo_url, commit) if commit else None,
     })
 
 

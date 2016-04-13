@@ -13,6 +13,7 @@ def test_version(client, mocker):
     assert res.data == {
         'source': 'https://github.com/mozilla/normandy',
         'commit': '<git hash>',
+        'commit_link': 'https://github.com/mozilla/normandy/commit/<git hash>',
     }
 
 
