@@ -42,7 +42,11 @@ class Client(object):
 
     @cached_property
     def country(self):
-        ip_address = self.request.META.get('REMOTE_ADDR')
+        try:
+            ip_address = self.request.META['HTTP_X_FORWARDED_FOR'].split(',')[0]
+        except (KeyError, IndexError):
+            ip_address = self.request.META.get('REMOTE_ADDR')
+
         return get_country_code(ip_address)
 
     @cached_property
