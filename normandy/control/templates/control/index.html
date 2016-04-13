@@ -9,6 +9,7 @@
 {% block content %}
   <div id="recipe-list" class="fluid-6">
     <h2>Recipes</h2>
+    <a href="{% url 'control:new_recipe' %}">Create new recipe</a>
     {% if all_recipes_list %}
       <ul class="table-list">
         {% for recipe in all_recipes_list %}
