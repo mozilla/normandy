@@ -208,6 +208,15 @@ class TestRecipeAPI(object):
         assert recipe.name == 'changed'
         assert recipe.revision_id == old_revision_id + 1
 
+    def test_it_can_delete_recipes(self, api_client):
+        recipe = RecipeFactory()
+
+        res = api_client.delete('/api/v1/recipe/%s/' % recipe.id)
+        assert res.status_code == 204
+
+        recipes = Recipe.objects.all()
+        assert recipes.count() == 0
+
     def test_available_if_admin_enabled(self, api_client, settings):
         settings.ADMIN_ENABLED = True
         res = api_client.get('/api/v1/recipe/')
