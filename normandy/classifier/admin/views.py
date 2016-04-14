@@ -8,7 +8,7 @@ from normandy.recipes.models import match_sample_rate
 
 @admin_site.register_view('classifier_preview', name='Classifier Preview')
 def classifier_preview(request):
-    form = ClientForm(request.GET or None)
+    form = ClientForm(request.GET or None, request=request)
     if form.is_valid():
         client = form.save()
         bundle = Bundle.for_client(client, exclude=[match_sample_rate])
