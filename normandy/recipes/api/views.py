@@ -6,6 +6,7 @@ from rest_framework import generics, permissions, viewsets
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
+from normandy.base.api.mixins import RevisionMixin
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.recipes.models import Action
@@ -13,7 +14,7 @@ from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import ActionSerializer
 
 
-class ActionViewSet(viewsets.ModelViewSet):
+class ActionViewSet(RevisionMixin, viewsets.ModelViewSet):
     """Viewset for viewing and uploading recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer

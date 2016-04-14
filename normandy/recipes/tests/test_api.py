@@ -2,6 +2,7 @@ import hashlib
 
 import pytest
 from rest_framework.reverse import reverse
+from reversion import revisions as reversion
 
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.tests import Whatever
@@ -142,6 +143,24 @@ class TestActionAPI(object):
         res = api_client.get('/api/v1/action/')
         assert res.status_code == 403
         assert res.data['detail'] == AdminEnabled.message
+
+    def test_it_creates_revisions(self, api_client):
+        res = api_client.post('/api/v1/action/', {
+            'name': 'foo',
+            'implementation': 'foobar',
+            'arguments_schema': {'type': 'object'},
+        })
+        assert res.status_code == 201
+
+        action = Action.objects.all()[0]
+        assert len(reversion.get_for_object(action)) == 1
+
+        res = api_client.patch('/api/v1/action/foo/', {'implementation': 'changed'})
+        assert res.status_code == 200
+        assert len(reversion.get_for_object(action)) == 2
+
+        res = api_client.delete('/api/v1/action/foo/')
+        assert len(reversion.get_deleted(Action)) == 1
 
 
 @pytest.mark.django_db
