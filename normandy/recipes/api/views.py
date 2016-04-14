@@ -1,10 +1,12 @@
 from django.conf import settings
+from django.db import transaction
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
 from rest_framework import generics, permissions, viewsets
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
+from reversion import revisions as reversion
 
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.renderers import JavaScriptRenderer
@@ -26,6 +28,13 @@ class ActionViewSet(viewsets.ModelViewSet):
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
 
+    @transaction.atomic()
+    @reversion.create_revision()
+    def create(self, *args, **kwargs):
+        return super().create(*args, **kwargs)
+
+    @transaction.atomic()
+    @reversion.create_revision()
     def update(self, request, *args, **kwargs):
         """
         Intercept PUT requests and have them create instead of update
