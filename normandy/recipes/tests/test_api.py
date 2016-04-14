@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.tests import Whatever
-from normandy.recipes.models import Action
+from normandy.recipes.models import Action, Recipe
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.tests import ActionFactory, RecipeFactory
 
@@ -181,3 +181,50 @@ class TestImplementationAPI(object):
         max_age = 'max-age={}'.format(settings.ACTION_IMPLEMENTATION_CACHE_TIME)
         assert max_age in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+
+@pytest.mark.django_db
+class TestRecipeAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_it_serves_recipes(self, api_client):
+        recipe = RecipeFactory()
+
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 200
+        assert res.data[0]['name'] == recipe.name
+
+    def test_it_can_edit_recipes(self, api_client):
+        recipe = RecipeFactory(name='unchanged')
+        old_revision_id = recipe.revision_id
+
+        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'name': 'changed'})
+        assert res.status_code == 200
+
+        recipe = Recipe.objects.all()[0]
+        assert recipe.name == 'changed'
+        assert recipe.revision_id == old_revision_id + 1
+
+    def test_it_can_delete_recipes(self, api_client):
+        recipe = RecipeFactory()
+
+        res = api_client.delete('/api/v1/recipe/%s/' % recipe.id)
+        assert res.status_code == 204
+
+        recipes = Recipe.objects.all()
+        assert recipes.count() == 0
+
+    def test_available_if_admin_enabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = True
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_unavailable_if_admin_disabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 403
+        assert res.data['detail'] == AdminEnabled.message
