@@ -8,9 +8,9 @@ from rest_framework.response import Response
 
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.recipes.models import Action
+from normandy.recipes.models import Action, Recipe
 from normandy.recipes.api.permissions import NotInUse
-from normandy.recipes.api.serializers import ActionSerializer
+from normandy.recipes.api.serializers import ActionSerializer, RecipeSerializer
 
 
 class ActionViewSet(viewsets.ModelViewSet):
@@ -58,3 +58,26 @@ class ActionImplementationView(generics.RetrieveAPIView):
             raise NotFound('Hash does not match current stored action.')
 
         return Response(action.implementation)
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    """Viewset for viewing and uploading recipes."""
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    permission_classes = [
+        permissions.DjangoModelPermissions,
+        AdminEnabled,
+    ]
+
+    def update(self, request, *args, **kwargs):
+        """
+        Intercept PUT requests and have them create instead of update
+        if the object does not exist.
+        """
+        if request.method == 'PUT':
+            try:
+                self.get_object()
+            except Http404:
+                return self.create(request, *args, **kwargs)
+
+        return super().update(request, *args, **kwargs)
