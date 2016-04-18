@@ -61,7 +61,7 @@ class TestClientClassifier(object):
         )
         RecipeFactory(locales=[other_locale])  # Non-matching
 
-        with patch('normandy.classifier.middleware.timezone') as timezone:
+        with patch('normandy.base.middleware.timezone') as timezone:
             timezone.now.return_value = aware_datetime(2016, 1, 2)
             response = admin_client.get('/admin/classifier_preview', {
                 'locale': locale.code,

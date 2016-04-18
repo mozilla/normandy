@@ -3,8 +3,8 @@ import pytest
 from rest_framework.reverse import reverse
 
 from normandy.base.tests import Whatever
-from normandy.recipes.tests import RecipeFactory
-from normandy.recipes.api.serializers import RecipeSerializer
+from normandy.recipes.tests import BundleFactory, RecipeFactory
+from normandy.recipes.api.serializers import BundleSerializer, RecipeSerializer
 
 
 @pytest.mark.django_db()
@@ -37,3 +37,18 @@ class TestRecipeSerializer:
         recipe = RecipeFactory()
         serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
         assert serializer.data['action']['implementation_url'].startswith(settings.CDN_URL)
+
+
+@pytest.mark.django_db()
+def test_bundle_serializer(rf):
+    recipe = RecipeFactory()
+    bundle = BundleFactory(recipes=[recipe])
+    serializer = BundleSerializer(bundle, context={'request': rf.get('/')})
+
+    assert serializer.data['recipes'] == [{
+        'name': recipe.name,
+        'id': recipe.id,
+        'revision_id': recipe.revision_id,
+        'action': Whatever(),
+        'arguments': Whatever(),
+    }]

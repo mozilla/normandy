@@ -3,16 +3,21 @@ from django.db import transaction
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, viewsets, views
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion import revisions as reversion
 
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.recipes.models import Action, Recipe
+from normandy.base.decorators import short_circuit_middlewares
+from normandy.recipes.models import Action, Bundle, Client, Recipe
 from normandy.recipes.api.permissions import NotInUse
-from normandy.recipes.api.serializers import ActionSerializer, RecipeSerializer
+from normandy.recipes.api.serializers import (
+    ActionSerializer,
+    BundleSerializer,
+    RecipeSerializer,
+)
 
 
 class ActionViewSet(viewsets.ModelViewSet):
@@ -90,3 +95,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return self.create(request, *args, **kwargs)
 
         return super().update(request, *args, **kwargs)
+
+
+class FetchBundle(views.APIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = BundleSerializer
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super().as_view(**initkwargs)
+        # Apply the short circuit middleware
+        return short_circuit_middlewares(view)
+
+    def post(self, request, format=None):
+        """
+        Determine the recipes that matches the requesting client.
+        """
+        client = Client(request)
+        bundle = Bundle.for_client(client)
+        serializer = self.serializer_class(bundle, context={'request': request})
+        return Response(serializer.data)

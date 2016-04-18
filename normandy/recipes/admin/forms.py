@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.admin import widgets
 from django.utils import timezone
 
-from normandy.recipes.models import Country, Locale, ReleaseChannel
-from normandy.classifier.models import Client
+from normandy.recipes.models import Client, Country, Locale, ReleaseChannel
 
 
 class ClientForm(forms.Form):
