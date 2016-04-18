@@ -11,7 +11,6 @@ class Core(Configuration):
     # Application definition
     INSTALLED_APPS = [
         'normandy.base.apps.BaseApp',
-        'normandy.classifier',
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
@@ -34,7 +33,7 @@ class Core(Configuration):
     ]
 
     MIDDLEWARE_CLASSES = [
-        'normandy.classifier.middleware.RequestReceivedAtMiddleware',
+        'normandy.base.middleware.RequestReceivedAtMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'normandy.base.middleware.ShortCircuitMiddleware',
 

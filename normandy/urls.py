@@ -17,7 +17,6 @@ if settings.ADMIN_ENABLED:
 
 urlpatterns += [
     url(r'', include('normandy.recipes.urls')),
-    url(r'', include('normandy.classifier.urls')),
     url(r'', include('normandy.selfrepair.urls')),
     url(r'', include('normandy.health.urls')),
 ]
