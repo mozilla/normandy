@@ -2,7 +2,12 @@ from django.conf.urls import url, include
 
 from rest_framework.routers import DefaultRouter
 
-from normandy.recipes.api.views import ActionImplementationView, ActionViewSet, RecipeViewSet
+from normandy.recipes.api.views import (
+    ActionImplementationView,
+    ActionViewSet,
+    FetchBundle,
+    RecipeViewSet,
+)
 
 # API Router
 router = DefaultRouter()
@@ -19,4 +24,5 @@ urlpatterns = [
         ActionImplementationView.as_view(),
         name='action-implementation'
     ),
+    url(r'^api/v1/fetch_bundle/$', FetchBundle.as_view(), name='api.v1.fetch_bundle'),
 ]

@@ -1,9 +1,8 @@
 from django.shortcuts import render
 
 from normandy.base.admin import site as admin_site
-from normandy.classifier.admin.forms import ClientForm
-from normandy.classifier.models import Bundle
-from normandy.recipes.models import match_sample_rate
+from normandy.recipes.admin.forms import ClientForm
+from normandy.recipes.models import Bundle, match_sample_rate
 
 
 @admin_site.register_view('classifier_preview', name='Classifier Preview')

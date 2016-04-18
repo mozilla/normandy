@@ -6,7 +6,7 @@ from geoip2.database import Reader
 from geoip2.errors import GeoIP2Error, AddressNotFoundError
 
 
-log = logging.getLogger('normandy.classifier')
+log = logging.getLogger('normandy.geolocation')
 
 
 #: Shared instance of the GeoIP2 database reader.

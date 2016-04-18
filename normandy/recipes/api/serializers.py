@@ -35,3 +35,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             'action',
             'arguments',
         ]
+
+
+class BundleSerializer(serializers.Serializer):
+    recipes = RecipeSerializer(many=True)
+    country = serializers.CharField()

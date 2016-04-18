@@ -5,7 +5,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from normandy.base.tests import UserFactory, skip_except_in_ci
-from normandy.classifier import geolocation as geolocation_module
+from normandy.recipes import geolocation as geolocation_module
 
 
 @pytest.fixture
