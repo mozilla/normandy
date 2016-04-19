@@ -15,6 +15,7 @@
     "json-editor": "^0.7.23",
     "node-sass": "^3.4.2",
     "node-uuid": "^1.4.7",
+    "uglifyjs": "^2.4.10",
     "wolfy87-eventemitter": "^4.3.0"
   }
 }

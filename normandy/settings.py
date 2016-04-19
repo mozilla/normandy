@@ -137,6 +137,11 @@ class Core(Configuration):
         },
         'CSS_COMPRESSOR': 'pipeline.compressors.cssmin.CSSMinCompressor',
         'CSSMIN_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/cssmin'),
+
+        'DISABLE_WRAPPER': True,
+
+        'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+        'UGLIFYJS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/uglifyjs'),
     }
 
 
