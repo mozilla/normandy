@@ -1,5 +1,4 @@
 $('#recipe-list tr').click(function(e) {
-  console.log('clicked!');
   var recipeId = $(this).data('recipe-id');
   window.location = '/control/recipe/' + recipeId + '/';
 });

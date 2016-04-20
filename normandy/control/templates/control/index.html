@@ -49,7 +49,7 @@
                 {% endif %}
               </td>
               <td>{{ recipe.sample_rate }}</td>
-              <td>{{ recipe.release_channels.all|join:"<br />"|default:"No Release Channels Chosen" }}</td>
+              <td>{{ recipe.release_channels.all|join:"<br />"|default:"All Release Channels" }}</td>
             </tr>
         {% endfor %}
         </tbody>
