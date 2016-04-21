@@ -21,13 +21,19 @@
     <div class="row">
       <div class="fluid-8">
         {{ form.username.errors }}
-        {{ form.username.label_tag }} <div class="input-with-icon user">{{ form.username }}</div>
+        {{ form.username.label_tag }}
+        <div class="input-with-icon user">
+          <input id="id_username" maxlength="254" name="username" type="text" autofocus>
+        </div>
       </div>
     </div>
     <div class="row">
       <div class="fluid-8">
         {{ form.password.errors }}
-        {{ form.password.label_tag }} <div class="input-with-icon key">{{ form.password }}</div>
+        {{ form.password.label_tag }}
+        <div class="input-with-icon key">
+          <input id="id_password" name="password" type="password">
+        </div>
         <input type="hidden" name="next" value="{{ next|default:"/control" }}" />
       </div>
     </div>
@@ -35,8 +41,4 @@
       <label>&nbsp;</label><input type="submit" class="button" value="Log in" />
     </div>
   </form>
-
-  <script type="text/javascript">
-    document.getElementById('id_username').focus()
-  </script>
 {% endblock %}
