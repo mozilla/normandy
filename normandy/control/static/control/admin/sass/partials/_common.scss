@@ -102,10 +102,11 @@ input, select, textarea {
   background: $cta;
   border: 0px;
   border-radius: 0px;
-  color: $darkBrown;
+  color: #fff;
   font: normal normal 600 13px/30px $OpenSans;
   padding: 10px 40px;
   text-align: center;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
   text-transform: uppercase;
 }
 
