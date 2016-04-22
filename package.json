@@ -26,6 +26,6 @@
     "woodchipper": "^0.9.1"
   },
   "dependencies": {
-    "jexl": "^1.1.2"
+    "jexl": "^1.1.3"
   }
 }
