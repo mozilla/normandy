@@ -24,5 +24,8 @@
     "eslint-plugin-mozilla": "0.0.3",
     "jpm": "^1.0.5",
     "woodchipper": "^0.9.1"
+  },
+  "dependencies": {
+    "jexl": "^1.1.2"
   }
 }
