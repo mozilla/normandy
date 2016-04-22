@@ -17,19 +17,21 @@ class IndexView(ControlMixin, generic.ListView):
   context_object_name = 'all_recipes_list'
 
   def get_queryset(self):
-    return Recipe.objects.all()
+    return Recipe.objects.all().order_by('-enabled')
 
 
 class EditView(ControlMixin, generic.UpdateView):
   model = Recipe
   fields = RECIPE_EDITABLE_FIELDS
   template_name = 'control/edit_recipe.html'
+  success_url = reverse_lazy('control:index')
 
 
 class CreateView(ControlMixin, generic.CreateView):
   model = Recipe
   fields = RECIPE_EDITABLE_FIELDS
   template_name = 'control/create_recipe.html'
+  success_url = reverse_lazy('control:index')
 
 
 class DeleteView(ControlMixin, generic.DeleteView):

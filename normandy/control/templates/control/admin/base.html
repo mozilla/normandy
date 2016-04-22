@@ -14,31 +14,27 @@
     <!-- Container -->
     <div id="container">
 
-      <!-- Header -->
       <div id="header">
-        <div id="branding">
-          <h1 id="site-name"><a href="{% url 'control:index' %}">SHIELD Control Panel</a></h1>
-        </div>
+        <h1><a href="{% url 'control:index' %}">SHIELD Control Panel</a></h1>
         {% if user.is_authenticated %}
-          <div id="user-tools">
+          <span>
             {% firstof user.get_short_name user.get_username %} //
-            <a href="{% url 'control:logout' %}">Log Out</a>
-          </div>
+            <a href="{% url 'control:logout' %}">Log Out <i class="fa fa-sign-out post"></i></a>
+          </span>
         {% endif %}
       </div>
-      <!-- END Header -->
 
-      {% block breadcrumbs %}
-      {% endblock %}
+      <div id="page-header">
+        {% block page-header %}{% endblock %}
+      </div>
 
-      <!-- Content -->
-      <div id="content">
+      <div id="content" class="wrapper">
         {% block content %}{% endblock %}
       </div>
-      <!-- END Content -->
 
     </div>
     <!-- END Container -->
 
+    {% javascript 'control' %}
   </body>
 </html>

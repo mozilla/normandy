@@ -87,6 +87,7 @@ class Core(Configuration):
         'babel-polyfill': ['dist/*.js'],
         'font-awesome': ['css/*.css', 'fonts/*'],
         'node-uuid': ['uuid.js'],
+        'jquery': ['dist/*.js'],
         'json-editor': ['dist/*.js'],
         'wolfy87-eventemitter': ['EventEmitter.js'],
     }
@@ -119,14 +120,28 @@ class Core(Configuration):
         'STYLESHEETS': {
             'control': {
                 'source_filenames': (
-                  'admin/css/base.css',
+                  'npm/font-awesome/css/font-awesome.css',
                   'control/admin/sass/*.scss',
                 ),
                 'output_filename': 'control/css/control-min.css',
             },
         },
+        'JAVASCRIPT': {
+            'control': {
+                'source_filenames': (
+                    'npm/jquery/dist/jquery.min.js',
+                    'control/js/main.js',
+                ),
+                'output_filename': 'control/js/control.js'
+            },
+        },
         'CSS_COMPRESSOR': 'pipeline.compressors.cssmin.CSSMinCompressor',
         'CSSMIN_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/cssmin'),
+
+        'DISABLE_WRAPPER': True,
+
+        'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+        'UGLIFYJS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/uglifyjs'),
     }
 
 

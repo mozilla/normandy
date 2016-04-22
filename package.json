@@ -11,9 +11,11 @@
     "babel-polyfill": "^6.7.2",
     "cssmin": "^0.4.3",
     "font-awesome": "^4.5.0",
+    "jquery": "^2.2.3",
     "json-editor": "^0.7.23",
     "node-sass": "^3.4.2",
     "node-uuid": "^1.4.7",
+    "uglifyjs": "^2.4.10",
     "wolfy87-eventemitter": "^4.3.0"
   }
 }
