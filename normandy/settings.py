@@ -244,6 +244,7 @@ class ProductionInsecure(Production):
     Useful for testing and setups where security is provided by other means.
     Not intended for general use on the public internet.
     """
+    INSTALLED_APPS = Production.INSTALLED_APPS + ['sslserver']
     SECRET_KEY = values.Value('not a secret')
     ALLOWED_HOSTS = values.ListValue(['*'])
     SECURE_SSL_REDIRECT = values.BooleanValue(False)
