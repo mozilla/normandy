@@ -126,13 +126,16 @@ let Normandy = {
                 emitter.emit(eventName, data);
             };
 
+            // Positional arguments are overridden by the final options
+            // argument, but they're still required so we pass them anyway.
             Mozilla.UITour.showHeartbeat(
                 options.message,
                 options.thanksMessage,
                 options.flowId,
                 options.postAnswerUrl,
                 options.learnMoreMessage,
-                options.learnMoreUrl
+                options.learnMoreUrl,
+                options
             );
 
             resolve(emitter);
