@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script generates SSL keys for the Nginx proxy.
 BASE_DIR="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
-SSL_DIR="$BASE_DIR/ssl"
+SSL_DIR="$BASE_DIR/etc"
 KEY="$SSL_DIR/proxy.key"
 CERT="$SSL_DIR/proxy.crt"
 

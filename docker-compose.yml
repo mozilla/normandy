@@ -20,5 +20,6 @@ services:
     links:
       - normandy
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl/:/etc/nginx/ssl/
+      - ./etc/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./etc/proxy.crt:/etc/nginx/proxy.crt:ro
+      - ./etc/proxy.key:/etc/nginx/proxy.key:ro
