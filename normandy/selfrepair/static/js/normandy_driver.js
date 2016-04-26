@@ -68,7 +68,19 @@ let Normandy = {
 
     client() {
         return new Promise(resolve => {
-            let client = {};
+            let client = {
+                plugins: {}
+            };
+
+            // Populate plugin info.
+            for (let plugin of navigator.plugins) {
+                client.plugins[plugin.name] = {
+                    name: plugin.name,
+                    filename: plugin.filename,
+                    description: plugin.description,
+                    version: plugin.version,
+                }
+            }
 
             // Keys are UITour configs, functions are given the data
             // returned by UITour for that config.
