@@ -27,4 +27,5 @@ ENV DJANGO_SETTINGS_MODULE=normandy.settings \
 EXPOSE $PORT
 CMD gunicorn normandy.wsgi:application \
     --log-file - \
-    --worker-class ${WORKER_CLASS:-sync}
+    --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
+    --max-requests ${GUNICORN_MAX_REQUESTS:-0}
