@@ -1,6 +1,6 @@
-This is a repo to hold all the bits to get a prod-like Normandy running using [Docker Compose][].
+This is a repo to hold all the bits to get a prod-like Normandy running using
+[Docker Compose][].
 
-[Docker Compse]: https://docs.docker.com/compose/
 
 1. Install [Docker][] and Docker Compose, and start the Docker daemon (possibly via [Docker Machine][]).
 2. Clone this repo, and `cd` into it.
@@ -12,3 +12,5 @@ This is a repo to hold all the bits to get a prod-like Normandy running using [D
 8. Later, run `docker-compose down` to shut everything down.
 
 [Docker Machine]: https://docs.docker.com/machine/
+[Docker Compose]: https://docs.docker.com/compose/
+[Docker]: https://docker.io
