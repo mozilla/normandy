@@ -1,12 +1,14 @@
 from django.core.checks import Info, Warning, Error, register as register_check
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 
 
 INFO_CANT_CHECK_MIGRATIONS = 'normandy.health.I001'
 WARNING_UNAPPLIED_MIGRATION = 'normandy.health.W001'
 ERROR_CANNOT_CONNECT_DATABASE = 'normandy.health.E001'
 ERROR_UNUSABLE_DATABASE = 'normandy.health.E002'
+ERROR_MISCONFIGURED_DATABASE = 'normandy.health.E003'
 
 
 def database_connected(app_configs, **kwargs):
@@ -14,8 +16,12 @@ def database_connected(app_configs, **kwargs):
 
     try:
         connection.ensure_connection()
-    except OperationalError:
-        errors.append(Error('Could not connect to database', id=ERROR_CANNOT_CONNECT_DATABASE))
+    except OperationalError as e:
+        msg = 'Could not connect to database: {!s}'.format(e)
+        errors.append(Error(msg, id=ERROR_CANNOT_CONNECT_DATABASE))
+    except ImproperlyConfigured as e:
+        msg = 'Datbase misconfigured: "{!s}"'.format(e)
+        errors.append(Error(msg, id=ERROR_MISCONFIGURED_DATABASE))
     else:
         if not connection.is_usable():
             errors.append(Error('Database connection is not usable', id=ERROR_UNUSABLE_DATABASE))
@@ -30,7 +36,7 @@ def migrations_applied(app_configs, **kwargs):
     # Load migrations from disk/DB
     try:
         loader = MigrationLoader(connection, ignore_no_migrations=True)
-    except OperationalError:
+    except (ImproperlyConfigured, ProgrammingError, OperationalError):
         msg = "Can't connect to database to check migrations"
         return [Info(msg, id=INFO_CANT_CHECK_MIGRATIONS)]
     graph = loader.graph
