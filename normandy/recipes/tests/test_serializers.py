@@ -29,7 +29,9 @@ class TestRecipeSerializer:
             },
             'arguments': {
                 'foo': 'bar',
-            }
+            },
+            'start_time': recipe.start_time,
+            'end_time': recipe.end_time,
         }
 
     def test_it_uses_cdn_url(self, rf, settings):
@@ -51,4 +53,6 @@ def test_bundle_serializer(rf):
         'revision_id': recipe.revision_id,
         'action': Whatever(),
         'arguments': Whatever(),
+        'start_time': recipe.start_time,
+        'end_time': recipe.end_time,
     }]
