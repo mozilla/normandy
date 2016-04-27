@@ -15,7 +15,7 @@ def fraction_to_key(frac):
     assert in_decimal >= 0
 
     hex_digits = hex(in_decimal)[2:]  # Strip off leading "0x"
-    padded = "{:0<64}".format(hex_digits)
+    padded = "{:0>64}".format(hex_digits)
 
     # Saturate at 2**256 - 1
     if len(padded) > 64:
