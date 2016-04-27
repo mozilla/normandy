@@ -13,10 +13,14 @@ class TestFractionToKey(object):
         assert fraction_to_key(Fraction(2, 4)) == '7' + 'f' * 63
         assert fraction_to_key(Fraction(3, 4)) == 'b' + 'f' * 63
         assert fraction_to_key(Fraction(4, 4)) == 'f' * 64
+        assert fraction_to_key(Fraction(1, 32)) == '07' + 'f' * 62
 
     def test_floats(self):
         assert fraction_to_key(0.0) == '0' * 64
         assert fraction_to_key(1.0) == 'f' * 64
+        # This magic number is 0.00001 * 2**256, in hexadecimal
+        assert (fraction_to_key(0.00001) ==
+                '0000a7c5ac471b47880000000000000000000000000000000000000000000000')
 
     @pytest.mark.parametrize('bad_val', [-1, -0.5, 1.5, 2])
     def test_error_cases(self, bad_val):
