@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.db.utils import OperationalError, ProgrammingError
 from django.core.checks import Warning, Info, register as register_check
-from django.template.defaultfilters import pluralize
+from django.core.exceptions import ImproperlyConfigured
 
 
 INFO_COULD_NOT_RETRIEVE_ACTIONS = 'normandy.recipes.I001'
@@ -13,7 +13,7 @@ def actions_have_consistent_hashes(app_configs, **kwargs):
     try:
         Action = apps.get_model('recipes', 'Action')
         actions = list(Action.objects.all())
-    except (ProgrammingError, OperationalError):
+    except (ProgrammingError, OperationalError, ImproperlyConfigured):
         errors.append(Info('Could not retrieve actions', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
     else:
         bad_actions = []
