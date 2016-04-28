@@ -4,7 +4,9 @@ var BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = {
   context: __dirname,
-  entry: './selfrepair/static/js/index',
+  entry: {
+    selfrepair: ['./selfrepair/static/js/index']
+  },
   output: {
       path: path.resolve('static/js/bundles/'),
       filename: "selfrepair-[hash].js"
