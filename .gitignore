@@ -1,6 +1,7 @@
 .env
 db.sqlite3
 .DS_Store
+webpack-stats.json
 __pycache__/
 /static/
 /media/
