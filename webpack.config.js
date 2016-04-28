@@ -5,7 +5,7 @@ var BundleTracker = require('webpack-bundle-tracker');
 module.exports = {
   context: __dirname,
   entry: {
-    selfrepair: ['./selfrepair/static/js/self_repair_runner']
+    selfrepair: ['./normandy/selfrepair/static/js/self_repair_runner']
   },
   output: {
       path: path.resolve('static/js/bundles/'),
