@@ -30,6 +30,13 @@ def urlparams(url, fragment=None, **kwargs):
 
 
 def get_client_ip(request):
+    """
+    Get a client's IP address from a request.
+
+    If settings.NUM_PROXIES is 0, reads directly from REMOTE_ADDR. If
+    settings.NUM_PROXIES is non-zero, parses X-Forwarded-For header
+    based on the number of proxies.
+    """
     if settings.NUM_PROXIES == 0:
         return request.META.get('REMOTE_ADDR')
     else:
