@@ -2,6 +2,7 @@ import 'babel-polyfill'
 import xhr from './xhr.js'
 import Mozilla from './uitour.js'
 import Normandy from './normandy_driver.js'
+import uuid from 'node-uuid'
 
 let registeredActions = {};
 window.registerAction = function(name, ActionClass) {
