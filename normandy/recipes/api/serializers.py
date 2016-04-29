@@ -32,15 +32,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'enabled',
             'revision_id',
             'action',
             'arguments',
+            'filter_expression',
         ]
 
 
-class BundleSerializer(serializers.Serializer):
-    recipes = RecipeSerializer(many=True)
+class ClientSerializer(serializers.Serializer):
     country = serializers.CharField()
+    request_time = serializers.DateTimeField()
 
 
 class RecipeVersionSerializer(serializers.ModelSerializer):
