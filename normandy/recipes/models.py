@@ -4,6 +4,7 @@ import logging
 import uuid
 
 from django.core.cache import caches
+from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -293,10 +294,15 @@ class Client(object):
 
     @cached_property
     def country(self):
-        try:
-            ip_address = self.request.META['HTTP_X_FORWARDED_FOR'].split(',')[0]
-        except (KeyError, IndexError):
+        if settings.NUM_PROXIES == 0:
             ip_address = self.request.META.get('REMOTE_ADDR')
+        else:
+            try:
+                ips = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+                ips = [ip.strip() for ip in ips]
+                ip_address = ips[-settings.NUM_PROXIES]
+            except IndexError:
+                return None
 
         return get_country_code(ip_address)
 

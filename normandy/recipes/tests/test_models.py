@@ -208,20 +208,47 @@ class TestReleaseChannel(object):
 
 
 class TestClient(object):
-    @pytest.mark.parametrize('x_forwarded_for,expected_ip', [
-        ('192.0.2.0,127.0.0.1', '192.0.2.0'),
-        ('192.0.2.0', '192.0.2.0'),
-    ])
-    def test_country_x_forwarded_for(self, rf, x_forwarded_for, expected_ip):
-        client = Client(rf.get('/', HTTP_X_FORWARDED_FOR=x_forwarded_for))
-
-        with patch('normandy.recipes.models.get_country_code') as get_country_code:
-            assert client.country == get_country_code.return_value
-            get_country_code.assert_called_with(expected_ip)
-
     def test_country_remote_addr_fallback(self, rf):
         client = Client(rf.get('/', REMOTE_ADDR='192.0.2.0'))
 
         with patch('normandy.recipes.models.get_country_code') as get_country_code:
             assert client.country == get_country_code.return_value
             get_country_code.assert_called_with('192.0.2.0')
+
+    def test_x_forwarded_for_no_proxies(self, rf, settings):
+        """If there are no proxies, REMOTE_ADDR should be used."""
+        settings.NUM_PROXIES = 0
+        client_ip = '1.1.1.1'
+        req = rf.get('/', HTTP_X_FORWARDED_FOR='fake', REMOTE_ADDR=client_ip)
+        client = Client(req)
+
+        with patch('normandy.recipes.models.get_country_code') as get_country_code:
+            assert client.country == get_country_code.return_value
+            get_country_code.assert_called_with(client_ip)
+
+    def test_x_forwarded_for_one_proxy(self, rf, settings):
+        """If there is one proxy, the right-most value in HTTP_X_FORWARDED_FOR should be used."""
+        settings.NUM_PROXIES = 1
+        client_ip = '1.1.1.1'
+        nginx_ip = '2.2.2.2'
+        forwarded_for = ', '.join(['fake', client_ip])
+        req = rf.get('/', HTTP_X_FORWARDED_FOR=forwarded_for, REMOTE_ADDR=nginx_ip)
+        client = Client(req)
+
+        with patch('normandy.recipes.models.get_country_code') as get_country_code:
+            assert client.country == get_country_code.return_value
+            get_country_code.assert_called_with(client_ip)
+
+    def test_x_forwarded_for_two_proxies(self, rf, settings):
+        """If there is one proxy, the right-most value in HTTP_X_FORWARDED_FOR should be used."""
+        settings.NUM_PROXIES = 2
+        client_ip = '1.1.1.1'
+        elb_ip = '2.2.2.2'
+        nginx_ip = '3.3.3.3'
+        forwarded_for = ', '.join(['fake', client_ip, elb_ip])
+        req = rf.get('/', HTTP_X_FORWARDED_FOR=forwarded_for, REMOTE_ADDR=nginx_ip)
+        client = Client(req)
+
+        with patch('normandy.recipes.models.get_country_code') as get_country_code:
+            assert client.country == get_country_code.return_value
+            get_country_code.assert_called_with(client_ip)
