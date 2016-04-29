@@ -1,6 +1,7 @@
 from datetime import datetime
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -26,3 +27,22 @@ def urlparams(url, fragment=None, **kwargs):
         urlencode(query, doseq=True),
         fragment if fragment is not None else parsed.fragment
     ))
+
+
+def get_client_ip(request):
+    """
+    Get a client's IP address from a request.
+
+    If settings.NUM_PROXIES is 0, reads directly from REMOTE_ADDR. If
+    settings.NUM_PROXIES is non-zero, parses X-Forwarded-For header
+    based on the number of proxies.
+    """
+    if settings.NUM_PROXIES == 0:
+        return request.META.get('REMOTE_ADDR')
+    else:
+        try:
+            ips = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+            ips = [ip.strip() for ip in ips]
+            return ips[-settings.NUM_PROXIES]
+        except IndexError:
+            return None
