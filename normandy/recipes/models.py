@@ -11,6 +11,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
+from normandy.base.utils import get_client_ip
 from normandy.recipes import utils
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.validators import validate_json
@@ -293,12 +294,11 @@ class Client(object):
 
     @cached_property
     def country(self):
-        try:
-            ip_address = self.request.META['HTTP_X_FORWARDED_FOR'].split(',')[0]
-        except (KeyError, IndexError):
-            ip_address = self.request.META.get('REMOTE_ADDR')
-
-        return get_country_code(ip_address)
+        ip_address = get_client_ip(self.request)
+        if ip_address is None:
+            return None
+        else:
+            return get_country_code(ip_address)
 
     @cached_property
     def request_time(self):

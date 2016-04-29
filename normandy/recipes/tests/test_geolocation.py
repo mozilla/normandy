@@ -1,6 +1,3 @@
-import pytest
-
-
 class TestGetCountryCode:
     def test_it_works(self, geolocation):
         assert geolocation.get_country_code('207.126.102.129') == 'US'

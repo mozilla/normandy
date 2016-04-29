@@ -208,20 +208,11 @@ class TestReleaseChannel(object):
 
 
 class TestClient(object):
-    @pytest.mark.parametrize('x_forwarded_for,expected_ip', [
-        ('192.0.2.0,127.0.0.1', '192.0.2.0'),
-        ('192.0.2.0', '192.0.2.0'),
-    ])
-    def test_country_x_forwarded_for(self, rf, x_forwarded_for, expected_ip):
-        client = Client(rf.get('/', HTTP_X_FORWARDED_FOR=x_forwarded_for))
+    def test_geolocation(self, rf, settings):
+        settings.NUM_PROXIES = 1
+        req = rf.post('/', X_FORWARDED_FOR='fake, 1.1.1.1', REMOTE_ADDR='2.2.2.2')
+        client = Client(req)
 
         with patch('normandy.recipes.models.get_country_code') as get_country_code:
             assert client.country == get_country_code.return_value
-            get_country_code.assert_called_with(expected_ip)
-
-    def test_country_remote_addr_fallback(self, rf):
-        client = Client(rf.get('/', REMOTE_ADDR='192.0.2.0'))
-
-        with patch('normandy.recipes.models.get_country_code') as get_country_code:
-            assert client.country == get_country_code.return_value
-            get_country_code.assert_called_with('192.0.2.0')
+            assert get_country_code.called_with('1.1.1.1')
