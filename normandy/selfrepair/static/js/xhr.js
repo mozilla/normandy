@@ -11,7 +11,7 @@
  * @promise {XMLHttpRequest} The request after it has succeeded.
  * @rejects {XMLHttpRequest} The request after it has failed.
  */
-function xhr(method, url, options={}) {
+export default function xhr(method, url, options={}) {
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
         req.addEventListener('load', e => {

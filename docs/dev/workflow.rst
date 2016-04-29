@@ -63,6 +63,19 @@ make adding these hashes easier.
 
 .. _hashin: https://github.com/peterbe/hashin
 
+Preprocessing Assets with webpack
+-----------------------
+
+We use webpack to create asset bundles of static resources. You can build an
+asset bundle by running:
+
+.. code-block:: bash
+
+   ./node_modules/.bin/webpack --config ./webpack.config.js
+
+Running the command with ``--watch`` will automatically rebuild your bundles as
+you make changes.
+
 Self-Repair Setup
 -----------------
 Normandy has a self-support-compatible endpoint. If you want to test out using

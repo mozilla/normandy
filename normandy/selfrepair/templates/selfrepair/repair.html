@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
 <html lang="en" data-locale="{{ locale }}" data-bundle-url="{% url 'recipes:api.v1.fetch_bundle' %}">
@@ -7,13 +8,6 @@
     <link rel="icon" href="data:;base64,=">
   </head>
   <body>
-    <script src="{% static 'js/uitour.js' %}"></script>
-    <script src="{% static 'npm/node-uuid/uuid.js' %}"></script>
-    <script src="{% static 'npm/wolfy87-eventemitter/EventEmitter.js' %}"></script>
-    <script src="{% static 'npm/babel-polyfill/dist/polyfill.js' %}"></script>
-    <!-- Cheat so that we get let and other version-limited JavaScript features. -->
-    <script type="application/javascript;version=1.8" src="{% static 'js/xhr.js' %}"></script>
-    <script type="application/javascript;version=1.8" src="{% static 'js/normandy_driver.js' %}"></script>
-    <script type="application/javascript;version=1.8" src="{% static 'js/self_repair_runner.js' %}"></script>
+    {% render_bundle 'selfrepair' %}
   </body>
 </html>
