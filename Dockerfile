@@ -11,10 +11,14 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     apt-get update && apt-get install -y nodejs
 
 COPY ./requirements.txt /app/requirements.txt
-RUN pip install -U 'pip>=8' && pip install --upgrade --no-cache-dir -r requirements.txt
+COPY ./package.json /app/package.json
+RUN pip install -U 'pip>=8' && \
+    pip install --upgrade --no-cache-dir -r requirements.txt && \
+    npm install
 
 COPY . /app
-RUN DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
+RUN ./node_modules/.bin/webpack && \
+    DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media && \
     mkdir -p __version__ && \
     # Get the current git commit. Done by hand to avoid installing Git.
