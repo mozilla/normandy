@@ -11,110 +11,119 @@ To accomplish this goal, the SHIELD system consists of:
 Normandy
    Service that acts as the source of actions that we wish to perform, and
    determines which users receive which recipes.
-Self-Repair System Addon
+Self-Repair Client
    Ships with Firefox and handles fetching recipes and action implementations
    from Normandy and executing them within Firefox.
 
-.. note:: Normandy provides both the names of actions and, separately,
-   implementations for them to be used in self-repair executors. Other Firefox
-   features may also query Normandy and implement the actions however they
-   wish, although they are recommended to use the implementations that
-   Normandy provides if possible.
+Self-Repair Protocol
+--------------------
+The following section describes how Firefox retrieves and executes recipes from
+Normandy.
 
-Normandy / Self-Repair Protocol
--------------------------------
-The following section describes the protocol used to communicate between
-Normandy and clients in Firefox that execute Self-Repair recipes. The domain
-``shield.mozilla.org`` is used as a stand-in domain; the actual domain Normandy
-is hosted at may be different.
+.. image:: /resources/self-repair-sequence.png
+   :width: 460
+   :height: 535
+   :align: center
 
-.. warning:: The following documentation is still in flux and does not describe
-   a live system yet. Expect the protocol to change.
+When Firefox is launched by a user, it makes the following series of requests:
 
-Retrieving Recipes
-^^^^^^^^^^^^^^^^^^
-The Self-Repair addon retrieves a recipe bundle by making an HTTP POST request
-to the URL::
+1. First, a ``GET`` request to ``https://self-repair.mozilla.org/en-US/repair``.
+   The ``en-US`` part of the URL differs depending on the locale that Firefox
+   was built for.
 
-   https://shield.mozilla.org/api/v1/fetch_bundle/
+   The server returns an HTML page that loads the JavaScript for the self-repair
+   shim. This JavaScript triggers and processes all other requests in the
+   sequence.
 
-The request should contain a JSON object of the form:
+2. Next, a ``POST`` to ``https://self-repair.mozilla.org/api/v1/fetch_bundle/``.
+   This request includes client info, such as the client's update channel, and
+   the response contains a list of recipes that should be run on the client.
 
-.. code-block:: json
+3. Finally, a series of ``GET`` requests to URLs like
+   ``https://self-repair.mozilla.org/api/v1/action/action-name/implementation/SHA1_HASH/``
+   are sent to fetch the JavaScript code for each action to be executed. The
+   ``SHA1_HASH`` part of the URL unsurprisingly contains a SHA1 hash of the
+   JavaScript code being fetched.
 
-   {
-      "locale": "en-US",
-      "version": "42.0.1",
-      "release_channel": "release",
-      "user_id": "bd3ece30-ddb1-46ce-b3e9-c2816e59103f"
-   }
+.. http:get:: /(str:locale)/repair
 
-The API will respond with a JSON object containing metadata the server
-calculated (such as location), and a list of recipes. Each recipe will include
-a link to the JS implementation of the action for that recipe, an arguments
-schema, the arguments to pass to the implementation, and metadata about the
-action.
+   Returns an HTML page that performs the rest of the self-repair dance for
+   fetching and executing recipes.
 
-.. code-block:: json
+   :param string locale:
+      Locale code for the Firefox client in use.
+   :query boolean testing:
+      If included, activates "testing mode", which alters the behavior of some
+      recipes to make testing easier.
 
-   {
-      "country": "US",
-      "recipes": [
-         {
-            "id": 1,
-            "name": "Console Log Test",
-            "revision_id": 12,
-            "action": {
-               "name": "console-log",
-               "implementation_url": "https://shield.mozilla.org/api/v1/action/console-log/implementation/8ee8e7621fc08574f854972ee77be2a5280fb546/",
-               "arguments_schema": {
-                  "$schema": "http://json-schema.org/draft-04/schema#",
-                  "description": "Log a message to the console",
-                  "type": "object",
-                  "properties": {
-                     "message": {
-                        "default": "",
-                        "description": "Message to log to the console",
-                        "type": "string",
-                     }
-                  },
-                  "required": [
-                     "message"
-                  ],
+.. http:post:: /api/v1/fetch_bundle/
+
+   Retrieves recipes that should be executed by the client based on filtering
+   rules specified in the Normandy admin interface.
+
+   :<json string locale:
+      Locale code for the Firefox client in use.
+   :<json string version:
+      The client's Firefox version.
+   :<json string release_channel:
+      The release channel Firefox is currently set to.
+   :<json string user_id:
+      A v4 UUID used to provide stable sampling. If a recipe is sampled at 10%,
+      this UUID helps ensure the same 10% of users consistently receive that
+      recipe.
+
+   :>json string country:
+      Geolocated country code for the client based on their IP address.
+   :>json array recipes:
+      List of recipes that have been matched to the user.
+
+   **Example response**:
+
+   .. sourcecode:: json
+
+      {
+         "country": "US",
+         "recipes": [
+            {
+               "id": 1,
+               "name": "Console Log Test",
+               "revision_id": 12,
+               "action": {
+                  "name": "console-log",
+                  "implementation_url": "https://self-repair.mozilla.org/api/v1/action/console-log/implementation/8ee8e7621fc08574f854972ee77be2a5280fb546/",
+                  "arguments_schema": {
+                     "$schema": "http://json-schema.org/draft-04/schema#",
+                     "description": "Log a message to the console",
+                     "type": "object",
+                     "properties": {
+                        "message": {
+                           "default": "",
+                           "description": "Message to log to the console",
+                           "type": "string",
+                        }
+                     },
+                     "required": [
+                        "message"
+                     ],
+                  }
+               },
+               "arguments": {
+                  "message": "It works!"
                }
-            },
-            "arguments": {
-               "message": "It works!"
             }
-         }
-      ]
-   }
+         ]
+      }
 
-Retrieving an Action
-^^^^^^^^^^^^^^^^^^^^
-The Self-Repair addon retrieves the code necessary to execute an action by
-making an HTTP GET to the URL provided in the ``implementation_url`` property
-of an action. The response is the JavaScript code for the requested action.
+.. http:get:: /api/v1/action/(string:action_name)/implementation/(string:action_hash)/
 
-Legacy Self-Repair
-------------------
-Normandy also hosts an endpoint so that it can replace the predecessor
-Self-Repair server, which delivers a single HTML page for Firefox to execute.
+   Retreives the JavaScript code for executing an action.
 
-Firefox currently retrieves the HTML page at the URL::
-
-   https://self-repair.mozilla.org/en-US/repair/
-
-Which returns an HTML page roughly of the form:
-
-.. code-block:: html
-
-   <!DOCTYPE html>
-   <html lang="en">
-      <head>
-         <meta charset="utf-8">
-      </head>
-      <body>
-         <script>/* Code to retrieve and execute recipes and actions. */</script>
-      </body>
-   </html>
+   :param string action_name:
+      Unique slug for the action being requested.
+   :param string action_hash:
+      SHA1 hash of the action code being requested.
+   :status 200:
+      When the action code is found and the hash matches it.
+   :status 404:
+      If no action could be found with the given ``action_name``, or if the
+      given ``action_hash`` does not match the stored JavaScript.
