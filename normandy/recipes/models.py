@@ -4,7 +4,6 @@ import logging
 import uuid
 
 from django.core.cache import caches
-from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -12,6 +11,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
+from normandy.base.utils import get_client_ip
 from normandy.recipes import utils
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.validators import validate_json
@@ -294,17 +294,11 @@ class Client(object):
 
     @cached_property
     def country(self):
-        if settings.NUM_PROXIES == 0:
-            ip_address = self.request.META.get('REMOTE_ADDR')
+        ip_address = get_client_ip(self.request)
+        if ip_address is None:
+            return None
         else:
-            try:
-                ips = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-                ips = [ip.strip() for ip in ips]
-                ip_address = ips[-settings.NUM_PROXIES]
-            except IndexError:
-                return None
-
-        return get_country_code(ip_address)
+            return get_country_code(ip_address)
 
     @cached_property
     def request_time(self):
