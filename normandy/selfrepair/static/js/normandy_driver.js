@@ -1,3 +1,8 @@
+import Mozilla from './uitour.js'
+import EventEmitter from 'wolfy87-eventemitter'
+import xhr from './xhr.js'
+import uuid from 'node-uuid'
+
 /**
  * Storage class that uses window.localStorage as it's backing store.
  * @param {string} prefix Prefix to append to all incoming keys.
@@ -148,3 +153,5 @@ Mozilla.UITour.observe((eventName, data) => {
         }
     }
 });
+
+export default Normandy;

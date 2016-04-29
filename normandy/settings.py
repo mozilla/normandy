@@ -12,19 +12,18 @@ class Core(Configuration):
     INSTALLED_APPS = [
         'normandy.base.apps.BaseApp',
         'normandy.classifier',
-        'normandy.control.apps.ControlApp',
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
 
         'adminplus',
-        'pipeline',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
         'reversion',
         'storages',
         'raven.contrib.django.raven_compat',
+        'webpack_loader',
 
         'django.contrib.admin.apps.SimpleAdminConfig',
         'django.contrib.auth',
@@ -81,7 +80,6 @@ class Core(Configuration):
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'npm.finders.NpmFinder',
-        'pipeline.finders.PipelineFinder',
     ]
     NPM_DESTINATION_PREFIX = 'npm'
     NPM_FILE_PATTERNS = {
@@ -112,24 +110,11 @@ class Core(Configuration):
         },
     }
 
-    PIPELINE = {
-        'COMPILERS': (
-            'pipeline.compilers.sass.SASSCompiler',
-        ),
-        'SASS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/node-sass'),
-        'STYLESHEETS': {
-            'control': {
-                'source_filenames': (
-                  'admin/css/base.css',
-                  'control/admin/sass/*.scss',
-                ),
-                'output_filename': 'control/css/control-min.css',
-            },
-        },
-        'CSS_COMPRESSOR': 'pipeline.compressors.cssmin.CSSMinCompressor',
-        'CSSMIN_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/cssmin'),
+    WEBPACK_LOADER = {
+        'DEFAULT': {
+            'BUNDLE_DIR_NAME': 'js/bundles/',
+        }
     }
-
 
 
 class Base(Core):
@@ -190,7 +175,6 @@ class Base(Core):
     STATIC_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'static'))
     MEDIA_URL = values.Value('/media/')
     MEDIA_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'media'))
-    STATICFILES_STORAGE = values.Value('normandy.storage.GzipManifestPipelineStorage')
     # Overwrite old files when uploading media.
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
@@ -247,4 +231,3 @@ class Test(Base):
     SECRET_KEY = values.Value('not a secret')
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
     SECURE_SSL_REDIRECT = values.BooleanValue(False)
-    STATICFILES_STORAGE = values.Value('django.contrib.staticfiles.storage.StaticFilesStorage')

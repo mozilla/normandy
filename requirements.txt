@@ -19,8 +19,6 @@ django-countries==3.4.1 \
 django-mozilla-product-details==0.10 \
     --hash=sha256:400e59be3c163aebfc8c078879e87a895dad249589d8bc332bb76dc9c9b63efb \
     --hash=sha256:33add704683a5d7f9ff49c03e40a4d8c500882589aee970d5ed81ad11c7ae75c
-django-pipeline==1.6.8 \
-    --hash=sha256:b7cdc2efe27e478ddd38e878dd7b5e5ac121c2898fd85accf3187e19137fe6b7
 django-reversion==1.10.0 \
     --hash=sha256:a7df6a438bb7f2135bd6c9f5a7bf2879d700e381c0e1336bb8606c1275168395
 django-sslserver==0.18 \
@@ -28,6 +26,8 @@ django-sslserver==0.18 \
 django-storages-redux==1.3.2 \
     --hash=sha256:df94a582d452c8e7763291d5463b60316bf7f6ffe2c59c4c162514c1bbc39504 \
     --hash=sha256:84cb0e685ac0401f14d320d3d469b3e5968a7314a93936c86672c2315d8302dc
+django-webpack-loader==0.3.0 \
+    --hash=sha256:729c8d1b0d3f1449a2f7964c7e5351d0494bbe0470afdf9570e26593ac75fe13
 Django==1.9 \
     --hash=sha256:e66d58bfeed3a5eb44f2af6d5f1b6a85d656c4180ebba63b692e58d29db2a716 \
     --hash=sha256:05fe4b19a8778d4b48bbf1f4dfca3106881fea7982664553e7f7f861606f7c66

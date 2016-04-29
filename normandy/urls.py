@@ -19,7 +19,6 @@ urlpatterns += [
     url(r'', include('normandy.recipes.urls')),
     url(r'', include('normandy.classifier.urls')),
     url(r'', include('normandy.selfrepair.urls')),
-    url(r'', include('normandy.control.urls')),
     url(r'', include('normandy.health.urls')),
 ]
 
