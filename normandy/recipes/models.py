@@ -93,6 +93,7 @@ class Recipe(models.Model):
         help_text=('A number between 0.0 and 1.0. A value of 0.0 will '
                    'select no users. A value of 1.0 will select all users'))
     release_channels = models.ManyToManyField(ReleaseChannel, blank=True)
+    filter_expression = models.TextField(blank=False)
 
     @property
     def arguments(self):
