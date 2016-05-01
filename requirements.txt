@@ -19,8 +19,6 @@ django-countries==3.4.1 \
 django-mozilla-product-details==0.10 \
     --hash=sha256:400e59be3c163aebfc8c078879e87a895dad249589d8bc332bb76dc9c9b63efb \
     --hash=sha256:33add704683a5d7f9ff49c03e40a4d8c500882589aee970d5ed81ad11c7ae75c
-django-pipeline==1.6.8 \
-    --hash=sha256:b7cdc2efe27e478ddd38e878dd7b5e5ac121c2898fd85accf3187e19137fe6b7
 django-reversion==1.10.0 \
     --hash=sha256:a7df6a438bb7f2135bd6c9f5a7bf2879d700e381c0e1336bb8606c1275168395
 django-sslserver==0.18 \

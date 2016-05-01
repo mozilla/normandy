@@ -15,8 +15,6 @@ class Core(Configuration):
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
-
-        'pipeline',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
@@ -80,8 +78,12 @@ class Core(Configuration):
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'npm.finders.NpmFinder',
-        'pipeline.finders.PipelineFinder',
     ]
+
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'assets'),
+    )
+
     NPM_DESTINATION_PREFIX = 'npm'
     NPM_FILE_PATTERNS = {
         'babel-polyfill': ['dist/*.js'],
@@ -114,41 +116,10 @@ class Core(Configuration):
         },
     }
 
-    PIPELINE = {
-        'COMPILERS': (
-            'pipeline.compilers.sass.SASSCompiler',
-        ),
-        'SASS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/node-sass'),
-        'STYLESHEETS': {
-            'control': {
-                'source_filenames': (
-                  'npm/font-awesome/css/font-awesome.css',
-                  'control/admin/sass/*.scss',
-                ),
-                'output_filename': 'control/css/control-min.css',
-            },
-        },
-        'JAVASCRIPT': {
-            'control': {
-                'source_filenames': (
-                    'npm/jquery/dist/jquery.min.js',
-                    'control/js/main.js',
-                ),
-                'output_filename': 'control/js/control.js'
-            },
-        },
-        'CSS_COMPRESSOR': 'pipeline.compressors.cssmin.CSSMinCompressor',
-        'CSSMIN_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/cssmin'),
-
-        'DISABLE_WRAPPER': True,
-
-        'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
-        'UGLIFYJS_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/uglifyjs'),
-    }
-
     WEBPACK_LOADER = {
         'DEFAULT': {
-            'BUNDLE_DIR_NAME': 'js/bundles/',
+            'BUNDLE_DIR_NAME': 'bundles/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
         }
     }
 
@@ -211,7 +182,7 @@ class Base(Core):
     STATIC_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'static'))
     MEDIA_URL = values.Value('/media/')
     MEDIA_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'media'))
-    STATICFILES_STORAGE = values.Value('normandy.storage.GzipManifestPipelineStorage')
+    STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
     # Overwrite old files when uploading media.
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
