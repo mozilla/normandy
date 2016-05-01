@@ -7,7 +7,12 @@ export default class ControlApp extends React.Component {
 
   render() {
     return (
-      <div className="fluid-8">Control App</div>
+      <div id="content" className="wrapper">
+          <div className="fluid-8">
+            {React.Children.map(this.props.children,
+              (child) => React.cloneElement(child))}
+          </div>
+      </div>
     )
   }
 }
