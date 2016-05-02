@@ -81,7 +81,7 @@ Configuring Postgres
    same place as ``postgresql.conf``. Add a line referencing the docker
    network, like this:
 
-   .. code-block:: ini
+   .. code-block:: text
 
      host    all             all             172.17.0.0/16           trust
 

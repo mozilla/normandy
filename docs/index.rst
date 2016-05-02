@@ -13,3 +13,4 @@ JavaScript to various clients based on certain rules.
    dev/architecture
    dev/troubleshooting
    qa/docker
+   ops/config
