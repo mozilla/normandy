@@ -292,6 +292,8 @@ class TestFetchBundleAPI(object):
             'arguments': {
                 'foo': 'bar',
             },
+            'start_time': recipe.start_time,
+            'end_time': recipe.end_time,
         }]
 
     def test_it_filters_by_locale(self, client):

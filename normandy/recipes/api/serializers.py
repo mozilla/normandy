@@ -25,6 +25,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     revision_id = serializers.IntegerField()
     action = ActionSerializer()
     arguments = serializers.JSONField()
+    start_time = serializers.DateTimeField()
+    end_time = serializers.DateTimeField()
 
     class Meta:
         model = Recipe
@@ -34,6 +36,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             'revision_id',
             'action',
             'arguments',
+            'start_time',
+            'end_time',
         ]
 
 
