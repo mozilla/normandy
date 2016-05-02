@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from reversion.models import Version
 
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import Action, Recipe
@@ -37,6 +38,25 @@ class RecipeSerializer(serializers.ModelSerializer):
         ]
 
 
-class BundleSerializer(serializers.Serializer):
+class BundleSerializer(serializers.ModelSerializer):
     recipes = RecipeSerializer(many=True)
     country = serializers.CharField()
+
+
+class RecipeVersionSerializer(serializers.ModelSerializer):
+    date_created = serializers.SerializerMethodField(read_only=True)
+    recipe = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Version
+        fields = [
+            'date_created',
+            'recipe',
+        ]
+
+    def get_date_created(self, obj):
+        return obj.revision.date_created
+
+    def get_recipe(self, obj):
+        return RecipeSerializer(obj.object_version.object,
+                                context={'request': self.context['request']}).data

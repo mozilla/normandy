@@ -20,6 +20,7 @@ from normandy.recipes.api.serializers import (
     ActionSerializer,
     BundleSerializer,
     RecipeSerializer,
+    RecipeVersionSerializer,
 )
 
 
@@ -104,14 +105,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = self.get_object()
         content_type = ContentType.objects.get_for_model(recipe)
         versions = Version.objects.filter(content_type=content_type, object_id=recipe.pk)
-
-        data = []
-        for v in versions:
-            data.append({
-                'date': v.revision.date_created,
-                'recipe': RecipeSerializer(v.object_version.object,
-                                           context={'request': request}).data})
-
+        data = [RecipeVersionSerializer(v, context={'request': request}).data for v in versions]
         return Response(data)
 
 
