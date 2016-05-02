@@ -38,14 +38,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         ]
 
 
-class BundleSerializer(serializers.ModelSerializer):
+class BundleSerializer(serializers.Serializer):
     recipes = RecipeSerializer(many=True)
     country = serializers.CharField()
 
 
 class RecipeVersionSerializer(serializers.ModelSerializer):
-    date_created = serializers.SerializerMethodField(read_only=True)
-    recipe = serializers.SerializerMethodField(read_only=True)
+    date_created = serializers.DateTimeField(source='revision.date_created', read_only=True)
+    recipe = RecipeSerializer(source='object_version.object', read_only=True)
 
     class Meta:
         model = Version
@@ -53,10 +53,3 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
         ]
-
-    def get_date_created(self, obj):
-        return obj.revision.date_created
-
-    def get_recipe(self, obj):
-        return RecipeSerializer(obj.object_version.object,
-                                context={'request': self.context['request']}).data

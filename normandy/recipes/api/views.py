@@ -105,8 +105,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = self.get_object()
         content_type = ContentType.objects.get_for_model(recipe)
         versions = Version.objects.filter(content_type=content_type, object_id=recipe.pk)
-        data = [RecipeVersionSerializer(v, context={'request': request}).data for v in versions]
-        return Response(data)
+        serializer = RecipeVersionSerializer(versions, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class FetchBundle(views.APIView):
