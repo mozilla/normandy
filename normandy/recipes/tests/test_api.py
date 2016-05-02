@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
-from normandy.base.tests import Whatever
+from normandy.base.tests import Whatever, UserFactory
 from normandy.base.utils import aware_datetime
 from normandy.recipes.models import Action, Recipe
 from normandy.recipes.api.permissions import NotInUse
@@ -312,6 +312,62 @@ class TestRecipeAPI(object):
         assert res.data[0]['recipe']['name'] == 'version 3'
         assert res.data[1]['recipe']['name'] == 'version 2'
         assert res.data[2]['recipe']['name'] == 'version 1'
+
+    def test_disabled_on_edit(self, api_client):
+        recipe = RecipeFactory(name='enabled', enabled=True)
+
+        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'name': 'disabled'})
+        assert res.status_code == 200
+
+        recipe = Recipe.objects.all()[0]
+        assert recipe.name == 'disabled'
+        assert not recipe.enabled
+
+    def test_it_can_approve_recipes(self, api_client):
+        user = UserFactory()
+        recipe = RecipeFactory(approver=None)
+
+        api_client.force_authenticate(user=user)
+        res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
+        assert res.status_code == 204
+
+        recipe = Recipe.objects.all()[0]
+        assert recipe.approver == user
+
+    def test_cannot_approve_approved_recipes(self, api_client):
+        user = UserFactory()
+        recipe = RecipeFactory(approver=user)
+
+        api_client.force_authenticate(user=user)
+        res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
+        assert res.status_code == 400
+
+    def test_it_can_enable_recipes(self, api_client):
+        user = UserFactory()
+        recipe = RecipeFactory(approver=user, enabled=False)
+
+        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
+        assert res.status_code == 204
+
+        recipe = Recipe.objects.all()[0]
+        assert recipe.enabled
+
+    def test_cannot_enable_unapproved_recipes(self, api_client):
+        recipe = RecipeFactory(approver=None, enabled=False)
+
+        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
+        assert res.status_code == 400
+
+    def test_it_can_disable_recipes(self, api_client):
+        user = UserFactory()
+        recipe = RecipeFactory(approver=user, enabled=True)
+
+        res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
+        assert res.status_code == 204
+
+        recipe = Recipe.objects.all()[0]
+        assert recipe.approver is None
+        assert not recipe.enabled
 
 
 @pytest.mark.django_db
