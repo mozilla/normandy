@@ -20,9 +20,9 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
-    revision_id = serializers.IntegerField()
+    revision_id = serializers.IntegerField(read_only=True)
     action = ActionSerializer()
     arguments = serializers.JSONField()
 
