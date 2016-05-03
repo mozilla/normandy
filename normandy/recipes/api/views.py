@@ -1,12 +1,15 @@
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
 from rest_framework import generics, permissions, viewsets, views
+from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion import revisions as reversion
+from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.renderers import JavaScriptRenderer
@@ -17,6 +20,7 @@ from normandy.recipes.api.serializers import (
     ActionSerializer,
     BundleSerializer,
     RecipeSerializer,
+    RecipeVersionSerializer,
 )
 
 
@@ -95,6 +99,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return self.create(request, *args, **kwargs)
 
         return super().update(request, *args, **kwargs)
+
+    @detail_route(methods=['GET',])
+    def history(self, request, pk=None):
+        recipe = self.get_object()
+        content_type = ContentType.objects.get_for_model(recipe)
+        versions = Version.objects.filter(content_type=content_type, object_id=recipe.pk)
+        serializer = RecipeVersionSerializer(versions, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class FetchBundle(views.APIView):

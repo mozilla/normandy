@@ -1,4 +1,5 @@
 import hashlib
+import json
 from unittest.mock import patch
 
 import pytest
@@ -258,6 +259,25 @@ class TestRecipeAPI(object):
         res = api_client.get('/api/v1/recipe/')
         assert res.status_code == 403
         assert res.data['detail'] == AdminEnabled.message
+
+
+    def test_history(self, api_client):
+        with reversion.create_revision():
+            recipe = RecipeFactory(name='version 1')
+
+        with reversion.create_revision():
+            recipe.name = 'version 2'
+            recipe.save()
+
+        with reversion.create_revision():
+            recipe.name = 'version 3'
+            recipe.save()
+
+        res = api_client.get('/api/v1/recipe/%s/history/' % recipe.id)
+
+        assert res.data[0]['recipe']['name'] == 'version 3'
+        assert res.data[1]['recipe']['name'] == 'version 2'
+        assert res.data[2]['recipe']['name'] == 'version 1'
 
 
 @pytest.mark.django_db
