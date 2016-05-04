@@ -324,7 +324,7 @@ class TestRecipeAPI(object):
         assert not recipe.enabled
 
     def test_it_can_approve_recipes(self, api_client):
-        user = UserFactory()
+        user = UserFactory(is_superuser=True)
         recipe = RecipeFactory(approver=None)
 
         api_client.force_authenticate(user=user)
@@ -338,7 +338,6 @@ class TestRecipeAPI(object):
         user = UserFactory()
         recipe = RecipeFactory(approver=user)
 
-        api_client.force_authenticate(user=user)
         res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
         assert res.status_code == 400
 

@@ -87,6 +87,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
+    @transaction.atomic()
+    @reversion.create_revision()
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
     def update(self, request, *args, **kwargs):
         """
         Intercept PUT requests and have them create instead of update
@@ -97,12 +102,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe = self.get_object()
             except Http404:
                 if request.method == 'PUT':
-                    return self.create(request, *args, **kwargs)
+                    with transaction.atomic(), reversion.create_revision():
+                        return self.create(request, *args, **kwargs)
             else:
                 if recipe.is_approved:
                     recipe.disable(ignore_revision_id=True)
 
-        return super().update(request, *args, **kwargs)
+        with transaction.atomic(), reversion.create_revision():
+            return super().update(request, *args, **kwargs)
 
     @detail_route(methods=['GET'])
     def history(self, request, pk=None):
@@ -112,7 +119,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = RecipeVersionSerializer(versions, many=True, context={'request': request})
         return Response(serializer.data)
 
-    @detail_route(methods=['POST',], permission_classes=[permissions.IsAuthenticated,])
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         recipe = self.get_object()
 
@@ -124,7 +133,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @detail_route(methods=['POST',], permission_classes=[permissions.IsAuthenticated,])
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
 
@@ -136,7 +147,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @detail_route(methods=['POST',], permission_classes=[permissions.IsAuthenticated,])
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
         recipe.disable()
