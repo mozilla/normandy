@@ -17,7 +17,7 @@ class TestRecipeSerializer:
             'enabled': recipe.enabled,
             'filter_expression': recipe.filter_expression,
             'revision_id': recipe.revision_id,
-            'action_id': action.id,
+            'action_name': action.name,
             'arguments': {
                 'foo': 'bar',
             }

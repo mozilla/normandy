@@ -13,7 +13,6 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = [
-            'id',
             'name',
             'implementation',
             'implementation_url',
@@ -22,7 +21,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    action_id = serializers.IntegerField(source='action.id')
+    action_name = serializers.CharField(source='action.name')
     arguments = serializers.JSONField()
 
     class Meta:
@@ -32,14 +31,21 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name',
             'enabled',
             'revision_id',
-            'action_id',
+            'action_name',
             'arguments',
             'filter_expression',
         ]
 
+    def validate_action_name(self, attr):
+        try:
+            Action.objects.get(name=attr)
+        except Action.DoesNotExist:
+            raise serializers.ValidationError('Action does not exist.')
+        return attr
+
     def create(self, validated_data):
-        action_id = validated_data.pop('action')['id']
-        action = Action.objects.get(pk=action_id)
+        action_name = validated_data.pop('action')['name']
+        action = Action.objects.get(name=action_name)
         recipe = Recipe.objects.create(action=action, **validated_data)
         return recipe
 
@@ -48,8 +54,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.arguments = validated_data.get('arguments', instance.arguments)
 
         if 'action' in validated_data:
-            action_id = validated_data.pop('action')['id']
-            instance.action = Action.objects.get(pk=action_id)
+            action_name = validated_data.pop('action')['name']
+            instance.action = Action.objects.get(name=action_name)
 
         instance.save()
 

@@ -38,7 +38,6 @@ class TestActionAPI(object):
         assert res.status_code == 200
         assert res.data == [
             {
-                'id': Whatever(),
                 'name': 'foo',
                 'implementation_url': Whatever.endswith(action_url),
                 'arguments_schema': {'type': 'object'}
@@ -228,7 +227,7 @@ class TestRecipeAPI(object):
         action = ActionFactory()
 
         res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
-                                                  'action_id': action.id,
+                                                  'action_name': action.name,
                                                   'arguments': '{}'})
         assert res.status_code == 201
 
@@ -246,11 +245,20 @@ class TestRecipeAPI(object):
         assert recipe.name == 'changed'
         assert recipe.revision_id == old_revision_id + 1
 
+    def test_creation_when_action_does_not_exist(self, api_client):
+        res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
+                                                  'action_name': 'fake-action',
+                                                  'arguments': '{}'})
+        assert res.status_code == 400
+
+        recipes = Recipe.objects.all()
+        assert recipes.count() == 0
+
     def test_it_can_change_action_for_recipes(self, api_client):
         recipe = RecipeFactory()
         action = ActionFactory()
 
-        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'action_id': action.id})
+        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'action_name': action.name})
         assert res.status_code == 200
 
         recipe = Recipe.objects.get(pk=recipe.id)
