@@ -13,6 +13,7 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = [
+            'id',
             'name',
             'implementation',
             'implementation_url',
@@ -21,10 +22,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField()
-    revision_id = serializers.IntegerField(read_only=True)
-    action = ActionSerializer()
+    action_id = serializers.IntegerField(source='action.id')
     arguments = serializers.JSONField()
 
     class Meta:
@@ -34,10 +32,28 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name',
             'enabled',
             'revision_id',
-            'action',
+            'action_id',
             'arguments',
             'filter_expression',
         ]
+
+    def create(self, validated_data):
+        action_id = validated_data.pop('action')['id']
+        action = Action.objects.get(pk=action_id)
+        recipe = Recipe.objects.create(action=action, **validated_data)
+        return recipe
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.arguments = validated_data.get('arguments', instance.arguments)
+
+        if 'action' in validated_data:
+            action_id = validated_data.pop('action')['id']
+            instance.action = Action.objects.get(pk=action_id)
+
+        instance.save()
+
+        return instance
 
 
 class ClientSerializer(serializers.Serializer):

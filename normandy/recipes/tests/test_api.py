@@ -38,6 +38,7 @@ class TestActionAPI(object):
         assert res.status_code == 200
         assert res.data == [
             {
+                'id': Whatever(),
                 'name': 'foo',
                 'implementation_url': Whatever.endswith(action_url),
                 'arguments_schema': {'type': 'object'}
@@ -223,6 +224,17 @@ class TestRecipeAPI(object):
         assert res.status_code == 200
         assert res.data[0]['name'] == recipe.name
 
+    def test_it_can_create_recipes(self, api_client):
+        action = ActionFactory()
+
+        res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
+                                                  'action_id': action.id,
+                                                  'arguments': '{}'})
+        assert res.status_code == 201
+
+        recipes = Recipe.objects.all()
+        assert recipes.count() == 1
+
     def test_it_can_edit_recipes(self, api_client):
         recipe = RecipeFactory(name='unchanged')
         old_revision_id = recipe.revision_id
@@ -233,6 +245,16 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.name == 'changed'
         assert recipe.revision_id == old_revision_id + 1
+
+    def test_it_can_change_action_for_recipes(self, api_client):
+        recipe = RecipeFactory()
+        action = ActionFactory()
+
+        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'action_id': action.id})
+        assert res.status_code == 200
+
+        recipe = Recipe.objects.get(pk=recipe.id)
+        assert recipe.action == action
 
     def test_it_can_delete_recipes(self, api_client):
         recipe = RecipeFactory()
