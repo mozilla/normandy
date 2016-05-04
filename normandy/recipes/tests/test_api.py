@@ -228,7 +228,8 @@ class TestRecipeAPI(object):
 
         res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
                                                   'action_name': action.name,
-                                                  'arguments': '{}'})
+                                                  'arguments': '{}',
+                                                  'filter_expression': 'whatever'})
         assert res.status_code == 201
 
         recipes = Recipe.objects.all()
