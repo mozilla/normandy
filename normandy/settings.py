@@ -16,7 +16,6 @@ class Core(Configuration):
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
 
-        'adminplus',
         'pipeline',
         'product_details',
         'rest_framework',
@@ -26,7 +25,7 @@ class Core(Configuration):
         'raven.contrib.django.raven_compat',
         'webpack_loader',
 
-        'django.contrib.admin.apps.SimpleAdminConfig',
+        'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -91,6 +90,7 @@ class Core(Configuration):
         'jquery': ['dist/*.js'],
         'json-editor': ['dist/*.js'],
         'wolfy87-eventemitter': ['EventEmitter.js'],
+        'jexl': ['dist/*.js'],
     }
 
     REST_FRAMEWORK = {
@@ -98,6 +98,7 @@ class Core(Configuration):
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.SessionAuthentication'
         ),
+        'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.DjangoFilterBackend'],
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     }
 

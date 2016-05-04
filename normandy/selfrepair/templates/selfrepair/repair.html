@@ -2,7 +2,11 @@
 {% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
-<html lang="en" data-locale="{{ locale }}" data-bundle-url="{% url 'recipes:api.v1.fetch_bundle' %}">
+<html lang="en"
+      data-locale="{{ locale }}"
+      data-recipe-url="{% url 'recipes:recipe-list' %}"
+      data-classify-url="{% url 'recipes:classify-client' %}"
+>
   <head>
     <meta charset="utf-8">
     <link rel="icon" href="data:;base64,=">

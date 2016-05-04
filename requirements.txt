@@ -153,3 +153,6 @@ cffi==1.5.2 \
     --hash=sha256:da9bde99872e46f7bb5cff40a9b1cc08406765efafb583c704de108b6cb821dd
 pycparser==2.14 \
     --hash=sha256:7959b4a74abdc27b312fed1c21e6caf9309ce0b29ea86b591fd2e99ecdf27f73
+django-filter==0.13.0 \
+    --hash=sha256:b4c1614576fe696d1a91d08f100caeffcbc084d93181b3df26f5d4fc0131f0fc \
+    --hash=sha256:f5e10bea3b30e43a9b0b7efdca8e91cb0c1d5bf4d316e8fb6c0c22300d30c7dd

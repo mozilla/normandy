@@ -1,9 +1,0 @@
-{% if recipes %}
-  <ul>
-    {% for recipe in recipes %}
-      <li><a href="{% url 'admin:recipes_recipe_change' recipe.id %}">{{ recipe.name }}</a></li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>Not used in any active recipes.</p>
-{% endif %}

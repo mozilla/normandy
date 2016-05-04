@@ -3,6 +3,11 @@ import xhr from './xhr.js'
 import Mozilla from './uitour.js'
 import Normandy from './normandy_driver.js'
 import uuid from 'node-uuid'
+import jexl from 'jexl'
+
+
+jexl.addTransform('date', value => new Date(value));
+
 
 let registeredActions = {};
 window.registerAction = function(name, ActionClass) {
@@ -38,35 +43,6 @@ function loadAction(recipe) {
     });
 }
 
-/**
- * @promise {Object} The data to send to fetch_bundle to identify this client.
- */
-function getFetchRecipePayload() {
-    let data = {
-        locale: document.documentElement.dataset.locale,
-        user_id: getUserId(),
-        release_channel: null,
-        version: null,
-    };
-
-    return getUitourAppinfo()
-    .then(uitourData => {
-        data.release_channel = uitourData.defaultUpdateChannel;
-        data.version = uitourData.version;
-        return data;
-    });
-}
-
-/**
- * @promise {Object} The appinfo from UITour
- */
-function getUitourAppinfo() {
-    return new Promise((resolve, reject) => {
-        Mozilla.UITour.getConfiguration('appinfo', appinfo => {
-            resolve(appinfo);
-        });
-    });
-}
 
 /**
  * Get a user id. If one doesn't exist yet, make one up and store it in local storage.
@@ -81,18 +57,40 @@ function getUserId() {
     return userId;
 }
 
-/**
- * Fetch recipes from the Recipe server.
- *
- * @promise {Object} Bundle object, containing recipes and client data.
- */
-function fetchBundle() {
-    let {bundleUrl} = document.documentElement.dataset;
-    let headers = {Accept: 'application/json'};
 
-    return getFetchRecipePayload()
-    .then(data => xhr.post(bundleUrl, {data, headers}))
+/**
+ * Fetch all enabled recipes from the server.
+ * @promise Resolves with a list of all enabled recipes.
+ */
+function fetchRecipes() {
+    let {recipeUrl} = document.documentElement.dataset;
+    let headers = {Accept: 'application/json'};
+    let data = {enabled: 'True'}
+
+    return xhr.get(recipeUrl, {headers, data})
     .then(request => JSON.parse(request.responseText));
+}
+
+
+/**
+ * Fetch client information from the Normandy server and the driver.
+ * @promise Resolves with an object containing client info.
+ */
+function classifyClient() {
+    let {classifyUrl} = document.documentElement.dataset;
+    let headers = {Accept: 'application/json'};
+    let classifyXhr = xhr.get(classifyUrl, {headers})
+    .then(request => JSON.parse(request.responseText));
+
+    return Promise.all([classifyXhr, Normandy.client()])
+    .then(([classification, client]) => {
+        // Parse request time
+        classification.request_time = new Date(classification.request_time)
+
+        return Object.assign({
+            locale: Normandy.locale,
+        }, classification, client);
+    });
 }
 
 
@@ -109,14 +107,49 @@ function runRecipe(recipe) {
 }
 
 
-// Actually fetch and run the recipes.
-fetchBundle().then(bundle => {
-    // Update Normandy driver with user's country.
-    Normandy._location.countryCode = bundle.country;
+/**
+ * Generate a context object for JEXL filter expressions.
+ * @return {object}
+ */
+function filterContext() {
+    return {
+        normandy: classifyClient(),
+        telemetry: {},
+        events: {},
+    }
+}
 
-    for (let recipe of bundle.recipes) {
-        runRecipe(recipe).catch(err => {
-            console.error(err);
+
+/**
+ * Match a recipe against a context using its filter expression.
+ * @param  {Recipe} recipe  Recipe fetched from the server.
+ * @param  {object} context Context returned by filterContext.
+ * @promise Resolves with a list containing the recipe and a boolean
+ *     signifying if the filter passed or failed.
+ */
+function matches(recipe, context) {
+    // Remove newlines, which are invalid in JEXL
+    let filter_expression = recipe.filter_expression.replace(/\r?\n|\r/g, '');
+
+    return jexl.eval(filter_expression, context)
+    .then(value => [recipe, !!value]);
+}
+
+
+// Actually fetch and run the recipes.
+fetchRecipes().then(recipes => {
+    let context = filterContext();
+
+    // Update Normandy driver with user's country.
+    Normandy._location.countryCode = context.normandy.country;
+
+    for (let recipe of recipes) {
+        matches(recipe, context).then(([recipe, match]) => {
+            if (match) {
+                runRecipe(recipe).catch(err => {
+                    console.error(err);
+                });
+            }
         });
     }
 }).catch((err) => {

@@ -21,10 +21,20 @@ export default function xhr(method, url, options={}) {
                 resolve(req);
             }
         });
+
+        // Modify the URL parameters before calling open.
+        if (method === 'GET' && options.data) {
+            url = new URL(url, window.location.href);
+            for (let key in options.data) {
+                url.searchParams.set(key, options.data[key]);
+            }
+            url = url.href;
+        }
         req.open(method, url);
 
+        // setRequestHeader must be called _after_ open.
         let data = undefined;
-        if (options.data) {
+        if (method !== 'GET' && options.data) {
             req.setRequestHeader('Content-Type', 'application/json');
             data = JSON.stringify(options.data);
         }
@@ -34,6 +44,7 @@ export default function xhr(method, url, options={}) {
                 req.setRequestHeader(key, options.headers[key]);
             }
         }
+
 
         req.send(data);
     });

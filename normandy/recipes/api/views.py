@@ -4,21 +4,20 @@ from django.db import transaction
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
-from rest_framework import generics, permissions, viewsets, views
+from rest_framework import generics, permissions, views, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion import revisions as reversion
 from reversion.models import Version
 
-from normandy.base.api.permissions import AdminEnabled
+from normandy.base.api.permissions import AdminEnabled, AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.base.decorators import short_circuit_middlewares
-from normandy.recipes.models import Action, Bundle, Client, Recipe
+from normandy.recipes.models import Action, Client, Recipe
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import (
     ActionSerializer,
-    BundleSerializer,
+    ClientSerializer,
     RecipeSerializer,
     RecipeVersionSerializer,
 )
@@ -82,9 +81,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Viewset for viewing and uploading recipes."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    filter_fields = ('action', 'enabled')
     permission_classes = [
         permissions.DjangoModelPermissions,
-        AdminEnabled,
+        AdminEnabledOrReadOnly,
     ]
 
     def update(self, request, *args, **kwargs):
@@ -100,7 +100,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
-    @detail_route(methods=['GET',])
+    @detail_route(methods=['GET'])
     def history(self, request, pk=None):
         recipe = self.get_object()
         content_type = ContentType.objects.get_for_model(recipe)
@@ -109,22 +109,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class FetchBundle(views.APIView):
+class ClassifyClient(views.APIView):
     authentication_classes = []
     permission_classes = []
-    serializer_class = BundleSerializer
+    serializer_class = ClientSerializer
 
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super().as_view(**initkwargs)
-        # Apply the short circuit middleware
-        return short_circuit_middlewares(view)
-
-    def post(self, request, format=None):
-        """
-        Determine the recipes that matches the requesting client.
-        """
+    def get(self, request, format=None):
         client = Client(request)
-        bundle = Bundle.for_client(client)
-        serializer = self.serializer_class(bundle, context={'request': request})
+        serializer = self.serializer_class(client, context={'request': request})
         return Response(serializer.data)

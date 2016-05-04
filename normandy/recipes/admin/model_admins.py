@@ -1,14 +1,13 @@
 from django.contrib import admin
 from django.template.loader import render_to_string
 
-from normandy.base.admin import site as admin_site
 from normandy.recipes import models
 from normandy.recipes.forms import ActionAdminForm, RecipeAdminForm
 
 from reversion.admin import VersionAdmin
 
 
-@admin.register(models.Recipe, site=admin_site)
+@admin.register(models.Recipe)
 class RecipeAdmin(VersionAdmin):
     form = RecipeAdminForm
     save_as = True
@@ -16,25 +15,18 @@ class RecipeAdmin(VersionAdmin):
         'name',
         'enabled',
         'action',
-        'get_locales_display',
-        'get_countries_display',
-        'start_time',
-        'end_time',
+        'filter_expression',
     ]
-    search_fields = ['name', 'locales', 'countries']
-    filter_horizontal = ['locales', 'countries']
+    search_fields = ['name']
 
     list_filter = [
         ('enabled', admin.BooleanFieldListFilter),
-        ('locales', admin.RelatedOnlyFieldListFilter),
-        ('countries', admin.RelatedOnlyFieldListFilter),
         ('action', admin.RelatedOnlyFieldListFilter),
-        ('release_channels', admin.RelatedFieldListFilter),
     ]
 
     fieldsets = [
         [None, {
-            'fields': ['name']
+            'fields': ['name', 'enabled', 'filter_expression']
         }],
         ['Action', {
             'fields': [
@@ -42,22 +34,10 @@ class RecipeAdmin(VersionAdmin):
                 'arguments_json',
             ],
         }],
-        ['Delivery Rules', {
-            'fields': [
-                'enabled',
-                'sample_rate',
-                'start_time',
-                'end_time',
-                'locales',
-                'countries',
-                'release_channels',
-            ],
-        }],
-
     ]
 
 
-@admin.register(models.Action, site=admin_site)
+@admin.register(models.Action)
 class ActionAdmin(VersionAdmin):
     form = ActionAdminForm
     list_display = ['name', 'implementation_hash', 'in_use']
