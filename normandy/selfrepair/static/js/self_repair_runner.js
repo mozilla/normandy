@@ -25,20 +25,23 @@ window.registerAction = function(name, ActionClass) {
  */
 function loadAction(recipe) {
     return new Promise((resolve, reject) => {
-        let action = recipe.action;
-        if (!registeredActions[action.name]) {
-            let script = document.createElement('script');
-            script.src = action.implementation_url;
-            script.onload = () => {
-                if (!registeredActions[action.name]) {
-                    reject(new Error(`Could not find action with name ${action.name}.`));
-                } else {
-                    resolve(registeredActions[action.name]);
-                }
-            };
-            document.head.appendChild(script);
+        let action_name = recipe.action_name;
+        if (!registeredActions[action_name]) {
+            xhr.get(`/api/v1/action/${action_name}/`).then(function(response) {
+                let action = JSON.parse(response.responseText);
+                let script = document.createElement('script');
+                script.src = action.implementation_url;
+                script.onload = () => {
+                    if (!registeredActions[action.name]) {
+                        reject(new Error(`Could not find action with name ${action.name}.`));
+                    } else {
+                        resolve(registeredActions[action.name]);
+                    }
+                };
+                document.head.appendChild(script);
+            });
         } else {
-            resolve(registeredActions[action.name]);
+            resolve(registeredActions[action_name]);
         }
     });
 }
