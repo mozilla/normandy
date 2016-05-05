@@ -5,7 +5,7 @@ import pytest
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
-from normandy.base.api.permissions import AdminEnabled, AdminEnabledOrReadOnly
+from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import Whatever
 from normandy.base.utils import aware_datetime
 from normandy.recipes.models import Action, Recipe
@@ -143,11 +143,16 @@ class TestActionAPI(object):
         assert res.status_code == 200
         assert res.data == []
 
-    def test_unavailable_if_admin_disabled(self, api_client, settings):
+    def test_readable_if_admin_disabled(self, api_client, settings):
         settings.ADMIN_ENABLED = False
         res = api_client.get('/api/v1/action/')
+        assert res.status_code == 200
+
+    def test_not_writable_if_admin_disabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+        res = api_client.post('/api/v1/action/')
         assert res.status_code == 403
-        assert res.data['detail'] == AdminEnabled.message
+        assert res.data['detail'] == AdminEnabledOrReadOnly.message
 
     def test_it_creates_revisions_on_create(self, api_client):
         res = api_client.post('/api/v1/action/', {

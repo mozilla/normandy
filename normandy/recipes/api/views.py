@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from reversion import revisions as reversion
 from reversion.models import Version
 
-from normandy.base.api.permissions import AdminEnabled, AdminEnabledOrReadOnly
+from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.recipes.models import Action, Client, Recipe
 from normandy.recipes.api.permissions import NotInUse
@@ -28,9 +28,9 @@ class ActionViewSet(viewsets.ModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     permission_classes = [
-        permissions.DjangoModelPermissions,
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
         NotInUse,
-        AdminEnabled,
+        AdminEnabledOrReadOnly,
     ]
 
     lookup_field = 'name'
@@ -83,7 +83,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_fields = ('action', 'enabled')
     permission_classes = [
-        permissions.DjangoModelPermissions,
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
         AdminEnabledOrReadOnly,
     ]
 
