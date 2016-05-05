@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git://github.com/mozilla/normandy.git"
   },
+  "scripts": {
+    "start": "webpack --config ./webpack.config.js --watch"
+  },
   "license": "MPL-2.0",
   "dependencies": {
     "babel-polyfill": "^6.7.2",
