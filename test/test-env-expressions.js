@@ -13,4 +13,22 @@ exports['test it can access telemetry'] = promiseTest(assert => {
   .then(val => assert.ok(val));
 });
 
+exports['test has a date transform'] = promiseTest(assert => {
+  return EnvExpressions.eval('"2016-04-22"|date')
+  .then(val => {
+    assert.equal(val.toString(), Date.UTC(2016, 3, 22).toString()); // months are 0 based
+  });
+});
+
+exports['test dates are comparable'] = promiseTest(assert => {
+  let context = {someTime: new Date(2016, 0, 1)};
+
+  return Promise.all([
+    EnvExpressions.eval('"2015-01-01"|date < someTime', context)
+      .then(val => assert.ok(val)),
+    EnvExpressions.eval('"2017-01-01"|date > someTime', context)
+      .then(val => assert.ok(val)),
+  ]);
+});
+
 testRunner.run(exports);
