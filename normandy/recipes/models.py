@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.functional import cached_property
 
@@ -67,6 +68,14 @@ class Recipe(models.Model):
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
     filter_expression = models.TextField(blank=False)
+    approver = models.ForeignKey(User, null=True, blank=True)
+
+    class IsNotApproved(Exception):
+        pass
+
+    @property
+    def is_approved(self):
+        return self.approver is not None
 
     @property
     def arguments(self):
@@ -76,6 +85,18 @@ class Recipe(models.Model):
     def arguments(self, value):
         self.arguments_json = json.dumps(value)
 
+    def enable(self):
+        if self.is_approved:
+            self.enabled = True
+            self.save()
+        else:
+            raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
+
+    def disable(self, ignore_revision_id=False, *args, **kwargs):
+        self.enabled = False
+        self.approver = None
+        self.save(ignore_revision_id=ignore_revision_id, *args, **kwargs)
+
     _registered_matchers = []
 
     def __repr__(self):
@@ -84,8 +105,9 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        self.revision_id += 1
+    def save(self, ignore_revision_id=False, *args, **kwargs):
+        if not ignore_revision_id:
+            self.revision_id += 1
         super(Recipe, self).save(*args, **kwargs)
 
 

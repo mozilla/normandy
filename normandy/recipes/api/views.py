@@ -4,7 +4,7 @@ from django.db import transaction
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
-from rest_framework import generics, permissions, views, viewsets
+from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
@@ -87,18 +87,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
+    @transaction.atomic()
+    @reversion.create_revision()
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
     def update(self, request, *args, **kwargs):
         """
         Intercept PUT requests and have them create instead of update
         if the object does not exist.
         """
-        if request.method == 'PUT':
+        if request.method in ['PUT', 'PATCH']:
             try:
-                self.get_object()
+                recipe = self.get_object()
             except Http404:
-                return self.create(request, *args, **kwargs)
+                if request.method == 'PUT':
+                    with transaction.atomic(), reversion.create_revision():
+                        return self.create(request, *args, **kwargs)
+            else:
+                if recipe.is_approved:
+                    recipe.disable(ignore_revision_id=True)
 
-        return super().update(request, *args, **kwargs)
+        with transaction.atomic(), reversion.create_revision():
+            return super().update(request, *args, **kwargs)
 
     @detail_route(methods=['GET'])
     def history(self, request, pk=None):
@@ -107,6 +118,42 @@ class RecipeViewSet(viewsets.ModelViewSet):
         versions = Version.objects.filter(content_type=content_type, object_id=recipe.pk)
         serializer = RecipeVersionSerializer(versions, many=True, context={'request': request})
         return Response(serializer.data)
+
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
+    def approve(self, request, pk=None):
+        recipe = self.get_object()
+
+        if recipe.is_approved:
+            return Response({'approver': 'This recipe is already approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        recipe.approver = request.user
+        recipe.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
+    def enable(self, request, pk=None):
+        recipe = self.get_object()
+
+        try:
+            recipe.enable()
+        except recipe.IsNotApproved:
+            return Response({'is_approved': 'This recipe cannot be enabled until it is approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
+    def disable(self, request, pk=None):
+        recipe = self.get_object()
+        recipe.disable()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ClassifyClient(views.APIView):

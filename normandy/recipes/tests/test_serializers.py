@@ -1,5 +1,6 @@
 import pytest
 
+from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeFactory, ActionFactory
 from normandy.recipes.api.serializers import RecipeSerializer, ActionSerializer
 
@@ -20,7 +21,10 @@ class TestRecipeSerializer:
             'action_name': action.name,
             'arguments': {
                 'foo': 'bar',
-            }
+            },
+            'approver': Whatever(),
+            'is_approved': recipe.is_approved,
+            'enabled': recipe.enabled,
         }
 
 

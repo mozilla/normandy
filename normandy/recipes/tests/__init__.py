@@ -5,7 +5,7 @@ import factory
 from django.template.defaultfilters import slugify
 from django.test import RequestFactory
 
-from normandy.base.tests import FuzzyUnicode
+from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.recipes.models import (
     Action,
     Client,
@@ -30,6 +30,7 @@ class RecipeFactory(factory.DjangoModelFactory):
 
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
+    approver = factory.SubFactory(UserFactory)
     enabled = True
 
     @factory.post_generation

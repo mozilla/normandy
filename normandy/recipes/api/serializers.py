@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from reversion.models import Version
 
+from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import Action, Recipe
 
@@ -23,6 +24,9 @@ class ActionSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     action_name = serializers.CharField(source='action.name')
     arguments = serializers.JSONField()
+    approver = UserSerializer(read_only=True)
+    is_approved = serializers.BooleanField(read_only=True)
+    enabled = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -34,6 +38,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             'action_name',
             'arguments',
             'filter_expression',
+            'approver',
+            'is_approved',
+            'enabled',
         ]
 
     def validate_action_name(self, attr):
