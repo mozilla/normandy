@@ -5,7 +5,7 @@ from django.http import Http404
 from django.views.decorators.cache import cache_control
 
 from rest_framework import generics, permissions, status, views, viewsets
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion import revisions as reversion
@@ -13,13 +13,15 @@ from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.recipes.models import Action, Client, Recipe
+from normandy.recipes.models import (Action, Client, Recipe, Approval, ApprovalRequest,
+                                     ApprovalRequestComment)
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import (
     ActionSerializer,
     ClientSerializer,
     RecipeSerializer,
     RecipeVersionSerializer,
+    ApprovalRequestSerializer,
 )
 
 
@@ -119,19 +121,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = RecipeVersionSerializer(versions, many=True, context={'request': request})
         return Response(serializer.data)
 
-    @transaction.atomic()
-    @reversion.create_revision()
-    @detail_route(methods=['POST'])
-    def approve(self, request, pk=None):
-        recipe = self.get_object()
-
-        if recipe.is_approved:
-            return Response({'approver': 'This recipe is already approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        recipe.approver = request.user
-        recipe.save()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @transaction.atomic()
     @reversion.create_revision()

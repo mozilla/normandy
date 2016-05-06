@@ -22,9 +22,9 @@ class TestRecipeSerializer:
             'arguments': {
                 'foo': 'bar',
             },
-            'approver': Whatever(),
-            'is_approved': recipe.is_approved,
-            'enabled': recipe.enabled,
+            'current_approval_request': Whatever(),
+            'approval': Whatever(),
+            'is_approved': recipe.is_approved
         }
 
 

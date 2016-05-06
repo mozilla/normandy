@@ -16,6 +16,7 @@ from normandy.recipes.models import Action, Recipe
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.tests import (
     ActionFactory,
+    ApprovalRequestFactory,
     RecipeFactory,
 )
 
@@ -319,35 +320,21 @@ class TestRecipeAPI(object):
 
     def test_disabled_on_edit(self, api_client):
         recipe = RecipeFactory(name='enabled', enabled=True)
+        approval_request = ApprovalRequestFactory(recipe=recipe)
+        approval_request.approve(UserFactory())
 
         res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'name': 'disabled'})
         assert res.status_code == 200
 
         recipe = Recipe.objects.all()[0]
         assert recipe.name == 'disabled'
+        assert not recipe.is_approved
         assert not recipe.enabled
 
-    def test_it_can_approve_recipes(self, api_client):
-        user = UserFactory(is_superuser=True)
-        recipe = RecipeFactory(approver=None)
-
-        api_client.force_authenticate(user=user)
-        res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
-        assert res.status_code == 204
-
-        recipe = Recipe.objects.all()[0]
-        assert recipe.approver == user
-
-    def test_cannot_approve_approved_recipes(self, api_client):
-        user = UserFactory()
-        recipe = RecipeFactory(approver=user)
-
-        res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
-        assert res.status_code == 400
-
     def test_it_can_enable_recipes(self, api_client):
-        user = UserFactory()
-        recipe = RecipeFactory(approver=user, enabled=False)
+        recipe = RecipeFactory(enabled=False)
+        approval_request = ApprovalRequestFactory(recipe=recipe)
+        approval_request.approve(UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 204
@@ -356,20 +343,21 @@ class TestRecipeAPI(object):
         assert recipe.enabled
 
     def test_cannot_enable_unapproved_recipes(self, api_client):
-        recipe = RecipeFactory(approver=None, enabled=False)
+        recipe = RecipeFactory(approval=None, enabled=False)
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 400
 
     def test_it_can_disable_recipes(self, api_client):
-        user = UserFactory()
-        recipe = RecipeFactory(approver=user, enabled=True)
+        recipe = RecipeFactory(enabled=True)
+        approval_request = ApprovalRequestFactory(recipe=recipe)
+        approval_request.approve(UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
         assert res.status_code == 204
 
         recipe = Recipe.objects.all()[0]
-        assert recipe.approver is None
+        assert recipe.approval is None
         assert not recipe.enabled
 
 

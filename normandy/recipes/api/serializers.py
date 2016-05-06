@@ -1,9 +1,12 @@
+from django.contrib.auth.models import User
+
 from rest_framework import serializers
 from reversion.models import Version
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import Action, Recipe
+from normandy.recipes.models import (Action, Recipe, Approval, ApprovalRequest,
+                                     ApprovalRequestComment)
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -21,10 +24,137 @@ class ActionSerializer(serializers.ModelSerializer):
         ]
 
 
+class ApprovalSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.IntegerField(source='creator.id', write_only=True)
+
+    class Meta:
+        model = Approval
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'creator_id',
+        ]
+
+    def validate_creator_id(self, attr):
+        try:
+            User.objects.get(id=attr)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User does not exist.')
+        return attr
+
+    def create(self, validated_data):
+        creator_id = validated_data.pop('creator')['id']
+        creator = User.objects.get(id=creator_id)
+        approval_request = Approval.objects.create(creator=creator, **validated_data)
+        return approval_request
+
+    def update(self, instance, validated_data):
+        instance.created = validated_data.get('created', instance.created)
+
+        if 'creator' in validated_data:
+            creator_id = validated_data.pop('creator')['id']
+            instance.action = User.objects.get(id=creator_id)
+
+        instance.save()
+        return instance
+
+
+class ApprovalRequestSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.IntegerField(source='creator.id', write_only=True)
+    approval = ApprovalSerializer(required=False)
+
+    class Meta:
+        model = ApprovalRequest
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'creator_id',
+            'active',
+            'approval',
+        ]
+
+    def validate_creator_id(self, attr):
+        try:
+            User.objects.get(id=attr)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User does not exist.')
+        return attr
+
+    def create(self, validated_data):
+        creator_id = validated_data.pop('creator')['id']
+        validated_data['creator'] = User.objects.get(id=creator_id)
+
+        if 'approval' in validated_data:
+            approval_data = validated_data.pop('approval')
+            validated_data['approval'] = Approval.objects.create(**approval_data)
+
+        approval_request = ApprovalRequest.objects.create(**validated_data)
+        return approval_request
+
+    def update(self, instance, validated_data):
+        instance.created = validated_data.get('created', instance.created)
+        instance.active = validated_data.get('active', instance.active)
+
+        if 'approval' in validated_data:
+            approval_data = validated_data.pop('approval')
+            instance.approval = Approval.objects.create(**approval_data)
+
+        if 'creator' in validated_data:
+            creator_id = validated_data.pop('creator')['id']
+            instance.action = User.objects.get(id=creator_id)
+
+        instance.save()
+        return instance
+
+
+class ApprovalRequestCommentSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.IntegerField(source='creator.id', write_only=True)
+
+    class Meta:
+        model = ApprovalRequestComment
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'creator_id',
+            'text'
+        ]
+
+    def validate_creator_id(self, attr):
+        try:
+            User.objects.get(id=attr)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User does not exist.')
+        return attr
+
+    def create(self, validated_data):
+        creator_id = validated_data.pop('creator')['id']
+        creator = User.objects.get(id=creator_id)
+        comment = ApprovalRequestComment.objects.create(creator=creator, **validated_data)
+        return comment
+
+    def update(self, instance, validated_data):
+        instance.created = validated_data.get('created', instance.created)
+        instance.text = validated_data.get('text', instance.text)
+
+        if 'creator' in validated_data:
+            creator_id = validated_data.pop('creator')['id']
+            instance.action = User.objects.get(id=creator_id)
+
+        instance.save()
+        return instance
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     action_name = serializers.CharField(source='action.name')
     arguments = serializers.JSONField()
-    approver = UserSerializer(read_only=True)
+    current_approval_request = ApprovalRequestSerializer(read_only=True)
+    approval = ApprovalSerializer(read_only=True)
     is_approved = serializers.BooleanField(read_only=True)
     enabled = serializers.BooleanField(read_only=True)
 
@@ -38,9 +168,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             'action_name',
             'arguments',
             'filter_expression',
-            'approver',
+            'current_approval_request',
+            'approval',
             'is_approved',
-            'enabled',
         ]
 
     def validate_action_name(self, attr):
@@ -65,7 +195,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.action = Action.objects.get(name=action_name)
 
         instance.save()
-
         return instance
 
 

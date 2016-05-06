@@ -2,6 +2,8 @@ import hashlib
 import json
 import logging
 
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.functional import cached_property
@@ -68,14 +70,14 @@ class Recipe(models.Model):
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
     filter_expression = models.TextField(blank=False)
-    approver = models.ForeignKey(User, null=True, blank=True)
+    approval = models.OneToOneField('Approval', related_name='recipe', null=True, blank=True)
 
     class IsNotApproved(Exception):
         pass
 
     @property
     def is_approved(self):
-        return self.approver is not None
+        return self.approval is not None
 
     @property
     def arguments(self):
@@ -84,6 +86,13 @@ class Recipe(models.Model):
     @arguments.setter
     def arguments(self, value):
         self.arguments_json = json.dumps(value)
+
+    @property
+    def current_approval_request(self):
+        try:
+            return self.approval_requests.get(active=True)
+        except ApprovalRequest.DoesNotExist:
+            return None
 
     def enable(self):
         if self.is_approved:
@@ -94,7 +103,7 @@ class Recipe(models.Model):
 
     def disable(self, ignore_revision_id=False, *args, **kwargs):
         self.enabled = False
-        self.approver = None
+        self.approval = None
         self.save(ignore_revision_id=ignore_revision_id, *args, **kwargs)
 
     _registered_matchers = []
@@ -174,3 +183,50 @@ class Client(object):
     @cached_property
     def request_time(self):
         return self.request.received_at
+
+
+class ApprovalRequest(models.Model):
+    recipe = models.ForeignKey(Recipe, related_name='approval_requests')
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
+    active = models.BooleanField(default=True)
+
+    class IsNotActive(Exception):
+        pass
+
+    @property
+    def is_approved(self):
+        return self.approval is not None
+
+    def approve(self, user):
+        if self.active:
+            approval = Approval(approval_request=self, creator=user)
+            approval.save()
+
+            self.active = False
+            self.save()
+
+            self.recipe.approval = approval
+            self.recipe.save()
+        else:
+            raise self.IsNotActive('Approval request has already been closed.')
+
+    def reject(self):
+        if self.active:
+            self.active = False
+            self.save()
+        else:
+            raise self.IsNotActive('Approval request has already been closed.')
+
+
+class ApprovalRequestComment(models.Model):
+    approval_request = models.ForeignKey(ApprovalRequest, related_name='comments')
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
+    text = models.TextField()
+
+
+class Approval(models.Model):
+    approval_request = models.OneToOneField(ApprovalRequest, related_name='approval')
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
