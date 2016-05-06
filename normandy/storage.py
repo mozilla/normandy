@@ -3,4 +3,4 @@ from whitenoise.django import GzipManifestStaticFilesStorage
 
 
 class GzipManifestPipelineStorage(PipelineMixin, GzipManifestStaticFilesStorage):
-  pass
+    pass
