@@ -1,5 +1,3 @@
-import uuid
-
 import factory
 
 from django.template.defaultfilters import slugify
