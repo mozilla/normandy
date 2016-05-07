@@ -25,11 +25,12 @@
         {% endif %}
       </div>
 
+      {% block page-header %}{% endblock %}
+      {% block content %}{% endblock %}
       <div id="page-container"></div>
 
     </div>
     <!-- END Container -->
-
     {% render_bundle 'control' 'js' %}
   </body>
 </html>
