@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { browserHistory } from 'react-router';
 import { routerReducer, routerMiddleware } from 'react-router-redux';
 import controlAppReducer from '../reducers/ControlAppReducer.js';
+import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 
 const loggerMiddleware = createLogger();
@@ -16,6 +17,7 @@ export default function controlStore(initialState) {
     initialState,
     applyMiddleware(
       reduxRouterMiddleware,
+      thunk,
       loggerMiddleware
     )
   );

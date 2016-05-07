@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" data-csrf="{{csrf_token}}">
   <head>
     <title>SHIELD Control Panel</title>
     {% render_bundle 'control' 'css' %}
