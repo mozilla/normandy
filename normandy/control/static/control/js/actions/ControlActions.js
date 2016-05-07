@@ -10,6 +10,7 @@ export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 
 export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
+export const RECIPE_DELETED = 'RECIPE_DELETED';
 
 
 const BASE_API_URL = '/api/v1/recipe/';
@@ -66,6 +67,17 @@ const apiRequestMap = {
       },
       actionOnSuccess: recipeUpdated
     };
+  },
+
+  deleteRecipe(recipeInfo) {
+    return {
+      url: `${BASE_API_URL}${recipeInfo.recipeId}/`,
+      settings: {
+        method: 'delete'
+      },
+      actionOnSuccess: recipeDeleted,
+      successActionParams: recipeInfo.recipeId
+    };
   }
 };
 
@@ -108,6 +120,13 @@ function recipeUpdated(recipe) {
   return {
     type: RECIPE_UPDATED,
     recipe
+  };
+}
+
+function recipeDeleted(recipeId) {
+  return {
+    type: RECIPE_DELETED,
+    recipeId
   };
 }
 

@@ -121,4 +121,16 @@ describe('controlApp Actions', () => {
       })
   });
 
+  it('creates RECIPE_DELETED when deleting a recipe is successful', () => {
+    const expectedAction = { type: actions.RECIPE_DELETED, recipeId: 1 };
+    spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes));
+
+    return store.dispatch(actions.makeApiRequest('deleteRecipe', { recipeId: 1 }))
+      .then(() => {
+        expect(window.fetch).toHaveBeenCalled();
+        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/?format=json&', jasmine.any(Object));
+        expect(store.getActions()).toContain(expectedAction);
+      })
+  });
+
 })

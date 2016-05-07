@@ -114,4 +114,22 @@ describe('controlApp reducer', () => {
       }]
     })
   })
+
+  it('should handle RECIPE_DELETED', () => {
+    expect(controlAppReducer({ recipes: fixtureRecipes }, {
+      type: actions.RECIPE_DELETED,
+      recipeId: 3
+    })).toEqual({
+      recipes: [{
+        "id": 1,
+        "name": "Lorem Ipsum",
+        "enabled": true
+      },
+      {
+        "id": 2,
+        "name": "Dolor set amet",
+        "enabled": true
+      }]
+    })
+  })
 });

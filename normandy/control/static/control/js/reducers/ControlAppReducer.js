@@ -1,7 +1,7 @@
 import {
   REQUEST_IN_PROGRESS, REQUEST_COMPLETE,
   RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED,
-  RECIPE_ADDED, RECIPE_UPDATED,
+  RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
   SET_SELECTED_RECIPE } from '../actions/ControlActions.js';
 
 let initialState = {
@@ -54,6 +54,12 @@ export function controlAppReducer(state = initialState, action) {
             recipe = Object.assign(recipe, action.recipe);
           }
           return recipe;
+        })
+      });
+    case RECIPE_DELETED:
+      return Object.assign({}, state, {
+        recipes: state.recipes.filter((recipe) => {
+          return recipe.id !== action.recipeId;
         })
       });
 
