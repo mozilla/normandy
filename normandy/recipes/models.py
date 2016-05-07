@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.functional import cached_property
 
 from rest_framework.reverse import reverse
@@ -217,6 +217,11 @@ class ApprovalRequest(models.Model):
             self.save()
         else:
             raise self.IsNotActive('Approval request has already been closed.')
+
+    def save(self, *args, **kwargs):
+        if self.active and self.recipe.approval_requests.filter(active=True).exists():
+            raise IntegrityError('A recipe can only have one active approval request.')
+        super().save(*args, **kwargs)
 
 
 class ApprovalRequestComment(models.Model):
