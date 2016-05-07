@@ -3,6 +3,7 @@ import apiFetch from '../utils/apiFetch.js';
 export const REQUEST_IN_PROGRESS = 'REQUEST_IN_PROGRESS';
 export const REQUEST_COMPLETE = 'REQUEST_COMPLETE';
 export const RECIPES_RECEIVED = 'RECIPES_RECEIVED';
+export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 
 
 const BASE_API_URL = '/api/v1/recipe/';
@@ -60,6 +61,13 @@ function shouldFetchRecipes(state) {
   }
 }
 
+export function setSelectedRecipe(recipeId) {
+  return {
+    type: SET_SELECTED_RECIPE,
+    recipeId
+  };
+}
+
 export function makeApiRequest(requestType, settings) {
   return (dispatch, getState) => {
     let apiRequestConfig = apiRequestMap[requestType](settings, getState);
@@ -82,5 +90,6 @@ export function makeApiRequest(requestType, settings) {
 
 
 export default {
+  setSelectedRecipe,
   makeApiRequest,
 };

@@ -13,6 +13,7 @@ class RecipeDataRow extends React.Component {
 
     return (
       <tr key={recipe.id} onClick={(e) => {
+        dispatch(ControlActions.setSelectedRecipe(recipe.id));
         dispatch(push(`/control/recipe/${recipe.id}/`))
       }}>
         <td>{recipe.name}</td>
@@ -41,6 +42,7 @@ class RecipeList extends React.Component {
   componentWillMount() {
     const { dispatch } = this.props
     dispatch(ControlActions.makeApiRequest('fetchAllRecipes', {}));
+    dispatch(ControlActions.setSelectedRecipe(null));
   }
 
   render() {

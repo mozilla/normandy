@@ -1,7 +1,8 @@
 import {
   REQUEST_IN_PROGRESS,
   REQUEST_COMPLETE,
-  RECIPES_RECEIVED
+  RECIPES_RECEIVED,
+  SET_SELECTED_RECIPE
 } from '../actions/ControlActions.js';
 
 let initialState = {
@@ -25,6 +26,10 @@ export function controlAppReducer(state = initialState, action) {
       return Object.assign({}, state, {
         recipes: action.recipes,
         recipeListNeedsFetch: false
+      });
+    case SET_SELECTED_RECIPE:
+      return Object.assign({}, state, {
+        selectedRecipe: action.recipeId
       });
     default:
       return state;
