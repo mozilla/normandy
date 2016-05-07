@@ -6,7 +6,14 @@ import RecipeForm from './components/RecipeForm.jsx';
 
 export default (
   <Route component={ControlApp}>
-    <Route path='control/' component={RecipeList} />
-    <Route path='control/recipe/:id/' component={RecipeForm} />
+    <Route path='control/'
+      component={RecipeList}
+      ctaButton={{text: 'Add New', icon: 'plus', link: 'recipe/new/'}}
+    />
+    <Route path='control/recipe/:id/'
+      component={RecipeForm}
+      pageTitle="Edit Recipe"
+      ctaButton={{text: 'History', icon: 'history', link: 'history/'}}
+    />
   </Route>
 );
