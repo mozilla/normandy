@@ -70,6 +70,24 @@ describe('controlApp reducer', () => {
     })
   })
 
+  it('should handle RECIPE_ADDED', () => {
+    expect(controlAppReducer(initialState, {
+      type: actions.RECIPE_ADDED,
+      recipe: {
+        id: 4,
+        name: 'Villis stebulum',
+        enabled: false
+      }
+    })).toEqual({
+      ...initialState,
+      recipes: [{
+        id: 4,
+        name: 'Villis stebulum',
+        enabled: false
+      }]
+    })
+  })
+
   it('should handle RECIPE_UPDATED', () => {
     expect(controlAppReducer({ recipes: fixtureRecipes }, {
       type: actions.RECIPE_UPDATED,

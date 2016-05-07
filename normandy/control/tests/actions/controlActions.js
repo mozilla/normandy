@@ -97,6 +97,18 @@ describe('controlApp Actions', () => {
       })
   });
 
+  it('creates RECIPE_ADDED when adding a recipe is successful', () => {
+    const expectedAction = { type: actions.RECIPE_ADDED, recipe: fixtureRecipes[0] }
+    spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
+
+    return store.dispatch(actions.makeApiRequest('addRecipe', fixtureRecipes[0]))
+      .then(() => {
+        expect(window.fetch).toHaveBeenCalled();
+        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/?format=json&', jasmine.any(Object));
+        expect(store.getActions()).toContain(expectedAction);
+      })
+  });
+
   it('creates RECIPE_UPDATED when updating a recipe is successful', () => {
     const expectedAction = { type: actions.RECIPE_UPDATED, recipe: fixtureRecipes[0] };
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
@@ -107,6 +119,6 @@ describe('controlApp Actions', () => {
         expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/?format=json&', jasmine.any(Object));
         expect(store.getActions()).toContain(expectedAction);
       })
-  })
+  });
 
 })

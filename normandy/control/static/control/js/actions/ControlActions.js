@@ -8,6 +8,7 @@ export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
 
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 
+export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 
 
@@ -42,6 +43,17 @@ const apiRequestMap = {
         method: 'get'
       },
       actionOnSuccess: singleRecipeReceived
+    };
+  },
+
+  addRecipe(recipeInfo) {
+    return {
+      url: BASE_API_URL,
+      settings: {
+        data: recipeInfo,
+        method: 'post'
+      },
+      actionOnSuccess: recipeAdded
     };
   },
 
@@ -81,6 +93,13 @@ function recipesReceived(recipes) {
 function singleRecipeReceived(recipe) {
   return {
     type: SINGLE_RECIPE_RECEIVED,
+    recipe
+  };
+}
+
+function recipeAdded(recipe) {
+  return {
+    type: RECIPE_ADDED,
     recipe
   };
 }

@@ -10,6 +10,10 @@ export default (
       component={RecipeList}
       ctaButton={{text: 'Add New', icon: 'plus', link: 'recipe/new/'}}
     />
+    <Route path='control/recipe/new/'
+      component={RecipeForm}
+      pageTitle="Add New Recipe"
+    />
     <Route path='control/recipe/:id/'
       component={RecipeForm}
       pageTitle="Edit Recipe"

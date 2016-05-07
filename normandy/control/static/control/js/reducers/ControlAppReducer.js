@@ -1,7 +1,8 @@
 import {
   REQUEST_IN_PROGRESS, REQUEST_COMPLETE,
   RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED,
-  RECIPE_UPDATED, SET_SELECTED_RECIPE } from '../actions/ControlActions.js';
+  RECIPE_ADDED, RECIPE_UPDATED,
+  SET_SELECTED_RECIPE } from '../actions/ControlActions.js';
 
 let initialState = {
   recipes: null,
@@ -39,6 +40,13 @@ export function controlAppReducer(state = initialState, action) {
         selectedRecipe: action.recipeId
       });
 
+    case RECIPE_ADDED:
+      return Object.assign({}, state, {
+        recipes: [
+          ...state.recipes || [],
+          action.recipe
+        ]
+      });
     case RECIPE_UPDATED:
       return Object.assign({}, state, {
         recipes: state.recipes.map((recipe) => {
