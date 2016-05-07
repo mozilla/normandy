@@ -219,8 +219,14 @@ class ApprovalRequest(models.Model):
             raise self.IsNotActive('Approval request has already been closed.')
 
     def save(self, *args, **kwargs):
-        if self.active and self.recipe.approval_requests.filter(active=True).exists():
+        open_approval_requests = self.recipe.approval_requests.filter(active=True)
+
+        if self.pk:
+            open_approval_requests = open_approval_requests.exclude(pk=self.pk)
+
+        if self.active and open_approval_requests.exists():
             raise IntegrityError('A recipe can only have one active approval request.')
+
         super().save(*args, **kwargs)
 
 

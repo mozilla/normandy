@@ -2,9 +2,12 @@ from unittest.mock import patch
 
 import pytest
 
+from django.db import IntegrityError
+
 from normandy.recipes.models import Client
 from normandy.recipes.tests import (
     ActionFactory,
+    ApprovalRequestFactory,
     RecipeFactory,
 )
 
@@ -48,6 +51,26 @@ class TestRecipe(object):
 
         recipe.save()
         assert recipe.revision_id == revision_id + 1
+
+
+@pytest.mark.django_db
+class TestApprovalRequest(object):
+    def test_only_one_open_request_for_recipe(self):
+        recipe = RecipeFactory()
+        ApprovalRequestFactory(recipe=recipe, active=False)
+
+        # Should be able to create a new request because last one was not active
+        ApprovalRequestFactory(recipe=recipe, active=True)
+
+        # Should not be able to create a new request because an open request exists
+        with pytest.raises(IntegrityError):
+            ApprovalRequestFactory(recipe=recipe, active=True)
+
+    def test_can_save_open_request(self):
+        request = ApprovalRequestFactory(active=True)
+
+        # Should be able to call save without an integrity error
+        request.save()
 
 
 class TestClient(object):
