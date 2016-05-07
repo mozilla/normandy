@@ -2,8 +2,13 @@ import apiFetch from '../utils/apiFetch.js';
 
 export const REQUEST_IN_PROGRESS = 'REQUEST_IN_PROGRESS';
 export const REQUEST_COMPLETE = 'REQUEST_COMPLETE';
+
 export const RECIPES_RECEIVED = 'RECIPES_RECEIVED';
+export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
+
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
+
+export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 
 
 const BASE_API_URL = '/api/v1/recipe/';
@@ -28,6 +33,27 @@ const apiRequestMap = {
     } else {
       return null;
     }
+  },
+
+  fetchSingleRecipe(recipeInfo) {
+    return {
+      url: `${BASE_API_URL}${recipeInfo.recipeId}/`,
+      settings: {
+        method: 'get'
+      },
+      actionOnSuccess: singleRecipeReceived
+    };
+  },
+
+  updateRecipe(recipeInfo) {
+    return {
+      url: `${BASE_API_URL}${recipeInfo.recipeId}/`,
+      settings: {
+        data: recipeInfo.recipe,
+        method: 'patch'
+      },
+      actionOnSuccess: recipeUpdated
+    };
   }
 };
 
@@ -49,6 +75,20 @@ function recipesReceived(recipes) {
   return {
     type: RECIPES_RECEIVED,
     recipes
+  };
+}
+
+function singleRecipeReceived(recipe) {
+  return {
+    type: SINGLE_RECIPE_RECEIVED,
+    recipe
+  };
+}
+
+function recipeUpdated(recipe) {
+  return {
+    type: RECIPE_UPDATED,
+    recipe
   };
 }
 

@@ -78,12 +78,35 @@ describe('controlApp Actions', () => {
 
   });
 
-
   it('doesnt create any actions if fetching recipes is not needed', () => {
     const store = mockStore({ controlApp: { ...initialState, recipeListNeedsFetch: false } }, []);
 
     store.dispatch(actions.makeApiRequest('fetchAllRecipes'));
     expect(store.getActions()).toEqual([]);
   });
+
+  it('creates SINGLE_RECIPE_RECEIVED when fetching a single recipes is successful', () => {
+    const expectedAction = { type: actions.SINGLE_RECIPE_RECEIVED, recipe: fixtureRecipes[0] };
+    spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
+
+    return store.dispatch(actions.makeApiRequest('fetchSingleRecipe', { recipeId: 1 }))
+      .then(() => {
+        expect(window.fetch).toHaveBeenCalled();
+        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/?format=json&', jasmine.any(Object));
+        expect(store.getActions()).toContain(expectedAction);
+      })
+  });
+
+  it('creates RECIPE_UPDATED when updating a recipe is successful', () => {
+    const expectedAction = { type: actions.RECIPE_UPDATED, recipe: fixtureRecipes[0] };
+    spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
+
+    return store.dispatch(actions.makeApiRequest('updateRecipe', { recipe: fixtureRecipes[0], recipeId: 1 }))
+      .then(() => {
+        expect(window.fetch).toHaveBeenCalled();
+        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/?format=json&', jasmine.any(Object));
+        expect(store.getActions()).toContain(expectedAction);
+      })
+  })
 
 })
