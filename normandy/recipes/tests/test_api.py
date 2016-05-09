@@ -360,6 +360,16 @@ class TestRecipeAPI(object):
         assert recipe.approval is None
         assert not recipe.enabled
 
+    def test_approval_request_list(self, api_client):
+        recipe = RecipeFactory()
+        ar1 = ApprovalRequestFactory(recipe=recipe, active=False)
+        ar2 = ApprovalRequestFactory(recipe=recipe)
+
+        res = api_client.get('/api/v1/recipe/%s/approval_requests/' % recipe.id)
+        assert res.status_code == 200
+        assert res.data[0]['id'] == ar2.id
+        assert res.data[1]['id'] == ar1.id
+
 
 @pytest.mark.django_db
 class TestRecipeVersionAPI(object):

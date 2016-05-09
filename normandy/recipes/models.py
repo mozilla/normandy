@@ -58,6 +58,11 @@ class Country(models.Model):
         return '{self.name} ({self.code})'.format(self=self)
 
 
+class Approval(models.Model):
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
+
+
 @reversion.register()
 class Recipe(models.Model):
     """A set of actions to be fetched and executed by users."""
@@ -70,7 +75,7 @@ class Recipe(models.Model):
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
     filter_expression = models.TextField(blank=False)
-    approval = models.OneToOneField('Approval', related_name='recipe', null=True, blank=True)
+    approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
 
     class IsNotApproved(Exception):
         pass
@@ -190,6 +195,10 @@ class ApprovalRequest(models.Model):
     created = models.DateTimeField(default=datetime.now)
     creator = models.ForeignKey(User)
     active = models.BooleanField(default=True)
+    approval = models.OneToOneField(Approval, null=True, related_name='approval_request')
+
+    class Meta:
+        ordering = ('-created',)
 
     class IsNotActive(Exception):
         pass
@@ -200,13 +209,13 @@ class ApprovalRequest(models.Model):
 
     def approve(self, user):
         if self.active:
-            approval = Approval(approval_request=self, creator=user)
-            approval.save()
+            self.approval = Approval(creator=user)
+            self.approval.save()
 
             self.active = False
             self.save()
 
-            self.recipe.approval = approval
+            self.recipe.approval = self.approval
             self.recipe.save()
         else:
             raise self.IsNotActive('Approval request has already been closed.')
@@ -235,9 +244,3 @@ class ApprovalRequestComment(models.Model):
     created = models.DateTimeField(default=datetime.now)
     creator = models.ForeignKey(User)
     text = models.TextField()
-
-
-class Approval(models.Model):
-    approval_request = models.OneToOneField(ApprovalRequest, related_name='approval')
-    created = models.DateTimeField(default=datetime.now)
-    creator = models.ForeignKey(User)

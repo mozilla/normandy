@@ -5,7 +5,7 @@ from django.http import Http404
 from django.views.decorators.cache import cache_control
 
 from rest_framework import generics, permissions, status, views, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion import revisions as reversion
@@ -22,6 +22,7 @@ from normandy.recipes.api.serializers import (
     RecipeSerializer,
     RecipeVersionSerializer,
     ApprovalRequestSerializer,
+    ApprovalRequestCommentSerializer,
 )
 
 
@@ -143,6 +144,54 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = self.get_object()
         recipe.disable()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['GET'])
+    def approval_requests(self, request, pk=None):
+        recipe = self.get_object()
+        serializer = ApprovalRequestSerializer(recipe.approval_requests, many=True)
+        return Response(serializer.data)
+
+
+class ApprovalRequestViewSet(viewsets.ModelViewSet):
+    queryset = ApprovalRequest.objects.all()
+    serializer_class = ApprovalRequestSerializer
+    filter_fields = ('action', 'enabled')
+    permission_classes = [
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
+        AdminEnabledOrReadOnly,
+    ]
+
+    @transaction.atomic()
+    @reversion.create_revision()
+    @detail_route(methods=['POST'])
+    def approve(self, request, pk=None):
+        approval_request = self.get_object()
+        approval_request.approve(request.user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['POST'])
+    def reject(self, request, pk=None):
+        approval_request = self.get_object()
+        approval_request.reject()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['POST'])
+    def comment(self, request, pk=None):
+        if 'text' not in request.POST:
+            return Response({'text': 'You must provide the text field.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        approval_request = self.get_object()
+        comment = ApprovalRequestComment(approval_request=approval_request, creator=request.user,
+                                         text=request.POST['text'])
+        comment.save()
+        return Response(ApprovalRequestSerializer(comment).data)
+
+    @detail_route(methods=['GET'])
+    def comments(self, request, pk=None):
+        approval_request = self.get_object()
+        serializer = ApprovalRequestCommentSerializer(approval_request.comments, many=True)
+        return Response(serializer.data)
 
 
 class RecipeVersionViewSet(viewsets.ReadOnlyModelViewSet):
