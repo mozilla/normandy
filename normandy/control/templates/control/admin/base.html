@@ -1,11 +1,12 @@
-{% load i18n pipeline %}
+{% load i18n %}
+{% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" data-csrf="{{csrf_token}}">
   <head>
     <title>SHIELD Control Panel</title>
-    {% stylesheet 'control' %}
+    {% render_bundle 'control' 'css' %}
     <meta name="robots" content="NONE,NOARCHIVE" />
   </head>
 
@@ -24,17 +25,12 @@
         {% endif %}
       </div>
 
-      <div id="page-header">
-        {% block page-header %}{% endblock %}
-      </div>
-
-      <div id="content" class="wrapper">
-        {% block content %}{% endblock %}
-      </div>
+      {% block page-header %}{% endblock %}
+      {% block content %}{% endblock %}
+      <div id="page-container"></div>
 
     </div>
     <!-- END Container -->
-
-    {% javascript 'control' %}
+    {% render_bundle 'control' 'js' %}
   </body>
 </html>

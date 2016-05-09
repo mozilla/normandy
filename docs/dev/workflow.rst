@@ -11,6 +11,12 @@ You can run the automated test suite with the following command:
 
    py.test
 
+Front-end JavaScript tests can be run with:
+
+.. code-block:: bash
+
+   karma start
+
 Updating Your Local Instance
 ----------------------------
 When changes are merged to the main Normandy repository, you'll want to update
