@@ -80,10 +80,6 @@ class Core(Configuration):
         'npm.finders.NpmFinder',
     ]
 
-    STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, 'assets'),
-    )
-
     NPM_DESTINATION_PREFIX = 'npm'
     NPM_FILE_PATTERNS = {
         'babel-polyfill': ['dist/*.js'],
@@ -182,6 +178,11 @@ class Base(Core):
     STATIC_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'static'))
     MEDIA_URL = values.Value('/media/')
     MEDIA_ROOT = values.Value(os.path.join(Core.BASE_DIR, 'media'))
+
+    STATICFILES_DIRS = (
+        os.path.join(Core.BASE_DIR, 'assets'),
+    )
+
     STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
     # Overwrite old files when uploading media.
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
