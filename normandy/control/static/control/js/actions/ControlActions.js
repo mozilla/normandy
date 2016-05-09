@@ -152,8 +152,8 @@ export function makeApiRequest(requestType, settings) {
     if (apiRequestConfig) {
       dispatch(requestInProgress());
       return apiFetch(apiRequestConfig.url, {
-        ...apiRequestConfig.settings,
-        ...API_REQUEST_SETTINGS
+        ...API_REQUEST_SETTINGS,
+        ...apiRequestConfig.settings
       })
       .then(response => {
         dispatch(requestComplete('success'));
