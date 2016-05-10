@@ -21,9 +21,12 @@ class RecipeForm extends React.Component {
   }
 
   render() {
-    const { fields: { name, filter_expression }, recipeId, handleSubmit } = this.props;
+    const { fields: { name, filter_expression }, recipeId, handleSubmit, viewingRevision } = this.props;
+    const notification = (viewingRevision) ? `You are viewing a revision of this recipe.` : '';
+
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
+        <p className="notification info">{notification}</p>
         <div className="row">
           <div className="fluid-3">
             <label>Name</label>
@@ -55,7 +58,8 @@ RecipeForm.propTypes = {
 export default composeRecipeContainer(reduxForm({
     form: 'recipe',
     fields: ['name', 'filter_expression']
-  }, (state, props) => ({ // mapStateToProps
-    initialValues: (props.recipe || null)
+  }, (state, props) => ({
+    initialValues: ((props.location.state) ? props.location.state.selectedRevision : props.recipe),
+    viewingRevision: ((props.location.state && props.location.state.selectedRevision))
   })
 )(RecipeForm))

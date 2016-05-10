@@ -13,7 +13,7 @@ export default function composeRecipeContainer(Component) {
 
     getRecipeData(recipeId) {
       const { dispatch } = this.props;
-      if (!this.props.recipes) {
+      if (!this.props.recipe) {
         dispatch(ControlActions.setSelectedRecipe(recipeId));
         dispatch(ControlActions.makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }));
       }
