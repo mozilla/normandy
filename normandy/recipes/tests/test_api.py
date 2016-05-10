@@ -526,6 +526,68 @@ class TestApprovalRequestAPI(object):
 
 
 @pytest.mark.django_db
+class TestApprovalRequestCommentAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_it_serves_comments(self, api_client):
+        approval_request = ApprovalRequestCommentFactory()
+
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+        assert res.data[0]['id'] == approval_request.id
+
+    def test_it_can_create_comments(self, api_client):
+        approval_request = ApprovalRequestFactory()
+        user = UserFactory()
+
+        res = api_client.post('/api/v1/approval_request_comment/', {
+            'creator_id': user.id, 'text': 'testing', 'approval_request_id': approval_request.id})
+        assert res.status_code == 201
+
+        comments = ApprovalRequestComment.objects.all()
+        assert comments.count() == 1
+
+    def test_it_can_edit_comments(self, api_client):
+        comment = ApprovalRequestCommentFactory(text='unchanged')
+
+        res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,
+                               {'text': 'changed'})
+        assert res.status_code == 200
+
+        comment = ApprovalRequestComment.objects.get(id=comment.id)
+        assert comment.text == 'changed'
+
+    def test_it_can_delete_comments(self, api_client):
+        comment = ApprovalRequestCommentFactory()
+
+        res = api_client.delete('/api/v1/approval_request_comment/%s/' % comment.id)
+        assert res.status_code == 204
+
+        comments = ApprovalRequestComment.objects.all()
+        assert comments.count() == 0
+
+    def test_available_if_admin_enabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = True
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_readonly_if_admin_disabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+
+        comment = ApprovalRequestCommentFactory(text='unchanged')
+        res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,
+                               {'text': 'changed'})
+        assert res.status_code == 403
+        assert res.data['detail'] == AdminEnabledOrReadOnly.message
+
+
+@pytest.mark.django_db
 class TestClassifyClient(object):
     def test_it_works(self, api_client):
         get_country_code_patch = patch('normandy.recipes.models.get_country_code')

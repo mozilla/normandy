@@ -65,6 +65,8 @@ class ApprovalRequestCommentSerializer(serializers.ModelSerializer):
     creator = UserSerializer(read_only=True)
     creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
                                                     write_only=True)
+    approval_request_id = serializers.PrimaryKeyRelatedField(
+        source='approval_request', queryset=ApprovalRequest.objects.all(), write_only=True)
 
     class Meta:
         model = ApprovalRequestComment
@@ -73,7 +75,8 @@ class ApprovalRequestCommentSerializer(serializers.ModelSerializer):
             'created',
             'creator',
             'creator_id',
-            'text'
+            'text',
+            'approval_request_id',
         ]
 
 

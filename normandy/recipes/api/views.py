@@ -231,6 +231,15 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class ApprovalRequestCommentViewSet(viewsets.ModelViewSet):
+    queryset = ApprovalRequestComment.objects.all()
+    serializer_class = ApprovalRequestCommentSerializer
+    permission_classes = [
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
+        AdminEnabledOrReadOnly,
+    ]
+
+
 class RecipeVersionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecipeVersionSerializer
     permission_classes = [
