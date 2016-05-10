@@ -7,7 +7,7 @@ module.exports = {
   context: __dirname,
 
   entry: {
-    selfrepair: './normandy/selfrepair/static/js/self_repair_runner',
+    selfrepair: './normandy/selfrepair/static/js/self_repair',
     control: [
       './normandy/control/static/control/js/index',
       './normandy/control/static/control/admin/sass/control.scss',
@@ -24,6 +24,10 @@ module.exports = {
   plugins: [
     new BundleTracker({ filename: './webpack-stats.json' }),
     new ExtractTextPlugin('[name]-[hash].css'),
+    new webpack.ProvidePlugin({
+      'Promise': 'exports?global.Promise!es6-promise',
+      'fetch': 'exports?self.fetch!isomorphic-fetch'
+    }),
   ],
 
   module: {

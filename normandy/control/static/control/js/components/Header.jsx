@@ -8,13 +8,14 @@ class Header extends React.Component {
   }
 
   render() {
-    const { pageTitle, subTitle, ctaButton } = this.props.pageType;
-    let ctaBtn;
-    if (ctaButton) {
-      ctaBtn =
-      <Link className="button" to={this.props.currentLocation + ctaButton.link}>
-        <i className={"pre fa fa-" + ctaButton.icon}></i> {ctaButton.text}
-      </Link>
+    const { pageTitle, subTitle, ctaButtons } = this.props.pageType;
+    let ctaBtns;
+    if (ctaButtons) {
+      ctaBtns = ctaButtons.map(({text, icon, link}, index) => (
+        <Link className="button" to={this.props.currentLocation + link}>
+          <i className={"pre fa fa-" + icon}></i> {text}
+        </Link>
+      ))
     }
     return (
       <div id="page-header">
@@ -22,7 +23,7 @@ class Header extends React.Component {
           <Link to={`/control/`}>Recipes</Link>
           {pageTitle ? [': ', <span>{pageTitle}</span>] : '' }
         </h2>
-        {ctaBtn}
+        {ctaBtns}
       </div>
     )
   }

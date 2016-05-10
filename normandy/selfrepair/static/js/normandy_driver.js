@@ -1,6 +1,5 @@
 import Mozilla from './uitour.js'
 import EventEmitter from 'wolfy87-eventemitter'
-import xhr from './xhr.js'
 import uuid from 'node-uuid'
 
 /**
@@ -123,10 +122,13 @@ let Normandy = {
             this.log(data);
             return Promise.resolve({});
         } else {
-            return xhr('POST', 'https://input.mozilla.org/api/v2/hb/', {
+            return fetch('https://input.mozilla.org/api/v2/hb/', {
+                method: 'POST',
                 data: data,
                 headers: {Accept: 'application/json'},
-            }).then(request => JSON.parse(request.responseText));
+            }).then(response => {
+                return response.json().then(json => json)
+            });
         }
     },
 
