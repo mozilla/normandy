@@ -26,7 +26,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
 class ApprovalSerializer(serializers.ModelSerializer):
     creator = UserSerializer(read_only=True)
-    creator_id = serializers.PrimaryKeyRelatedField(source='creator',queryset=User.objects.all(),
+    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
                                                     write_only=True)
 
     class Meta:
