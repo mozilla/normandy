@@ -43,8 +43,9 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
     creator = UserSerializer(read_only=True)
     creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
                                                     write_only=True)
-    approval = ApprovalSerializer(read_only=True)
     is_approved = serializers.BooleanField(read_only=True)
+    recipe_id = serializers.PrimaryKeyRelatedField(source='recipe', queryset=Recipe.objects.all(),
+                                                   write_only=True)
 
     class Meta:
         model = ApprovalRequest
@@ -56,6 +57,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
             'active',
             'approval',
             'is_approved',
+            'recipe_id',
         ]
 
 

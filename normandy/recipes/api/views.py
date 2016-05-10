@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
@@ -13,8 +13,7 @@ from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.recipes.models import (Action, Client, Recipe, Approval, ApprovalRequest,
-                                     ApprovalRequestComment)
+from normandy.recipes.models import Action, Client, Recipe, ApprovalRequest, ApprovalRequestComment
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import (
     ActionSerializer,
@@ -155,7 +154,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class ApprovalRequestViewSet(viewsets.ModelViewSet):
     queryset = ApprovalRequest.objects.all()
     serializer_class = ApprovalRequestSerializer
-    filter_fields = ('action', 'enabled')
+    filter_fields = ('active',)
     permission_classes = [
         permissions.DjangoModelPermissionsOrAnonReadOnly,
         AdminEnabledOrReadOnly,
@@ -163,29 +162,67 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic()
     @reversion.create_revision()
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response(
+                {'active': 'You can only have one open approval request for a recipe.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic()
+    @reversion.create_revision()
+    def update(self, request, *args, **kwargs):
+        """
+        Intercept PUT requests and have them create instead of update
+        if the object does not exist.
+        """
+        try:
+            if request.method == 'PUT':
+                try:
+                    self.get_object()
+                except Http404:
+                    return self.create(request, *args, **kwargs)
+
+            return super().update(request, *args, **kwargs)
+        except IntegrityError:
+            return Response(
+                {'active': 'You can only have one open approval request for a recipe.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+    @transaction.atomic()
+    @reversion.create_revision()
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.approve(request.user)
+        try:
+            approval_request.approve(request.user)
+        except ApprovalRequest.IsNotActive:
+            return Response({'active': 'This approval request has already been closed.'},
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['POST'])
     def reject(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.reject()
+        try:
+            approval_request.reject()
+        except ApprovalRequest.IsNotActive:
+            return Response({'active': 'This approval request has already been closed.'},
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['POST'])
     def comment(self, request, pk=None):
-        if 'text' not in request.POST:
+        if 'text' not in request.data:
             return Response({'text': 'You must provide the text field.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         approval_request = self.get_object()
         comment = ApprovalRequestComment(approval_request=approval_request, creator=request.user,
-                                         text=request.POST['text'])
+                                         text=request.data['text'])
         comment.save()
-        return Response(ApprovalRequestSerializer(comment).data)
+        return Response(ApprovalRequestCommentSerializer(comment).data)
 
     @detail_route(methods=['GET'])
     def comments(self, request, pk=None):

@@ -109,6 +109,8 @@ class Recipe(models.Model):
     def disable(self, ignore_revision_id=False, *args, **kwargs):
         self.enabled = False
         self.approval = None
+        if self.current_approval_request:
+            self.current_approval_request.reject()
         self.save(ignore_revision_id=ignore_revision_id, *args, **kwargs)
 
     _registered_matchers = []
@@ -209,13 +211,14 @@ class ApprovalRequest(models.Model):
 
     def approve(self, user):
         if self.active:
-            self.approval = Approval(creator=user)
-            self.approval.save()
+            approval = Approval(creator=user)
+            approval.save()
 
+            self.approval = approval
             self.active = False
             self.save()
 
-            self.recipe.approval = self.approval
+            self.recipe.approval = approval
             self.recipe.save()
         else:
             raise self.IsNotActive('Approval request has already been closed.')
