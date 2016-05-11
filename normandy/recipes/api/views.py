@@ -74,7 +74,12 @@ class ActionImplementationView(generics.RetrieveAPIView):
         if impl_hash != action.implementation_hash:
             raise NotFound('Hash does not match current stored action.')
 
-        return Response(action.implementation)
+        headers = {}
+
+        if action.signature:
+            headers['Content-Signature'] = action.signature
+
+        return Response(action.implementation, headers=headers)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
