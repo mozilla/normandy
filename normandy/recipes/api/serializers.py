@@ -81,6 +81,7 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Version
         fields = [
+            'id',
             'date_created',
             'recipe',
         ]

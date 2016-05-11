@@ -156,6 +156,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class RecipeHistoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Version.objects.all()
+    serializer_class = RecipeVersionSerializer
+    permission_classes = [
+        AdminEnabledOrReadOnly,
+    ]
+
+
 class ClassifyClient(views.APIView):
     authentication_classes = []
     permission_classes = []
