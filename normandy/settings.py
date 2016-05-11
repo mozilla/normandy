@@ -194,6 +194,13 @@ class Base(Core):
     ADMIN_ENABLED = values.BooleanValue(True)
     ACTION_IMPLEMENTATION_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
     NUM_PROXIES = values.IntegerValue(0)
+    AUTOGRAPH = {
+        'URL': values.Value(environ_name='AUTOGRAPH_URL', late_binding=True),
+        'HAWK_ID': values.Value(environ_name='AUTOGRAPH_HAWK_ID', late_binding=True),
+        'HAWK_SECRET_KEY': values.Value(environ_name='AUTOGRAPH_HAWK_SECRET_KEY',
+                                        late_binding=True),
+    }
+    ACTION_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
 
 
 class Development(Base):
