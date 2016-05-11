@@ -1,9 +1,13 @@
 import hashlib
 from unittest.mock import patch
 
+from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+
 import pytest
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
+from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import Whatever, UserFactory
@@ -367,6 +371,25 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.approver is None
         assert not recipe.enabled
+
+
+@pytest.mark.django_db
+class TestRecipeHistoryAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/recipe_history/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_it_serves_recipes(self, api_client):
+        with transaction.atomic(), reversion.create_revision():
+            recipe = RecipeFactory()
+
+        content_type = ContentType.objects.get_for_model(recipe)
+        version = Version.objects.filter(content_type=content_type, object_id=recipe.pk).first()
+
+        res = api_client.get('/api/v1/recipe_history/%s/' % version.id)
+        assert res.status_code == 200
+        assert res.data['id'] == version.id
 
 
 @pytest.mark.django_db
