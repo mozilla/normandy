@@ -7,14 +7,14 @@ from normandy.recipes.api.views import (
     ActionViewSet,
     ClassifyClient,
     RecipeViewSet,
-    RecipeHistoryViewSet,
+    RecipeVersionViewSet,
 )
 
 # API Router
 router = DefaultRouter()
 router.register(r'action', ActionViewSet)
 router.register(r'recipe', RecipeViewSet)
-router.register(r'recipe_history', RecipeHistoryViewSet)
+router.register(r'recipe_version', RecipeVersionViewSet)
 
 
 app_name = 'recipes'

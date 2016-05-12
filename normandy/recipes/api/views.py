@@ -156,12 +156,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class RecipeHistoryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Version.objects.all()
+class RecipeVersionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecipeVersionSerializer
     permission_classes = [
         AdminEnabledOrReadOnly,
     ]
+
+    def get_queryset(self):
+        content_type = ContentType.objects.get_for_model(Recipe)
+        return Version.objects.filter(content_type=content_type)
 
 
 class ClassifyClient(views.APIView):
