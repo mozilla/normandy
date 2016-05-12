@@ -200,7 +200,6 @@ class Base(Core):
     CDN_URL = values.URLValue(None)
 
     # Normandy settings
-    CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(False)
     ADMIN_ENABLED = values.BooleanValue(True)
     ACTION_IMPLEMENTATION_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
     NUM_PROXIES = values.IntegerValue(0)
