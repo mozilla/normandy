@@ -14,7 +14,7 @@ from normandy.recipes.api.views import (
 router = DefaultRouter()
 router.register(r'action', ActionViewSet)
 router.register(r'recipe', RecipeViewSet)
-router.register(r'recipe_version', RecipeVersionViewSet)
+router.register(r'recipe_version', RecipeVersionViewSet, 'Version')
 
 
 app_name = 'recipes'

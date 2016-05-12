@@ -376,7 +376,7 @@ class TestRecipeAPI(object):
 @pytest.mark.django_db
 class TestRecipeHistoryAPI(object):
     def test_it_works(self, api_client):
-        res = api_client.get('/api/v1/recipe_history/')
+        res = api_client.get('/api/v1/recipe_version/')
         assert res.status_code == 200
         assert res.data == []
 
@@ -387,7 +387,7 @@ class TestRecipeHistoryAPI(object):
         content_type = ContentType.objects.get_for_model(recipe)
         version = Version.objects.filter(content_type=content_type, object_id=recipe.pk).first()
 
-        res = api_client.get('/api/v1/recipe_history/%s/' % version.id)
+        res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
         assert res.status_code == 200
         assert res.data['id'] == version.id
 
