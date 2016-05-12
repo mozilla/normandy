@@ -26,20 +26,19 @@ function loadAction(recipe) {
     return new Promise((resolve, reject) => {
         let action_name = recipe.action_name;
         if (!registeredActions[action_name]) {
-            fetch(`/api/v1/action/${action_name}/`).then(function(response) {
-                return response.json().then(action => {
-                    let script = document.createElement('script');
-                    script.src = action.implementation_url;
-                    script.onload = () => {
-                        if (!registeredActions[action.name]) {
-                            reject(new Error(`Could not find action with name ${action.name}.`));
-                        } else {
-                            resolve(registeredActions[action.name]);
-                        }
-                    };
-                    document.head.appendChild(script);
-                })
-
+            fetch(`/api/v1/action/${action_name}/`)
+            .then(response => response.json())
+            .then(action => {
+                let script = document.createElement('script');
+                script.src = action.implementation_url;
+                script.onload = () => {
+                    if (!registeredActions[action.name]) {
+                        reject(new Error(`Could not find action with name ${action.name}.`));
+                    } else {
+                        resolve(registeredActions[action.name]);
+                    }
+                };
+                document.head.appendChild(script);
             });
         } else {
             resolve(registeredActions[action_name]);
@@ -72,9 +71,8 @@ export function fetchRecipes() {
     let data = {enabled: 'True'}
 
     return fetch(recipeUrl, {headers, data})
-    .then(response => {
-        return response.json().then(recipes => recipes);
-    });
+    .then(response => response.json())
+    .then(recipes => recipes);
 }
 
 
@@ -86,9 +84,8 @@ function classifyClient() {
     let {classifyUrl} = document.documentElement.dataset;
     let headers = {Accept: 'application/json'};
     let classifyXhr = fetch(classifyUrl, {headers})
-    .then(response => {
-        return response.json().then(client => client);
-    });
+    .then(response => response.json())
+    .then(client => client);
 
     return Promise.all([classifyXhr, Normandy.client()])
     .then(([classification, client]) => {
@@ -120,15 +117,12 @@ export function runRecipe(recipe) {
  * @return {object}
  */
 export function filterContext() {
-    return new Promise(resolve => {
-        classifyClient().then(classifiedClient => {
-            resolve({
-                normandy: classifiedClient,
-                telemetry: {},
-                events: {},
-            })
-        })
-    })
+    return classifyClient()
+    .then(classifiedClient => {
+        return {
+            normandy: classifiedClient
+        }
+    });
 }
 
 

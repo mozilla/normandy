@@ -126,9 +126,9 @@ let Normandy = {
                 method: 'POST',
                 data: data,
                 headers: {Accept: 'application/json'},
-            }).then(response => {
-                return response.json().then(json => json)
-            });
+            })
+            .then(response => response.json())
+            .then(heartbeatFlow => heartbeatFlow);
         }
     },
 
