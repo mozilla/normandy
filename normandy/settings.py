@@ -116,7 +116,17 @@ class Core(Configuration):
         'DEFAULT': {
             'BUNDLE_DIR_NAME': 'bundles/',
             'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
+        },
+        'ACTIONS': {
+            'BUNDLE_DIR_NAME': 'bundles/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-actions.json')
         }
+    }
+
+    # Action names and the path they are located at.
+    ACTIONS = {
+        'console-log': os.path.join(BASE_DIR, 'normandy/recipes/static/actions/console-log'),
+        'show-heartbeat': os.path.join(BASE_DIR, 'normandy/recipes/static/actions/show-heartbeat'),
     }
 
 

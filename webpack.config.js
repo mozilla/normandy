@@ -3,50 +3,89 @@ var webpack = require('webpack')
 var BundleTracker = require('webpack-bundle-tracker')
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-module.exports = {
-  context: __dirname,
+module.exports = [
+  {
+    context: __dirname,
 
-  entry: {
-    selfrepair: './normandy/selfrepair/static/js/self_repair',
-    control: [
-      './normandy/control/static/control/js/index',
-      './normandy/control/static/control/admin/sass/control.scss',
-      './node_modules/font-awesome/scss/font-awesome.scss',
-    ]
-  },
+    entry: {
+      selfrepair: './normandy/selfrepair/static/js/self_repair',
+      control: [
+        './normandy/control/static/control/js/index',
+        './normandy/control/static/control/admin/sass/control.scss',
+        './node_modules/font-awesome/scss/font-awesome.scss',
+      ]
+    },
 
-  output: {
-      path: path.resolve('./assets/bundles/'),
-      filename: '[name]-[hash].js',
-      chunkFilename: '[id].bundle.js'
-  },
+    output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: '[name]-[hash].js',
+        chunkFilename: '[id].bundle.js'
+    },
 
-  plugins: [
-    new BundleTracker({ filename: './webpack-stats.json' }),
-    new ExtractTextPlugin('[name]-[hash].css'),
-    new webpack.ProvidePlugin({
-      'fetch': 'exports?self.fetch!isomorphic-fetch'
-    }),
-  ],
-
-  module: {
-    loaders: [
-      {
-        test: /(\.|\/)(jsx|js)$/,
-        exclude: /node_modules/,
-        loader: 'babel',
-        'query': {
-          presets: ['es2015', 'react', 'stage-2']
-        }
-      },
-      {
-        test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap')
-      },
-      {
-        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-        loader: 'file-loader'
-      }
+    plugins: [
+      new BundleTracker({ filename: './webpack-stats.json' }),
+      new ExtractTextPlugin('[name]-[hash].css'),
+      new webpack.ProvidePlugin({
+        'fetch': 'exports?self.fetch!isomorphic-fetch'
+      }),
     ],
+
+    module: {
+      loaders: [
+        {
+          test: /(\.|\/)(jsx|js)$/,
+          exclude: /node_modules/,
+          loader: 'babel',
+          'query': {
+            presets: ['es2015', 'react', 'stage-2']
+          }
+        },
+        {
+          test: /\.scss$/,
+          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap')
+        },
+        {
+          test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+          loader: 'file-loader'
+        }
+      ],
+    }
+  },
+  {
+    entry: {
+      'console-log': './normandy/recipes/static/actions/console-log/index',
+      'show-heartbeat': './normandy/recipes/static/actions/show-heartbeat/index',
+    },
+
+    plugins: [
+        new BundleTracker({filename: './webpack-stats-actions.json'}),
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}}),
+    ],
+
+    output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: '[name]-[hash].js'
+    },
+
+    module: {
+        loaders: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            query: {
+              presets: ['es2015', 'stage-2'],
+              plugins: [
+                ['transform-runtime', {
+                  polyfill: false,
+                  regenerator: true
+                }]
+              ]
+            }
+          }
+        ]
+    }
   }
-}
+]
