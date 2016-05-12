@@ -374,7 +374,7 @@ class TestRecipeAPI(object):
 
 
 @pytest.mark.django_db
-class TestRecipeHistoryAPI(object):
+class TestRecipeVersionAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get('/api/v1/recipe_version/')
         assert res.status_code == 200
@@ -390,6 +390,17 @@ class TestRecipeHistoryAPI(object):
         res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
         assert res.status_code == 200
         assert res.data['id'] == version.id
+
+    def test_it_filters_only_recipe_versions(self, api_client):
+        with transaction.atomic(), reversion.create_revision():
+            recipe = RecipeFactory()
+
+        action = recipe.action
+        content_type = ContentType.objects.get_for_model(action)
+        version = Version.objects.filter(content_type=content_type, object_id=action.pk).first()
+
+        res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
+        assert res.status_code == 404
 
 
 @pytest.mark.django_db
