@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db import IntegrityError
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
@@ -87,6 +86,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
+    def handle_exception(self, exc):
+        if isinstance(exc, Recipe.IsNotApproved):
+            return Response({'is_approved': 'This recipe cannot be enabled until it is approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return super().handle_exception(exc)
+
     @reversion_transaction
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -107,7 +113,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 if recipe.is_approved:
                     recipe.disable(ignore_revision_id=True)
 
-            return super().update(request, *args, **kwargs)
+        return super().update(request, *args, **kwargs)
 
     @detail_route(methods=['GET'])
     def history(self, request, pk=None):
@@ -117,19 +123,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = RecipeVersionSerializer(versions, many=True, context={'request': request})
         return Response(serializer.data)
 
-
     @reversion_transaction
     @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
-
-        try:
-            recipe.enable()
-        except recipe.IsNotApproved:
-            return Response({'is_approved': 'This recipe cannot be enabled until it is approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        recipe.enable()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @reversion_transaction
     @detail_route(methods=['POST'])
@@ -154,14 +153,20 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
-    @reversion_transaction
-    def create(self, request, *args, **kwargs):
-        try:
-            return super().create(request, *args, **kwargs)
-        except IntegrityError:
+    def handle_exception(self, exc):
+        if isinstance(exc, ApprovalRequest.ActiveRequestAlreadyExists):
             return Response(
                 {'active': 'You can only have one open approval request for a recipe.'},
                 status=status.HTTP_400_BAD_REQUEST)
+        elif isinstance(exc, ApprovalRequest.IsNotActive):
+            return Response({'active': 'This approval request has already been closed.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return super().handle_exception(exc)
+
+    @reversion_transaction
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
     @reversion_transaction
     def update(self, request, *args, **kwargs):
@@ -169,38 +174,25 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
         Intercept PUT requests and have them create instead of update
         if the object does not exist.
         """
-        try:
-            if request.method == 'PUT':
-                try:
-                    self.get_object()
-                except Http404:
-                    return self.create(request, *args, **kwargs)
+        if request.method == 'PUT':
+            try:
+                self.get_object()
+            except Http404:
+                return self.create(request, *args, **kwargs)
 
-            return super().update(request, *args, **kwargs)
-        except IntegrityError:
-            return Response(
-                {'active': 'You can only have one open approval request for a recipe.'},
-                status=status.HTTP_400_BAD_REQUEST)
+        return super().update(request, *args, **kwargs)
 
     @reversion_transaction
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
-        try:
-            approval_request.approve(request.user)
-        except ApprovalRequest.IsNotActive:
-            return Response({'active': 'This approval request has already been closed.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        approval_request.approve(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['POST'])
     def reject(self, request, pk=None):
         approval_request = self.get_object()
-        try:
-            approval_request.reject()
-        except ApprovalRequest.IsNotActive:
-            return Response({'active': 'This approval request has already been closed.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        approval_request.reject()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['POST'])

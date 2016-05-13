@@ -2,9 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from django.db import IntegrityError
-
-from normandy.recipes.models import Client
+from normandy.recipes.models import ApprovalRequest, Client
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -63,7 +61,7 @@ class TestApprovalRequest(object):
         ApprovalRequestFactory(recipe=recipe, active=True)
 
         # Should not be able to create a new request because an open request exists
-        with pytest.raises(IntegrityError):
+        with pytest.raises(ApprovalRequest.ActiveRequestAlreadyExists):
             ApprovalRequestFactory(recipe=recipe, active=True)
 
     def test_can_save_open_request(self):

@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils.functional import cached_property
 
 from rest_framework.reverse import reverse
@@ -100,11 +100,8 @@ class Recipe(models.Model):
             return None
 
     def enable(self):
-        if self.is_approved:
-            self.enabled = True
-            self.save()
-        else:
-            raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
+        self.enabled = True
+        self.save()
 
     def disable(self, ignore_revision_id=False, *args, **kwargs):
         self.enabled = False
@@ -122,6 +119,8 @@ class Recipe(models.Model):
         return self.name
 
     def save(self, ignore_revision_id=False, *args, **kwargs):
+        if self.enabled and self.approval is None:
+            raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
         if not ignore_revision_id:
             self.revision_id += 1
         super(Recipe, self).save(*args, **kwargs)
@@ -205,6 +204,9 @@ class ApprovalRequest(models.Model):
     class IsNotActive(Exception):
         pass
 
+    class ActiveRequestAlreadyExists(Exception):
+        pass
+
     @property
     def is_approved(self):
         return self.approval is not None
@@ -237,7 +239,8 @@ class ApprovalRequest(models.Model):
             open_approval_requests = open_approval_requests.exclude(pk=self.pk)
 
         if self.active and open_approval_requests.exists():
-            raise IntegrityError('A recipe can only have one active approval request.')
+            raise self.ActiveRequestAlreadyExists('A recipe can only have one active approval '
+                                                  'request.')
 
         super().save(*args, **kwargs)
 

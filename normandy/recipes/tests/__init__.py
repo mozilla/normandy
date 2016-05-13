@@ -25,6 +25,13 @@ class ActionFactory(factory.DjangoModelFactory):
     implementation = 'console.log("test");'
 
 
+class ApprovalFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Approval
+
+    creator = factory.SubFactory(UserFactory)
+
+
 class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
@@ -32,6 +39,7 @@ class RecipeFactory(factory.DjangoModelFactory):
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
     enabled = True
+    approval = factory.SubFactory(ApprovalFactory)
 
     @factory.post_generation
     def countries(self, create, extracted, **kwargs):
@@ -66,14 +74,6 @@ class ApprovalRequestFactory(factory.DjangoModelFactory):
         model = ApprovalRequest
 
     recipe = factory.SubFactory(RecipeFactory)
-    creator = factory.SubFactory(UserFactory)
-
-
-class ApprovalFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Approval
-
-    approval_request = factory.SubFactory(ApprovalRequestFactory)
     creator = factory.SubFactory(UserFactory)
 
 
