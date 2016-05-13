@@ -69,10 +69,9 @@ make adding these hashes easier.
 
 .. _hashin: https://github.com/peterbe/hashin
 
-Preprocessing Assets with webpack
------------------------
-
-We use webpack to create asset bundles of static resources. You can build an
+Preprocessing Assets with Webpack
+---------------------------------
+We use Webpack_ to create asset bundles of static resources. You can build an
 asset bundle by running:
 
 .. code-block:: bash
@@ -81,6 +80,8 @@ asset bundle by running:
 
 Running the command with ``--watch`` will automatically rebuild your bundles as
 you make changes.
+
+.. _Webpack: http://webpack.github.io/
 
 Self-Repair Setup
 -----------------
