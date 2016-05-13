@@ -25,7 +25,6 @@ module.exports = {
     new BundleTracker({ filename: './webpack-stats.json' }),
     new ExtractTextPlugin('[name]-[hash].css'),
     new webpack.ProvidePlugin({
-      'Promise': 'exports?global.Promise!es6-promise',
       'fetch': 'exports?self.fetch!isomorphic-fetch'
     }),
   ],
