@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction, IntegrityError
+from django.db import IntegrityError
 from django.http import Http404
 from django.views.decorators.cache import cache_control
 
@@ -8,11 +8,11 @@ from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
-from reversion import revisions as reversion
 from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
+from normandy.base.decorators import reversion_transaction
 from normandy.recipes.models import Action, Client, Recipe, ApprovalRequest, ApprovalRequestComment
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import (
@@ -38,13 +38,11 @@ class ActionViewSet(viewsets.ModelViewSet):
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     def create(self, *args, **kwargs):
         return super().create(*args, **kwargs)
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     def update(self, request, *args, **kwargs):
         """
         Intercept PUT requests and have them create instead of update
@@ -89,11 +87,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
+    @reversion_transaction
     def update(self, request, *args, **kwargs):
         """
         Intercept PUT requests and have them create instead of update
@@ -104,13 +102,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe = self.get_object()
             except Http404:
                 if request.method == 'PUT':
-                    with transaction.atomic(), reversion.create_revision():
-                        return self.create(request, *args, **kwargs)
+                    return self.create(request, *args, **kwargs)
             else:
                 if recipe.is_approved:
                     recipe.disable(ignore_revision_id=True)
 
-        with transaction.atomic(), reversion.create_revision():
             return super().update(request, *args, **kwargs)
 
     @detail_route(methods=['GET'])
@@ -122,8 +118,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
@@ -136,8 +131,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     @detail_route(methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
@@ -160,8 +154,7 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
@@ -170,8 +163,7 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
                 {'active': 'You can only have one open approval request for a recipe.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     def update(self, request, *args, **kwargs):
         """
         Intercept PUT requests and have them create instead of update
@@ -190,8 +182,7 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
                 {'active': 'You can only have one open approval request for a recipe.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @transaction.atomic()
-    @reversion.create_revision()
+    @reversion_transaction
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
