@@ -14,13 +14,35 @@ from normandy.recipes.models import Action, Recipe
 class Command(BaseCommand):
     help = 'Updates the actions in the database with the latest built code.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'action_name',
+            nargs='*',
+            type=str,
+            help='Only update the specified actions'
+        )
+        parser.add_argument(
+            '--no-disable',
+            action='store_true',
+            dest='no-disable',
+            default=False,
+            help='Do not disable recipes using actions that are updated'
+        )
+
     @transaction.atomic
     @reversion.create_revision()
     def handle(self, *args, **options):
         disabled_recipes = []
         chunks = get_loader('ACTIONS').get_assets()['chunks']
 
-        for name, action_directory in settings.ACTIONS.items():
+        actions = settings.ACTIONS.items()
+        if options['action_name']:
+            actions = [
+                (name, directory) for name, directory in actions
+                if name in options['action_name']
+            ]
+
+        for name, action_directory in actions:
             self.stdout.write('Updating action {}...'.format(name), ending='')
 
             # We assume each action is compiled to a single chunk.
@@ -47,9 +69,10 @@ class Command(BaseCommand):
 
                     # As a precaution, disable any recipes that are
                     # being used by an action that was just updated.
-                    recipes = Recipe.objects.filter(action=action, enabled=True)
-                    disabled_recipes += list(recipes)
-                    recipes.update(enabled=False)
+                    if not options['no-disable']:
+                        recipes = Recipe.objects.filter(action=action, enabled=True)
+                        disabled_recipes += list(recipes)
+                        recipes.update(enabled=False)
             except Action.DoesNotExist:
                 action = Action(
                     name=name,

@@ -1,7 +1,14 @@
-var path = require('path')
-var webpack = require('webpack')
+var path = require('path');
+var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker')
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var argv = require('yargs').argv;
+var child_process = require('child_process');
+
+
+const BOLD = '\u001b[1m';
+const END_BOLD = '\u001b[39m\u001b[22m';
+
 
 module.exports = [
   {
@@ -62,6 +69,25 @@ module.exports = [
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}}),
+
+        // Small plugin to update the actions in the database if
+        // --update-actions was passed.
+        function updateActions() {
+          this.plugin('done', function(stats) {
+            if (argv['update-actions']) {
+              // Don't disable actions since this is mostly for development.
+              var cmd = 'python manage.py update_actions --no-disable';
+
+              child_process.exec(cmd, function(err, stdout, stderr) {
+                console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
+                console.log(stdout);
+                if (stderr) {
+                  console.error(stderr);
+                }
+              });
+            }
+          });
+        },
     ],
 
     output: {
