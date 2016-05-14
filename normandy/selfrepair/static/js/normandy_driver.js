@@ -124,8 +124,11 @@ let Normandy = {
         } else {
             return fetch('https://input.mozilla.org/api/v2/hb/', {
                 method: 'POST',
-                data: data,
-                headers: {Accept: 'application/json'},
+                body: JSON.stringify(data),
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                }
             })
             .then(response => response.json())
             .then(heartbeatFlow => heartbeatFlow);
