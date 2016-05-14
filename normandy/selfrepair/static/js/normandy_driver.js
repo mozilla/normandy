@@ -120,7 +120,6 @@ let Normandy = {
         if (this.testing) {
             this.log('Pretending to send flow to Input');
             this.log(data);
-            return Promise.resolve({});
         } else {
             return fetch('https://input.mozilla.org/api/v2/hb/', {
                 method: 'POST',
@@ -129,9 +128,7 @@ let Normandy = {
                     Accept: 'application/json',
                     'Content-Type': 'application/json'
                 }
-            })
-            .then(response => response.json())
-            .then(heartbeatFlow => heartbeatFlow);
+            });
         }
     },
 
