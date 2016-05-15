@@ -11,7 +11,7 @@ class UpdateOrCreateModelViewSet(ModelViewSet):
         """
         if request.method in ['PUT', 'PATCH']:
             try:
-                recipe = self.get_object()
+                self.get_object()
             except Http404:
                 if request.method == 'PUT':
                     return self.create(request, *args, **kwargs)
