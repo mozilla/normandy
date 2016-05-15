@@ -9,6 +9,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion.models import Version
 
+from normandy.base.api import UpdateOrCreateModelViewSet
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import reversion_transaction
@@ -24,7 +25,7 @@ from normandy.recipes.api.serializers import (
 )
 
 
-class ActionViewSet(viewsets.ModelViewSet):
+class ActionViewSet(UpdateOrCreateModelViewSet):
     """Viewset for viewing and uploading recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
@@ -43,16 +44,6 @@ class ActionViewSet(viewsets.ModelViewSet):
 
     @reversion_transaction
     def update(self, request, *args, **kwargs):
-        """
-        Intercept PUT requests and have them create instead of update
-        if the object does not exist.
-        """
-        if request.method == 'PUT':
-            try:
-                self.get_object()
-            except Http404:
-                return self.create(request, *args, **kwargs)
-
         return super().update(request, *args, **kwargs)
 
 
@@ -76,7 +67,7 @@ class ActionImplementationView(generics.RetrieveAPIView):
         return Response(action.implementation)
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(UpdateOrCreateModelViewSet):
     """Viewset for viewing and uploading recipes."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -99,17 +90,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @reversion_transaction
     def update(self, request, *args, **kwargs):
-        """
-        Intercept PUT requests and have them create instead of update
-        if the object does not exist.
-        """
-        if request.method in ['PUT', 'PATCH']:
-            try:
-                recipe = self.get_object()
-            except Http404:
-                if request.method == 'PUT':
-                    return self.create(request, *args, **kwargs)
-
         return super().update(request, *args, **kwargs)
 
     @detail_route(methods=['GET'])
@@ -143,7 +123,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ApprovalRequestViewSet(viewsets.ModelViewSet):
+class ApprovalRequestViewSet(UpdateOrCreateModelViewSet):
     queryset = ApprovalRequest.objects.all()
     serializer_class = ApprovalRequestSerializer
     filter_fields = ('active',)
@@ -169,16 +149,6 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
 
     @reversion_transaction
     def update(self, request, *args, **kwargs):
-        """
-        Intercept PUT requests and have them create instead of update
-        if the object does not exist.
-        """
-        if request.method == 'PUT':
-            try:
-                self.get_object()
-            except Http404:
-                return self.create(request, *args, **kwargs)
-
         return super().update(request, *args, **kwargs)
 
     @reversion_transaction
@@ -213,7 +183,7 @@ class ApprovalRequestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ApprovalRequestCommentViewSet(viewsets.ModelViewSet):
+class ApprovalRequestCommentViewSet(UpdateOrCreateModelViewSet):
     queryset = ApprovalRequestComment.objects.all()
     serializer_class = ApprovalRequestCommentSerializer
     permission_classes = [
