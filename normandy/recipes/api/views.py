@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.http import Http404
 from django.views.decorators.cache import cache_control
 
 from rest_framework import generics, permissions, status, views, viewsets
