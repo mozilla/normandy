@@ -47,8 +47,21 @@ class TestRecipe(object):
         # The factory saves a couple times so revision id is not 0
         revision_id = recipe.revision_id
 
+        recipe.action = ActionFactory()
         recipe.save()
         assert recipe.revision_id == revision_id + 1
+
+    def test_changing_whitelisted_field_does_not_disable_recipe(self):
+        recipe = RecipeFactory(name='enabled', enabled=True)
+        recipe.name = 'not disabled'
+        recipe.save()
+        assert recipe.enabled
+
+    def test_changing_non_whitelisted_field_disables_recipe(self):
+        recipe = RecipeFactory(enabled=True)
+        recipe.action = ActionFactory()
+        recipe.save()
+        assert not recipe.enabled
 
 
 @pytest.mark.django_db

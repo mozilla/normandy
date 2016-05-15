@@ -109,9 +109,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             except Http404:
                 if request.method == 'PUT':
                     return self.create(request, *args, **kwargs)
-            else:
-                if recipe.is_approved:
-                    recipe.disable(ignore_revision_id=True)
 
         return super().update(request, *args, **kwargs)
 
@@ -128,6 +125,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def enable(self, request, pk=None):
         recipe = self.get_object()
         recipe.enable()
+        recipe.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @reversion_transaction
@@ -135,6 +133,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def disable(self, request, pk=None):
         recipe = self.get_object()
         recipe.disable()
+        recipe.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['GET'])

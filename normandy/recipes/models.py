@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.functional import cached_property
 
+from dirtyfields import DirtyFieldsMixin
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
@@ -64,7 +65,7 @@ class Approval(models.Model):
 
 
 @reversion.register()
-class Recipe(models.Model):
+class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
     revision_id = models.IntegerField(default=0, editable=False)
@@ -76,6 +77,9 @@ class Recipe(models.Model):
     enabled = models.BooleanField(default=False)
     filter_expression = models.TextField(blank=False)
     approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
+
+    # A tuple of fields that can be edited without causing the recipe to be disabled
+    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval',)
 
     class IsNotApproved(Exception):
         pass
@@ -101,14 +105,10 @@ class Recipe(models.Model):
 
     def enable(self):
         self.enabled = True
-        self.save()
 
-    def disable(self, ignore_revision_id=False, *args, **kwargs):
+    def disable(self):
         self.enabled = False
         self.approval = None
-        if self.current_approval_request:
-            self.current_approval_request.reject()
-        self.save(ignore_revision_id=ignore_revision_id, *args, **kwargs)
 
     _registered_matchers = []
 
@@ -118,11 +118,22 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, ignore_revision_id=False, *args, **kwargs):
+    def save(self, *args, **kwargs):
         if self.enabled and self.approval is None:
             raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
-        if not ignore_revision_id:
+
+        # Check for changes that should disable the recipe
+        if self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+            for field in self.EDITABLE_FIELDS_WHITELIST:
+                if field in dirty_fields:
+                    dirty_fields.pop(field)
+            if dirty_fields:
+                self.disable()
+
+            # Increment the revision ID
             self.revision_id += 1
+
         super(Recipe, self).save(*args, **kwargs)
 
 

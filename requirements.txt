@@ -16,6 +16,8 @@ django-configurations==1.0 \
 django-countries==3.4.1 \
     --hash=sha256:5bdda9d2c3473b519371428d88517f29befad7e35dfc489e8b0f95cb2aa941dc \
     --hash=sha256:23c6b5455a2e68ed02601cee0d3c80481965d0c3a6bd2f07ca56902b0a4c55a6
+django-dirtyfields==0.8.2 \
+    --hash=sha256:90a60223a373ec563c0e6b013121a2d965233498384af0cf132b1622d0d8aa19
 django-mozilla-product-details==0.10 \
     --hash=sha256:400e59be3c163aebfc8c078879e87a895dad249589d8bc332bb76dc9c9b63efb \
     --hash=sha256:33add704683a5d7f9ff49c03e40a4d8c500882589aee970d5ed81ad11c7ae75c

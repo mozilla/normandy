@@ -319,20 +319,6 @@ class TestRecipeAPI(object):
         assert res.data[1]['recipe']['name'] == 'version 2'
         assert res.data[2]['recipe']['name'] == 'version 1'
 
-    def test_disabled_on_edit(self, api_client):
-        recipe = RecipeFactory(name='enabled', enabled=True)
-        approval_request = ApprovalRequestFactory(recipe=recipe)
-        approval_request.approve(UserFactory())
-        assert approval_request.is_approved
-
-        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'name': 'disabled'})
-        assert res.status_code == 200
-
-        recipe = Recipe.objects.all()[0]
-        assert recipe.name == 'disabled'
-        assert not recipe.is_approved
-        assert not recipe.enabled
-
     def test_it_can_enable_recipes(self, api_client):
         recipe = RecipeFactory(enabled=False)
         approval_request = ApprovalRequestFactory(recipe=recipe)
