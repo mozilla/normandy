@@ -17,7 +17,7 @@ class RecipeHistory extends React.Component {
     apiFetch(`/api/v1/recipe/${recipeId}/history/`)
       .then(response => {
         this.setState({
-          revisionLog: response
+          revisionLog: response.reverse()
         })
       });
   }
