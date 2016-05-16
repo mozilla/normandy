@@ -41,7 +41,7 @@ class RecipeHistory extends React.Component {
                     dispatch(push({
                       pathname: `/control/recipe/${recipeId}/`,
                       query: {
-                        revisionId: `${revision.recipe.revision_id}`
+                        revisionId: `${revision.id}`
                       },
                       state: {
                         selectedRevision: revision.recipe
