@@ -13,6 +13,7 @@
   "dependencies": {
     "babel-polyfill": "^6.7.2",
     "babel-preset-stage-2": "^6.5.0",
+    "classnames": "^2.2.5",
     "cssmin": "^0.4.3",
     "font-awesome": "^4.5.0",
     "isomorphic-fetch": "^2.2.1",

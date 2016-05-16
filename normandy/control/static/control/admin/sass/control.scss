@@ -100,6 +100,16 @@
 }
 
 
+/* Content */
+#content {
+  h3 {
+    font-size: 16px;
+    font-weight: 300;
+    margin: 0 0 15px 0;
+  }
+}
+
+
 /* Add & Edit Forms */
 .crud-form {
   padding: 30px 45px;
@@ -179,4 +189,21 @@
   #container { width: 28em; }
   #header { display: none; }
   #content { padding: 20px; }
+}
+
+/* Recipe Preview */
+.preview-status {
+    border: 1px solid;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 30px;
+    margin-top: 10px;
+    padding: 5px 15px;
+    text-transform: uppercase;
+
+    p {
+      line-height: 15px;
+      margin: 0 0 10px 20px;
+      text-transform: none;
+    }
 }

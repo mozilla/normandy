@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import {runRecipe} from '../../../../../selfrepair/static/js/self_repair_runner.js';
 
@@ -8,6 +9,7 @@ class RecipePreview extends React.Component {
 
     this.state = {
       recipeExecuted: false,
+      errorRunningRecipe: null,
     };
   }
 
@@ -24,20 +26,44 @@ class RecipePreview extends React.Component {
     const {recipeExecuted} = this.state;
 
     if (recipe && !recipeExecuted) {
-      runRecipe(recipe, {testing: true}).catch(err => {
-        console.error(err);
+      runRecipe(recipe, {testing: true}).then(res => {
+        this.setState({
+          recipeExecuted: true
+        });
+      }).catch(error => {
+        this.setState({
+          errorRunningRecipe: error
+        });
       });
 
-      this.setState({recipeExecuted: true});
     }
   }
 
   render() {
     const {recipe} = this.props;
+    let statusClasses = classNames({
+      'preview-status': true,
+      'green': this.state.recipeExecuted,
+      'red': this.state.errorRunningRecipe,
+    });
     if (recipe) {
       return (
         <div className="fluid-7">
-          Previewing {recipe.name}...
+          <div className="fluid-3">
+            <h3>Previewing {recipe.name}...</h3>
+            <p><b>Action Type:</b> {recipe.action_name}</p>
+          </div>
+          <div className="fluid-3 float-right">
+            <div className={statusClasses}>
+            {this.state.recipeExecuted ?
+              [<i className='fa fa-circle pre'></i>, " Recipe executed"] :
+              [<i className='fa fa-circle-thin pre'></i>, " Running recipe..."]
+            }
+            {this.state.errorRunningRecipe ?
+              <p className="red">Error running recipe: { this.state.errorRunningRecipe }</p> : ''
+            }
+            </div>
+          </div>
         </div>
       );
     } else {
