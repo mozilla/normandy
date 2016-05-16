@@ -175,3 +175,20 @@ i {
   &.pre { margin-right: 5px; }
   &.post { margin-left: 5px; }
 }
+
+
+/* Notifications */
+.notification {
+  border: 1px solid;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 30px;
+  margin: 5px 0px;
+  padding: 5px 15px;
+}
+
+.info {
+  background-color: $yellow;
+  border-color: rgba(0,0,0,0.15);
+  color: rgba(0,0,0,0.5);
+}

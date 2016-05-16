@@ -22,11 +22,14 @@ class RecipeForm extends React.Component {
 
   render() {
     const { fields: { name, filter_expression }, recipeId, handleSubmit, viewingRevision } = this.props;
-    const notification = (viewingRevision) ? `You are viewing a revision of this recipe.` : '';
 
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
-        <p className="notification info">{notification}</p>
+        { viewingRevision ?
+          <p className="notification info">
+            You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
+          </p> : ''
+        }
         <div className="row">
           <div className="fluid-3">
             <label>Name</label>
