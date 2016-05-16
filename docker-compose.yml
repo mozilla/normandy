@@ -8,9 +8,15 @@ services:
     image: mozilla/normandy
     links:
       - database
+      - autograph
     environment:
-      DJANGO_CONFIGURATION: ProductionInsecure
       DATABASE_URL: "postgres://postgres@database/postgres"
+      DJANGO_CONFIGURATION: ProductionInsecure
+      DJANGO_AUTOGRAPH_URL: http://autograph:8000/
+      # From etc/autograph.yaml
+      DJANGO_AUTOGRAPH_HAWK_ID: alice
+      DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: fs5wgcer9qj819kfptdlp8gm227ewxnzvsuj9ztycsx08hfhzu
+    stop_signal: SIGKILL
 
   proxy:
     image: nginx:1.9.14
@@ -23,3 +29,11 @@ services:
       - ./etc/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./etc/proxy.crt:/etc/nginx/proxy.crt:ro
       - ./etc/proxy.key:/etc/nginx/proxy.key:ro
+
+  autograph:
+    image: mythmon/autograph
+    stop_signal: SIGKILL
+    volumes:
+      - ./etc/autograph.yaml:/etc/autograph/autograph.yaml:ro
+    ports:
+        - "8000"
