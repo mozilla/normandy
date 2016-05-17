@@ -61,8 +61,12 @@ RecipeForm.propTypes = {
 export default composeRecipeContainer(reduxForm({
     form: 'recipe',
     fields: ['name', 'filter_expression']
-  }, (state, props) => ({
-    initialValues: ((props.location.state) ? props.location.state.selectedRevision : props.recipe),
-    viewingRevision: ((props.location.state && props.location.state.selectedRevision))
-  })
+  }, (state, props) => {
+    let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
+
+    return {
+      initialValues: selectedRecipeRevision || props.recipe,
+      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false)
+    }
+  }
 )(RecipeForm))
