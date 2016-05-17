@@ -11,6 +11,26 @@ const fixtureRecipes = [
   { "id": 3, "name": "Consequitar adipscing", "enabled": false }
 ];
 
+const fixtureRevisions = [
+  {
+    "id": 169,
+    "date_created": "2016-05-13T17:20:35.698735Z",
+    "recipe": {
+        "id": 36,
+        "name": "Consequestar",
+        "enabled": true,
+        "revision_id": 22,
+        "action_name": "console-log",
+        "arguments": {
+            "message": "hi there message here"
+        },
+        "filter_expression": "()",
+        "approver": null,
+        "is_approved": false
+    }
+  }
+]
+
 const initialState = {
     recipes: null,
     isFetching: false,
@@ -85,7 +105,7 @@ describe('controlApp Actions', () => {
     expect(store.getActions()).toEqual([]);
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching a single recipes is successful', () => {
+  it('creates SINGLE_RECIPE_RECEIVED when fetching a single recipe is successful', () => {
     const expectedAction = { type: actions.SINGLE_RECIPE_RECEIVED, recipe: fixtureRecipes[0] };
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
 
@@ -93,6 +113,18 @@ describe('controlApp Actions', () => {
       .then(() => {
         expect(window.fetch).toHaveBeenCalled();
         expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/?format=json&', jasmine.any(Object));
+        expect(store.getActions()).toContain(expectedAction);
+      })
+  });
+
+  it('creates SINGLE_RECIPE_RECEIVED when fetching a single revision is successful', () => {
+    const expectedAction = { type: actions.SINGLE_RECIPE_RECEIVED, recipe: fixtureRevisions[0].recipe };
+    spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRevisions[0]));
+
+    return store.dispatch(actions.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
+      .then(() => {
+        expect(window.fetch).toHaveBeenCalled();
+        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe_version/1/?format=json&', jasmine.any(Object));
         expect(store.getActions()).toContain(expectedAction);
       })
   });
