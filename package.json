@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "description": "Client to download and run recipes for SHIELD, Heartbeat, etc.",
   "main": "index.js",
-  "author": "Mike Cooper <mythmon@gmail.com>",
+  "author": "Mike Cooper <mcooper@mozilla.com>",
+  "repository": "https://github.com/mozilla/normandy-addon",
   "scripts": {
     "test": "jpm test",
     "build": "jpm xpi"
