@@ -16,7 +16,8 @@ exports['test it can access telemetry'] = promiseTest(assert => {
 exports['test has a date transform'] = promiseTest(assert => {
   return EnvExpressions.eval('"2016-04-22"|date')
   .then(val => {
-    assert.equal(val.toString(), Date.UTC(2016, 3, 22).toString()); // months are 0 based
+    const d = new Date(Date.UTC(2016, 3, 22)); // months are 0 based
+    assert.equal(val.toString(), d.toString());
   });
 });
 
