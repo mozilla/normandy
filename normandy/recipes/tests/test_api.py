@@ -502,6 +502,13 @@ class TestApprovalRequestAPI(object):
         assert res.data['text'] == 'a test comment.'
         assert approval_request.comments.count() == 1
 
+    def test_blank_comments_fail_on_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory()
+
+        res = api_client.post('/api/v1/approval_request/%s/comment/' % approval_request.id,
+                              {'text': ''})
+        assert res.status_code == 400
+
     def test_it_can_list_comments_on_approval_requests(self, api_client):
         comment = ApprovalRequestCommentFactory()
 

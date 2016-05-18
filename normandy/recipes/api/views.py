@@ -165,15 +165,18 @@ class ApprovalRequestViewSet(UpdateOrCreateModelViewSet):
 
     @detail_route(methods=['POST'])
     def comment(self, request, pk=None):
-        if 'text' not in request.data:
-            return Response({'text': 'You must provide the text field.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
         approval_request = self.get_object()
-        comment = ApprovalRequestComment(approval_request=approval_request, creator=request.user,
-                                         text=request.data['text'])
-        comment.save()
-        return Response(ApprovalRequestCommentSerializer(comment).data)
+
+        data = request.data
+        data.update({'creator_id': request.user.id,
+                     'approval_request_id': approval_request.id})
+        serializer = ApprovalRequestCommentSerializer(data=data)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        return Response(serializer.data)
 
     @detail_route(methods=['GET'])
     def comments(self, request, pk=None):
