@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 
 from dirtyfields import DirtyFieldsMixin
@@ -222,6 +222,7 @@ class ApprovalRequest(models.Model):
     def is_approved(self):
         return self.approval is not None
 
+    @transaction.atomic
     def approve(self, user):
         if self.active:
             approval = Approval(creator=user)
