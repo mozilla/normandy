@@ -168,3 +168,8 @@ pyflakes==1.0.0 \
     --hash=sha256:f39e33a4c03beead8774f005bd3ecf0c3f2f264fa0201de965fce0aff1d34263
 flake8-junit-report==2.0.1 \
     --hash=sha256:55914a99126d3b30cad2a042d95d466b5b368c7f69ef68ec7ec8321d3f0e2eee
+requests-hawk==1.0.0 \
+    --hash=sha256:aef0dff8053dcae2057774516386bed0a3bc03fabea9e18f3aa98f02672ea5d0 \
+    --hash=sha256:c2626ab31ebef0c81b97781c44c2275bfcc6d8e8520fc4ced495f0f386f8fe26
+mohawk==0.3.2.1 \
+    --hash=sha256:46e98d8349f927b40227f1a9f0021509fedcf0398e1feb22dac954010f625f1d

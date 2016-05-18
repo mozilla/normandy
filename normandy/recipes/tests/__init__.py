@@ -1,3 +1,5 @@
+import hashlib
+
 import factory
 
 from django.template.defaultfilters import slugify
@@ -20,6 +22,10 @@ class ActionFactory(factory.DjangoModelFactory):
 
     name = FuzzyUnicode()
     implementation = 'console.log("test");'
+
+    @factory.lazy_attribute
+    def implementation_hash(action):
+        return hashlib.sha1(action.implementation.encode()).hexdigest()
 
 
 class RecipeFactory(factory.DjangoModelFactory):

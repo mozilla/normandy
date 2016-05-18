@@ -4,6 +4,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
 
 from rest_framework.reverse import reverse
@@ -12,6 +13,7 @@ from reversion import revisions as reversion
 from normandy.base.utils import get_client_ip
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.validators import validate_json
+from normandy.recipes.utils import Autographer
 
 
 logger = logging.getLogger()
@@ -111,15 +113,34 @@ class Recipe(models.Model):
         super(Recipe, self).save(*args, **kwargs)
 
 
+class ActionQuerySet(models.QuerySet):
+    def update_signatures(self):
+        """
+        Update the signatures on all Actions in the queryset.
+        """
+        autographer = Autographer()
+        # Convert to a list because order must be preserved
+        actions = list(self)
+        implementations = [a.implementation for a in actions]
+        signatures = autographer.sign_data(implementations)
+
+        for action, signature in zip(actions, signatures):
+            action.signature = signature
+            action.signature_timestamp = timezone.now()
+            action.save()
+
+
 @reversion.register()
 class Action(models.Model):
     """A single executable action that can take arguments."""
     name = models.SlugField(max_length=255, unique=True)
-
     implementation = models.TextField()
     implementation_hash = models.CharField(max_length=40, editable=False)
-
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
+    signature = models.TextField(blank=True, null=True)
+    signature_timestamp = models.DateTimeField(blank=True, null=True)
+
+    objects = ActionQuerySet.as_manager()
 
     @property
     def arguments_schema(self):
@@ -149,12 +170,16 @@ class Action(models.Model):
         return hashlib.sha1(self.implementation.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
-        # Save first so the upload is available.
-        super().save(*args, **kwargs)
-
         # Update hash
+        old_hash = self.implementation_hash
         self.implementation_hash = self.compute_implementation_hash()
-        super().save(update_fields=['implementation_hash'])
+
+        # Invalidate signature if content has changed
+        if self.implementation_hash != old_hash:
+            self.signature = None
+            self.signature_timestamp = None
+
+        super().save(*args, **kwargs)
 
 
 class Client(object):

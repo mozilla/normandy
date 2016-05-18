@@ -1,8 +1,9 @@
-from unittest.mock import patch
+from datetime import datetime
+from unittest.mock import patch, call
 
 import pytest
 
-from normandy.recipes.models import Client
+from normandy.recipes.models import Action, Client
 from normandy.recipes.tests import (
     ActionFactory,
     RecipeFactory,
@@ -35,6 +36,35 @@ class TestAction(object):
 
         RecipeFactory(action=action, enabled=True)
         assert action.in_use
+
+    def test_update_signatures(self):
+        action = ActionFactory()
+        assert action.signature is None
+        assert action.signature_timestamp is None
+        queryset = Action.objects.filter(id=action.id)
+
+        with patch('normandy.recipes.models.Autographer') as Autographer:
+            Autographer.return_value.sign_data.return_value = ['fake signature']
+            queryset.update_signatures()
+
+        assert Autographer.mock_calls == [
+            call(),  # Constructor
+            call().sign_data([action.implementation]),
+        ]
+
+        action = queryset.get()
+        assert action.signature == 'fake signature'
+        assert isinstance(action.signature_timestamp, datetime)
+
+    def test_signature_is_cleared_when_content_changes(self, settings):
+        action = ActionFactory(
+            implementation='original',
+            signature='original',
+            signature_timestamp=datetime.now())
+        action.implementation = 'new'
+        action.save()
+        assert action.signature is None
+        assert action.signature_timestamp is None
 
 
 @pytest.mark.django_db

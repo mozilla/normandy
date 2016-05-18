@@ -217,6 +217,15 @@ class TestImplementationAPI(object):
         assert max_age in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
+    def test_it_includes_content_signature_header(self, api_client):
+        action = ActionFactory(signature='fake signature')
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=action.implementation_hash,
+        ))
+        assert res.status_code == 200
+        assert res['Content-Signature'] == 'fake signature'
+
 
 @pytest.mark.django_db
 class TestRecipeAPI(object):
