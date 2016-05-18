@@ -1,6 +1,5 @@
 import Mozilla from './uitour.js'
 import EventEmitter from 'wolfy87-eventemitter'
-import xhr from './xhr.js'
 import uuid from 'node-uuid'
 
 /**
@@ -44,8 +43,12 @@ Object.assign(LocalStorage.prototype, {
 let Normandy = {
     locale: document.documentElement.dataset.locale || navigator.language,
 
+    _testingOverride: false,
     get testing() {
-        return new URL(window.location.href).searchParams.has('testing');
+        return this._testingOverride || new URL(window.location.href).searchParams.has('testing');
+    },
+    set testing(value) {
+        this._testingOverride = value;
     },
 
     _location: {countryCode: null},
@@ -121,12 +124,15 @@ let Normandy = {
         if (this.testing) {
             this.log('Pretending to send flow to Input');
             this.log(data);
-            return Promise.resolve({});
         } else {
-            return xhr('POST', 'https://input.mozilla.org/api/v2/hb/', {
-                data: data,
-                headers: {Accept: 'application/json'},
-            }).then(request => JSON.parse(request.responseText));
+            return fetch('https://input.mozilla.org/api/v2/hb/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
         }
     },
 

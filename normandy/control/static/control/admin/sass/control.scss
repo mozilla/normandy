@@ -27,12 +27,14 @@
 
 #page-header {
   background: $darkBrown;
-  padding: 15px 30px;
+  display: flex;
   position: relative;
 
   h2 {
     color: $cream;
+    flex: 1;
     font: normal normal 300 20px/30px $SourceSansPro;
+    padding: 15px 30px;
 
     span {
       font-weight: 400;
@@ -43,13 +45,11 @@
   }
 
   .button {
-    border-left: 1px solid #fff;
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    border-right: 1px solid rgba(0, 0, 0, 0.15);
     height: 100%;
     line-height: 40px;
     min-width: 165px;
-    position: absolute;
-    right: 0px;
-    top: 0px;
   }
 }
 
@@ -96,6 +96,16 @@
       float: right;
       margin: 0 0 0 16px;
     }
+  }
+}
+
+
+/* Content */
+#content {
+  h3 {
+    font-size: 16px;
+    font-weight: 300;
+    margin: 0 0 15px 0;
   }
 }
 
@@ -179,4 +189,21 @@
   #container { width: 28em; }
   #header { display: none; }
   #content { padding: 20px; }
+}
+
+/* Recipe Preview */
+.preview-status {
+    border: 1px solid;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 30px;
+    margin-top: 10px;
+    padding: 5px 15px;
+    text-transform: uppercase;
+
+    p {
+      line-height: 15px;
+      margin: 0 0 10px 20px;
+      text-transform: none;
+    }
 }
