@@ -43,8 +43,12 @@ Object.assign(LocalStorage.prototype, {
 let Normandy = {
     locale: document.documentElement.dataset.locale || navigator.language,
 
+    _testingOverride: false,
     get testing() {
-        return new URL(window.location.href).searchParams.has('testing');
+        return this._testingOverride || new URL(window.location.href).searchParams.has('testing');
+    },
+    set testing(value) {
+        this._testingOverride = value;
     },
 
     _location: {countryCode: null},

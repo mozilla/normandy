@@ -105,8 +105,12 @@ function classifyClient() {
  * @param {Recipe} recipe - Recipe retrieved from the server.
  * @promise Resolves once the action has executed.
  */
-export function runRecipe(recipe) {
+export function runRecipe(recipe, options={}) {
     return loadAction(recipe).then(function(Action) {
+        if (options.testing !== undefined) {
+            Normandy.testing = options.testing;
+        }
+
         return new Action(Normandy, recipe).execute();
     });
 }
