@@ -12,10 +12,12 @@ from reversion.models import Version
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import Whatever, UserFactory
 from normandy.base.utils import aware_datetime
-from normandy.recipes.models import Action, Recipe
+from normandy.recipes.models import Action, Recipe, ApprovalRequest, ApprovalRequestComment
 from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.tests import (
     ActionFactory,
+    ApprovalRequestFactory,
+    ApprovalRequestCommentFactory,
     RecipeFactory,
 )
 
@@ -317,37 +319,10 @@ class TestRecipeAPI(object):
         assert res.data[1]['recipe']['name'] == 'version 2'
         assert res.data[2]['recipe']['name'] == 'version 1'
 
-    def test_disabled_on_edit(self, api_client):
-        recipe = RecipeFactory(name='enabled', enabled=True)
-
-        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'name': 'disabled'})
-        assert res.status_code == 200
-
-        recipe = Recipe.objects.all()[0]
-        assert recipe.name == 'disabled'
-        assert not recipe.enabled
-
-    def test_it_can_approve_recipes(self, api_client):
-        user = UserFactory(is_superuser=True)
-        recipe = RecipeFactory(approver=None)
-
-        api_client.force_authenticate(user=user)
-        res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
-        assert res.status_code == 204
-
-        recipe = Recipe.objects.all()[0]
-        assert recipe.approver == user
-
-    def test_cannot_approve_approved_recipes(self, api_client):
-        user = UserFactory()
-        recipe = RecipeFactory(approver=user)
-
-        res = api_client.post('/api/v1/recipe/%s/approve/' % recipe.id)
-        assert res.status_code == 400
-
     def test_it_can_enable_recipes(self, api_client):
-        user = UserFactory()
-        recipe = RecipeFactory(approver=user, enabled=False)
+        recipe = RecipeFactory(enabled=False)
+        approval_request = ApprovalRequestFactory(recipe=recipe)
+        approval_request.approve(UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 204
@@ -356,21 +331,32 @@ class TestRecipeAPI(object):
         assert recipe.enabled
 
     def test_cannot_enable_unapproved_recipes(self, api_client):
-        recipe = RecipeFactory(approver=None, enabled=False)
+        recipe = RecipeFactory(approval=None, enabled=False)
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 400
 
     def test_it_can_disable_recipes(self, api_client):
-        user = UserFactory()
-        recipe = RecipeFactory(approver=user, enabled=True)
+        recipe = RecipeFactory(enabled=True)
+        approval_request = ApprovalRequestFactory(recipe=recipe)
+        approval_request.approve(UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
         assert res.status_code == 204
 
         recipe = Recipe.objects.all()[0]
-        assert recipe.approver is None
+        assert recipe.approval is None
         assert not recipe.enabled
+
+    def test_approval_request_list(self, api_client):
+        recipe = RecipeFactory()
+        ar1 = ApprovalRequestFactory(recipe=recipe, active=False)
+        ar2 = ApprovalRequestFactory(recipe=recipe)
+
+        res = api_client.get('/api/v1/recipe/%s/approval_requests/' % recipe.id)
+        assert res.status_code == 200
+        assert res.data[0]['id'] == ar2.id
+        assert res.data[1]['id'] == ar1.id
 
 
 @pytest.mark.django_db
@@ -401,6 +387,197 @@ class TestRecipeVersionAPI(object):
 
         res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
         assert res.status_code == 404
+
+
+@pytest.mark.django_db
+class TestApprovalRequestAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/approval_request/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_it_serves_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory()
+
+        res = api_client.get('/api/v1/approval_request/')
+        assert res.status_code == 200
+        assert res.data[0]['id'] == approval_request.id
+
+    def test_it_can_create_approval_requests(self, api_client):
+        recipe = RecipeFactory()
+        user = UserFactory()
+
+        res = api_client.post('/api/v1/approval_request/', {
+            'creator_id': user.id, 'active': True, 'recipe_id': recipe.id})
+        assert res.status_code == 201
+
+        approval_requests = ApprovalRequest.objects.all()
+        assert approval_requests.count() == 1
+
+    def test_it_cannot_create_multiple_open_approval_requests(self, api_client):
+        recipe = RecipeFactory()
+        user = UserFactory()
+        ApprovalRequestFactory(recipe=recipe, active=True)
+
+        res = api_client.post('/api/v1/approval_request/', {
+            'creator_id': user.id, 'active': True, 'recipe_id': recipe.id})
+        assert res.status_code == 400
+
+    def test_it_can_edit_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory(active=True)
+
+        res = api_client.patch('/api/v1/approval_request/%s/' % approval_request.id,
+                               {'active': False})
+        assert res.status_code == 200
+
+        approval_request = ApprovalRequest.objects.get(id=approval_request.id)
+        assert not approval_request.active
+
+    def test_it_can_delete_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory()
+
+        res = api_client.delete('/api/v1/approval_request/%s/' % approval_request.id)
+        assert res.status_code == 204
+
+        approval_requests = ApprovalRequest.objects.all()
+        assert approval_requests.count() == 0
+
+    def test_available_if_admin_enabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = True
+        res = api_client.get('/api/v1/approval_request/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_readonly_if_admin_disabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+        res = api_client.get('/api/v1/approval_request/')
+        assert res.status_code == 200
+
+        approval_request = ApprovalRequestFactory(active=True)
+        res = api_client.patch('/api/v1/approval_request/%s/' % approval_request.id,
+                               {'active': False})
+        assert res.status_code == 403
+        assert res.data['detail'] == AdminEnabledOrReadOnly.message
+
+    def test_it_can_approve_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory(active=True)
+
+        res = api_client.post('/api/v1/approval_request/%s/approve/' % approval_request.id)
+        assert res.status_code == 204
+
+        approval_request = ApprovalRequest.objects.first()
+        assert approval_request.approval is not None
+        assert approval_request.is_approved
+        assert not approval_request.active
+
+    def test_it_cannot_approve_closed_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory(active=False)
+
+        res = api_client.post('/api/v1/approval_request/%s/approve/' % approval_request.id)
+        assert res.status_code == 400
+
+    def test_it_can_reject_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory(active=True)
+
+        res = api_client.post('/api/v1/approval_request/%s/reject/' % approval_request.id)
+        assert res.status_code == 204
+
+        approval_request = ApprovalRequest.objects.first()
+        assert approval_request.approval is None
+        assert not approval_request.is_approved
+        assert not approval_request.active
+
+    def test_it_cannot_reject_closed_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory(active=False)
+
+        res = api_client.post('/api/v1/approval_request/%s/reject/' % approval_request.id)
+        assert res.status_code == 400
+
+    def test_it_can_comment_on_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory()
+
+        res = api_client.post('/api/v1/approval_request/%s/comment/' % approval_request.id,
+                              {'text': 'a test comment.'})
+        assert res.status_code == 200
+        assert res.data['text'] == 'a test comment.'
+        assert approval_request.comments.count() == 1
+
+    def test_blank_comments_fail_on_approval_requests(self, api_client):
+        approval_request = ApprovalRequestFactory()
+
+        res = api_client.post('/api/v1/approval_request/%s/comment/' % approval_request.id,
+                              {'text': ''})
+        assert res.status_code == 400
+
+    def test_it_can_list_comments_on_approval_requests(self, api_client):
+        comment = ApprovalRequestCommentFactory()
+
+        res = api_client.get('/api/v1/approval_request/%s/comments/' % comment.approval_request.id)
+        assert res.status_code == 200
+        assert res.data[0]['id'] == comment.id
+        assert ApprovalRequestComment.objects.count() == 1
+
+
+@pytest.mark.django_db
+class TestApprovalRequestCommentAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_it_serves_comments(self, api_client):
+        approval_request = ApprovalRequestCommentFactory()
+
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+        assert res.data[0]['id'] == approval_request.id
+
+    def test_it_can_create_comments(self, api_client):
+        approval_request = ApprovalRequestFactory()
+        user = UserFactory()
+
+        res = api_client.post('/api/v1/approval_request_comment/', {
+            'creator_id': user.id, 'text': 'testing', 'approval_request_id': approval_request.id})
+        assert res.status_code == 201
+
+        comments = ApprovalRequestComment.objects.all()
+        assert comments.count() == 1
+
+    def test_it_can_edit_comments(self, api_client):
+        comment = ApprovalRequestCommentFactory(text='unchanged')
+
+        res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,
+                               {'text': 'changed'})
+        assert res.status_code == 200
+
+        comment = ApprovalRequestComment.objects.get(id=comment.id)
+        assert comment.text == 'changed'
+
+    def test_it_can_delete_comments(self, api_client):
+        comment = ApprovalRequestCommentFactory()
+
+        res = api_client.delete('/api/v1/approval_request_comment/%s/' % comment.id)
+        assert res.status_code == 204
+
+        comments = ApprovalRequestComment.objects.all()
+        assert comments.count() == 0
+
+    def test_available_if_admin_enabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = True
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_readonly_if_admin_disabled(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+        res = api_client.get('/api/v1/approval_request_comment/')
+        assert res.status_code == 200
+
+        comment = ApprovalRequestCommentFactory(text='unchanged')
+        res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,
+                               {'text': 'changed'})
+        assert res.status_code == 403
+        assert res.data['detail'] == AdminEnabledOrReadOnly.message
 
 
 @pytest.mark.django_db

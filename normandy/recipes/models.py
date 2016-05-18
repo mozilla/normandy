@@ -2,10 +2,13 @@ import hashlib
 import json
 import logging
 
+from datetime import datetime
+
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
 from django.utils.functional import cached_property
 
+from dirtyfields import DirtyFieldsMixin
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
@@ -56,8 +59,13 @@ class Country(models.Model):
         return '{self.name} ({self.code})'.format(self=self)
 
 
+class Approval(models.Model):
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
+
+
 @reversion.register()
-class Recipe(models.Model):
+class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
     revision_id = models.IntegerField(default=0, editable=False)
@@ -68,14 +76,17 @@ class Recipe(models.Model):
     # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
     filter_expression = models.TextField(blank=False)
-    approver = models.ForeignKey(User, null=True, blank=True)
+    approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
+
+    # A tuple of fields that can be edited without causing the recipe to be disabled
+    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval',)
 
     class IsNotApproved(Exception):
         pass
 
     @property
     def is_approved(self):
-        return self.approver is not None
+        return self.approval is not None
 
     @property
     def arguments(self):
@@ -85,17 +96,19 @@ class Recipe(models.Model):
     def arguments(self, value):
         self.arguments_json = json.dumps(value)
 
-    def enable(self):
-        if self.is_approved:
-            self.enabled = True
-            self.save()
-        else:
-            raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
+    @property
+    def current_approval_request(self):
+        try:
+            return self.approval_requests.get(active=True)
+        except ApprovalRequest.DoesNotExist:
+            return None
 
-    def disable(self, ignore_revision_id=False, *args, **kwargs):
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
         self.enabled = False
-        self.approver = None
-        self.save(ignore_revision_id=ignore_revision_id, *args, **kwargs)
+        self.approval = None
 
     _registered_matchers = []
 
@@ -105,9 +118,22 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, ignore_revision_id=False, *args, **kwargs):
-        if not ignore_revision_id:
+    def save(self, *args, **kwargs):
+        if self.enabled and self.approval is None:
+            raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
+
+        # Check for changes that should disable the recipe
+        if self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+            for field in self.EDITABLE_FIELDS_WHITELIST:
+                if field in dirty_fields:
+                    dirty_fields.pop(field)
+            if dirty_fields:
+                self.disable()
+
+            # Increment the revision ID
             self.revision_id += 1
+
         super(Recipe, self).save(*args, **kwargs)
 
 
@@ -174,3 +200,65 @@ class Client(object):
     @cached_property
     def request_time(self):
         return self.request.received_at
+
+
+class ApprovalRequest(models.Model):
+    recipe = models.ForeignKey(Recipe, related_name='approval_requests')
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
+    active = models.BooleanField(default=True)
+    approval = models.OneToOneField(Approval, null=True, related_name='approval_request')
+
+    class Meta:
+        ordering = ('-created',)
+
+    class IsNotActive(Exception):
+        pass
+
+    class ActiveRequestAlreadyExists(Exception):
+        pass
+
+    @property
+    def is_approved(self):
+        return self.approval is not None
+
+    @transaction.atomic
+    def approve(self, user):
+        if self.active:
+            approval = Approval(creator=user)
+            approval.save()
+
+            self.approval = approval
+            self.active = False
+            self.save()
+
+            self.recipe.approval = approval
+            self.recipe.save()
+        else:
+            raise self.IsNotActive('Approval request has already been closed.')
+
+    def reject(self):
+        if self.active:
+            self.active = False
+            self.save()
+        else:
+            raise self.IsNotActive('Approval request has already been closed.')
+
+    def save(self, *args, **kwargs):
+        open_approval_requests = self.recipe.approval_requests.filter(active=True)
+
+        if self.pk:
+            open_approval_requests = open_approval_requests.exclude(pk=self.pk)
+
+        if self.active and open_approval_requests.exists():
+            raise self.ActiveRequestAlreadyExists('A recipe can only have one active approval '
+                                                  'request.')
+
+        super().save(*args, **kwargs)
+
+
+class ApprovalRequestComment(models.Model):
+    approval_request = models.ForeignKey(ApprovalRequest, related_name='comments')
+    created = models.DateTimeField(default=datetime.now)
+    creator = models.ForeignKey(User)
+    text = models.TextField()

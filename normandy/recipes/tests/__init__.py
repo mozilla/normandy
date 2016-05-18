@@ -6,6 +6,9 @@ from django.test import RequestFactory
 from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.recipes.models import (
     Action,
+    Approval,
+    ApprovalRequest,
+    ApprovalRequestComment,
     Client,
     Country,
     Locale,
@@ -22,14 +25,21 @@ class ActionFactory(factory.DjangoModelFactory):
     implementation = 'console.log("test");'
 
 
+class ApprovalFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Approval
+
+    creator = factory.SubFactory(UserFactory)
+
+
 class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
-    approver = factory.SubFactory(UserFactory)
     enabled = True
+    approval = factory.SubFactory(ApprovalFactory)
 
     @factory.post_generation
     def countries(self, create, extracted, **kwargs):
@@ -57,6 +67,22 @@ class RecipeFactory(factory.DjangoModelFactory):
         if extracted:
             for channel in extracted:
                 self.release_channels.add(channel)
+
+
+class ApprovalRequestFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = ApprovalRequest
+
+    recipe = factory.SubFactory(RecipeFactory)
+    creator = factory.SubFactory(UserFactory)
+
+
+class ApprovalRequestCommentFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = ApprovalRequestComment
+
+    approval_request = factory.SubFactory(ApprovalRequestFactory)
+    creator = factory.SubFactory(UserFactory)
 
 
 class CountryFactory(factory.DjangoModelFactory):

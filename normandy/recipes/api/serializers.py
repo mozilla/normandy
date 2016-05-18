@@ -1,9 +1,12 @@
+from django.contrib.auth.models import User
+
 from rest_framework import serializers
 from reversion.models import Version
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import Action, Recipe
+from normandy.recipes.models import (Action, Recipe, Approval, ApprovalRequest,
+                                     ApprovalRequestComment)
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -21,10 +24,67 @@ class ActionSerializer(serializers.ModelSerializer):
         ]
 
 
+class ApprovalSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
+                                                    write_only=True)
+
+    class Meta:
+        model = Approval
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'creator_id',
+        ]
+
+
+class ApprovalRequestSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
+                                                    write_only=True)
+    is_approved = serializers.BooleanField(read_only=True)
+    recipe_id = serializers.PrimaryKeyRelatedField(source='recipe', queryset=Recipe.objects.all(),
+                                                   write_only=True)
+
+    class Meta:
+        model = ApprovalRequest
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'creator_id',
+            'active',
+            'approval',
+            'is_approved',
+            'recipe_id',
+        ]
+
+
+class ApprovalRequestCommentSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
+                                                    write_only=True)
+    approval_request_id = serializers.PrimaryKeyRelatedField(
+        source='approval_request', queryset=ApprovalRequest.objects.all(), write_only=True)
+
+    class Meta:
+        model = ApprovalRequestComment
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'creator_id',
+            'text',
+            'approval_request_id',
+        ]
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     action_name = serializers.CharField(source='action.name')
     arguments = serializers.JSONField()
-    approver = UserSerializer(read_only=True)
+    current_approval_request = ApprovalRequestSerializer(read_only=True)
+    approval = ApprovalSerializer(read_only=True)
     is_approved = serializers.BooleanField(read_only=True)
     enabled = serializers.BooleanField(read_only=True)
 
@@ -38,9 +98,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             'action_name',
             'arguments',
             'filter_expression',
-            'approver',
+            'current_approval_request',
+            'approval',
             'is_approved',
-            'enabled',
         ]
 
     def validate_action_name(self, attr):
@@ -65,7 +125,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.action = Action.objects.get(name=action_name)
 
         instance.save()
-
         return instance
 
 
