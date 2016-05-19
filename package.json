@@ -35,6 +35,7 @@
     "redux-form": "^5.2.3",
     "redux-thunk": "^2.0.1",
     "uglifyjs": "^2.4.10",
+    "underscore": "^1.8.3",
     "wolfy87-eventemitter": "^4.3.0"
   },
   "devDependencies": {

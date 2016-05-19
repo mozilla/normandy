@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import ControlActions from '../actions/ControlActions.js'
 import { reduxForm } from 'redux-form'
 import composeRecipeContainer from './RecipeContainer.jsx'
+import { _ } from 'underscore'
 
 
 class RecipeForm extends React.Component {
@@ -21,8 +22,7 @@ class RecipeForm extends React.Component {
   }
 
   render() {
-    const { fields: { name, filter_expression }, recipeId, handleSubmit, viewingRevision } = this.props;
-
+    const { fields: { name, filter_expression, enabled, action_name }, recipeId, handleSubmit, viewingRevision } = this.props;
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
         { viewingRevision ?
@@ -59,14 +59,13 @@ RecipeForm.propTypes = {
 }
 
 export default composeRecipeContainer(reduxForm({
-    form: 'recipe',
-    fields: ['name', 'filter_expression']
+    form: 'recipe'
   }, (state, props) => {
+    let fields = ['name', 'filter_expression', 'enabled', 'action_name'];
     let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
 
     return {
       initialValues: selectedRecipeRevision || props.recipe,
       viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false)
     }
-  }
-)(RecipeForm))
+})(RecipeForm))
