@@ -43,6 +43,9 @@ steps, as they don't affect your setup if nothing has changed:
    # Add any new initial data (does not duplicate data).
    python manage.py initial_data
 
+   # Build frontend files
+   ./node_modules/.bin/webpack --config ./webpack.config.js --update-actions
+
 Building the Documentation
 --------------------------
 You can build the documentation with the following command:
@@ -69,6 +72,8 @@ make adding these hashes easier.
 
 .. _hashin: https://github.com/peterbe/hashin
 
+.. _process-webpack:
+
 Preprocessing Assets with Webpack
 ---------------------------------
 We use Webpack_ to create asset bundles of static resources. You can build an
@@ -80,6 +85,9 @@ asset bundle by running:
 
 Running the command with ``--watch`` will automatically rebuild your bundles as
 you make changes.
+
+Running the command with ``--update-actions`` will automatically call
+``manage.py update_actions`` when action code is built.
 
 .. _Webpack: http://webpack.github.io/
 
@@ -125,3 +133,24 @@ To generate an API key for privillaged API access:
 4. Select the user account you wish to generate a key for in the user list
    dropdown and click the Save button.
 5. Retrieve the API token from the list view under the "Key" column.
+
+Adding and Updating Actions
+---------------------------
+The code and argument schemas for Actions is stored on the filesystem, but must
+also be updated in the database to be used by the site.
+
+To add a new action:
+
+1. Create a new directory in ``normandy/recipes/static/actions`` containing a
+   ``package.json`` file for your action and the JavaScript code for it.
+2. Add the entry point for your action to ``webpack.config.js``.
+3. Add the action name and path to the ``ACTIONS`` setting in ``settings.py``.
+4. :ref:`Build the action code using Webpack <process-webpack>`.
+5. Update the database by running ``update_actions``:
+
+.. code-block:: bash
+
+   python manage.py update_actions
+
+To update an existing action, follow steps 4 and 5 above after making your
+changes.
