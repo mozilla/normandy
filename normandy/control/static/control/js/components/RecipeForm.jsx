@@ -25,27 +25,28 @@ class RecipeForm extends React.Component {
   }
 
   getAvailableActions(recipeId) {
-    apiFetch(`/api/v1/action/`)
-      .then(availableActions => {
-        let selectedActionName = (this.props.recipe ? this.props.recipe.action_name : null);
+    apiFetch('/api/v1/action/')
+    .then(availableActions => {
+      let selectedActionName = (this.props.recipe ? this.props.recipe.action_name : null);
 
-        availableActions.map(action => {
-          parseJsonSchema(action.arguments_schema).then(schema => {
-            action.arguments_schema = schema;
-            action.fields = generateFieldsFromSchema(schema);
+      availableActions.map(action => {
+        parseJsonSchema(action.arguments_schema)
+        .then(schema => {
+          action.arguments_schema = schema;
+          action.fields = generateFieldsFromSchema(schema);
 
-            if (selectedActionName === action.name) {
-              this.setState({
-                selectedAction: action
-              });
-            }
-            return action;
-          })
-        });
+          if (selectedActionName === action.name) {
+            this.setState({
+              selectedAction: action
+            });
+          }
+          return action;
+        })
+      });
 
-        this.setState({
-          availableActions
-        });
+      this.setState({
+        availableActions
+      });
     });
   }
 

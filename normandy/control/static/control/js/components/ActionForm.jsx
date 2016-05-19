@@ -10,14 +10,14 @@ class ActionForm extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const currentProps = _.pick(this.props, 'initialValues', 'values', 'fields', 'selectedAction');
-    const incomingProps = _.pick(nextProps, 'initialValues', 'values', 'fields', 'selectedAction');
+    const currentProps = _.pick(this.props, 'values', 'fields', 'arguments_schema');
+    const incomingProps = _.pick(nextProps, 'values', 'fields', 'arguments_schema');
 
     return (!_.isEqual(currentProps, incomingProps) || !_.isEqual(this.state, nextState));
   }
 
   render() {
-    const { fields, arguments_schema, recipe, name } = this.props;
+    const { fields, arguments_schema, name } = this.props;
 
     let childForm = 'No action form available';
 
