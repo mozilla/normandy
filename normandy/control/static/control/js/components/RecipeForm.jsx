@@ -1,14 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
-import ControlActions from '../actions/ControlActions.js'
 import { reduxForm } from 'redux-form'
-import composeRecipeContainer from './RecipeContainer.jsx'
 import { _ } from 'underscore'
 
 import apiFetch from '../utils/apiFetch.js';
 import { parseJsonSchema, generateFieldsFromSchema } from '../utils/formSchemaHelpers.js';
 
+import ControlActions from '../actions/ControlActions.js'
+import composeRecipeContainer from './RecipeContainer.jsx'
+import ActionForm from './ActionForm.jsx'
 
 class RecipeForm extends React.Component {
   constructor(props) {
@@ -71,7 +72,7 @@ class RecipeForm extends React.Component {
   }
 
   render() {
-    const { fields: { name, filter_expression, enabled, action_name }, recipeId, handleSubmit, viewingRevision } = this.props;
+    const { fields: { name, filter_expression, enabled, action_name }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
     const { availableActions, selectedAction } = this.state;
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
@@ -105,7 +106,7 @@ class RecipeForm extends React.Component {
             </select>
           </div>
           { selectedAction &&
-            <p>{selectedAction.name}</p>
+            <ActionForm recipe={recipe} {...selectedAction} />
           }
         </div>
         <div className="row form-action-buttons">

@@ -181,6 +181,26 @@
   }
 }
 
+#action-configuration {
+  background: $cream;
+  clear: both;
+  margin: 1em;
+  padding: 30px;
+  position: relative;
+
+  .fluid-8 {
+    padding: 0.5em 0em;
+  }
+
+  i.fa-caret-up {
+    color: $cream;
+    left: 15px;
+    position: absolute;
+    top: -10px;
+  }
+}
+
+
 
 /* Recipe History */
 li {
