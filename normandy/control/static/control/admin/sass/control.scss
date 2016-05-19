@@ -198,6 +198,86 @@
     position: absolute;
     top: -10px;
   }
+
+  h4 {
+    display: inline-block;
+    font-weight: 600;
+    line-height: 30px;
+  }
+
+  .active {
+    background-color: rgba(255,255,255,0.5);
+    border-bottom: 1px solid $darkCream;
+  }
+
+  .array-field {
+    margin-top: 25px;
+
+    a.button {
+      float: right;
+      padding: 0px 15px;
+    }
+  }
+
+  ul {
+    margin-top: 25px;
+
+    li {
+      font-size: 13px;
+      line-height: 30px;
+      list-style-type: none;
+      padding: 5px 1em;
+      transition: all 0.2s;
+
+      span {
+        display: inline-block;
+        float: right;
+      }
+
+      &:not(.active):hover {
+        background-color: transparent;
+        color: $cta;
+        cursor: pointer;
+      }
+
+      &.active {
+        margin-right: -2em;
+        padding-right: 40px;
+      }
+
+      &:before {
+        border-color: transparent $darkBrown;
+        border-style: solid;
+        border-width: 0.35em 0 0.35em 0.35em;
+        content: "";
+        display: inline-block;
+        height: 0;
+        left: -1em;
+        position: relative;
+        top: 50%;
+        width: 0;
+      }
+    }
+  }
+
+  .row.survey-form {
+    margin-top: -50px;
+    padding: 40px;
+    position: relative;
+    transition: all 0.2s;
+
+    span.return-to-defaults {
+      font-size: 11px;
+      position: absolute;
+      right: 15px;
+      top: 15px;
+
+      &:hover {
+        color: $cta;
+        cursor: pointer;
+      }
+    }
+  }
 }
 
 
