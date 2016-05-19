@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
-import { reduxForm } from 'redux-form'
+import { destroy, reduxForm, getValues } from 'redux-form'
 import { _ } from 'underscore'
 
 import apiFetch from '../utils/apiFetch.js';
@@ -50,20 +50,27 @@ class RecipeForm extends React.Component {
   }
 
   changeAction(event) {
-    const { fields } = this.props;
+    const { dispatch, fields } = this.props;
     let selectedActionName = event.currentTarget.value;
 
+    dispatch(destroy('action'));
     fields.action_name.onChange(event);
     this.setState({
       selectedAction: this.state.availableActions.find(action => action.name === selectedActionName)
     });
   }
 
-  submitForm(values) {
+  submitForm() {
+    let recipeFormValues = getValues(this.props.formState.recipe);
+    let actionFormValues = getValues(this.props.formState.action);
+    let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
     if (this.props.recipeId) {
-      this.props.dispatch(ControlActions.makeApiRequest('updateRecipe', { recipe: values, recipeId: this.props.recipeId }));
+      this.props.dispatch(ControlActions.makeApiRequest('updateRecipe', {
+        recipe: combinedFormValues,
+        recipeId: this.props.recipeId
+      }));
     } else {
-      this.props.dispatch(ControlActions.makeApiRequest('addRecipe', values));
+      this.props.dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
     }
   }
 
@@ -139,7 +146,9 @@ export default composeRecipeContainer(reduxForm({
     let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
 
     return {
+      fields,
       initialValues: selectedRecipeRevision || props.recipe,
-      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false)
+      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false),
+      formState: state.form
     }
 })(RecipeForm))
