@@ -1,9 +1,17 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
+import { _ } from 'underscore'
 
 class ActionForm extends React.Component {
   constructor(props) {
     super(props)
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const currentProps = _.pick(this.props, 'initialValues', 'values', 'fields', 'selectedAction');
+    const incomingProps = _.pick(nextProps, 'initialValues', 'values', 'fields', 'selectedAction');
+
+    return (!_.isEqual(currentProps, incomingProps) || !_.isEqual(this.state, nextState));
   }
 
   render() {
