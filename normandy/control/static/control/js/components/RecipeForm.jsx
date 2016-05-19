@@ -79,13 +79,6 @@ class RecipeForm extends React.Component {
     this.getAvailableActions();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const currentProps = _.pick(this.props, 'values');
-    const incomingProps = _.pick(nextProps, 'values');
-
-    return (!_.isEqual(currentProps, incomingProps) || !_.isEqual(this.state, nextState));
-  }
-
   render() {
     const { fields: { name, filter_expression, enabled, action_name }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
     const { availableActions, selectedAction } = this.state;
