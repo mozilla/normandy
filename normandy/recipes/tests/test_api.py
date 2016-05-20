@@ -358,6 +358,14 @@ class TestRecipeAPI(object):
         assert res.data[0]['id'] == ar2.id
         assert res.data[1]['id'] == ar1.id
 
+    def test_filtering_by_enabled_lowercase(self, api_client):
+        r1 = RecipeFactory(enabled=True)
+        RecipeFactory(enabled=False)
+
+        res = api_client.get('/api/v1/recipe/?enabled=true')
+        assert res.status_code == 200
+        assert [r['id'] for r in res.data] == [r1.id]
+
 
 @pytest.mark.django_db
 class TestRecipeVersionAPI(object):
