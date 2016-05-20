@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.cache import cache_control
 
+import django_filters
 from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import NotFound
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from reversion.models import Version
 
 from normandy.base.api import UpdateOrCreateModelViewSet
+from normandy.base.api.filters import CaseInsensitiveBooleanFilter
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import reversion_transaction
@@ -66,11 +68,19 @@ class ActionImplementationView(generics.RetrieveAPIView):
         return Response(action.implementation)
 
 
+class RecipeFilters(django_filters.FilterSet):
+    enabled = CaseInsensitiveBooleanFilter(name='enabled', lookup_type='eq')
+
+    class Meta:
+        model = Recipe
+        fields = ['action', 'enabled']
+
+
 class RecipeViewSet(UpdateOrCreateModelViewSet):
     """Viewset for viewing and uploading recipes."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    filter_fields = ('action', 'enabled')
+    filter_class = RecipeFilters
     permission_classes = [
         permissions.DjangoModelPermissionsOrAnonReadOnly,
         AdminEnabledOrReadOnly,
