@@ -85,7 +85,7 @@ class HeartbeatForm extends React.Component {
                         { childField.title.value || "Untitled Survey" }
                         <span title="Delete this survey" onClick={(e) => {
                           e.stopPropagation();
-                          fields['surveys'].removeField();
+                          fields['surveys'].removeField(index);
                           this.setSelectedSurvey();
                         }}><i className="fa fa-times red"></i></span>
                       </li>
