@@ -182,6 +182,28 @@
 }
 
 
+/* Recipe History */
+li {
+  p {
+    display: inline-block;
+    line-height: 20px;
+    margin: 0px 20px;
+    vertical-align: top;
+
+    &.revision-number {
+      font-weight: 600;
+    }
+  }
+
+  span {
+
+    &.label {
+      padding: 0px;
+    }
+  }
+}
+
+
 /* Login Page */
 .login {
   padding: 100px 0px;

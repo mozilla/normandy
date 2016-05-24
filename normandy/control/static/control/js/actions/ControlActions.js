@@ -47,6 +47,16 @@ const apiRequestMap = {
     };
   },
 
+  fetchSingleRevision(recipeInfo) {
+    return {
+      url: `/api/v1/recipe_version/${recipeInfo.revisionId}/`,
+      settings: {
+        method: 'get'
+      },
+      actionOnSuccess: singleRevisionReceived
+    }
+  },
+
   addRecipe(recipeInfo) {
     return {
       url: BASE_API_URL,
@@ -106,6 +116,13 @@ function singleRecipeReceived(recipe) {
   return {
     type: SINGLE_RECIPE_RECEIVED,
     recipe
+  };
+}
+
+function singleRevisionReceived(revision) {
+  return {
+    type: SINGLE_RECIPE_RECEIVED,
+    recipe: revision.recipe
   };
 }
 

@@ -21,9 +21,15 @@ class RecipeForm extends React.Component {
   }
 
   render() {
-    const { fields: { name, filter_expression }, recipeId, handleSubmit } = this.props;
+    const { fields: { name, filter_expression }, recipeId, handleSubmit, viewingRevision } = this.props;
+
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
+        { viewingRevision ?
+          <p className="notification info">
+            You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
+          </p> : ''
+        }
         <div className="row">
           <div className="fluid-3">
             <label>Name</label>
@@ -55,7 +61,12 @@ RecipeForm.propTypes = {
 export default composeRecipeContainer(reduxForm({
     form: 'recipe',
     fields: ['name', 'filter_expression']
-  }, (state, props) => ({ // mapStateToProps
-    initialValues: (props.recipe || null)
-  })
+  }, (state, props) => {
+    let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
+
+    return {
+      initialValues: selectedRecipeRevision || props.recipe,
+      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false)
+    }
+  }
 )(RecipeForm))

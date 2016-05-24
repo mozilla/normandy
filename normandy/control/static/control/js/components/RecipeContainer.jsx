@@ -12,10 +12,15 @@ export default function composeRecipeContainer(Component) {
     }
 
     getRecipeData(recipeId) {
-      const { dispatch } = this.props;
-      if (!this.props.recipes) {
+      const { dispatch, location, recipe } = this.props;
+      if (!recipe) {
         dispatch(ControlActions.setSelectedRecipe(recipeId));
-        dispatch(ControlActions.makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }));
+
+        if (location.query.revisionId) {
+          dispatch(ControlActions.makeApiRequest('fetchSingleRevision', { revisionId: location.query.revisionId }));
+        } else {
+          dispatch(ControlActions.makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }));
+        }
       }
     }
 
