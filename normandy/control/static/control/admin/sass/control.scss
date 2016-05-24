@@ -223,6 +223,7 @@
     margin-top: 25px;
 
     li {
+      border: 1px solid transparent;
       font-size: 13px;
       line-height: 30px;
       list-style-type: none;
@@ -241,8 +242,8 @@
       }
 
       &.active {
-        margin-right: -2em;
-        padding-right: 40px;
+        margin: 0px -2em;
+        padding: 5px 3em;
       }
 
       &:before {
