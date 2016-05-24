@@ -2,10 +2,9 @@ import hashlib
 import json
 import logging
 
-from datetime import datetime
-
 from django.contrib.auth.models import User
 from django.db import models, transaction
+from django.utils import timezone
 from django.utils.functional import cached_property
 
 from dirtyfields import DirtyFieldsMixin
@@ -60,7 +59,7 @@ class Country(models.Model):
 
 
 class Approval(models.Model):
-    created = models.DateTimeField(default=datetime.now)
+    created = models.DateTimeField(default=timezone.now)
     creator = models.ForeignKey(User)
 
 
@@ -204,7 +203,7 @@ class Client(object):
 
 class ApprovalRequest(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='approval_requests')
-    created = models.DateTimeField(default=datetime.now)
+    created = models.DateTimeField(default=timezone.now)
     creator = models.ForeignKey(User)
     active = models.BooleanField(default=True)
     approval = models.OneToOneField(Approval, null=True, related_name='approval_request')
@@ -259,6 +258,6 @@ class ApprovalRequest(models.Model):
 
 class ApprovalRequestComment(models.Model):
     approval_request = models.ForeignKey(ApprovalRequest, related_name='comments')
-    created = models.DateTimeField(default=datetime.now)
+    created = models.DateTimeField(default=timezone.now)
     creator = models.ForeignKey(User)
     text = models.TextField()
