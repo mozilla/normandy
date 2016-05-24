@@ -8,6 +8,7 @@ class RecipePreview extends React.Component {
     super(props);
 
     this.state = {
+      recipeAttempted: false,
       recipeExecuted: false,
       errorRunningRecipe: null,
     };
@@ -23,9 +24,13 @@ class RecipePreview extends React.Component {
 
   attemptPreview() {
     const {recipe} = this.props;
-    const {recipeExecuted} = this.state;
+    const {recipeAttempted} = this.state;
 
-    if (recipe && !recipeExecuted) {
+    if (recipe && !recipeAttempted) {
+      this.setState({
+          recipeAttempted: true
+      });
+
       runRecipe(recipe, {testing: true}).then(res => {
         this.setState({
           recipeExecuted: true
