@@ -4,7 +4,7 @@ import { _ } from 'underscore'
 import HeartbeatForm from './action_forms/HeartbeatForm.jsx'
 import ConsoleLogForm from './action_forms/ConsoleLogForm.jsx'
 
-class ActionForm extends React.Component {
+export class ActionForm extends React.Component {
   constructor(props) {
     super(props)
   }

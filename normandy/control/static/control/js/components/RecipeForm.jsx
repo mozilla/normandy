@@ -11,7 +11,7 @@ import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import ActionForm from './ActionForm.jsx'
 
-class RecipeForm extends React.Component {
+export class RecipeForm extends React.Component {
   constructor(props) {
     super(props);
     this.submitForm = this.submitForm.bind(this);
@@ -84,10 +84,10 @@ class RecipeForm extends React.Component {
     const { availableActions, selectedAction } = this.state;
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
-        { viewingRevision ?
-          <p className="notification info">
+        { viewingRevision &&
+          <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
-          </p> : ''
+          </p>
         }
         <div className="row">
           <div className="fluid-3">
