@@ -13,30 +13,29 @@ class SurveyForm extends React.Component {
     const { selectedSurvey, fields, setSelectedSurvey } = this.props;
     const surveyObject = selectedSurvey || fields['defaults'];
     let headerText = "Default Survey Values";
-    let containerClass = 'row survey-form';
+    let containerClass = 'fluid-8';
     if (selectedSurvey) {
       headerText = selectedSurvey.title.initialValue || "New survey"
       containerClass += ' active';
     }
 
     return (
-      <div className={containerClass}>
-        { selectedSurvey ?
-          <span className="return-to-defaults" onClick={(e) => {
+      <div id='survey-form' className={containerClass}>
+        { selectedSurvey &&
+          <a className="return-to-defaults" href="#" onClick={(e) => {
+            e.preventDefault();
             setSelectedSurvey()
           }}>
             <i className="fa fa-long-arrow-left pre"></i> Return to defaults
-          </span> : null
+          </a>
         }
         <h4>{headerText}</h4>
         {
           Object.keys(surveyObject).map(fieldName => {
             return (
               <div key={fieldName} className="row">
-                <div className="fluid-8">
-                  <label>{formatLabel(fieldName)}</label>
-                  <input type="text" field={surveyObject[fieldName]} {...surveyObject[fieldName]} />
-                 </div>
+                <label>{formatLabel(fieldName)}</label>
+                <input type="text" field={surveyObject[fieldName]} {...surveyObject[fieldName]} />
               </div>
             )
           })
@@ -70,7 +69,7 @@ class HeartbeatForm extends React.Component {
           <div className="row array-field">
             <h4>Surveys</h4>
 
-            <a className="button" onClick={(e) => {
+            <a className="button add-field" onClick={(e) => {
               e.preventDefault();
               fields['surveys'].addField();
             }}><i className="fa fa-plus"></i> Add Survey</a>
@@ -84,7 +83,7 @@ class HeartbeatForm extends React.Component {
                         this.setSelectedSurvey(childField)
                       }}>
                         { childField.title.value || "Untitled Survey" }
-                        <span title="Delete this survey" onClick={(e) => {
+                        <span title="Delete this survey" className="delete-field" onClick={(e) => {
                           e.stopPropagation();
                           fields['surveys'].removeField(index);
                           this.setSelectedSurvey();

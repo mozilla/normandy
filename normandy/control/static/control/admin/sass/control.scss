@@ -181,16 +181,13 @@
   }
 }
 
+/* Action Forms */
 #action-configuration {
   background: $cream;
   clear: both;
   margin: 1em;
   padding: 30px;
   position: relative;
-
-  .fluid-8 {
-    padding: 0.5em 0em;
-  }
 
   i.fa-caret-up {
     color: $cream;
@@ -205,6 +202,10 @@
     line-height: 30px;
   }
 
+  .row {
+    padding: 0.5em 0;
+  }
+
   .active {
     background-color: rgba(255,255,255,0.5);
     border-bottom: 1px solid $darkCream;
@@ -213,70 +214,66 @@
   .array-field {
     margin-top: 25px;
 
-    a.button {
+    a.add-field {
       float: right;
       padding: 0px 15px;
     }
-  }
 
-  ul {
-    margin-top: 25px;
+    ul {
+      margin-top: 25px;
 
-    li {
-      border: 1px solid transparent;
-      font-size: 13px;
-      line-height: 30px;
-      list-style-type: none;
-      padding: 5px 1em;
-      transition: all 0.2s;
+      li {
+        border: 1px solid transparent;
+        font-size: 13px;
+        line-height: 30px;
+        list-style-type: none;
+        padding: 5px 1em;
+        transition: all 0.2s;
 
-      span {
-        display: inline-block;
-        float: right;
-      }
+        .delete-field {
+          display: inline-block;
+          float: right;
+        }
 
-      &:not(.active):hover {
-        background-color: transparent;
-        color: $cta;
-        cursor: pointer;
-      }
+        &:not(.active):hover {
+          background-color: transparent;
+          color: $cta;
+          cursor: pointer;
+        }
 
-      &.active {
-        margin: 0px -2em;
-        padding: 5px 3em;
-      }
+        &.active {
+          margin: 0px -2em;
+          padding: 5px 3em;
+        }
 
-      &:before {
-        border-color: transparent $darkBrown;
-        border-style: solid;
-        border-width: 0.35em 0 0.35em 0.35em;
-        content: "";
-        display: inline-block;
-        height: 0;
-        left: -1em;
-        position: relative;
-        top: 50%;
-        width: 0;
+        &:before {
+          border-color: transparent $darkBrown;
+          border-style: solid;
+          border-width: 0.35em 0 0.35em 0.35em;
+          content: "";
+          display: inline-block;
+          height: 0;
+          left: -1em;
+          position: relative;
+          top: 50%;
+          width: 0;
+        }
       }
     }
   }
 
-  .row.survey-form {
+  /* Heartbeat Survey Form */
+  #survey-form {
     margin-top: -50px;
     padding: 40px;
     position: relative;
     transition: all 0.2s;
 
-    span.return-to-defaults {
+    a.return-to-defaults {
       font-size: 11px;
       position: absolute;
-      right: 15px;
+      right: 20px;
       top: 15px;
-
-      &:hover {
-        color: $cta;
-        cursor: pointer;
-      }
     }
   }
 }
