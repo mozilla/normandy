@@ -1,51 +1,57 @@
 import $RefParser from 'json-schema-ref-parser';
+import { _ } from 'underscore';
 
 /* Redux forms with complex/nested data structures require
  * a specialized fields array to handle objects and arrays.
  * Eg: ['surveyId', 'surveys[].title', 'defaults.thankYouMessage']
  */
-function processProperties(propsObj) {
-    let formFields = [];
+function processProperties(orderedPropNames, propsObj) {
+  let reduxFormFields = [];
+  let props = {};
 
-    Object.keys(propsObj).forEach(key => {
-      switch (propsObj[key].type) {
-        case "string":
-          formFields = formFields.concat([key]);
-          break;
-        case "integer":
-          formFields = formFields.concat([key]);
-          break;
-        case "object":
-          let objectItems = processProperties(propsObj[key].properties);
-          objectItems = objectItems.map(objectField => {
-            return `${key}.${objectField}`
-          });
+  orderedPropNames.forEach(key => {
+    switch (propsObj[key].type) {
+      case "object":
+        props = propsObj[key].properties;
 
-          formFields = formFields.concat(objectItems);
-          break;
-        case "array":
-          let arrayItems = propsObj[key].items.allOf;
-          let arrayFields = [];
-          arrayItems.forEach(item => {
-            arrayFields = arrayFields.concat(processProperties(item.properties).map(arrayField => {
-              return `${key}[].${arrayField}`;
-            }));
-          });
+        let objectFields = processProperties(orderPropNames(props), props)
+          .map(objectField => `${key}.${objectField}`);
 
-          formFields = formFields.concat(arrayFields);
-          break;
-      }
-    });
+        reduxFormFields = reduxFormFields.concat(objectFields);
+        break;
 
-    return formFields;
-  };
+      case "array":
+        (propsObj[key].items.allOf).forEach(item => {
+          props = { ...item.properties, ...props };
+        });
+
+        let arrayFields = processProperties(orderPropNames(props), props)
+          .map(arrayField => `${key}[].${arrayField}`);
+
+        reduxFormFields = reduxFormFields.concat(arrayFields);
+        break;
+
+      default:
+        reduxFormFields = reduxFormFields.concat([key]);
+    }
+  });
+
+  return reduxFormFields;
+};
+
+function orderPropNames(propsObj) {
+  return _.sortBy(Object.keys(propsObj), key => {
+    return propsObj[key].propertyOrder;
+  });
+}
 
 export function parseJsonSchema(jsonSchema) {
   return $RefParser.dereference(jsonSchema);
 }
 
 export function generateFieldsFromSchema(jsonSchema) {
-  return processProperties(jsonSchema.properties);
+  let props = jsonSchema.properties;
+  return processProperties(orderPropNames(props), props);
 }
 
 export {
