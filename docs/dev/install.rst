@@ -57,11 +57,12 @@ Installation
       :ref:`pip-install-error`
          How to troubleshoot errors during ``pip install``.
 
-4. Install frontend dependencies using npm:
+4. Install frontend dependencies and build the frontend code using npm:
 
    .. code-block:: bash
 
       npm install
+      npm run build
 
 5. Create a Postgres database for Normandy. By default it is assumed to be named
    ``normandy``:

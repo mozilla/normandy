@@ -81,13 +81,22 @@ asset bundle by running:
 
 .. code-block:: bash
 
-   ./node_modules/.bin/webpack --config ./webpack.config.js
+   npm run build
 
-Running the command with ``--watch`` will automatically rebuild your bundles as
-you make changes.
+You can also run the watch command to automatically rebuild your bundles as you
+make changes:
+
+.. code-block:: bash
+
+   npm run watch
 
 Running the command with ``--update-actions`` will automatically call
-``manage.py update_actions`` when action code is built.
+``manage.py update_actions`` when action code is built. Arguments are separated
+from the rest of the command by ``--``:
+
+.. code-block:: bash
+
+   npm run watch -- --update-actions
 
 .. _Webpack: http://webpack.github.io/
 
