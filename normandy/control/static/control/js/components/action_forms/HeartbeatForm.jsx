@@ -1,6 +1,7 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
 import { _ } from 'underscore'
+import { formatLabel } from '../../utils/formHelpers.js'
 
 
 class SurveyForm extends React.Component {
@@ -33,7 +34,7 @@ class SurveyForm extends React.Component {
             return (
               <div key={fieldName} className="row">
                 <div className="fluid-8">
-                  <label>{fieldName}</label>
+                  <label>{formatLabel(fieldName)}</label>
                   <input type="text" field={surveyObject[fieldName]} {...surveyObject[fieldName]} />
                  </div>
               </div>

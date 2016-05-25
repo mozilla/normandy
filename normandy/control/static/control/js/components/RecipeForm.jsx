@@ -5,7 +5,7 @@ import { destroy, reduxForm, getValues } from 'redux-form'
 import { _ } from 'underscore'
 
 import apiFetch from '../utils/apiFetch.js';
-import { parseJsonSchema, generateFieldsFromSchema } from '../utils/formSchemaHelpers.js';
+import { parseJsonSchema, generateFieldsFromSchema } from '../utils/formHelpers.js';
 
 import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'

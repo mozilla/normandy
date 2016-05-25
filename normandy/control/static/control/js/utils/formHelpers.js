@@ -54,7 +54,12 @@ export function generateFieldsFromSchema(jsonSchema) {
   return processProperties(orderPropNames(props), props);
 }
 
+export function formatLabel(labelName) {
+  return labelName.replace( /([A-Z])/g, " $1" );
+}
+
 export {
   parseJsonSchema,
-  generateFieldsFromSchema
+  generateFieldsFromSchema,
+  formatLabel
 }
