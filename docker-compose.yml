@@ -5,7 +5,7 @@ services:
     image: postgres:9.5.2
 
   normandy:
-    image: mozilla/normandy
+    image: mozilla/normandy:latest
     links:
       - database
       - autograph
