@@ -1,52 +1,117 @@
-var path = require('path')
-var webpack = require('webpack')
+var path = require('path');
+var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker')
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var argv = require('yargs').argv;
+var child_process = require('child_process');
 
-module.exports = {
-  context: __dirname,
 
-  entry: {
-    selfrepair: './normandy/selfrepair/static/js/self_repair',
-    control: [
-      './normandy/control/static/control/js/index',
-      './normandy/control/static/control/admin/sass/control.scss',
-      './node_modules/font-awesome/scss/font-awesome.scss',
-    ]
-  },
+const BOLD = '\u001b[1m';
+const END_BOLD = '\u001b[39m\u001b[22m';
 
-  output: {
-      path: path.resolve('./assets/bundles/'),
-      filename: '[name]-[hash].js',
-      chunkFilename: '[id].bundle.js'
-  },
 
-  plugins: [
-    new BundleTracker({ filename: './webpack-stats.json' }),
-    new ExtractTextPlugin('[name]-[hash].css'),
-    new webpack.ProvidePlugin({
-      'fetch': 'exports?self.fetch!isomorphic-fetch'
-    }),
-  ],
+module.exports = [
+  {
+    context: __dirname,
 
-  module: {
-    loaders: [
-      {
-        test: /(\.|\/)(jsx|js)$/,
-        exclude: /node_modules/,
-        loader: 'babel',
-        'query': {
-          presets: ['es2015', 'react', 'stage-2']
-        }
-      },
-      {
-        test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap')
-      },
-      {
-        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-        loader: 'file-loader'
-      }
+    entry: {
+      selfrepair: './normandy/selfrepair/static/js/self_repair',
+      control: [
+        './normandy/control/static/control/js/index',
+        './normandy/control/static/control/admin/sass/control.scss',
+        './node_modules/font-awesome/scss/font-awesome.scss',
+      ]
+    },
+
+    output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: '[name]-[hash].js',
+        chunkFilename: '[id].bundle.js'
+    },
+
+    plugins: [
+      new BundleTracker({ filename: './webpack-stats.json' }),
+      new ExtractTextPlugin('[name]-[hash].css'),
+      new webpack.ProvidePlugin({
+        'fetch': 'exports?self.fetch!isomorphic-fetch'
+      }),
     ],
+
+    module: {
+      loaders: [
+        {
+          test: /(\.|\/)(jsx|js)$/,
+          exclude: /node_modules/,
+          loader: 'babel',
+          'query': {
+            presets: ['es2015', 'react', 'stage-2']
+          }
+        },
+        {
+          test: /\.scss$/,
+          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap')
+        },
+        {
+          test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+          loader: 'file-loader'
+        }
+      ],
+    }
+  },
+  {
+    entry: {
+      'console-log': './normandy/recipes/static/actions/console-log/index',
+      'show-heartbeat': './normandy/recipes/static/actions/show-heartbeat/index',
+    },
+
+    plugins: [
+        new BundleTracker({filename: './webpack-stats-actions.json'}),
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}}),
+
+        // Small plugin to update the actions in the database if
+        // --update-actions was passed.
+        function updateActions() {
+          this.plugin('done', function(stats) {
+            if (argv['update-actions']) {
+              // Don't disable actions since this is mostly for development.
+              var cmd = 'python manage.py update_actions --no-disable';
+
+              child_process.exec(cmd, function(err, stdout, stderr) {
+                console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
+                console.log(stdout);
+                if (stderr) {
+                  console.error(stderr);
+                }
+              });
+            }
+          });
+        },
+    ],
+
+    output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: '[name]-[hash].js'
+    },
+
+    module: {
+        loaders: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            query: {
+              presets: ['es2015', 'stage-2'],
+              plugins: [
+                ['transform-runtime', {
+                  polyfill: false,
+                  regenerator: true
+                }]
+              ]
+            }
+          }
+        ]
+    }
   }
-}
+]

@@ -11,6 +11,7 @@ JavaScript to various clients based on certain rules.
    dev/install
    dev/workflow
    dev/architecture
+   dev/driver
    dev/troubleshooting
    qa/docker
    ops/config

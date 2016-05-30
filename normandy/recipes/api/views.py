@@ -15,7 +15,6 @@ from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import reversion_transaction
 from normandy.recipes.models import Action, Client, Recipe, ApprovalRequest, ApprovalRequestComment
-from normandy.recipes.api.permissions import NotInUse
 from normandy.recipes.api.serializers import (
     ActionSerializer,
     ClientSerializer,
@@ -26,26 +25,13 @@ from normandy.recipes.api.serializers import (
 )
 
 
-class ActionViewSet(UpdateOrCreateModelViewSet):
-    """Viewset for viewing and uploading recipe actions."""
+class ActionViewSet(viewsets.ReadOnlyModelViewSet):
+    """Viewset for viewing recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-    permission_classes = [
-        permissions.DjangoModelPermissionsOrAnonReadOnly,
-        NotInUse,
-        AdminEnabledOrReadOnly,
-    ]
 
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
-
-    @reversion_transaction
-    def create(self, *args, **kwargs):
-        return super().create(*args, **kwargs)
-
-    @reversion_transaction
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
 
 class ActionImplementationView(generics.RetrieveAPIView):

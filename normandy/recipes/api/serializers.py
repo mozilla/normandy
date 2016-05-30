@@ -11,14 +11,12 @@ from normandy.recipes.models import (Action, Recipe, Approval, ApprovalRequest,
 
 class ActionSerializer(serializers.ModelSerializer):
     arguments_schema = serializers.JSONField()
-    implementation = serializers.CharField(write_only=True)
     implementation_url = ActionImplementationHyperlinkField()
 
     class Meta:
         model = Action
         fields = [
             'name',
-            'implementation',
             'implementation_url',
             'arguments_schema',
         ]

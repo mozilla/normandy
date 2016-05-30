@@ -99,6 +99,8 @@ Running Normandy
      docker run -it --env-file=.env mozilla/normandy:latest ./manage.py createsuperuser
      # Load inital database data
      docker run -it --env-file=.env mozilla/normandy:latest ./manage.py initial_data
+     # Update the actions
+     docker run -it --env-file=.env mozilla/normandy:latest ./manage.py update_actions
      # Run the web server
      docker run -it -p 8000:8000 --env-file=.env mozilla/normandy:latest
 

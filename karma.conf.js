@@ -1,8 +1,8 @@
 // Karma configuration
 module.exports = function(config) {
-    config.set({
+    var karmaConfig = {
         // base path that will be used to resolve all patterns (eg. files, exclude)
-        basePath: 'normandy/control/tests/',
+        basePath: '',
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -10,13 +10,17 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'index.js'
+            'node_modules/babel-polyfill/dist/polyfill.js',
+            'node_modules/jasmine-promises/dist/jasmine-promises.js',
+            'normandy/control/tests/index.js',
+            'normandy/recipes/tests/actions/index.js',
         ],
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'index.js': ['webpack'],
+            'normandy/control/tests/index.js': ['webpack', 'sourcemap'],
+            'normandy/recipes/tests/actions/index.js': ['webpack', 'sourcemap'],
             'normandy/control/static/control/js/components/*.jsx': ['react-jsx'],
         },
 
@@ -43,7 +47,7 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['nyan'],
+        reporters: ['spec'],
 
         // web server port
         port: 9876,
@@ -69,5 +73,20 @@ module.exports = function(config) {
         // Concurrency level
         // how many browser should be started simultaneous
         concurrency: Infinity,
-    });
+    };
+
+    // Add JUnit reporting if we're running on CircleCI.
+    var reportDir = process.env.CIRCLE_TEST_REPORTS;
+    if (reportDir) {
+        karmaConfig.reporters.push('junit');
+        karmaConfig.junitReporter = {
+            // results will be saved as $outputDir/$browserName.xml
+            outputDir: reportDir,
+
+            // if included, results will be saved as $outputDir/$browserName/$outputFile
+            outputFile: 'normandy-actions.xml',
+        };
+    }
+
+    config.set(karmaConfig);
 };
