@@ -17,8 +17,6 @@ export class ActionForm extends React.Component {
       case 'console-log':
         childForm = (<ConsoleLogForm fields={fields} />);
         break;
-      default:
-        childForm = childForm;
     }
 
     return (
