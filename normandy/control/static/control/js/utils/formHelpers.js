@@ -40,9 +40,7 @@ function processProperties(orderedPropNames, propsObj) {
 };
 
 function orderPropNames(propsObj) {
-  return _.sortBy(Object.keys(propsObj), key => {
-    return propsObj[key].propertyOrder;
-  });
+  return _.sortBy(Object.keys(propsObj), key => propsObj[key].propertyOrder);
 }
 
 function parseJsonSchema(jsonSchema) {

@@ -35,24 +35,23 @@ class RecipeHistory extends React.Component {
         <h3>Viewing revision log for: <b>{recipe ? recipe.name : ''}</b></h3>
         <ul>
             {
-              this.state.revisionLog.map((revision, index) => {
-                return (
-                  <li key={revision.date_created} onClick={(e) => {
-                    let revisionInfo = {};
-                    if (index !== 0) {
-                      revisionInfo = {
-                        query: { revisionId: `${revision.id}` },
-                        state: { selectedRevision: revision.recipe }
-                      }
+              this.state.revisionLog.map((revision, index) =>
+                <li key={revision.date_created} onClick={(e) => {
+                  let revisionInfo = {};
+                  if (index !== 0) {
+                    revisionInfo = {
+                      query: { revisionId: `${revision.id}` },
+                      state: { selectedRevision: revision.recipe }
                     }
-                    dispatch(push({
-                      pathname: `/control/recipe/${recipeId}/`,
-                      ...revisionInfo
-                    }))
-                  }}><p className="revision-number">#{revision.recipe.revision_id} </p>
-                    <p><span className="label">Created On:</span>{ moment(revision.date_created).format('MMM Do YYYY - h:mmA') }</p>
-                  </li>)
-              })
+                  }
+                  dispatch(push({
+                    pathname: `/control/recipe/${recipeId}/`,
+                    ...revisionInfo
+                  }))
+                }}><p className="revision-number">#{revision.recipe.revision_id} </p>
+                  <p><span className="label">Created On:</span>{ moment(revision.date_created).format('MMM Do YYYY - h:mmA') }</p>
+                </li>
+              )
             }
         </ul>
       </div>

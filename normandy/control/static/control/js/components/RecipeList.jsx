@@ -56,9 +56,9 @@ class RecipeList extends React.Component {
           </thead>
           <tbody>
             {
-              this.props.recipes.map(recipe => {
-                return (<RecipeDataRow recipe={recipe} dispatch={this.props.dispatch} key={recipe.id} />)
-              })
+              this.props.recipes.map(recipe =>
+                <RecipeDataRow recipe={recipe} dispatch={this.props.dispatch} key={recipe.id} />
+              )
             }
           </tbody>
         </table>

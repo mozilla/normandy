@@ -107,9 +107,9 @@ export class RecipeForm extends React.Component {
             <select {...action_name} onChange={this.changeAction}>
               <option>Select an action</option>
               {
-                availableActions.map(action => {
-                  return (<option key={action.name} value={action.name}>{action.name}</option>)
-                })
+                availableActions.map(({name}) =>
+                  <option key={name} value={name}>{name}</option>
+                )
               }
             </select>
           </div>

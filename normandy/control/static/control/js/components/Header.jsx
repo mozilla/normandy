@@ -7,11 +7,11 @@ class Header extends React.Component {
     const { pageTitle, subTitle, ctaButtons } = this.props.pageType;
     let ctaBtns;
     if (ctaButtons) {
-      ctaBtns = ctaButtons.map(({text, icon, link}, index) => (
+      ctaBtns = ctaButtons.map(({text, icon, link}, index) =>
         <Link className="button" to={this.props.currentLocation + link}>
           <i className={"pre fa fa-" + icon}></i> {text}
         </Link>
-      ))
+      )
     }
     return (
       <div id="page-header">
