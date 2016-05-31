@@ -45,16 +45,16 @@ function orderPropNames(propsObj) {
   });
 }
 
-export function parseJsonSchema(jsonSchema) {
+function parseJsonSchema(jsonSchema) {
   return $RefParser.dereference(jsonSchema);
 }
 
-export function generateFieldsFromSchema(jsonSchema) {
+function generateFieldsFromSchema(jsonSchema) {
   let props = jsonSchema.properties;
   return processProperties(orderPropNames(props), props);
 }
 
-export function formatLabel(labelName) {
+function formatLabel(labelName) {
   return labelName.replace( /([A-Z])/g, " $1" );
 }
 

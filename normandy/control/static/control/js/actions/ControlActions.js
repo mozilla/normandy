@@ -156,14 +156,14 @@ function shouldFetchRecipes(state) {
   }
 }
 
-export function setSelectedRecipe(recipeId) {
+function setSelectedRecipe(recipeId) {
   return {
     type: SET_SELECTED_RECIPE,
     recipeId
   };
 }
 
-export function makeApiRequest(requestType, settings) {
+function makeApiRequest(requestType, settings) {
   return (dispatch, getState) => {
     let apiRequestConfig = apiRequestMap[requestType](settings, getState);
     if (apiRequestConfig) {
