@@ -5,10 +5,6 @@ import HeartbeatForm from './action_forms/HeartbeatForm.jsx'
 import ConsoleLogForm from './action_forms/ConsoleLogForm.jsx'
 
 export class ActionForm extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     const { fields, arguments_schema, name } = this.props;
 

@@ -3,10 +3,6 @@ import { connect } from 'react-redux'
 import { withRouter, Link } from 'react-router';
 
 class Header extends React.Component {
-  constructor() {
-    super();
-  }
-
   render() {
     const { pageTitle, subTitle, ctaButtons } = this.props.pageType;
     let ctaBtns;

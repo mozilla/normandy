@@ -1,10 +1,6 @@
 import React from 'react'
 
 class ConsoleLogForm extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     const { fields } = this.props;
     return (

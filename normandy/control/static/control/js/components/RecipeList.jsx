@@ -4,10 +4,6 @@ import { push } from 'react-router-redux'
 import ControlActions from '../actions/ControlActions.js'
 
 class RecipeDataRow extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { recipe, dispatch } = this.props;
 

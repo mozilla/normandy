@@ -5,10 +5,6 @@ import { formatLabel } from '../../utils/formHelpers.js'
 
 
 class SurveyForm extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     const { selectedSurvey, fields, setSelectedSurvey } = this.props;
     const surveyObject = selectedSurvey || fields['defaults'];
