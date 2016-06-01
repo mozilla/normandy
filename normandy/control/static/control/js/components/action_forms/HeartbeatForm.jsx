@@ -7,11 +7,11 @@ import { formatLabel } from '../../utils/formHelpers.js'
 class SurveyForm extends React.Component {
   render() {
     const { selectedSurvey, fields, setSelectedSurvey } = this.props;
-    const surveyObject = selectedSurvey || fields['defaults'];
-    let headerText = "Default Survey Values";
+    const surveyObject = selectedSurvey || fields.defaults;
+    let headerText = 'Default Survey Values';
     let containerClass = 'fluid-8';
     if (selectedSurvey) {
-      headerText = selectedSurvey.title.initialValue || "New survey"
+      headerText = selectedSurvey.title.initialValue || 'New survey';
       containerClass += ' active';
     }
 
@@ -60,20 +60,20 @@ class HeartbeatForm extends React.Component {
         <div className="fluid-4">
           <div className="row">
             <label>Survey ID</label>
-            <input type="text" field={fields['surveyId']} {...fields['surveyId']} />
+            <input type="text" field={fields.surveyId} {...fields.surveyId} />
           </div>
           <div className="row array-field">
             <h4>Surveys</h4>
 
             <a className="button add-field" onClick={(e) => {
               e.preventDefault();
-              fields['surveys'].addField();
+              fields.surveys.addField();
             }}><i className="fa fa-plus"></i> Add Survey</a>
 
-            { fields['surveys'].length ?
+            { fields.surveys.length &&
               <ul>
                 {
-                  fields['surveys'].map((childField, index) => {
+                  fields.surveys.map((childField, index) => {
                     return (
                       <li key={index} className={_.isEqual(childField, selectedSurvey) ? 'active' : ''} onClick={(e) => {
                         this.setSelectedSurvey(childField)
@@ -81,14 +81,15 @@ class HeartbeatForm extends React.Component {
                         { childField.title.value || "Untitled Survey" }
                         <span title="Delete this survey" className="delete-field" onClick={(e) => {
                           e.stopPropagation();
-                          fields['surveys'].removeField(index);
+                          fields.surveys.removeField(index);
                           this.setSelectedSurvey();
                         }}><i className="fa fa-times red"></i></span>
                       </li>
                     )
                   })
                 }
-              </ul> : 'No surveys' }
+              </ul>
+            }
           </div>
         </div>
         <div className="fluid-4 float-right">

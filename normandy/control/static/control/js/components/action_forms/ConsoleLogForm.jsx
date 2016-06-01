@@ -5,16 +5,10 @@ class ConsoleLogForm extends React.Component {
     const { fields } = this.props;
     return (
       <div className="row">
-        {
-          Object.keys(fields).map(fieldName => {
-            return (
-              <div key={fieldName} className="fluid-3">
-                <label>{fieldName}</label>
-                 <input type="text" field={fields[fieldName]} {...fields[fieldName]} />
-              </div>
-            )
-          })
-        }
+        <div key="message" className="fluid-3">
+          <label>Message</label>
+           <input type="text" field={fields.message} {...fields.message} />
+        </div>
       </div>
     )
   }

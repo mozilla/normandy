@@ -5,7 +5,7 @@ import { destroy, reduxForm, getValues } from 'redux-form'
 import { _ } from 'underscore'
 
 import apiFetch from '../utils/apiFetch.js';
-import { parseJsonSchema, generateFieldsFromSchema } from '../utils/formHelpers.js';
+import { reduxFormFields } from '../utils/formHelpers.js';
 
 import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
@@ -30,18 +30,15 @@ export class RecipeForm extends React.Component {
       let selectedActionName = (this.props.recipe ? this.props.recipe.action_name : null);
 
       availableActions.map(action => {
-        parseJsonSchema(action.arguments_schema)
-        .then(schema => {
-          action.arguments_schema = schema;
-          action.fields = generateFieldsFromSchema(schema);
+        action.fields = reduxFormFields[action.name];
 
-          if (selectedActionName === action.name) {
-            this.setState({
-              selectedAction: action
-            });
-          }
-          return action;
-        })
+        if (selectedActionName === action.name) {
+          this.setState({
+            selectedAction: action
+          });
+        }
+
+        return action;
       });
 
       this.setState({
