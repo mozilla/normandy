@@ -18,23 +18,18 @@ class SurveyForm extends React.Component {
     return (
       <div id='survey-form' className={containerClass}>
         { selectedSurvey &&
-          <a className="return-to-defaults" href="#" onClick={(e) => {
-            e.preventDefault();
-            setSelectedSurvey()
-          }}>
+          <span className="return-to-defaults" onClick={setSelectedSurvey.bind(this, null)}>
             <i className="fa fa-long-arrow-left pre"></i> Return to defaults
-          </a>
+          </span>
         }
         <h4>{headerText}</h4>
         {
-          Object.keys(surveyObject).map(fieldName => {
-            return (
-              <div key={fieldName} className="row">
-                <label>{formatLabel(fieldName)}</label>
-                <input type="text" field={surveyObject[fieldName]} {...surveyObject[fieldName]} />
-              </div>
-            )
-          })
+          Object.keys(surveyObject).map(fieldName =>
+            <div key={fieldName} className="row">
+              <label>{formatLabel(fieldName)}</label>
+              <input type="text" field={surveyObject[fieldName]} {...surveyObject[fieldName]} />
+            </div>
+          )
         }
       </div>
     )
@@ -52,6 +47,17 @@ class HeartbeatForm extends React.Component {
     this.setState({ selectedSurvey: survey || null });
   }
 
+  addSurvey(event) {
+    event.preventDefault();
+    this.props.fields.surveys.addField();
+  }
+
+  deleteSurvey(index, event) {
+    event.stopPropagation();
+    this.props.fields.surveys.removeField(index);
+    this.setSelectedSurvey();
+  }
+
   render() {
     const { fields, setSelectedSurvey } = this.props;
     const { selectedSurvey } = this.state;
@@ -65,30 +71,21 @@ class HeartbeatForm extends React.Component {
           <div className="row array-field">
             <h4>Surveys</h4>
 
-            <a className="button add-field" onClick={(e) => {
-              e.preventDefault();
-              fields.surveys.addField();
-            }}><i className="fa fa-plus"></i> Add Survey</a>
+            <a className="button add-field" onClick={this.addSurvey.bind(this)}><i className="fa fa-plus"></i> Add Survey</a>
 
-            { fields.surveys.length &&
+            { fields.surveys.length ?
               <ul>
                 {
-                  fields.surveys.map((childField, index) => {
-                    return (
-                      <li key={index} className={_.isEqual(childField, selectedSurvey) ? 'active' : ''} onClick={(e) => {
-                        this.setSelectedSurvey(childField)
-                      }}>
-                        { childField.title.value || "Untitled Survey" }
-                        <span title="Delete this survey" className="delete-field" onClick={(e) => {
-                          e.stopPropagation();
-                          fields.surveys.removeField(index);
-                          this.setSelectedSurvey();
-                        }}><i className="fa fa-times red"></i></span>
-                      </li>
-                    )
-                  })
+                  fields.surveys.map((survey, index) =>
+                    <li key={index} className={_.isEqual(survey, selectedSurvey) ? 'active' : ''} onClick={this.setSelectedSurvey.bind(this, survey)}>
+                      { survey.title.value || "Untitled Survey" }
+                      <span title="Delete this survey" className="delete-field" onClick={this.deleteSurvey.bind(this, index)}>
+                        <i className="fa fa-times red"></i>
+                      </span>
+                    </li>
+                  )
                 }
-              </ul>
+              </ul> : ' - No surveys'
             }
           </div>
         </div>

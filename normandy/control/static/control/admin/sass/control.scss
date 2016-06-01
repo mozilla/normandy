@@ -269,11 +269,16 @@
     position: relative;
     transition: all 0.2s;
 
-    a.return-to-defaults {
+    span.return-to-defaults {
       font-size: 11px;
       position: absolute;
       right: 20px;
       top: 15px;
+
+      &:hover {
+        color: $ctaHover;
+        cursor: pointer;
+      }
     }
   }
 }
