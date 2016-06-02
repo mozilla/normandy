@@ -3,3 +3,4 @@ test:
     - ./node_modules/.bin/jpm test --tbpl --binary /usr/bin/firefox | tee jpm.tbpl
   post:
     - woodchipper --timeout 600000 < jpm.tbpl > $CIRCLE_TEST_REPORTS/jpm.xml
+    - ./node_modules/.bin/jpm xpi && mv @recipe-client-*.xpi $CIRCLE_ARTIFACTS/recipe-client.xpi
