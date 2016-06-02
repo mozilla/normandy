@@ -284,4 +284,16 @@ describe('ShowHeartbeatAction', function() {
         expect(flowData.extra.syncSetup).toEqual(client.syncSetup);
         expect(flowData.extra.defaultBrowser).toEqual(client.isDefaultBrowser);
     });
+
+    it('should save flow data via normandy.saveHeartbeatFlow', async function() {
+        let recipe = recipeFactory();
+        let action = new ShowHeartbeatAction(this.normandy, recipe);
+        let survey = recipe.arguments.surveys[0];
+        let longString = 'A 50 character string.............................';
+        survey.message = longString + 'XXXXXXXXXX';
+        this.normandy.testing = true;
+        await action.execute();
+        let flowData = this.normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
+        expect(flowData.question_id).toEqual(longString);
+    });
 });
