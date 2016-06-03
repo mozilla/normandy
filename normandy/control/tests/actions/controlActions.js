@@ -105,7 +105,7 @@ describe('controlApp Actions', () => {
     expect(store.getActions()).toEqual([]);
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching a single recipe is successful', () => {
+  it('creates SINGLE_RECIPE_RECEIVED when fetching a single RECIPE is successful', () => {
     const expectedAction = { type: actionTypes.SINGLE_RECIPE_RECEIVED, recipe: fixtureRecipes[0] };
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
 
@@ -117,14 +117,14 @@ describe('controlApp Actions', () => {
       })
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching a single revision is successful', () => {
+  it('creates SINGLE_RECIPE_RECEIVED when fetching a single REVISION is successful', () => {
     const expectedAction = { type: actionTypes.SINGLE_RECIPE_RECEIVED, recipe: fixtureRevisions[0].recipe };
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRevisions[0]));
 
     return store.dispatch(controlActions.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
       .then(() => {
         expect(window.fetch).toHaveBeenCalled();
-        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe_version/1/?format=json&', jasmine.any(Object));
+        expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe_version/169/?format=json&', jasmine.any(Object));
         expect(store.getActions()).toContain(expectedAction);
       })
   });

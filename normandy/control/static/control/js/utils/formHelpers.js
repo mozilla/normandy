@@ -14,7 +14,7 @@ const reduxFormFields = {
 }
 
 function formatLabel(labelName) {
-  return labelName.replace( /([A-Z])/g, " $1" );
+  return labelName.replace( /([A-Z])/g, " $1" ).toLowerCase();
 }
 
 export {
