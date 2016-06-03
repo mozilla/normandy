@@ -29,7 +29,7 @@ export class RecipeForm extends React.Component {
     .then(availableActions => {
       let selectedActionName = (this.props.recipe ? this.props.recipe.action_name : null);
 
-      availableActions.map(action => {
+      for (let action of availableActions) {
         action.fields = reduxFormFields[action.name];
 
         if (selectedActionName === action.name) {
@@ -37,9 +37,7 @@ export class RecipeForm extends React.Component {
             selectedAction: action
           });
         }
-
-        return action;
-      });
+      };
 
       this.setState({
         availableActions
