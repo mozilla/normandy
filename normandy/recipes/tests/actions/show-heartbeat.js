@@ -284,4 +284,30 @@ describe('ShowHeartbeatAction', function() {
         expect(flowData.extra.syncSetup).toEqual(client.syncSetup);
         expect(flowData.extra.defaultBrowser).toEqual(client.isDefaultBrowser);
     });
+
+    it('should truncate long values in flow data', async function() {
+        let longString = 'A 50 character string.............................';
+        let tooLongString = longString + 'XXXXXXXXXX';
+
+        let recipe = recipeFactory();
+        let action = new ShowHeartbeatAction(this.normandy, recipe);
+        let survey = recipe.arguments.surveys[0];
+
+        survey.message = tooLongString;
+        this.normandy.locale = tooLongString;
+        this.normandy.mock.client.channel = tooLongString;
+        this.normandy.mock.client.version = tooLongString;
+        this.normandy.mock.location.countryCode = tooLongString;
+
+        await action.execute();
+
+        // Checking per field makes recognizing which field failed
+        // _much_ easier.
+        let flowData = this.normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
+        expect(flowData.question_id).toEqual(longString);
+        expect(flowData.locale).toEqual(longString);
+        expect(flowData.channel).toEqual(longString);
+        expect(flowData.version).toEqual(longString);
+        expect(flowData.country).toEqual('a 50');
+    });
 });
