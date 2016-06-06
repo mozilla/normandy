@@ -6,7 +6,7 @@ import { formatLabel } from '../../utils/formHelpers.js'
 
 class SurveyForm extends React.Component {
   render() {
-    const { selectedSurvey, fields, setSelectedSurvey } = this.props;
+    const { selectedSurvey, fields, showDefaults } = this.props;
     const surveyObject = selectedSurvey || fields.defaults;
     let headerText = 'Default Survey Values';
     let containerClass = 'fluid-8';
@@ -18,7 +18,7 @@ class SurveyForm extends React.Component {
     return (
       <div id='survey-form' className={containerClass}>
         { selectedSurvey &&
-          <span className="return-to-defaults" onClick={setSelectedSurvey.bind(this, null)}>
+          <span className="return-to-defaults" onClick={showDefaults}>
             <i className="fa fa-long-arrow-left pre"></i> Return to defaults
           </span>
         }
@@ -41,10 +41,15 @@ class HeartbeatForm extends React.Component {
     super(props)
     this.state = { selectedSurvey: null }
     this.setSelectedSurvey = this.setSelectedSurvey.bind(this);
+    this.showDefaults = this.showDefaults.bind(this);
   }
 
   setSelectedSurvey(survey) {
     this.setState({ selectedSurvey: survey || null });
+  }
+
+  showDefaults() {
+    this.setState({ selectedSurvey: null });
   }
 
   addSurvey(event) {
@@ -90,7 +95,7 @@ class HeartbeatForm extends React.Component {
           </div>
         </div>
         <div className="fluid-4 float-right">
-          <SurveyForm selectedSurvey={selectedSurvey} fields={fields} setSelectedSurvey={this.setSelectedSurvey} />
+          <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={this.showDefaults} />
         </div>
       </div>
     )
