@@ -10,6 +10,7 @@ if settings.ADMIN_ENABLED:
     urlpatterns += [url(r'^admin/', admin.site.urls)]
 
 urlpatterns += [
+    url(r'', include('normandy.base.urls')),
     url(r'', include('normandy.recipes.urls')),
     url(r'', include('normandy.selfrepair.urls')),
     url(r'', include('normandy.control.urls')),
