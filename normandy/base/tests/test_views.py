@@ -1,3 +1,2 @@
 def test_index(client):
-    url = '/'
-    assert client.get(url).status_code == 200
+    assert client.get('/').status_code == 200
