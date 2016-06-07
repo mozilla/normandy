@@ -1,29 +1,7 @@
-Architecture
-============
-Normandy is a component in a larger system called SHIELD. The end goal of
-SHIELD is to allow Firefox to perform a variety of actions to aid the user and
-gather feedback to guide us in developing a better browser for them. To do
-this, we need a way to instruct Firefox to perform certain actions without
-having to download an update or wait for a new release.
-
-To accomplish this goal, the SHIELD system consists of:
-
-Normandy
-   Service that acts as the source of actions that we wish to perform, and
-   determines which users receive which recipes.
-Self-Repair Client
-   Ships with Firefox and handles fetching recipes and action implementations
-   from Normandy and executing them within Firefox.
-
 Self-Repair Protocol
---------------------
+====================
 The following section describes how Firefox retrieves and executes recipes from
-Normandy.
-
-.. image:: /resources/self-repair-sequence.png
-   :width: 460
-   :height: 535
-   :align: center
+Normandy via the self-repair iframe.
 
 When Firefox is launched by a user, it makes the following series of requests:
 
