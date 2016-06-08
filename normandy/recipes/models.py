@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.utils import timezone
@@ -118,7 +119,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.enabled and self.approval is None:
+        if self.enabled and self.approval is None and settings.REQUIRE_RECIPE_AUTH:
             raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
 
         # Check for changes that should disable the recipe
