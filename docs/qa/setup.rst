@@ -16,9 +16,11 @@ This guide assumes you have already installed and set up the following:
 
 Getting the code
 ----------------
-We'll be using Docker Compose to run Normandy and the need services. The
-repository ``normandy-compose`` contains the ``docker-compose.yml`` file to
+We'll be using Docker Compose to run Normandy and the needed services. The
+repository normandy-compose_ contains the ``docker-compose.yml`` file to
 describe a Normandy system.
+
+.. _normandy-compose: https://github.com/mozilla/normandy-compose.git
 
 .. code-block:: shell
 
