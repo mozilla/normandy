@@ -182,6 +182,7 @@ class Base(Core):
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
     SECURE_CONTENT_TYPE_NOSNIFF = values.BooleanValue(True)
     X_FRAME_OPTIONS = values.Value('DENY')
+    REQUIRE_RECIPE_AUTH = values.BooleanValue(True)
 
     # Media and static settings
     STATIC_URL = values.Value('/static/')
@@ -216,6 +217,7 @@ class Development(Base):
     INSTALLED_APPS = Base.INSTALLED_APPS + ['sslserver']
     EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
     SECURE_SSL_REDIRECT = values.Value(False)
+    REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
 
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(True)
 
