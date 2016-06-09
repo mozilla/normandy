@@ -153,9 +153,11 @@ let Normandy = {
                 options.postAnswerUrl,
                 options.learnMoreMessage,
                 options.learnMoreUrl,
-                options.surveyId,
-                options.surveyVersion,
-                options.testing
+                {
+                    surveyId: options.surveyId,
+                    surveyVersion: options.surveyVersion,
+                    testing: options.testing
+                }
             );
 
             resolve(emitter);

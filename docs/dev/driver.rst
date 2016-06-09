@@ -55,7 +55,7 @@ The driver object contains the following attributes:
    :param learnMoreUrl: URL to open when the "Learn More" button is clicked.
    :param surveyId: Extra data to be stored in telemetry.
    :param surveyVersion: Extra data to be stored in telemetry.
-   :param testing: Extra data to be stored in telemetry when Normandy is in testing.
+   :param testing: Extra data to be stored in telemetry when Normandy is in testing mode.
    :returns: A Promise that resolves with an event emitter.
 
    The emitter returned by this function can be subscribed to using ``on``

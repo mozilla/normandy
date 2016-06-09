@@ -116,8 +116,6 @@ export default class ShowHeartbeatAction extends Action {
         let flow = new HeartbeatFlow(this);
         flow.save();
 
-        // Object declared for showHeartbeat call below, so that optional
-        //telemetry arg can be added if necessary
         // A bit redundant but the action argument names shouldn't necessarily rely
         // on the argument names showHeartbeat takes.
 
