@@ -153,7 +153,9 @@ let Normandy = {
                 options.postAnswerUrl,
                 options.learnMoreMessage,
                 options.learnMoreUrl,
-                options
+                options.surveyId,
+                options.surveyVersion,
+                options.testing
             );
 
             resolve(emitter);

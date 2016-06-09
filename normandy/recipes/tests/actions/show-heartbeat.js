@@ -170,14 +170,12 @@ describe('ShowHeartbeatAction', function() {
 
         await action.execute();
         expect(this.normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-            extraTelemetryArgs: {
-                surveyId: 'my-survey',
-                surveyVersion: 42,
-            },
+            surveyId: 'my-survey',
+            surveyVersion: 42,
         }));
     });
 
-    it('should include a testing argument in extraTelemetryArgs when in testing mode', async function() {
+    it('should include a testing argument when in testing mode', async function() {
         let recipe = recipeFactory({revision_id: 42});
         recipe.arguments.surveyId = 'my-survey';
         let action = new ShowHeartbeatAction(this.normandy, recipe);
@@ -186,11 +184,9 @@ describe('ShowHeartbeatAction', function() {
 
         await action.execute();
         expect(this.normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-            extraTelemetryArgs: {
-                surveyId: 'my-survey',
-                surveyVersion: 42,
-                testing: 1,
-            },
+            surveyId: 'my-survey',
+            surveyVersion: 42,
+            testing: 1,
         }));
     });
 

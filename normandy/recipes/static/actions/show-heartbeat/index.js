@@ -116,17 +116,12 @@ export default class ShowHeartbeatAction extends Action {
         let flow = new HeartbeatFlow(this);
         flow.save();
 
-        let extraTelemetryArgs = {
-            surveyId: surveyId,
-            surveyVersion: this.recipe.revision_id,
-        };
-        if (this.normandy.testing) {
-            extraTelemetryArgs.testing = 1;
-        }
-
+        // Object declared for showHeartbeat call below, so that optional
+        //telemetry arg can be added if necessary
         // A bit redundant but the action argument names shouldn't necessarily rely
         // on the argument names showHeartbeat takes.
-        let heartbeat = await this.normandy.showHeartbeat({
+
+        var heartbeatData = {
             message: this.survey.message,
             engagementButtonLabel: this.survey.engagementButtonLabel,
             thanksMessage: this.survey.thanksMessage,
@@ -134,8 +129,15 @@ export default class ShowHeartbeatAction extends Action {
             postAnswerUrl: await this.annotatePostAnswerUrl(this.survey.postAnswerUrl),
             learnMoreMessage: this.survey.learnMoreMessage,
             learnMoreUrl: this.survey.learnMoreUrl,
-            extraTelemetryArgs: extraTelemetryArgs,
-        });
+            surveyId: surveyId,
+            surveyVersion: this.recipe.revision_id
+        };
+
+        if (this.normandy.testing) {
+            heartbeatData.testing = 1;
+        }
+
+        let heartbeat = await this.normandy.showHeartbeat(heartbeatData);
 
         heartbeat.on('NotificationOffered', data => {
             flow.setPhaseTimestamp('offered', data.timestamp);
