@@ -90,6 +90,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = [
             'id',
+            'last_updated',
             'name',
             'enabled',
             'revision_id',
