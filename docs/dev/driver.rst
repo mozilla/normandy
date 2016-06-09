@@ -53,9 +53,9 @@ The driver object contains the following attributes:
       the user won't be shown anything.
    :param learnMoreMessage: Text to show on the "Learn More" button.
    :param learnMoreUrl: URL to open when the "Learn More" button is clicked.
-   :param extraTelemetryArgs: Object containing extra arguments to send to
-      telemetry associated with this heartbeat call. Defaults to an empty
-      object.
+   :param surveyId: Extra data to be stored in telemetry.
+   :param surveyVersion: Extra data to be stored in telemetry.
+   :param testing: Extra data to be stored in telemetry when Normandy is in testing mode.
    :returns: A Promise that resolves with an event emitter.
 
    The emitter returned by this function can be subscribed to using ``on``
