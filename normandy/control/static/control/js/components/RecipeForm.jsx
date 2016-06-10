@@ -11,6 +11,8 @@ import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import ActionForm from './ActionForm.jsx'
 
+import FormField from './form_fields/FormFieldWrapper.jsx';
+
 export class RecipeForm extends React.Component {
   constructor(props) {
     super(props);
@@ -59,41 +61,25 @@ export class RecipeForm extends React.Component {
   render() {
     const { fields: { name, filter_expression, enabled, action_name }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
     const { availableActions, selectedAction } = this.state;
+
     return (
       <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form">
+
         { viewingRevision &&
           <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
           </p>
         }
-        <div className="row">
-          <div className="fluid-3">
-            <label>Name</label>
-            <input type="text" field={name} {...name} />
-          </div>
-        </div>
-        <div className="row">
-          <div className="fluid-3">
-            <label>Filter Expression</label>
-            <textarea field={filter_expression} {...filter_expression} />
-          </div>
-        </div>
-        <div className="row">
-          <div className="fluid-3">
-            <label>Action</label>
-            <select {...action_name} onChange={::this.changeAction}>
-              <option>Select an action</option>
-              {
-                availableActions.map((name) =>
-                  <option key={name} value={name}>{name}</option>
-                )
-              }
-            </select>
-          </div>
-          { selectedAction &&
-            <ActionForm recipe={recipe} {...selectedAction} />
-          }
-        </div>
+
+        <FormField type="text" label="Name" field={name} containerClass="fluid-3" />
+        <FormField type="textarea" label="Filter Expression" field={filter_expression} containerClass="fluid-3" />
+        <FormField type="select" label="Action" field={action_name} containerClass="fluid-3"
+          options={availableActions}
+          onChange={::this.changeAction}
+        />
+
+        { selectedAction && <ActionForm recipe={recipe} {...selectedAction} /> }
+
         <div className="row form-action-buttons">
           <div className="fluid-2">
             {recipeId ? <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>Delete</Link> : ''}
@@ -102,6 +88,7 @@ export class RecipeForm extends React.Component {
             <button className="button" type="submit">Submit</button>
           </div>
         </div>
+
       </form>
     )
   }

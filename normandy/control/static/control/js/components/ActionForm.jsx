@@ -7,7 +7,6 @@ import ConsoleLogForm from './action_forms/ConsoleLogForm.jsx'
 export class ActionForm extends React.Component {
   render() {
     const { fields, name } = this.props;
-
     let childForm = 'No action form available';
 
     switch(name) {
