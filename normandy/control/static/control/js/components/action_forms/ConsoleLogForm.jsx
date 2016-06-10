@@ -5,7 +5,7 @@ class ConsoleLogForm extends React.Component {
     const { fields } = this.props;
     return (
       <div className="row">
-        <div key="message" className="fluid-3">
+        <div className="fluid-3">
           <label>Message</label>
            <input type="text" field={fields.message} {...fields.message} />
         </div>
