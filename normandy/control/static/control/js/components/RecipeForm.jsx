@@ -5,7 +5,6 @@ import { destroy, reduxForm, getValues } from 'redux-form'
 import { _ } from 'underscore'
 
 import apiFetch from '../utils/apiFetch.js';
-import { reduxFormFields } from '../utils/formHelpers.js';
 
 import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
@@ -30,7 +29,7 @@ export class RecipeForm extends React.Component {
     dispatch(destroy('action'));
     fields.action_name.onChange(event);
     this.setState({
-      selectedAction: { name: selectedActionName, fields: reduxFormFields[selectedActionName] }
+      selectedAction: { name: selectedActionName }
     });
   }
 
@@ -53,7 +52,7 @@ export class RecipeForm extends React.Component {
     if (!this.state.selectedAction && nextProps.recipe) {
       let selectedActionName = nextProps.recipe.action_name;
       this.setState({
-        selectedAction: { name: selectedActionName, fields: reduxFormFields[selectedActionName] }
+        selectedAction: { name: selectedActionName }
       });
     }
   }

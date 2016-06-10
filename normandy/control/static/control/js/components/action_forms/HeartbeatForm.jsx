@@ -2,8 +2,17 @@ import React from 'react'
 import { reduxForm } from 'redux-form'
 import classNames from 'classnames'
 import { _ } from 'underscore'
-import { formatLabel } from '../../utils/formHelpers.js'
 import FormField from '../form_fields/FormFieldWrapper.jsx';
+
+export const HeartbeatFormFields = [
+  'surveyId',
+  'defaults.message', 'defaults.engagementButtonLabel', 'defaults.thanksMessage',
+  'defaults.postAnswerUrl', 'defaults.learnMoreMessage', 'defaults.learnMoreUrl',
+  'surveys[].title', 'surveys[].message', 'surveys[].engagementButtonLabel', 'surveys[].thanksMessage',
+  'surveys[].postAnswerUrl','surveys[].learnMoreMessage', 'surveys[].learnMoreUrl', 'surveys[].weight'
+];
+
+const formatLabel = (labelName) => labelName.replace( /([A-Z])/g, " $1" ).toLowerCase();
 
 const SurveyListItem = (props) => {
   const { survey, surveyIndex, isSelected, deleteSurvey, onClick } = props;
@@ -81,33 +90,32 @@ class HeartbeatForm extends React.Component {
       <div className="row">
         <p className="help row">This action can show a single survey, or choose a single survey from multiple weighted ones.</p>
         <div className="fluid-4">
-            <FormField type="text" label="Survey ID" field={fields.surveyId} />
-            <div className="row array-field">
-              <h4>Surveys</h4>
+          <FormField type="text" label="Survey ID" field={fields.surveyId} />
+          <div className="row array-field">
+            <h4>Surveys</h4>
+            <a className="button add-field" onClick={::this.addSurvey}><i className="fa fa-plus"></i> Add Survey</a>
 
-              <a className="button add-field" onClick={::this.addSurvey}><i className="fa fa-plus"></i> Add Survey</a>
-
-              { fields.surveys.length ?
-                <ul>
-                  {
-                    fields.surveys.map((survey, index) =>
-                      <SurveyListItem
-                        key={index}
-                        survey={survey}
-                        surveyIndex={index}
-                        isSelected={_.isEqual(survey, selectedSurvey)}
-                        onClick={() => ::this.setSelectedSurvey(survey)}
-                        deleteSurvey={::this.deleteSurvey}
-                      />
-                    )
-                  }
-                </ul> : ' - No surveys'
-              }
-            </div>
+            { fields.surveys.length ?
+              <ul>
+                {
+                  fields.surveys.map((survey, index) =>
+                    <SurveyListItem
+                      key={index}
+                      survey={survey}
+                      surveyIndex={index}
+                      isSelected={_.isEqual(survey, selectedSurvey)}
+                      onClick={() => ::this.setSelectedSurvey(survey)}
+                      deleteSurvey={::this.deleteSurvey}
+                    />
+                  )
+                }
+              </ul> : ' - No surveys'
+            }
           </div>
-          <div className="fluid-4 float-right">
-            <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={::this.showDefaults} />
-          </div>
+        </div>
+        <div className="fluid-4 float-right">
+          <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={::this.showDefaults} />
+        </div>
       </div>
     )
   }

@@ -1,27 +1,16 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
-import { _ } from 'underscore'
-import HeartbeatForm from './action_forms/HeartbeatForm.jsx'
-import ConsoleLogForm from './action_forms/ConsoleLogForm.jsx'
+import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.jsx'
+import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.jsx'
 
 export class ActionForm extends React.Component {
   render() {
-    const { fields, name } = this.props;
-    let childForm = 'No action form available';
-
-    switch(name) {
-      case 'show-heartbeat':
-        childForm = (<HeartbeatForm fields={fields} />);
-        break;
-      case 'console-log':
-        childForm = (<ConsoleLogForm fields={fields} />);
-        break;
-    }
+    const { fields, name, ChildForm } = this.props;
 
     return (
       <div id="action-configuration">
         <i className="fa fa-caret-up fa-lg"></i>
-        {childForm}
+        <ChildForm fields={fields} />
       </div>
     )
   }
@@ -31,11 +20,27 @@ export default reduxForm({
     form: 'action',
   }, (state, props) => {
     let initialValues = {};
+    let fields = [];
+    let ChildForm = null;
+
+    switch(props.name) {
+      case 'show-heartbeat':
+        ChildForm = HeartbeatForm;
+        fields = HeartbeatFormFields;
+        break;
+      case 'console-log':
+        ChildForm = ConsoleLogForm;
+        fields = ConsoleLogFormFields;
+        break;
+    }
+
     if (props.recipe && props.recipe.action_name === props.name) {
       initialValues = props.recipe['arguments'];
     }
 
     return {
-      initialValues
+      initialValues,
+      fields,
+      ChildForm
     }
 })(ActionForm)

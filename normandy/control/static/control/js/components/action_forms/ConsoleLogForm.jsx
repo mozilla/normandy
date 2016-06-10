@@ -1,6 +1,8 @@
 import React from 'react'
 import FormField from '../form_fields/FormFieldWrapper.jsx';
 
+export const ConsoleLogFormFields = ['message'];
+
 class ConsoleLogForm extends React.Component {
   render() {
     const { fields } = this.props;
