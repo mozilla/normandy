@@ -1,5 +1,6 @@
 import React from 'react'
 import { reduxForm } from 'redux-form'
+import classNames from 'classnames'
 import { _ } from 'underscore'
 import { formatLabel } from '../../utils/formHelpers.js'
 
@@ -9,14 +10,17 @@ class SurveyForm extends React.Component {
     const { selectedSurvey, fields, showDefaults } = this.props;
     const surveyObject = selectedSurvey || fields.defaults;
     let headerText = 'Default Survey Values';
-    let containerClass = 'fluid-8';
+    let containerClasses = classNames({
+      'fluid-8': true,
+      'active': selectedSurvey
+    });
+
     if (selectedSurvey) {
       headerText = selectedSurvey.title.initialValue || 'New survey';
-      containerClass += ' active';
     }
 
     return (
-      <div id='survey-form' className={containerClass}>
+      <div id='survey-form' className={containerClasses}>
         { selectedSurvey &&
           <span className="return-to-defaults" onClick={showDefaults}>
             <i className="fa fa-long-arrow-left pre"></i> Return to defaults
