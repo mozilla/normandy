@@ -2,14 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import { destroy, reduxForm, getValues } from 'redux-form'
-import { _ } from 'underscore'
 
 import apiFetch from '../utils/apiFetch.js';
-
 import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import ActionForm from './ActionForm.jsx'
-
 import FormField from './form_fields/FormFieldWrapper.jsx';
 
 export class RecipeForm extends React.Component {
