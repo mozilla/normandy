@@ -10,7 +10,6 @@ class RecipeHistory extends React.Component {
     this.state = {
       revisionLog: []
     }
-    this.getHistory = this.getHistory.bind(this);
   }
 
   getHistory(recipeId) {

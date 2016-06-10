@@ -14,9 +14,6 @@ import ActionForm from './ActionForm.jsx'
 export class RecipeForm extends React.Component {
   constructor(props) {
     super(props);
-    this.submitForm = this.submitForm.bind(this);
-    this.getAvailableActions = this.getAvailableActions.bind(this);
-    this.changeAction = this.changeAction.bind(this);
 
     this.state = {
       availableActions: [],
@@ -24,7 +21,7 @@ export class RecipeForm extends React.Component {
     };
   }
 
-  getAvailableActions(recipeId) {
+  getAvailableActions() {
     apiFetch('/api/v1/action/')
     .then(availableActions => {
       let selectedActionName = (this.props.recipe ? this.props.recipe.action_name : null);
@@ -79,7 +76,7 @@ export class RecipeForm extends React.Component {
     const { fields: { name, filter_expression, enabled, action_name }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
     const { availableActions, selectedAction } = this.state;
     return (
-      <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
+      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form">
         { viewingRevision &&
           <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
@@ -100,7 +97,7 @@ export class RecipeForm extends React.Component {
         <div className="row">
           <div className="fluid-3">
             <label>Action</label>
-            <select {...action_name} onChange={this.changeAction}>
+            <select {...action_name} onChange={::this.changeAction}>
               <option>Select an action</option>
               {
                 availableActions.map(({name}) =>

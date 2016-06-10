@@ -44,8 +44,6 @@ class HeartbeatForm extends React.Component {
   constructor(props) {
     super(props)
     this.state = { selectedSurvey: null }
-    this.setSelectedSurvey = this.setSelectedSurvey.bind(this);
-    this.showDefaults = this.showDefaults.bind(this);
   }
 
   setSelectedSurvey(survey) {
@@ -61,14 +59,16 @@ class HeartbeatForm extends React.Component {
     this.props.fields.surveys.addField();
   }
 
-  deleteSurvey(index, event) {
+  deleteSurvey(event) {
+    let index = event.currentTarget.dataset.surveyIndex;
+
     event.stopPropagation();
     this.props.fields.surveys.removeField(index);
     this.setSelectedSurvey();
   }
 
   render() {
-    const { fields, setSelectedSurvey } = this.props;
+    const { fields } = this.props;
     const { selectedSurvey } = this.state;
     return (
       <div className="row">
@@ -80,15 +80,15 @@ class HeartbeatForm extends React.Component {
           <div className="row array-field">
             <h4>Surveys</h4>
 
-            <a className="button add-field" onClick={this.addSurvey.bind(this)}><i className="fa fa-plus"></i> Add Survey</a>
+            <a className="button add-field" onClick={::this.addSurvey}><i className="fa fa-plus"></i> Add Survey</a>
 
             { fields.surveys.length ?
               <ul>
                 {
                   fields.surveys.map((survey, index) =>
-                    <li key={index} className={_.isEqual(survey, selectedSurvey) ? 'active' : ''} onClick={this.setSelectedSurvey.bind(this, survey)}>
+                    <li key={index} className={_.isEqual(survey, selectedSurvey) ? 'active' : ''} onClick={() => ::this.setSelectedSurvey(survey)}>
                       { survey.title.value || "Untitled Survey" }
-                      <span title="Delete this survey" className="delete-field" onClick={this.deleteSurvey.bind(this, index)}>
+                      <span title="Delete this survey" className="delete-field" data-survey-index={index} onClick={::this.deleteSurvey}>
                         <i className="fa fa-times red"></i>
                       </span>
                     </li>
@@ -99,7 +99,7 @@ class HeartbeatForm extends React.Component {
           </div>
         </div>
         <div className="fluid-4 float-right">
-          <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={this.showDefaults} />
+          <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={::this.showDefaults} />
         </div>
       </div>
     )
