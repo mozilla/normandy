@@ -6,7 +6,7 @@ import ConsoleLogForm from './action_forms/ConsoleLogForm.jsx'
 
 export class ActionForm extends React.Component {
   render() {
-    const { fields, arguments_schema, name } = this.props;
+    const { fields, name } = this.props;
 
     let childForm = 'No action form available';
 
@@ -22,9 +22,6 @@ export class ActionForm extends React.Component {
     return (
       <div id="action-configuration">
         <i className="fa fa-caret-up fa-lg"></i>
-        <div className="row">
-          <p className="help fluid-4">{arguments_schema.description || arguments_schema.title }</p>
-        </div>
         {childForm}
       </div>
     )

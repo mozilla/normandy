@@ -16,30 +16,9 @@ export class RecipeForm extends React.Component {
     super(props);
 
     this.state = {
-      availableActions: [],
+      availableActions: ['console-log', 'show-heartbeat'],
       selectedAction: null,
     };
-  }
-
-  getAvailableActions() {
-    apiFetch('/api/v1/action/')
-    .then(availableActions => {
-      let selectedActionName = (this.props.recipe ? this.props.recipe.action_name : null);
-
-      for (let action of availableActions) {
-        action.fields = reduxFormFields[action.name];
-
-        if (selectedActionName === action.name) {
-          this.setState({
-            selectedAction: action
-          });
-        }
-      };
-
-      this.setState({
-        availableActions
-      });
-    });
   }
 
   changeAction(event) {
@@ -49,7 +28,7 @@ export class RecipeForm extends React.Component {
     dispatch(destroy('action'));
     fields.action_name.onChange(event);
     this.setState({
-      selectedAction: this.state.availableActions.find(action => action.name === selectedActionName)
+      selectedAction: { name: selectedActionName, fields: reduxFormFields[selectedActionName] }
     });
   }
 
@@ -68,8 +47,13 @@ export class RecipeForm extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.getAvailableActions();
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.selectedAction && nextProps.recipe) {
+      let selectedActionName = nextProps.recipe.action_name;
+      this.setState({
+        selectedAction: { name: selectedActionName, fields: reduxFormFields[selectedActionName] }
+      });
+    }
   }
 
   render() {
@@ -100,7 +84,7 @@ export class RecipeForm extends React.Component {
             <select {...action_name} onChange={::this.changeAction}>
               <option>Select an action</option>
               {
-                availableActions.map(({name}) =>
+                availableActions.map((name) =>
                   <option key={name} value={name}>{name}</option>
                 )
               }

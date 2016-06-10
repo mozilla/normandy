@@ -71,35 +71,40 @@ class HeartbeatForm extends React.Component {
     const { fields } = this.props;
     const { selectedSurvey } = this.state;
     return (
-      <div className="row">
-        <div className="fluid-4">
-          <div className="row">
-            <label>Survey ID</label>
-            <input type="text" field={fields.surveyId} {...fields.surveyId} />
-          </div>
-          <div className="row array-field">
-            <h4>Surveys</h4>
-
-            <a className="button add-field" onClick={::this.addSurvey}><i className="fa fa-plus"></i> Add Survey</a>
-
-            { fields.surveys.length ?
-              <ul>
-                {
-                  fields.surveys.map((survey, index) =>
-                    <li key={index} className={_.isEqual(survey, selectedSurvey) ? 'active' : ''} onClick={() => ::this.setSelectedSurvey(survey)}>
-                      { survey.title.value || "Untitled Survey" }
-                      <span title="Delete this survey" className="delete-field" data-survey-index={index} onClick={::this.deleteSurvey}>
-                        <i className="fa fa-times red"></i>
-                      </span>
-                    </li>
-                  )
-                }
-              </ul> : ' - No surveys'
-            }
-          </div>
+      <div>
+        <div className="row">
+          <p className="help fluid-4">This action can show a single survey, or choose a single survey from multiple weighted ones.</p>
         </div>
-        <div className="fluid-4 float-right">
-          <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={::this.showDefaults} />
+        <div className="row">
+          <div className="fluid-4">
+            <div className="row">
+              <label>Survey ID</label>
+              <input type="text" field={fields.surveyId} {...fields.surveyId} />
+            </div>
+            <div className="row array-field">
+              <h4>Surveys</h4>
+
+              <a className="button add-field" onClick={::this.addSurvey}><i className="fa fa-plus"></i> Add Survey</a>
+
+              { fields.surveys.length ?
+                <ul>
+                  {
+                    fields.surveys.map((survey, index) =>
+                      <li key={index} className={_.isEqual(survey, selectedSurvey) ? 'active' : ''} onClick={() => ::this.setSelectedSurvey(survey)}>
+                        { survey.title.value || "Untitled Survey" }
+                        <span title="Delete this survey" className="delete-field" data-survey-index={index} onClick={::this.deleteSurvey}>
+                          <i className="fa fa-times red"></i>
+                        </span>
+                      </li>
+                    )
+                  }
+                </ul> : ' - No surveys'
+              }
+            </div>
+          </div>
+          <div className="fluid-4 float-right">
+            <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={::this.showDefaults} />
+          </div>
         </div>
       </div>
     )
