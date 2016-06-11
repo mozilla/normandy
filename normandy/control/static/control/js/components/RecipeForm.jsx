@@ -1,47 +1,81 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import { destroy, reduxForm, getValues } from 'redux-form'
+
+import apiFetch from '../utils/apiFetch.js';
 import ControlActions from '../actions/ControlActions.js'
-import { reduxForm } from 'redux-form'
 import composeRecipeContainer from './RecipeContainer.jsx'
+import ActionForm from './ActionForm.jsx'
+import FormField from './form_fields/FormFieldWrapper.jsx';
 
-
-class RecipeForm extends React.Component {
+export class RecipeForm extends React.Component {
   constructor(props) {
     super(props);
-    this.submitForm = this.submitForm.bind(this);
+
+    this.state = {
+      availableActions: ['console-log', 'show-heartbeat'],
+      selectedAction: null,
+    };
   }
 
-  submitForm(values) {
-    if (this.props.recipeId) {
-      this.props.dispatch(ControlActions.makeApiRequest('updateRecipe', { recipe: values, recipeId: this.props.recipeId }));
+  changeAction(event) {
+    const { dispatch, fields } = this.props;
+    let selectedActionName = event.currentTarget.value;
+
+    dispatch(destroy('action'));
+    fields.action_name.onChange(event);
+    this.setState({
+      selectedAction: { name: selectedActionName }
+    });
+  }
+
+  submitForm() {
+    const { dispatch, formState, recipeId } = this.props;
+    let recipeFormValues = getValues(formState.recipe);
+    let actionFormValues = getValues(formState.action);
+    let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
+    if (recipeId) {
+      dispatch(ControlActions.makeApiRequest('updateRecipe', {
+        recipe: combinedFormValues,
+        recipeId: recipeId
+      }));
     } else {
-      this.props.dispatch(ControlActions.makeApiRequest('addRecipe', values));
+      dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.selectedAction && nextProps.recipe) {
+      let selectedActionName = nextProps.recipe.action_name;
+      this.setState({
+        selectedAction: { name: selectedActionName }
+      });
     }
   }
 
   render() {
-    const { fields: { name, filter_expression }, recipeId, handleSubmit, viewingRevision } = this.props;
+    const { fields: { name, filter_expression, enabled, action_name }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
+    const { availableActions, selectedAction } = this.state;
 
     return (
-      <form onSubmit={handleSubmit(this.submitForm)} className="crud-form">
-        { viewingRevision ?
-          <p className="notification info">
+      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form">
+
+        { viewingRevision &&
+          <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
-          </p> : ''
+          </p>
         }
-        <div className="row">
-          <div className="fluid-3">
-            <label>Name</label>
-            <input type="text" field={name} {...name} />
-          </div>
-        </div>
-        <div className="row">
-          <div className="fluid-3">
-            <label>Filter Expression</label>
-            <textarea field={filter_expression} {...filter_expression} />
-          </div>
-        </div>
+
+        <FormField type="text" label="Name" field={name} containerClass="fluid-3" />
+        <FormField type="textarea" label="Filter Expression" field={filter_expression} containerClass="fluid-3" />
+        <FormField type="select" label="Action" field={action_name} containerClass="fluid-3"
+          options={availableActions}
+          onChange={::this.changeAction}
+        />
+
+        { selectedAction && <ActionForm recipe={recipe} {...selectedAction} /> }
+
         <div className="row form-action-buttons">
           <div className="fluid-2">
             {recipeId ? <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>Delete</Link> : ''}
@@ -50,6 +84,7 @@ class RecipeForm extends React.Component {
             <button className="button" type="submit">Submit</button>
           </div>
         </div>
+
       </form>
     )
   }
@@ -59,14 +94,15 @@ RecipeForm.propTypes = {
 }
 
 export default composeRecipeContainer(reduxForm({
-    form: 'recipe',
-    fields: ['name', 'filter_expression']
+    form: 'recipe'
   }, (state, props) => {
+    let fields = ['name', 'filter_expression', 'enabled', 'action_name'];
     let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
 
     return {
+      fields,
       initialValues: selectedRecipeRevision || props.recipe,
-      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false)
+      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false),
+      formState: state.form
     }
-  }
-)(RecipeForm))
+})(RecipeForm))

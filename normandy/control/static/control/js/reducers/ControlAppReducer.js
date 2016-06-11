@@ -11,7 +11,7 @@ let initialState = {
   recipeListNeedsFetch: true
 };
 
-export function controlAppReducer(state = initialState, action) {
+function controlAppReducer(state = initialState, action) {
   switch (action.type) {
 
     case REQUEST_IN_PROGRESS:

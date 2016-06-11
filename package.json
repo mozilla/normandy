@@ -13,6 +13,7 @@
   },
   "license": "MPL-2.0",
   "dependencies": {
+    "babel-plugin-transform-function-bind": "^6.8.0",
     "babel-polyfill": "^6.7.2",
     "babel-preset-stage-2": "^6.5.0",
     "babel-runtime": "^6.6.1",
@@ -35,6 +36,7 @@
     "redux-form": "^5.2.3",
     "redux-thunk": "^2.0.1",
     "uglifyjs": "^2.4.10",
+    "underscore": "^1.8.3",
     "wolfy87-eventemitter": "^4.3.0"
   },
   "devDependencies": {
@@ -60,7 +62,7 @@
     "karma-spec-reporter": "0.0.26",
     "karma-webpack": "^1.7.0",
     "postcss-loader": "^0.9.1",
-    "react-addons-test-utils": "^15.0.2",
+    "react-addons-test-utils": "^15.1.0",
     "react-tools": "^0.13.3",
     "redux-logger": "^2.6.1",
     "redux-mock-store": "^1.0.2",

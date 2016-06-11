@@ -4,10 +4,6 @@ import { push } from 'react-router-redux'
 import ControlActions from '../actions/ControlActions.js'
 
 class RecipeDataRow extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { recipe, dispatch } = this.props;
 
@@ -60,9 +56,9 @@ class RecipeList extends React.Component {
           </thead>
           <tbody>
             {
-              this.props.recipes.map(recipe => {
-                return (<RecipeDataRow recipe={recipe} dispatch={this.props.dispatch} key={recipe.id} />)
-              })
+              this.props.recipes.map(recipe =>
+                <RecipeDataRow recipe={recipe} dispatch={this.props.dispatch} key={recipe.id} />
+              )
             }
           </tbody>
         </table>

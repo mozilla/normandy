@@ -8,7 +8,6 @@ export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
     constructor(props) {
       super(props);
-      this.getRecipeData = this.getRecipeData.bind(this);
     }
 
     getRecipeData(recipeId) {
