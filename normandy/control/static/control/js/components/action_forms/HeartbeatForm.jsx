@@ -30,8 +30,7 @@ const SurveyForm = (props) => {
   const { selectedSurvey, fields, showDefaults } = props;
   const surveyObject = selectedSurvey || fields.defaults;
   let headerText = 'Default Survey Values';
-  let containerClasses = classNames({
-    'fluid-8': true,
+  let containerClasses = classNames('fluid-8', {
     'active': selectedSurvey
   });
 
