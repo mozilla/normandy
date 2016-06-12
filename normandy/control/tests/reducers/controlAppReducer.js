@@ -1,18 +1,6 @@
 import controlAppReducer from '../../static/control/js/reducers/ControlAppReducer';
 import * as actions from '../../static/control/js/actions/ControlActions';
-
-const initialState = {
-  recipes: null,
-  isFetching: false,
-  selectedRecipe: null,
-  recipeListNeedsFetch: true
-};
-
-const fixtureRecipes = [
-  { "id": 1, "name": "Lorem Ipsum", "enabled": true },
-  { "id": 2, "name": "Dolor set amet", "enabled": true },
-  { "id": 3, "name": "Consequitar adipscing", "enabled": false }
-];
+import { fixtureRecipes, initialState } from '../fixtures/fixtures';
 
 describe('controlApp reducer', () => {
   it('should return initial state by default', () => {
@@ -67,6 +55,16 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       selectedRecipe: 2
+    })
+  })
+
+  it('should handle SET_NOTIFICATION', () => {
+    expect(controlAppReducer(undefined, {
+      type: actions.SET_NOTIFICATION,
+      notification: { messageType: 'success', 'message': 'Success message' }
+    })).toEqual({
+      ...initialState,
+      notification: { messageType: 'success', 'message': 'Success message' }
     })
   })
 

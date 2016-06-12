@@ -178,17 +178,57 @@ i {
 
 
 /* Notifications */
-.notification {
-  border: 1px solid;
-  border-radius: 3px;
-  font-size: 12px;
-  line-height: 30px;
-  margin: 5px 0px;
-  padding: 5px 15px;
+#notification-bar {
+  transition: top 0.25s;
+  background-color: #fff;
+  left: 40px;
+  position: fixed;
+  right: 40px;
+  top: -55px;
+  z-index: 1;
+
+  &.active {
+    top: 2px;
+  }
 }
 
-.info {
-  background-color: $yellow;
-  border-color: rgba(0,0,0,0.15);
-  color: rgba(0,0,0,0.5);
+p.notification {
+  color: rgba(0,0,0,0.6);
+  font-size: 12px;
+  line-height: 22px;
+  padding: 15px 30px;
+  position: relative;
+  text-indent: 20px;
+
+  &::before {
+    font: normal normal 400 14px/1 FontAwesome;
+    left: 10px;
+    opacity: 0.75;
+    position: absolute;
+    top: 36%;
+  }
+
+  &.success {
+    background-color: rgba($green, 0.75);
+    &::before {  content: "\f00c"; }
+  }
+
+  &.error {
+    background-color: rgba($red, 0.75);
+    &::before {  content: "\f12a"; }
+  }
+
+  &.info {
+    background-color: rgba($yellow, 0.75);
+    &::before {  content: "\f129"; }
+  }
+
+  i.remove-message {
+    float: right;
+    padding: 5px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }

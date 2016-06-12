@@ -12,7 +12,8 @@ const store = controlStore({
     recipes: null,
     isFetching: false,
     selectedRecipe: null,
-    recipeListNeedsFetch: true
+    recipeListNeedsFetch: true,
+    notification: null
   }
 });
 
