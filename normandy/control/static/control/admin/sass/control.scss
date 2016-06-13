@@ -114,7 +114,10 @@
 .crud-form {
   padding: 30px 45px;
 
-  input[type="checkbox"] { opacity: 0; }
+  input[type="checkbox"] {
+    width: auto;
+    margin: 0 5px;
+  }
   input[type="number"] { width: 20%; }
 
   .fluid-1 { width: 6.25%; }
