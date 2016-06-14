@@ -69,6 +69,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
     name = models.CharField(max_length=255, unique=True)
     revision_id = models.IntegerField(default=0, editable=False)
+    last_updated = models.DateTimeField(auto_now=True)
 
     action = models.ForeignKey('Action')
     arguments_json = models.TextField(default='{}', validators=[validate_json])
@@ -79,7 +80,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
 
     # A tuple of fields that can be edited without causing the recipe to be disabled
-    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval',)
+    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval', 'last_updated')
+
+    class Meta:
+        ordering = ['-enabled', '-last_updated']
 
     class IsNotApproved(Exception):
         pass

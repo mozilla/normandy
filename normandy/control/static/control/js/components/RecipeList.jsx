@@ -1,7 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
+import moment from 'moment'
 import ControlActions from '../actions/ControlActions.js'
+
+class BooleanIcon extends React.Component {
+  render() {
+    switch(this.props.value) {
+      case true: return <i className="fa fa-lg fa-check green">&nbsp;</i>;
+      case false: return <i className="fa fa-lg fa-times red">&nbsp;</i>;
+    }
+  }
+}
 
 class RecipeDataRow extends React.Component {
   render() {
@@ -14,16 +24,9 @@ class RecipeDataRow extends React.Component {
       }}>
         <td>{recipe.name}</td>
         <td>{recipe.action_name}</td>
-        <td>
-          {(() => {
-            switch(recipe.enabled) {
-              case true: return <i className="fa fa-lg fa-check green">&nbsp;</i>;
-              case false: return <i className="fa fa-lg fa-times red">&nbsp;</i>;
-            }
-          })()}
-        </td>
-        <td>{recipe.sample_rate}</td>
-        <td>{recipe.release_channels}</td>
+        <td><BooleanIcon value={recipe.enabled} /></td>
+        <td><BooleanIcon value={recipe.is_approved} /></td>
+        <td>{ moment(recipe.last_updated).fromNow() }</td>
       </tr>
     )
   }
@@ -50,8 +53,8 @@ class RecipeList extends React.Component {
               <td>Name</td>
               <td>Action</td>
               <td>Enabled</td>
-              <td>Sample Rate</td>
-              <td>Release Channels</td>
+              <td>Approved</td>
+              <td>Last Updated</td>
             </tr>
           </thead>
           <tbody>
@@ -67,12 +70,10 @@ class RecipeList extends React.Component {
   }
 }
 
-let mapStateToProps = (state, ownProps) => {
-  return {
-    recipes: state.controlApp.recipes || [],
-    dispatch: ownProps.dispatch
-  }
-}
+let mapStateToProps = (state, ownProps) => ({
+  recipes: state.controlApp.recipes || [],
+  dispatch: ownProps.dispatch
+})
 
 export default connect(
   mapStateToProps

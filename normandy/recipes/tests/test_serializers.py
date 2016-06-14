@@ -15,6 +15,7 @@ class TestRecipeSerializer:
         assert serializer.data == {
             'name': recipe.name,
             'id': recipe.id,
+            'last_updated': Whatever(),
             'enabled': recipe.enabled,
             'filter_expression': recipe.filter_expression,
             'revision_id': recipe.revision_id,
