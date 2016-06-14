@@ -76,7 +76,7 @@ export class RecipeForm extends React.Component {
     const { availableActions, selectedAction } = this.state;
 
     return (
-      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form">
+      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form fluid-8">
 
         { viewingRevision &&
           <p id="viewing-revision" className="notification info">

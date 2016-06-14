@@ -9,11 +9,9 @@ export default class ControlApp extends React.Component {
         <NotificationBar />
         <Header pageType={this.props.children.props.route} currentLocation={this.props.location.pathname} />
         <div id="content" className="wrapper">
-          <div className="fluid-8">
-            {
-              React.Children.map(this.props.children, (child) => React.cloneElement(child))
-            }
-          </div>
+          {
+            React.Children.map(this.props.children, (child) => React.cloneElement(child))
+          }
         </div>
       </div>
     )
