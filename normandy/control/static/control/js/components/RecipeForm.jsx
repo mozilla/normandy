@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import { destroy, reduxForm, getValues } from 'redux-form'
 
+import jexl from 'jexl'
+
 import apiFetch from '../utils/apiFetch.js';
 import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
@@ -30,19 +32,30 @@ export class RecipeForm extends React.Component {
     });
   }
 
+  validateForm(formValues) {
+    let jexlExpression = formValues.filter_expression;
+    return jexl.eval(jexlExpression, {});
+  }
+
   submitForm() {
     const { dispatch, formState, recipeId } = this.props;
     let recipeFormValues = getValues(formState.recipe);
     let actionFormValues = getValues(formState.action);
     let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
-    if (recipeId) {
-      dispatch(ControlActions.makeApiRequest('updateRecipe', {
-        recipe: combinedFormValues,
-        recipeId: recipeId
-      }));
-    } else {
-      dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
-    }
+    this.validateForm(combinedFormValues)
+        .then(response => {
+            if (recipeId) {
+              dispatch(ControlActions.makeApiRequest('updateRecipe', {
+                recipe: combinedFormValues,
+                recipeId: recipeId
+              }));
+            } else {
+              dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
   }
 
   componentWillReceiveProps(nextProps) {
