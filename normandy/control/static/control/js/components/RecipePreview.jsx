@@ -46,8 +46,7 @@ class RecipePreview extends React.Component {
 
   render() {
     const {recipe} = this.props;
-    let statusClasses = classNames({
-      'preview-status': true,
+    let statusClasses = classNames('preview-status', {
       'green': this.state.recipeExecuted,
       'red': this.state.errorRunningRecipe,
     });
