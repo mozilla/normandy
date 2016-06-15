@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import { destroy, reduxForm, getValues } from 'redux-form'
-
 import jexl from 'jexl'
 
 import apiFetch from '../utils/apiFetch.js';
