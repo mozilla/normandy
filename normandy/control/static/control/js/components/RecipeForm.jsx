@@ -42,20 +42,22 @@ export class RecipeForm extends React.Component {
     let recipeFormValues = getValues(formState.recipe);
     let actionFormValues = getValues(formState.action);
     let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
-    this.validateForm(combinedFormValues)
-      .then(response => {
-        if (recipeId) {
-          dispatch(ControlActions.makeApiRequest('updateRecipe', {
-            recipe: combinedFormValues,
-            recipeId: recipeId
-          }));
-        } else {
-          dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      })
+    return this.validateForm(combinedFormValues)
+    .catch(error => {
+      throw {
+        filter_expression: "Invalid Expression"
+      };
+    })
+    .then(response => {
+      if (recipeId) {
+        dispatch(ControlActions.makeApiRequest('updateRecipe', {
+          recipe: combinedFormValues,
+          recipeId: recipeId
+        }));
+      } else {
+        dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
+      }
+    })
   }
 
   componentWillReceiveProps(nextProps) {
