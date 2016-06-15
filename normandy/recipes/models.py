@@ -1,8 +1,8 @@
 import hashlib
 import json
 import logging
+import requests
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.utils import timezone
@@ -123,22 +123,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.enabled and self.approval is None and settings.REQUIRE_RECIPE_AUTH:
-            raise self.IsNotApproved('You must approve a recipe before it can be enabled.')
-
-        # Check for changes that should disable the recipe
-        if self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields(check_relationship=True)
-            for field in self.EDITABLE_FIELDS_WHITELIST:
-                if field in dirty_fields:
-                    dirty_fields.pop(field)
-            if dirty_fields:
-                self.disable()
-
-            # Increment the revision ID
-            self.revision_id += 1
-
-        super(Recipe, self).save(*args, **kwargs)
+    # Incrementing revision ID
+    self.revision_id +=1
+    
+    super().save(*args, **kwargs)
 
 
 @reversion.register()
