@@ -10,7 +10,9 @@ JavaScript to various clients based on certain rules.
 
    dev/install
    dev/workflow
-   dev/architecture
+   dev/concepts
+   qa/example
+   dev/self-repair
    dev/driver
    dev/troubleshooting
    qa/docker
