@@ -29,7 +29,7 @@ const FormField = (props) => {
   return (
     <div className="row">
       <div className={containerClass}>
-        <label>{label}</label>
+        <label> {label} <span className="validation-error"> {field.error} </span> </label>
         {fieldType}
       </div>
     </div>
