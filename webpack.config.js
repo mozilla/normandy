@@ -44,8 +44,7 @@ module.exports = [
           exclude: /node_modules/,
           loader: 'babel',
           'query': {
-            presets: ['es2015', 'react', 'stage-2'],
-            plugins: ['transform-function-bind']
+            presets: ['es2015', 'react', 'stage-0'],
           }
         },
         {
@@ -103,7 +102,7 @@ module.exports = [
             exclude: /node_modules/,
             loader: 'babel-loader',
             query: {
-              presets: ['es2015', 'stage-2'],
+              presets: ['es2015', 'stage-0'],
               plugins: [
                 ['transform-runtime', {
                   polyfill: false,
