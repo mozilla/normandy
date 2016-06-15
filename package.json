@@ -13,9 +13,8 @@
   },
   "license": "MPL-2.0",
   "dependencies": {
-    "babel-plugin-transform-function-bind": "^6.8.0",
     "babel-polyfill": "^6.7.2",
-    "babel-preset-stage-2": "^6.5.0",
+    "babel-preset-stage-0": "^6.5.0",
     "babel-runtime": "^6.6.1",
     "classnames": "^2.2.5",
     "cssmin": "^0.4.3",
