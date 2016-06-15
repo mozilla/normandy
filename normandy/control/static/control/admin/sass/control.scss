@@ -126,6 +126,13 @@
     opacity: 0.5;
   }
 
+  .validation-error {
+    color: $red;
+    float: right;
+    font-size: 11px;
+    text-transform: lowercase;
+  }
+
   /* Custom checkbox toggle for enabled/disabled state */
   .checkbox-container {
     border: 1px solid;
