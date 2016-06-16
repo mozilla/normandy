@@ -215,14 +215,14 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
 
-    @pytest.mark.xfail
+    @pytest.mark.xfail(reason='disabled approvals temporarily')
     def test_cannot_enable_unapproved_recipes(self, api_client):
         recipe = RecipeFactory(approval=None, enabled=False)
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 400
 
-    @pytest.mark.xfail(strict=False)
+    @pytest.mark.skip(reason='disabled approvals temporarily')
     def test_can_enable_unapproved_recipes_in_development(self, api_client, settings):
         settings.REQUIRE_RECIPE_AUTH = False
         recipe = RecipeFactory(approval=None, enabled=False)

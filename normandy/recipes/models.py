@@ -122,8 +122,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        # Increment the revision ID
-        self.revision_id += 1
+        # Increment the revision ID if we've changed
+        if self.is_dirty(check_relationship=True):
+            self.revision_id += 1
 
         super().save(*args, **kwargs)
 
