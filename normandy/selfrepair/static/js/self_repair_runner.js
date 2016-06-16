@@ -24,7 +24,7 @@ window.registerAction = function(name, ActionClass) {
  */
 function loadAction(recipe) {
     return new Promise((resolve, reject) => {
-        let action_name = recipe.action_name;
+        let action_name = recipe.action;
         if (!registeredActions[action_name]) {
             fetch(`/api/v1/action/${action_name}/`)
             .then(response => response.json())

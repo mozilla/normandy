@@ -23,7 +23,7 @@ class RecipeDataRow extends React.Component {
         dispatch(push(`/control/recipe/${recipe.id}/`))
       }}>
         <td>{recipe.name}</td>
-        <td>{recipe.action_name}</td>
+        <td>{recipe.action}</td>
         <td><BooleanIcon value={recipe.enabled} /></td>
         <td><BooleanIcon value={recipe.is_approved} /></td>
         <td>{ moment(recipe.last_updated).fromNow() }</td>

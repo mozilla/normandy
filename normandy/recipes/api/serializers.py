@@ -79,7 +79,7 @@ class ApprovalRequestCommentSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    action_name = serializers.CharField(source='action.name')
+    action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
     current_approval_request = ApprovalRequestSerializer(read_only=True)
     approval = ApprovalSerializer(read_only=True)
@@ -94,37 +94,13 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name',
             'enabled',
             'revision_id',
-            'action_name',
+            'action',
             'arguments',
             'filter_expression',
             'current_approval_request',
             'approval',
             'is_approved',
         ]
-
-    def validate_action_name(self, attr):
-        try:
-            Action.objects.get(name=attr)
-        except Action.DoesNotExist:
-            raise serializers.ValidationError('Action does not exist.')
-        return attr
-
-    def create(self, validated_data):
-        action_name = validated_data.pop('action')['name']
-        action = Action.objects.get(name=action_name)
-        recipe = Recipe.objects.create(action=action, **validated_data)
-        return recipe
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.arguments = validated_data.get('arguments', instance.arguments)
-
-        if 'action' in validated_data:
-            action_name = validated_data.pop('action')['name']
-            instance.action = Action.objects.get(name=action_name)
-
-        instance.save()
-        return instance
 
 
 class ClientSerializer(serializers.Serializer):

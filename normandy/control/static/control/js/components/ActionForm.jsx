@@ -34,7 +34,7 @@ export default reduxForm({
         break;
     }
 
-    if (props.recipe && props.recipe.action_name === props.name) {
+    if (props.recipe && props.recipe.action === props.name) {
       initialValues = props.recipe['arguments'];
     }
 

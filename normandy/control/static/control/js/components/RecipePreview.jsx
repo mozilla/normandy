@@ -55,7 +55,7 @@ class RecipePreview extends React.Component {
         <div className="fluid-7">
           <div className="fluid-3">
             <h3>Previewing {recipe.name}...</h3>
-            <p><b>Action Type:</b> {recipe.action_name}</p>
+            <p><b>Action Type:</b> {recipe.action}</p>
           </div>
           <div className="fluid-3 float-right">
             <div className={statusClasses}>
