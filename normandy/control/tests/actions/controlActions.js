@@ -20,7 +20,7 @@ const fixtureRevisions = [
         "name": "Consequestar",
         "enabled": true,
         "revision_id": 22,
-        "action_name": "console-log",
+        "action": "console-log",
         "arguments": {
             "message": "hi there message here"
         },

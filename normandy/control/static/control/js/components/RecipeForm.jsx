@@ -25,7 +25,7 @@ export class RecipeForm extends React.Component {
     let selectedActionName = event.currentTarget.value;
 
     dispatch(destroy('action'));
-    fields.action_name.onChange(event);
+    fields.action.onChange(event);
     this.setState({
       selectedAction: { name: selectedActionName }
     });
@@ -61,7 +61,7 @@ export class RecipeForm extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (!this.state.selectedAction && nextProps.recipe) {
-      let selectedActionName = nextProps.recipe.action_name;
+      let selectedActionName = nextProps.recipe.action;
       this.setState({
         selectedAction: { name: selectedActionName }
       });
@@ -69,7 +69,7 @@ export class RecipeForm extends React.Component {
   }
 
   render() {
-    const { fields: { name, filter_expression, enabled, action_name }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
+    const { fields: { name, filter_expression, enabled, action }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
     const { availableActions, selectedAction } = this.state;
 
     return (
@@ -83,7 +83,7 @@ export class RecipeForm extends React.Component {
 
         <FormField type="text" label="Name" field={name} containerClass="fluid-3" />
         <FormField type="textarea" label="Filter Expression" field={filter_expression} containerClass="fluid-3" />
-        <FormField type="select" label="Action" field={action_name} containerClass="fluid-3"
+        <FormField type="select" label="Action" field={action} containerClass="fluid-3"
           options={availableActions}
           onChange={::this.changeAction}
         />
@@ -110,7 +110,7 @@ RecipeForm.propTypes = {
 export default composeRecipeContainer(reduxForm({
     form: 'recipe'
   }, (state, props) => {
-    let fields = ['name', 'filter_expression', 'enabled', 'action_name'];
+    let fields = ['name', 'filter_expression', 'enabled', 'action'];
     let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
 
     return {
