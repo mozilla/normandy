@@ -14,6 +14,7 @@ module.exports = function(config) {
             'node_modules/jasmine-promises/dist/jasmine-promises.js',
             'normandy/control/tests/index.js',
             'normandy/recipes/tests/actions/index.js',
+            'normandy/selfrepair/tests/index.js',
         ],
 
         // preprocess matching files before serving them to the browser
@@ -21,6 +22,7 @@ module.exports = function(config) {
         preprocessors: {
             'normandy/control/tests/index.js': ['webpack', 'sourcemap'],
             'normandy/recipes/tests/actions/index.js': ['webpack', 'sourcemap'],
+            'normandy/selfrepair/tests/index.js': ['webpack', 'sourcemap'],
             'normandy/control/static/control/js/components/*.jsx': ['react-jsx'],
         },
 
@@ -31,9 +33,6 @@ module.exports = function(config) {
                         test: /(\.|\/)(jsx|js)$/,
                         exclude: /node_modules/,
                         loader: 'babel',
-                        'query': {
-                          presets: ['react', 'es2015', 'stage-0']
-                        }
                     },
                 ],
             },

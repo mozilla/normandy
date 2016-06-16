@@ -43,9 +43,6 @@ module.exports = [
           test: /(\.|\/)(jsx|js)$/,
           exclude: /node_modules/,
           loader: 'babel',
-          'query': {
-            presets: ['es2015', 'react', 'stage-0'],
-          }
         },
         {
           test: /\.scss$/,
@@ -102,7 +99,6 @@ module.exports = [
             exclude: /node_modules/,
             loader: 'babel-loader',
             query: {
-              presets: ['es2015', 'stage-0'],
               plugins: [
                 ['transform-runtime', {
                   polyfill: false,
