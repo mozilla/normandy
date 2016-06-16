@@ -179,7 +179,6 @@ i {
 
 /* Notifications */
 #notification-bar {
-  transition: top 0.25s;
   background-color: #fff;
   left: 40px;
   position: fixed;
@@ -188,8 +187,18 @@ i {
   z-index: 1;
 
   &.active {
+    animation-name: notification-bar;
+    animation-duration: 10s;
+    animation-fill-mode: forwards;
     top: 2px;
   }
+}
+
+@keyframes notification-bar {
+    0%   { top: -55px;}
+    2%  { top: 2px; }
+    98%  { top: 2px; }
+    100% { top: -55px;}
 }
 
 p.notification {
