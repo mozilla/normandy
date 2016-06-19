@@ -173,6 +173,7 @@
   /* Action buttons (submit, delete, etc) */
   .form-action-buttons {
     border-top: 1px solid $darkCream;
+    clear: both;
     line-height: 30px;
     margin-top: 30px;
     padding-top: 15px;
@@ -338,4 +339,109 @@ li {
       margin: 0 0 10px 20px;
       text-transform: none;
     }
+}
+
+#status-details {
+  border: 1px solid #ECE7DB;
+  border-radius: 3px;
+  margin: 15px 1em 0 1em;
+  padding: 20px 40px;
+
+  > div {
+    margin: 20px 0px;
+  }
+
+  input[type="checkbox"] {
+    display: none;
+  }
+
+  div.recipe-enabled {
+    .red { color: #999; }
+    .toggle-recipe-status.disabled {
+      font-weight: 400;
+      opacity: 0.5;
+      &:hover {
+        cursor: pointer;
+        opacity: 0.75;
+      }
+    }
+  }
+
+  div.recipe-disabled {
+    .green { color: #999; }
+    .toggle-recipe-status.enabled {
+      font-weight: 400;
+      opacity: 0.5;
+      &:hover {
+        cursor: pointer;
+        opacity: 0.75;
+      }
+    }
+  }
+
+  .separator {
+    background-color: #999;
+    display: inline-block;
+    margin: 0 15px;
+    width: 1px;
+  }
+
+  p.approval-meta {
+    font-size: 12px;
+    margin: 3px 0 0 0;
+  }
+
+  p.status-with-icon {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 5px 0;
+  }
+
+  a.button {
+    display: inline-block;
+    font-size: 12px;
+    margin: 15px 0 0 0;
+    padding: 5px 25px;
+  }
+}
+
+#comments-list {
+  > li {
+    background: #fff;
+    border: 1px solid $darkCream;
+    border-radius: 3px;
+    cursor: unset;
+    margin-bottom: 1em;
+    padding: 10px;
+
+    .comment-meta {
+      color: rgba($darkBrown, 0.6);
+    }
+
+    .comment-text {
+      padding: 1em;
+    }
+  }
+}
+
+#comment-form {
+  .form-action-buttons {
+    text-align: right;
+
+    .button {
+      margin-left: 1em;
+    }
+  }
+}
+
+#approval-request-details {
+  .row {
+    margin-bottom: 1.5em;
+  }
+
+  .form-action-buttons {
+    .button {
+      width: 100%;
+    }
+  }
 }

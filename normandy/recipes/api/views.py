@@ -140,6 +140,9 @@ class ApprovalRequestViewSet(UpdateOrCreateModelViewSet):
 
     @reversion_transaction
     def create(self, request, *args, **kwargs):
+        if 'creator_id' not in request.data:
+            request.data.update({'creator_id': request.user.id})
+
         return super().create(request, *args, **kwargs)
 
     @reversion_transaction

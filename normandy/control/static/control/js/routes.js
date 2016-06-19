@@ -6,6 +6,8 @@ import RecipeForm from './components/RecipeForm.jsx';
 import RecipeHistory from './components/RecipeHistory.jsx';
 import RecipePreview from './components/RecipePreview.jsx';
 import DeleteRecipe from './components/DeleteRecipe.jsx';
+import ApprovalRequestList from './components/ApprovalRequestList.jsx';
+import ApprovalRequestDetails from './components/ApprovalRequestDetails.jsx';
 
 export default (
   <Route component={ControlApp}>
@@ -24,6 +26,7 @@ export default (
       pageTitle="Edit Recipe"
       ctaButtons={[
         {text: 'Preview', icon: 'eye', link: 'preview/'},
+        {text: 'Approval Requests', icon: '', link: 'requests/'},
         {text: 'History', icon: 'history', link: 'history/'},
       ]}
     />
@@ -39,6 +42,15 @@ export default (
       path='control/recipe/:id/delete/'
       component={DeleteRecipe}
       pageTitle="Delete Recipe"
+    />
+    <Route
+      path='control/recipe/:recipeId/requests/'
+      component={ApprovalRequestList}
+    />
+    <Route
+      path='control/recipe/:recipeId/requests/:approvalRequestId/'
+      component={ApprovalRequestDetails}
+      pageTitle="Approval Request"
     />
   </Route>
 );
