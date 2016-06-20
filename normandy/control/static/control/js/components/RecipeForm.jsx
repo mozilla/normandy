@@ -69,7 +69,10 @@ export class RecipeForm extends React.Component {
   }
 
   render() {
-    const { fields: { name, filter_expression, enabled, action }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
+    const {
+      fields: { name, filter_expression, enabled, action },
+      submitting, recipe, recipeId, handleSubmit, viewingRevision
+    } = this.props;
     const { availableActions, selectedAction } = this.state;
 
     return (
@@ -95,7 +98,7 @@ export class RecipeForm extends React.Component {
             {recipeId ? <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>Delete</Link> : ''}
           </div>
           <div className="fluid-2 float-right">
-            <button className="button" type="submit">Submit</button>
+            <button className="button" type="submit" disabled={submitting} >Submit</button>
           </div>
         </div>
 
