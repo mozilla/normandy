@@ -10,9 +10,12 @@ import { syncHistoryWithStore } from 'react-router-redux'
 const store = controlStore({
   controlApp: {
     recipes: null,
+    approvalRequests: null,
     isFetching: false,
     selectedRecipe: null,
-    recipeListNeedsFetch: true
+    selectedApprovalRequest: null,
+    recipeListNeedsFetch: true,
+    approvalRequestListNeedsFetch: true
   }
 });
 

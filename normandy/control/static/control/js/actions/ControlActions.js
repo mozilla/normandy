@@ -12,6 +12,18 @@ export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
 
+export const APPROVAL_REQUESTS_RECEIVED = 'APPROVAL_REQUESTS_RECEIVED';
+export const SINGLE_APPROVAL_REQUEST_RECEIVED = 'SINGLE_APPROVAL_REQUEST_RECEIVED';
+
+export const SET_SELECTED_APPROVAL_REQUEST = 'SET_SELECTED_APPROVAL_REQUEST';
+
+export const APPROVAL_REQUEST_CREATED = 'APPROVAL_REQUEST_CREATED';
+export const APPROVAL_REQUEST_APPROVED = 'APPROVAL_REQUEST_APPROVED';
+export const APPROVAL_REQUEST_REJECTED = 'APPROVAL_REQUEST_REJECTED';
+
+export const APPROVAL_REQUEST_COMMENTS_RECEIVED = 'APPROVAL_REQUEST_COMMENTS_RECEIVED';
+
+export const APPROVAL_REQUEST_COMMENT_CREATED = 'APPROVAL_REQUEST_COMMENT_CREATED';
 
 const BASE_API_URL = '/api/v1/recipe/';
 
@@ -88,6 +100,83 @@ const apiRequestMap = {
       actionOnSuccess: recipeDeleted,
       successActionParams: recipeInfo.recipeId
     };
+  },
+
+  fetchAllApprovalRequests(settings) {
+    return {
+      url: `${BASE_API_URL}${settings.recipeId}/approval_requests/`,
+      settings: {
+        method: 'get'
+      },
+      actionOnSuccess: approvalRequestsReceived
+    };
+  },
+
+  fetchSingleApprovalRequest(approvalRequestInfo) {
+    return {
+      url: `/api/v1/approval_request/${approvalRequestInfo.approvalRequestId}/`,
+      settings: {
+        method: 'get'
+      },
+      actionOnSuccess: singleApprovalRequestReceived
+    }
+  },
+
+  createApprovalRequest(recipeInfo) {
+    return {
+      url: '/api/v1/approval_request/',
+      settings: {
+        data: {
+          'recipe_id': recipeInfo.recipeId,
+          'active': true
+        },
+        method: 'post'
+      },
+      actionOnSuccess: approvalRequestCreated
+    }
+  },
+
+  approveApprovalRequest(approvalRequestInfo) {
+    return {
+      url: `/api/v1/approval_request/${approvalRequestInfo.approvalRequestId}/approve/`,
+      settings: {
+        method: 'post'
+      },
+      actionOnSuccess: approvalRequestApproved
+    }
+  },
+
+  rejectApprovalRequest(approvalRequestInfo) {
+    return {
+      url: `/api/v1/approval_request/${approvalRequestInfo.approvalRequestId}/reject/`,
+      settings: {
+        method: 'post'
+      },
+      actionOnSuccess: approvalRequestRejected
+    }
+  },
+
+  fetchAllApprovalRequestComments(settings) {
+    return {
+      url: `/api/v1/approval_request/${settings.approvalRequestId}/comments/`,
+      settings: {
+        method: 'get'
+      },
+      actionOnSuccess: approvalRequestCommentsReceived
+    }
+  },
+
+  createApprovalRequestComment(commentInfo) {
+    return {
+      url: `/api/v1/approval_request/${commentInfo.approvalRequestId}/comment/`,
+      settings: {
+        data: {
+          'text': commentInfo.text
+        },
+        method: 'post'
+      },
+      actionOnSuccess: approvalRequestCommentCreated
+    }
   }
 };
 
@@ -147,6 +236,53 @@ function recipeDeleted(recipeId) {
   };
 }
 
+function approvalRequestsReceived(approvalRequests) {
+  return {
+    type: APPROVAL_REQUESTS_RECEIVED,
+    approvalRequests
+  };
+}
+
+function singleApprovalRequestReceived(approvalRequest) {
+  return {
+    type: SINGLE_APPROVAL_REQUEST_RECEIVED,
+    approvalRequest
+  };
+}
+
+function approvalRequestCreated(approvalRequest) {
+  return {
+    type: APPROVAL_REQUEST_CREATED,
+    approvalRequest
+  };
+}
+
+function approvalRequestApproved() {
+  return {
+    type: APPROVAL_REQUEST_APPROVED
+  }
+}
+
+function approvalRequestRejected() {
+  return {
+    type: APPROVAL_REQUEST_REJECTED
+  }
+}
+
+function approvalRequestCommentsReceived(approvalRequestComments) {
+  return {
+    type: APPROVAL_REQUEST_COMMENTS_RECEIVED,
+    approvalRequestComments
+  }
+}
+
+function approvalRequestCommentCreated(approvalRequestComment) {
+  return {
+    type: APPROVAL_REQUEST_COMMENT_CREATED,
+    approvalRequestComment
+  }
+}
+
 function shouldFetchRecipes(state) {
   if (state.controlApp.recipeListNeedsFetch === true &&
       state.controlApp.isFetching === false) {
@@ -160,6 +296,13 @@ function setSelectedRecipe(recipeId) {
   return {
     type: SET_SELECTED_RECIPE,
     recipeId
+  };
+}
+
+function setSelectedApprovalRequest(approvalRequestId) {
+  return {
+    type: SET_SELECTED_APPROVAL_REQUEST,
+    approvalRequestId
   };
 }
 
@@ -186,5 +329,6 @@ function makeApiRequest(requestType, settings) {
 
 export default {
   setSelectedRecipe,
-  makeApiRequest,
+  setSelectedApprovalRequest,
+  makeApiRequest
 };

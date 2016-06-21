@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import { push } from 'react-router-redux'
 import { destroy, reduxForm, getValues } from 'redux-form'
 import jexl from 'jexl'
 
@@ -68,6 +69,12 @@ export class RecipeForm extends React.Component {
     }
   }
 
+  createApprovalRequest() {
+    if (this.props.recipeId) {
+      this.props.dispatch(ControlActions.makeApiRequest('createApprovalRequest', { recipeId: this.props.recipeId }));
+    }
+  }
+
   render() {
     const { fields: { name, filter_expression, enabled, action }, recipe, recipeId, handleSubmit, viewingRevision } = this.props;
     const { availableActions, selectedAction } = this.state;
@@ -79,6 +86,58 @@ export class RecipeForm extends React.Component {
           <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
           </p>
+        }
+
+        { recipeId ?
+          <div id="status-details" className="fluid-3 float-right">
+            <div className={ enabled.checked ? 'recipe-enabled' : 'recipe-disabled' }>
+              <label>Recipe Status</label>
+
+              <p className="status-with-icon">
+              <span onClick={() => enabled.onChange(false)}
+                    className="toggle-recipe-status disabled"><i
+                  className="pre fa fa-lg fa-times red"></i> Disabled</span>
+                <span className="separator">&nbsp;</span>
+              <span onClick={() => enabled.onChange(true)}
+                    className="toggle-recipe-status enabled"><i
+                  className="pre fa fa-lg fa-check green"></i> Enabled</span>
+              </p>
+            </div>
+            <div>
+              <label>Approval Status</label>
+              <div>
+                {(() => {
+                  if (recipe) {
+                    switch (recipe.approval) {
+                      case null:
+                        if (recipe.current_approval_request) {
+                          return <p className="status-with-icon"><i className="fa fa-lg fa-question-circle yellow">&nbsp;</i> Pending</p>;
+                        } else {
+                          return <p className="status-with-icon"><i className="fa fa-lg fa-times red">&nbsp;</i> Not Approved</p>;
+                        }
+                      default:
+                        return <p className="status-with-icon"><i className="fa fa-lg fa-check green">&nbsp;</i> Approved</p>;
+                    }
+                  }
+                })()}
+
+                {(() => {
+                  if (recipe) {
+                    switch (recipe.approval) {
+                      case null:
+                        if (recipe.current_approval_request) {
+                          return <div><a className="button" onClick={() => {this.props.dispatch(push(`/control/recipe/${recipe.id}/requests/${recipe.current_approval_request.id}/`))}}>View Conversation</a></div>;
+                        } else {
+                          return <div><a className="button" onClick={::this.createApprovalRequest}>Request Approval</a></div>;
+                        }
+                      default:
+                        return '';
+                    }
+                  }
+                })()}
+              </div>
+            </div>
+          </div> : ''
         }
 
         <FormField type="text" label="Name" field={name} containerClass="fluid-3" />
@@ -103,9 +162,10 @@ export class RecipeForm extends React.Component {
     )
   }
 }
+
 RecipeForm.propTypes = {
   fields: React.PropTypes.object.isRequired,
-}
+};
 
 export default composeRecipeContainer(reduxForm({
     form: 'recipe'

@@ -311,6 +311,21 @@ class TestApprovalRequestAPI(object):
         approval_requests = ApprovalRequest.objects.all()
         assert approval_requests.count() == 1
 
+    def test_creating_approval_requests_without_creator_id(self, api_client):
+        recipe = RecipeFactory()
+        user = UserFactory(is_superuser=True)
+
+        api_client.force_authenticate(user)
+        res = api_client.post('/api/v1/approval_request/', {'active': True,
+                                                            'recipe_id': recipe.id})
+        assert res.status_code == 201
+
+        approval_requests = ApprovalRequest.objects.all()
+        assert approval_requests.count() == 1
+
+        request = approval_requests.first()
+        assert request.creator == user
+
     def test_it_cannot_create_multiple_open_approval_requests(self, api_client):
         recipe = RecipeFactory()
         user = UserFactory()
