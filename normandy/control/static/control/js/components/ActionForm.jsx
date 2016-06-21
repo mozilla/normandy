@@ -2,6 +2,7 @@ import React from 'react'
 import { reduxForm } from 'redux-form'
 import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.jsx'
 import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.jsx'
+import FeatureRecommendationForm, { FeatureRecommendationFormFields } from './action_forms/FeatureRecommendationForm.jsx'
 
 export class ActionForm extends React.Component {
   render() {
@@ -31,6 +32,10 @@ export default reduxForm({
       case 'console-log':
         ChildForm = ConsoleLogForm;
         fields = ConsoleLogFormFields;
+        break;
+      case 'feature-recommendation':
+        ChildForm = FeatureRecommendationForm;
+        fields = FeatureRecommendationFormFields;
         break;
     }
 

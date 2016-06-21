@@ -15,7 +15,7 @@ export class RecipeForm extends React.Component {
     super(props);
 
     this.state = {
-      availableActions: ['console-log', 'show-heartbeat'],
+      availableActions: ['console-log', 'show-heartbeat', 'feature-recommendation'],
       selectedAction: null,
     };
   }

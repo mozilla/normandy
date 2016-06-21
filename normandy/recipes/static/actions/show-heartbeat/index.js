@@ -56,7 +56,7 @@ export class HeartbeatFlow {
                 defaultBrowser: client.isDefaultBrowser,
                 plugins: plugins,
                 flashVersion: flashPlugin ? flashPlugin.version : undefined,
-                doNotTrack: navigator.doNotTrack === '1',
+                doNotTrack: false,
             },
             is_test: normandy.testing,
         };

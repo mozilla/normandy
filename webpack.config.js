@@ -58,6 +58,7 @@ module.exports = [
   {
     entry: {
       'console-log': './normandy/recipes/static/actions/console-log/index',
+      'feature-recommendation': './normandy/recipes/static/actions/feature-recommendation/index',
       'show-heartbeat': './normandy/recipes/static/actions/show-heartbeat/index',
     },
 

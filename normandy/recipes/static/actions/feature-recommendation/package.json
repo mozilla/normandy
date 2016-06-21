@@ -1,0 +1,89 @@
+{
+    "name": "feature-recommendation",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./index.js",
+    "normandy": {
+        "driverVersion": "1.x",
+        "argumentsSchema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "title": "Recommend add-ons for a target domain.",
+            "description": "This action can recommend one or more add-ons when the user visits a specified domain.",
+            "type": "object",
+            "required": [
+                "domain",
+                "recommendations"
+            ],
+            "properties": {
+                "domain": {
+                    "type": "string",
+                    "description": "Target domain on which to suggest Add-on",
+                    "default": ""
+                },
+                "recommendations": {
+                    "type": "array",
+                    "format": "tabs",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/recommendation"
+                    }
+                }
+            },
+            "definitions": {
+                "name": {
+                    "description": "Name of Add-on to suggest",
+                    "type": "string",
+                    "default": ""
+                },
+                "id": {
+                    "description": "Id of Add-on",
+                    "type": "string",
+                    "default": ""
+                },
+                "description": {
+                    "description": "Description of Add-on",
+                    "type": "string",
+                    "default": ""
+                },
+                "packageURL": {
+                    "description": "URL of Add-on package for install",
+                    "type": "string",
+                    "default": ""
+                },
+                "imageURL": {
+                    "description": "URL of image for Add-on",
+                    "type": "string",
+                    "default": ""
+                },
+                "infoURL": {
+                    "description": "URL for link users can click for more info on Add-on",
+                    "type": "string",
+                    "default": ""
+                },
+                "recommendation": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "$ref": "#/definitions/name"
+                        },
+                        "id": {
+                            "$ref": "#/definitions/id"
+                        },
+                        "description": {
+                            "$ref": "#/definitions/description"
+                        },
+                        "packageURL": {
+                            "$ref": "#/definitions/packageURL"
+                        },
+                        "imageURL": {
+                            "$ref": "#/definitions/imageURL"
+                        },
+                        "infoURL": {
+                            "$ref": "#/definitions/infoURL"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
