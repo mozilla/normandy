@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import { push } from 'react-router-redux'
 import { destroy, reduxForm, getValues } from 'redux-form'
 import jexl from 'jexl'
 
-import apiFetch from '../utils/apiFetch.js';
-import ControlActions from '../actions/ControlActions.js'
+import { makeApiRequest, recipeUpdated, recipeAdded } from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import ActionForm from './ActionForm.jsx'
 import CheckboxField from './form_fields/CheckboxField.jsx';
@@ -39,9 +39,13 @@ export class RecipeForm extends React.Component {
 
   submitForm() {
     const { dispatch, formState, recipeId } = this.props;
+
+    let submitAction, successAction;
     let recipeFormValues = getValues(formState.recipe);
     let actionFormValues = getValues(formState.action);
     let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
+    let requestBody = { recipe: combinedFormValues, recipeId };
+
     return this.validateForm(combinedFormValues)
     .catch(error => {
       throw {
@@ -50,14 +54,18 @@ export class RecipeForm extends React.Component {
     })
     .then(response => {
       if (recipeId) {
-        dispatch(ControlActions.makeApiRequest('updateRecipe', {
-          recipe: combinedFormValues,
-          recipeId: recipeId
-        }));
+        submitAction = 'updateRecipe';
+        successAction = (response) => dispatch(recipeUpdated(response));
       } else {
-        dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
-      }
-    })
+        submitAction = 'addRecipe';
+        successAction = (response) => {
+          dispatch(recipeAdded(response));
+          dispatch(push(`/control/recipe/${response.id}/`));
+        };
+      };
+
+      return dispatch(makeApiRequest(submitAction, requestBody)).then(response => successAction(response));
+    });
   }
 
   componentWillReceiveProps(nextProps) {

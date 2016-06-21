@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import ControlActions from '../actions/ControlActions.js'
+import { setNotification } from '../actions/ControlActions.js'
 import classNames from 'classnames'
 
 class NotificationBar extends React.Component {
@@ -18,7 +18,7 @@ class NotificationBar extends React.Component {
 
   removeNotification() {
     const { dispatch } = this.props;
-    dispatch(ControlActions.setNotification());
+    dispatch(setNotification());
   }
 
   render() {

@@ -4,7 +4,7 @@ import { push } from 'react-router-redux'
 import { Table, Thead, Th, Tr, Td, applyFilter } from 'reactable'
 import classNames from 'classnames'
 import moment from 'moment'
-import ControlActions from '../actions/ControlActions.js'
+import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js'
 
 const BooleanIcon = (props) => {
   switch(props.value) {
@@ -56,14 +56,18 @@ class RecipeList extends React.Component {
   }
 
   componentWillMount() {
-    const { dispatch, recipes } = this.props
-    dispatch(ControlActions.makeApiRequest('fetchAllRecipes', {}));
-    dispatch(ControlActions.setSelectedRecipe(null));
+    const { dispatch, isFetching, recipeListNeedsFetch } = this.props
+    dispatch(setSelectedRecipe(null));
+
+    if (recipeListNeedsFetch && !isFetching) {
+      dispatch(makeApiRequest('fetchAllRecipes', {}))
+      .then(recipes => dispatch(recipesReceived(recipes)));
+    }
   }
 
   viewRecipe(recipe) {
     const { dispatch } = this.props;
-    dispatch(ControlActions.setSelectedRecipe(recipe.id));
+    dispatch(setSelectedRecipe(recipe.id));
     dispatch(push(`/control/recipe/${recipe.id}/`));
   }
 
@@ -127,7 +131,9 @@ class RecipeList extends React.Component {
 
 let mapStateToProps = (state, ownProps) => ({
   recipes: state.controlApp.recipes || [],
-  dispatch: ownProps.dispatch
+  dispatch: ownProps.dispatch,
+  recipeListNeedsFetch: state.controlApp.recipeListNeedsFetch,
+  isFetching: state.controlApp.isFetching
 })
 
 export default connect(

@@ -2,7 +2,7 @@ import React, { PropTypes as pt } from 'react'
 import { push } from 'react-router-redux'
 import moment from 'moment'
 import composeRecipeContainer from './RecipeContainer.jsx'
-import apiFetch from '../utils/apiFetch.js';
+import { makeApiRequest } from '../actions/ControlActions.js'
 
 class RecipeHistory extends React.Component {
   constructor(props) {
@@ -13,11 +13,13 @@ class RecipeHistory extends React.Component {
   }
 
   getHistory(recipeId) {
-    apiFetch(`/api/v1/recipe/${recipeId}/history/`)
-    .then(response => {
+    const { dispatch } = this.props;
+
+    dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
+    .then(history => {
       this.setState({
-        revisionLog: response
-      })
+        revisionLog: history.reverse()
+      });
     });
   }
 

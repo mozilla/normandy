@@ -1,6 +1,6 @@
 import React from 'react'
 import { push } from 'react-router-redux'
-import ControlActions from '../actions/ControlActions.js'
+import { makeApiRequest, recipeDeleted } from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 
 class DeleteRecipe extends React.Component {
@@ -14,8 +14,12 @@ class DeleteRecipe extends React.Component {
             <div className="form-action-buttons">
               <div className="fluid-2 float-right">
                 <input type="submit" value="Confirm" class="delete" onClick={(e) => {
-                  dispatch(ControlActions.makeApiRequest('deleteRecipe', { recipeId }));
-                  dispatch(push(`/control/`));
+                  e.preventDefault();
+                  dispatch(makeApiRequest('deleteRecipe', { recipeId }))
+                  .then(response => {
+                    dispatch(recipeDeleted(recipeId));
+                    dispatch(push('/control/'));
+                  });
                 }} />
               </div>
             </div>
