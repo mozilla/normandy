@@ -2,13 +2,14 @@ import {
   REQUEST_IN_PROGRESS, REQUEST_COMPLETE,
   RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED,
   RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
-  SET_SELECTED_RECIPE } from '../actions/ControlActions.js';
+  SET_SELECTED_RECIPE, SET_NOTIFICATION } from '../actions/ControlActions.js';
 
 let initialState = {
   recipes: null,
   isFetching: false,
   selectedRecipe: null,
-  recipeListNeedsFetch: true
+  recipeListNeedsFetch: true,
+  notification: null,
 };
 
 function controlAppReducer(state = initialState, action) {
@@ -38,6 +39,11 @@ function controlAppReducer(state = initialState, action) {
     case SET_SELECTED_RECIPE:
       return Object.assign({}, state, {
         selectedRecipe: action.recipeId
+      });
+
+    case SET_NOTIFICATION:
+      return Object.assign({}, state, {
+        notification: action.notification
       });
 
     case RECIPE_ADDED:
