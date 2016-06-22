@@ -204,6 +204,7 @@ class Base(Core):
     ADMIN_ENABLED = values.BooleanValue(True)
     ACTION_IMPLEMENTATION_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
     NUM_PROXIES = values.IntegerValue(0)
+    API_CACHE_TIME = values.IntegerValue(30)
 
 
 class Development(Base):
@@ -220,6 +221,7 @@ class Development(Base):
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
 
     CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(True)
+    API_CACHE_TIME = values.IntegerValue(0)
 
 
 class Production(Base):
