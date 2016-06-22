@@ -16,6 +16,7 @@ services:
       # From etc/autograph.yaml
       DJANGO_AUTOGRAPH_HAWK_ID: alice
       DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: fs5wgcer9qj819kfptdlp8gm227ewxnzvsuj9ztycsx08hfhzu
+      DJANGO_CAN_EDIT_ACTIONS_IN_USE: "true"
     stop_signal: SIGKILL
 
   proxy:
