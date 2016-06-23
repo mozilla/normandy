@@ -74,16 +74,5 @@ module.exports = function(config) {
         concurrency: Infinity,
     };
 
-    // Add JUnit reporting if we're running on CircleCI.
-    var reportDir = process.env.CIRCLE_TEST_REPORTS;
-    if (reportDir) {
-        console.log('Setting up JUnit reporting');
-        karmaConfig.reporters.push('junit');
-        karmaConfig.junitReporter = {
-            // results will be saved as $outputDir/$browserName.xml
-            outputDir: reportDir,
-        };
-    }
-
     config.set(karmaConfig);
 };
