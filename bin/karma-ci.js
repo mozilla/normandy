@@ -9,7 +9,8 @@ var config = karmaConfig.parseConfig(__dirname + '/../karma.conf.js', {
 var server = new karma.Server(config);
 
 server.on('browser_complete', (completedBrowser) => {
-  if (completedBrowser.lastResult.failed > 0) {
+  console.log(completedBrowser);
+  if (completedBrowser.lastResult.error || completedBrowser.lastResult.failed > 0) {
     process.exit(1);
   } else {
     process.exit(0);
