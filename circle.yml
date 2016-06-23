@@ -32,10 +32,11 @@ test:
     # Start Karma test server, and run them in Firefox
     - >
       (
-        docker run -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis;
+        docker run --net host -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis;
+        echo Starting Firefox;
         firefox localhost:9876
       ) &
-      docker run -p 9876:9876 normandy:build node bin/karma-ci.js
+      docker run --net host -p 9876:9876 normandy:build node bin/karma-ci.js
   post:
     # Save test artifacts for Python and Lint tests
     - >
