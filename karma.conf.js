@@ -81,9 +81,6 @@ module.exports = function(config) {
         karmaConfig.junitReporter = {
             // results will be saved as $outputDir/$browserName.xml
             outputDir: reportDir,
-
-            // if included, results will be saved as $outputDir/$browserName/$outputFile
-            outputFile: 'normandy-actions.xml',
         };
     }
 

@@ -36,7 +36,10 @@ test:
         echo Starting Firefox;
         firefox localhost:9876
       ) &
-      docker run --net host -p 9876:9876 normandy:build node bin/karma-ci.js
+      docker run --net host -p 9876:9876
+      -e CIRCLE_TEST_REPORTS=/test_artifacts
+      -v $CIRCLE_TEST_REPORTS:/test_artifacts
+      normandy:build node bin/karma-ci.js
   post:
     # Save test artifacts for Python and Lint tests
     - >
