@@ -13,7 +13,7 @@ const BooleanIcon = (props) => {
   }
 }
 
-const FilterBar = ({searchText, filterStatus, updateSearch, updateFilter}) => {
+const FilterBar = ({searchText, selectedFilter, updateSearch, updateFilter}) => {
   return (
     <div id="secondary-header" className="fluid-8">
       <div className="fluid-2">
@@ -23,7 +23,7 @@ const FilterBar = ({searchText, filterStatus, updateSearch, updateFilter}) => {
       </div>
       <div id="filters-container" className="fluid-6">
         <h4>Filter By:</h4>
-        <SwitchFilter options={['All', 'Enabled', 'Disabled']} selectedFilter={filterStatus} updateFilter={updateFilter} />
+        <SwitchFilter options={['All', 'Enabled', 'Disabled']} selectedFilter={selectedFilter} updateFilter={updateFilter} />
       </div>
     </div>
   );
@@ -48,13 +48,13 @@ class RecipeList extends React.Component {
     super(props);
     this.state = {
       searchText: '',
-      searchQuery: '',
-      filterStatus: 'All'
+      filteredRecipes: null,
+      selectedFilter: 'All'
     }
   }
 
   componentWillMount() {
-    const { dispatch } = this.props
+    const { dispatch, recipes } = this.props
     dispatch(ControlActions.makeApiRequest('fetchAllRecipes', {}));
     dispatch(ControlActions.setSelectedRecipe(null));
   }
@@ -67,51 +67,38 @@ class RecipeList extends React.Component {
 
   updateSearch(event) {
     this.setState({
-      searchText: event.target.value,
-      searchQuery: `${event.target.value}:${this.state.filterStatus}`
+      searchText: event.target.value
     });
   }
 
   updateFilter(filterStatus) {
-    let searchQuery = this.state.searchText;
-    if (filterStatus !== 'All') {
-      searchQuery = `${this.state.searchText}:${filterStatus}`;
+    const { recipes } = this.props;
+
+    if (filterStatus === 'All') {
+      this.setState({
+        filteredRecipes: null,
+        selectedFilter: filterStatus
+      });
+    } else {
+      let enabledState = (filterStatus === 'Enabled') ? true : false;
+      this.setState({
+        filteredRecipes: recipes.filter(recipe => recipe.enabled === enabledState),
+        selectedFilter: filterStatus
+      });
     }
-
-    this.setState({
-      searchQuery,
-      filterStatus
-    })
-  }
-
-  parseFilter(contents, filter) {
-    let enabledStatusMatches = true;
-
-    if (this.state.filterStatus !== 'All') {
-      enabledStatusMatches = (contents.split(':')[1] === this.state.filterStatus);
-    }
-
-    return enabledStatusMatches && contents.toLowerCase().indexOf(this.state.searchText.toLowerCase()) > -1;
-  }
-
-  formatFilterValue(recipe, property) {
-    let status = (recipe.enabled === true ? 'Enabled' : 'Disabled');
-    return `${recipe[property]}:${status}`;
   }
 
   render() {
     const { dispatch, recipes } = this.props;
+    let filteredRecipes = this.state.filteredRecipes || recipes;
 
     return (
       <div>
       <FilterBar {...this.state} updateFilter={::this.updateFilter} updateSearch={::this.updateSearch} />
       <div className="fluid-8">
         <Table id="recipe-list" sortable={true} hideFilterInput
-          filterable={[
-            { column: 'name', filterFunction: ::this.parseFilter },
-            { column: 'action', filterFunction: ::this.parseFilter }
-          ]}
-          filterBy={this.state.searchQuery}>
+          filterable={['name', 'action']}
+          filterBy={this.state.searchText}>
           <Thead>
             <Th column="name"><span>Name</span></Th>
             <Th column="action"><span>Action Name</span></Th>
@@ -119,11 +106,11 @@ class RecipeList extends React.Component {
             <Th column="is_approved"><span>Approved</span></Th>
             <Th column="last_updated"><span>Last Updated</span></Th>
           </Thead>
-          { recipes.map(recipe =>
+          { filteredRecipes.map(recipe =>
             <Tr key={recipe.id} onClick={(e) => { ::this.viewRecipe(recipe); }}>
-              <Td column="name" value={this.formatFilterValue(recipe, 'name')}>{recipe.name}</Td>
-              <Td column="action" value={this.formatFilterValue(recipe, 'action')}>{recipe.action}</Td>
-              <Td column="enabled" value={recipe.enabled ? 'Enabled' : 'Disabled'}><BooleanIcon value={recipe.enabled} /></Td>
+              <Td column="name">{recipe.name}</Td>
+              <Td column="action">{recipe.action}</Td>
+              <Td column="enabled" value={recipe.enabled}><BooleanIcon value={recipe.enabled} /></Td>
               <Td column="is_approved" value={recipe.is_approved}><BooleanIcon value={recipe.is_approved} /></Td>
               <Td column="last_updated" value={recipe.last_updated}>{moment(recipe.last_updated).fromNow()}</Td>
             </Tr>
