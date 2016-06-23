@@ -51,20 +51,6 @@ class TestRecipe(object):
         recipe.save()
         assert recipe.revision_id == revision_id + 1
 
-    @pytest.mark.skip(reason='disabled approvals temporarily')
-    def test_changing_whitelisted_field_does_not_disable_recipe(self):
-        recipe = RecipeFactory(name='enabled', enabled=True)
-        recipe.name = 'not disabled'
-        recipe.save()
-        assert recipe.enabled
-
-    @pytest.mark.xfail(reason='disabled approvals temporarily')
-    def test_changing_non_whitelisted_field_disables_recipe(self):
-        recipe = RecipeFactory(enabled=True)
-        recipe.action = ActionFactory()
-        recipe.save()
-        assert not recipe.enabled
-
 
 @pytest.mark.django_db
 class TestApprovalRequest(object):

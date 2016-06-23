@@ -1,7 +1,6 @@
 import React from 'react';
 
-const CheckboxField = (props) => {
-  const {label, field, containerClass} = props;
+export default function CheckboxField({label, field, containerClass}) {
   return (
     <div className="row">
       <div className={containerClass}>
@@ -12,6 +11,4 @@ const CheckboxField = (props) => {
       </div>
     </div>
   );
-};
-
-export default CheckboxField;
+}
