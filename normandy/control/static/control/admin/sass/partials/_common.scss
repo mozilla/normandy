@@ -63,9 +63,10 @@ input, select, textarea {
   }
 }
 
-.switch-label {
+.switch span {
   color: $darkBrown;
   cursor: pointer;
+  font-size: 12px;
   float: left;
   line-height: 26px;
   padding: 0px;
@@ -74,15 +75,12 @@ input, select, textarea {
   text-transform: none;
   width: 33%;
   z-index: 2;
-}
 
-.switch-label:active { font-weight: 600; }
-.switch-input { display: none; }
-
-.switch-input:checked + .switch-label {
-  font-weight: 600;
-  text-shadow: 0 1px rgba(255, 255, 255, 0.25);
-  transition: 0.15s ease-out;
+  &.active {
+    font-weight: 600;
+    height: 26px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.25);
+  }
 }
 
 .switch-selection {
@@ -91,9 +89,15 @@ input, select, textarea {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(0, 0, 0, 0.2);
   display: block;
   height: 26px;
+  left: 5px;
   position: absolute;
+  top: 5px;
   transition: left 0.15s ease-out;
   width: 33%;
+  z-index: 1;
+
+  &.position-1 { left: 33%; }
+  &.position-2 { left: 65%; }
 }
 
 
@@ -127,6 +131,7 @@ input, select, textarea {
 table {
   border-collapse: collapse;
   font-family: $SourceSansPro;
+  table-layout: fixed;
   width: 100%;
 
   a:link, a:visited {
@@ -139,6 +144,42 @@ thead {
   font-weight: 600;
   font-size: 13px;
   font-family: $OpenSans;
+
+  th {
+    outline: 0;
+    padding: 5px 0px;
+    position: relative;
+    &:hover { cursor: pointer; }
+
+    &.reactable-th-name { width: 30%; }
+
+    span::after {
+      color: $secondaryColor;
+      content: "\f0dc";
+      display: inline-block;
+      font: normal normal 400 16px/18px FontAwesome;
+      margin: 0 0 0 10px;
+      position: absolute;
+    }
+
+    &.reactable-header-sort-asc {
+      span::after {
+        color: $cta;
+        content: "\f0de";
+        font-size-adjust: 0.85;
+        margin-top: 6px;
+      }
+    }
+
+    &.reactable-header-sort-desc {
+      span::after {
+        color: $cta;
+        content: "\f0dd";
+        font-size-adjust: 0.85;
+        margin-top: -5px;
+      }
+    }
+  }
 }
 
 tr:nth-child(even) {
