@@ -131,6 +131,7 @@ input, select, textarea {
 table {
   border-collapse: collapse;
   font-family: $SourceSansPro;
+  table-layout: fixed;
   width: 100%;
 
   a:link, a:visited {
@@ -147,8 +148,37 @@ thead {
   th {
     outline: 0;
     padding: 5px 0px;
+    position: relative;
     &:hover { cursor: pointer; }
-    i { color: $secondaryColor; }
+
+    &.reactable-th-name { width: 30%; }
+
+    span::after {
+      color: $secondaryColor;
+      content: "\f0dc";
+      display: inline-block;
+      font: normal normal 400 16px/18px FontAwesome;
+      margin: 0 0 0 10px;
+      position: absolute;
+    }
+
+    &.reactable-header-sort-asc {
+      span::after {
+        color: $cta;
+        content: "\f0de";
+        font-size-adjust: 0.85;
+        margin-top: 6px;
+      }
+    }
+
+    &.reactable-header-sort-desc {
+      span::after {
+        color: $cta;
+        content: "\f0dd";
+        font-size-adjust: 0.85;
+        margin-top: -5px;
+      }
+    }
   }
 }
 

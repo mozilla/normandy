@@ -13,11 +13,26 @@ const BooleanIcon = (props) => {
   }
 }
 
-const SwitchFilter = (props) => {
-  const { options, selectedFilter, updateFilter } = props;
+const FilterBar = ({searchText, filterStatus, updateSearch, updateFilter}) => {
+  return (
+    <div id="secondary-header" className="fluid-8">
+      <div className="fluid-2">
+        <div className="search input-with-icon">
+          <input type="text" placeholder="Search" value={searchText} onChange={updateSearch} />
+        </div>
+      </div>
+      <div id="filters-container" className="fluid-6">
+        <h4>Filter By:</h4>
+        <SwitchFilter options={['All', 'Enabled', 'Disabled']} selectedFilter={filterStatus} updateFilter={updateFilter} />
+      </div>
+    </div>
+  );
+}
+
+const SwitchFilter = ({ options, selectedFilter, updateFilter }) => {
   return (
     <div className="switch">
-      <div className={classNames('switch-selection', `position-${options.indexOf(selectedFilter)}`)}>&nbsp;</div>
+      <div className={`switch-selection position-${options.indexOf(selectedFilter)}`}>&nbsp;</div>
       { options.map(option =>
         <span key={option}
           className={classNames({ 'active': (option === selectedFilter) })}
@@ -89,44 +104,33 @@ class RecipeList extends React.Component {
 
     return (
       <div>
-        <div id="secondary-header" className="fluid-8">
-          <div className="fluid-2">
-            <div className="search input-with-icon">
-              <input type="text" placeholder="Search" value={this.state.searchText} onChange={::this.updateSearch} />
-            </div>
-          </div>
-          <div id="filters-container" className="fluid-6">
-            <h4>Filter By:</h4>
-            <SwitchFilter options={['All', 'Enabled', 'Disabled']} selectedFilter={this.state.filterStatus} updateFilter={::this.updateFilter} />
-          </div>
-        </div>
-
-        <div className="fluid-8">
-          <Table id="recipe-list" sortable={true} hideFilterInput
-            filterable={[
-              { column: 'name', filterFunction: ::this.parseFilter },
-              { column: 'action', filterFunction: ::this.parseFilter }
-            ]}
-            filterBy={this.state.searchQuery}>
-            <Thead>
-              <Th column="name">Name <i className="fa fa-sort post">&nbsp;</i></Th>
-              <Th column="action">Action Name <i className="fa fa-sort post">&nbsp;</i></Th>
-              <Th column="enabled">Enabled <i className="fa fa-sort post">&nbsp;</i></Th>
-              <Th column="is_approved">Approved <i className="fa fa-sort post">&nbsp;</i></Th>
-              <Th column="last_updated">Last Updated <i className="fa fa-sort post">&nbsp;</i></Th>
-            </Thead>
-            { recipes.map(recipe =>
-              <Tr key={recipe.id} onClick={(e) => { ::this.viewRecipe(recipe); }}>
-                <Td column="name" value={this.formatFilterValue(recipe, 'name')}>{recipe.name}</Td>
-                <Td column="action" value={this.formatFilterValue(recipe, 'action')}>{recipe.action}</Td>
-                <Td column="enabled" value={recipe.enabled ? 'Enabled' : 'Disabled'}><BooleanIcon value={recipe.enabled} /></Td>
-                <Td column="is_approved" value={recipe.is_approved}><BooleanIcon value={recipe.is_approved} /></Td>
-                <Td column="last_updated" value={recipe.last_updated}>{moment(recipe.last_updated).fromNow()}</Td>
-              </Tr>
-              )
-            }
-          </Table>
-        </div>
+      <FilterBar {...this.state} updateFilter={::this.updateFilter} updateSearch={::this.updateSearch} />
+      <div className="fluid-8">
+        <Table id="recipe-list" sortable={true} hideFilterInput
+          filterable={[
+            { column: 'name', filterFunction: ::this.parseFilter },
+            { column: 'action', filterFunction: ::this.parseFilter }
+          ]}
+          filterBy={this.state.searchQuery}>
+          <Thead>
+            <Th column="name"><span>Name</span></Th>
+            <Th column="action"><span>Action Name</span></Th>
+            <Th column="enabled"><span>Enabled</span></Th>
+            <Th column="is_approved"><span>Approved</span></Th>
+            <Th column="last_updated"><span>Last Updated</span></Th>
+          </Thead>
+          { recipes.map(recipe =>
+            <Tr key={recipe.id} onClick={(e) => { ::this.viewRecipe(recipe); }}>
+              <Td column="name" value={this.formatFilterValue(recipe, 'name')}>{recipe.name}</Td>
+              <Td column="action" value={this.formatFilterValue(recipe, 'action')}>{recipe.action}</Td>
+              <Td column="enabled" value={recipe.enabled ? 'Enabled' : 'Disabled'}><BooleanIcon value={recipe.enabled} /></Td>
+              <Td column="is_approved" value={recipe.is_approved}><BooleanIcon value={recipe.is_approved} /></Td>
+              <Td column="last_updated" value={recipe.last_updated}>{moment(recipe.last_updated).fromNow()}</Td>
+            </Tr>
+            )
+          }
+        </Table>
+      </div>
       </div>
     )
   }
