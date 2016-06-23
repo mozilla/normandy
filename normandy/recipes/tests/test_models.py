@@ -51,6 +51,19 @@ class TestRecipe(object):
         recipe.save()
         assert recipe.revision_id == revision_id + 1
 
+    def test_revision_id_doesnt_increment_if_no_changes(self):
+        """
+        revision_id should not increment if a recipe is saved with no
+        changes.
+        """
+        recipe = RecipeFactory()
+
+        # The factory saves a couple times so revision id is not 0
+        revision_id = recipe.revision_id
+
+        recipe.save()
+        assert recipe.revision_id == revision_id
+
 
 @pytest.mark.django_db
 class TestApprovalRequest(object):

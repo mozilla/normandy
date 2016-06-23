@@ -110,7 +110,7 @@ class ClientSerializer(serializers.Serializer):
 
 class RecipeVersionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='revision.date_created', read_only=True)
-    recipe = RecipeSerializer(source='object_version.object', read_only=True)
+    recipe = RecipeSerializer(source='_object_version.object', read_only=True)
 
     class Meta:
         model = Version

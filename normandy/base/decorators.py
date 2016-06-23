@@ -22,6 +22,6 @@ def short_circuit_middlewares(view_func):
 
 def reversion_transaction(view_func):
     def wrapped_view(*args, **kwargs):
-        with transaction.atomic(), revisions.create_revision():
+        with transaction.atomic(), revisions.create_revision(manage_manually=True):
             return view_func(*args, **kwargs)
     return wraps(view_func)(wrapped_view)
