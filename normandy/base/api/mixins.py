@@ -2,7 +2,7 @@ from django.conf import settings
 from django.views.decorators.cache import cache_control
 
 
-class CachingMixin:
+class CachingViewsetMixin(object):
     """Modify a ModelViewSet to add caching to read methods"""
 
     @cache_control(public=True, max_age=settings.API_CACHE_TIME)
