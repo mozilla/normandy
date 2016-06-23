@@ -84,7 +84,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     current_approval_request = ApprovalRequestSerializer(read_only=True)
     approval = ApprovalSerializer(read_only=True)
     is_approved = serializers.BooleanField(read_only=True)
-    enabled = serializers.BooleanField(read_only=True)
+    enabled = serializers.BooleanField()
 
     class Meta:
         model = Recipe

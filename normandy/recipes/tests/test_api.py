@@ -115,10 +115,13 @@ class TestRecipeAPI(object):
     def test_it_can_create_recipes(self, api_client):
         action = ActionFactory()
 
-        res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
-                                                  'action': action.name,
-                                                  'arguments': {},
-                                                  'filter_expression': 'whatever'})
+        res = api_client.post('/api/v1/recipe/', {
+            'name': 'Test Recipe',
+            'action': action.name,
+            'arguments': {},
+            'filter_expression': 'whatever',
+            'enabled': True
+        })
         assert res.status_code == 201
 
         recipes = Recipe.objects.all()
@@ -211,19 +214,6 @@ class TestRecipeAPI(object):
 
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
-
-    def test_cannot_enable_unapproved_recipes(self, api_client):
-        recipe = RecipeFactory(approval=None, enabled=False)
-
-        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-        assert res.status_code == 400
-
-    def test_can_enable_unapproved_recipes_in_development(self, api_client, settings):
-        settings.REQUIRE_RECIPE_AUTH = False
-        recipe = RecipeFactory(approval=None, enabled=False)
-
-        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-        assert res.status_code == 204
 
     def test_it_can_disable_recipes(self, api_client):
         recipe = RecipeFactory(enabled=True)

@@ -8,6 +8,7 @@ import apiFetch from '../utils/apiFetch.js';
 import ControlActions from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import ActionForm from './ActionForm.jsx'
+import CheckboxField from './form_fields/CheckboxField.jsx';
 import FormField from './form_fields/FormFieldWrapper.jsx';
 
 export class RecipeForm extends React.Component {
@@ -85,6 +86,7 @@ export class RecipeForm extends React.Component {
         }
 
         <FormField type="text" label="Name" field={name} containerClass="fluid-3" />
+        <CheckboxField label="Enabled" field={enabled} containerClass="fluid-3" />
         <FormField type="textarea" label="Filter Expression" field={filter_expression} containerClass="fluid-3" />
         <FormField type="select" label="Action" field={action} containerClass="fluid-3"
           options={availableActions}
