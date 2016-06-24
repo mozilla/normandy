@@ -44,6 +44,8 @@ const SwitchFilter = ({ options, selectedFilter, updateFilter }) => {
 }
 
 class RecipeList extends React.Component {
+  title = 'Recipes';
+
   constructor(props) {
     super(props);
     this.state = {
