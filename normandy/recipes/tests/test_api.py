@@ -1,4 +1,5 @@
 import hashlib
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
@@ -142,7 +143,7 @@ class TestRecipeAPI(object):
         recipes = Recipe.objects.all()
         assert recipes.count() == 1
 
-    def test_it_can_edit_recipes(self, api_client):
+    def test_it_can_edit_recipes(self, api_client, skip_midair):
         recipe = RecipeFactory(name='unchanged', filter_expression='true')
         old_revision_id = recipe.revision_id
 
@@ -166,11 +167,13 @@ class TestRecipeAPI(object):
         recipes = Recipe.objects.all()
         assert recipes.count() == 0
 
-    def test_it_can_change_action_for_recipes(self, api_client):
+    def test_it_can_change_action_for_recipes(self, api_client, skip_midair):
         recipe = RecipeFactory()
         action = ActionFactory()
 
-        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'action': action.name})
+        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {
+            'action': action.name,
+        })
         assert res.status_code == 200
 
         recipe = Recipe.objects.get(pk=recipe.id)
@@ -275,6 +278,25 @@ class TestRecipeAPI(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
+    def test_midair_collisions(self, api_client):
+        recipe = RecipeFactory(name='first')
+        original_last_updated = recipe.last_updated
+
+        url = '/api/v1/recipe/{id}/'.format(id=recipe.id)
+        res = api_client.patch(url, {'name': 'second', 'last_updated': original_last_updated})
+        assert res.status_code == 200
+        recipe = Recipe.objects.get(id=recipe.id)
+        assert recipe.name == 'second'
+
+        # Midair collision only operates on one second precision, for easier
+        # client design. Cheat here so that we can artificially slow down this test.
+        original_last_updated -= timedelta(seconds=10)
+
+        res = api_client.patch(url, {'name': 'third', 'last_updated': original_last_updated})
+        assert res.status_code == 409  # HTTP 409 Conflict
+        recipe = Recipe.objects.get(id=recipe.id)
+        assert recipe.name == 'second'
+
 
 @pytest.mark.django_db
 class TestRecipeVersionAPI(object):
@@ -340,7 +362,7 @@ class TestApprovalRequestAPI(object):
             'creator_id': user.id, 'active': True, 'recipe_id': recipe.id})
         assert res.status_code == 400
 
-    def test_it_can_edit_approval_requests(self, api_client):
+    def test_it_can_edit_approval_requests(self, api_client, skip_midair):
         approval_request = ApprovalRequestFactory(active=True)
 
         res = api_client.patch('/api/v1/approval_request/%s/' % approval_request.id,
@@ -460,7 +482,7 @@ class TestApprovalRequestCommentAPI(object):
         comments = ApprovalRequestComment.objects.all()
         assert comments.count() == 1
 
-    def test_it_can_edit_comments(self, api_client):
+    def test_it_can_edit_comments(self, api_client, skip_midair):
         comment = ApprovalRequestCommentFactory(text='unchanged')
 
         res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,

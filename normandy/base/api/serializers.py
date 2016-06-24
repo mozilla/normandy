@@ -17,3 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
         ]
+
+
+class LastUpdatedSerializer(serializers.Serializer):
+    last_updated = serializers.DateTimeField()

@@ -5,6 +5,7 @@ import pytest
 from rest_framework.test import APIClient
 
 from normandy.base.tests import UserFactory, skip_except_in_ci
+from normandy.base.api import mixins
 from normandy.recipes import geolocation as geolocation_module
 
 
@@ -33,3 +34,13 @@ def geolocation():
         skip_except_in_ci()
     else:
         return geolocation_module
+
+
+@pytest.yield_fixture()
+def skip_midair():
+    """Fixture to skip mid-air collision checks"""
+    try:
+        mixins._enable_midair_collision(False)
+        yield None
+    finally:
+        mixins._enable_midair_collision(True)
