@@ -11,6 +11,7 @@ from reversion.models import Version
 
 from normandy.base.api import UpdateOrCreateModelViewSet
 from normandy.base.api.filters import CaseInsensitiveBooleanFilter
+from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import reversion_transaction
@@ -25,7 +26,7 @@ from normandy.recipes.api.serializers import (
 )
 
 
-class ActionViewSet(viewsets.ReadOnlyModelViewSet):
+class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     """Viewset for viewing recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
@@ -62,7 +63,7 @@ class RecipeFilters(django_filters.FilterSet):
         fields = ['action', 'enabled']
 
 
-class RecipeViewSet(UpdateOrCreateModelViewSet):
+class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     """Viewset for viewing and uploading recipes."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
