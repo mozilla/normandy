@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import Mozilla from './uitour.js'
 import Normandy from './normandy_driver.js'
 import uuid from 'node-uuid'
