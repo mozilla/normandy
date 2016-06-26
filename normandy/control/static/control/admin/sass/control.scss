@@ -296,23 +296,33 @@
 }
 
 
-
 /* Recipe History */
-li {
-  p {
-    display: inline-block;
-    line-height: 20px;
-    margin: 0px 20px;
-    vertical-align: top;
+.recipe-history {
+  .history-item {
+    display: flex;
+    flex-direction: row;
 
-    &.revision-number {
+    .revision-number,
+    .revision-created {
+      line-height: 20px;
+      margin: 0 20px;
+    }
+
+    .revision-number {
+      flex: 0;
       font-weight: 600;
     }
-  }
 
-  span {
+    .revision-created {
+      flex: 1;
+    }
 
-    &.label {
+    .revision-status {
+      flex: 1;
+      margin: 0 20px; /* Reset .status-indicator margin */
+    }
+
+    .label {
       padding: 0px;
     }
   }
@@ -328,8 +338,8 @@ li {
   #content { padding: 20px; }
 }
 
-/* Recipe Preview */
-.preview-status {
+/* Status Indicator */
+.status-indicator {
     border: 1px solid;
     border-radius: 3px;
     font-size: 12px;
