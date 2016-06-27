@@ -36,12 +36,16 @@
     font: normal normal 300 20px/30px $SourceSansPro;
     padding: 15px 30px;
 
-    span {
-      font-weight: 400;
-      margin-left: 5px;
+    a:link, a:visited { color: $cream; }
+
+    .fa {
+      margin: 0 5px;
+      font-size: 15px;
     }
 
-    a:link, a:visited { color: $cream; }
+    span:last-child .fa {
+      display: none;
+    }
   }
 
   .button {
