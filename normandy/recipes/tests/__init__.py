@@ -1,3 +1,5 @@
+import hashlib
+
 import factory
 
 from django.template.defaultfilters import slugify
@@ -14,6 +16,7 @@ from normandy.recipes.models import (
     Locale,
     Recipe,
     ReleaseChannel,
+    Signature,
 )
 
 
@@ -23,6 +26,10 @@ class ActionFactory(factory.DjangoModelFactory):
 
     name = FuzzyUnicode()
     implementation = 'console.log("test");'
+
+    @factory.lazy_attribute
+    def implementation_hash(action):
+        return hashlib.sha1(action.implementation.encode()).hexdigest()
 
 
 class ApprovalFactory(factory.DjangoModelFactory):
@@ -40,6 +47,15 @@ class RecipeFactory(factory.DjangoModelFactory):
     action = factory.SubFactory(ActionFactory)
     enabled = True
     approval = factory.SubFactory(ApprovalFactory)
+
+    @factory.post_generation
+    def signed(self, create, extracted=False, **kwargs):
+        if extracted:
+            self.signature = SignatureFactory()
+            self.signature.save()
+            self.save()
+        else:
+            return None
 
     @factory.post_generation
     def countries(self, create, extracted, **kwargs):
@@ -83,6 +99,13 @@ class ApprovalRequestCommentFactory(factory.DjangoModelFactory):
 
     approval_request = factory.SubFactory(ApprovalRequestFactory)
     creator = factory.SubFactory(UserFactory)
+
+
+class SignatureFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Signature
+
+    signature = 'fake signature'
 
 
 class CountryFactory(factory.DjangoModelFactory):

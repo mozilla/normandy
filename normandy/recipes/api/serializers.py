@@ -5,8 +5,8 @@ from reversion.models import Version
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import (Action, Recipe, Approval, ApprovalRequest,
-                                     ApprovalRequestComment)
+from normandy.recipes.models import (
+    Action, Approval, ApprovalRequest, ApprovalRequestComment, Recipe, Signature)
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -119,3 +119,24 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
         ]
+
+
+class SignatureSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(read_only=True)
+    signature = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Signature
+        fields = ['timestamp', 'signature']
+
+
+class SignedRecipeSerializer(serializers.ModelSerializer):
+    signature = SignatureSerializer()
+    recipe = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ['signature', 'recipe']
+
+    def get_recipe(self, recipe):
+        return RecipeSerializer(recipe).data
