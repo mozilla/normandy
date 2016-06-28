@@ -17,7 +17,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Signature',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(
+                    auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('signature', models.TextField()),
                 ('timestamp', models.DateTimeField(default=django.utils.timezone.now)),
             ],
@@ -25,6 +26,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='recipe',
             name='signature',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='recipe', to='recipes.Signature'),
+            field=models.OneToOneField(
+                blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                related_name='recipe', to='recipes.Signature'),
         ),
     ]
