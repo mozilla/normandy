@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropTypes as pt } from 'react'
 import { push } from 'react-router-redux'
 import moment from 'moment'
 import composeRecipeContainer from './RecipeContainer.jsx'
@@ -49,14 +49,14 @@ class RecipeHistory extends React.Component {
 
 class HistoryItem extends React.Component {
   static propTypes = {
-    revision: React.PropTypes.shape({
-      recipe: React.PropTypes.shape({
-        revision_id: React.PropTypes.number.isRequired,
+    revision: pt.shape({
+      recipe: pt.shape({
+        revision_id: pt.number.isRequired,
       }).isRequired,
-      date_created: React.PropTypes.string.isRequired
+      date_created: pt.string.isRequired
     }).isRequired,
-    recipe: React.PropTypes.shape({
-      revision_id: React.PropTypes.number.isRequired,
+    recipe: pt.shape({
+      revision_id: pt.number.isRequired,
     }).isRequired,
   }
 
