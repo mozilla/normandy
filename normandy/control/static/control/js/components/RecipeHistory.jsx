@@ -48,6 +48,18 @@ class RecipeHistory extends React.Component {
 }
 
 class HistoryItem extends React.Component {
+  static propTypes = {
+    revision: React.PropTypes.shape({
+      recipe: React.PropTypes.shape({
+        revision_id: React.PropTypes.number.isRequired,
+      }).isRequired,
+      date_created: React.PropTypes.string.isRequired
+    }).isRequired,
+    recipe: React.PropTypes.shape({
+      revision_id: React.PropTypes.number.isRequired,
+    }).isRequired,
+  }
+
   render() {
     const { revision, recipe } = this.props;
     const isCurrent = revision.recipe.revision_id === recipe.revision_id;
