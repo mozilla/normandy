@@ -20,7 +20,7 @@ class CachingViewsetMixin(object):
 _midair_collision_enabled = True
 
 
-def _enable_midair_collision(enabled=True):
+def _set_midair_collision(enabled=True):
     global _midair_collision_enabled
     _midair_collision_enabled = enabled
 
@@ -31,8 +31,9 @@ class MidairCollisionViewsetMixin(object):
     def update(self, request, *args, **kwargs):
         if _midair_collision_enabled:
             # Using a serializer gets some easy validation
-            serializer = LastUpdatedSerializer()
-            request_ts = serializer.to_internal_value(request.data)['last_updated']
+            serializer = LastUpdatedSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            request_ts = serializer.validated_data['last_updated']
             instance_ts = self.get_object().last_updated
 
             # Round to one-second precision, because JSON serialization often

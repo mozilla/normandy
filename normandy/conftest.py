@@ -40,7 +40,7 @@ def geolocation():
 def skip_midair():
     """Fixture to skip mid-air collision checks"""
     try:
-        mixins._enable_midair_collision(False)
+        mixins._set_midair_collision(False)
         yield None
     finally:
-        mixins._enable_midair_collision(True)
+        mixins._set_midair_collision(True)
