@@ -15,7 +15,10 @@ module.exports = [
     context: __dirname,
 
     entry: {
-      selfrepair: './normandy/selfrepair/static/js/self_repair',
+      selfrepair: [
+        'babel-polyfill',
+        './normandy/selfrepair/static/js/self_repair',
+      ],
       control: [
         './normandy/control/static/control/js/index',
         './normandy/control/static/control/admin/sass/control.scss',

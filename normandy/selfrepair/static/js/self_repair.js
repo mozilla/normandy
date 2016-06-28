@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import Normandy from './normandy_driver.js';
 import {fetchRecipes, filterContext, doesRecipeMatch, runRecipe} from './self_repair_runner.js';
 
