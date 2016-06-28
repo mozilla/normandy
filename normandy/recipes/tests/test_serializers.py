@@ -50,6 +50,7 @@ class TestSignedRecipeSerializer:
             'signature': {
                 'signature': 'fake signature',
                 'timestamp': Whatever(),
+                'x5u': Whatever(),
             },
             'recipe': {
                 'name': recipe.name,

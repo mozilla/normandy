@@ -124,10 +124,11 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
 class SignatureSerializer(serializers.ModelSerializer):
     timestamp = serializers.DateTimeField(read_only=True)
     signature = serializers.ReadOnlyField()
+    x5u = serializers.ReadOnlyField()
 
     class Meta:
         model = Signature
-        fields = ['timestamp', 'signature']
+        fields = ['timestamp', 'signature', 'x5u']
 
 
 class SignedRecipeSerializer(serializers.ModelSerializer):

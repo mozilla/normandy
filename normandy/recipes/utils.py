@@ -6,6 +6,7 @@ from requests_hawk import HawkAuth
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import timezone
 
 
 def fraction_to_key(frac):
@@ -86,10 +87,11 @@ class Autographer:
 
     def sign_data(self, content_list):
         """
-        Fetches content-signatures from Autograph for each item in `content_list`.
+        Fetches Signatures objects from Autograph for each item in `content_list`.
 
         The items in `content_list` must be bytes objects.
         """
+        ts = timezone.now()
         url = '{}sign/data'.format(settings.AUTOGRAPH_URL)
         signing_request = []
         for item in content_list:
@@ -104,4 +106,11 @@ class Autographer:
         res = self.session.post(url, json=signing_request)
         res.raise_for_status()
         signing_responses = res.json()
-        return [res['content-signature'] for res in signing_responses]
+
+        from normandy.recipes.models import Signature  # avoid circular import
+        signatures = []
+        for res in signing_responses:
+            sig = Signature(timestamp=ts, signature=res['content-signature'], x5u=res['x5u'])
+            sig.save()
+            signatures.append(sig)
+        return signatures

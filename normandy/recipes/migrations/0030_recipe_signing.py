@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
                     auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('signature', models.TextField()),
                 ('timestamp', models.DateTimeField(default=django.utils.timezone.now)),
+                ('x5u', models.TextField()),
             ],
         ),
         migrations.AddField(

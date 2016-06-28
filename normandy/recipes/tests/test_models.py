@@ -5,11 +5,13 @@ from django.utils import timezone
 
 import pytest
 
-from normandy.recipes.models import ApprovalRequest, Client
+from normandy.base.tests import Whatever
+from normandy.recipes.models import ApprovalRequest, Client, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
     RecipeFactory,
+    SignatureFactory,
 )
 
 
@@ -100,6 +102,25 @@ class TestRecipe(object):
         }
         expected = expected.encode()
         assert recipe.canonical_json() == expected
+
+
+@pytest.mark.django_db
+class TestRecipeQueryset(object):
+
+    def test_update_signatures(self, mocker):
+        # Make sure the test environment is clean. This test is invalid otherwise.
+        assert Recipe.objects.all().count() == 0
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = SignatureFactory.create_batch(2)
+        # Make and sign two recipes
+        RecipeFactory.create_batch(2)
+        Recipe.objects.all().update_signatures()
+        # Assert the autographer was used as expected
+        assert mock_autograph.called
+        assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
+        signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
+        assert signatures == ['fake signature', 'fake signature']
 
 
 @pytest.mark.django_db

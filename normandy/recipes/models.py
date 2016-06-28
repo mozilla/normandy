@@ -68,6 +68,7 @@ class Approval(models.Model):
 class Signature(models.Model):
     signature = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
+    x5u = models.TextField()
 
 
 class RecipeQuerySet(models.QuerySet):
@@ -80,11 +81,8 @@ class RecipeQuerySet(models.QuerySet):
         recipes = list(self)
         canonical_jsons = [r.canonical_json() for r in recipes]
         signatures = autographer.sign_data(canonical_jsons)
-        timestamp = timezone.now()
 
         for recipe, signature in zip(recipes, signatures):
-            signature = Signature(signature=signature, timestamp=timestamp)
-            signature.save()
             recipe.signature = signature
             recipe.save()
 
