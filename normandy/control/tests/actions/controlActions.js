@@ -78,7 +78,6 @@ describe('controlApp Actions', () => {
     .then((response) => {
       store.dispatch(actionTypes.recipesReceived(response));
 
-      expect(window.fetch).toHaveBeenCalled();
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/', jasmine.objectContaining({ method: 'GET' }));
       expect(store.getActions()).toContain(expectedAction);
     });
@@ -92,7 +91,6 @@ describe('controlApp Actions', () => {
     .then((response) => {
       store.dispatch(actionTypes.singleRecipeReceived(response));
 
-      expect(window.fetch).toHaveBeenCalled();
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({ method: 'GET' }));
       expect(store.getActions()).toContain(expectedAction);
     })
@@ -106,7 +104,6 @@ describe('controlApp Actions', () => {
     .then((response) => {
       store.dispatch(actionTypes.singleRecipeReceived(response.recipe));
 
-      expect(window.fetch).toHaveBeenCalled();
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe_version/169/', jasmine.objectContaining({ method: 'GET' }));
       expect(store.getActions()).toContain(expectedAction);
     })
@@ -120,7 +117,6 @@ describe('controlApp Actions', () => {
     .then((response) => {
       store.dispatch(actionTypes.recipeAdded(response));
 
-      expect(window.fetch).toHaveBeenCalled();
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/', jasmine.objectContaining({ method: 'POST' }));
       expect(store.getActions()).toContain(expectedAction);
     })
@@ -134,7 +130,6 @@ describe('controlApp Actions', () => {
     .then((response) => {
       store.dispatch(actionTypes.recipeUpdated(response));
 
-      expect(window.fetch).toHaveBeenCalled();
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({ method: 'PATCH' }));
       expect(store.getActions()).toContain(expectedAction);
     })
@@ -148,7 +143,6 @@ describe('controlApp Actions', () => {
     .then((response) => {
       store.dispatch(actionTypes.recipeDeleted(1));
 
-      expect(window.fetch).toHaveBeenCalled();
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({ method: 'DELETE' }));
       expect(store.getActions()).toContain(expectedAction);
     })
