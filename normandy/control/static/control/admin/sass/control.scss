@@ -115,6 +115,20 @@
 }
 
 
+/* 404 NoMatch Page */
+.no-match {
+  padding: 30px 45px;
+
+  h2 {
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+}
+
+
 /* Add & Edit Forms */
 .crud-form {
   padding: 30px 45px;

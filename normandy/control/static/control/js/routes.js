@@ -6,6 +6,7 @@ import RecipeForm from './components/RecipeForm.jsx';
 import RecipeHistory from './components/RecipeHistory.jsx';
 import RecipePreview from './components/RecipePreview.jsx';
 import DeleteRecipe from './components/DeleteRecipe.jsx';
+import NoMatch from './components/NoMatch.jsx';
 
 export default (
   <Route path="/control/" component={ControlApp}>
@@ -47,5 +48,6 @@ export default (
         />
       </Route>
     </Route>
+    <Route path="*" component={NoMatch}/>
   </Route>
 );
