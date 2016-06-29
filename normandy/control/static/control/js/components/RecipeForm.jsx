@@ -40,7 +40,6 @@ export class RecipeForm extends React.Component {
   submitForm() {
     const { dispatch, formState, recipeId } = this.props;
 
-    let submitAction, successAction;
     let recipeFormValues = getValues(formState.recipe);
     let actionFormValues = getValues(formState.action);
     let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
@@ -54,17 +53,15 @@ export class RecipeForm extends React.Component {
     })
     .then(response => {
       if (recipeId) {
-        submitAction = 'updateRecipe';
-        successAction = (response) => dispatch(recipeUpdated(response));
+        return dispatch(makeApiRequest('updateRecipe', requestBody))
+        .then(response => dispatch(recipeUpdated(response)));
       } else {
-        submitAction = 'addRecipe';
-        successAction = (response) => {
+        return dispatch(makeApiRequest('addRecipe', requestBody))
+        .then(response => {
           dispatch(recipeAdded(response));
           dispatch(push(`/control/recipe/${response.id}/`));
-        };
+        });
       };
-
-      return dispatch(makeApiRequest(submitAction, requestBody)).then(response => successAction(response));
     });
   }
 
