@@ -12,7 +12,7 @@ export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
 
 
-const BASE_API_URL = '/api/v1/recipe/';
+const BASE_API_URL = '/api/v1/';
 
 const API_REQUEST_SETTINGS = {
   credentials: 'include',
@@ -26,7 +26,7 @@ const API_REQUEST_SETTINGS = {
 const apiRequestMap = {
   fetchAllRecipes() {
     return {
-      url: BASE_API_URL,
+      url: `${BASE_API_URL}recipe/`,
       settings: {
         method: 'GET'
       },
@@ -35,9 +35,8 @@ const apiRequestMap = {
   },
 
   fetchSingleRecipe(recipeInfo) {
-    let fetchUrl = (recipeInfo.recipeId ? `${BASE_API_URL}${recipeInfo.recipeId}/` : `/api/v1/recipe_version/${recipeInfo.revisionId}/`)
     return {
-      url: fetchUrl,
+      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/`,
       settings: {
         method: 'GET'
       },
@@ -45,9 +44,19 @@ const apiRequestMap = {
     };
   },
 
+  fetchSingleRevision(recipeInfo) {
+    return {
+      url: `${BASE_API_URL}recipe_version/${recipeInfo.revisionId}/`,
+      settings: {
+        method: 'GET'
+      },
+      errorNotification: 'Error fetching recipe revision.'
+    };
+  },
+
   fetchRecipeHistory(recipeInfo) {
     return {
-      url: `${BASE_API_URL}${recipeInfo.recipeId}/history/`,
+      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/history/`,
       settings: {
         method: 'GET'
       },
@@ -57,7 +66,7 @@ const apiRequestMap = {
 
   addRecipe(recipeInfo) {
     return {
-      url: BASE_API_URL,
+      url: `${BASE_API_URL}recipe/`,
       settings: {
         body: JSON.stringify(recipeInfo.recipe),
         method: 'POST'
@@ -69,7 +78,7 @@ const apiRequestMap = {
 
   updateRecipe(recipeInfo) {
     return {
-      url: `${BASE_API_URL}${recipeInfo.recipeId}/`,
+      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/`,
       settings: {
         body: JSON.stringify(recipeInfo.recipe),
         method: 'PATCH'
@@ -81,7 +90,7 @@ const apiRequestMap = {
 
   deleteRecipe(recipeInfo) {
     return {
-      url: `${BASE_API_URL}${recipeInfo.recipeId}/`,
+      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/`,
       settings: {
         method: 'DELETE'
       }

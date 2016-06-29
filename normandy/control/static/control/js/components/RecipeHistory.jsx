@@ -15,10 +15,10 @@ class RecipeHistory extends React.Component {
   getHistory(recipeId) {
     const { dispatch } = this.props;
 
-    dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
+    dispatch(makeApiRequest('fetchRecipeHistory', { recipeId: recipeId }))
     .then(history => {
       this.setState({
-        revisionLog: history.reverse()
+        revisionLog: history
       });
     });
   }

@@ -14,12 +14,18 @@ export default function composeRecipeContainer(Component) {
       const { dispatch, location, recipe } = this.props;
       if (!recipe) {
         dispatch(setSelectedRecipe(recipeId));
-        let requestBody = location.query.revisionId ? { revisionId: location.query.revisionId } : { recipeId: recipeId };
 
-        dispatch(makeApiRequest('fetchSingleRecipe', requestBody))
-        .then(response => {
-          dispatch(singleRecipeReceived(response.recipe || response));
-        });
+        if (location.query.revisionId) {
+          dispatch(makeApiRequest('fetchSingleRevision', { revisionId: location.query.revisionId }))
+          .then(revision => {
+            dispatch(singleRecipeReceived(revision.recipe));
+          });
+        } else {
+          dispatch(makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }))
+          .then(recipe => {
+            dispatch(singleRecipeReceived(recipe));
+          });
+        }
       }
     }
 
