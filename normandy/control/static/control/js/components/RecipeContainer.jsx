@@ -43,7 +43,7 @@ export default function composeRecipeContainer(Component) {
     }
 
     return {
-      recipeId: state.controlApp.selectedRecipe || parseInt(props.routeParams.id) || null,
+      recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id) || null,
       recipe: recipeData,
       dispatch: props.dispatch
     };
