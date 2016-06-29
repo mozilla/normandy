@@ -70,81 +70,63 @@ describe('controlApp Actions', () => {
     });
   })
 
-  it('creates RECIPES_RECEIVED when fetching recipes is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPES_RECEIVED, recipes: fixtureRecipes }
+  it('makes a proper API request for fetchAllRecipes', () => {
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes));
 
     return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
     .then((response) => {
-      store.dispatch(actionTypes.recipesReceived(response));
-
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/', jasmine.objectContaining({ method: 'GET' }));
-      expect(store.getActions()).toContain(expectedAction);
     });
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching by RECIPE id is successful', () => {
-    const expectedAction = { type: actionTypes.SINGLE_RECIPE_RECEIVED, recipe: fixtureRecipes[0] };
+  it('makes a proper API request for fetchSingleRecipe', () => {
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
 
     return store.dispatch(actionTypes.makeApiRequest('fetchSingleRecipe', { recipeId: 1 }))
     .then((response) => {
-      store.dispatch(actionTypes.singleRecipeReceived(response));
-
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({ method: 'GET' }));
-      expect(store.getActions()).toContain(expectedAction);
     })
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching by REVISION id is successful', () => {
-    const expectedAction = { type: actionTypes.SINGLE_RECIPE_RECEIVED, recipe: fixtureRevisions[0].recipe };
+  it('makes a proper API request for fetchSingleRevision', () => {
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRevisions[0]));
 
-    return store.dispatch(actionTypes.makeApiRequest('fetchSingleRecipe', { revisionId: 169 }))
+    return store.dispatch(actionTypes.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
     .then((response) => {
-      store.dispatch(actionTypes.singleRecipeReceived(response.recipe));
-
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe_version/169/', jasmine.objectContaining({ method: 'GET' }));
-      expect(store.getActions()).toContain(expectedAction);
     })
   });
 
-  it('creates RECIPE_ADDED when adding a recipe is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPE_ADDED, recipe: fixtureRecipes[0] }
+  it('makes a proper API request for addRecipe', () => {
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
 
-    return store.dispatch(actionTypes.makeApiRequest('addRecipe', fixtureRecipes[0]))
+    return store.dispatch(actionTypes.makeApiRequest('addRecipe', { recipe: fixtureRecipes[0] }))
     .then((response) => {
-      store.dispatch(actionTypes.recipeAdded(response));
-
-      expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/', jasmine.objectContaining({ method: 'POST' }));
-      expect(store.getActions()).toContain(expectedAction);
+      expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/', jasmine.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(fixtureRecipes[0])
+      }));
     })
   });
 
-  it('creates RECIPE_UPDATED when updating a recipe is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPE_UPDATED, recipe: fixtureRecipes[0] };
+  it('makes a proper API request for updateRecipe', () => {
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes[0]));
 
     return store.dispatch(actionTypes.makeApiRequest('updateRecipe', { recipe: fixtureRecipes[0], recipeId: 1 }))
     .then((response) => {
-      store.dispatch(actionTypes.recipeUpdated(response));
-
-      expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({ method: 'PATCH' }));
-      expect(store.getActions()).toContain(expectedAction);
+      expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify(fixtureRecipes[0])
+      }));
     })
   });
 
-  it('creates RECIPE_DELETED when deleting a recipe is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPE_DELETED, recipeId: 1 };
+  it('makes a proper API request for deleteRecipe', () => {
     spyOn(window, 'fetch').and.returnValue(successPromise(fixtureRecipes.filter(recipe => recipe.id !== 1)));
 
     return store.dispatch(actionTypes.makeApiRequest('deleteRecipe', { recipeId: 1 }))
     .then((response) => {
-      store.dispatch(actionTypes.recipeDeleted(1));
-
       expect(window.fetch).toHaveBeenCalledWith('/api/v1/recipe/1/', jasmine.objectContaining({ method: 'DELETE' }));
-      expect(store.getActions()).toContain(expectedAction);
     })
   });
 
