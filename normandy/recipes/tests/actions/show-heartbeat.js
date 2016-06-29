@@ -114,6 +114,16 @@ describe('ShowHeartbeatAction', function() {
         }));
     });
 
+    it('should not bother to annotate an empty post-answer URL', async function() {
+        let recipe = recipeFactory();
+        recipe.arguments.surveys[0].postAnswerUrl = '';
+        let action = new ShowHeartbeatAction(this.normandy, recipe);
+
+        await action.execute();
+        let postAnswerUrl = this.normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+        expect(postAnswerUrl).toEqual('');
+    });
+
     it('should annotate the post-answer URL with extra query args', async function() {
         let url = 'https://example.com';
         let recipe = recipeFactory();
@@ -122,12 +132,20 @@ describe('ShowHeartbeatAction', function() {
 
         this.normandy.mock.client.version = '42.0.1';
         this.normandy.mock.client.channel = 'nightly';
+        this.normandy.mock.client.isDefaultBrowser = true;
+        this.normandy.mock.client.searchEngine = 'shady-tims';
+        this.normandy.mock.client.syncSetup = true;
 
         await action.execute();
-        expect(this.normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-            postAnswerUrl: (url + '?source=heartbeat&surveyversion=52' +
-                            '&updateChannel=nightly&fxVersion=42.0.1'),
-        }));
+        let postAnswerUrl = this.normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+        let params = new URL(postAnswerUrl).searchParams;
+        expect(params.get('source')).toEqual('heartbeat');
+        expect(params.get('surveyversion')).toEqual('52');
+        expect(params.get('updateChannel')).toEqual('nightly');
+        expect(params.get('fxVersion')).toEqual('42.0.1');
+        expect(params.get('isDefaultBrowser')).toEqual('1');
+        expect(params.get('searchEngine')).toEqual('shady-tims');
+        expect(params.get('syncSetup')).toEqual('1');
     });
 
     it('should annotate the post-answer URL if it has an existing query string', async function() {
@@ -140,10 +158,10 @@ describe('ShowHeartbeatAction', function() {
         this.normandy.mock.client.channel = 'nightly';
 
         await action.execute();
-        expect(this.normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-            postAnswerUrl: (url + '&source=heartbeat&surveyversion=52' +
-                            '&updateChannel=nightly&fxVersion=42.0.1'),
-        }));
+        let postAnswerUrl = this.normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+        let params = new URL(postAnswerUrl).searchParams;
+        expect(params.get('foo')).toEqual('bar');
+        expect(params.get('source')).toEqual('heartbeat');
     });
 
     it('should annotate the post-answer URL with a testing param in testing mode', async function() {
@@ -153,14 +171,11 @@ describe('ShowHeartbeatAction', function() {
         let action = new ShowHeartbeatAction(this.normandy, recipe);
 
         this.normandy.testing = true;
-        this.normandy.mock.client.version = '42.0.1';
-        this.normandy.mock.client.channel = 'nightly';
 
         await action.execute();
-        expect(this.normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-            postAnswerUrl: (url + '?source=heartbeat&surveyversion=52' +
-                            '&updateChannel=nightly&fxVersion=42.0.1&testing=1'),
-        }));
+        let postAnswerUrl = this.normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+        let params = new URL(postAnswerUrl).searchParams;
+        expect(params.get('testing')).toEqual('1');
     });
 
     it('should pass some extra telemetry arguments to showHeartbeat', async function() {
