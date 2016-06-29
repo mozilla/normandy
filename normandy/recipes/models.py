@@ -68,7 +68,8 @@ class Approval(models.Model):
 class Signature(models.Model):
     signature = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
-    x5u = models.TextField()
+    public_key = models.TextField()
+    x5u = models.TextField(null=True)
 
 
 class RecipeQuerySet(models.QuerySet):

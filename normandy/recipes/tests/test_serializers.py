@@ -51,6 +51,7 @@ class TestSignedRecipeSerializer:
                 'signature': 'fake signature',
                 'timestamp': Whatever(),
                 'x5u': Whatever(),
+                'public_key': Whatever(),
             },
             'recipe': {
                 'name': recipe.name,

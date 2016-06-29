@@ -110,7 +110,12 @@ class Autographer:
         from normandy.recipes.models import Signature  # avoid circular import
         signatures = []
         for res in signing_responses:
-            sig = Signature(timestamp=ts, signature=res['content-signature'], x5u=res['x5u'])
+            sig = Signature(
+                timestamp=ts,
+                signature=res['content-signature'],
+                x5u=res.get('x5u'),
+                public_key=res['public_key'],
+            )
             sig.save()
             signatures.append(sig)
         return signatures
