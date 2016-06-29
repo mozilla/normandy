@@ -20,7 +20,7 @@ export default function controlStore() {
         isFetching: false,
         selectedRecipe: null,
         recipeListNeedsFetch: true,
-        notification: null
+        notifications: []
       }
     },
     applyMiddleware(

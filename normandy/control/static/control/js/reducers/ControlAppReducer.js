@@ -1,15 +1,15 @@
 import {
-  REQUEST_IN_PROGRESS, REQUEST_COMPLETE,
-  RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED,
-  RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
-  SET_SELECTED_RECIPE, SET_NOTIFICATION } from '../actions/ControlActions.js';
+  REQUEST_IN_PROGRESS, REQUEST_COMPLETE, RECIPES_RECEIVED,
+  SINGLE_RECIPE_RECEIVED, RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
+  SET_SELECTED_RECIPE, SHOW_NOTIFICATION, DISMISS_NOTIFICATION
+} from '../actions/ControlActions.js';
 
 let initialState = {
   recipes: null,
   isFetching: false,
   selectedRecipe: null,
   recipeListNeedsFetch: true,
-  notification: null,
+  notifications: [],
 };
 
 function controlAppReducer(state = initialState, action) {
@@ -41,9 +41,14 @@ function controlAppReducer(state = initialState, action) {
         selectedRecipe: action.recipeId
       });
 
-    case SET_NOTIFICATION:
+    case SHOW_NOTIFICATION:
       return Object.assign({}, state, {
-        notification: action.notification
+        notifications: [action.notification, ...state.notifications],
+      });
+
+    case DISMISS_NOTIFICATION:
+      return Object.assign({}, state, {
+        notifications: state.notifications.filter(n => n.id !== action.notificationId),
       });
 
     case RECIPE_ADDED:
