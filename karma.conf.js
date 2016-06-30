@@ -13,8 +13,8 @@ module.exports = function(config) {
             'node_modules/babel-polyfill/dist/polyfill.js',
             'node_modules/jasmine-promises/dist/jasmine-promises.js',
             'normandy/control/tests/index.js',
-            'normandy/recipes/tests/actions/index.js',
-            'normandy/selfrepair/tests/index.js',
+            // 'normandy/recipes/tests/actions/index.js',
+            // 'normandy/selfrepair/tests/index.js',
         ],
 
         // preprocess matching files before serving them to the browser
