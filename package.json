@@ -36,6 +36,7 @@
     "redux": "^3.5.2",
     "redux-form": "^5.2.3",
     "redux-thunk": "^2.0.1",
+    "sha.js": "^2.4.5",
     "uglifyjs": "^2.4.10",
     "underscore": "^1.8.3",
     "wolfy87-eventemitter": "^4.3.0"
@@ -50,6 +51,7 @@
     "css-loader": "^0.23.1",
     "exports-loader": "^0.6.3",
     "extract-text-webpack-plugin": "^1.0.1",
+    "fetch-mock": "^4.5.4",
     "file-loader": "^0.8.5",
     "imports-loader": "^0.6.5",
     "jasmine-core": "^2.4.1",
