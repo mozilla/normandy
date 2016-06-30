@@ -23,7 +23,7 @@ export class RecipeForm extends React.Component {
 
   changeAction(event) {
     const { dispatch, fields } = this.props;
-    let selectedActionName = event.currentTarget.value;
+    let selectedActionName = event.target.value;
 
     dispatch(destroy('action'));
     fields.action.onChange(event);
@@ -113,6 +113,7 @@ export class RecipeForm extends React.Component {
     )
   }
 }
+
 RecipeForm.propTypes = {
   fields: React.PropTypes.object.isRequired,
 }
@@ -121,12 +122,18 @@ export default composeRecipeContainer(reduxForm({
     form: 'recipe'
   }, (state, props) => {
     let fields = ['name', 'filter_expression', 'enabled', 'action'];
-    let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
+    let selectedRecipeRevision = null;
+    let viewingRevision = false;
+
+    if (props.location) {
+      selectedRecipeRevision = props.location.state ? props.location.state.selectedRevision : null;
+      viewingRevision = ((selectedRecipeRevision || props.location.query.revisionId) ? true : false)
+    }
 
     return {
       fields,
       initialValues: selectedRecipeRevision || props.recipe,
-      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false),
+      viewingRevision,
       formState: state.form
     }
-})(RecipeForm))
+})(RecipeForm));

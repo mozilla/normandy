@@ -6,23 +6,24 @@ import thunk from 'redux-thunk';
 import { reducer as formReducer } from 'redux-form';
 
 const reduxRouterMiddleware = routerMiddleware(browserHistory);
+const defaultState = {
+  controlApp: {
+    recipes: null,
+    isFetching: false,
+    selectedRecipe: null,
+    recipeListNeedsFetch: true,
+    notification: null
+  }
+};
 
-export default function controlStore() {
+export default function controlStore(initialState = defaultState) {
   return createStore(
     combineReducers({
       controlApp: controlAppReducer,
       form: formReducer,
       routing: routerReducer,
     }),
-    {
-      controlApp: {
-        recipes: null,
-        isFetching: false,
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
-        notification: null
-      }
-    },
+    initialState,
     applyMiddleware(
       reduxRouterMiddleware,
       thunk
