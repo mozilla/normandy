@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
-import ControlActions from '../actions/ControlActions.js'
+import { fetchSingleRecipe, makeApiRequest, singleRecipeReceived, setSelectedRecipe } from '../actions/ControlActions.js'
 
 export default function composeRecipeContainer(Component) {
 
@@ -13,12 +13,18 @@ export default function composeRecipeContainer(Component) {
     getRecipeData(recipeId) {
       const { dispatch, location, recipe } = this.props;
       if (!recipe) {
-        dispatch(ControlActions.setSelectedRecipe(recipeId));
+        dispatch(setSelectedRecipe(recipeId));
 
         if (location.query.revisionId) {
-          dispatch(ControlActions.makeApiRequest('fetchSingleRevision', { revisionId: location.query.revisionId }));
+          dispatch(makeApiRequest('fetchSingleRevision', { revisionId: location.query.revisionId }))
+          .then(revision => {
+            dispatch(singleRecipeReceived(revision.recipe));
+          });
         } else {
-          dispatch(ControlActions.makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }));
+          dispatch(makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }))
+          .then(recipe => {
+            dispatch(singleRecipeReceived(recipe));
+          });
         }
       }
     }
@@ -43,7 +49,7 @@ export default function composeRecipeContainer(Component) {
     }
 
     return {
-      recipeId: state.controlApp.selectedRecipe || parseInt(props.routeParams.id) || null,
+      recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id) || null,
       recipe: recipeData,
       dispatch: props.dispatch
     };

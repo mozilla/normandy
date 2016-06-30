@@ -1,13 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import { push } from 'react-router-redux'
 import { destroy, reduxForm, getValues } from 'redux-form'
 import jexl from 'jexl'
 
-import apiFetch from '../utils/apiFetch.js';
-import ControlActions from '../actions/ControlActions.js'
+import { makeApiRequest, recipeUpdated, recipeAdded } from '../actions/ControlActions.js'
 import composeRecipeContainer from './RecipeContainer.jsx'
 import ActionForm from './ActionForm.jsx'
+import CheckboxField from './form_fields/CheckboxField.jsx';
 import FormField from './form_fields/FormFieldWrapper.jsx';
 
 export class RecipeForm extends React.Component {
@@ -38,9 +39,12 @@ export class RecipeForm extends React.Component {
 
   submitForm() {
     const { dispatch, formState, recipeId } = this.props;
+
     let recipeFormValues = getValues(formState.recipe);
     let actionFormValues = getValues(formState.action);
     let combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
+    let requestBody = { recipe: combinedFormValues, recipeId };
+
     return this.validateForm(combinedFormValues)
     .catch(error => {
       throw {
@@ -49,14 +53,16 @@ export class RecipeForm extends React.Component {
     })
     .then(response => {
       if (recipeId) {
-        dispatch(ControlActions.makeApiRequest('updateRecipe', {
-          recipe: combinedFormValues,
-          recipeId: recipeId
-        }));
+        return dispatch(makeApiRequest('updateRecipe', requestBody))
+        .then(response => dispatch(recipeUpdated(response)));
       } else {
-        dispatch(ControlActions.makeApiRequest('addRecipe', combinedFormValues));
-      }
-    })
+        return dispatch(makeApiRequest('addRecipe', requestBody))
+        .then(response => {
+          dispatch(recipeAdded(response));
+          dispatch(push(`/control/recipe/${response.id}/`));
+        });
+      };
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -76,7 +82,7 @@ export class RecipeForm extends React.Component {
     const { availableActions, selectedAction } = this.state;
 
     return (
-      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form">
+      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form fluid-8">
 
         { viewingRevision &&
           <p id="viewing-revision" className="notification info">
@@ -85,6 +91,7 @@ export class RecipeForm extends React.Component {
         }
 
         <FormField type="text" label="Name" field={name} containerClass="fluid-3" />
+        <CheckboxField label="Enabled" field={enabled} containerClass="fluid-3" />
         <FormField type="textarea" label="Filter Expression" field={filter_expression} containerClass="fluid-3" />
         <FormField type="select" label="Action" field={action} containerClass="fluid-3"
           options={availableActions}

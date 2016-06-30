@@ -84,7 +84,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     current_approval_request = ApprovalRequestSerializer(read_only=True)
     approval = ApprovalSerializer(read_only=True)
     is_approved = serializers.BooleanField(read_only=True)
-    enabled = serializers.BooleanField(read_only=True)
+    enabled = serializers.BooleanField()
 
     class Meta:
         model = Recipe
@@ -110,7 +110,7 @@ class ClientSerializer(serializers.Serializer):
 
 class RecipeVersionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='revision.date_created', read_only=True)
-    recipe = RecipeSerializer(source='object_version.object', read_only=True)
+    recipe = RecipeSerializer(source='_object_version.object', read_only=True)
 
     class Meta:
         model = Version

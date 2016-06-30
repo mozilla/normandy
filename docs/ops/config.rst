@@ -131,6 +131,14 @@ in other Django projects.
     environments, setting this value too low can be a denial-of-service risk.
     Defaults to 5 minutes.
 
+.. envvar:: DJANGO_API_CACHE_TIME
+
+    :default: ``30``
+
+    The time in seconds to set in cache headers for cacheable APIs. This may be
+    set to 0 in non-production environments to ease testing. In production
+    environments, setting this value too low can be a denial-of-service risk.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the

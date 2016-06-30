@@ -7,14 +7,22 @@ import { reducer as formReducer } from 'redux-form';
 
 const reduxRouterMiddleware = routerMiddleware(browserHistory);
 
-export default function controlStore(initialState) {
+export default function controlStore() {
   return createStore(
     combineReducers({
       controlApp: controlAppReducer,
       form: formReducer,
       routing: routerReducer,
     }),
-    initialState,
+    {
+      controlApp: {
+        recipes: null,
+        isFetching: false,
+        selectedRecipe: null,
+        recipeListNeedsFetch: true,
+        notification: null
+      }
+    },
     applyMiddleware(
       reduxRouterMiddleware,
       thunk

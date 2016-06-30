@@ -36,12 +36,16 @@
     font: normal normal 300 20px/30px $SourceSansPro;
     padding: 15px 30px;
 
-    span {
-      font-weight: 400;
-      margin-left: 5px;
+    a:link, a:visited { color: $cream; }
+
+    .fa {
+      margin: 0 5px;
+      font-size: 15px;
     }
 
-    a:link, a:visited { color: $cream; }
+    span:last-child .fa {
+      display: none;
+    }
   }
 
   .button {
@@ -57,6 +61,7 @@
 #secondary-header {
   background-color: $secondaryColor;
   border-top: 1px solid #fff;
+  margin: 0 0 30px 0;
   padding: 0px;
 
   h3 {
@@ -110,11 +115,29 @@
 }
 
 
+/* 404 NoMatch Page */
+.no-match {
+  padding: 30px 45px;
+
+  h2 {
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+}
+
+
 /* Add & Edit Forms */
 .crud-form {
   padding: 30px 45px;
 
-  input[type="checkbox"] { opacity: 0; }
+  input[type="checkbox"] {
+    width: auto;
+    margin: 0 5px;
+  }
+
   input[type="number"] { width: 20%; }
 
   .fluid-1 { width: 6.25%; }
@@ -291,23 +314,33 @@
 }
 
 
-
 /* Recipe History */
-li {
-  p {
-    display: inline-block;
-    line-height: 20px;
-    margin: 0px 20px;
-    vertical-align: top;
+.recipe-history {
+  .history-item {
+    display: flex;
+    flex-direction: row;
 
-    &.revision-number {
+    .revision-number,
+    .revision-created {
+      line-height: 20px;
+      margin: 0 20px;
+    }
+
+    .revision-number {
+      flex: 0;
       font-weight: 600;
     }
-  }
 
-  span {
+    .revision-created {
+      flex: 1;
+    }
 
-    &.label {
+    .revision-status {
+      flex: 1;
+      margin: 0 20px; /* Reset .status-indicator margin */
+    }
+
+    .label {
       padding: 0px;
     }
   }
@@ -323,8 +356,8 @@ li {
   #content { padding: 20px; }
 }
 
-/* Recipe Preview */
-.preview-status {
+/* Status Indicator */
+.status-indicator {
     border: 1px solid;
     border-radius: 3px;
     font-size: 12px;

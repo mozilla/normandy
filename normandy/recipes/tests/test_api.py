@@ -58,6 +58,21 @@ class TestActionAPI(object):
         assert res.status_code == 200
         assert res.data['name'] == action.name
 
+    def test_list_view_includes_cache_headers(self, api_client):
+        res = api_client.get('/api/v1/action/')
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max-age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
+
+    def test_detail_view_includes_cache_headers(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/'.format(name=action))
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max-age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
+
 
 @pytest.mark.django_db
 class TestImplementationAPI(object):
@@ -115,10 +130,13 @@ class TestRecipeAPI(object):
     def test_it_can_create_recipes(self, api_client):
         action = ActionFactory()
 
-        res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
-                                                  'action': action.name,
-                                                  'arguments': {},
-                                                  'filter_expression': 'whatever'})
+        res = api_client.post('/api/v1/recipe/', {
+            'name': 'Test Recipe',
+            'action': action.name,
+            'arguments': {},
+            'filter_expression': 'whatever',
+            'enabled': True
+        })
         assert res.status_code == 201
 
         recipes = Recipe.objects.all()
@@ -212,19 +230,6 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
 
-    def test_cannot_enable_unapproved_recipes(self, api_client):
-        recipe = RecipeFactory(approval=None, enabled=False)
-
-        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-        assert res.status_code == 400
-
-    def test_can_enable_unapproved_recipes_in_development(self, api_client, settings):
-        settings.REQUIRE_RECIPE_AUTH = False
-        recipe = RecipeFactory(approval=None, enabled=False)
-
-        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-        assert res.status_code == 204
-
     def test_it_can_disable_recipes(self, api_client):
         recipe = RecipeFactory(enabled=True)
         approval_request = ApprovalRequestFactory(recipe=recipe)
@@ -254,6 +259,21 @@ class TestRecipeAPI(object):
         res = api_client.get('/api/v1/recipe/?enabled=true')
         assert res.status_code == 200
         assert [r['id'] for r in res.data] == [r1.id]
+
+    def test_list_view_includes_cache_headers(self, api_client):
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max_age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
+
+    def test_detail_view_includes_cache_headers(self, api_client):
+        recipe = RecipeFactory()
+        res = api_client.get('/api/v1/recipe/{id}/'.format(id=recipe.id))
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max-age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
 
 
 @pytest.mark.django_db

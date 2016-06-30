@@ -124,7 +124,7 @@ export default class ShowHeartbeatAction extends Action {
             engagementButtonLabel: this.survey.engagementButtonLabel,
             thanksMessage: this.survey.thanksMessage,
             flowId: flow.id,
-            postAnswerUrl: await this.annotatePostAnswerUrl(this.survey.postAnswerUrl),
+            postAnswerUrl: this.annotatePostAnswerUrl(this.survey.postAnswerUrl),
             learnMoreMessage: this.survey.learnMoreMessage,
             learnMoreUrl: this.survey.learnMoreUrl,
             surveyId: surveyId,
@@ -166,27 +166,33 @@ export default class ShowHeartbeatAction extends Action {
         return Number.isNaN(lastShown) ? null : lastShown;
     }
 
-    async annotatePostAnswerUrl(url) {
-        let args = [
-            ['source', 'heartbeat'],
-            ['surveyversion', VERSION],
-            ['updateChannel', this.client.channel],
-            ['fxVersion', this.client.version],
-        ];
+    annotatePostAnswerUrl(url) {
+        // Don't bother with empty URLs.
+        if (!url) {
+            return url;
+        }
+
+        let args = {
+            source: 'heartbeat',
+            surveyversion: VERSION,
+            updateChannel: this.client.channel,
+            fxVersion: this.client.version,
+            isDefaultBrowser: this.client.isDefaultBrowser ? 1 : 0,
+            searchEngine: this.client.searchEngine,
+            syncSetup: this.client.syncSetup ? 1 : 0,
+        };
 
         // Append testing parameter if in testing mode.
         if (this.normandy.testing) {
-            args.push(['testing', 1]);
+            args.testing = 1;
         }
 
-        let params = args.map(([a, b]) => `${a}=${b}`).join('&');
-        if (url.indexOf('?') !== -1) {
-            url += '&' + params;
-        } else {
-            url += '?' + params;
+        let annotatedUrl = new URL(url);
+        for (let key in args) {
+            annotatedUrl.searchParams.set(key, args[key]);
         }
 
-        return url;
+        return annotatedUrl.href;
     }
 
     /**

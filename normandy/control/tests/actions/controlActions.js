@@ -2,8 +2,8 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import fetchMock from 'fetch-mock';
 
-import controlActions, * as actionTypes from '../../static/control/js/actions/ControlActions'
 import { fixtureRecipes, fixtureRevisions, initialState } from '../fixtures/fixtures';
+import * as actionTypes from '../../static/control/js/actions/ControlActions'
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -37,8 +37,10 @@ describe('controlApp Actions', () => {
 
   it('creates REQUEST_IN_PROGRESS when initiating an api call', () => {
     const expectedAction = { type: actionTypes.REQUEST_IN_PROGRESS };
+    fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
 
-    return store.dispatch(controlActions.makeApiRequest('fetchAllRecipes')).then(() => {
+    return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
+    .then(() => {
       expect(store.getActions()).toContain(expectedAction);
     });
   })
@@ -47,103 +49,88 @@ describe('controlApp Actions', () => {
 
     it('returns with `status: success` if the request succeeded', () => {
       const expectedAction = { type: actionTypes.REQUEST_COMPLETE, status: 'success' };
-      fetchMock.mock('/api/v1/recipe/?format=json&', 'GET', fixtureRecipes);
+      fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
 
-      return store.dispatch(controlActions.makeApiRequest('fetchAllRecipes')).then(() => {
+      return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
+      .then(() => {
         expect(store.getActions()).toContain(expectedAction);
       });
     })
 
     it('returns with `status: error` if the request failed', () => {
       const expectedAction = { type: actionTypes.REQUEST_COMPLETE, status: 'error' };
-      fetchMock.mock('/api/v1/recipe/?format=json&', 'GET', {status: 400});
+      fetchMock.mock('/api/v1/recipe/', 'GET', {status: 500});
 
-      return store.dispatch(controlActions.makeApiRequest('fetchAllRecipes')).then(() => {
+      return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
+      .catch(() => {
         expect(store.getActions()).toContain(expectedAction);
       });
     });
 
     it('creates a SET_NOTIFICATION action if provided', () => {
       const expectedAction = { type: actionTypes.SET_NOTIFICATION, notification: { messageType: 'error', 'message': 'Error fetching recipes.'} };
-      fetchMock.mock('/api/v1/recipe/?format=json&', 'GET', {status: 400});
+      fetchMock.mock('/api/v1/recipe/', 'GET', {status: 500});
 
-      return store.dispatch(controlActions.makeApiRequest('fetchAllRecipes')).then(() => {
+      return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes')).catch(() => {
         expect(store.getActions()).toContain(expectedAction);
       });
     });
   })
 
-  it('creates RECIPES_RECEIVED when fetching recipes is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPES_RECEIVED, recipes: fixtureRecipes }
-      fetchMock.mock('/api/v1/recipe/?format=json&', 'GET', fixtureRecipes);
+  it('makes a proper API request for fetchAllRecipes', () => {
+    fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
 
-    return store.dispatch(controlActions.makeApiRequest('fetchAllRecipes')).then(() => {
-      expect(fetchMock.calls('/api/v1/recipe/?format=json&').length).toEqual(1);
-      expect(store.getActions()).toContain(expectedAction);
+    return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
+    .then((response) => {
+      expect(fetchMock.calls('/api/v1/recipe/').length).toEqual(1);
     });
-
   });
 
-  it('doesnt create any actions if fetching recipes is not needed', () => {
-    const store = mockStore({ controlApp: { ...initialState, recipeListNeedsFetch: false } }, []);
+  it('makes a proper API request for fetchSingleRecipe', () => {
+    fetchMock.mock('/api/v1/recipe/1/', 'GET', fixtureRecipes[0]);
 
-    store.dispatch(controlActions.makeApiRequest('fetchAllRecipes'));
-    expect(store.getActions()).toEqual([]);
+    return store.dispatch(actionTypes.makeApiRequest('fetchSingleRecipe', { recipeId: 1 }))
+    .then((response) => {
+      expect(fetchMock.calls('/api/v1/recipe/1/').length).toEqual(1);
+    })
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching a single RECIPE is successful', () => {
-    const expectedAction = { type: actionTypes.SINGLE_RECIPE_RECEIVED, recipe: fixtureRecipes[0] };
-    fetchMock.mock('/api/v1/recipe/1/?format=json&', 'GET', fixtureRecipes[0]);
+  it('makes a proper API request for fetchSingleRevision', () => {
+    fetchMock.mock('/api/v1/recipe_version/169/', 'GET', fixtureRecipes[0]);
 
-    return store.dispatch(controlActions.makeApiRequest('fetchSingleRecipe', { recipeId: 1 }))
-      .then(() => {
-        expect(fetchMock.calls('/api/v1/recipe/1/?format=json&').length).toEqual(1);
-        expect(store.getActions()).toContain(expectedAction);
-      })
+    return store.dispatch(actionTypes.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
+    .then((response) => {
+      expect(fetchMock.calls('/api/v1/recipe_version/169/').length).toEqual(1);
+    })
   });
 
-  it('creates SINGLE_RECIPE_RECEIVED when fetching a single REVISION is successful', () => {
-    const expectedAction = { type: actionTypes.SINGLE_RECIPE_RECEIVED, recipe: fixtureRevisions[0].recipe };
-    fetchMock.mock('/api/v1/recipe_version/169/?format=json&', 'GET', fixtureRevisions[0]);
+  it('makes a proper API request for addRecipe', () => {
+    fetchMock.mock('/api/v1/recipe/', 'POST', fixtureRecipes[0]);
 
-    return store.dispatch(controlActions.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
-      .then(() => {
-        expect(fetchMock.calls('/api/v1/recipe_version/169/?format=json&').length).toEqual(1);
-        expect(store.getActions()).toContain(expectedAction);
-      })
+    return store.dispatch(actionTypes.makeApiRequest('addRecipe', { recipe: fixtureRecipes[0] }))
+    .then((response) => {
+      const calls = fetchMock.calls('/api/v1/recipe/');
+      expect(calls[0][1].body).toEqual(JSON.stringify(fixtureRecipes[0]));
+    })
   });
 
-  it('creates RECIPE_ADDED when adding a recipe is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPE_ADDED, recipe: fixtureRecipes[0] }
-    fetchMock.mock('/api/v1/recipe/?format=json&', 'POST', fixtureRecipes[0]);
+  it('makes a proper API request for updateRecipe', () => {
+    fetchMock.mock('/api/v1/recipe/1/', 'PATCH', fixtureRecipes[0]);
 
-    return store.dispatch(controlActions.makeApiRequest('addRecipe', fixtureRecipes[0]))
-      .then(() => {
-        expect(fetchMock.calls('/api/v1/recipe/?format=json&').length).toEqual(1);
-        expect(store.getActions()).toContain(expectedAction);
-      })
+    return store.dispatch(actionTypes.makeApiRequest('updateRecipe', { recipe: fixtureRecipes[0], recipeId: 1 }))
+    .then((response) => {
+      const calls = fetchMock.calls('/api/v1/recipe/1/');
+      expect(calls[0][1].body).toEqual(JSON.stringify(fixtureRecipes[0]));
+    })
   });
 
-  it('creates RECIPE_UPDATED when updating a recipe is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPE_UPDATED, recipe: fixtureRecipes[0] };
-    fetchMock.mock('/api/v1/recipe/1/?format=json&', 'PATCH', fixtureRecipes[0]);
+  it('makes a proper API request for deleteRecipe', () => {
+    fetchMock.mock('/api/v1/recipe/1/', 'DELETE', fixtureRecipes[0]);
 
-    return store.dispatch(controlActions.makeApiRequest('updateRecipe', { recipe: fixtureRecipes[0], recipeId: 1 }))
-      .then(() => {
-        expect(fetchMock.calls('/api/v1/recipe/1/?format=json&').length).toEqual(1);
-        expect(store.getActions()).toContain(expectedAction);
-      })
-  });
-
-  it('creates RECIPE_DELETED when deleting a recipe is successful', () => {
-    const expectedAction = { type: actionTypes.RECIPE_DELETED, recipeId: 1 };
-    fetchMock.mock('/api/v1/recipe/1/?format=json&', 'DELETE', fixtureRecipes[0]);
-
-    return store.dispatch(controlActions.makeApiRequest('deleteRecipe', { recipeId: 1 }))
-      .then(() => {
-        expect(fetchMock.calls('/api/v1/recipe/1/?format=json&').length).toEqual(1);
-        expect(store.getActions()).toContain(expectedAction);
-      })
+    return store.dispatch(actionTypes.makeApiRequest('deleteRecipe', { recipeId: 1 }))
+    .then((response) => {
+      expect(fetchMock.calls('/api/v1/recipe/1/').length).toEqual(1);
+    })
   });
 
 })

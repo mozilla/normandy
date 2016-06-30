@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { PropTypes as pt } from 'react'
 import { push } from 'react-router-redux'
 import moment from 'moment'
 import composeRecipeContainer from './RecipeContainer.jsx'
-import apiFetch from '../utils/apiFetch.js';
+import { makeApiRequest } from '../actions/ControlActions.js'
 
 class RecipeHistory extends React.Component {
   constructor(props) {
@@ -13,12 +13,14 @@ class RecipeHistory extends React.Component {
   }
 
   getHistory(recipeId) {
-    apiFetch(`/api/v1/recipe/${recipeId}/history/`)
-      .then(response => {
-        this.setState({
-          revisionLog: response.reverse()
-        })
+    const { dispatch } = this.props;
+
+    dispatch(makeApiRequest('fetchRecipeHistory', { recipeId: recipeId }))
+    .then(history => {
+      this.setState({
+        revisionLog: history
       });
+    });
   }
 
   componentDidMount() {
@@ -30,31 +32,75 @@ class RecipeHistory extends React.Component {
     const { revisionLog } = this.state;
     const { recipeId, recipe, dispatch } = this.props;
     return (
-      <div className="fluid-8">
+      <div className="fluid-8 recipe-history">
         <h3>Viewing revision log for: <b>{recipe ? recipe.name : ''}</b></h3>
         <ul>
-            {
-              this.state.revisionLog.map((revision, index) =>
-                <li key={revision.date_created} onClick={(e) => {
-                  let revisionInfo = {};
-                  if (index !== 0) {
-                    revisionInfo = {
-                      query: { revisionId: `${revision.id}` },
-                      state: { selectedRevision: revision.recipe }
-                    }
-                  }
-                  dispatch(push({
-                    pathname: `/control/recipe/${recipeId}/`,
-                    ...revisionInfo
-                  }))
-                }}><p className="revision-number">#{revision.recipe.revision_id} </p>
-                  <p><span className="label">Created On:</span>{ moment(revision.date_created).format('MMM Do YYYY - h:mmA') }</p>
-                </li>
-              )
-            }
+            {this.state.revisionLog.map((revision, index) =>
+              <HistoryItem
+                key={revision.id}
+                revision={revision}
+                recipe={recipe}
+                dispatch={dispatch}
+              />
+            )}
         </ul>
       </div>
     )
+  }
+}
+
+class HistoryItem extends React.Component {
+  static propTypes = {
+    revision: pt.shape({
+      recipe: pt.shape({
+        revision_id: pt.number.isRequired,
+      }).isRequired,
+      date_created: pt.string.isRequired
+    }).isRequired,
+    recipe: pt.shape({
+      revision_id: pt.number.isRequired,
+    }).isRequired,
+  }
+
+  render() {
+    const { revision, recipe } = this.props;
+    const isCurrent = revision.recipe.revision_id === recipe.revision_id;
+
+    return (
+      <li className="history-item" onClick={::this.handleClick}>
+        <p className="revision-number">#{revision.recipe.revision_id}</p>
+        <p className="revision-created">
+          <span className="label">Created On:</span>
+          { moment(revision.date_created).format('MMM Do YYYY - h:mmA') }
+        </p>
+        {isCurrent && (
+          <div className="revision-status status-indicator green">
+            <i className="fa fa-circle pre" />
+            Current Revision
+          </div>
+        )}
+      </li>
+    );
+  }
+
+  /**
+   * When a revision is clicked, open the recipe form with changes from
+   * the clicked revision.
+   */
+  handleClick() {
+    const { dispatch, revision, recipe } = this.props;
+
+    // Do not include form state changes if the current revision was
+    // clicked.
+    if (revision.recipe.revision_id === recipe.revision_id) {
+      dispatch(push(`/control/recipe/${recipe.id}/`));
+    } else {
+      dispatch(push({
+        pathname: `/control/recipe/${recipe.id}/`,
+        query: { revisionId: `${revision.id}` },
+        state: { selectedRevision: revision.recipe },
+      }));
+    }
   }
 }
 

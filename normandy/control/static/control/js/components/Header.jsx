@@ -1,28 +1,32 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Link } from 'react-router';
+import { Link } from 'react-router';
+import Breadcrumbs from 'react-breadcrumbs';
 
-class Header extends React.Component {
-  render() {
-    const { pageTitle, subTitle, ctaButtons } = this.props.pageType;
-    let ctaBtns;
-    if (ctaButtons) {
-      ctaBtns = ctaButtons.map(({text, icon, link}, index) =>
-        <Link className="button" to={this.props.currentLocation + link}>
-          <i className={"pre fa fa-" + icon}></i> {text}
-        </Link>
-      )
-    }
-    return (
-      <div id="page-header">
-        <h2>
-          <Link to={`/control/`}>Recipes</Link>
-          {pageTitle ? [': ', <span>{pageTitle}</span>] : '' }
-        </h2>
-        {ctaBtns}
-      </div>
+export default function Header ({ pageType, currentLocation, routes, params }) {
+  const { pageTitle, subTitle, ctaButtons } = pageType;
+
+  let ctaBtns;
+  if (ctaButtons) {
+    ctaBtns = ctaButtons.map(({text, icon, link}, index) =>
+      <Link className="button" to={currentLocation + link} key={index}>
+        <i className={"pre fa fa-" + icon}></i> {text}
+      </Link>
     )
   }
-}
 
-export default withRouter(Header)
+  return (
+    <div id="page-header">
+      <h2>
+        <Breadcrumbs
+          routes={routes}
+          params={params}
+          displayMissing={false}
+          hideNoPath={true}
+          separator={<i className="fa fa-chevron-right"></i>}
+        />
+      </h2>
+      {ctaBtns}
+    </div>
+  )
+}
