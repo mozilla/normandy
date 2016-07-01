@@ -5,17 +5,20 @@ import { _ } from 'underscore'
 import FormField from '../form_fields/FormFieldWrapper.jsx';
 
 export const FeatureRecommendationFormFields = ['domain',
-              'recommendations[].name', 'recommendations[].id', 'recommendations[].description', 
-              'recommendations[].packageURL', 'recommendations[].imageURL', 'recommendations[].infoURL'];
+              'recommendations[].name', 'recommendations[].id',
+              'recommendations[].description', 'recommendations[].packageURL',
+              'recommendations[].imageURL', 'recommendations[].infoURL'];
 
-const formatLabel = (labelName) => labelName.replace( /([A-Z])/g, " $1" ).toLowerCase();
+const formatLabel = (labelName) =>
+  labelName.replace( /([A-Z])/g, " $1" ).toLowerCase();
 
 const RecListItem = (props) => {
   const { recommendation, recIndex, isSelected, deleteRec, onClick } = props;
   return (
     <li className={classNames({'active': isSelected})} onClick={onClick}>
       { recommendation.name.value || "New Recommendation" }
-      <span title="Delete this recommendation" className="delete-field" data-rec-index={recIndex} onClick={deleteRec}>
+      <span title="Delete this recommendation" className="delete-field"
+            data-rec-index={recIndex} onClick={deleteRec}>
         <i className="fa fa-times red"></i>
       </span>
     </li>
@@ -35,7 +38,8 @@ const RecForm = (props) => {
       <h4>{headerText}</h4>
       {
         Object.keys(recObject).map(fieldName =>
-          <FormField key={fieldName} label={formatLabel(fieldName)} type="text" field={recObject[fieldName]} />
+          <FormField key={fieldName} label={formatLabel(fieldName)} type="text"
+                     field={recObject[fieldName]} />
         )
       }
     </div>
@@ -57,10 +61,7 @@ class FeatureRecommendationForm extends React.Component {
     this.props.fields.recommendations.addField();
   }
 
-  deleteRec(event) {
-    let index = event.currentTarget.dataset.recIndex;
-
-    event.stopPropagation();
+  deleteRec(index) {
     this.props.fields.recommendations.removeField(index);
     this.setSelectedRec();
   }
@@ -70,12 +71,15 @@ class FeatureRecommendationForm extends React.Component {
     const { selectedRec } = this.state;
     return (
       <div className="row">
-        <p className="help row">This action can recommend one or more add-ons to a user at a taret domain.</p>
+        <p className="help row">This action can recommend one or more add-ons
+                                to a user at a taret domain.</p>
         <div className="fluid-4">
           <FormField type="text" label="Target Domain" field={fields.domain} />
           <div className="row array-field">
             <h4>Recommended Add-ons</h4>
-            <a className="button add-field" onClick={::this.addRec}><i className="fa fa-plus"></i> Add Recommendation</a>
+            <a className="button add-field" onClick={::this.addRec}>
+              <i className="fa fa-plus"></i> Add Recommendation
+            </a>
 
             { fields.recommendations.length ?
               <ul>
@@ -87,7 +91,7 @@ class FeatureRecommendationForm extends React.Component {
                       recIndex={index}
                       isSelected={_.isEqual(recommendation, selectedRec)}
                       onClick={() => ::this.setSelectedRec(recommendation)}
-                      deleteRec={::this.deleteRec}
+                      deleteRec={() => ::this.deleteRec(index)}
                     />
                   )
                 }
@@ -96,9 +100,7 @@ class FeatureRecommendationForm extends React.Component {
           </div>
         </div>
         <div className="fluid-4 float-right">
-          { selectedRec ?
-             <RecForm selectedRec={selectedRec} fields={fields} /> : ''
-          }
+          {selectedRec && <RecForm selectedRec={selectedRec} fields={fields} />}
         </div>
       </div>
     )
