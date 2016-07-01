@@ -4,38 +4,31 @@ import uuid from 'node-uuid';
 
 /**
  * Storage class that uses window.localStorage as it's backing store.
- * @param {string} prefix Prefix to append to all incoming keys.
  */
-function LocalStorage(prefix) {
-  this.prefix = prefix;
-}
+class LocalStorage {
+  /**
+   * @param    {string} prefix Prefix to append to all incoming keys.
+   */
+  constructor(prefix) {
+    this.prefix = prefix;
+  }
 
-Object.assign(LocalStorage.prototype, {
   _makeKey(key) {
     return `${this.prefix}-${key}`;
-  },
+  }
 
-  getItem(key) {
-    return new Promise(resolve => {
-      resolve(localStorage.getItem(this._makeKey(key)));
-    });
-  },
+  async getItem(key) {
+    return localStorage.getItem(this._makeKey(key));
+  }
 
-  setItem(key, value) {
-    return new Promise(resolve => {
-      localStorage.setItem(this._makeKey(key), value);
-      resolve();
-    });
-  },
+  async setItem(key, value) {
+    return localStorage.setItem(this._makeKey(key), value);
+  }
 
-  removeItem(key) {
-    return new Promise(resolve => {
-      localStorage.removeItem(this._makeKey(key));
-      resolve();
-    });
-  },
-});
-
+  async removeItem(key) {
+    return localStorage.removeItem(this._makeKey(key));
+  }
+}
 
 /**
  * Implementation of the Normandy driver.
