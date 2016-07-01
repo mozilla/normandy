@@ -9,14 +9,19 @@ const notificationPropType = pt.shape({
   message: pt.string,
 });
 
-class Notifications extends React.Component {
+export class Notifications extends React.Component {
   static propTypes = {
     dispatch: pt.func,
     notifications: pt.arrayOf(notificationPropType),
   }
 
+  removeNotification(notificationId) {
+    const { dispatch } = this.props;
+    dispatch(dismissNotification(notificationId));
+  }
+
   render() {
-    const { dispatch, notifications } = this.props;
+    const { notifications } = this.props;
     return (
       <ReactCSSTransitionGroup
         component="div"
@@ -26,33 +31,32 @@ class Notifications extends React.Component {
         transitionLeaveTimeout={200}
       >
         {notifications.map(n => (
-          <Notification key={n.id} notification={n} dispatch={dispatch} />
+          <Notification
+            key={n.id}
+            notification={n}
+            toRemove={() => this.removeNotification(n.id)}
+          />
         ))}
       </ReactCSSTransitionGroup>
     );
   }
 }
 
-class Notification extends React.Component {
+export class Notification extends React.Component {
   static propTypes = {
     dispatch: pt.func,
     notification: notificationPropType,
   }
 
-  handleClickRemove() {
-    const { dispatch, notification } = this.props;
-    dispatch(dismissNotification(notification.id));
-  }
-
   render() {
-    const { notification, dispatch } = this.props;
+    const { notification, toRemove } = this.props;
     return (
       <div className="notification">
         <p className={`message ${notification.messageType}`}>
           { notification.message }
           <i
             className="fa fa-lg fa-times remove-message"
-            onClick={::this.handleClickRemove}
+            onClick={toRemove}
           />
         </p>
       </div>

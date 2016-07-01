@@ -34,6 +34,10 @@ module.exports = function(config) {
                         exclude: /node_modules/,
                         loader: 'babel',
                     },
+                    {
+                        test: /(\.|\/)(json)$/,
+                        loader: 'json',
+                    },
                 ],
             },
             devtool: 'inline-source-map',
