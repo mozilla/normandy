@@ -67,8 +67,15 @@ describe('controlApp Actions', () => {
       });
     });
 
-    it('creates a SET_NOTIFICATION action if provided', () => {
-      const expectedAction = { type: actionTypes.SET_NOTIFICATION, notification: { messageType: 'error', 'message': 'Error fetching recipes.'} };
+    it('creates a SHOW_NOTIFICATION action if provided', () => {
+      const expectedAction = {
+        type: actionTypes.SHOW_NOTIFICATION,
+        notification: {
+          messageType: 'error',
+          message: 'Error fetching recipes.',
+          id: jasmine.any(Number),
+        },
+      };
       fetchMock.mock('/api/v1/recipe/', 'GET', {status: 500});
 
       return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes')).catch(() => {
@@ -133,4 +140,19 @@ describe('controlApp Actions', () => {
     })
   });
 
-})
+  describe('showNotification', () => {
+    it('automatically dismisses notifications after 10 seconds', async function() {
+      jasmine.clock().install();
+
+      const notification = {messageType: 'success', message: 'message'};
+      await store.dispatch(actionTypes.showNotification(notification));
+
+      const dismissAction = actionTypes.dismissNotification(notification.id);
+      expect(store.getActions()).not.toContain(dismissAction);
+      jasmine.clock().tick(10001);
+      expect(store.getActions()).toContain(dismissAction);
+
+      jasmine.clock().uninstall();
+    });
+  });
+});
