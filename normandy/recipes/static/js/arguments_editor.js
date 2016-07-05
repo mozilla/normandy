@@ -1,4 +1,4 @@
-(function ($, JSONEditor) {
+(function argumentsEditor($, JSONEditor) {
   'use strict';
 
     /**
@@ -14,7 +14,7 @@
     $editorElement.insertBefore($argumentsJson);
 
         // Update the backing textarea before submitting.
-    $actionSelect.parents('form').submit(function () {
+    $actionSelect.parents('form').submit(function storeValue() {
       if (editor !== null) {
         $argumentsJson.val(JSON.stringify(editor.getValue()));
       }
@@ -22,7 +22,8 @@
 
         // When the action type changes, remove the existing editor and
         // create a new one.
-    $actionSelect.change(function () {
+    $actionSelect.change(function handleChange() {
+      var actionName;
       if (editor !== null) {
         editor.destroy();
         editor = null;
@@ -32,8 +33,9 @@
         return;
       }
 
-      var actionName = $actionSelect.find('option:selected').text();
-      $.getJSON('/api/v1/action/' + actionName + '/', function (action) {
+      $actionSelect.find('option:selected').text();
+      $.getJSON('/api/v1/action/' + actionName + '/', function processAction(action) {
+        var data;
         editor = new JSONEditor($editorElement[0], {
           schema: action.arguments_schema,
           iconlib: 'fontawesome4',
@@ -42,9 +44,9 @@
           theme: 'django',
         });
 
-                // Assign data regardless of validation to avoid data
-                // loss.
-        var data = JSON.parse($argumentsJson.val());
+        // Assign data regardless of validation to avoid data
+        // loss.
+        data = JSON.parse($argumentsJson.val());
         if (!$.isEmptyObject(data)) {
           editor.setValue(data);
         }
@@ -81,7 +83,7 @@
   });
 
     // Initialize the editor.
-  $(function () {
+  $(function init() {
     initialize($('#id_action'), $('#id_arguments_json'));
   });
-})(django.jQuery, window.JSONEditor);
+}(django.jQuery, window.JSONEditor));

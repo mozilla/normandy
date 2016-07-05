@@ -1,15 +1,17 @@
-function ConsoleLogAction(normandy, recipe) {
-  this.normandy = normandy;
-  this.recipe = recipe;
+class ConsoleLogAction {
+  constructor(normandy, recipe) {
+    this.normandy = normandy;
+    this.recipe = recipe;
+  }
+
+  execute() {
+    const normandy = this.normandy;
+    const recipe = this.recipe;
+
+    return new Promise(() => {
+      normandy.log(recipe.arguments.message, 'info');
+    });
+  }
 }
-
-ConsoleLogAction.prototype.execute = function () {
-  var normandy = this.normandy;
-  var recipe = this.recipe;
-
-  return new Promise(function (resolve) {
-    normandy.log(recipe.arguments.message, 'info');
-  });
-};
 
 window.registerAction('console-log', ConsoleLogAction);

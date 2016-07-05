@@ -4,7 +4,7 @@ import {
   SET_SELECTED_RECIPE, SHOW_NOTIFICATION, DISMISS_NOTIFICATION,
 } from '../actions/ControlActions.js';
 
-let initialState = {
+const initialState = {
   recipes: null,
   isFetching: false,
   selectedRecipe: null,
@@ -62,16 +62,14 @@ function controlAppReducer(state = initialState, action) {
       return Object.assign({}, state, {
         recipes: state.recipes.map(recipe => {
           if (recipe.id === action.recipe.id) {
-            recipe = Object.assign(recipe, action.recipe);
+            return Object.assign(recipe, action.recipe);
           }
           return recipe;
         }),
       });
     case RECIPE_DELETED:
       return Object.assign({}, state, {
-        recipes: state.recipes.filter(recipe => {
-          return recipe.id !== action.recipeId;
-        }),
+        recipes: state.recipes.filter(recipe => recipe.id !== action.recipeId),
       });
 
     default:

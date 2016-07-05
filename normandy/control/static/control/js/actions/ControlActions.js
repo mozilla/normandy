@@ -19,7 +19,7 @@ const API_REQUEST_SETTINGS = {
   credentials: 'include',
   headers: {
     'X-CSRFToken': document.getElementsByTagName('html')[0].dataset.csrf,
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 };
@@ -182,7 +182,7 @@ function dismissNotification(notificationId) {
 
 function makeApiRequest(requestType, requestData) {
   return dispatch => {
-    let apiRequestConfig = apiRequestMap[requestType](requestData);
+    const apiRequestConfig = apiRequestMap[requestType](requestData);
 
     dispatch(requestInProgress());
 
@@ -192,12 +192,17 @@ function makeApiRequest(requestType, requestData) {
     })
     .then(response => {
       if (response.status >= 400) {
-        dispatch(requestComplete({ status: 'error', notification: apiRequestConfig.errorNotification }));
+        dispatch(requestComplete({
+          status: 'error',
+          notification: apiRequestConfig.errorNotification,
+        }));
         return response.json().then(err => { throw err; });
-      } else {
-        dispatch(requestComplete({ status: 'success', notification: apiRequestConfig.successNotification }));
-        return (response.status == 204) ? response.text : response.json();
       }
+      dispatch(requestComplete({
+        status: 'success',
+        notification: apiRequestConfig.successNotification,
+      }));
+      return (response.status === 204) ? response.text : response.json();
     });
   };
 }

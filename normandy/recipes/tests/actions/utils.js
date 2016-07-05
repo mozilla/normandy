@@ -7,7 +7,7 @@ export class MockStorage {
   }
 
   getItem(key) {
-    let value = this.data[key];
+    const value = this.data[key];
     return Promise.resolve(value !== undefined ? value : null);
   }
 
@@ -34,7 +34,7 @@ export function pluginFactory(props = {}) {
 
 
 export function mockNormandy() {
-  let normandy = {
+  const normandy = {
     mock: {
       storage: new MockStorage(),
       heartbeatEmitter: new EventEmitter(),
@@ -76,7 +76,7 @@ export function mockNormandy() {
     },
   };
 
-  let toSpy = [
+  const toSpy = [
     'location',
     'log',
     'createStorage',
@@ -85,7 +85,7 @@ export function mockNormandy() {
     'uuid',
     'saveHeartbeatFlow',
   ];
-  for (let method of toSpy) {
+  for (const method of toSpy) {
     spyOn(normandy, method).and.callThrough();
   }
 

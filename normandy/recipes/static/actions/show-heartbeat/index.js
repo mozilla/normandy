@@ -7,12 +7,15 @@ const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
 export class HeartbeatFlow {
   constructor(action) {
     this.action = action;
-    let { normandy, recipe, survey, client, location } = action;
+    const { normandy, recipe, survey, client, location } = action;
 
-    let flashPlugin = client.plugins['Shockwave Flash'];
-    let plugins = {};
-    for (let pluginName in client.plugins) {
-      let plugin = client.plugins[pluginName];
+    const flashPlugin = client.plugins['Shockwave Flash'];
+    const plugins = {};
+    for (const pluginName in client.plugins) {
+      if (!client.plugins.hasOwnProperty(pluginName)) {
+        continue;
+      }
+      const plugin = client.plugins[pluginName];
       plugins[plugin.name] = plugin.version;
     }
 
@@ -69,7 +72,7 @@ export class HeartbeatFlow {
   save() {
     this.data.updated_ts = Date.now();
 
-    let { normandy } = this.action;
+    const { normandy } = this.action;
     normandy.saveHeartbeatFlow(this.data);
   }
 
@@ -78,7 +81,7 @@ export class HeartbeatFlow {
   }
 
   setPhaseTimestamp(phase, timestamp) {
-    let key = `flow_${phase}_ts`;
+    const key = `flow_${phase}_ts`;
     if (key in this.data && this.data[key] === 0) {
       this.data[key] = timestamp;
     }
@@ -97,10 +100,10 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   async execute() {
-    let { surveys, defaults, surveyId } = this.recipe.arguments;
+    const { surveys, defaults, surveyId } = this.recipe.arguments;
 
-    let lastShown = await this.getLastShownDate();
-    let shouldShowSurvey = (
+    const lastShown = await this.getLastShownDate();
+    const shouldShowSurvey = (
             this.normandy.testing
             || lastShown === null
             || Date.now() - lastShown > LAST_SHOWN_DELAY
@@ -113,13 +116,13 @@ export default class ShowHeartbeatAction extends Action {
     this.client = await this.normandy.client();
     this.survey = this.chooseSurvey(surveys, defaults);
 
-    let flow = new HeartbeatFlow(this);
+    const flow = new HeartbeatFlow(this);
     flow.save();
 
         // A bit redundant but the action argument names shouldn't necessarily rely
         // on the argument names showHeartbeat takes.
 
-    var heartbeatData = {
+    const heartbeatData = {
       message: this.survey.message,
       engagementButtonLabel: this.survey.engagementButtonLabel,
       thanksMessage: this.survey.thanksMessage,
@@ -135,7 +138,7 @@ export default class ShowHeartbeatAction extends Action {
       heartbeatData.testing = 1;
     }
 
-    let heartbeat = await this.normandy.showHeartbeat(heartbeatData);
+    const heartbeat = await this.normandy.showHeartbeat(heartbeatData);
 
     heartbeat.on('NotificationOffered', data => {
       flow.setPhaseTimestamp('offered', data.timestamp);
@@ -162,7 +165,7 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   async getLastShownDate() {
-    let lastShown = Number.parseInt(await this.storage.getItem('lastShown'), 10);
+    const lastShown = Number.parseInt(await this.storage.getItem('lastShown'), 10);
     return Number.isNaN(lastShown) ? null : lastShown;
   }
 
@@ -172,7 +175,7 @@ export default class ShowHeartbeatAction extends Action {
       return url;
     }
 
-    let args = {
+    const args = {
       source: 'heartbeat',
       surveyversion: VERSION,
       updateChannel: this.client.channel,
@@ -187,8 +190,11 @@ export default class ShowHeartbeatAction extends Action {
       args.testing = 1;
     }
 
-    let annotatedUrl = new URL(url);
-    for (let key in args) {
+    const annotatedUrl = new URL(url);
+    for (const key in args) {
+      if (!args.hasOwnProperty(key)) {
+        continue;
+      }
       annotatedUrl.searchParams.set(key, args[key]);
     }
 
@@ -206,8 +212,8 @@ export default class ShowHeartbeatAction extends Action {
      * @return {object}          The chosen survey, with the defaults applied.
      */
   chooseSurvey(surveys, defaults) {
-    let finalSurvey = Object.assign({}, weightedChoose(surveys));
-    for (let prop in defaults) {
+    const finalSurvey = Object.assign({}, weightedChoose(surveys));
+    for (const prop in defaults) {
       if (!finalSurvey[prop]) {
         finalSurvey[prop] = defaults[prop];
       }

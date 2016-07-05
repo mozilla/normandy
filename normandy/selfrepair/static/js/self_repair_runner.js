@@ -1,4 +1,3 @@
-import Mozilla from './uitour.js';
 import Normandy from './normandy_driver.js';
 import uuid from 'node-uuid';
 import jexl from 'jexl';
@@ -7,8 +6,8 @@ import jexl from 'jexl';
 jexl.addTransform('date', value => new Date(value));
 
 
-let registeredActions = {};
-window.registerAction = function (name, ActionClass) {
+const registeredActions = {};
+window.registerAction = (name, ActionClass) => {
   registeredActions[name] = ActionClass;
 };
 
@@ -23,12 +22,12 @@ window.registerAction = function (name, ActionClass) {
  */
 function loadAction(recipe) {
   return new Promise((resolve, reject) => {
-    let action_name = recipe.action;
-    if (!registeredActions[action_name]) {
-      fetch(`/api/v1/action/${action_name}/`)
+    const actionName = recipe.action;
+    if (!registeredActions[actionName]) {
+      fetch(`/api/v1/action/${actionName}/`)
             .then(response => response.json())
             .then(action => {
-              let script = document.createElement('script');
+              const script = document.createElement('script');
               script.src = action.implementation_url;
               script.onload = () => {
                 if (!registeredActions[action.name]) {
@@ -40,7 +39,7 @@ function loadAction(recipe) {
               document.head.appendChild(script);
             });
     } else {
-      resolve(registeredActions[action_name]);
+      resolve(registeredActions[actionName]);
     }
   });
 }
@@ -65,9 +64,9 @@ export function getUserId() {
  * @promise Resolves with a list of all enabled recipes.
  */
 export function fetchRecipes() {
-  let { recipeUrl } = document.documentElement.dataset;
-  let headers = { Accept: 'application/json' };
-  let data = { enabled: 'True' };
+  const { recipeUrl } = document.documentElement.dataset;
+  const headers = { Accept: 'application/json' };
+  const data = { enabled: 'True' };
 
   return fetch(recipeUrl, { headers, data })
     .then(response => response.json())
@@ -80,9 +79,9 @@ export function fetchRecipes() {
  * @promise Resolves with an object containing client info.
  */
 function classifyClient() {
-  let { classifyUrl } = document.documentElement.dataset;
-  let headers = { Accept: 'application/json' };
-  let classifyXhr = fetch(classifyUrl, { headers })
+  const { classifyUrl } = document.documentElement.dataset;
+  const headers = { Accept: 'application/json' };
+  const classifyXhr = fetch(classifyUrl, { headers })
     .then(response => response.json())
     .then(client => client);
 
@@ -105,7 +104,7 @@ function classifyClient() {
  * @promise Resolves once the action has executed.
  */
 export function runRecipe(recipe, options = {}) {
-  return loadAction(recipe).then(function (Action) {
+  return loadAction(recipe).then(Action => {
     if (options.testing !== undefined) {
       Normandy.testing = options.testing;
     }
@@ -121,11 +120,9 @@ export function runRecipe(recipe, options = {}) {
  */
 export function filterContext() {
   return classifyClient()
-    .then(classifiedClient => {
-      return {
-        normandy: classifiedClient,
-      };
-    });
+  .then(classifiedClient => ({
+    normandy: classifiedClient,
+  }));
 }
 
 
@@ -138,8 +135,8 @@ export function filterContext() {
  */
 export function doesRecipeMatch(recipe, context) {
     // Remove newlines, which are invalid in JEXL
-  let filter_expression = recipe.filter_expression.replace(/\r?\n|\r/g, '');
+  const filterExpression = recipe.filterExpression.replace(/\r?\n|\r/g, '');
 
-  return jexl.eval(filter_expression, context)
+  return jexl.eval(filterExpression, context)
     .then(value => [recipe, !!value]);
 }

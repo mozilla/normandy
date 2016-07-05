@@ -135,14 +135,14 @@ describe('controlApp reducer', () => {
       },
     })).toEqual({
       recipes: [{
-        'id': 1,
-        'name': 'Lorem Ipsum',
-        'enabled': true,
+        id: 1,
+        name: 'Lorem Ipsum',
+        enabled: true,
       },
       {
-        'id': 2,
-        'name': 'Dolor set amet',
-        'enabled': true,
+        id: 2,
+        name: 'Dolor set amet',
+        enabled: true,
       },
       {
         id: 3,
@@ -158,14 +158,14 @@ describe('controlApp reducer', () => {
       recipeId: 3,
     })).toEqual({
       recipes: [{
-        'id': 1,
-        'name': 'Lorem Ipsum',
-        'enabled': true,
+        id: 1,
+        name: 'Lorem Ipsum',
+        enabled: true,
       },
       {
-        'id': 2,
-        'name': 'Dolor set amet',
-        'enabled': true,
+        id: 2,
+        name: 'Dolor set amet',
+        enabled: true,
       }],
     });
   });

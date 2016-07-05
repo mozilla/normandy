@@ -22,9 +22,9 @@ export function weightedChoose(choices) {
     return null;
   }
 
-  let maxWeight = choices.map(c => c.weight).reduce((a, b) => a + b, 0);
+  const maxWeight = choices.map(c => c.weight).reduce((a, b) => a + b, 0);
   let chosenWeight = Math.random() * maxWeight;
-  for (let choice of choices) {
+  for (const choice of choices) {
     chosenWeight -= choice.weight;
     if (chosenWeight <= 0) {
       return choice;
@@ -55,5 +55,5 @@ if (!registerAction) {
 
 // If it still isn't found, just shim it.
 if (!registerAction) {
-  registerAction = function () { };
+  registerAction = () => {};
 }

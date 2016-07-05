@@ -1,19 +1,5 @@
 import Sha256 from 'sha.js/sha256';
 
-export function stableSample(input, rate) {
-  const hasher = new Sha256();
-  hasher.update(JSON.stringify(input));
-
-  const samplePoint = fractionToKey(rate);
-  const inputHash = hasher.digest('hex');
-
-  if (samplePoint.length !== 64 || inputHash.length !== 64) {
-    throw new Error('Unexpected hash length');
-  }
-
-  return inputHash < samplePoint;
-}
-
 /**
  * Map from the range [0, 1] to [0, max(sha256)].
  * @param  {number} frac A float from 0.0 to 1.0.
@@ -44,4 +30,18 @@ export function fractionToKey(frac) {
   }
 
   return hexDigits;
+}
+
+export function stableSample(input, rate) {
+  const hasher = new Sha256();
+  hasher.update(JSON.stringify(input));
+
+  const samplePoint = fractionToKey(rate);
+  const inputHash = hasher.digest('hex');
+
+  if (samplePoint.length !== 64 || inputHash.length !== 64) {
+    throw new Error('Unexpected hash length');
+  }
+
+  return inputHash < samplePoint;
 }

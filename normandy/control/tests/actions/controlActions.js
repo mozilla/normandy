@@ -2,27 +2,12 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 
-import { fixtureRecipes, fixtureRevisions, initialState } from '../fixtures/fixtures';
+import { fixtureRecipes, initialState } from '../fixtures/fixtures';
 import * as actionTypes from '../../static/control/js/actions/ControlActions';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 const store = mockStore({ controlApp: initialState });
-
-const successPromise = responseData => {
-  return Promise.resolve(new Response(JSON.stringify(responseData), {
-    Headers: 'Content-Type: application/json',
-    status: 200,
-  }));
-};
-
-const failurePromise = () => {
-  return Promise.resolve(new Response('{}', {
-    Headers: 'Content-Type: application/json',
-    status: 403,
-  }));
-};
-
 
 describe('controlApp Actions', () => {
   beforeEach(() => {
@@ -86,7 +71,7 @@ describe('controlApp Actions', () => {
     fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
-    .then(response => {
+    .then(() => {
       expect(fetchMock.calls('/api/v1/recipe/').length).toEqual(1);
     });
   });
@@ -95,7 +80,7 @@ describe('controlApp Actions', () => {
     fetchMock.mock('/api/v1/recipe/1/', 'GET', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchSingleRecipe', { recipeId: 1 }))
-    .then(response => {
+    .then(() => {
       expect(fetchMock.calls('/api/v1/recipe/1/').length).toEqual(1);
     });
   });
@@ -104,7 +89,7 @@ describe('controlApp Actions', () => {
     fetchMock.mock('/api/v1/recipe_version/169/', 'GET', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
-    .then(response => {
+    .then(() => {
       expect(fetchMock.calls('/api/v1/recipe_version/169/').length).toEqual(1);
     });
   });
@@ -113,7 +98,7 @@ describe('controlApp Actions', () => {
     fetchMock.mock('/api/v1/recipe/', 'POST', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('addRecipe', { recipe: fixtureRecipes[0] }))
-    .then(response => {
+    .then(() => {
       const calls = fetchMock.calls('/api/v1/recipe/');
       expect(calls[0][1].body).toEqual(JSON.stringify(fixtureRecipes[0]));
     });
@@ -122,8 +107,10 @@ describe('controlApp Actions', () => {
   it('makes a proper API request for updateRecipe', () => {
     fetchMock.mock('/api/v1/recipe/1/', 'PATCH', fixtureRecipes[0]);
 
-    return store.dispatch(actionTypes.makeApiRequest('updateRecipe', { recipe: fixtureRecipes[0], recipeId: 1 }))
-    .then(response => {
+    return store.dispatch(actionTypes.makeApiRequest('updateRecipe', {
+      recipe: fixtureRecipes[0], recipeId: 1,
+    }))
+    .then(() => {
       const calls = fetchMock.calls('/api/v1/recipe/1/');
       expect(calls[0][1].body).toEqual(JSON.stringify(fixtureRecipes[0]));
     });
@@ -133,24 +120,8 @@ describe('controlApp Actions', () => {
     fetchMock.mock('/api/v1/recipe/1/', 'DELETE', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('deleteRecipe', { recipeId: 1 }))
-    .then(response => {
+    .then(() => {
       expect(fetchMock.calls('/api/v1/recipe/1/').length).toEqual(1);
-    });
-  });
-
-  describe('showNotification', () => {
-    it('automatically dismisses notifications after 10 seconds', async function() {
-      jasmine.clock().install();
-
-      const notification = { messageType: 'success', message: 'message' };
-      await store.dispatch(actionTypes.showNotification(notification));
-
-      const dismissAction = actionTypes.dismissNotification(notification.id);
-      expect(store.getActions()).not.toContain(dismissAction);
-      jasmine.clock().tick(10001);
-      expect(store.getActions()).toContain(dismissAction);
-
-      jasmine.clock().uninstall();
     });
   });
 });

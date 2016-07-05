@@ -11,26 +11,26 @@ function LocalStorage(prefix) {
 }
 
 Object.assign(LocalStorage.prototype, {
-  _key(key) {
+  _makeKey(key) {
     return `${this.prefix}-${key}`;
   },
 
   getItem(key) {
     return new Promise(resolve => {
-      resolve(localStorage.getItem(this._key(key)));
+      resolve(localStorage.getItem(this._makeKey(key)));
     });
   },
 
   setItem(key, value) {
     return new Promise(resolve => {
-      localStorage.setItem(this._key(key), value);
+      localStorage.setItem(this._makeKey(key), value);
       resolve();
     });
   },
 
   removeItem(key) {
     return new Promise(resolve => {
-      localStorage.removeItem(this._key(key));
+      localStorage.removeItem(this._makeKey(key));
       resolve();
     });
   },
@@ -40,7 +40,7 @@ Object.assign(LocalStorage.prototype, {
 /**
  * Implementation of the Normandy driver.
  */
-let Normandy = {
+const Normandy = {
   locale: document.documentElement.dataset.locale || navigator.language,
 
   _testingOverride: false,
@@ -76,12 +76,12 @@ let Normandy = {
 
   client() {
     return new Promise(resolve => {
-      let client = {
+      const client = {
         plugins: {},
       };
 
             // Populate plugin info.
-      for (let plugin of navigator.plugins) {
+      for (const plugin of navigator.plugins) {
         client.plugins[plugin.name] = {
           name: plugin.name,
           filename: plugin.filename,
@@ -90,9 +90,9 @@ let Normandy = {
         };
       }
 
-            // Keys are UITour configs, functions are given the data
-            // returned by UITour for that config.
-      let wantedConfigs = {
+      // Keys are UITour configs, functions are given the data
+      // returned by UITour for that config.
+      const wantedConfigs = {
         appinfo(data) {
           client.version = data.version;
           client.channel = data.defaultUpdateChannel;
@@ -107,9 +107,9 @@ let Normandy = {
       };
 
       let retrievedConfigs = 0;
-      let wantedConfigNames = Object.keys(wantedConfigs);
+      const wantedConfigNames = Object.keys(wantedConfigs);
       wantedConfigNames.forEach(configName => {
-        Mozilla.UITour.getConfiguration(configName, function (data) {
+        Mozilla.UITour.getConfiguration(configName, data => {
           wantedConfigs[configName](data);
           retrievedConfigs++;
           if (retrievedConfigs >= wantedConfigNames.length) {
@@ -124,25 +124,23 @@ let Normandy = {
     if (this.testing) {
       this.log('Pretending to send flow to Input');
       this.log(data);
-    } else {
-      return fetch('https://input.mozilla.org/api/v2/hb/', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
+      return Promise.resolve();
     }
+    return fetch('https://input.mozilla.org/api/v2/hb/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
   },
 
   heartbeatCallbacks: [],
   showHeartbeat(options) {
     return new Promise(resolve => {
-      let emitter = new EventEmitter();
-      this.heartbeatCallbacks[options.flowId] = function (eventName, data) {
-        emitter.emit(eventName, data);
-      };
+      const emitter = new EventEmitter();
+      this.heartbeatCallbacks[options.flowId] = (eventName, data) => emitter.emit(eventName, data);
 
             // Positional arguments are overridden by the final options
             // argument, but they're still required so we pass them anyway.
@@ -170,10 +168,10 @@ let Normandy = {
 // happened.
 Mozilla.UITour.observe((eventName, data) => {
   if (eventName.startsWith('Heartbeat:')) {
-    let flowId = data.flowId;
-    eventName = eventName.slice(10); // Chop off "Heartbeat:"
+    const flowId = data.flowId;
+    const croppedEventName = eventName.slice(10); // Chop off "Heartbeat:"
     if (flowId in Normandy.heartbeatCallbacks) {
-      Normandy.heartbeatCallbacks[flowId](eventName, data);
+      Normandy.heartbeatCallbacks[flowId](croppedEventName, data);
     }
   }
 });
