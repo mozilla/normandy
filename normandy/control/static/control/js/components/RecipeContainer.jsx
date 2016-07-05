@@ -1,10 +1,9 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
-import { fetchSingleRecipe, makeApiRequest, singleRecipeReceived, setSelectedRecipe } from '../actions/ControlActions.js'
+import React from 'react';
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+import { fetchSingleRecipe, makeApiRequest, singleRecipeReceived, setSelectedRecipe } from '../actions/ControlActions.js';
 
 export default function composeRecipeContainer(Component) {
-
   class RecipeContainer extends React.Component {
     constructor(props) {
       super(props);
@@ -21,7 +20,7 @@ export default function composeRecipeContainer(Component) {
             dispatch(singleRecipeReceived(revision.recipe));
           });
         } else {
-          dispatch(makeApiRequest('fetchSingleRecipe', { recipeId: recipeId }))
+          dispatch(makeApiRequest('fetchSingleRecipe', { recipeId }))
           .then(recipe => {
             dispatch(singleRecipeReceived(recipe));
           });
@@ -36,7 +35,7 @@ export default function composeRecipeContainer(Component) {
     }
 
     render() {
-     return <Component {...this.props} {...this.state} />
+      return <Component {...this.props} {...this.state} />;
     }
   }
 
@@ -51,18 +50,17 @@ export default function composeRecipeContainer(Component) {
     return {
       recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id) || null,
       recipe: recipeData,
-      dispatch: props.dispatch
+      dispatch: props.dispatch,
     };
-  }
+  };
 
   RecipeContainer.propTypes = {
     recipeId: React.PropTypes.number,
     recipe: React.PropTypes.object,
-    dispatch: React.PropTypes.func
-  }
+    dispatch: React.PropTypes.func,
+  };
 
   return connect(
     mapStateToProps
-  )(RecipeContainer)
-
+  )(RecipeContainer);
 }

@@ -1,7 +1,7 @@
-import React, { PropTypes as pt } from 'react'
-import { connect } from 'react-redux'
-import { dismissNotification } from '../actions/ControlActions.js'
-import classNames from 'classnames'
+import React, { PropTypes as pt } from 'react';
+import { connect } from 'react-redux';
+import { dismissNotification } from '../actions/ControlActions.js';
+import classNames from 'classnames';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 const notificationPropType = pt.shape({
@@ -53,20 +53,20 @@ export class Notification extends React.Component {
     return (
       <div className="notification">
         <p className={`message ${notification.messageType}`}>
-          { notification.message }
+          {notification.message}
           <i
             className="fa fa-lg fa-times remove-message"
             onClick={toRemove}
           />
         </p>
       </div>
-    )
+    );
   }
 }
 
-const mapStateToProps = (state) => {
-  return { notifications: state.controlApp.notifications }
-}
+const mapStateToProps = state => {
+  return { notifications: state.controlApp.notifications };
+};
 
 export default connect(
   mapStateToProps

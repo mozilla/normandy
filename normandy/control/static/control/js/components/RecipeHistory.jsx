@@ -1,24 +1,24 @@
-import React, { PropTypes as pt } from 'react'
-import { push } from 'react-router-redux'
-import moment from 'moment'
-import composeRecipeContainer from './RecipeContainer.jsx'
-import { makeApiRequest } from '../actions/ControlActions.js'
+import React, { PropTypes as pt } from 'react';
+import { push } from 'react-router-redux';
+import moment from 'moment';
+import composeRecipeContainer from './RecipeContainer.jsx';
+import { makeApiRequest } from '../actions/ControlActions.js';
 
 class RecipeHistory extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      revisionLog: []
-    }
+      revisionLog: [],
+    };
   }
 
   getHistory(recipeId) {
     const { dispatch } = this.props;
 
-    dispatch(makeApiRequest('fetchRecipeHistory', { recipeId: recipeId }))
+    dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
     .then(history => {
       this.setState({
-        revisionLog: history
+        revisionLog: history,
       });
     });
   }
@@ -45,7 +45,7 @@ class RecipeHistory extends React.Component {
             )}
         </ul>
       </div>
-    )
+    );
   }
 }
 
@@ -55,7 +55,7 @@ class HistoryItem extends React.Component {
       recipe: pt.shape({
         revision_id: pt.number.isRequired,
       }).isRequired,
-      date_created: pt.string.isRequired
+      date_created: pt.string.isRequired,
     }).isRequired,
     recipe: pt.shape({
       revision_id: pt.number.isRequired,
@@ -71,7 +71,7 @@ class HistoryItem extends React.Component {
         <p className="revision-number">#{revision.recipe.revision_id}</p>
         <p className="revision-created">
           <span className="label">Created On:</span>
-          { moment(revision.date_created).format('MMM Do YYYY - h:mmA') }
+          {moment(revision.date_created).format('MMM Do YYYY - h:mmA')}
         </p>
         {isCurrent && (
           <div className="revision-status status-indicator green">

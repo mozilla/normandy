@@ -1,19 +1,19 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
-import { Table, Thead, Th, Tr, Td, applyFilter } from 'reactable'
-import classNames from 'classnames'
-import moment from 'moment'
-import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js'
+import React from 'react';
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+import { Table, Thead, Th, Tr, Td, applyFilter } from 'reactable';
+import classNames from 'classnames';
+import moment from 'moment';
+import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js';
 
-const BooleanIcon = (props) => {
-  switch(props.value) {
+const BooleanIcon = props => {
+  switch (props.value) {
     case true: return <i className="fa fa-lg fa-check green">&nbsp;</i>;
     case false: return <i className="fa fa-lg fa-times red">&nbsp;</i>;
   }
-}
+};
 
-const FilterBar = ({searchText, selectedFilter, updateSearch, updateFilter}) => {
+const FilterBar = ({ searchText, selectedFilter, updateSearch, updateFilter }) => {
   return (
     <div id="secondary-header" className="fluid-8">
       <div className="fluid-2">
@@ -27,21 +27,22 @@ const FilterBar = ({searchText, selectedFilter, updateSearch, updateFilter}) => 
       </div>
     </div>
   );
-}
+};
 
 const SwitchFilter = ({ options, selectedFilter, updateFilter }) => {
   return (
     <div className="switch">
       <div className={`switch-selection position-${options.indexOf(selectedFilter)}`}>&nbsp;</div>
-      { options.map(option =>
+      {options.map(option =>
         <span key={option}
           className={classNames({ 'active': (option === selectedFilter) })}
-          onClick={() => updateFilter(option)}>{option}
+          onClick={() => updateFilter(option)}
+        >{option}
         </span>
       )}
     </div>
-  )
-}
+  );
+};
 
 class RecipeList extends React.Component {
   title = 'Recipes';
@@ -51,12 +52,12 @@ class RecipeList extends React.Component {
     this.state = {
       searchText: '',
       filteredRecipes: null,
-      selectedFilter: 'All'
-    }
+      selectedFilter: 'All',
+    };
   }
 
   componentWillMount() {
-    const { dispatch, isFetching, recipeListNeedsFetch } = this.props
+    const { dispatch, isFetching, recipeListNeedsFetch } = this.props;
     dispatch(setSelectedRecipe(null));
 
     if (recipeListNeedsFetch && !isFetching) {
@@ -73,7 +74,7 @@ class RecipeList extends React.Component {
 
   updateSearch(event) {
     this.setState({
-      searchText: event.target.value
+      searchText: event.target.value,
     });
   }
 
@@ -83,13 +84,13 @@ class RecipeList extends React.Component {
     if (filterStatus === 'All') {
       this.setState({
         filteredRecipes: null,
-        selectedFilter: filterStatus
+        selectedFilter: filterStatus,
       });
     } else {
       let enabledState = (filterStatus === 'Enabled') ? true : false;
       this.setState({
         filteredRecipes: recipes.filter(recipe => recipe.enabled === enabledState),
-        selectedFilter: filterStatus
+        selectedFilter: filterStatus,
       });
     }
   }
@@ -102,9 +103,10 @@ class RecipeList extends React.Component {
       <div>
       <FilterBar {...this.state} updateFilter={::this.updateFilter} updateSearch={::this.updateSearch} />
       <div className="fluid-8">
-        <Table id="recipe-list" sortable={true} hideFilterInput
+        <Table id="recipe-list" sortable hideFilterInput
           filterable={['name', 'action']}
-          filterBy={this.state.searchText}>
+          filterBy={this.state.searchText}
+        >
           <Thead>
             <Th column="name"><span>Name</span></Th>
             <Th column="action"><span>Action Name</span></Th>
@@ -112,8 +114,8 @@ class RecipeList extends React.Component {
             <Th column="is_approved"><span>Approved</span></Th>
             <Th column="last_updated"><span>Last Updated</span></Th>
           </Thead>
-          { filteredRecipes.map(recipe =>
-            <Tr key={recipe.id} onClick={(e) => { ::this.viewRecipe(recipe); }}>
+          {filteredRecipes.map(recipe =>
+            <Tr key={recipe.id} onClick={e => { ::this.viewRecipe(recipe); }}>
               <Td column="name">{recipe.name}</Td>
               <Td column="action">{recipe.action}</Td>
               <Td column="enabled" value={recipe.enabled}><BooleanIcon value={recipe.enabled} /></Td>
@@ -125,7 +127,7 @@ class RecipeList extends React.Component {
         </Table>
       </div>
       </div>
-    )
+    );
   }
 }
 
@@ -133,9 +135,9 @@ let mapStateToProps = (state, ownProps) => ({
   recipes: state.controlApp.recipes || [],
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.controlApp.recipeListNeedsFetch,
-  isFetching: state.controlApp.isFetching
-})
+  isFetching: state.controlApp.isFetching,
+});
 
 export default connect(
   mapStateToProps
-)(RecipeList)
+)(RecipeList);

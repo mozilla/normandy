@@ -1,7 +1,7 @@
-import React from 'react'
-import { reduxForm } from 'redux-form'
-import classNames from 'classnames'
-import { _ } from 'underscore'
+import React from 'react';
+import { reduxForm } from 'redux-form';
+import classNames from 'classnames';
+import { _ } from 'underscore';
 import FormField from '../form_fields/FormFieldWrapper.jsx';
 
 export const HeartbeatFormFields = [
@@ -9,29 +9,29 @@ export const HeartbeatFormFields = [
   'defaults.message', 'defaults.engagementButtonLabel', 'defaults.thanksMessage',
   'defaults.postAnswerUrl', 'defaults.learnMoreMessage', 'defaults.learnMoreUrl',
   'surveys[].title', 'surveys[].message', 'surveys[].engagementButtonLabel', 'surveys[].thanksMessage',
-  'surveys[].postAnswerUrl','surveys[].learnMoreMessage', 'surveys[].learnMoreUrl', 'surveys[].weight'
+  'surveys[].postAnswerUrl', 'surveys[].learnMoreMessage', 'surveys[].learnMoreUrl', 'surveys[].weight',
 ];
 
-const formatLabel = (labelName) => labelName.replace( /([A-Z])/g, " $1" ).toLowerCase();
+const formatLabel = labelName => labelName.replace(/([A-Z])/g, ' $1').toLowerCase();
 
-const SurveyListItem = (props) => {
+const SurveyListItem = props => {
   const { survey, surveyIndex, isSelected, deleteSurvey, onClick } = props;
   return (
-    <li className={classNames({'active': isSelected})} onClick={onClick}>
-      { survey.title.value || "Untitled Survey" }
+    <li className={classNames({ 'active': isSelected })} onClick={onClick}>
+      {survey.title.value || 'Untitled Survey'}
       <span title="Delete this survey" className="delete-field" data-survey-index={surveyIndex} onClick={deleteSurvey}>
         <i className="fa fa-times red"></i>
       </span>
     </li>
-  )
-}
+  );
+};
 
-const SurveyForm = (props) => {
+const SurveyForm = props => {
   const { selectedSurvey, fields, showDefaults } = props;
   const surveyObject = selectedSurvey || fields.defaults;
   let headerText = 'Default Survey Values';
   let containerClasses = classNames('fluid-8', {
-    'active': selectedSurvey
+    'active': selectedSurvey,
   });
 
   if (selectedSurvey) {
@@ -39,8 +39,8 @@ const SurveyForm = (props) => {
   }
 
   return (
-    <div id='survey-form' className={containerClasses}>
-      { selectedSurvey &&
+    <div id="survey-form" className={containerClasses}>
+      {selectedSurvey &&
         <span className="return-to-defaults" onClick={showDefaults}>
           <i className="fa fa-long-arrow-left pre"></i> Return to defaults
         </span>
@@ -52,13 +52,13 @@ const SurveyForm = (props) => {
         )
       }
     </div>
-  )
-}
+  );
+};
 
 class HeartbeatForm extends React.Component {
   constructor(props) {
-    super(props)
-    this.state = { selectedSurvey: null }
+    super(props);
+    this.state = { selectedSurvey: null };
   }
 
   setSelectedSurvey(survey) {
@@ -94,7 +94,7 @@ class HeartbeatForm extends React.Component {
             <h4>Surveys</h4>
             <a className="button add-field" onClick={::this.addSurvey}><i className="fa fa-plus"></i> Add Survey</a>
 
-            { fields.surveys.length ?
+            {fields.surveys.length ?
               <ul>
                 {
                   fields.surveys.map((survey, index) =>
@@ -116,7 +116,7 @@ class HeartbeatForm extends React.Component {
           <SurveyForm selectedSurvey={selectedSurvey} fields={fields} showDefaults={::this.showDefaults} />
         </div>
       </div>
-    )
+    );
   }
 }
 

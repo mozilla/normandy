@@ -1,13 +1,13 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { Link } from 'react-router'
-import { push } from 'react-router-redux'
-import { destroy, reduxForm, getValues } from 'redux-form'
-import jexl from 'jexl'
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router';
+import { push } from 'react-router-redux';
+import { destroy, reduxForm, getValues } from 'redux-form';
+import jexl from 'jexl';
 
-import { makeApiRequest, recipeUpdated, recipeAdded } from '../actions/ControlActions.js'
-import composeRecipeContainer from './RecipeContainer.jsx'
-import ActionForm from './ActionForm.jsx'
+import { makeApiRequest, recipeUpdated, recipeAdded } from '../actions/ControlActions.js';
+import composeRecipeContainer from './RecipeContainer.jsx';
+import ActionForm from './ActionForm.jsx';
 import CheckboxField from './form_fields/CheckboxField.jsx';
 import FormField from './form_fields/FormFieldWrapper.jsx';
 
@@ -28,7 +28,7 @@ export class RecipeForm extends React.Component {
     dispatch(destroy('action'));
     fields.action.onChange(event);
     this.setState({
-      selectedAction: { name: selectedActionName }
+      selectedAction: { name: selectedActionName },
     });
   }
 
@@ -48,7 +48,7 @@ export class RecipeForm extends React.Component {
     return this.validateForm(combinedFormValues)
     .catch(error => {
       throw {
-        filter_expression: "Invalid Expression"
+        filter_expression: 'Invalid Expression',
       };
     })
     .then(response => {
@@ -61,7 +61,7 @@ export class RecipeForm extends React.Component {
           dispatch(recipeAdded(response));
           dispatch(push(`/control/recipe/${response.id}/`));
         });
-      };
+      }
     });
   }
 
@@ -69,7 +69,7 @@ export class RecipeForm extends React.Component {
     if (!this.state.selectedAction && nextProps.recipe) {
       let selectedActionName = nextProps.recipe.action;
       this.setState({
-        selectedAction: { name: selectedActionName }
+        selectedAction: { name: selectedActionName },
       });
     }
   }
@@ -77,14 +77,14 @@ export class RecipeForm extends React.Component {
   render() {
     const {
       fields: { name, filter_expression, enabled, action },
-      submitting, recipe, recipeId, handleSubmit, viewingRevision
+      submitting, recipe, recipeId, handleSubmit, viewingRevision,
     } = this.props;
     const { availableActions, selectedAction } = this.state;
 
     return (
       <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form fluid-8">
 
-        { viewingRevision &&
+        {viewingRevision &&
           <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form will rollback the recipe to this revision.
           </p>
@@ -98,7 +98,7 @@ export class RecipeForm extends React.Component {
           onChange={::this.changeAction}
         />
 
-        { selectedAction && <ActionForm recipe={recipe} {...selectedAction} /> }
+        {selectedAction && <ActionForm recipe={recipe} {...selectedAction} />}
 
         <div className="row form-action-buttons">
           <div className="fluid-2">
@@ -110,23 +110,23 @@ export class RecipeForm extends React.Component {
         </div>
 
       </form>
-    )
+    );
   }
 }
 RecipeForm.propTypes = {
   fields: React.PropTypes.object.isRequired,
-}
+};
 
 export default composeRecipeContainer(reduxForm({
-    form: 'recipe'
-  }, (state, props) => {
-    let fields = ['name', 'filter_expression', 'enabled', 'action'];
-    let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
+  form: 'recipe',
+}, (state, props) => {
+  let fields = ['name', 'filter_expression', 'enabled', 'action'];
+  let selectedRecipeRevision = (props.location.state) ? props.location.state.selectedRevision : null;
 
-    return {
-      fields,
-      initialValues: selectedRecipeRevision || props.recipe,
-      viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false),
-      formState: state.form
-    }
-})(RecipeForm))
+  return {
+    fields,
+    initialValues: selectedRecipeRevision || props.recipe,
+    viewingRevision: ((selectedRecipeRevision || props.location.query.revisionId) ? true : false),
+    formState: state.form,
+  };
+})(RecipeForm));

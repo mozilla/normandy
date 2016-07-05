@@ -1,6 +1,6 @@
-import React from 'react'
-import Header from './Header.jsx'
-import Notifications from './Notifications.jsx'
+import React from 'react';
+import Header from './Header.jsx';
+import Notifications from './Notifications.jsx';
 
 export default class ControlApp extends React.Component {
   render() {
@@ -15,10 +15,10 @@ export default class ControlApp extends React.Component {
         />
         <div id="content" className="wrapper">
           {
-            React.Children.map(this.props.children, (child) => React.cloneElement(child))
+            React.Children.map(this.props.children, child => React.cloneElement(child))
           }
         </div>
       </div>
-    )
+    );
   }
 }

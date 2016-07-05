@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import FormField from '../form_fields/FormFieldWrapper.jsx';
 
 export const ConsoleLogFormFields = ['message'];
@@ -11,7 +11,7 @@ class ConsoleLogForm extends React.Component {
         <p className="help row">Log a message to the console.</p>
         <FormField type="text" label="Message" field={fields.message} containerClass="fluid-3" />
       </div>
-    )
+    );
   }
 }
 
