@@ -1,8 +1,8 @@
 export class Action {
-    constructor(normandy, recipe) {
-        this.normandy = normandy;
-        this.recipe = recipe;
-    }
+  constructor(normandy, recipe) {
+    this.normandy = normandy;
+    this.recipe = recipe;
+  }
 }
 
 /**
@@ -18,21 +18,21 @@ export class Action {
  * @return {object}          The chosen choice.
  */
 export function weightedChoose(choices) {
-    if (choices.length < 1) {
-        return null;
-    }
+  if (choices.length < 1) {
+    return null;
+  }
 
-    let maxWeight = choices.map(c => c.weight).reduce((a, b) => a + b, 0);
-    let chosenWeight = Math.random() * maxWeight;
-    for (let choice of choices) {
-        chosenWeight -= choice.weight;
-        if (chosenWeight <= 0) {
-            return choice;
-        }
+  let maxWeight = choices.map(c => c.weight).reduce((a, b) => a + b, 0);
+  let chosenWeight = Math.random() * maxWeight;
+  for (let choice of choices) {
+    chosenWeight -= choice.weight;
+    if (chosenWeight <= 0) {
+      return choice;
     }
+  }
 
     // We shouldn't hit this, but if we do, return the last choice.
-    return choices[choices.length - 1];
+  return choices[choices.length - 1];
 }
 
 // Attempt to find the global registerAction, and fall back to a noop if it's
@@ -40,20 +40,20 @@ export function weightedChoose(choices) {
 export let registerAction = null;
 
 try {
-    registerAction = global.registerAction;
+  registerAction = global.registerAction;
 } catch (err) {
     // Not running in Node.
 }
 
 if (!registerAction) {
-    try {
-        registerAction = window.registerAction;
-    } catch (err) {
+  try {
+    registerAction = window.registerAction;
+  } catch (err) {
         // Not running in a browser.
-    }
+  }
 }
 
 // If it still isn't found, just shim it.
 if (!registerAction) {
-    registerAction = function() { };
+  registerAction = function () { };
 }

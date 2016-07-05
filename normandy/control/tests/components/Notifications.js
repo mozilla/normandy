@@ -5,8 +5,8 @@ import { Notifications, Notification } from '../../static/control/js/components/
 describe('Notification components', () => {
   describe('<Notifications>', () => {
     it('should render a <Notification> for each given notification', () => {
-      const notification1 = {messageType: 'success', message: 'message', id: 1};
-      const notification2 = {messageType: 'success', message: 'message', id: 2};
+      const notification1 = { messageType: 'success', message: 'message', id: 1 };
+      const notification2 = { messageType: 'success', message: 'message', id: 2 };
       const wrapper = shallow(<Notifications notifications={[notification1, notification2]} />);
 
       const notifications = wrapper.find(Notification);
@@ -18,7 +18,7 @@ describe('Notification components', () => {
 
   describe('<Notification>', () => {
     it('should render the notification message', () => {
-      const notification1 = {messageType: 'success', message: 'message', id: 1};
+      const notification1 = { messageType: 'success', message: 'message', id: 1 };
       const wrapper = shallow(<Notification notification={notification1} />);
       expect(wrapper.text()).toEqual(notification1.message);
     });

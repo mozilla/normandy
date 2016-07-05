@@ -1,7 +1,7 @@
 import {
   REQUEST_IN_PROGRESS, REQUEST_COMPLETE, RECIPES_RECEIVED,
   SINGLE_RECIPE_RECEIVED, RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
-  SET_SELECTED_RECIPE, SHOW_NOTIFICATION, DISMISS_NOTIFICATION
+  SET_SELECTED_RECIPE, SHOW_NOTIFICATION, DISMISS_NOTIFICATION,
 } from '../actions/ControlActions.js';
 
 let initialState = {
@@ -17,28 +17,28 @@ function controlAppReducer(state = initialState, action) {
 
     case REQUEST_IN_PROGRESS:
       return Object.assign({}, state, {
-        isFetching: true
+        isFetching: true,
       });
     case REQUEST_COMPLETE:
       return Object.assign({}, state, {
-        isFetching: false
+        isFetching: false,
       });
 
     case RECIPES_RECEIVED:
       return Object.assign({}, state, {
         recipes: action.recipes,
-        recipeListNeedsFetch: false
+        recipeListNeedsFetch: false,
       });
     case SINGLE_RECIPE_RECEIVED:
       return Object.assign({}, state, {
         recipes: [action.recipe],
         recipeListNeedsFetch: true,
-        selectedRecipe: action.recipe.id
+        selectedRecipe: action.recipe.id,
       });
 
     case SET_SELECTED_RECIPE:
       return Object.assign({}, state, {
-        selectedRecipe: action.recipeId
+        selectedRecipe: action.recipeId,
       });
 
     case SHOW_NOTIFICATION:
@@ -55,23 +55,23 @@ function controlAppReducer(state = initialState, action) {
       return Object.assign({}, state, {
         recipes: [
           ...state.recipes || [],
-          action.recipe
-        ]
+          action.recipe,
+        ],
       });
     case RECIPE_UPDATED:
       return Object.assign({}, state, {
-        recipes: state.recipes.map((recipe) => {
+        recipes: state.recipes.map(recipe => {
           if (recipe.id === action.recipe.id) {
             recipe = Object.assign(recipe, action.recipe);
           }
           return recipe;
-        })
+        }),
       });
     case RECIPE_DELETED:
       return Object.assign({}, state, {
-        recipes: state.recipes.filter((recipe) => {
+        recipes: state.recipes.filter(recipe => {
           return recipe.id !== action.recipeId;
-        })
+        }),
       });
 
     default:

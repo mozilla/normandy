@@ -1,2 +1,2 @@
-var testsContext = require.context("./", true, /^\.\/.*\.js$/);
+var testsContext = require.context('./', true, /^\.\/.*\.js$/);
 testsContext.keys().forEach(testsContext);

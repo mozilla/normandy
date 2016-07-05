@@ -15,7 +15,7 @@ export default (
       <IndexRoute
         component={RecipeList}
         ctaButtons={[
-          {text: 'Add New', icon: 'plus', link: 'new/'}
+          { text: 'Add New', icon: 'plus', link: 'new/' },
         ]}
       />
       <Route
@@ -27,8 +27,8 @@ export default (
         <IndexRoute
           component={RecipeForm}
           ctaButtons={[
-            {text: 'Preview', icon: 'eye', link: 'preview/'},
-            {text: 'History', icon: 'history', link: 'history/'},
+            { text: 'Preview', icon: 'eye', link: 'preview/' },
+            { text: 'History', icon: 'history', link: 'history/' },
           ]}
         />
         <Route
@@ -48,6 +48,6 @@ export default (
         />
       </Route>
     </Route>
-    <Route path="*" component={NoMatch}/>
+    <Route path="*" component={NoMatch} />
   </Route>
 );

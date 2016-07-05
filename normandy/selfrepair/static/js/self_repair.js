@@ -1,5 +1,5 @@
 import Normandy from './normandy_driver.js';
-import {fetchRecipes, filterContext, doesRecipeMatch, runRecipe} from './self_repair_runner.js';
+import { fetchRecipes, filterContext, doesRecipeMatch, runRecipe } from './self_repair_runner.js';
 
 // Actually fetch and run the recipes.
 fetchRecipes().then(recipes => {
@@ -17,6 +17,6 @@ fetchRecipes().then(recipes => {
       });
     }
   });
-}).catch((err) => {
+}).catch(err => {
   console.error(err);
 });

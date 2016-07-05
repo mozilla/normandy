@@ -1,4 +1,4 @@
-import { push } from 'react-router-redux'
+import { push } from 'react-router-redux';
 
 import TestUtils from 'react/lib/ReactTestUtils';
 
