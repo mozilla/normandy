@@ -224,58 +224,49 @@ i {
 
 
 /* Notifications */
-#notification-bar {
-  background-color: #fff;
+.notifications {
   left: 40px;
   position: fixed;
   right: 40px;
-  top: -55px;
+  top: 2px;
   z-index: 1;
-
-  &.active {
-    animation-name: notification-bar;
-    animation-duration: 10s;
-    animation-fill-mode: forwards;
-    top: 2px;
-  }
 }
 
-@keyframes notification-bar {
-    0%   { top: -55px;}
-    2%  { top: 2px; }
-    98%  { top: 2px; }
-    100% { top: -55px;}
-}
+.notification {
+  $line-height: 22px;
+  $top-padding: 15px;
 
-p.notification {
-  color: rgba(0,0,0,0.6);
+  background-color: #FFF;
+  color: rgba(0,0,0, 0.6);
   font-size: 12px;
-  line-height: 22px;
-  padding: 15px 30px;
-  position: relative;
+  line-height: $line-height;
   text-indent: 20px;
+  margin-bottom: 2px;
+  overflow: hidden;
 
-  &::before {
-    font: normal normal 400 14px/1 FontAwesome;
-    left: 10px;
-    opacity: 0.75;
-    position: absolute;
-    top: 36%;
-  }
+  .message {
+    padding: $top-padding 30px;
 
-  &.success {
-    background-color: rgba($green, 0.75);
-    &::before {  content: "\f00c"; }
-  }
+    &::before {
+      font: normal normal 400 14px/1 FontAwesome;
+      opacity: 0.75;
+      margin-right: 10px;
+    }
 
-  &.error {
-    background-color: rgba($red, 0.75);
-    &::before {  content: "\f12a"; }
-  }
+    &.success {
+      background-color: rgba($green, 0.75);
+      &::before {  content: "\f00c"; }
+    }
 
-  &.info {
-    background-color: rgba($yellow, 0.75);
-    &::before {  content: "\f129"; }
+    &.error {
+      background-color: rgba($red, 0.75);
+      &::before {  content: "\f12a"; }
+    }
+
+    &.info {
+      background-color: rgba($yellow, 0.75);
+      &::before {  content: "\f129"; }
+    }
   }
 
   i.remove-message {
@@ -286,4 +277,26 @@ p.notification {
       cursor: pointer;
     }
   }
+
+  /* Notification animations
+     These assume only one line of text but that's fine. */
+  $height: ($top-padding * 2) + $line-height;
+  &.notification-enter {
+    height: 0;
+  }
+
+  &.notification-enter-active {
+    height: $height;
+    transition: height 200ms ease-out;
+  }
+
+  &.notification-leave {
+    height: $height;
+  }
+
+  &.notification-leave-active {
+    height: 0;
+    transition: height 200ms ease-in;
+  }
+
 }

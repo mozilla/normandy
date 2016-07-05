@@ -5,7 +5,8 @@ export const RECIPES_RECEIVED = 'RECIPES_RECEIVED';
 export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
 
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
-export const SET_NOTIFICATION = 'SET_NOTIFICATION';
+export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
+export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
 
 export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
@@ -108,7 +109,7 @@ function requestInProgress() {
 function requestComplete(result) {
   return (dispatch) => {
     if (result.notification) {
-      dispatch(setNotification({ messageType: result.status, message: result.notification }));
+      dispatch(showNotification({ messageType: result.status, message: result.notification }));
     }
 
     dispatch({ type: REQUEST_COMPLETE, status: result.status });
@@ -157,10 +158,25 @@ function setSelectedRecipe(recipeId) {
   };
 }
 
-function setNotification(notification) {
+function showNotification(notification) {
+  return dispatch => {
+    // Use time-based id and dismiss automatically after 10 seconds.
+    notification.id = notification.id || new Date().getTime();
+    setTimeout(() => {
+      dispatch(dismissNotification(notification.id));
+    }, 10000);
+
+    dispatch({
+      type: SHOW_NOTIFICATION,
+      notification
+    });
+  };
+}
+
+function dismissNotification(notificationId) {
   return {
-    type: SET_NOTIFICATION,
-    notification
+    type: DISMISS_NOTIFICATION,
+    notificationId
   };
 }
 
@@ -192,7 +208,8 @@ export {
   recipesReceived,
   singleRecipeReceived,
   setSelectedRecipe,
-  setNotification,
+  showNotification,
+  dismissNotification,
   recipeAdded,
   recipeUpdated,
   recipeDeleted,

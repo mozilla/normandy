@@ -9,7 +9,7 @@ export const initialState = {
   isFetching: false,
   selectedRecipe: null,
   recipeListNeedsFetch: true,
-  notification: null
+  notifications: []
 };
 
 export const fixtureRevisions = [

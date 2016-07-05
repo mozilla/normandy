@@ -58,15 +58,54 @@ describe('controlApp reducer', () => {
     })
   })
 
-  it('should handle SET_NOTIFICATION', () => {
+  it(`
+    should append notifications to the notification list for the
+    SHOW_NOTIFICATION action
+  `, () => {
+    const notification = {
+      messageType: 'success',
+      message: 'Success message',
+      id: 5
+    };
+
     expect(controlAppReducer(undefined, {
-      type: actions.SET_NOTIFICATION,
-      notification: { messageType: 'success', 'message': 'Success message' }
+      type: actions.SHOW_NOTIFICATION,
+      notification,
     })).toEqual({
       ...initialState,
-      notification: { messageType: 'success', 'message': 'Success message' }
-    })
-  })
+      notifications: [notification],
+    });
+  });
+
+  describe('DISMISS_NOTIFICATION', () => {
+    const notification1 = {messageType: 'success', message: 'message1', id: 1};
+    const notification2 = {messageType: 'success', message: 'message2', id: 2};
+    const startState = {
+      ...initialState,
+      notifications: [notification1, notification2],
+    };
+
+    it('should remove matching notifications from the notification list', () => {
+      expect(
+        controlAppReducer(startState, {
+          type: actions.DISMISS_NOTIFICATION,
+          notificationId: notification1.id
+        })
+      ).toEqual({
+        ...initialState,
+        notifications: [notification2],
+      });
+    });
+
+    it('should not remove any notifications when an invalid id is given', () => {
+      expect(
+        controlAppReducer(startState, {type: actions.DISMISS_NOTIFICATION, id: 99999})
+      ).toEqual({
+        ...initialState,
+        notifications: [notification1, notification2],
+      });
+    });
+  });
 
   it('should handle RECIPE_ADDED', () => {
     expect(controlAppReducer(initialState, {

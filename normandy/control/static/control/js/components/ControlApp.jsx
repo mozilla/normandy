@@ -1,12 +1,12 @@
 import React from 'react'
 import Header from './Header.jsx'
-import NotificationBar from './NotificationBar.jsx'
+import Notifications from './Notifications.jsx'
 
 export default class ControlApp extends React.Component {
   render() {
     return (
       <div>
-        <NotificationBar />
+        <Notifications />
         <Header
           pageType={this.props.children.props.route}
           currentLocation={this.props.location.pathname}
