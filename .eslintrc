@@ -13,3 +13,5 @@ rules:
   no-underscore-dangle: [off]
   no-console: [off]
   no-use-before-define: [warn, { functions: false }]
+  react/no-multi-comp: [off]
+  no-throw-literal: [off]

@@ -29,7 +29,7 @@ test:
     - >
       docker run --net host
       -v $CIRCLE_TEST_REPORTS:/test_artifacts
-      normandy:build node_modules/.bin/eslint normandy -f junit -o /test_artifacts/eslint.xml
+      normandy:build node_modules/.bin/eslint normandy --ext js,jsx --format junit --output-file /test_artifacts/eslint.xml
     # Run Python tests
     - >
       docker run --net host -e DJANGO_CONFIGURATION=Test
