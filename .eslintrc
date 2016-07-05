@@ -1,0 +1,15 @@
+extends: airbnb
+parser: babel-eslint
+plugins:
+  - jasmine
+  - babel
+rules:
+  no-restricted-syntax: [off]
+  import/no-mutable-exports: [off]
+  no-param-reassign: [warn, { props: false }]
+  prefer-const: [warn]
+  arrow-parens: [off]
+  babel/arrow-parens: [warn, as-needed]
+  no-underscore-dangle: [off]
+  no-console: [off]
+  no-use-before-define: [warn, { functions: false }]
