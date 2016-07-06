@@ -4,7 +4,8 @@ import { push } from 'react-router-redux';
 import { destroy, reduxForm, getValues } from 'redux-form';
 import jexl from 'jexl';
 
-import { makeApiRequest, recipeUpdated, recipeAdded } from '../actions/ControlActions.js';
+import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
+  from '../actions/ControlActions.js';
 import composeRecipeContainer from './RecipeContainer.js';
 import ActionForm from './ActionForm.js';
 import CheckboxField from './form_fields/CheckboxField.js';
@@ -65,6 +66,10 @@ export class RecipeForm extends React.Component {
 
     return this.validateForm(combinedFormValues)
     .catch(() => {
+      dispatch(showNotification({
+        messageType: 'error',
+        message: 'Recipe cannot be saved. Please correct any errors listed in the form below.',
+      }));
       throw {
         filter_expression: 'Invalid Expression',
       };
