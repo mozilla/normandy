@@ -74,7 +74,7 @@ class FeatureRecommendationForm extends React.Component {
         <p className="help row">This action can recommend one or more add-ons
                                 to a user at a taret domain.</p>
         <div className="fluid-4">
-          <FormField type="text" label="Target Domain" field={fields.domain} />
+          <FormField type="text" label="Target URL Substring" field={fields.domain} />
           <div className="row array-field">
             <h4>Recommended Add-ons</h4>
             <a className="button add-field" onClick={::this.addRec}>

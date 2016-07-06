@@ -17,7 +17,7 @@
             "properties": {
                 "domain": {
                     "type": "string",
-                    "description": "Target domain on which to suggest Add-on",
+                    "description": "Target url substring on which to suggest Add-on",
                     "default": ""
                 },
                 "recommendations": {
