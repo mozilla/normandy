@@ -1,5 +1,5 @@
 import React, { PropTypes as pt } from 'react';
-import FormField from '../form_fields/FormFieldWrapper.jsx';
+import FormField from '../form_fields/FormFieldWrapper.js';
 
 export const ConsoleLogFormFields = ['message'];
 

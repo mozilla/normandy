@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { reduxForm } from 'redux-form';
-import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.jsx';
-import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.jsx';
+import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.js';
+import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.js';
 
 function ActionForm({ fields, ChildForm }) {
   return (

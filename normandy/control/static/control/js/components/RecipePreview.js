@@ -1,6 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import classNames from 'classnames';
-import composeRecipeContainer from './RecipeContainer.jsx';
+import composeRecipeContainer from './RecipeContainer.js';
 import { runRecipe } from '../../../../../selfrepair/static/js/self_repair_runner.js';
 
 class RecipePreview extends React.Component {

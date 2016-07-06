@@ -13,7 +13,7 @@ const BooleanIcon = props => {
   return <i className="fa fa-lg fa-times red">&nbsp;</i>;
 };
 BooleanIcon.propTypes = {
-  value: pt.boolean.isRequired,
+  value: pt.bool.isRequired,
 };
 
 function FilterBar({ searchText, selectedFilter, updateSearch, updateFilter }) {

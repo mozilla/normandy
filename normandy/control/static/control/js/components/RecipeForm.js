@@ -5,10 +5,10 @@ import { destroy, reduxForm, getValues } from 'redux-form';
 import jexl from 'jexl';
 
 import { makeApiRequest, recipeUpdated, recipeAdded } from '../actions/ControlActions.js';
-import composeRecipeContainer from './RecipeContainer.jsx';
-import ActionForm from './ActionForm.jsx';
-import CheckboxField from './form_fields/CheckboxField.jsx';
-import FormField from './form_fields/FormFieldWrapper.jsx';
+import composeRecipeContainer from './RecipeContainer.js';
+import ActionForm from './ActionForm.js';
+import CheckboxField from './form_fields/CheckboxField.js';
+import FormField from './form_fields/FormFieldWrapper.js';
 
 export class RecipeForm extends React.Component {
   propTypes = {

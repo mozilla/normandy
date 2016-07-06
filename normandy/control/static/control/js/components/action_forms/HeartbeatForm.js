@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import classNames from 'classnames';
 import { _ } from 'underscore';
-import FormField from '../form_fields/FormFieldWrapper.jsx';
+import FormField from '../form_fields/FormFieldWrapper.js';
 
 export const HeartbeatFormFields = [
   'surveyId',

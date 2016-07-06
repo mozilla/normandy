@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from './Header.jsx';
-import Notifications from './Notifications.jsx';
+import Header from './Header.js';
+import Notifications from './Notifications.js';
 
 export default function ControlApp() {
   return (

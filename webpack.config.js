@@ -1,6 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
-var BundleTracker = require('webpack-bundle-tracker')
+var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var argv = require('yargs').argv;
 var child_process = require('child_process');
@@ -23,40 +23,40 @@ module.exports = [
         './normandy/control/static/control/js/index',
         './normandy/control/static/control/admin/sass/control.scss',
         './node_modules/font-awesome/scss/font-awesome.scss',
-      ]
+      ],
     },
 
     output: {
-        path: path.resolve('./assets/bundles/'),
-        filename: '[name]-[hash].js',
-        chunkFilename: '[id].bundle.js'
+      path: path.resolve('./assets/bundles/'),
+      filename: '[name]-[hash].js',
+      chunkFilename: '[id].bundle.js',
     },
 
     plugins: [
       new BundleTracker({ filename: './webpack-stats.json' }),
       new ExtractTextPlugin('[name]-[hash].css'),
       new webpack.ProvidePlugin({
-        'fetch': 'exports?self.fetch!isomorphic-fetch'
+        'fetch': 'exports?self.fetch!isomorphic-fetch',
       }),
     ],
 
     module: {
       loaders: [
         {
-          test: /(\.|\/)(jsx|js)$/,
+          test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel',
         },
         {
           test: /\.scss$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap')
+          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap'),
         },
         {
           test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-          loader: 'file-loader'
-        }
+          loader: 'file-loader',
+        },
       ],
-    }
+    },
   },
   {
     entry: {
@@ -65,52 +65,52 @@ module.exports = [
     },
 
     plugins: [
-        new BundleTracker({filename: './webpack-stats-actions.json'}),
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.OccurrenceOrderPlugin(),
-        new webpack.optimize.UglifyJsPlugin({compress: {warnings: false}}),
+      new BundleTracker({ filename: './webpack-stats-actions.json' }),
+      new webpack.optimize.DedupePlugin(),
+      new webpack.optimize.OccurrenceOrderPlugin(),
+      new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }),
 
         // Small plugin to update the actions in the database if
         // --update-actions was passed.
-        function updateActions() {
-          this.plugin('done', function(stats) {
-            if (argv['update-actions']) {
+      function updateActions() {
+        this.plugin('done', function (stats) {
+          if (argv['update-actions']) {
               // Don't disable actions since this is mostly for development.
-              var cmd = 'python manage.py update_actions --no-disable';
+            var cmd = 'python manage.py update_actions --no-disable';
 
-              child_process.exec(cmd, function(err, stdout, stderr) {
-                console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
-                console.log(stdout);
-                if (stderr) {
-                  console.error(stderr);
-                }
-              });
-            }
-          });
-        },
+            child_process.exec(cmd, function (err, stdout, stderr) {
+              console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
+              console.log(stdout);
+              if (stderr) {
+                console.error(stderr);
+              }
+            });
+          }
+        });
+      },
     ],
 
     output: {
-        path: path.resolve('./assets/bundles/'),
-        filename: '[name]-[hash].js'
+      path: path.resolve('./assets/bundles/'),
+      filename: '[name]-[hash].js',
     },
 
     module: {
-        loaders: [
-          {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-            query: {
-              plugins: [
+      loaders: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader',
+          query: {
+            plugins: [
                 ['transform-runtime', {
                   polyfill: false,
-                  regenerator: true
-                }]
-              ]
-            }
-          }
-        ]
-    }
-  }
-]
+                  regenerator: true,
+                }],
+            ],
+          },
+        },
+      ],
+    },
+  },
+];

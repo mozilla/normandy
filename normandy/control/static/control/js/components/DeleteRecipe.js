@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { push } from 'react-router-redux';
 import { makeApiRequest, recipeDeleted } from '../actions/ControlActions.js';
-import composeRecipeContainer from './RecipeContainer.jsx';
+import composeRecipeContainer from './RecipeContainer.js';
 
 class DeleteRecipe extends React.Component {
   propTypes = {

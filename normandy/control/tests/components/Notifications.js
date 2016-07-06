@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { Notifications, Notification } from '../../static/control/js/components/Notifications.jsx';
+import { Notifications, Notification } from '../../static/control/js/components/Notifications.js';
 
 describe('Notification components', () => {
   describe('<Notifications>', () => {
