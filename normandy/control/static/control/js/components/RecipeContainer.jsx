@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
-import { fetchSingleRecipe, makeApiRequest, singleRecipeReceived, setSelectedRecipe } from '../actions/ControlActions.js';
+import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
+  from '../actions/ControlActions.js';
 
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
-    constructor(props) {
-      super(props);
+    propTypes = {
+      dispatch: pt.func.isRequired,
+      location: pt.object.isRequired,
+      recipe: pt.object.isRequired,
+    }
+
+    componentWillMount() {
+      if (this.props.recipeId) {
+        this.getRecipeData(this.props.recipeId);
+      }
     }
 
     getRecipeData(recipeId) {
@@ -21,16 +29,10 @@ export default function composeRecipeContainer(Component) {
           });
         } else {
           dispatch(makeApiRequest('fetchSingleRecipe', { recipeId }))
-          .then(recipe => {
-            dispatch(singleRecipeReceived(recipe));
+          .then(newRecipe => {
+            dispatch(singleRecipeReceived(newRecipe));
           });
         }
-      }
-    }
-
-    componentWillMount() {
-      if (this.props.recipeId) {
-        this.getRecipeData(this.props.recipeId);
       }
     }
 
@@ -42,13 +44,12 @@ export default function composeRecipeContainer(Component) {
   const mapStateToProps = (state, props) => {
     let recipeData = null;
     if (state.controlApp.recipes) {
-      recipeData = state.controlApp.recipes.find(recipe => {
-        return recipe.id === state.controlApp.selectedRecipe;
-      });
+      recipeData = state.controlApp.recipes
+      .find(recipe => recipe.id === state.controlApp.selectedRecipe);
     }
 
     return {
-      recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id) || null,
+      recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id, 10) || null,
       recipe: recipeData,
       dispatch: props.dispatch,
     };

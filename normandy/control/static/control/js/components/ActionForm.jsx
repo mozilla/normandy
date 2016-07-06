@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 import { reduxForm } from 'redux-form';
 import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.jsx';
 import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.jsx';
 
-export class ActionForm extends React.Component {
-  render() {
-    const { fields, name, ChildForm } = this.props;
-
-    return (
-      <div id="action-configuration">
-        <i className="fa fa-caret-up fa-lg"></i>
-        <ChildForm fields={fields} />
-      </div>
-    );
-  }
+function ActionForm({ fields, ChildForm }) {
+  return (
+    <div id="action-configuration">
+      <i className="fa fa-caret-up fa-lg"></i>
+      <ChildForm fields={fields} />
+    </div>
+  );
 }
+ActionForm.propTypes = {
+  fields: pt.object.isRequired,
+  ChildForm: pt.child,
+};
 
 export default reduxForm({
   form: 'action',
@@ -28,14 +28,18 @@ export default reduxForm({
       ChildForm = HeartbeatForm;
       fields = HeartbeatFormFields;
       break;
+
     case 'console-log':
       ChildForm = ConsoleLogForm;
       fields = ConsoleLogFormFields;
       break;
+
+    default:
+      throw new Error(`Unexpected action name: "${name}"`);
   }
 
   if (props.recipe && props.recipe.action === props.name) {
-    initialValues = props.recipe['arguments'];
+    initialValues = props.recipe.arguments;
   }
 
   return {

@@ -1,16 +1,13 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import Breadcrumbs from 'react-breadcrumbs';
 
-export default function Header({ pageType, currentLocation, routes, params }) {
-  const { pageTitle, subTitle, ctaButtons } = pageType;
-
+export default function Header({ pageType: { ctaButtons }, currentLocation, routes, params }) {
   let ctaBtns;
   if (ctaButtons) {
     ctaBtns = ctaButtons.map(({ text, icon, link }, index) =>
       <Link className="button" to={currentLocation + link} key={index}>
-        <i className={'pre fa fa-' + icon}></i> {text}
+        <i className={`pre fa fa-${icon}`}></i> {text}
       </Link>
     );
   }
@@ -30,3 +27,9 @@ export default function Header({ pageType, currentLocation, routes, params }) {
     </div>
   );
 }
+Header.propTypes = {
+  pageType: pt.object.isRequired,
+  currentLocation: pt.string.isRequired,
+  routes: pt.object.isRequired,
+  params: pt.object.isRequired,
+};

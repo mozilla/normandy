@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 
 export default function CheckboxField({ label, field, containerClass }) {
   return (
@@ -12,3 +12,8 @@ export default function CheckboxField({ label, field, containerClass }) {
     </div>
   );
 }
+CheckboxField.propTypes = {
+  label: pt.string.isRequired,
+  field: pt.object.isRequired,
+  containerClass: pt.string,
+};

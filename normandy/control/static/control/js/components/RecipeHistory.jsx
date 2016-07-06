@@ -5,11 +5,22 @@ import composeRecipeContainer from './RecipeContainer.jsx';
 import { makeApiRequest } from '../actions/ControlActions.js';
 
 class RecipeHistory extends React.Component {
+  propTypes = {
+    dispatch: pt.func.isRequired,
+    recipe: pt.object.isRequired,
+    recipeId: pt.number.isRequired,
+  }
+
   constructor(props) {
     super(props);
     this.state = {
       revisionLog: [],
     };
+  }
+
+  componentDidMount() {
+    const { recipeId } = this.props;
+    this.getHistory(recipeId);
   }
 
   getHistory(recipeId) {
@@ -23,19 +34,13 @@ class RecipeHistory extends React.Component {
     });
   }
 
-  componentDidMount() {
-    const { recipeId } = this.props;
-    this.getHistory(recipeId);
-  }
-
   render() {
-    const { revisionLog } = this.state;
-    const { recipeId, recipe, dispatch } = this.props;
+    const { recipe, dispatch } = this.props;
     return (
       <div className="fluid-8 recipe-history">
         <h3>Viewing revision log for: <b>{recipe ? recipe.name : ''}</b></h3>
         <ul>
-            {this.state.revisionLog.map((revision, index) =>
+            {this.state.revisionLog.map(revision =>
               <HistoryItem
                 key={revision.id}
                 revision={revision}
@@ -51,6 +56,7 @@ class RecipeHistory extends React.Component {
 
 class HistoryItem extends React.Component {
   static propTypes = {
+    dispatch: pt.func.isRequired,
     revision: pt.shape({
       recipe: pt.shape({
         revision_id: pt.number.isRequired,
@@ -60,6 +66,26 @@ class HistoryItem extends React.Component {
     recipe: pt.shape({
       revision_id: pt.number.isRequired,
     }).isRequired,
+  }
+
+  /**
+   * When a revision is clicked, open the recipe form with changes from
+   * the clicked revision.
+   */
+  handleClick() {
+    const { dispatch, revision, recipe } = this.props;
+
+    // Do not include form state changes if the current revision was
+    // clicked.
+    if (revision.recipe.revision_id === recipe.revision_id) {
+      dispatch(push(`/control/recipe/${recipe.id}/`));
+    } else {
+      dispatch(push({
+        pathname: `/control/recipe/${recipe.id}/`,
+        query: { revisionId: `${revision.id}` },
+        state: { selectedRevision: revision.recipe },
+      }));
+    }
   }
 
   render() {
@@ -81,26 +107,6 @@ class HistoryItem extends React.Component {
         )}
       </li>
     );
-  }
-
-  /**
-   * When a revision is clicked, open the recipe form with changes from
-   * the clicked revision.
-   */
-  handleClick() {
-    const { dispatch, revision, recipe } = this.props;
-
-    // Do not include form state changes if the current revision was
-    // clicked.
-    if (revision.recipe.revision_id === recipe.revision_id) {
-      dispatch(push(`/control/recipe/${recipe.id}/`));
-    } else {
-      dispatch(push({
-        pathname: `/control/recipe/${recipe.id}/`,
-        query: { revisionId: `${revision.id}` },
-        state: { selectedRevision: revision.recipe },
-      }));
-    }
   }
 }
 

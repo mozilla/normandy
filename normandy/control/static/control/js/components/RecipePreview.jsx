@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 import classNames from 'classnames';
 import composeRecipeContainer from './RecipeContainer.jsx';
 import { runRecipe } from '../../../../../selfrepair/static/js/self_repair_runner.js';
 
 class RecipePreview extends React.Component {
+  propTypes = {
+    recipe: pt.object.isRequired,
+  }
+
   constructor(props) {
     super(props);
 
@@ -31,11 +35,12 @@ class RecipePreview extends React.Component {
         recipeAttempted: true,
       });
 
-      runRecipe(recipe, { testing: true }).then(res => {
+      runRecipe(recipe, { testing: true }).then(() => {
         this.setState({
           recipeExecuted: true,
         });
-      }).catch(error => {
+      })
+      .catch(error => {
         this.setState({
           errorRunningRecipe: error,
         });
@@ -46,8 +51,8 @@ class RecipePreview extends React.Component {
   render() {
     const { recipe } = this.props;
     let statusClasses = classNames('status-indicator', {
-      'green': this.state.recipeExecuted,
-      'red': this.state.errorRunningRecipe,
+      green: this.state.recipeExecuted,
+      red: this.state.errorRunningRecipe,
     });
     if (recipe) {
       return (
@@ -69,9 +74,8 @@ class RecipePreview extends React.Component {
           </div>
         </div>
       );
-    } else {
-      return null;
     }
+    return null;
   }
 }
 
