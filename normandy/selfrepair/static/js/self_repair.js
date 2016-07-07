@@ -1,8 +1,7 @@
-import Mozilla from './uitour.js';
 import NormandyDriver from './normandy_driver.js';
 import { fetchRecipes, filterContext, doesRecipeMatch, runRecipe } from './self_repair_runner.js';
 
-const driver = new NormandyDriver(Mozilla.UITour);
+const driver = new NormandyDriver();
 driver.registerCallbacks();
 
 // Actually fetch and run the recipes.
