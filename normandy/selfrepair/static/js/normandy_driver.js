@@ -34,8 +34,8 @@ class LocalStorage {
  * Implementation of the Normandy driver.
  */
 export default class NormandyDriver {
-  constructor(uitour=Mozilla.UITour) {
-      this._uitour = uitour;
+  constructor(uitour = Mozilla.UITour) {
+    this._uitour = uitour;
   }
 
   _heartbeatCallbacks = [];

@@ -2,10 +2,10 @@ import NormandyDriver from '../static/js/normandy_driver.js';
 
 describe('Normandy Driver', () => {
   describe('showHeartbeat', () => {
-    it('should pass all the required arguments to the UITour helper', async function() {
-      let uitour = jasmine.createSpyObj('uitour', ['showHeartbeat']);
-      let driver = new NormandyDriver(uitour);
-      let options = {
+    it('should pass all the required arguments to the UITour helper', async () => {
+      const uitour = jasmine.createSpyObj('uitour', ['showHeartbeat']);
+      const driver = new NormandyDriver(uitour);
+      const options = {
         message: 'testMessage',
         thanksMessage: 'testThanks',
         flowId: 'testFlowId',
@@ -15,7 +15,7 @@ describe('Normandy Driver', () => {
         engagementButtonLabel: 'testEngagementButtonLabel',
         surveyId: 'testSurveyId',
         surveyVersion: 'testSurveyVersion',
-        testing: true
+        testing: true,
       };
 
       await driver.showHeartbeat(options);
