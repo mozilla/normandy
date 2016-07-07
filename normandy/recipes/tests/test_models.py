@@ -1,12 +1,17 @@
+from datetime import datetime
 from unittest.mock import patch
+
+from django.utils import timezone
 
 import pytest
 
-from normandy.recipes.models import ApprovalRequest, Client
+from normandy.base.tests import Whatever
+from normandy.recipes.models import ApprovalRequest, Client, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
     RecipeFactory,
+    SignatureFactory,
 )
 
 
@@ -63,6 +68,59 @@ class TestRecipe(object):
 
         recipe.save()
         assert recipe.revision_id == revision_id
+
+    def test_canonical_json(self):
+        recipe = RecipeFactory.build(
+            action=ActionFactory(name='action'),
+            approval=None,
+            arguments={'foo': 1, 'bar': 2},
+            enabled=False,
+            filter_expression='2 + 2 == 4',
+            name='canonical',
+            last_updated=datetime(2016, 6, 27, 13, 54, 51, 1234, tzinfo=timezone.utc),
+        )
+        recipe.save(skip_last_updated=True)
+        # Yes, this is really ugly, but we really do need to compare an exact
+        # byte sequence, since this is used for hashing and signing
+        expected = (
+            '{'
+            '"action":"action",'
+            '"approval":null,'
+            '"arguments":{"bar":2,"foo":1},'
+            '"current_approval_request":null,'
+            '"enabled":false,'
+            '"filter_expression":"2 + 2 == 4",'
+            '"id":%(id)s,'
+            '"is_approved":false,'
+            '"last_updated":"2016-06-27T13:54:51.001234Z",'
+            '"name":"canonical",'
+            '"revision_id":%(revision_id)s'
+            '}'
+        ) % {
+            'id': recipe.id,
+            'revision_id': recipe.revision_id,
+        }
+        expected = expected.encode()
+        assert recipe.canonical_json() == expected
+
+
+@pytest.mark.django_db
+class TestRecipeQueryset(object):
+
+    def test_update_signatures(self, mocker):
+        # Make sure the test environment is clean. This test is invalid otherwise.
+        assert Recipe.objects.all().count() == 0
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = SignatureFactory.create_batch(2)
+        # Make and sign two recipes
+        RecipeFactory.create_batch(2)
+        Recipe.objects.all().update_signatures()
+        # Assert the autographer was used as expected
+        assert mock_autograph.called
+        assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
+        signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
+        assert signatures == ['fake signature', 'fake signature']
 
 
 @pytest.mark.django_db

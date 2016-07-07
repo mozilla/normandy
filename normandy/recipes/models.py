@@ -11,8 +11,10 @@ from dirtyfields import DirtyFieldsMixin
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
+from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import get_client_ip
 from normandy.recipes.geolocation import get_country_code
+from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
 
 
@@ -63,12 +65,37 @@ class Approval(models.Model):
     creator = models.ForeignKey(User)
 
 
+class Signature(models.Model):
+    signature = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
+    public_key = models.TextField()
+    x5u = models.TextField(null=True)
+
+
+class RecipeQuerySet(models.QuerySet):
+    def update_signatures(self):
+        """
+        Update the signatures on all Recipes in the queryset.
+        """
+        autographer = Autographer()
+        # Convert to a list because order must be preserved
+        recipes = list(self)
+        canonical_jsons = [r.canonical_json() for r in recipes]
+        signatures = autographer.sign_data(canonical_jsons)
+
+        for recipe, signature in zip(recipes, signatures):
+            recipe.signature = signature
+            recipe.save()
+
+
 @reversion.register()
 class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
+    objects = RecipeQuerySet.as_manager()
+
     name = models.CharField(max_length=255, unique=True)
     revision_id = models.IntegerField(default=0, editable=False)
-    last_updated = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(default=timezone.now)
 
     action = models.ForeignKey('Action')
     arguments_json = models.TextField(default='{}', validators=[validate_json])
@@ -78,8 +105,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     filter_expression = models.TextField(blank=False)
     approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
 
+    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
+
     # A tuple of fields that can be edited without causing the recipe to be disabled
-    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval', 'last_updated')
+    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval', 'last_updated', 'signature')
 
     class Meta:
         ordering = ['-enabled', '-last_updated']
@@ -121,15 +150,39 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, skip_last_updated=False, **kwargs):
         # Increment the revision ID and save the reversion if we've
         # changed
         if self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+
+            # Any change will invalid the signature
+            dirty_field_names = list(dirty_fields.keys())
+            if dirty_field_names != ['signature'] and self.signature is not None:
+                self.signature.delete()
+
+            # Check for changes that should disable the recipe
+            for field in self.EDITABLE_FIELDS_WHITELIST:
+                if field in dirty_fields:
+                    dirty_fields.pop(field)
+            if dirty_fields:
+                self.disable()
+
+            # Increment the revision ID
             self.revision_id += 1
             if reversion.is_active():
                 reversion.add_to_revision(self)
 
+            # Set last_updated
+            if not skip_last_updated:
+                self.last_updated = timezone.now()
+
         super().save(*args, **kwargs)
+
+    def canonical_json(self):
+        from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
+        data = RecipeSerializer(self).data
+        return CanonicalJSONRenderer().render(data)
 
 
 @reversion.register()
