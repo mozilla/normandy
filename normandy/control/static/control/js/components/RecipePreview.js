@@ -1,9 +1,13 @@
-import React from 'react'
-import classNames from 'classnames'
-import composeRecipeContainer from './RecipeContainer.jsx'
-import {runRecipe} from '../../../../../selfrepair/static/js/self_repair_runner.js';
+import React, { PropTypes as pt } from 'react';
+import classNames from 'classnames';
+import composeRecipeContainer from './RecipeContainer.js';
+import { runRecipe } from '../../../../../selfrepair/static/js/self_repair_runner.js';
 
 class RecipePreview extends React.Component {
+  propTypes = {
+    recipe: pt.object.isRequired,
+  }
+
   constructor(props) {
     super(props);
 
@@ -23,32 +27,32 @@ class RecipePreview extends React.Component {
   }
 
   attemptPreview() {
-    const {recipe} = this.props;
-    const {recipeAttempted} = this.state;
+    const { recipe } = this.props;
+    const { recipeAttempted } = this.state;
 
     if (recipe && !recipeAttempted) {
       this.setState({
-          recipeAttempted: true
+        recipeAttempted: true,
       });
 
-      runRecipe(recipe, {testing: true}).then(res => {
+      runRecipe(recipe, { testing: true }).then(() => {
         this.setState({
-          recipeExecuted: true
+          recipeExecuted: true,
         });
-      }).catch(error => {
+      })
+      .catch(error => {
         this.setState({
-          errorRunningRecipe: error
+          errorRunningRecipe: error,
         });
       });
-
     }
   }
 
   render() {
-    const {recipe} = this.props;
+    const { recipe } = this.props;
     let statusClasses = classNames('status-indicator', {
-      'green': this.state.recipeExecuted,
-      'red': this.state.errorRunningRecipe,
+      green: this.state.recipeExecuted,
+      red: this.state.errorRunningRecipe,
     });
     if (recipe) {
       return (
@@ -60,19 +64,18 @@ class RecipePreview extends React.Component {
           <div className="fluid-3 float-right">
             <div className={statusClasses}>
             {this.state.recipeExecuted ?
-              [<i className='fa fa-circle pre'></i>, " Recipe executed"] :
-              [<i className='fa fa-circle-thin pre'></i>, " Running recipe..."]
+              [<i className="fa fa-circle pre"></i>, ' Recipe executed'] :
+              [<i className="fa fa-circle-thin pre"></i>, ' Running recipe...']
             }
             {this.state.errorRunningRecipe ?
-              <p className="red">Error running recipe: { this.state.errorRunningRecipe }</p> : ''
+              <p className="red">Error running recipe: {this.state.errorRunningRecipe}</p> : ''
             }
             </div>
           </div>
         </div>
       );
-    } else {
-      return null;
     }
+    return null;
   }
 }
 

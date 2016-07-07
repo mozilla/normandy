@@ -19,9 +19,9 @@ const API_REQUEST_SETTINGS = {
   credentials: 'include',
   headers: {
     'X-CSRFToken': document.getElementsByTagName('html')[0].dataset.csrf,
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 };
 
 const apiRequestMap = {
@@ -29,9 +29,9 @@ const apiRequestMap = {
     return {
       url: `${BASE_API_URL}recipe/`,
       settings: {
-        method: 'GET'
+        method: 'GET',
       },
-      errorNotification: 'Error fetching recipes.'
+      errorNotification: 'Error fetching recipes.',
     };
   },
 
@@ -39,9 +39,9 @@ const apiRequestMap = {
     return {
       url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/`,
       settings: {
-        method: 'GET'
+        method: 'GET',
       },
-      errorNotification: 'Error fetching recipe.'
+      errorNotification: 'Error fetching recipe.',
     };
   },
 
@@ -49,9 +49,9 @@ const apiRequestMap = {
     return {
       url: `${BASE_API_URL}recipe_version/${recipeInfo.revisionId}/`,
       settings: {
-        method: 'GET'
+        method: 'GET',
       },
-      errorNotification: 'Error fetching recipe revision.'
+      errorNotification: 'Error fetching recipe revision.',
     };
   },
 
@@ -59,9 +59,9 @@ const apiRequestMap = {
     return {
       url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/history/`,
       settings: {
-        method: 'GET'
+        method: 'GET',
       },
-      errorNotification: 'Error fetching recipe history.'
+      errorNotification: 'Error fetching recipe history.',
     };
   },
 
@@ -70,10 +70,10 @@ const apiRequestMap = {
       url: `${BASE_API_URL}recipe/`,
       settings: {
         body: JSON.stringify(recipeInfo.recipe),
-        method: 'POST'
+        method: 'POST',
       },
       successNotification: 'Recipe added.',
-      errorNotification: 'Error adding recipe.'
+      errorNotification: 'Error adding recipe.',
     };
   },
 
@@ -82,10 +82,10 @@ const apiRequestMap = {
       url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/`,
       settings: {
         body: JSON.stringify(recipeInfo.recipe),
-        method: 'PATCH'
+        method: 'PATCH',
       },
       successNotification: 'Recipe updated.',
-      errorNotification: 'Error updating recipe.'
+      errorNotification: 'Error updating recipe.',
     };
   },
 
@@ -93,68 +93,68 @@ const apiRequestMap = {
     return {
       url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/`,
       settings: {
-        method: 'DELETE'
-      }
+        method: 'DELETE',
+      },
     };
-  }
+  },
 };
 
 
 function requestInProgress() {
   return {
-    type: REQUEST_IN_PROGRESS
+    type: REQUEST_IN_PROGRESS,
   };
 }
 
 function requestComplete(result) {
-  return (dispatch) => {
+  return dispatch => {
     if (result.notification) {
       dispatch(showNotification({ messageType: result.status, message: result.notification }));
     }
 
     dispatch({ type: REQUEST_COMPLETE, status: result.status });
-  }
+  };
 }
 
 function recipesReceived(recipes) {
   return {
     type: RECIPES_RECEIVED,
-    recipes
+    recipes,
   };
 }
 
 function singleRecipeReceived(recipe) {
   return {
     type: SINGLE_RECIPE_RECEIVED,
-    recipe
+    recipe,
   };
 }
 
 function recipeAdded(recipe) {
   return {
     type: RECIPE_ADDED,
-    recipe
+    recipe,
   };
 }
 
 function recipeUpdated(recipe) {
   return {
     type: RECIPE_UPDATED,
-    recipe
+    recipe,
   };
 }
 
 function recipeDeleted(recipeId) {
   return {
     type: RECIPE_DELETED,
-    recipeId
+    recipeId,
   };
 }
 
 function setSelectedRecipe(recipeId) {
   return {
     type: SET_SELECTED_RECIPE,
-    recipeId
+    recipeId,
   };
 }
 
@@ -168,7 +168,7 @@ function showNotification(notification) {
 
     dispatch({
       type: SHOW_NOTIFICATION,
-      notification
+      notification,
     });
   };
 }
@@ -176,28 +176,33 @@ function showNotification(notification) {
 function dismissNotification(notificationId) {
   return {
     type: DISMISS_NOTIFICATION,
-    notificationId
+    notificationId,
   };
 }
 
 function makeApiRequest(requestType, requestData) {
-  return (dispatch) => {
-    let apiRequestConfig = apiRequestMap[requestType](requestData);
+  return dispatch => {
+    const apiRequestConfig = apiRequestMap[requestType](requestData);
 
     dispatch(requestInProgress());
 
     return fetch(apiRequestConfig.url, {
       ...API_REQUEST_SETTINGS,
-      ...apiRequestConfig.settings
+      ...apiRequestConfig.settings,
     })
     .then(response => {
       if (response.status >= 400) {
-        dispatch(requestComplete({ status: 'error', notification: apiRequestConfig.errorNotification }));
+        dispatch(requestComplete({
+          status: 'error',
+          notification: apiRequestConfig.errorNotification,
+        }));
         return response.json().then(err => { throw err; });
-      } else {
-        dispatch(requestComplete({ status: 'success', notification: apiRequestConfig.successNotification }));
-        return (response.status == 204) ? response.text : response.json();
       }
+      dispatch(requestComplete({
+        status: 'success',
+        notification: apiRequestConfig.successNotification,
+      }));
+      return (response.status === 204) ? response.text : response.json();
     });
   };
 }

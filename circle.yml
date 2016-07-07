@@ -20,10 +20,16 @@ test:
   pre:
     - chmod -R 777 $CIRCLE_TEST_REPORTS
   override:
-    # Run Lint checks
+    # Run Python lint checks
     - >
-      docker run -v $CIRCLE_TEST_REPORTS:/test_artifacts
+      docker run --net host
+      -v $CIRCLE_TEST_REPORTS:/test_artifacts
       normandy:build flake8 --output-file /test_artifacts/flake8.txt normandy
+    # Run JS lint checks
+    - >
+      docker run --net host
+      -v $CIRCLE_TEST_REPORTS:/test_artifacts
+      normandy:build node_modules/.bin/eslint normandy --format junit --output-file /test_artifacts/eslint.xml
     # Run Python tests
     - >
       docker run --net host -e DJANGO_CONFIGURATION=Test

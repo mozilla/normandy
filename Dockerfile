@@ -21,6 +21,8 @@ RUN ./node_modules/.bin/webpack && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media && \
     mkdir -p __version__ && \
+    mkdir -p /test_artifacts && \
+    chmod 777 /test_artifacts && \
     git rev-parse HEAD > __version__/commit && \
     rm -rf .git
 

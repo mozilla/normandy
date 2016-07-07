@@ -1,12 +1,12 @@
 import React from 'react';
 import { IndexRedirect, IndexRoute, Route } from 'react-router';
-import ControlApp from './components/ControlApp.jsx';
-import RecipeList from './components/RecipeList.jsx';
-import RecipeForm from './components/RecipeForm.jsx';
-import RecipeHistory from './components/RecipeHistory.jsx';
-import RecipePreview from './components/RecipePreview.jsx';
-import DeleteRecipe from './components/DeleteRecipe.jsx';
-import NoMatch from './components/NoMatch.jsx';
+import ControlApp from './components/ControlApp.js';
+import RecipeList from './components/RecipeList.js';
+import RecipeForm from './components/RecipeForm.js';
+import RecipeHistory from './components/RecipeHistory.js';
+import RecipePreview from './components/RecipePreview.js';
+import DeleteRecipe from './components/DeleteRecipe.js';
+import NoMatch from './components/NoMatch.js';
 
 export default (
   <Route path="/control/" component={ControlApp}>
@@ -15,7 +15,7 @@ export default (
       <IndexRoute
         component={RecipeList}
         ctaButtons={[
-          {text: 'Add New', icon: 'plus', link: 'new/'}
+          { text: 'Add New', icon: 'plus', link: 'new/' },
         ]}
       />
       <Route
@@ -27,8 +27,8 @@ export default (
         <IndexRoute
           component={RecipeForm}
           ctaButtons={[
-            {text: 'Preview', icon: 'eye', link: 'preview/'},
-            {text: 'History', icon: 'history', link: 'history/'},
+            { text: 'Preview', icon: 'eye', link: 'preview/' },
+            { text: 'History', icon: 'history', link: 'history/' },
           ]}
         />
         <Route
@@ -48,6 +48,6 @@ export default (
         />
       </Route>
     </Route>
-    <Route path="*" component={NoMatch}/>
+    <Route path="*" component={NoMatch} />
   </Route>
 );

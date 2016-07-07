@@ -20,8 +20,8 @@ export default function controlStore() {
         isFetching: false,
         selectedRecipe: null,
         recipeListNeedsFetch: true,
-        notifications: []
-      }
+        notifications: [],
+      },
     },
     applyMiddleware(
       reduxRouterMiddleware,

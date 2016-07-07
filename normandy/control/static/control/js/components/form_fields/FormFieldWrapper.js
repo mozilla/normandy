@@ -1,20 +1,25 @@
-import React from 'react'
+import React, { PropTypes as pt } from 'react';
 
-const SelectMenu = (props) => {
+const SelectMenu = props => {
   const { options, onChange, field } = props;
   return (
     <select {...field} onChange={onChange}>
       <option>Select...</option>
-      { options.map(name => <option key={name} value={name}>{name}</option>) }
+      {options.map(name => <option key={name} value={name}>{name}</option>)}
     </select>
-  )
-}
+  );
+};
+SelectMenu.propTypes = {
+  options: pt.object.isRequired,
+  onChange: pt.func,
+  field: pt.object.isRequired,
+};
 
-const FormField = (props) => {
+const FormField = props => {
   const { label, type, field, containerClass } = props;
-  let fieldType = "Unrenderable form field";
+  let fieldType;
 
-  switch(type) {
+  switch (type) {
     case 'select':
       fieldType = (<SelectMenu {...props} />);
       break;
@@ -24,6 +29,8 @@ const FormField = (props) => {
     case 'textarea':
       fieldType = (<textarea field={field} {...field} />);
       break;
+    default:
+      throw new Error(`Unexpected field type: "${type}"`);
   }
 
   return (
@@ -33,7 +40,13 @@ const FormField = (props) => {
         {fieldType}
       </div>
     </div>
-  )
-}
+  );
+};
+FormField.propTypes = {
+  label: pt.string.isRequired,
+  type: pt.string.isRequired,
+  field: pt.object.isRequired,
+  containerClass: pt.string.isRequired,
+};
 
 export default FormField;

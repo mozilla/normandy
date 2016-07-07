@@ -1,26 +1,27 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 import { Provider } from 'react-redux';
 import controlStore from './stores/ControlStore.js';
 import ControlAppRoutes from './routes.js';
 
 import { Router, browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux'
+import { syncHistoryWithStore } from 'react-router-redux';
 
 /**
  * Root Component for the entire app.
  */
-class Root extends React.Component {
-  render() {
-    const {store, history} = this.props;
-    return (
-      <Provider store={store}>
-        <Router history={history}>
-          {ControlAppRoutes}
-        </Router>
-      </Provider>
-    );
-  }
+function Root({ store, history }) {
+  return (
+    <Provider store={store}>
+      <Router history={history}>
+        {ControlAppRoutes}
+      </Router>
+    </Provider>
+  );
 }
+Root.propTypes = {
+  store: pt.object.isRequired,
+  history: pt.object.isRequired,
+};
 
 /**
  * Initialize Redux store, history, and root component.

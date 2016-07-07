@@ -1,0 +1,9 @@
+parserOptions:
+  sourceType: script
+globals:
+  django: false
+rules:
+  no-var: [off]
+  strict: [error, function]
+  prefer-arrow-callback: [off]
+  prefer-template: [off]
