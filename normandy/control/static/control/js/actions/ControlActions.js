@@ -95,6 +95,8 @@ const apiRequestMap = {
       settings: {
         method: 'DELETE',
       },
+      successNotification: 'Recipe deleted.',
+      errorNotification: 'Error deleting recipe.',
     };
   },
 };
