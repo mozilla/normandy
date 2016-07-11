@@ -1,0 +1,5 @@
+configparser
+flake8
+jsonschema
+pytest
+requests
