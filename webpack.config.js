@@ -20,6 +20,7 @@ module.exports = [
         './normandy/selfrepair/static/js/self_repair',
       ],
       control: [
+        'babel-polyfill',
         './normandy/control/static/control/js/index',
         './normandy/control/static/control/admin/sass/control.scss',
         './node_modules/font-awesome/scss/font-awesome.scss',

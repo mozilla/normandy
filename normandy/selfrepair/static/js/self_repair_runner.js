@@ -1,4 +1,3 @@
-import Normandy from './normandy_driver.js';
 import uuid from 'node-uuid';
 import jexl from 'jexl';
 
@@ -78,22 +77,22 @@ export function fetchRecipes() {
  * Fetch client information from the Normandy server and the driver.
  * @promise Resolves with an object containing client info.
  */
-function classifyClient() {
+function classifyClient(driver) {
   const { classifyUrl } = document.documentElement.dataset;
   const headers = { Accept: 'application/json' };
   const classifyXhr = fetch(classifyUrl, { headers })
     .then(response => response.json())
     .then(client => client);
 
-  return Promise.all([classifyXhr, Normandy.client()])
-    .then(([classification, client]) => {
-        // Parse request time
-      classification.request_time = new Date(classification.request_time);
+  return Promise.all([classifyXhr, driver.client()])
+  .then(([classification, client]) => {
+      // Parse request time
+    classification.request_time = new Date(classification.request_time);
 
-      return Object.assign({
-        locale: Normandy.locale,
-      }, classification, client);
-    });
+    return Object.assign({
+      locale: driver.locale,
+    }, classification, client);
+  });
 }
 
 
@@ -103,13 +102,13 @@ function classifyClient() {
  * @param {Recipe} recipe - Recipe retrieved from the server.
  * @promise Resolves once the action has executed.
  */
-export function runRecipe(recipe, options = {}) {
+export function runRecipe(recipe, driver, options = {}) {
   return loadAction(recipe).then(Action => {
     if (options.testing !== undefined) {
-      Normandy.testing = options.testing;
+      driver.testing = options.testing;
     }
 
-    return new Action(Normandy, recipe).execute();
+    return new Action(driver, recipe).execute();
   });
 }
 
@@ -118,8 +117,8 @@ export function runRecipe(recipe, options = {}) {
  * Generate a context object for JEXL filter expressions.
  * @return {object}
  */
-export function filterContext() {
-  return classifyClient()
+export function filterContext(driver) {
+  return classifyClient(driver)
   .then(classifiedClient => ({
     normandy: classifiedClient,
   }));
