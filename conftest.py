@@ -6,7 +6,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--env",
         action="store",
-        required=True,
+        required=False,
         help="Choose a test environment: dev, stage, or prod",
     )
 
