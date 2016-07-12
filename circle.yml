@@ -35,7 +35,7 @@ test:
       docker run --net host -e DJANGO_CONFIGURATION=Test
       -v $CIRCLE_TEST_REPORTS:/test_artifacts
       -v ~/cache/GeoLite2-Country.mmdb:/app/GeoLite2-Country.mmdb
-      normandy:build py.test --junitxml=/test_artifacts/pytest.xml
+      normandy:build py.test --junitxml=/test_artifacts/pytest.xml normandy/
     # Start Karma test server, and run them in Firefox
     - >
       (
