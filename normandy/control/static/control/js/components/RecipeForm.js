@@ -2,6 +2,7 @@ import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import { push } from 'react-router-redux';
 import { destroy, reduxForm, getValues } from 'redux-form';
+import { _ } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
   from '../actions/ControlActions.js';
@@ -63,6 +64,7 @@ export class RecipeForm extends React.Component {
     const recipeFormValues = getValues(formState.recipe);
     const actionFormValues = getValues(formState.action);
     const combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
+
     const requestBody = { recipe: combinedFormValues, recipeId };
 
     return this.validateForm(combinedFormValues)
