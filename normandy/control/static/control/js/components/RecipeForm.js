@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import { push } from 'react-router-redux';
-import { destroy, reduxForm, getValues } from 'redux-form';
+import { destroy, stopSubmit, reduxForm, getValues } from 'redux-form';
 import { _ } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
@@ -64,7 +64,6 @@ export class RecipeForm extends React.Component {
     const recipeFormValues = getValues(formState.recipe);
     const actionFormValues = getValues(formState.action);
     const combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
-
     const requestBody = { recipe: combinedFormValues, recipeId };
 
     return this.validateForm(combinedFormValues)
@@ -155,10 +154,37 @@ export default composeRecipeContainer(reduxForm({
     ? props.location.state.selectedRevision
     : null;
 
+  const formatErrors = payload => {
+    let errors = payload;
+
+    if (_.isObject(payload)) {
+      const invalidFields = Object.keys(payload);
+      if (invalidFields.length > 0) {
+        errors = isNaN(invalidFields[0]) ? {} : [];
+
+        invalidFields.forEach(fieldName => {
+          errors[fieldName] = formatErrors(payload[fieldName]);
+        });
+      }
+    }
+
+    return errors;
+  };
+
+  const onSubmitFail = errors => {
+    const { dispatch } = props;
+    const actionFormErrors = errors['arguments']; // eslint-disable-line dot-notation
+
+    if (actionFormErrors) {
+      dispatch(stopSubmit('action', formatErrors(actionFormErrors)));
+    }
+  };
+
   return {
     fields,
     initialValues: selectedRecipeRevision || props.recipe,
     viewingRevision: selectedRecipeRevision || props.location.query.revisionId,
     formState: state.form,
+    onSubmitFail,
   };
 })(RecipeForm));
