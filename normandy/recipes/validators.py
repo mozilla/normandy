@@ -11,7 +11,7 @@ def _required(validator, required, instance, schema):
         return
 
     for index, requirement in enumerate(required):
-        if requirement not in instance:
+        if requirement not in instance or instance[requirement] == '':
             error = jsonschema.ValidationError(
                 'This field may not be blank.',
                 path=[requirement]
