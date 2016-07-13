@@ -81,7 +81,7 @@ additional arguments passed in the expression:
 
 .. code-block:: javascript
 
-   'January 7th, 1980'|date // == a date object
+   '1980-01-07'|date // == a date object
 
 .. _JEXL Readme: https://github.com/TechnologyAdvice/Jexl#jexl---
 
@@ -165,8 +165,8 @@ function is the value being transformed.
 
 .. js:function:: date(dateString)
 
-   Parses a string as a date and returns a Date object. Strings should be in a
-   format recognized by `Date.parse()`_.
+   Parses a string as a date and returns a Date object. Date strings should be
+   in `ISO 8601`_ format.
 
    :param string dateString:
       String to parse as a date.
@@ -175,7 +175,7 @@ function is the value being transformed.
 
       '2011-10-10T14:48:00'|date // == Date object matching the given date
 
-   .. _Date.parse(): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
+   .. _ISO 8601: https://www.w3.org/TR/NOTE-datetime
 
 Examples
 --------
@@ -201,5 +201,7 @@ This section lists some examples of commonly-used filter expressions.
    // Match users located in the US who have Firefox as their default browser
    normandy.country == 'US' && normandy.isDefaultBrowser
 
-   // Match users with the Flash plugin installed
+   // Match users with the Flash plugin installed. If Flash is missing, the
+   // plugin list returns `undefined`, which is a falsy value in JavaScript and
+   // fails the match. Otherwise, it returns a plugin object, which is truthy.
    normandy.plugins['Shockwave Flash']
