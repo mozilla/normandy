@@ -163,6 +163,32 @@ This section describes the transforms available to filter expressions, and what
 they do. They're documented as functions, and the first parameter to each
 function is the value being transformed.
 
+.. js:function:: stableSample(input, rate)
+
+   Randomly returns ``true`` or ``false`` based on the given sample rate. Used
+   to sample over the set of matched users.
+
+   Sampling with this transform is stable over the input, meaning that the same
+   input and sample rate will always result in the same return value. The most
+   common use is to pass in a unique user ID and a recipe ID as the input; this
+   means that each user will consistently run or not run a recipe.
+
+   Without stable sampling, a user might execute a recipe on Monday, and then
+   not execute it on Tuesday. In addition, without stable sampling, a recipe
+   would be seen by a different percentage of users each day, and over time this
+   would add up such that the recipe is seen by more than the percent sampled.
+
+   :param input:
+      A value for the sample to be stable over.
+   :param number rate:
+      A number between ``0`` and ``1`` with the sample rate. For example,
+      ``0.5`` would be a 50% sample rate.
+
+   .. code-block:: javascript
+
+      // True 50% of the time, stable per-user per-recipe.
+      [normandy.userId, normandy.recipe.id]|stableSample(0.5)
+
 .. js:function:: date(dateString)
 
    Parses a string as a date and returns a Date object. Date strings should be
@@ -185,6 +211,12 @@ This section lists some examples of commonly-used filter expressions.
 
    // Match users using the en-US locale while located in India
    normandy.locale == 'en-US' && normandy.country == 'IN'
+
+   // Match 10% of users in the fr locale.
+   (
+      normandy.locale == 'fr'
+      && [normandy.userId, normandy.recipe.id]|stableSample(0.1)
+   )
 
    // Match users in any English locale using Firefox Beta
    (
