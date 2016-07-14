@@ -13,6 +13,8 @@ dependencies:
     - if [ -e ~/cache/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/cache/docker/image.tar || rm ~/cache/docker/image.tar; fi
     # build image
     - docker build -t normandy:build .
+    # write the sha256 sum to an artifact to make image verification easier
+    - docker inspect -f '{{.Config.Image}}' normandy:build | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
     # Get MaxMind GeoIP database
     - cd ~/cache/ && ~/normandy/bin/download_geolite2.sh
 
