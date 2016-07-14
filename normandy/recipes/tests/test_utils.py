@@ -89,7 +89,7 @@ class TestAutographer(object):
         settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
 
         autographer = Autographer()
-        autographer._session = MagicMock()
+        autographer.session = MagicMock()
 
         url = self.test_settings['URL'] + 'sign/data'
         foo_base64 = base64.b64encode(b'foo').decode('utf8')

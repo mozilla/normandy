@@ -7,6 +7,7 @@ from requests_hawk import HawkAuth
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 
 def fraction_to_key(frac):
@@ -67,16 +68,14 @@ class Autographer:
 
     def __init__(self):
         self.check_config()
-        self._session = None
 
-    @property
+    @cached_property
     def session(self):
-        if self._session is None:
-            self._session = requests.Session()
-            self._session.auth = HawkAuth(
-                id=str(settings.AUTOGRAPH_HAWK_ID),
-                key=str(settings.AUTOGRAPH_HAWK_SECRET_KEY))
-        return self._session
+        session = requests.Session()
+        session.auth = HawkAuth(
+            id=str(settings.AUTOGRAPH_HAWK_ID),
+            key=str(settings.AUTOGRAPH_HAWK_SECRET_KEY))
+        return session
 
     def check_config(self):
         required_keys = ['URL', 'HAWK_ID', 'HAWK_SECRET_KEY']

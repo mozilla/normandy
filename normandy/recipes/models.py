@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -107,9 +108,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
 
-    # A tuple of fields that can be edited without causing the recipe to be disabled
-    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval', 'last_updated', 'signature')
-
     class Meta:
         ordering = ['-enabled', '-last_updated']
 
@@ -151,29 +149,30 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.name
 
     def save(self, *args, skip_last_updated=False, **kwargs):
-        # Increment the revision ID and save the reversion if we've
-        # changed
         if self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
 
-            # Any change will invalid the signature
+            # If only the signature changed, skip the rest of the updates here, to avoid
+            # invalidating that signature. If anything else changed, remove the signature,
+            # since it is now invalid.
             dirty_field_names = list(dirty_fields.keys())
-            if dirty_field_names != ['signature'] and self.signature is not None:
-                self.signature.delete()
+            if dirty_field_names == ['signature']:
+                super().save(*args, **kwargs)
+                return
+            elif 'signature' in dirty_field_names and self.signature is not None:
+                # Setting the signature while also changing something else is probably
+                # going to make the signature immediately invalid. Don't allow it.
+                raise ValidationError('Signatures must change alone')
+            elif self.signature is not None:
+                self.signature = None
 
-            # Check for changes that should disable the recipe
-            for field in self.EDITABLE_FIELDS_WHITELIST:
-                if field in dirty_fields:
-                    dirty_fields.pop(field)
-            if dirty_fields:
-                self.disable()
+            # Increment the revision ID, unless someone else tried to change it.
+            if 'revision_id' not in dirty_field_names:
+                self.revision_id += 1
 
-            # Increment the revision ID
-            self.revision_id += 1
             if reversion.is_active():
                 reversion.add_to_revision(self)
 
-            # Set last_updated
             if not skip_last_updated:
                 self.last_updated = timezone.now()
 

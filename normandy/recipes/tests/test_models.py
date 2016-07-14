@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 import pytest
@@ -69,6 +70,22 @@ class TestRecipe(object):
         recipe.save()
         assert recipe.revision_id == revision_id
 
+    def test_skip_last_updated(self):
+        # set last_updated to avoid timestamp precision problems
+        recipe = RecipeFactory(name='one', last_updated=datetime.now() - timedelta(30))
+        last_updated_1 = recipe.last_updated
+
+        recipe.name = 'two'
+        recipe.save()
+        last_updated_2 = recipe.last_updated
+
+        recipe.name = 'three'
+        recipe.save(skip_last_updated=True)
+        last_updated_3 = recipe.last_updated
+
+        assert last_updated_1 != last_updated_2
+        assert last_updated_2 == last_updated_3
+
     def test_canonical_json(self):
         recipe = RecipeFactory.build(
             action=ActionFactory(name='action'),
@@ -103,6 +120,31 @@ class TestRecipe(object):
         expected = expected.encode()
         assert recipe.canonical_json() == expected
 
+    def test_signature_is_invalidated(self):
+        recipe = RecipeFactory(name='unchanged', signed=True)
+        recipe.name = 'changed'
+        recipe.save()
+        recipe = Recipe.objects.get(id=recipe.id)
+        assert recipe.signature is None
+        assert recipe.name == 'changed'
+
+    def test_setting_signature_doesnt_change_canonical_json(self):
+        recipe = RecipeFactory(name='unchanged', signed=False)
+        serialized = recipe.canonical_json()
+        recipe.signature = SignatureFactory()
+        recipe.save()
+        recipe = Recipe.objects.get(id=recipe.id)
+        assert recipe.signature is not None
+        assert recipe.canonical_json() == serialized
+
+    def test_cant_change_serializer_and_other_fields(self):
+        recipe = RecipeFactory(name='unchanged', signed=False)
+        recipe.signature = SignatureFactory()
+        recipe.name = 'changed'
+        with pytest.raises(ValidationError) as exc_info:
+            recipe.save()
+        assert exc_info.value.message == 'Signatures must change alone'
+
 
 @pytest.mark.django_db
 class TestRecipeQueryset(object):
@@ -121,6 +163,18 @@ class TestRecipeQueryset(object):
         assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
         signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
         assert signatures == ['fake signature', 'fake signature']
+
+    def test_update_signatures_increments_revision_id(self, mocker):
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = [SignatureFactory()]
+        # Make a recipe, and record the revision_id
+        recipe = RecipeFactory()
+        old_revision_id = recipe.revision_id
+        # Sign the recipe, and assert the revision_id was incremented
+        Recipe.objects.all().update_signatures()
+        recipe = Recipe.objects.get(id=recipe.id)
+        assert recipe.revision_id == old_revision_id + 1
 
 
 @pytest.mark.django_db
