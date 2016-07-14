@@ -1,16 +1,16 @@
-import JexlEnv from '../static/js/JexlEnv.js';
+import JexlEnvironment from '../static/js/JexlEnvironment.js';
 
-describe('JexlEnv', () => {
+describe('JexlEnvironment', () => {
   let jexlEnv;
 
   beforeAll(() => {
-    jexlEnv = new JexlEnv();
+    jexlEnv = new JexlEnvironment();
   });
 
   it('should pull values from the context', () => {
     const marker = Symbol();
     const context = { data: { marker } };
-    jexlEnv = new JexlEnv(context);
+    jexlEnv = new JexlEnvironment(context);
     return jexlEnv.eval('data.marker')
     .then(val => expect(val).toEqual(marker));
   });

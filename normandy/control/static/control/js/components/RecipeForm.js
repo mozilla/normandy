@@ -9,7 +9,7 @@ import composeRecipeContainer from './RecipeContainer.js';
 import ActionForm from './ActionForm.js';
 import CheckboxField from './form_fields/CheckboxField.js';
 import FormField from './form_fields/FormFieldWrapper.js';
-import JexlEnv from '../../../../../selfrepair/static/js/JexlEnv.js';
+import JexlEnvironment from '../../../../../selfrepair/static/js/JexlEnvironment.js';
 
 export class RecipeForm extends React.Component {
   propTypes = {
@@ -53,7 +53,7 @@ export class RecipeForm extends React.Component {
 
   validateForm(formValues) {
     const jexlExpression = formValues.filter_expression;
-    const jexlEnv = new JexlEnv({});
+    const jexlEnv = new JexlEnvironment({});
     return jexlEnv.eval(jexlExpression, {});
   }
 

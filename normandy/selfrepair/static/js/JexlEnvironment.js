@@ -1,7 +1,7 @@
 import { Jexl } from 'jexl';
 import { stableSample } from './utils.js';
 
-export default class JexlEnv {
+export default class JexlEnvironment {
   constructor(context) {
     this.context = context;
     this.jexl = new Jexl();
@@ -10,7 +10,7 @@ export default class JexlEnv {
   }
 
   eval(expr) {
-    const oneLineExpr = expr.replace('\n', ' ');
+    const oneLineExpr = expr.replace(/\r?\n|\r/g, ' ');
     return this.jexl.eval(oneLineExpr, this.context);
   }
 }
