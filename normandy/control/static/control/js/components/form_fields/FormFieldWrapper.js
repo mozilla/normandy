@@ -1,4 +1,5 @@
 import React, { PropTypes as pt } from 'react';
+import NumberField from './NumberField.js';
 
 const SelectMenu = props => {
   const { options, onChange, field } = props;
@@ -26,6 +27,9 @@ const FormField = props => {
     case 'text':
       fieldType = (<input type="text" field={field} {...field} />);
       break;
+    case 'number':
+      fieldType = (<NumberField {...props} />);
+      break;
     case 'textarea':
       fieldType = (<textarea field={field} {...field} />);
       break;
@@ -47,6 +51,9 @@ FormField.propTypes = {
   type: pt.string.isRequired,
   field: pt.object.isRequired,
   containerClass: pt.string.isRequired,
+};
+FormField.defaultProps = {
+  type: 'text',
 };
 
 export default FormField;

@@ -21,8 +21,6 @@ export const HeartbeatFormFields = [
   'surveys[].weight',
 ];
 
-const formatLabel = labelName => labelName.replace(/([A-Z])/g, ' $1').toLowerCase();
-
 const SurveyListItem = props => {
   const { survey, surveyIndex, isSelected, deleteSurvey, onClick } = props;
   return (
@@ -51,9 +49,11 @@ const SurveyForm = props => {
   const { selectedSurvey, fields, showDefaults } = props;
   const surveyObject = selectedSurvey || fields.defaults;
   let headerText = 'Default Survey Values';
+  let showAdditionalSurveyFields = false;
   let containerClasses = classNames('fluid-8', { active: selectedSurvey });
 
   if (selectedSurvey) {
+    showAdditionalSurveyFields = true;
     headerText = selectedSurvey.title.initialValue || 'New survey';
   }
 
@@ -65,16 +65,22 @@ const SurveyForm = props => {
         </span>
       }
       <h4>{headerText}</h4>
-      {
-        Object.keys(surveyObject).map(fieldName =>
-          <FormField
-            key={fieldName}
-            label={formatLabel(fieldName)}
-            type="text"
-            field={surveyObject[fieldName]}
-          />
-        )
+
+      {showAdditionalSurveyFields &&
+        <FormField label="Title" field={surveyObject.title} />
       }
+
+      <FormField label="Message" field={surveyObject.message} />
+      <FormField label="Engagement Button Label" field={surveyObject.engagementButtonLabel} />
+      <FormField label="Thanks Message" field={surveyObject.thanksMessage} />
+      <FormField label="Post Answer Url" field={surveyObject.postAnswerUrl} />
+      <FormField label="Learn More Message" field={surveyObject.learnMoreMessage} />
+      <FormField label="Learn More Url" field={surveyObject.learnMoreUrl} />
+
+      {showAdditionalSurveyFields &&
+        <FormField label="Weight" type="number" min="1" field={surveyObject.weight} />
+      }
+
     </div>
   );
 };
