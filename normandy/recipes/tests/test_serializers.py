@@ -2,7 +2,8 @@ import pytest
 
 from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeFactory, ActionFactory
-from normandy.recipes.api.serializers import RecipeSerializer, ActionSerializer
+from normandy.recipes.api.serializers import (
+    ActionSerializer, RecipeSerializer, SignedRecipeSerializer)
 
 
 @pytest.mark.django_db()
@@ -36,3 +37,44 @@ class TestActionSerializer:
         action = ActionFactory()
         serializer = ActionSerializer(action, context={'request': rf.get('/')})
         assert serializer.data['implementation_url'].startswith(settings.CDN_URL)
+
+
+@pytest.mark.django_db()
+class TestSignedRecipeSerializer:
+    def test_it_works_with_signature(self, rf):
+        recipe = RecipeFactory(signed=True)
+        context = {'request': rf.get('/')}
+        combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
+        recipe_serializer = RecipeSerializer(instance=recipe, context=context)
+
+        assert combined_serializer.data == {
+            'signature': {
+                'signature': 'fake signature',
+                'timestamp': Whatever(),
+                'x5u': Whatever(),
+                'public_key': Whatever(),
+            },
+            'recipe': recipe_serializer.data,
+        }
+
+    def test_it_works_with_no_signature(self, rf):
+        recipe = RecipeFactory(signed=False)
+        action = recipe.action
+        serializer = SignedRecipeSerializer(instance=recipe, context={'request': rf.get('/')})
+
+        assert serializer.data == {
+            'signature': None,
+            'recipe': {
+                'name': recipe.name,
+                'id': recipe.id,
+                'enabled': recipe.enabled,
+                'filter_expression': recipe.filter_expression,
+                'revision_id': recipe.revision_id,
+                'action': action.name,
+                'arguments': recipe.arguments,
+                'current_approval_request': Whatever(),
+                'approval': Whatever(),
+                'is_approved': recipe.is_approved,
+                'last_updated': Whatever(),
+            }
+        }

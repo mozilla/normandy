@@ -1,3 +1,4 @@
+import canonicaljson
 from rest_framework import renderers
 
 
@@ -22,3 +23,12 @@ class JavaScriptRenderer(TextRenderer):
 
     def render_error(self, data):
         return '/* {} */'.format(super().render_error(data))
+
+
+class CanonicalJSONRenderer(renderers.BaseRenderer):
+    media_type = 'application/json'
+    format = 'json'
+    charset = None
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return canonicaljson.encode_canonical_json(data)

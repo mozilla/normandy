@@ -275,6 +275,29 @@ class TestRecipeAPI(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
+    def test_signed_listing_works(self, api_client):
+        r1 = RecipeFactory(signed=True)
+        res = api_client.get('/api/v1/recipe/signed/')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['recipe']['id'] == r1.id
+        assert res.data[0]['signature']['signature'] == r1.signature.signature
+
+    def test_signed_only_lists_signed_recipes(self, api_client):
+        r1 = RecipeFactory(signed=True)
+        r2 = RecipeFactory(signed=True)
+        RecipeFactory(signed=False)
+        res = api_client.get('/api/v1/recipe/signed/')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+
+        res.data.sort(key=lambda r: r['recipe']['id'])
+
+        assert res.data[0]['recipe']['id'] == r1.id
+        assert res.data[0]['signature']['signature'] == r1.signature.signature
+        assert res.data[1]['recipe']['id'] == r2.id
+        assert res.data[1]['signature']['signature'] == r2.signature.signature
+
 
 @pytest.mark.django_db
 class TestRecipeVersionAPI(object):
@@ -347,7 +370,7 @@ class TestApprovalRequestAPI(object):
                                {'active': False})
         assert res.status_code == 200
 
-        approval_request = ApprovalRequest.objects.get(id=approval_request.id)
+        approval_request.refresh_from_db()
         assert not approval_request.active
 
     def test_it_can_delete_approval_requests(self, api_client):
@@ -467,7 +490,7 @@ class TestApprovalRequestCommentAPI(object):
                                {'text': 'changed'})
         assert res.status_code == 200
 
-        comment = ApprovalRequestComment.objects.get(id=comment.id)
+        comment.refresh_from_db()
         assert comment.text == 'changed'
 
     def test_it_can_delete_comments(self, api_client):
