@@ -22,9 +22,10 @@ export const HeartbeatFormFields = [
 ];
 
 const SurveyListItem = props => {
-  const { survey, surveyIndex, isSelected, deleteSurvey, onClick } = props;
+  const { survey, surveyIndex, isSelected, hasErrors, deleteSurvey, onClick } = props;
+
   return (
-    <li className={classNames({ active: isSelected })} onClick={onClick}>
+    <li className={classNames({ active: isSelected, invalid: hasErrors })} onClick={onClick}>
       {survey.title.value || 'Untitled Survey'}
       <span
         title="Delete this survey"
@@ -41,6 +42,7 @@ SurveyListItem.propTypes = {
   survey: pt.object.isRequired,
   surveyIndex: pt.number.isRequired,
   isSelected: pt.bool.isRequired,
+  hasErrors: pt.bool.isRequired,
   deleteSurvey: pt.func.isRequired,
   onClick: pt.func,
 };
@@ -147,6 +149,7 @@ class HeartbeatForm extends React.Component {
                       survey={survey}
                       surveyIndex={index}
                       isSelected={_.isEqual(survey, selectedSurvey)}
+                      hasErrors={_.some(survey, field => field.invalid)}
                       onClick={() => ::this.setSelectedSurvey(survey)}
                       deleteSurvey={::this.deleteSurvey}
                     />
