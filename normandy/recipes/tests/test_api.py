@@ -370,7 +370,7 @@ class TestApprovalRequestAPI(object):
                                {'active': False})
         assert res.status_code == 200
 
-        approval_request = ApprovalRequest.objects.get(id=approval_request.id)
+        approval_request.refresh_from_db()
         assert not approval_request.active
 
     def test_it_can_delete_approval_requests(self, api_client):
@@ -490,7 +490,7 @@ class TestApprovalRequestCommentAPI(object):
                                {'text': 'changed'})
         assert res.status_code == 200
 
-        comment = ApprovalRequestComment.objects.get(id=comment.id)
+        comment.refresh_from_db()
         assert comment.text == 'changed'
 
     def test_it_can_delete_comments(self, api_client):

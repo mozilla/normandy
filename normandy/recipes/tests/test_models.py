@@ -124,7 +124,6 @@ class TestRecipe(object):
         recipe = RecipeFactory(name='unchanged', signed=True)
         recipe.name = 'changed'
         recipe.save()
-        recipe = Recipe.objects.get(id=recipe.id)
         assert recipe.signature is None
         assert recipe.name == 'changed'
 
@@ -133,11 +132,10 @@ class TestRecipe(object):
         serialized = recipe.canonical_json()
         recipe.signature = SignatureFactory()
         recipe.save()
-        recipe = Recipe.objects.get(id=recipe.id)
         assert recipe.signature is not None
         assert recipe.canonical_json() == serialized
 
-    def test_cant_change_serializer_and_other_fields(self):
+    def test_cant_change_signature_and_other_fields(self):
         recipe = RecipeFactory(name='unchanged', signed=False)
         recipe.signature = SignatureFactory()
         recipe.name = 'changed'
@@ -154,7 +152,10 @@ class TestRecipeQueryset(object):
         assert Recipe.objects.all().count() == 0
         # Mock the Autographer
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-        mock_autograph.return_value.sign_data.return_value = SignatureFactory.create_batch(2)
+        mock_autograph.return_value.sign_data.return_value = [
+            {'signature': 'fake signature 1'},
+            {'signature': 'fake signature 2'},
+        ]
         # Make and sign two recipes
         RecipeFactory.create_batch(2)
         Recipe.objects.all().update_signatures()
@@ -162,7 +163,8 @@ class TestRecipeQueryset(object):
         assert mock_autograph.called
         assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
         signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
-        assert signatures == ['fake signature', 'fake signature']
+        assert signatures == ['fake signature 1', 'fake signature 2']
+
 
 @pytest.mark.django_db
 class TestApprovalRequest(object):

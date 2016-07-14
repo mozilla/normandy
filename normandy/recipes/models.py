@@ -82,9 +82,11 @@ class RecipeQuerySet(models.QuerySet):
         # Convert to a list because order must be preserved
         recipes = list(self)
         canonical_jsons = [r.canonical_json() for r in recipes]
-        signatures = autographer.sign_data(canonical_jsons)
+        signatures_data = autographer.sign_data(canonical_jsons)
 
-        for recipe, signature in zip(recipes, signatures):
+        for recipe, sig_data in zip(recipes, signatures_data):
+            signature = Signature(**sig_data)
+            signature.save()
             recipe.signature = signature
             recipe.save()
 

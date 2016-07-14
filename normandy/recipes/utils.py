@@ -106,15 +106,12 @@ class Autographer:
         res.raise_for_status()
         signing_responses = res.json()
 
-        from normandy.recipes.models import Signature  # avoid circular import
         signatures = []
         for res in signing_responses:
-            sig = Signature(
-                timestamp=ts,
-                signature=res['content-signature'],
-                x5u=res.get('x5u'),
-                public_key=res['public_key'],
-            )
-            sig.save()
-            signatures.append(sig)
+            signatures.append({
+                'timestamp': ts,
+                'signature': res['content-signature'],
+                'x5u': res.get('x5u'),
+                'public_key': res['public_key'],
+            })
         return signatures
