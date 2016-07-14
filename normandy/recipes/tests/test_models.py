@@ -164,19 +164,6 @@ class TestRecipeQueryset(object):
         signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
         assert signatures == ['fake signature', 'fake signature']
 
-    def test_update_signatures_increments_revision_id(self, mocker):
-        # Mock the Autographer
-        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-        mock_autograph.return_value.sign_data.return_value = [SignatureFactory()]
-        # Make a recipe, and record the revision_id
-        recipe = RecipeFactory()
-        old_revision_id = recipe.revision_id
-        # Sign the recipe, and assert the revision_id was incremented
-        Recipe.objects.all().update_signatures()
-        recipe = Recipe.objects.get(id=recipe.id)
-        assert recipe.revision_id == old_revision_id + 1
-
-
 @pytest.mark.django_db
 class TestApprovalRequest(object):
     def test_only_one_open_request_for_recipe(self):
