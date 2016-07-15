@@ -1,4 +1,7 @@
 import pytest
+from rest_framework import serializers
+
+import json
 
 from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeFactory, ActionFactory
@@ -27,6 +30,46 @@ class TestRecipeSerializer:
             'approval': Whatever(),
             'is_approved': recipe.is_approved
         }
+
+    def test_it_validates_arguments(self):
+        schema = json.loads(
+            open('normandy/recipes/static/actions/console-log/package.json').read()
+        )
+
+        ActionFactory(
+            name='console-log',
+            arguments_schema=schema['normandy']['argumentsSchema']
+        )
+
+        # If the action specified cannot be found, raise validation
+        # error indicating the arguments schema could not be loaded
+        serializer = RecipeSerializer(data={
+            'action': 'action-that-doesnt-exist', 'arguments': {}
+        })
+
+        serializer.is_valid()
+        assert serializer.errors['arguments'] == ['Could not find arguments schema.']
+        assert pytest.raises(serializers.ValidationError)
+
+        # If the action can be found, raise validation error
+        # with the arguments error formatted appropriately
+        serializer = RecipeSerializer(data={
+            'action': 'console-log', 'arguments': {'message': ''}
+        })
+
+        serializer.is_valid()
+        assert serializer.errors['arguments'] == {'message': 'This field may not be blank.'}
+        assert pytest.raises(serializers.ValidationError)
+
+        # If the action can be found, and the arguments passed
+        # are accurate, serializer should be valid
+        serializer = RecipeSerializer(data={
+            'name': 'bar', 'enabled': True, 'filter_expression': True,
+            'action': 'console-log', 'arguments': {'message': 'foo'}
+        })
+
+        serializer.is_valid()
+        assert serializer.errors == {}
 
 
 @pytest.mark.django_db()
