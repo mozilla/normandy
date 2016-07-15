@@ -26,11 +26,14 @@
       </div>
 
       {% block page-header %}{% endblock %}
-      {% block content %}{% endblock %}
-      <div id="page-container"></div>
+      {% block content %}
+        <div id="page-container"></div>
+      {% endblock %}
 
     </div>
     <!-- END Container -->
-    {% render_bundle 'control' 'js' %}
+    {% block javascript %}
+      {% render_bundle 'control' 'js' %}
+    {% endblock %}
   </body>
 </html>
