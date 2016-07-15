@@ -65,30 +65,24 @@ export function fetchRecipes() {
   const data = { enabled: 'True' };
 
   return fetch(recipeUrl, { headers, data })
-    .then(response => response.json())
-    .then(recipes => recipes);
+  .then(response => response.json());
 }
 
 
 /**
- * Fetch client information from the Normandy server and the driver.
+ * Fetch client information from the Normandy server.
  * @promise Resolves with an object containing client info.
  */
-function classifyClient(driver) {
+export function classifyClient() {
   const { classifyUrl } = document.documentElement.dataset;
   const headers = { Accept: 'application/json' };
-  const classifyXhr = fetch(classifyUrl, { headers })
-    .then(response => response.json())
-    .then(client => client);
 
-  return Promise.all([classifyXhr, driver.client()])
-  .then(([classification, client]) => {
-      // Parse request time
+  return fetch(classifyUrl, { headers })
+  .then(response => response.json())
+  .then(classification => {
+    // Parse request time
     classification.request_time = new Date(classification.request_time);
-
-    return Object.assign({
-      locale: driver.locale,
-    }, classification, client);
+    return classification;
   });
 }
 
@@ -114,11 +108,18 @@ export function runRecipe(recipe, driver, options = {}) {
  * Generate a context object for JEXL filter expressions.
  * @return {object}
  */
-export function filterContext(driver) {
-  return classifyClient(driver)
-  .then(classifiedClient => ({
-    normandy: classifiedClient,
-  }));
+export async function filterContext(driver) {
+  const classification = await classifyClient();
+  const client = await driver.client();
+
+  return {
+    normandy: {
+      locale: driver.locale,
+      userId: getUserId(),
+      ...client,
+      ...classification,
+    },
+  };
 }
 
 
@@ -130,7 +131,6 @@ export function filterContext(driver) {
  *     signifying if the filter passed or failed.
  */
 export function doesRecipeMatch(recipe, context) {
-    // Remove newlines, which are invalid in JEXL
-  const jexlEnv = new JexlEnvironment(context);
-  return jexlEnv.eval(recipe.filterExpression).then(value => [recipe, !!value]);
+  const jexlEnv = new JexlEnvironment({ recipe, ...context });
+  return jexlEnv.eval(recipe.filter_expression).then(value => [recipe, !!value]);
 }
