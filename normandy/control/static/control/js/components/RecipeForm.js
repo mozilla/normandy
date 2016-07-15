@@ -2,7 +2,6 @@ import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import { push } from 'react-router-redux';
 import { destroy, reduxForm, getValues } from 'redux-form';
-import jexl from 'jexl';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
   from '../actions/ControlActions.js';
@@ -10,6 +9,7 @@ import composeRecipeContainer from './RecipeContainer.js';
 import ActionForm from './ActionForm.js';
 import CheckboxField from './form_fields/CheckboxField.js';
 import FormField from './form_fields/FormFieldWrapper.js';
+import JexlEnvironment from '../../../../../selfrepair/static/js/JexlEnvironment.js';
 
 export class RecipeForm extends React.Component {
   propTypes = {
@@ -53,7 +53,8 @@ export class RecipeForm extends React.Component {
 
   validateForm(formValues) {
     const jexlExpression = formValues.filter_expression;
-    return jexl.eval(jexlExpression, {});
+    const jexlEnv = new JexlEnvironment({});
+    return jexlEnv.eval(jexlExpression, {});
   }
 
   submitForm() {

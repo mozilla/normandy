@@ -1,9 +1,6 @@
 import uuid from 'node-uuid';
-import jexl from 'jexl';
 
-
-jexl.addTransform('date', value => new Date(value));
-
+import JexlEnvironment from './JexlEnvironment.js';
 
 const registeredActions = {};
 window.registerAction = (name, ActionClass) => {
@@ -134,8 +131,6 @@ export function filterContext(driver) {
  */
 export function doesRecipeMatch(recipe, context) {
     // Remove newlines, which are invalid in JEXL
-  const filterExpression = recipe.filterExpression.replace(/\r?\n|\r/g, '');
-
-  return jexl.eval(filterExpression, context)
-    .then(value => [recipe, !!value]);
+  const jexlEnv = new JexlEnvironment(context);
+  return jexlEnv.eval(recipe.filterExpression).then(value => [recipe, !!value]);
 }
