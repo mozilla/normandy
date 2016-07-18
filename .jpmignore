@@ -1,0 +1,9 @@
+*
+.*
+!/data/**/*
+!/lib/**/*
+!/node_modules/jexl/**/*
+!/index.js
+!/LICENSE
+!/README.md
+!/package.json
