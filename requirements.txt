@@ -30,9 +30,9 @@ django-storages-redux==1.3.2 \
     --hash=sha256:84cb0e685ac0401f14d320d3d469b3e5968a7314a93936c86672c2315d8302dc
 django-webpack-loader==0.3.0 \
     --hash=sha256:729c8d1b0d3f1449a2f7964c7e5351d0494bbe0470afdf9570e26593ac75fe13
-Django==1.9 \
-    --hash=sha256:e66d58bfeed3a5eb44f2af6d5f1b6a85d656c4180ebba63b692e58d29db2a716 \
-    --hash=sha256:05fe4b19a8778d4b48bbf1f4dfca3106881fea7982664553e7f7f861606f7c66
+django==1.9.8 \
+    --hash=sha256:e50c8d4653433413d26ecf25a84ccdcb9c7eac7cd1bb36eed4cd89c71f43064e \
+    --hash=sha256:b9806e0d598fd04b29b8ef35aea8c9308b3803c3ce8adab4d342db9cdfd42dfb
 djangorestframework==3.3.2 \
     --hash=sha256:5634b1ff56581bf0fe4075e86227fc9693c1ca031c7213c9ae942c445c24817b \
     --hash=sha256:4962418a57804f8323282728a4f9b9496e78caec1adda352170697752eff01bf
