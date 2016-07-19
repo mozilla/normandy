@@ -124,7 +124,7 @@ class TestRecipeSerializer:
             }
         })
 
-        serializer.is_valid()
+        assert serializer.is_valid()
         assert serializer.validated_data == {
             'name': 'bar',
             'enabled': True,
