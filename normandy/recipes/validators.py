@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 # Add path to required validator so we can get property name
 def _required(validator, required, instance, schema):
-    '''Validate 'required' properties.'''
+    """Validate 'required' properties."""
     if not validator.is_type(instance, 'object'):
         return
 
