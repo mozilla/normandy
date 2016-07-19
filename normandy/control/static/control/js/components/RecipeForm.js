@@ -157,9 +157,15 @@ export default composeRecipeContainer(reduxForm({
   const formatErrors = payload => {
     let errors = payload;
 
+    /* If our payload is an object, process each error in the object
+       Otherwise, it is a string and will be returned immediately */
     if (_.isObject(payload)) {
       const invalidFields = Object.keys(payload);
       if (invalidFields.length > 0) {
+        /* If our error keys are integers, it means they correspond
+           to an array field and we want to present errors as an array
+           e.g. { surveys: {0: {title: 'err'}}, {2: {weight: 'err'}} }
+           =>   { surveys: [{title: 'err'}, null, {weight: 'err'}] } */
         errors = isNaN(invalidFields[0]) ? {} : [];
 
         invalidFields.forEach(fieldName => {
