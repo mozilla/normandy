@@ -36,7 +36,7 @@ class TestRecipeSerializer:
             open('normandy/recipes/static/actions/console-log/package.json').read()
         )
 
-        ActionFactory(
+        mockAction = ActionFactory(
             name='console-log',
             arguments_schema=schema['normandy']['argumentsSchema']
         )
@@ -64,11 +64,20 @@ class TestRecipeSerializer:
         # If the action can be found, and the arguments passed
         # are accurate, serializer should be valid
         serializer = RecipeSerializer(data={
-            'name': 'bar', 'enabled': True, 'filter_expression': True,
+            'name': 'bar', 'enabled': True, 'filter_expression': '[]',
             'action': 'console-log', 'arguments': {'message': 'foo'}
         })
 
         serializer.is_valid()
+        assert serializer.validated_data == {
+            'name': 'bar',
+            'enabled': True,
+            'filter_expression': '[]',
+            'action': mockAction,
+            'arguments': {
+                'message': 'foo'
+            }
+        }
         assert serializer.errors == {}
 
 
