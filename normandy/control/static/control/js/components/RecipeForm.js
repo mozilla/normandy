@@ -173,7 +173,7 @@ export default composeRecipeContainer(reduxForm({
 
   const onSubmitFail = errors => {
     const { dispatch } = props;
-    const actionFormErrors = errors['arguments']; // eslint-disable-line dot-notation
+    const actionFormErrors = errors.arguments;
 
     if (actionFormErrors) {
       dispatch(stopSubmit('action', formatErrors(actionFormErrors)));
