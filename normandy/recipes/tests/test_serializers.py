@@ -2,7 +2,7 @@ import pytest
 from rest_framework import serializers
 
 from normandy.base.tests import Whatever
-from normandy.recipes.tests import RecipeFactory, ActionFactory
+from normandy.recipes.tests import RecipeFactory, ActionFactory, ARGUMENTS_SCHEMA
 from normandy.recipes.api.serializers import RecipeSerializer, ActionSerializer
 
 
@@ -46,23 +46,7 @@ class TestRecipeSerializer:
     def test_validation_with_wrong_arguments(self):
         ActionFactory(
             name='show-heartbeat',
-            arguments_schema={
-                "required": ["surveyId", "surveys"],
-                "properties": {
-                    "surveyId": {"type": "string"},
-                    "surveys": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                            "properties": {
-                                "title": {"type": "string"},
-                                "weight": {"type": "integer", "minimum": 1}
-                            },
-                            "required": ["title", "weight"]
-                        },
-                    }
-                }
-            }
+            arguments_schema=ARGUMENTS_SCHEMA
         )
 
         serializer = RecipeSerializer(data={
@@ -93,23 +77,7 @@ class TestRecipeSerializer:
     def test_validation_with_valid_data(self):
         mockAction = ActionFactory(
             name='show-heartbeat',
-            arguments_schema={
-                "required": ["surveyId", "surveys"],
-                "properties": {
-                    "surveyId": {"type": "string"},
-                    "surveys": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                            "properties": {
-                                "title": {"type": "string"},
-                                "weight": {"type": "integer", "minimum": 1}
-                            },
-                            "required": ["title", "weight"]
-                        },
-                    }
-                }
-            }
+            arguments_schema=ARGUMENTS_SCHEMA
         )
 
         serializer = RecipeSerializer(data={
