@@ -29,32 +29,9 @@ class TestRecipeSerializer:
             'is_approved': recipe.is_approved
         }
 
-    def test_it_validates_arguments(self):
-        schema = {
-            "required": ["surveyId", "surveys"],
-            "properties": {
-                "surveyId": {"type": "string"},
-                "surveys": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "properties": {
-                            "title": {"type": "string"},
-                            "weight": {"type": "integer", "minimum": 1}
-                        },
-                        "required": ["title", "weight"]
-                    },
-                }
-            }
-        }
-
-        mockAction = ActionFactory(
-            name='show-heartbeat',
-            arguments_schema=schema
-        )
-
-        # If the action specified cannot be found, raise validation
-        # error indicating the arguments schema could not be loaded
+    # If the action specified cannot be found, raise validation
+    # error indicating the arguments schema could not be loaded
+    def test_validation_with_wrong_action(self):
         serializer = RecipeSerializer(data={
             'action': 'action-that-doesnt-exist', 'arguments': {}
         })
@@ -64,8 +41,30 @@ class TestRecipeSerializer:
 
         assert serializer.errors['arguments'] == ['Could not find arguments schema.']
 
-        # If the action can be found, raise validation error
-        # with the arguments error formatted appropriately
+    # If the action can be found, raise validation error
+    # with the arguments error formatted appropriately
+    def test_validation_with_wrong_arguments(self):
+        ActionFactory(
+            name='show-heartbeat',
+            arguments_schema={
+                "required": ["surveyId", "surveys"],
+                "properties": {
+                    "surveyId": {"type": "string"},
+                    "surveys": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "properties": {
+                                "title": {"type": "string"},
+                                "weight": {"type": "integer", "minimum": 1}
+                            },
+                            "required": ["title", "weight"]
+                        },
+                    }
+                }
+            }
+        )
+
         serializer = RecipeSerializer(data={
             'action': 'show-heartbeat',
             'arguments': {
@@ -91,8 +90,28 @@ class TestRecipeSerializer:
             }
         }
 
-        # If the action can be found, and the arguments passed
-        # are accurate, serializer should be valid
+    def test_validation_with_valid_data(self):
+        mockAction = ActionFactory(
+            name='show-heartbeat',
+            arguments_schema={
+                "required": ["surveyId", "surveys"],
+                "properties": {
+                    "surveyId": {"type": "string"},
+                    "surveys": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "properties": {
+                                "title": {"type": "string"},
+                                "weight": {"type": "integer", "minimum": 1}
+                            },
+                            "required": ["title", "weight"]
+                        },
+                    }
+                }
+            }
+        )
+
         serializer = RecipeSerializer(data={
             'name': 'bar', 'enabled': True, 'filter_expression': '[]',
             'action': 'show-heartbeat',
