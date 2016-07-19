@@ -1,8 +1,6 @@
 import pytest
 from rest_framework import serializers
 
-import json
-
 from normandy.base.tests import Whatever
 from normandy.recipes.tests import RecipeFactory, ActionFactory
 from normandy.recipes.api.serializers import RecipeSerializer, ActionSerializer
@@ -32,13 +30,27 @@ class TestRecipeSerializer:
         }
 
     def test_it_validates_arguments(self):
-        schema = json.loads(
-            open('normandy/recipes/static/actions/console-log/package.json').read()
-        )
+        schema = {
+            "required": ["surveyId", "surveys"],
+            "properties": {
+                "surveyId": {"type": "string"},
+                "surveys": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "properties": {
+                            "title": {"type": "string"},
+                            "weight": {"type": "integer", "minimum": 1}
+                        },
+                        "required": ["title", "weight"]
+                    },
+                }
+            }
+        }
 
         mockAction = ActionFactory(
-            name='console-log',
-            arguments_schema=schema['normandy']['argumentsSchema']
+            name='show-heartbeat',
+            arguments_schema=schema
         )
 
         # If the action specified cannot be found, raise validation
@@ -54,18 +66,41 @@ class TestRecipeSerializer:
         # If the action can be found, raise validation error
         # with the arguments error formatted appropriately
         serializer = RecipeSerializer(data={
-            'action': 'console-log', 'arguments': {'message': ''}
+            'action': 'show-heartbeat',
+            'arguments': {
+                'surveyId': '',
+                'surveys': [
+                    {'title': '', 'weight': 1},
+                    {'title': 'bar', 'weight': 1},
+                    {'title': 'foo', 'weight': 0},
+                    {'title': 'baz', 'weight': 'lorem ipsum'}
+                ]
+            }
         })
 
         serializer.is_valid()
-        assert serializer.errors['arguments'] == {'message': 'This field may not be blank.'}
+        assert serializer.errors['arguments'] == {
+            'surveyId': 'This field may not be blank.',
+            'surveys': {
+                0: {'title': 'This field may not be blank.'},
+                2: {'weight': '0 is less than the minimum of 1'},
+                3: {'weight': '\'lorem ipsum\' is not of type \'integer\''}
+            }
+        }
         assert pytest.raises(serializers.ValidationError)
 
         # If the action can be found, and the arguments passed
         # are accurate, serializer should be valid
         serializer = RecipeSerializer(data={
             'name': 'bar', 'enabled': True, 'filter_expression': '[]',
-            'action': 'console-log', 'arguments': {'message': 'foo'}
+            'action': 'show-heartbeat',
+            'arguments': {
+                'surveyId': 'lorem-ipsum-dolor',
+                'surveys': [
+                    {'title': 'adipscing', 'weight': 1},
+                    {'title': 'consequetar', 'weight': 1}
+                ]
+            }
         })
 
         serializer.is_valid()
@@ -75,7 +110,11 @@ class TestRecipeSerializer:
             'filter_expression': '[]',
             'action': mockAction,
             'arguments': {
-                'message': 'foo'
+                'surveyId': 'lorem-ipsum-dolor',
+                'surveys': [
+                    {'title': 'adipscing', 'weight': 1},
+                    {'title': 'consequetar', 'weight': 1}
+                ]
             }
         }
         assert serializer.errors == {}
