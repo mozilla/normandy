@@ -114,6 +114,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         errorResponse = {}
         errors = sorted(schemaValidator.iter_errors(value), key=lambda e: e.path)
 
+        # Loop through ValidationErrors returned by JSONSchema
+        # Each error contains a message and a path attribute
+        # message: string human-readable error explanation
+        # path: list containing path to offending element
         for error in errors:
             currentLevel = errorResponse
 
