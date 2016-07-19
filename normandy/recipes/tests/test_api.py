@@ -166,6 +166,25 @@ class TestRecipeAPI(object):
         recipes = Recipe.objects.all()
         assert recipes.count() == 0
 
+    def test_creation_when_arguments_are_invalid(self, api_client):
+        ActionFactory(
+            name='foobarbaz',
+            arguments_schema={
+                'type': 'object',
+                'properties': {'message': {'type': 'string'}},
+                'required': ['message']
+            }
+        )
+        res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
+                                                  'enabled': True,
+                                                  'filter_expression': 'true',
+                                                  'action': 'foobarbaz',
+                                                  'arguments': {'message': ''}})
+        assert res.status_code == 400
+
+        recipes = Recipe.objects.all()
+        assert recipes.count() == 0
+
     def test_it_can_change_action_for_recipes(self, api_client):
         recipe = RecipeFactory()
         action = ActionFactory()

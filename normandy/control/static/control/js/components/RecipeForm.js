@@ -1,7 +1,8 @@
 import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import { push } from 'react-router-redux';
-import { destroy, reduxForm, getValues } from 'redux-form';
+import { destroy, stopSubmit, reduxForm, getValues } from 'redux-form';
+import { _ } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
   from '../actions/ControlActions.js';
@@ -153,10 +154,43 @@ export default composeRecipeContainer(reduxForm({
     ? props.location.state.selectedRevision
     : null;
 
+  const formatErrors = payload => {
+    let errors = payload;
+
+    /* If our payload is an object, process each error in the object
+       Otherwise, it is a string and will be returned immediately */
+    if (_.isObject(payload)) {
+      const invalidFields = Object.keys(payload);
+      if (invalidFields.length > 0) {
+        /* If our error keys are integers, it means they correspond
+           to an array field and we want to present errors as an array
+           e.g. { surveys: {0: {title: 'err'}}, {2: {weight: 'err'}} }
+           =>   { surveys: [{title: 'err'}, null, {weight: 'err'}] } */
+        errors = isNaN(invalidFields[0]) ? {} : [];
+
+        invalidFields.forEach(fieldName => {
+          errors[fieldName] = formatErrors(payload[fieldName]);
+        });
+      }
+    }
+
+    return errors;
+  };
+
+  const onSubmitFail = errors => {
+    const { dispatch } = props;
+    const actionFormErrors = errors.arguments;
+
+    if (actionFormErrors) {
+      dispatch(stopSubmit('action', formatErrors(actionFormErrors)));
+    }
+  };
+
   return {
     fields,
     initialValues: selectedRecipeRevision || props.recipe,
     viewingRevision: selectedRecipeRevision || props.location.query.revisionId,
     formState: state.form,
+    onSubmitFail,
   };
 })(RecipeForm));

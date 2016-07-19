@@ -112,3 +112,21 @@ class ClientFactory(factory.Factory):
         model = Client
 
     request = factory.LazyAttribute(lambda o: RequestFactory().get('/'))
+
+ARGUMENTS_SCHEMA = {
+    "required": ["surveyId", "surveys"],
+    "properties": {
+        "surveyId": {"type": "string"},
+        "surveys": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "properties": {
+                    "title": {"type": "string"},
+                    "weight": {"type": "integer", "minimum": 1}
+                },
+                "required": ["title", "weight"]
+            },
+        },
+    },
+}

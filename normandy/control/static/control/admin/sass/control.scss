@@ -276,6 +276,20 @@
           padding: 5px 3em;
         }
 
+        &.invalid {
+          color: $red;
+          font-weight: 700;
+
+          &:before {
+            border: none;
+            color: $red;
+            content: "\f071"; // error icon, fa-exclamation-triangle
+            font: normal normal 400 11px/1 FontAwesome;
+            left: -1.5em;
+            margin-right: 4px;
+          }
+        }
+
         &:before {
           border-color: transparent $darkBrown;
           border-style: solid;
