@@ -59,9 +59,10 @@ class TestRecipeSerializer:
             'action': 'action-that-doesnt-exist', 'arguments': {}
         })
 
-        serializer.is_valid()
+        with pytest.raises(serializers.ValidationError):
+            serializer.is_valid(raise_exception=True)
+
         assert serializer.errors['arguments'] == ['Could not find arguments schema.']
-        assert pytest.raises(serializers.ValidationError)
 
         # If the action can be found, raise validation error
         # with the arguments error formatted appropriately
@@ -78,7 +79,9 @@ class TestRecipeSerializer:
             }
         })
 
-        serializer.is_valid()
+        with pytest.raises(serializers.ValidationError):
+            serializer.is_valid(raise_exception=True)
+
         assert serializer.errors['arguments'] == {
             'surveyId': 'This field may not be blank.',
             'surveys': {
@@ -87,7 +90,6 @@ class TestRecipeSerializer:
                 3: {'weight': '\'lorem ipsum\' is not of type \'integer\''}
             }
         }
-        assert pytest.raises(serializers.ValidationError)
 
         # If the action can be found, and the arguments passed
         # are accurate, serializer should be valid
