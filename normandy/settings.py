@@ -120,8 +120,8 @@ class Core(Configuration):
 
     # Action names and the path they are located at.
     ACTIONS = {
-        'console-log': os.path.join(BASE_DIR, 'normandy/recipes/static/actions/console-log'),
-        'show-heartbeat': os.path.join(BASE_DIR, 'normandy/recipes/static/actions/show-heartbeat'),
+        'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
+        'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
     }
 
 

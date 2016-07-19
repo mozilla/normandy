@@ -1,3 +1,4 @@
+/* eslint-env node */
 /* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
 var path = require('path');
 var webpack = require('webpack');
@@ -18,12 +19,12 @@ module.exports = [
     entry: {
       selfrepair: [
         'babel-polyfill',
-        './normandy/selfrepair/static/js/self_repair',
+        './client/selfrepair/self_repair.js',
       ],
       control: [
         'babel-polyfill',
-        './normandy/control/static/control/js/index',
-        './normandy/control/static/control/admin/sass/control.scss',
+        './client/control/index.js',
+        './client/control/sass/control.scss',
         './node_modules/font-awesome/scss/font-awesome.scss',
       ],
     },
@@ -62,8 +63,8 @@ module.exports = [
   },
   {
     entry: {
-      'console-log': './normandy/recipes/static/actions/console-log/index',
-      'show-heartbeat': './normandy/recipes/static/actions/show-heartbeat/index',
+      'console-log': './client/actions/console-log/index',
+      'show-heartbeat': './client/actions/show-heartbeat/index',
     },
 
     plugins: [
@@ -75,10 +76,10 @@ module.exports = [
         // Small plugin to update the actions in the database if
         // --update-actions was passed.
       function updateActions() {
-        var cmd;
         this.plugin('done', function () {
+          var cmd;
           if (argv['update-actions']) {
-              // Don't disable actions since this is mostly for development.
+            // Don't disable actions since this is mostly for development.
             cmd = 'python manage.py update_actions --no-disable';
 
             childProcess.exec(cmd, function (err, stdout, stderr) {

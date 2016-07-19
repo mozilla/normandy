@@ -1,30 +1,31 @@
-/* eslint-disable func-names, no-var */
+/* eslint-env node */
+/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
 // Karma configuration
 module.exports = function (config) {
   var karmaConfig = {
-        // base path that will be used to resolve all patterns (eg. files, exclude)
+    // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-        // frameworks to use
-        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+    // frameworks to use
+    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
 
-        // list of files / patterns to load in the browser
+    // list of files / patterns to load in the browser
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/jasmine-promises/dist/jasmine-promises.js',
-      'normandy/control/tests/index.js',
-      'normandy/recipes/tests/actions/index.js',
-      'normandy/selfrepair/tests/index.js',
+      'client/control/tests/index.js',
+      'client/actions/tests/index.js',
+      'client/selfrepair/tests/index.js',
     ],
 
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    // preprocess matching files before serving them to the browser
+    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'normandy/control/tests/index.js': ['webpack', 'sourcemap'],
-      'normandy/recipes/tests/actions/index.js': ['webpack', 'sourcemap'],
-      'normandy/selfrepair/tests/index.js': ['webpack', 'sourcemap'],
-      'normandy/control/static/control/js/components/*.js': ['react-jsx'],
+      'client/control/tests/index.js': ['webpack', 'sourcemap'],
+      'client/selfrepair/tests/index.js': ['webpack', 'sourcemap'],
+      'client/control/components/*.js': ['react-jsx'],
+      'client/actions/tests/index.js': ['webpack', 'sourcemap'],
     },
 
     webpack: {
