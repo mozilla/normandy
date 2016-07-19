@@ -7,7 +7,7 @@ from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import (Action, Recipe, Approval, ApprovalRequest,
                                      ApprovalRequestComment)
-from normandy.recipes.validators import Validator
+from normandy.recipes.validators import JSONSchemaValidator
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -110,7 +110,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         except:
             raise serializers.ValidationError('Could not find arguments schema.')
 
-        schemaValidator = Validator(schema)
+        schemaValidator = JSONSchemaValidator(schema)
         errorResponse = {}
         errors = sorted(schemaValidator.iter_errors(value), key=lambda e: e.path)
 
