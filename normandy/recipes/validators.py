@@ -5,13 +5,13 @@ from django.core.exceptions import ValidationError
 
 
 # Add path to required validator so we can get property name
-def _required(validator, required, instance, schema):
+def _required(validator, requirements, instance, schema):
     """Validate 'required' properties."""
     if not validator.is_type(instance, 'object'):
         return
 
-    for index, requirement in enumerate(required):
-        if requirement not in instance or instance[requirement] == '':
+    for index, requirement in enumerate(requirements):
+        if instance.get(requirement, '') == '':
             error = jsonschema.ValidationError(
                 'This field may not be blank.',
                 path=[requirement]
