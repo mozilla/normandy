@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-set -eu
+
+set -x
 
 DOCKER_ARGS=( )
 
 if [[ -v CIRCLE_TEST_REPORTS ]]; then
-  DOCKER_ARGS+=(--volume $CIRCLE_TEST_REPORTS:/test/artifacts)
+  DOCKER_ARGS+=(--volume $CIRCLE_TEST_REPORTS:/test_artifacts)
 fi
 
 if [[ -f ~/cache/GeoLite2-Country.mmdb ]]; then
@@ -12,13 +13,19 @@ if [[ -f ~/cache/GeoLite2-Country.mmdb ]]; then
 fi
 
 # Parse out known command flags to give to `docker run` instead of the command
+# After hitting the first unrecognized argument, assume everything else it the
+# command to run
 while [ $# -ge 1 ]; do
   case $1 in
     --)
       shift
       break
       ;;
-    -p)
+    -d|-i|-t)
+      DOCKER_ARGS+=($1)
+      shift
+      ;;
+    -p|-e)
       DOCKER_ARGS+=($1 $2)
       shift
       shift
@@ -29,9 +36,9 @@ while [ $# -ge 1 ]; do
   esac
 done
 
-echo docker run \
-  --net host \
+docker run \
   --env DJANGO_CONFIGURATION=Test \
+  --net host \
   "${DOCKER_ARGS[@]}" \
   normandy:build \
   "$@"

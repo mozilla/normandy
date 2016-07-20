@@ -1,7 +1,8 @@
+/* eslint-disable no-var, prefer-template */
 var karma = require('karma');
 var karmaConfig = require('karma/lib/config');
 
-var config = karmaConfig.parseConfig(__dirname + '/../karma.conf.js', {
+var config = karmaConfig.parseConfig(__dirname + '/../../karma.conf.js', {
   browsers: [],
   oneShot: true,
   reporters: ['spec', 'junit'],

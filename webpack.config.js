@@ -1,9 +1,10 @@
+/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var argv = require('yargs').argv;
-var child_process = require('child_process');
+var childProcess = require('child_process');
 
 
 const BOLD = '\u001b[1m';
@@ -37,7 +38,7 @@ module.exports = [
       new BundleTracker({ filename: './webpack-stats.json' }),
       new ExtractTextPlugin('[name]-[hash].css'),
       new webpack.ProvidePlugin({
-        'fetch': 'exports?self.fetch!isomorphic-fetch',
+        fetch: 'exports?self.fetch!isomorphic-fetch',
       }),
     ],
 
@@ -74,12 +75,13 @@ module.exports = [
         // Small plugin to update the actions in the database if
         // --update-actions was passed.
       function updateActions() {
-        this.plugin('done', function (stats) {
+        var cmd;
+        this.plugin('done', function () {
           if (argv['update-actions']) {
               // Don't disable actions since this is mostly for development.
-            var cmd = 'python manage.py update_actions --no-disable';
+            cmd = 'python manage.py update_actions --no-disable';
 
-            child_process.exec(cmd, function (err, stdout, stderr) {
+            childProcess.exec(cmd, function (err, stdout, stderr) {
               console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
               console.log(stdout);
               if (stderr) {
