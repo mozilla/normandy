@@ -13,8 +13,9 @@ import FormField from './form_fields/FormFieldWrapper.js';
 import JexlEnvironment from '../../../../../selfrepair/static/js/JexlEnvironment.js';
 
 export class RecipeForm extends React.Component {
-  propTypes = {
+  static propTypes = {
     dispatch: pt.func.isRequired,
+    fields: pt.object.isRequired,
     formState: pt.object.isRequired,
     recipeId: pt.number.isRequired,
     submitting: pt.bool.isRequired,
@@ -143,7 +144,6 @@ export class RecipeForm extends React.Component {
   }
 }
 RecipeForm.propTypes = {
-  fields: React.PropTypes.object.isRequired,
 };
 
 export default composeRecipeContainer(reduxForm({
