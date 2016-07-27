@@ -92,8 +92,8 @@ SurveyForm.propTypes = {
   showDefaults: pt.func,
 };
 
-class HeartbeatForm extends React.Component {
-  propTypes = {
+export default class HeartbeatForm extends React.Component {
+  static propTypes = {
     fields: pt.object.isRequired,
   }
 
@@ -170,5 +170,3 @@ class HeartbeatForm extends React.Component {
     );
   }
 }
-
-export default HeartbeatForm;

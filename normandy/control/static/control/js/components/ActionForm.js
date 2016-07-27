@@ -35,7 +35,7 @@ export default reduxForm({
       break;
 
     default:
-      throw new Error(`Unexpected action name: "${name}"`);
+      throw new Error(`Unexpected action name: "${props.name}"`);
   }
 
   if (props.recipe && props.recipe.action === props.name) {
