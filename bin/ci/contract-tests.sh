@@ -5,6 +5,7 @@ echo $BASE_DIR
 cd $BASE_DIR
 
 echo "Setting up Normandy"
+dropdb --if-exists normandy
 createdb normandy
 ./docker-run.sh -i -t ./manage.py migrate
 ./docker-run.sh -i -t ./manage.py update_product_details

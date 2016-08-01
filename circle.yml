@@ -15,8 +15,11 @@ dependencies:
     - docker build -t normandy:build .
     # write the sha256 sum to an artifact to make image verification easier
     - docker inspect -f '{{.Config.Image}}' normandy:build | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
+    # Build Marionette testing image
+    - docker build -t normandy:marionette system-tests
     # Get MaxMind GeoIP database
     - cd ~/cache/ && ~/normandy/bin/download_geolite2.sh
+
 
 test:
   pre:
@@ -39,6 +42,8 @@ test:
       bin/ci/docker-run.sh -p 9876:9876 node bin/ci/karma-ci.js
     # Start the app, and run acceptance tests
     - bin/ci/contract-tests.sh
+    # Start Firefox and the app, and run system tests
+    - bin/ci/system-tests.sh
 
   post:
     # Save test artifacts for Python and Lint tests
