@@ -23,7 +23,7 @@ test:
     - chmod -R 777 $CIRCLE_TEST_REPORTS
   override:
     # Run lint checks
-    - therapist run --use-tracked-files
+    - bin/ci/docker-run.sh therapist run --use-tracked-files
     # Run Python tests
     - bin/ci/docker-run.sh py.test --junitxml=/test_artifacts/pytest.xml normandy/
     # Start Karma test server, and run them in Firefox
@@ -39,8 +39,6 @@ test:
     - bin/ci/contract-tests.sh
 
   post:
-    # Save test artifacts for Python and Lint tests
-    - bin/ci/docker-run.sh flake8_junit /test_artifacts/flake8.txt /test_artifacts/flake8.xml
     # Clean up old image and save the new one
     - >
       mkdir -p ~/cache/docker;
