@@ -1,3 +1,4 @@
+/* eslint-disable func-names, no-var */
 // Karma configuration
 module.exports = function (config) {
   var karmaConfig = {
@@ -58,8 +59,8 @@ module.exports = function (config) {
     // enable / disable colors in the output (reporters and logs)
     colors: true,
 
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    // possible values: config.LOG_DISABLE, config.LOG_ERROR, config.LOG_WARN,
+    // config.LOG_INFO, or config.LOG_DEBUG.
     logLevel: config.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
