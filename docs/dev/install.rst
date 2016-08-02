@@ -57,14 +57,20 @@ Installation
       :ref:`pip-install-error`
          How to troubleshoot errors during ``pip install``.
 
-4. Install frontend dependencies and build the frontend code using npm:
+4. Install pre-commit tools (optional)
+
+   .. code-block:: bash
+
+      therapist install
+
+5. Install frontend dependencies and build the frontend code using npm:
 
    .. code-block:: bash
 
       npm install
       npm run build
 
-5. Create a Postgres database for Normandy. By default it is assumed to be named
+6. Create a Postgres database for Normandy. By default it is assumed to be named
    ``normandy``:
 
    .. code-block:: bash
@@ -82,33 +88,33 @@ Installation
          DATABASE_URL=postgres://username:password@server_addr/database_name
 
 
-6. Initialize your database by running the migrations:
+7. Initialize your database by running the migrations:
 
    .. code-block:: bash
 
       python manage.py migrate
 
-7. Create a new superuser account:
+8. Create a new superuser account:
 
    .. code-block:: bash
 
       python manage.py createsuperuser
 
-8. Pull the latest data on Firefox releases and supported locales with the
+9. Pull the latest data on Firefox releases and supported locales with the
    ``update_product_details`` command:
 
    .. code-block:: bash
 
       python manage.py update_product_details
 
-9. Pull the latest geolocation database using the ``download_geolite2.sh``
+10. Pull the latest geolocation database using the ``download_geolite2.sh``
    script:
 
    .. code-block:: bash
 
       ./bin/download_geolite2.sh
 
-10. Add some useful initial data to your database using the ``initial_data``
+11. Add some useful initial data to your database using the ``initial_data``
     command:
 
     .. code-block:: bash

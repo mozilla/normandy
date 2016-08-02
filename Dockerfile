@@ -23,8 +23,7 @@ RUN ./node_modules/.bin/webpack && \
     mkdir -p __version__ && \
     mkdir -p /test_artifacts && \
     chmod 777 /test_artifacts && \
-    git rev-parse HEAD > __version__/commit && \
-    rm -rf .git
+    git rev-parse HEAD > __version__/commit
 
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
