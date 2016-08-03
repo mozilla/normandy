@@ -68,11 +68,22 @@ class TestActionAPI(object):
 
     def test_detail_view_includes_cache_headers(self, api_client):
         action = ActionFactory()
-        res = api_client.get('/api/v1/action/{name}/'.format(name=action))
+        res = api_client.get('/api/v1/action/{name}/'.format(name=action.name))
         assert res.status_code == 200
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+    def test_list_sets_no_cookies(self, api_client):
+        res = api_client.get('/api/v1/action/')
+        assert res.status_code == 200
+        assert 'Cookies' not in res
+
+    def test_detail_sets_no_cookies(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/'.format(name=action.name))
+        assert res.status_code == 200
+        assert res.client.cookies == {}
 
 
 @pytest.mark.django_db
@@ -112,6 +123,15 @@ class TestImplementationAPI(object):
         max_age = 'max-age={}'.format(settings.ACTION_IMPLEMENTATION_CACHE_TIME)
         assert max_age in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+    def test_sets_no_cookies(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=action.implementation_hash,
+        ))
+        assert res.status_code == 200
+        assert res.client.cookies == {}
 
 
 @pytest.mark.django_db
@@ -294,6 +314,17 @@ class TestRecipeAPI(object):
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+    def test_list_sets_no_cookies(self, api_client):
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 200
+        assert 'Cookies' not in res
+
+    def test_detail_sets_no_cookies(self, api_client):
+        recipe = RecipeFactory()
+        res = api_client.get('/api/v1/recipe/{id}/'.format(id=recipe.id))
+        assert res.status_code == 200
+        assert res.client.cookies == {}
 
 
 @pytest.mark.django_db
@@ -540,3 +571,8 @@ class TestClassifyClient(object):
             res = client.get('/api/v1/classify_client/')
             assert res.status_code == 200
         assert len(queries) == 0
+
+    def test_sets_no_cookies(self, api_client):
+        res = api_client.get('/api/v1/classify_client/')
+        assert res.status_code == 200
+        assert res.client.cookies == {}
