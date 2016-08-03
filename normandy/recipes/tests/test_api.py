@@ -2,7 +2,8 @@ import hashlib
 from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction
+from django.db import connection, transaction
+from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
@@ -532,3 +533,10 @@ class TestClassifyClient(object):
             'country': 'us',
             'request_time': '2016-01-01T00:00:00Z',
         }
+
+    def test_makes_no_db_queries(self, client):
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res = client.get('/api/v1/classify_client/')
+            assert res.status_code == 200
+        assert len(queries) == 0
