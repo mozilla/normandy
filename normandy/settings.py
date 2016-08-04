@@ -248,6 +248,7 @@ class ProductionReadOnly(Production):
     used on public-facing webheads.
     """
     EXTRA_MIDDLEWARE_CLASSES = []  # No need for sessions!
+    ADMIN_ENABLED = values.BooleanValue(False)
 
 
 class ProductionInsecure(Production):
