@@ -267,6 +267,10 @@ class ProductionInsecure(Production):
     CSRF_COOKIE_SECURE = values.BooleanValue(False)
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SESSION_COOKIE_SECURE = values.BooleanValue(False)
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W008',  # Secure SSL redirect
+        'security.W009',  # Secret key length
+    ])
 
 
 class Build(Production):
