@@ -130,6 +130,7 @@ class Base(Core):
     # General settings
     DEBUG = values.BooleanValue(False)
     ADMINS = values.SingleNestedListValue([])
+    SILENCED_SYSTEM_CHECKS = values.ListValue([])
 
     # Middleware that _most_ environments will need. Subclasses can
     # override this list.
@@ -249,6 +250,7 @@ class ProductionReadOnly(Production):
     """
     EXTRA_MIDDLEWARE_CLASSES = []  # No need for sessions!
     ADMIN_ENABLED = values.BooleanValue(False)
+    SILENCED_SYSTEM_CHECKS = values.ListValue(['security.W003'])  # CSRF check
 
 
 class ProductionInsecure(Production):
@@ -265,6 +267,10 @@ class ProductionInsecure(Production):
     CSRF_COOKIE_SECURE = values.BooleanValue(False)
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SESSION_COOKIE_SECURE = values.BooleanValue(False)
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W008',  # Secure SSL redirect
+        'security.W009',  # Secret key length
+    ])
 
 
 class Build(Production):
