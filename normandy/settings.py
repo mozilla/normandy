@@ -31,17 +31,12 @@ class Core(Configuration):
         'django.contrib.staticfiles',
     ]
 
+    # Middleware that ALL environments must have. See the Base class for
+    # details.
     MIDDLEWARE_CLASSES = [
         'normandy.base.middleware.RequestReceivedAtMiddleware',
         'django.middleware.security.SecurityMiddleware',
-        'normandy.base.middleware.ShortCircuitMiddleware',
-
-        'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ]
 
@@ -136,6 +131,23 @@ class Base(Core):
     DEBUG = values.BooleanValue(False)
     ADMINS = values.SingleNestedListValue([])
 
+    # Middleware that _most_ environments will need. Subclasses can
+    # override this list.
+    EXTRA_MIDDLEWARE_CLASSES = [
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    ]
+
+    def MIDDLEWARE_CLASSES(self):
+        """
+        Determine middleware by combining the core set and
+        per-environment set.
+        """
+        return Core.MIDDLEWARE_CLASSES + self.EXTRA_MIDDLEWARE_CLASSES
+
     # Remote services
     DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
@@ -228,6 +240,14 @@ class Production(Base):
     """Settings for the production environment."""
     USE_X_FORWARDED_HOST = values.BooleanValue(True)
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
+
+
+class ProductionReadOnly(Production):
+    """
+    Settings for a production environment that is read-only. This is
+    used on public-facing webheads.
+    """
+    EXTRA_MIDDLEWARE_CLASSES = []  # No need for sessions!
 
 
 class ProductionInsecure(Production):
