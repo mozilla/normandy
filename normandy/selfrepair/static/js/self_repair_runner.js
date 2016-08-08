@@ -62,9 +62,8 @@ export function getUserId() {
 export function fetchRecipes() {
   const { recipeUrl } = document.documentElement.dataset;
   const headers = { Accept: 'application/json' };
-  const data = { enabled: 'True' };
 
-  return fetch(recipeUrl, { headers, data })
+  return fetch(`${recipeUrl}?enabled=true`, { headers })
   .then(response => response.json());
 }
 
