@@ -33,6 +33,7 @@ class Command(BaseCommand):
     @reversion.create_revision()
     def handle(self, *args, **options):
         disabled_recipes = []
+        reversion.set_comment('Updating actions.')
 
         action_names = settings.ACTIONS.keys()
         if options['action_name']:
