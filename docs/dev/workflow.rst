@@ -163,3 +163,12 @@ To add a new action:
 
 To update an existing action, follow steps 4 and 5 above after making your
 changes.
+
+Redux DevTools
+--------------
+The control interface includes the `Redux DevTools`_ in development mode to help
+debug issues. To toggle the DevTools, hit ``Ctrl-H``. You can change the side of
+the screen the tools are docked on using ``Ctrl-Q``, and can resize the tools by
+dragging the edge of the bar.
+
+.. _Redux DevTools: https://github.com/gaearon/redux-devtools
