@@ -16,7 +16,7 @@ To build the addon:
 $ npm run build
 ```
 
-This will create `@recipe-client-0.0.1.xpi`, which you can install in Firefox.
+This will create `recipe-client.xpi`, which you can install in Firefox.
 
 For hacking on the addon, consider using [`jpm post`][].
 
