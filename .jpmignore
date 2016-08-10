@@ -2,9 +2,7 @@
 .*
 !/data/**/*
 !/lib/**/*
-!/node_modules/inherits/*
 !/node_modules/jexl/**/*
-!/node_modules/sha.js/*
 !/index.js
 !/LICENSE
 !/README.md
