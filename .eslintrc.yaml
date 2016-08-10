@@ -13,3 +13,5 @@ globals:
   require: false
   exports: true
   uneval: false
+  crypto: true
+  TextEncoder: true
