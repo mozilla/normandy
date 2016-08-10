@@ -152,6 +152,7 @@ class ClientSerializer(serializers.Serializer):
 
 class RecipeVersionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='revision.date_created', read_only=True)
+    comment = serializers.CharField(source='revision.comment', read_only=True)
     recipe = RecipeSerializer(source='_object_version.object', read_only=True)
 
     class Meta:
@@ -160,4 +161,5 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
             'id',
             'date_created',
             'recipe',
+            'comment',
         ]

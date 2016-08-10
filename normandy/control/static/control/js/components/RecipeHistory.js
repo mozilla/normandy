@@ -4,8 +4,8 @@ import moment from 'moment';
 import composeRecipeContainer from './RecipeContainer.js';
 import { makeApiRequest } from '../actions/ControlActions.js';
 
-class RecipeHistory extends React.Component {
-  propTypes = {
+export class RecipeHistory extends React.Component {
+  static propTypes = {
     dispatch: pt.func.isRequired,
     recipe: pt.object.isRequired,
     recipeId: pt.number.isRequired,
@@ -14,7 +14,7 @@ class RecipeHistory extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      revisionLog: [],
+      revisions: [],
     };
   }
 
@@ -29,32 +29,44 @@ class RecipeHistory extends React.Component {
     dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
     .then(history => {
       this.setState({
-        revisionLog: history,
+        revisions: history,
       });
     });
   }
 
   render() {
     const { recipe, dispatch } = this.props;
-    return (
-      <div className="fluid-8 recipe-history">
-        <h3>Viewing revision log for: <b>{recipe ? recipe.name : ''}</b></h3>
-        <ul>
-            {this.state.revisionLog.map(revision =>
-              <HistoryItem
-                key={revision.id}
-                revision={revision}
-                recipe={recipe}
-                dispatch={dispatch}
-              />
-            )}
-        </ul>
-      </div>
-    );
+    const { revisions } = this.state;
+    return <HistoryList recipe={recipe} dispatch={dispatch} revisions={revisions} />;
   }
 }
 
-class HistoryItem extends React.Component {
+export function HistoryList({ recipe, revisions, dispatch }) {
+  return (
+    <div className="fluid-8 recipe-history">
+      <h3>Viewing revision log for: <b>{recipe ? recipe.name : ''}</b></h3>
+      <table>
+        <tbody>
+          {revisions.map(revision =>
+            <HistoryItem
+              key={revision.id}
+              revision={revision}
+              recipe={recipe}
+              dispatch={dispatch}
+            />
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+HistoryList.propTypes = {
+  dispatch: pt.func.isRequired,
+  recipe: pt.object.isRequired,
+  revisions: pt.arrayOf(pt.object).isRequired,
+};
+
+export class HistoryItem extends React.Component {
   static propTypes = {
     dispatch: pt.func.isRequired,
     revision: pt.shape({
@@ -62,6 +74,7 @@ class HistoryItem extends React.Component {
         revision_id: pt.number.isRequired,
       }).isRequired,
       date_created: pt.string.isRequired,
+      comment: pt.string.isRequired,
     }).isRequired,
     recipe: pt.shape({
       revision_id: pt.number.isRequired,
@@ -93,19 +106,25 @@ class HistoryItem extends React.Component {
     const isCurrent = revision.recipe.revision_id === recipe.revision_id;
 
     return (
-      <li className="history-item" onClick={::this.handleClick}>
-        <p className="revision-number">#{revision.recipe.revision_id}</p>
-        <p className="revision-created">
+      <tr className="history-item" onClick={::this.handleClick}>
+        <td className="revision-number">#{revision.recipe.revision_id}</td>
+        <td className="revision-created">
           <span className="label">Created On:</span>
           {moment(revision.date_created).format('MMM Do YYYY - h:mmA')}
-        </p>
-        {isCurrent && (
-          <div className="revision-status status-indicator green">
-            <i className="fa fa-circle pre" />
-            Current Revision
-          </div>
-        )}
-      </li>
+        </td>
+        <td className="revision-comment">
+          <span className="label">Comment:</span>
+          {revision.comment || '--'}
+        </td>
+        <td>
+          {isCurrent && (
+            <div className="status-indicator green">
+              <i className="fa fa-circle pre" />
+              Current Revision
+            </div>
+          )}
+        </td>
+      </tr>
     );
   }
 }
