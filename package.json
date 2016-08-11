@@ -18,15 +18,15 @@
     "jetpack"
   ],
   "devDependencies": {
-    "babel-eslint": "^6.0.2",
-    "eslint": "^1.10.3",
-    "eslint-config-normandy": "^1.0.0",
-    "eslint-plugin-babel": "^3.1.0",
+    "babel-eslint": "6.1.2",
+    "eslint": "1.10.3",
+    "eslint-config-normandy": "1.0.0",
+    "eslint-plugin-babel": "3.3.0",
     "eslint-plugin-mozilla": "0.0.3",
-    "jpm": "^1.0.5",
-    "woodchipper": "^0.9.1"
+    "jpm": "1.1.3",
+    "woodchipper": "0.9.1"
   },
   "dependencies": {
-    "jexl": "^1.1.3"
+    "jexl": "1.1.3"
   }
 }
