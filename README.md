@@ -1,4 +1,4 @@
-# Recipe Client
+# Recipe Client [![CircleCI](https://img.shields.io/circleci/project/mozilla/normandy-addon.svg)](https://circleci.com/gh/mozilla/normandy-addon/tree/master)
 
 Client to download and run recipes from [Normandy](https://github.com/mozilla/normandy).
 
