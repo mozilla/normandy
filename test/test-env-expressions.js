@@ -32,4 +32,19 @@ exports['test dates are comparable'] = promiseTest(assert => {
   ]);
 });
 
+exports['test has a stable sample transform'] = promiseTest(assert => {
+  return EnvExpressions.eval('["test"]|stableSample(0.999)')
+  .then(val => assert.ok(val));
+});
+
+exports['test returns true for matching samples'] = promiseTest(assert => {
+  return EnvExpressions.eval('["test"]|stableSample(1)')
+  .then(val => assert.equal(val, true));
+});
+
+exports['test returns false for matching samples'] = promiseTest(assert => {
+  return EnvExpressions.eval('["test"]|stableSample(0)')
+  .then(val => assert.equal(val, false));
+});
+
 testRunner.run(exports);
