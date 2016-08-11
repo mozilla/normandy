@@ -1,4 +1,4 @@
-# Normandy
+# Normandy [![CircleCI](https://img.shields.io/circleci/project/mozilla/normandy.svg)](https://circleci.com/gh/mozilla/normandy/tree/master)
 
 Normandy is the server-side implementation of the [Recipe Server][]. It serves
 bundles of JavaScript to various clients (Firefox browsers) based on certain
