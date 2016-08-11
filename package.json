@@ -17,6 +17,27 @@
   "keywords": [
     "jetpack"
   ],
+  "preferences": [
+    {
+      "name": "api_url",
+      "title": "API URL",
+      "description": "URL prefix to use for server requests",
+      "type": "string",
+      "value": "https://self-repair.mozilla.org/api/v1"
+    }, {
+      "name": "enabled",
+      "title": "Enabled",
+      "description": "Enable the recipe client",
+      "type": "bool",
+      "value": true
+    }, {
+      "name": "log_level",
+      "title": "Log Level",
+      "description": "Verbosity of logs",
+      "type": "string",
+      "value": "warning"
+    }
+  ],
   "devDependencies": {
     "babel-eslint": "6.1.2",
     "eslint": "1.10.3",
