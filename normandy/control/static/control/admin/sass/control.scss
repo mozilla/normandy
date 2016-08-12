@@ -330,33 +330,24 @@
 
 /* Recipe History */
 .recipe-history {
-  .history-item {
-    display: flex;
-    flex-direction: row;
+  td {
+    text-align: left;
+  }
 
-    .revision-number,
-    .revision-created {
-      line-height: 20px;
-      margin: 0 20px;
-    }
+  .revision-number {
+    font-weight: 600;
 
-    .revision-number {
-      flex: 0;
-      font-weight: 600;
-    }
+    /* Force table cell to smallest width */
+    white-space: nowrap;
+    width: 1px;
+  }
 
-    .revision-created {
-      flex: 1;
-    }
+  .status-indicator {
+    margin: 0 20px; /* Reset .status-indicator margin */
+  }
 
-    .revision-status {
-      flex: 1;
-      margin: 0 20px; /* Reset .status-indicator margin */
-    }
-
-    .label {
-      padding: 0px;
-    }
+  .label {
+    padding: 0px;
   }
 }
 
