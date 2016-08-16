@@ -19,45 +19,6 @@ from normandy.recipes.validators import validate_json
 logger = logging.getLogger()
 
 
-class Locale(models.Model):
-    """Database table for locales from product_details."""
-    code = models.CharField(max_length=255, unique=True)
-    english_name = models.CharField(max_length=255, blank=True)
-    native_name = models.CharField(max_length=255, blank=True)
-    order = models.IntegerField(default=100)
-
-    class Meta:
-        ordering = ['order', 'code']
-
-    def __str__(self):
-        return '{self.code} ({self.english_name})'.format(self=self)
-
-
-class ReleaseChannel(models.Model):
-    """Release channel of Firefox"""
-    slug = models.SlugField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        ordering = ['slug']
-
-    def __str__(self):
-        return self.name
-
-
-class Country(models.Model):
-    """Database table for countries from django_countries."""
-    code = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-    order = models.IntegerField(default=100)
-
-    class Meta:
-        ordering = ['order', 'name']
-
-    def __str__(self):
-        return '{self.name} ({self.code})'.format(self=self)
-
-
 class Approval(models.Model):
     created = models.DateTimeField(default=timezone.now)
     creator = models.ForeignKey(User)
