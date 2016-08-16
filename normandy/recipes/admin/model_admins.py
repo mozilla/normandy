@@ -70,8 +70,3 @@ class ActionAdmin(VersionAdmin):
         """
         return action.in_use
     in_use.boolean = True
-
-
-@admin.register(models.ReleaseChannel)
-class ReleaseChannelAdmin(admin.ModelAdmin):
-    fields = ['name', 'slug']

@@ -100,26 +100,18 @@ Installation
 
       python manage.py createsuperuser
 
-9. Pull the latest data on Firefox releases and supported locales with the
-   ``update_product_details`` command:
-
-   .. code-block:: bash
-
-      python manage.py update_product_details
-
-10. Pull the latest geolocation database using the ``download_geolite2.sh``
+9. Pull the latest geolocation database using the ``download_geolite2.sh``
    script:
 
    .. code-block:: bash
 
       ./bin/download_geolite2.sh
 
-11. Add some useful initial data to your database using the ``initial_data``
-    command:
+10. Load actions into the database:
 
-    .. code-block:: bash
+   .. code-block:: bash
 
-       python manage.py initial_data
+      python manage.py update_actions
 
 Once you've finished these steps, you should be able to start the site by
 running:

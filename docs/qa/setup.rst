@@ -47,7 +47,7 @@ Starting the server, and initial setup
    .. code-block:: shell
 
      $ docker-compose run normandy ./manage.py migrate
-     $ docker-compose run normandy ./manage.py initial_data
+     $ docker-compose run normandy ./manage.py update_actions
      $ docker-compose run normandy ./manage.py createsuperuser
 
 4. Open the site. If you are using Docker Machine, get your VM's IP with

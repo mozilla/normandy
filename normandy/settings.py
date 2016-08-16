@@ -15,7 +15,6 @@ class Core(Configuration):
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
-        'product_details',
         'rest_framework',
         'rest_framework.authtoken',
         'reversion',
@@ -162,7 +161,6 @@ class Base(Core):
     RAVEN_CONFIG = {
         'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
     }
-    PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
     # statsd
     STATSD_HOST = values.Value('localhost')
     STATSD_PORT = values.IntegerValue(8125)

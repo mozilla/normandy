@@ -7,8 +7,6 @@ cd $BASE_DIR
 echo "Setting up Normandy"
 createdb normandy
 ./docker-run.sh -i -t ./manage.py migrate
-./docker-run.sh -i -t ./manage.py update_product_details
-./docker-run.sh -i -t ./manage.py initial_data
 ./docker-run.sh -i -t ./manage.py update_actions
 echo "Starting Normandy server"
 SERVER_ID=$(./docker-run.sh -e DJANGO_CONFIGURATION=ProductionInsecure -d)
