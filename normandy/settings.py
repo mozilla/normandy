@@ -161,7 +161,8 @@ class Base(Core):
                 },
                 'development': {
                     'format': '%(levelname)s %(asctime)s %(name)s %(message)s',
-                }, },
+                },
+            },
             'handlers': {
                 'console': {
                     'level': 'DEBUG',
