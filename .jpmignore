@@ -2,7 +2,8 @@
 .*
 !/data/**/*
 !/lib/**/*
-!/node_modules/jexl/**/*
+!/node_modules/jexl/package.json
+!/node_modules/jexl/lib/**/*.js
 !/index.js
 !/LICENSE
 !/README.md
