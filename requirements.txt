@@ -178,3 +178,5 @@ click==6.6 \
 PyYAML==3.11 \
     --hash=sha256:c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b0846e8 \
     --hash=sha256:19bb3ac350ef878dda84a62d37c7d5c17a137386dde9c2ce7249c7a21d7f6ac9
+mozilla-cloud-services-logger==1.0.1 \
+    --hash=sha256:2a2a524f9d05bc5c8a6f3d13a28cb06386b0720cee00ba58e22b2de68089c6e4

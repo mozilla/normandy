@@ -148,6 +148,40 @@ class Base(Core):
         """
         return Core.MIDDLEWARE_CLASSES + self.EXTRA_MIDDLEWARE_CLASSES
 
+    LOGGING_USE_JSON = values.BooleanValue(False)
+
+    def LOGGING(self):
+        return {
+            'version': 1,
+            'disable_existing_loggers': True,
+            'formatters': {
+                'json': {
+                    '()': 'mozilla_cloud_services_logger.formatters.JsonLogFormatter',
+                    'logger_name': 'normandy',
+                },
+                'development': {
+                    'format': '%(levelname)s %(asctime)s %(name)s %(message)s',
+                }, },
+            'handlers': {
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'json' if self.LOGGING_USE_JSON else 'development',
+                },
+            },
+            'root': {
+                'handlers': ['console'],
+                'level': 'WARNING',
+            },
+            'loggers': {
+                'normandy': {
+                    'propagate': False,
+                    'handlers': ['console'],
+                    'level': 'DEBUG',
+                },
+            },
+        }
+
     # Remote services
     DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
@@ -239,6 +273,7 @@ class Production(Base):
     """Settings for the production environment."""
     USE_X_FORWARDED_HOST = values.BooleanValue(True)
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
+    LOGGING_USE_JSON = values.Value(True)
 
 
 class ProductionReadOnly(Production):
