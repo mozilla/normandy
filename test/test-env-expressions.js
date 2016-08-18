@@ -1,3 +1,6 @@
+const {Cu} = require('chrome');
+Cu.import('resource://gre/modules/TelemetryController.jsm'); /* globals TelemetryController: false */
+Cu.import('resource://gre/modules/Task.jsm'); /* globals Task */
 const testRunner = require('sdk/test');
 
 const {EnvExpressions} = require('../lib/EnvExpressions.js');
@@ -9,9 +12,18 @@ exports['test it works'] = promiseTest(assert => {
 });
 
 exports['test it can access telemetry'] = promiseTest(assert => {
-  return EnvExpressions.eval('telemetry != null')
-  .then(val => assert.ok(val));
+  return EnvExpressions.eval('telemetry')
+  .then(telemetry => assert.ok(typeof telemetry === 'object'));
 });
+
+exports['test it reads different types of telemetry'] = promiseTest(Task.async(function* (assert) {
+  yield TelemetryController.submitExternalPing('testfoo', {foo: 1});
+  yield TelemetryController.submitExternalPing('testbar', {bar: 2});
+  const result = yield(EnvExpressions.eval('telemetry'));
+  console.log('!!!!!!!', result);
+  assert.equal(result.testfoo.payload.foo, 1);
+  assert.equal(result.testbar.payload.bar, 2);
+}));
 
 exports['test has a date transform'] = promiseTest(assert => {
   return EnvExpressions.eval('"2016-04-22"|date')
