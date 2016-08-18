@@ -10,7 +10,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recipes', '0029_recipe_last_updated'),
+        ('recipes', '0030_auto_20160816_2154'),
     ]
 
     operations = [

@@ -9,7 +9,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recipes', '0030_recipe_signing'),
+        ('recipes', '0031_recipe_signing'),
     ]
 
     operations = [
