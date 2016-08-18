@@ -3,7 +3,7 @@ import json
 import logging
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -127,7 +127,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 # going to make the signature immediately invalid. Don't allow it.
                 raise ValidationError('Signatures must change alone')
             elif self.signature is not None:
-                self.signature = None
+                try:
+                    self.update_signature()
+                except ImproperlyConfigured:
+                    self.signature = None
 
             # Increment the revision ID, unless someone else tried to change it.
             if 'revision_id' not in dirty_field_names:
@@ -145,6 +148,14 @@ class Recipe(DirtyFieldsMixin, models.Model):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
         data = RecipeSerializer(self).data
         return CanonicalJSONRenderer().render(data)
+
+    def update_signature(self):
+        autographer = Autographer()
+        # Convert to a list because order must be preserved
+        signature_data = autographer.sign_data([self.canonical_json()])[0]
+        signature = Signature(**signature_data)
+        signature.save()
+        self.signature = signature
 
 
 @reversion.register()

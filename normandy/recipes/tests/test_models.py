@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils import timezone
 
 import pytest
@@ -120,12 +120,33 @@ class TestRecipe(object):
         expected = expected.encode()
         assert recipe.canonical_json() == expected
 
-    def test_signature_is_invalidated(self):
+    def test_signature_is_updated_if_autograph_available(self, mocker):
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = [
+            {'signature': 'fake signature'},
+        ]
+
         recipe = RecipeFactory(name='unchanged', signed=True)
+        original_signature = recipe.signature
         recipe.name = 'changed'
         recipe.save()
-        assert recipe.signature is None
         assert recipe.name == 'changed'
+        assert recipe.signature is not original_signature
+        assert recipe.signature.signature == 'fake signature'
+
+    def test_signature_is_cleared_if_autograph_unavailable(self, mocker):
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.side_effect = ImproperlyConfigured
+
+        recipe = RecipeFactory(name='unchanged', signed=True)
+        original_signature = recipe.signature
+        recipe.name = 'changed'
+        recipe.save()
+        assert recipe.name == 'changed'
+        assert recipe.signature is not original_signature
+        assert recipe.signature is None
 
     def test_setting_signature_doesnt_change_canonical_json(self):
         recipe = RecipeFactory(name='unchanged', signed=False)
@@ -142,6 +163,20 @@ class TestRecipe(object):
         with pytest.raises(ValidationError) as exc_info:
             recipe.save()
         assert exc_info.value.message == 'Signatures must change alone'
+
+    def test_update_signature(self, mocker):
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = [
+            {'signature': 'fake signature'},
+        ]
+
+        recipe = RecipeFactory(signed=False)
+        assert recipe.signature is None
+        recipe.update_signature()
+        recipe.save()
+        assert recipe.signature is not None
+        assert recipe.signature.signature == 'fake signature'
 
 
 @pytest.mark.django_db
