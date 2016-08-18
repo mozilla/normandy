@@ -1,9 +1,11 @@
+/* eslint-env node */
+/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var argv = require('yargs').argv;
-var child_process = require('child_process');
+var childProcess = require('child_process');
 
 
 const BOLD = '\u001b[1m';
@@ -17,11 +19,12 @@ module.exports = [
     entry: {
       selfrepair: [
         'babel-polyfill',
-        './normandy/selfrepair/static/js/self_repair',
+        './client/selfrepair/self_repair.js',
       ],
       control: [
-        './normandy/control/static/control/js/index',
-        './normandy/control/static/control/admin/sass/control.scss',
+        'babel-polyfill',
+        './client/control/index.js',
+        './client/control/sass/control.scss',
         './node_modules/font-awesome/scss/font-awesome.scss',
       ],
     },
@@ -36,7 +39,7 @@ module.exports = [
       new BundleTracker({ filename: './webpack-stats.json' }),
       new ExtractTextPlugin('[name]-[hash].css'),
       new webpack.ProvidePlugin({
-        'fetch': 'exports?self.fetch!isomorphic-fetch',
+        fetch: 'exports?self.fetch!isomorphic-fetch',
       }),
     ],
 
@@ -60,8 +63,8 @@ module.exports = [
   },
   {
     entry: {
-      'console-log': './normandy/recipes/static/actions/console-log/index',
-      'show-heartbeat': './normandy/recipes/static/actions/show-heartbeat/index',
+      'console-log': './client/actions/console-log/index',
+      'show-heartbeat': './client/actions/show-heartbeat/index',
     },
 
     plugins: [
@@ -73,12 +76,13 @@ module.exports = [
         // Small plugin to update the actions in the database if
         // --update-actions was passed.
       function updateActions() {
-        this.plugin('done', function (stats) {
+        this.plugin('done', function () {
+          var cmd;
           if (argv['update-actions']) {
-              // Don't disable actions since this is mostly for development.
-            var cmd = 'python manage.py update_actions --no-disable';
+            // Don't disable actions since this is mostly for development.
+            cmd = 'python manage.py update_actions --no-disable';
 
-            child_process.exec(cmd, function (err, stdout, stderr) {
+            childProcess.exec(cmd, function (err, stdout, stderr) {
               console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
               console.log(stdout);
               if (stderr) {

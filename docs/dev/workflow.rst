@@ -40,8 +40,8 @@ steps, as they don't affect your setup if nothing has changed:
    # Run database migrations.
    python manage.py migrate
 
-   # Add any new initial data (does not duplicate data).
-   python manage.py initial_data
+   # Add any new action data (does not duplicate data).
+   python manage.py update_actions
 
    # Build frontend files
    ./node_modules/.bin/webpack --config ./webpack.config.js --update-actions

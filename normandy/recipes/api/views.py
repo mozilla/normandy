@@ -205,8 +205,7 @@ class RecipeVersionViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
     def get_queryset(self):
-        content_type = ContentType.objects.get_for_model(Recipe)
-        return Version.objects.filter(content_type=content_type)
+        return Version.objects.get_for_model(Recipe)
 
 
 class ClassifyClient(views.APIView):

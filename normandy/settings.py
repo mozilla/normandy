@@ -15,7 +15,6 @@ class Core(Configuration):
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
-        'product_details',
         'rest_framework',
         'rest_framework.authtoken',
         'reversion',
@@ -31,17 +30,12 @@ class Core(Configuration):
         'django.contrib.staticfiles',
     ]
 
+    # Middleware that ALL environments must have. See the Base class for
+    # details.
     MIDDLEWARE_CLASSES = [
         'normandy.base.middleware.RequestReceivedAtMiddleware',
         'django.middleware.security.SecurityMiddleware',
-        'normandy.base.middleware.ShortCircuitMiddleware',
-
-        'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ]
 
@@ -129,8 +123,8 @@ class Core(Configuration):
 
     # Action names and the path they are located at.
     ACTIONS = {
-        'console-log': os.path.join(BASE_DIR, 'normandy/recipes/static/actions/console-log'),
-        'show-heartbeat': os.path.join(BASE_DIR, 'normandy/recipes/static/actions/show-heartbeat'),
+        'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
+        'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
     }
 
 
@@ -139,6 +133,59 @@ class Base(Core):
     # General settings
     DEBUG = values.BooleanValue(False)
     ADMINS = values.SingleNestedListValue([])
+    SILENCED_SYSTEM_CHECKS = values.ListValue([])
+
+    # Middleware that _most_ environments will need. Subclasses can
+    # override this list.
+    EXTRA_MIDDLEWARE_CLASSES = [
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    ]
+
+    def MIDDLEWARE_CLASSES(self):
+        """
+        Determine middleware by combining the core set and
+        per-environment set.
+        """
+        return Core.MIDDLEWARE_CLASSES + self.EXTRA_MIDDLEWARE_CLASSES
+
+    LOGGING_USE_JSON = values.BooleanValue(False)
+
+    def LOGGING(self):
+        return {
+            'version': 1,
+            'disable_existing_loggers': True,
+            'formatters': {
+                'json': {
+                    '()': 'mozilla_cloud_services_logger.formatters.JsonLogFormatter',
+                    'logger_name': 'normandy',
+                },
+                'development': {
+                    'format': '%(levelname)s %(asctime)s %(name)s %(message)s',
+                },
+            },
+            'handlers': {
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'json' if self.LOGGING_USE_JSON else 'development',
+                },
+            },
+            'root': {
+                'handlers': ['console'],
+                'level': 'WARNING',
+            },
+            'loggers': {
+                'normandy': {
+                    'propagate': False,
+                    'handlers': ['console'],
+                    'level': 'DEBUG',
+                },
+            },
+        }
 
     # Remote services
     DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
@@ -153,7 +200,6 @@ class Base(Core):
     RAVEN_CONFIG = {
         'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
     }
-    PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
     # statsd
     STATSD_HOST = values.Value('localhost')
     STATSD_PORT = values.IntegerValue(8125)
@@ -237,6 +283,17 @@ class Production(Base):
     """Settings for the production environment."""
     USE_X_FORWARDED_HOST = values.BooleanValue(True)
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
+    LOGGING_USE_JSON = values.Value(True)
+
+
+class ProductionReadOnly(Production):
+    """
+    Settings for a production environment that is read-only. This is
+    used on public-facing webheads.
+    """
+    EXTRA_MIDDLEWARE_CLASSES = []  # No need for sessions!
+    ADMIN_ENABLED = values.BooleanValue(False)
+    SILENCED_SYSTEM_CHECKS = values.ListValue(['security.W003'])  # CSRF check
 
 
 class ProductionInsecure(Production):
@@ -253,6 +310,10 @@ class ProductionInsecure(Production):
     CSRF_COOKIE_SECURE = values.BooleanValue(False)
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SESSION_COOKIE_SECURE = values.BooleanValue(False)
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W008',  # Secure SSL redirect
+        'security.W009',  # Secret key length
+    ])
 
 
 class Build(Production):

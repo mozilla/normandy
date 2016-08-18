@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 
 import pytest
+from reversion.models import Version
 
 from normandy.recipes.models import Action
 from normandy.recipes.tests import ActionFactory, RecipeFactory
@@ -126,3 +127,16 @@ class TestUpdateActions(object):
         call_command('update_actions', '--no-disable')
         recipe.refresh_from_db()
         assert recipe.enabled
+
+    def test_it_sets_the_revision_comment(self, mock_action):
+        mock_action('test-action', 'console.log("foo");', {'type': 'int'})
+
+        call_command('update_actions')
+        assert Action.objects.count() == 1
+
+        action = Action.objects.all()[0]
+        versions = Version.objects.get_for_object(action)
+        assert versions.count() == 1
+
+        version = versions[0]
+        assert version.revision.comment == 'Updating actions.'

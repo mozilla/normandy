@@ -13,6 +13,8 @@ dependencies:
     - if [ -e ~/cache/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/cache/docker/image.tar || rm ~/cache/docker/image.tar; fi
     # build image
     - docker build -t normandy:build .
+    # write the sha256 sum to an artifact to make image verification easier
+    - docker inspect -f '{{.Config.Image}}' normandy:build | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
     # Get MaxMind GeoIP database
     - cd ~/cache/ && ~/normandy/bin/download_geolite2.sh
 
@@ -20,39 +22,29 @@ test:
   pre:
     - chmod -R 777 $CIRCLE_TEST_REPORTS
   override:
-    # Run Python lint checks
-    - >
-      docker run --net host
-      -v $CIRCLE_TEST_REPORTS:/test_artifacts
-      normandy:build flake8 --output-file /test_artifacts/flake8.txt normandy
-    # Run JS lint checks
-    - >
-      docker run --net host
-      -v $CIRCLE_TEST_REPORTS:/test_artifacts
-      normandy:build node_modules/.bin/eslint normandy --format junit --output-file /test_artifacts/eslint.xml
+    # Run lint checks
+    - bin/ci/docker-run.sh therapist run --use-tracked-files
     # Run Python tests
-    - >
-      docker run --net host -e DJANGO_CONFIGURATION=Test
-      -v $CIRCLE_TEST_REPORTS:/test_artifacts
-      -v ~/cache/GeoLite2-Country.mmdb:/app/GeoLite2-Country.mmdb
-      normandy:build py.test --junitxml=/test_artifacts/pytest.xml
+    - bin/ci/docker-run.sh py.test --junitxml=/test_artifacts/pytest.xml normandy/
     # Start Karma test server, and run them in Firefox
     - >
       (
+        echo Waiting for Karma server to start;
         docker run --net host -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis;
         echo Starting Firefox;
         firefox localhost:9876
       ) &
-      docker run --net host -p 9876:9876
-      -v $CIRCLE_TEST_REPORTS:/test_artifacts
-      normandy:build node bin/karma-ci.js
+      bin/ci/docker-run.sh -p 9876:9876 node bin/ci/karma-ci.js
+    # Start the app, and run acceptance tests
+    - bin/ci/contract-tests.sh
+
   post:
-    # Save test artifacts for Python and Lint tests
-    - >
-      docker run -v $CIRCLE_TEST_REPORTS:/test_artifacts
-      normandy:build flake8_junit /test_artifacts/flake8.txt /test_artifacts/flake8.xml
     # Clean up old image and save the new one
-    - mkdir -p ~/cache/docker; test '!' -e ~/cache/docker/image.tar || rm ~/cache/docker/image.tar; docker save normandy:build > ~/cache/docker/image.tar; ls -l ~/cache/docker
+    - >
+      mkdir -p ~/cache/docker;
+      rm -f ~/cache/docker/image.tar;
+      docker save normandy:build > ~/cache/docker/image.tar;
+      ls -l ~/cache/docker
 
 # appropriately tag and push the container to dockerhub
 deployment:
@@ -61,7 +53,7 @@ deployment:
     commands:
       # set DOCKER_DEPLOY=true in Circle UI to do deploys
       - "${DOCKER_DEPLOY:-false}"
-      - bin/deploy/dockerhub.sh latest
+      - bin/ci/deploy-dockerhub.sh latest
 
   tags:
     # push all tags
@@ -69,4 +61,4 @@ deployment:
     commands:
       # set DOCKER_DEPLOY=true in Circle UI to do deploys
       - "${DOCKER_DEPLOY:-false}"
-      - bin/deploy/dockerhub.sh "$CIRCLE_TAG"
+      - bin/ci/deploy-dockerhub.sh "$CIRCLE_TAG"

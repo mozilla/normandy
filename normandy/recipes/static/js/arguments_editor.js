@@ -10,18 +10,18 @@
     var $editorElement = $('<div class="arguments-editor"></div>');
     var editor = null;
 
-        // Insert editor next to field.
+    // Insert editor next to field.
     $editorElement.insertBefore($argumentsJson);
 
-        // Update the backing textarea before submitting.
+    // Update the backing textarea before submitting.
     $actionSelect.parents('form').submit(function storeValue() {
       if (editor !== null) {
         $argumentsJson.val(JSON.stringify(editor.getValue()));
       }
     });
 
-        // When the action type changes, remove the existing editor and
-        // create a new one.
+    // When the action type changes, remove the existing editor and
+    // create a new one.
     $actionSelect.change(function handleChange() {
       var actionName;
       if (editor !== null) {
@@ -33,7 +33,7 @@
         return;
       }
 
-      $actionSelect.find('option:selected').text();
+      actionName = $actionSelect.find('option:selected').text();
       $.getJSON('/api/v1/action/' + actionName + '/', function processAction(action) {
         var data;
         editor = new JSONEditor($editorElement[0], {

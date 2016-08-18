@@ -1,0 +1,8 @@
+actions:
+  flake8:
+    run: flake8 {files}
+    include: "*.py"
+    exclude: "docs/"
+  eslint:
+    run: ./node_modules/.bin/eslint {files}
+    include: "*.js"

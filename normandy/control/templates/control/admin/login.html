@@ -8,6 +8,9 @@
   </div>
 {% endblock %}
 
+{# Do not render the frontend app on the login page. #}
+{% block javascript %}{% endblock %}
+
 {% block content %}
   <div id="content" class="wrapper">
     {% if form.errors and not form.non_field_errors %}

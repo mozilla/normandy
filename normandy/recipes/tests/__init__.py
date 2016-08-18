@@ -2,20 +2,13 @@ import hashlib
 
 import factory
 
-from django.template.defaultfilters import slugify
-from django.test import RequestFactory
-
 from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.recipes.models import (
     Action,
     Approval,
     ApprovalRequest,
     ApprovalRequestComment,
-    Client,
-    Country,
-    Locale,
     Recipe,
-    ReleaseChannel,
     Signature,
 )
 
@@ -108,30 +101,20 @@ class SignatureFactory(factory.DjangoModelFactory):
     signature = 'fake signature'
 
 
-class CountryFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Country
-
-    code = factory.fuzzy.FuzzyText(length=3)
-
-
-class LocaleFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Locale
-
-    code = factory.fuzzy.FuzzyText(length=2)
-
-
-class ReleaseChannelFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = ReleaseChannel
-
-    name = FuzzyUnicode()
-    slug = factory.LazyAttribute(lambda o: slugify(o.name))
-
-
-class ClientFactory(factory.Factory):
-    class Meta:
-        model = Client
-
-    request = factory.LazyAttribute(lambda o: RequestFactory().get('/'))
+ARGUMENTS_SCHEMA = {
+    "required": ["surveyId", "surveys"],
+    "properties": {
+        "surveyId": {"type": "string"},
+        "surveys": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "properties": {
+                    "title": {"type": "string"},
+                    "weight": {"type": "integer", "minimum": 1}
+                },
+                "required": ["title", "weight"]
+            },
+        },
+    },
+}
