@@ -7,10 +7,42 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var argv = require('yargs').argv;
 var childProcess = require('child_process');
 
-
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
+const production = process.env.NODE_ENV === 'production';
 
+var plugins = [
+  new BundleTracker({ filename: './webpack-stats.json' }),
+  new webpack.optimize.OccurrenceOrderPlugin(true),
+  new ExtractTextPlugin('[name]-[hash].css'),
+  new webpack.ProvidePlugin({
+    fetch: 'exports?self.fetch!isomorphic-fetch',
+  }),
+  new webpack.DefinePlugin({
+    PRODUCTION: production,
+    DEVELOPMENT: !production,
+    process: {
+      env: {
+        NODE_ENV: production ? '"production"' : '"development"',
+      },
+    },
+  }),
+];
+
+if (production) {
+  plugins = plugins.concat([
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+      },
+    }),
+  ]);
+} else {
+  plugins = plugins.concat([
+    new webpack.NoErrorsPlugin(),
+  ]);
+}
 
 module.exports = [
   {
@@ -35,13 +67,7 @@ module.exports = [
       chunkFilename: '[id].bundle.js',
     },
 
-    plugins: [
-      new BundleTracker({ filename: './webpack-stats.json' }),
-      new ExtractTextPlugin('[name]-[hash].css'),
-      new webpack.ProvidePlugin({
-        fetch: 'exports?self.fetch!isomorphic-fetch',
-      }),
-    ],
+    plugins,
 
     module: {
       loaders: [
