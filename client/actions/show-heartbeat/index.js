@@ -20,7 +20,7 @@ export class HeartbeatFlow {
     }
 
     this.data = {
-            // Required fields
+      // Required fields
       response_version: 2,
       experiment_version: '-',
       person_id: 'NA',
@@ -31,7 +31,7 @@ export class HeartbeatFlow {
       question_text: survey.message,
       variation_id: recipe.revision_id.toString(),
 
-            // Optional fields
+      // Optional fields
       score: null,
       max_score: 5,
       flow_began_ts: Date.now(),
@@ -59,7 +59,6 @@ export class HeartbeatFlow {
         defaultBrowser: client.isDefaultBrowser,
         plugins,
         flashVersion: flashPlugin ? flashPlugin.version : undefined,
-        doNotTrack: navigator.doNotTrack === '1',
       },
       is_test: normandy.testing,
     };
@@ -104,10 +103,10 @@ export default class ShowHeartbeatAction extends Action {
 
     const lastShown = await this.getLastShownDate();
     const shouldShowSurvey = (
-            this.normandy.testing
-            || lastShown === null
-            || Date.now() - lastShown > LAST_SHOWN_DELAY
-        );
+        this.normandy.testing
+        || lastShown === null
+        || Date.now() - lastShown > LAST_SHOWN_DELAY
+    );
     if (!shouldShowSurvey) {
       return;
     }
@@ -119,9 +118,8 @@ export default class ShowHeartbeatAction extends Action {
     const flow = new HeartbeatFlow(this);
     flow.save();
 
-        // A bit redundant but the action argument names shouldn't necessarily rely
-        // on the argument names showHeartbeat takes.
-
+    // A bit redundant but the action argument names shouldn't necessarily rely
+    // on the argument names showHeartbeat takes.
     const heartbeatData = {
       message: this.survey.message,
       engagementButtonLabel: this.survey.engagementButtonLabel,
@@ -160,7 +158,7 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   setLastShownDate() {
-        // Returns a promise, but there's nothing to do if it fails.
+    // Returns a promise, but there's nothing to do if it fails.
     this.storage.setItem('lastShown', Date.now());
   }
 
@@ -170,7 +168,7 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   annotatePostAnswerUrl(url) {
-        // Don't bother with empty URLs.
+    // Don't bother with empty URLs.
     if (!url) {
       return url;
     }
@@ -185,7 +183,7 @@ export default class ShowHeartbeatAction extends Action {
       syncSetup: this.client.syncSetup ? 1 : 0,
     };
 
-        // Append testing parameter if in testing mode.
+    // Append testing parameter if in testing mode.
     if (this.normandy.testing) {
       args.testing = 1;
     }
@@ -201,16 +199,16 @@ export default class ShowHeartbeatAction extends Action {
     return annotatedUrl.href;
   }
 
-    /**
-     * From the given list of surveys, choose one based on their relative
-     * weights and return it.
-     *
-     * @param  {array}  surveys  Array of weighted surveys from the arguments
-     *                           object.
-     * @param  {object} defaults Default values for survey attributes if they aren't
-     *                           specified.
-     * @return {object}          The chosen survey, with the defaults applied.
-     */
+  /**
+   * From the given list of surveys, choose one based on their relative
+   * weights and return it.
+   *
+   * @param  {array}  surveys  Array of weighted surveys from the arguments
+   *                           object.
+   * @param  {object} defaults Default values for survey attributes if they aren't
+   *                           specified.
+   * @return {object}          The chosen survey, with the defaults applied.
+   */
   chooseSurvey(surveys, defaults) {
     const finalSurvey = Object.assign({}, weightedChoose(surveys));
     for (const prop in defaults) {
