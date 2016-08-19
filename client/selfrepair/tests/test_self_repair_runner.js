@@ -1,7 +1,13 @@
 import fetchMock from 'fetch-mock';
 
 import { mockNormandy } from '../../actions/tests/utils.js';
-import { classifyClient, doesRecipeMatch, filterContext } from '../self_repair_runner.js';
+import {
+  classifyClient,
+  doesRecipeMatch,
+  fetchAction,
+  filterContext,
+  loadActionImplementation,
+} from '../self_repair_runner.js';
 
 
 const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
@@ -59,6 +65,43 @@ describe('Self-Repair Runner', () => {
       recipe.shouldPass = false;
       match = await doesRecipeMatch(recipe, {});
       expect(match[1]).toBe(false);
+    });
+  });
+
+  describe('fetchAction', () => {
+    it('should not make more than one request for the same action', async () => {
+      const recipe = { action: 'test' };
+
+      // Mock fetch that returns an action with an increasing number. If we
+      // make more than one request, then fetchAction will return different
+      // values for the same recipe.
+      let id = 0;
+      fetchMock.mock(`/api/v1/action/${recipe.action}/`, () => {
+        id++;
+        return `{"mock": "action", "id": ${id}}`;
+      });
+
+      const action1Promise = fetchAction(recipe);
+      const action2Promise = fetchAction(recipe);
+      const action1 = await action1Promise;
+      const action2 = await action2Promise;
+      expect(action1).toEqual(action2);
+    });
+  });
+
+  describe('loadActionImplementation', async () => {
+    it('should not make more than one request for the same action', async () => {
+      window.loadActionImplementationTest = 0;
+      const url = (
+        'data:text/javascript,registerAction("test", window.loadActionImplementationTest++)'
+      );
+      const action = { name: 'test', implementation_url: url };
+
+      const impl1Promise = loadActionImplementation(action);
+      const impl2Promise = loadActionImplementation(action);
+      const impl1 = await impl1Promise;
+      const impl2 = await impl2Promise;
+      expect(impl1).toEqual(impl2);
     });
   });
 });
