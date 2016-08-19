@@ -144,7 +144,6 @@ class RecipeList extends React.Component {
               <Th column="name"><span>Name</span></Th>
               <Th column="action"><span>Action Name</span></Th>
               <Th column="enabled"><span>Enabled</span></Th>
-              <Th column="is_approved"><span>Approved</span></Th>
               <Th column="last_updated"><span>Last Updated</span></Th>
             </Thead>
             {filteredRecipes.map(recipe =>
@@ -153,9 +152,6 @@ class RecipeList extends React.Component {
                 <Td column="action">{recipe.action}</Td>
                 <Td column="enabled" value={recipe.enabled}>
                   <BooleanIcon value={recipe.enabled} />
-                </Td>
-                <Td column="is_approved" value={recipe.is_approved}>
-                  <BooleanIcon value={recipe.is_approved} />
                 </Td>
                 <Td column="last_updated" value={recipe.last_updated}>
                   {moment(recipe.last_updated).fromNow()}
