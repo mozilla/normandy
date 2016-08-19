@@ -9,14 +9,26 @@ dependencies:
   override:
     - docker info
     # use circleci's docker cache workaround
-    - mkdir -p ~/cache/
-    - if [ -e ~/cache/docker/image.tar ]; then echo "Loading image.tar"; docker load -i ~/cache/docker/image.tar || rm ~/cache/docker/image.tar; fi
+    - |
+      mkdir -p ~/cache/
+      if [ -e ~/cache/docker/image.tar ]; then
+        echo "Loading image.tar"
+        docker load -i ~/cache/docker/image.tar || rm ~/cache/docker/image.tar
+      fi
     # build image
     - docker build -t normandy:build .
+    # pull other docker images used below
+    - docker pull giorgos/takis
     # write the sha256 sum to an artifact to make image verification easier
     - docker inspect -f '{{.Config.Image}}' normandy:build | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
-    # Get MaxMind GeoIP database
+    # get MaxMind GeoIP database
     - cd ~/cache/ && ~/normandy/bin/download_geolite2.sh
+    # clean up old cached Docker image and save the new one
+    - |
+      mkdir -p ~/cache/docker
+      rm -f ~/cache/docker/image.tar
+      docker save normandy:build > ~/cache/docker/image.tar
+      ls -l ~/cache/docker
 
 test:
   pre:
@@ -27,24 +39,16 @@ test:
     # Run Python tests
     - bin/ci/docker-run.sh py.test --junitxml=/test_artifacts/pytest.xml normandy/
     # Start Karma test server, and run them in Firefox
-    - >
+    - |
       (
-        echo Waiting for Karma server to start;
-        docker run --net host -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis;
-        echo Starting Firefox;
+        echo Waiting for Karma server to start
+        docker run --net host -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis
+        echo Starting Firefox
         firefox localhost:9876
       ) &
       bin/ci/docker-run.sh -p 9876:9876 node bin/ci/karma-ci.js
     # Start the app, and run acceptance tests
     - bin/ci/contract-tests.sh
-
-  post:
-    # Clean up old image and save the new one
-    - >
-      mkdir -p ~/cache/docker;
-      rm -f ~/cache/docker/image.tar;
-      docker save normandy:build > ~/cache/docker/image.tar;
-      ls -l ~/cache/docker
 
 # appropriately tag and push the container to dockerhub
 deployment:
