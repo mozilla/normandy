@@ -47,6 +47,7 @@ if (production) {
 module.exports = [
   {
     context: __dirname,
+    devtool: production ? undefined : 'eval-source-map',
 
     entry: {
       selfrepair: [
