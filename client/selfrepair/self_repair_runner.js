@@ -11,34 +11,51 @@ window.registerAction = (name, ActionClass) => {
 /**
  * Download the implementation of the given action from the server.
  *
- * @param {Recipe} recipe Recipe object from the server.
+ * @param {Action} action Action object from the server.
  * @promise {Function} The action class for the given recipe's action.
  * @rejects {Error} Rejects if the action could not be loaded or did not
  *     register itself.
  */
-function loadAction(recipe) {
-  return new Promise((resolve, reject) => {
-    const actionName = recipe.action;
-    if (!registeredActions[actionName]) {
-      fetch(`/api/v1/action/${actionName}/`)
-            .then(response => response.json())
-            .then(action => {
-              const script = document.createElement('script');
-              script.src = action.implementation_url;
-              script.onload = () => {
-                if (!registeredActions[action.name]) {
-                  reject(new Error(`Could not find action with name ${action.name}.`));
-                } else {
-                  resolve(registeredActions[action.name]);
-                }
-              };
-              document.head.appendChild(script);
-            });
-    } else {
-      resolve(registeredActions[actionName]);
-    }
-  });
+export function loadActionImplementation(action) {
+  const cache = loadActionImplementation._cache;
+
+  if (!(action.name in cache)) {
+    cache[action.name] = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = action.implementation_url;
+      script.onload = () => {
+        if (!(action.name in registeredActions)) {
+          reject(new Error(`Could not find action with name ${action.name}.`));
+        } else {
+          resolve(registeredActions[action.name]);
+        }
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  return cache[action.name];
 }
+loadActionImplementation._cache = {};
+
+
+/**
+ * Fetch an action object from the server for the given recipe.
+ *
+ * @param {Recipe} recipe Recipe object from the server.
+ * @promise {Action} The Action object from the server.
+ */
+export function fetchAction(recipe) {
+  const cache = fetchAction._cache;
+
+  if (!(recipe.action in cache)) {
+    cache[recipe.action] = fetch(`/api/v1/action/${recipe.action}/`)
+      .then(response => response.json());
+  }
+
+  return cache[recipe.action];
+}
+fetchAction._cache = {};
 
 
 /**
@@ -92,14 +109,14 @@ export function classifyClient() {
  * @param {Recipe} recipe - Recipe retrieved from the server.
  * @promise Resolves once the action has executed.
  */
-export function runRecipe(recipe, driver, options = {}) {
-  return loadAction(recipe).then(Action => {
-    if (options.testing !== undefined) {
-      driver.testing = options.testing;
-    }
+export async function runRecipe(recipe, driver, options = {}) {
+  const action = await fetchAction(recipe);
+  const ActionImplementation = await loadActionImplementation(action);
+  if (options.testing !== undefined) {
+    driver.testing = options.testing;
+  }
 
-    return new Action(driver, recipe).execute();
-  });
+  return new ActionImplementation(driver, recipe).execute();
 }
 
 
