@@ -4,10 +4,10 @@ plugins:
 
 rules:
   indent: [1, 2, {SwitchCase: 1}]
-  mozilla/balanced-listeners: [1]
   mozilla/no-aArgs: [1]
   mozilla/this-top-level-scope: [1]
   no-console: [1]
+  mozilla/balanced-listeners: [0]
 
 globals:
   require: false
