@@ -1,7 +1,8 @@
 {
-  "title": "Recipe Client",
-  "name": "recipe-client",
-  "version": "0.0.1",
+  "title": "Shield Recipe Client",
+  "name": "shield-recipe-client",
+  "id": "shield-recipe-client@mozilla.org",
+  "version": "0.1.0",
   "description": "Client to download and run recipes for SHIELD, Heartbeat, etc.",
   "main": "index.js",
   "author": "Mike Cooper <mcooper@mozilla.com>",
@@ -50,5 +51,8 @@
   "dependencies": {
     "jexl": "1.1.3",
     "sha.js": "2.4.5"
+  },
+  "permissions": {
+    "multiprocess": true
   }
 }
