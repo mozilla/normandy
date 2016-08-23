@@ -1,13 +1,15 @@
 server:
-    listen: "0.0.0.0:8000"
-    noncecachesize: 524288
+  listen: "0.0.0.0:8000"
+  noncecachesize: 524288
 
 signers:
-    - id: appkey
-      privatekey: "MIGkAgEBBDAzX2TrGOr0WE92AbAl+nqnpqh25pKCLYNMTV2hJHztrkVPWOp8w0mhscIodK8RMpagBwYFK4EEACKhZANiAATiTcWYbt0Wg63dO7OXvpptNG0ryxv+v+JsJJ5Upr3pFus5fZyKxzP9NPzB+oFhL/xw3jMx7X5/vBGaQ2sJSiNlHVkqZgzYF6JQ4yUyiqTY7v67CyfUPA1BJg/nxOS9m3o="
+  # Normandy dev chain with x5u on github
+  - id: normankey
+    privatekey: "MIGkAgEBBDCZFHf46zW7Wp5fgwc2zL42+Uir4qCj/MMxqhXhRuGQMCR0+RWLqE0DpX0gjKsqWT2gBwYFK4EEACKhZANiAARUQqIIAiTBGDVUWw/wk5h1IXpreq+BtE+gQr15O4tusHpCLGjOxwpHiJYnxk45fpE8JGAV19UOhmqMUEU0k31C1EGTSZW0ducSvHrh3a8wXShZ6dxLWHItbbCGA6A7Puk="
+    x5u: "https://raw.githubusercontent.com/mozilla-services/autograph/2a6166a1c8d1ae8f8d9a2c5a518795e796844392/docs/statics/normandy.content-signature.mozilla.org-20210705.dev.chain"
 
 authorizations:
-    - id: alice
-      key: fs5wgcer9qj819kfptdlp8gm227ewxnzvsuj9ztycsx08hfhzu
-      signers:
-          - appkey
+  - id: normandev
+    key: 3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
+    signers:
+      - normankey

@@ -5,7 +5,7 @@ services:
     image: postgres:9.5.2
 
   normandy:
-    image: mozilla/normandy:latest
+    image: mythmon/normandy:signing
     links:
       - database
       - autograph
@@ -14,8 +14,8 @@ services:
       DJANGO_CONFIGURATION: ProductionInsecure
       DJANGO_AUTOGRAPH_URL: http://autograph:8000/
       # From etc/autograph.yaml
-      DJANGO_AUTOGRAPH_HAWK_ID: alice
-      DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: fs5wgcer9qj819kfptdlp8gm227ewxnzvsuj9ztycsx08hfhzu
+      DJANGO_AUTOGRAPH_HAWK_ID: normandev
+      DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: 3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
       DJANGO_CAN_EDIT_ACTIONS_IN_USE: "true"
     stop_signal: SIGKILL
 
