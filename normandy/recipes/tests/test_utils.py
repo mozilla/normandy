@@ -1,9 +1,13 @@
+import base64
+from unittest.mock import MagicMock
 from random import random
 from fractions import Fraction
 
+from django.core.exceptions import ImproperlyConfigured
+
 import pytest
 
-from normandy.recipes.utils import fraction_to_key
+from normandy.recipes.utils import Autographer, fraction_to_key
 
 
 class TestFractionToKey(object):
@@ -37,3 +41,64 @@ class TestFractionToKey(object):
             r = random()
             key = fraction_to_key(r)
             assert len(key) == 64
+
+
+class TestAutographer(object):
+    test_settings = {
+        'URL': 'https://autograph.example.com/',
+        'HAWK_ID': 'hawk id',
+        'HAWK_SECRET_KEY': 'hawk secret key',
+    }
+
+    def test_it_checks_settings(self, settings):
+        """Test that each required key is required individually"""
+        # Leave out URL
+        settings.AUTOGRAPH_URL = None
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+        with pytest.raises(ImproperlyConfigured) as exc:
+            Autographer()
+        assert 'AUTOGRAPH_URL' in str(exc)
+
+        # Leave out HAWK_ID
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = None
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+        with pytest.raises(ImproperlyConfigured) as exc:
+            Autographer()
+        assert 'AUTOGRAPH_HAWK_ID' in str(exc)
+
+        # Leave out HAWK_SECRET_KEY
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = None
+        with pytest.raises(ImproperlyConfigured) as exc:
+            Autographer()
+        assert 'AUTOGRAPH_HAWK_SECRET_KEY' in str(exc)
+
+        # Include everything
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+        # assert doesn't raise
+        Autographer()
+
+    def test_it_makes_good_requests(self, settings):
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+
+        autographer = Autographer()
+        autographer.session = MagicMock()
+
+        url = self.test_settings['URL'] + 'sign/data'
+        foo_base64 = base64.b64encode(b'foo').decode('utf8')
+        bar_base64 = base64.b64encode(b'bar').decode('utf8')
+
+        autographer.sign_data([b'foo', b'bar'])
+        assert autographer.session.post.called_once_with(
+            [url, [
+                {'template': 'content-signature', 'input': foo_base64},
+                {'template': 'content-signature', 'input': bar_base64},
+            ]]
+        )

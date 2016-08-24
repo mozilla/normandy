@@ -1,4 +1,13 @@
+import base64
 import hashlib
+
+import requests
+from requests_hawk import HawkAuth
+
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.utils import timezone
+from django.utils.functional import cached_property
 
 
 def fraction_to_key(frac):
@@ -46,3 +55,63 @@ def deterministic_sample(rate, inputs):
     assert len(input_hash) == 64
 
     return input_hash < sample_point
+
+
+class Autographer:
+    """
+    Interacts with an Autograph service.
+
+    If Autograph signing is not configured using `settings.AUTOGRAPH`,
+    raises `ImproperlyConfigured`. If the Autograph server can't be reached
+    or returns an HTTP error, an error will be thrown by `requests`.
+    """
+
+    def __init__(self):
+        self.check_config()
+
+    @cached_property
+    def session(self):
+        session = requests.Session()
+        session.auth = HawkAuth(
+            id=str(settings.AUTOGRAPH_HAWK_ID),
+            key=str(settings.AUTOGRAPH_HAWK_SECRET_KEY))
+        return session
+
+    def check_config(self):
+        required_keys = ['URL', 'HAWK_ID', 'HAWK_SECRET_KEY']
+        for key in required_keys:
+            if getattr(settings, 'AUTOGRAPH_' + key) is None:
+                msg = 'set settings.AUTOGRAPH_{} to use action signatures'.format(key)
+                raise ImproperlyConfigured(msg)
+
+    def sign_data(self, content_list):
+        """
+        Fetches Signatures objects from Autograph for each item in `content_list`.
+
+        The items in `content_list` must be bytes objects.
+        """
+        ts = timezone.now()
+        url = '{}sign/data'.format(settings.AUTOGRAPH_URL)
+        signing_request = []
+        for item in content_list:
+            # base64 works in bytes. requests work in UTF-8.
+            # Convert to bytes, and then back.
+            encoded_implementation = base64.b64encode(item).decode('utf8')
+            signing_request.append({
+                'template': 'content-signature',
+                'input': encoded_implementation,
+            })
+
+        res = self.session.post(url, json=signing_request)
+        res.raise_for_status()
+        signing_responses = res.json()
+
+        signatures = []
+        for res in signing_responses:
+            signatures.append({
+                'timestamp': ts,
+                'signature': res['content-signature'],
+                'x5u': res.get('x5u'),
+                'public_key': res['public_key'],
+            })
+        return signatures

@@ -92,6 +92,10 @@ class Core(Configuration):
         ),
         'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.DjangoFilterBackend'],
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+        'DEFAULT_RENDERER_CLASSES': (
+            'normandy.base.api.renderers.CanonicalJSONRenderer',
+            'rest_framework.renderers.BrowsableAPIRenderer',
+        )
     }
 
     CACHES = {
@@ -251,6 +255,11 @@ class Base(Core):
     ACTION_IMPLEMENTATION_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
     NUM_PROXIES = values.IntegerValue(0)
     API_CACHE_TIME = values.IntegerValue(30)
+    # Autograph settings
+    AUTOGRAPH_URL = values.Value()
+    AUTOGRAPH_HAWK_ID = values.Value()
+    AUTOGRAPH_HAWK_SECRET_KEY = values.Value()
+    AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
 
 
 class Development(Base):
@@ -315,7 +324,7 @@ class Build(Production):
 class Test(Base):
     DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, '.env'))
     DOTENV = '.env' if DOTENV_EXISTS else None
-    SECRET_KEY = values.Value('not a secret')
+    SECRET_KEY = 'not a secret'
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
-    SECURE_SSL_REDIRECT = values.BooleanValue(False)
-    STATICFILES_STORAGE = values.Value('django.contrib.staticfiles.storage.StaticFilesStorage')
+    SECURE_SSL_REDIRECT = False
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
