@@ -7,4 +7,4 @@ test:
       (exit ${PIPESTATUS[0]})
   post:
     - woodchipper --timeout 600000 < jpm.tbpl > $CIRCLE_TEST_REPORTS/jpm.xml
-    - ./node_modules/.bin/jpm xpi && mv recipe-client.xpi $CIRCLE_ARTIFACTS/recipe-client.xpi
+    - ./node_modules/.bin/jpm xpi && mv shield-recipe-client.xpi $CIRCLE_ARTIFACTS/shield-recipe-client.xpi
