@@ -10,6 +10,11 @@ class DeleteRecipe extends React.Component {
     recipe: pt.object.isRequired,
   }
 
+  constructor(props) {
+    super(props);
+    this.deleteRecipe = ::this.deleteRecipe;
+  }
+
   deleteRecipe(event) {
     const { dispatch, recipeId } = this.props;
 
@@ -34,7 +39,7 @@ class DeleteRecipe extends React.Component {
                   type="submit"
                   value="Confirm"
                   className="delete"
-                  onClick={::this.deleteRecipe}
+                  onClick={this.deleteRecipe}
                 />
               </div>
             </div>

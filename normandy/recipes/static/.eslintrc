@@ -1,3 +1,2 @@
 env:
-  jasmine: true
   browser: true

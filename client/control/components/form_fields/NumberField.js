@@ -12,6 +12,12 @@ export default class NumberField extends React.Component {
     normalize: value => value && parseInt(value, 10),
   }
 
+  constructor(props) {
+    super(props);
+    this.handleBlur = ::this.handleBlur;
+    this.handleChange = ::this.handleChange;
+  }
+
   /* Swallow redux-form's onBlur() so it doesn't reset value to string */
   handleBlur() {
     if (this.props.onBlur) {
@@ -34,8 +40,8 @@ export default class NumberField extends React.Component {
       <input
         type="number"
         {...field}
-        onBlur={::this.handleBlur}
-        onChange={::this.handleChange}
+        onBlur={this.handleBlur}
+        onChange={this.handleChange}
       />
     );
   }

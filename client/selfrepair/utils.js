@@ -14,7 +14,7 @@ export function fractionToKey(frac) {
     throw new Error(`frac must be between 0 and 1 inclusive (got ${frac})`);
   }
 
-  const mult = 2 ** 256 - 1;
+  const mult = (2 ** 256) - 1;
   const inDecimal = Math.floor(frac * mult);
   let hexDigits = inDecimal.toString(16);
 

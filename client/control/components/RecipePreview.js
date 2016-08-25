@@ -67,8 +67,8 @@ class RecipePreview extends React.Component {
           <div className="fluid-3 float-right">
             <div className={statusClasses}>
             {this.state.recipeExecuted ?
-              [<i className="fa fa-circle pre"></i>, ' Recipe executed'] :
-              [<i className="fa fa-circle-thin pre"></i>, ' Running recipe...']
+              [<i className="fa fa-circle pre" />, ' Recipe executed'] :
+              [<i className="fa fa-circle-thin pre" />, ' Running recipe...']
             }
             {this.state.errorRunningRecipe ?
               <p className="red">Error running recipe: {this.state.errorRunningRecipe}</p> : ''

@@ -1,15 +1,15 @@
 import React, { PropTypes as pt } from 'react';
 import { Provider } from 'react-redux';
-import controlStore from './stores/ControlStore.js';
-import ControlAppRoutes from './routes.js';
-
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
+
+import controlStore from './stores/ControlStore.js';
+import ControlAppRoutes from './routes.js';
 
 /**
  * Root Component for the entire app.
  */
-function Root({ store, history }) {
+export function Root({ store, history }) {
   return (
     <Provider store={store}>
       <Router history={history}>
