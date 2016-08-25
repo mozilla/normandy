@@ -5,7 +5,7 @@ import { runRecipe } from '../../selfrepair/self_repair_runner.js';
 import NormandyDriver from '../../selfrepair/normandy_driver.js';
 
 class RecipePreview extends React.Component {
-  propTypes = {
+  static propTypes = {
     recipe: pt.object.isRequired,
   }
 

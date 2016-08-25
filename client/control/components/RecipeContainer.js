@@ -5,7 +5,7 @@ import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
 
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
-    propTypes = {
+    static propTypes = {
       dispatch: pt.func.isRequired,
       location: pt.object.isRequired,
       recipe: pt.object.isRequired,
