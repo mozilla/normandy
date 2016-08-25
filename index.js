@@ -7,5 +7,6 @@ exports.main = function() {
 };
 
 exports.onUnload = function() {
+  RecipeRunner.cleanup();
   SelfRepairInteraction.enableSelfRepair();
 };
