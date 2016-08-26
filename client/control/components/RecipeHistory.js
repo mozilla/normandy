@@ -4,7 +4,7 @@ import moment from 'moment';
 import composeRecipeContainer from './RecipeContainer.js';
 import { makeApiRequest } from '../actions/ControlActions.js';
 
-export class RecipeHistory extends React.Component {
+export class DisconnectedRecipeHistory extends React.Component {
   static propTypes = {
     dispatch: pt.func.isRequired,
     recipe: pt.object.isRequired,
@@ -81,6 +81,11 @@ export class HistoryItem extends React.Component {
     }).isRequired,
   }
 
+  constructor(props) {
+    super(props);
+    this.handleClick = ::this.handleClick;
+  }
+
   /**
    * When a revision is clicked, open the recipe form with changes from
    * the clicked revision.
@@ -106,7 +111,7 @@ export class HistoryItem extends React.Component {
     const isCurrent = revision.recipe.revision_id === recipe.revision_id;
 
     return (
-      <tr className="history-item" onClick={::this.handleClick}>
+      <tr className="history-item" onClick={this.handleClick}>
         <td className="revision-number">#{revision.recipe.revision_id}</td>
         <td className="revision-created">
           <span className="label">Created On:</span>
@@ -129,4 +134,4 @@ export class HistoryItem extends React.Component {
   }
 }
 
-export default composeRecipeContainer(RecipeHistory);
+export default composeRecipeContainer(DisconnectedRecipeHistory);

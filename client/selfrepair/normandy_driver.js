@@ -1,6 +1,7 @@
-import Mozilla from './uitour.js';
 import EventEmitter from 'wolfy87-eventemitter';
 import uuid from 'node-uuid';
+
+import Mozilla from './uitour.js';
 
 /**
  * Storage class that uses window.localStorage as it's backing store.

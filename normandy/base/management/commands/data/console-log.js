@@ -1,3 +1,4 @@
+/* global window */
 class ConsoleLogAction {
   constructor(normandy, recipe) {
     this.normandy = normandy;

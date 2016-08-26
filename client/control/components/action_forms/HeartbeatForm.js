@@ -33,7 +33,7 @@ const SurveyListItem = props => {
         data-survey-index={surveyIndex}
         onClick={deleteSurvey}
       >
-        <i className="fa fa-times red"></i>
+        <i className="fa fa-times red" />
       </span>
     </li>
   );
@@ -63,7 +63,7 @@ const SurveyForm = props => {
     <div id="survey-form" className={containerClasses}>
       {selectedSurvey &&
         <span className="return-to-defaults" onClick={showDefaults}>
-          <i className="fa fa-long-arrow-left pre"></i> Return to defaults
+          <i className="fa fa-long-arrow-left pre" /> Return to defaults
         </span>
       }
       <h4>{headerText}</h4>
@@ -100,6 +100,11 @@ export default class HeartbeatForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = { selectedSurvey: null };
+
+    this.addSurvey = ::this.addSurvey;
+    this.setSelectedSurvey = ::this.setSelectedSurvey;
+    this.deleteSurvey = ::this.deleteSurvey;
+    this.showDefaults = ::this.showDefaults;
   }
 
   setSelectedSurvey(survey) {
@@ -136,8 +141,8 @@ export default class HeartbeatForm extends React.Component {
           <FormField type="text" label="Survey ID" field={fields.surveyId} />
           <div className="row array-field">
             <h4>Surveys</h4>
-            <a className="button add-field" onClick={::this.addSurvey}>
-              <i className="fa fa-plus"></i> Add Survey
+            <a className="button add-field" onClick={this.addSurvey}>
+              <i className="fa fa-plus" /> Add Survey
             </a>
 
             {fields.surveys.length ?
@@ -150,8 +155,8 @@ export default class HeartbeatForm extends React.Component {
                       surveyIndex={index}
                       isSelected={_.isEqual(survey, selectedSurvey)}
                       hasErrors={_.some(survey, field => field.invalid)}
-                      onClick={() => ::this.setSelectedSurvey(survey)}
-                      deleteSurvey={::this.deleteSurvey}
+                      onClick={() => this.setSelectedSurvey(survey)}
+                      deleteSurvey={this.deleteSurvey}
                     />
                   )
                 }
@@ -163,7 +168,7 @@ export default class HeartbeatForm extends React.Component {
           <SurveyForm
             selectedSurvey={selectedSurvey}
             fields={fields}
-            showDefaults={::this.showDefaults}
+            showDefaults={this.showDefaults}
           />
         </div>
       </div>
