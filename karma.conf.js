@@ -34,8 +34,8 @@ module.exports = function (config) {
     // that this config works for the action code/tests as well.
     webpack: WEBPACK_CONFIG[0],
 
-    webpackServer: {
-      quiet: true, // Suppress *all* webpack messages, including errors
+    webpackMiddleware: {
+      stats: 'errors-only', // Only show errors during webpack builds.
     },
 
     // test results reporter to use
