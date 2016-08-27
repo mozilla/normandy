@@ -15,9 +15,6 @@ var plugins = [
   new BundleTracker({ filename: './webpack-stats.json' }),
   new webpack.optimize.OccurrenceOrderPlugin(true),
   new ExtractTextPlugin('[name]-[hash].css'),
-  new webpack.ProvidePlugin({
-    fetch: 'exports?self.fetch!isomorphic-fetch',
-  }),
   new webpack.DefinePlugin({
     PRODUCTION: production,
     DEVELOPMENT: !production,
@@ -67,6 +64,11 @@ module.exports = [
       filename: '[name]-[hash].js',
       chunkFilename: '[id].bundle.js',
     },
+    externals: {
+      'react/lib/ExecutionEnvironment': true,
+      'react/lib/ReactContext': true,
+      'react/addons': true,
+    },
 
     plugins,
 
@@ -76,6 +78,10 @@ module.exports = [
           test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel',
+        },
+        {
+          test: /\.json$/,
+          loader: 'json-loader',
         },
         {
           test: /\.scss$/,

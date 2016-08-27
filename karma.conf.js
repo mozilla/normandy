@@ -1,6 +1,8 @@
 /* eslint-env node */
 /* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
 // Karma configuration
+const WEBPACK_CONFIG = require('./webpack.config.js');
+
 module.exports = function (config) {
   var karmaConfig = {
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -28,22 +30,9 @@ module.exports = function (config) {
       'client/actions/tests/index.js': ['webpack', 'sourcemap'],
     },
 
-    webpack: {
-      module: {
-        loaders: [
-          {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel',
-          },
-          {
-            test: /(\.|\/)(json)$/,
-            loader: 'json',
-          },
-        ],
-      },
-      devtool: 'inline-source-map',
-    },
+    // The first config is for the control interface. It is only coincidence
+    // that this config works for the action code/tests as well.
+    webpack: WEBPACK_CONFIG[0],
 
     webpackServer: {
       quiet: true, // Suppress *all* webpack messages, including errors
