@@ -110,6 +110,7 @@ export default class NormandyDriver {
           client.version = data.version;
           client.channel = data.defaultUpdateChannel;
           client.isDefaultBrowser = data.defaultBrowser;
+          client.distribution = data.distribution;
         },
         selectedSearchEngine(data) {
           client.searchEngine = data.searchEngineIdentifier;

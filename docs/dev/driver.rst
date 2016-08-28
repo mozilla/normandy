@@ -156,6 +156,9 @@ The driver object contains the following attributes:
    plugins
       An object mapping of plugin names to :js:class:`Plugin` objects describing
       the plugins installed on the client.
+   distribution
+      String containing the distribution ID of Firefox. This value is
+      ``undefined`` on Firefox versions older than 48.0.
 
 Plugins
 -------

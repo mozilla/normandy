@@ -35,4 +35,22 @@ describe('Normandy Driver', () => {
       );
     });
   });
+
+  describe('client', () => {
+    it("should fetch the user's distribution ID from UITour", async () => {
+      const uitour = {
+        getConfiguration(config, cb) {
+          if (config === 'appinfo') {
+            cb({ distribution: 'funnelcake85' });
+          } else {
+            cb({});
+          }
+        },
+      };
+      const driver = new NormandyDriver(uitour);
+
+      const client = await driver.client();
+      expect(client.distribution).toEqual('funnelcake85');
+    });
+  });
 });
