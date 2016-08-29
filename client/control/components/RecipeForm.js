@@ -33,6 +33,7 @@ export class DisconnectedRecipeForm extends React.Component {
     };
 
     this.submitForm = ::this.submitForm;
+    this.changeAction = ::this.changeAction;
   }
 
   componentWillReceiveProps(nextProps) {
