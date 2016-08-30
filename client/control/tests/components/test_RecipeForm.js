@@ -28,4 +28,22 @@ describe('<RecipeForm>', () => {
       <RecipeForm params={{}} location={{ query: '' }} />
     </Provider>);
   });
+
+  describe('changeAction', () => {
+    const store = controlStore();
+    const recipeFormWrapper = mount(<Provider store={store}>
+      <RecipeForm params={{}} recipe={{ action: 'show-heartbeat' }} location={{ query: '' }} />
+    </Provider>);
+
+    const disconnectedFormWrapper = recipeFormWrapper.find('DisconnectedRecipeForm').get(0);
+    disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
+
+    it('should update the selectedAction in state', () => {
+      expect(disconnectedFormWrapper.state.selectedAction).toEqual({ name: 'console-log' });
+    });
+
+    it('should change the action form component', () => {
+      expect(recipeFormWrapper.find('ConsoleLogForm').length).toEqual(1);
+    });
+  });
 });
