@@ -113,7 +113,7 @@ function ExecuteStatus({ status, error, errorHelp }) {
     }
     case 'attempting': {
       statusColor = 'green';
-      statusIcon = 'fa-circle-thin';
+      statusIcon = 'circle-thin';
       statusText = 'Running recipe';
       break;
     }
