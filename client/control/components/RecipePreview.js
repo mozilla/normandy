@@ -100,34 +100,32 @@ class RecipePreview extends React.Component {
 }
 
 function ExecuteStatus({ status, error, errorHelp }) {
-  let statusEl = <span>error</span>;
   let statusColor = 'grey';
+  let statusIcon = 'circle';
+  let statusText = 'Unknown';
 
   switch (status) {
     case 'start':
     case 'uitourFound': {
       statusColor = 'blue';
-      statusEl = <span><i className="fa fa-circle-thin pre" /> Initializing</span>;
+      statusText = 'Initializing';
       break;
     }
     case 'attempting': {
       statusColor = 'green';
-      statusEl = <span><i className="fa fa-circle-thin pre" /> Running recipe</span>;
+      statusIcon = 'fa-circle-thin';
+      statusText = 'Running recipe';
       break;
     }
     case 'executed': {
       statusColor = 'green';
-      statusEl = <span><i className="fa fa-circle pre" /> Recipe executed</span>;
+      statusText = 'Recipe executed';
       break;
     }
     case 'error': {
       statusColor = 'red';
-      statusEl = (
-        <span>
-          <i className="fa fa-circle-thin pre" /> {error}
-          {errorHelp && <p>{errorHelp}</p>}
-        </span>
-      );
+      statusIcon = 'circle-thin';
+      statusText = <span>{error} {errorHelp && <p>{errorHelp}</p>}</span>;
       break;
     }
     default: {
@@ -136,7 +134,10 @@ function ExecuteStatus({ status, error, errorHelp }) {
   }
 
   return (
-    <div className={classNames('status-indicator', statusColor)}>{statusEl}</div>
+    <div className={classNames('status-indicator', statusColor)}>
+      <i className={`fa fa-${statusIcon} pre`} />
+      {statusText}
+    </div>
   );
 }
 ExecuteStatus.propTypes = {
