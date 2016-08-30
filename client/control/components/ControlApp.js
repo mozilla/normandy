@@ -23,6 +23,6 @@ export default function ControlApp({ children, location, routes, params }) {
 ControlApp.propTypes = {
   children: pt.object.isRequired,
   location: pt.object.isRequired,
-  routes: pt.object.isRequired,
+  routes: pt.array.isRequired,
   params: pt.object.isRequired,
 };

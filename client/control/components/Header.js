@@ -30,6 +30,6 @@ export default function Header({ pageType: { ctaButtons }, currentLocation, rout
 Header.propTypes = {
   pageType: pt.object.isRequired,
   currentLocation: pt.string.isRequired,
-  routes: pt.object.isRequired,
+  routes: pt.array.isRequired,
   params: pt.object.isRequired,
 };

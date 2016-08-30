@@ -3,9 +3,10 @@ import classNames from 'classnames';
 import composeRecipeContainer from './RecipeContainer.js';
 import { runRecipe } from '../../selfrepair/self_repair_runner.js';
 import NormandyDriver from '../../selfrepair/normandy_driver.js';
+import Mozilla from '../../selfrepair/uitour.js';
 
 class RecipePreview extends React.Component {
-  propTypes = {
+  static propTypes = {
     recipe: pt.object.isRequired,
   }
 
@@ -13,9 +14,9 @@ class RecipePreview extends React.Component {
     super(props);
 
     this.state = {
-      recipeAttempted: false,
-      recipeExecuted: false,
-      errorRunningRecipe: null,
+      status: 'start',
+      error: null,
+      errorHelp: null,
     };
   }
 
@@ -29,34 +30,58 @@ class RecipePreview extends React.Component {
 
   attemptPreview() {
     const { recipe } = this.props;
-    const { recipeAttempted } = this.state;
+    const { status } = this.state;
     const driver = new NormandyDriver();
     driver.registerCallbacks();
 
-    if (recipe && !recipeAttempted) {
+    if (recipe && status === 'start') {
+      this.pingUITour();
+    } else if (recipe && status === 'uitourFound') {
       this.setState({
-        recipeAttempted: true,
+        status: 'attempting',
       });
 
       runRecipe(recipe, driver, { testing: true }).then(() => {
         this.setState({
-          recipeExecuted: true,
+          status: 'executed',
         });
       })
       .catch(error => {
         this.setState({
-          errorRunningRecipe: error,
+          status: 'error',
+          error: `Error running recipe: ${error}`,
         });
       });
     }
   }
 
+  pingUITour() {
+    const timeout = setTimeout(() => {
+      const url = new URL(window.location);
+      const prefName = 'browser.uitour.testingOrigins';
+      const prefValue = `${url.protocol}//${url.hostname}${url.port ? `:${url.port}` : ':'}`;
+      this.setState({
+        status: 'error',
+        error: 'UITour unavailable',
+        errorHelp: (
+          <span>
+            Make sure the pref <code>{prefName}</code> includes <code>{prefValue}</code>.
+          </span>
+        ),
+      });
+    }, 1000);
+
+    Mozilla.UITour.ping(() => {
+      clearTimeout(timeout);
+      this.setState({
+        status: 'uitourFound',
+      });
+    });
+  }
+
   render() {
     const { recipe } = this.props;
-    let statusClasses = classNames('status-indicator', {
-      green: this.state.recipeExecuted,
-      red: this.state.errorRunningRecipe,
-    });
+    const { status, error, errorHelp } = this.state;
     if (recipe) {
       return (
         <div className="fluid-7">
@@ -65,15 +90,7 @@ class RecipePreview extends React.Component {
             <p><b>Action Type:</b> {recipe.action}</p>
           </div>
           <div className="fluid-3 float-right">
-            <div className={statusClasses}>
-            {this.state.recipeExecuted ?
-              [<i className="fa fa-circle pre" />, ' Recipe executed'] :
-              [<i className="fa fa-circle-thin pre" />, ' Running recipe...']
-            }
-            {this.state.errorRunningRecipe ?
-              <p className="red">Error running recipe: {this.state.errorRunningRecipe}</p> : ''
-            }
-            </div>
+            <ExecuteStatus status={status} error={error} errorHelp={errorHelp} />
           </div>
         </div>
       );
@@ -81,5 +98,53 @@ class RecipePreview extends React.Component {
     return null;
   }
 }
+
+function ExecuteStatus({ status, error, errorHelp }) {
+  let statusColor = 'grey';
+  let statusIcon = 'circle';
+  let statusText = 'Unknown';
+
+  switch (status) {
+    case 'start':
+    case 'uitourFound': {
+      statusColor = 'blue';
+      statusText = 'Initializing';
+      break;
+    }
+    case 'attempting': {
+      statusColor = 'green';
+      statusIcon = 'circle-thin';
+      statusText = 'Running recipe';
+      break;
+    }
+    case 'executed': {
+      statusColor = 'green';
+      statusText = 'Recipe executed';
+      break;
+    }
+    case 'error': {
+      statusColor = 'red';
+      statusIcon = 'circle-thin';
+      statusText = <span>{error} {errorHelp && <p>{errorHelp}</p>}</span>;
+      break;
+    }
+    default: {
+      throw new Error(`Unexpected execution status "${status}"`);
+    }
+  }
+
+  return (
+    <div className={classNames('status-indicator', statusColor)}>
+      <i className={`fa fa-${statusIcon} pre`} />
+      {statusText}
+    </div>
+  );
+}
+ExecuteStatus.propTypes = {
+  status: pt.string.isRequired,
+  error: pt.node,
+  errorHelp: pt.node,
+};
+
 
 export default composeRecipeContainer(RecipePreview);
