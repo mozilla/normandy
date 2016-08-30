@@ -4,17 +4,8 @@ machine:
     - docker
 
 dependencies:
-  cache_directories:
-    - "~/cache/"
   override:
     - docker info
-    # use circleci's docker cache workaround
-    - |
-      mkdir -p ~/cache/
-      if [ -e ~/cache/docker/image.tar ]; then
-        echo "Loading image.tar"
-        docker load -i ~/cache/docker/image.tar || rm ~/cache/docker/image.tar
-      fi
     # build image
     - docker build -t normandy:build .
     # pull other docker images used below
@@ -22,13 +13,7 @@ dependencies:
     # write the sha256 sum to an artifact to make image verification easier
     - docker inspect -f '{{.Config.Image}}' normandy:build | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
     # get MaxMind GeoIP database
-    - cd ~/cache/ && ~/normandy/bin/download_geolite2.sh
-    # clean up old cached Docker image and save the new one
-    - |
-      mkdir -p ~/cache/docker
-      rm -f ~/cache/docker/image.tar
-      docker save normandy:build > ~/cache/docker/image.tar
-      ls -l ~/cache/docker
+    - ~/normandy/bin/download_geolite2.sh
 
 test:
   pre:
