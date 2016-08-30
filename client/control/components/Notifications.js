@@ -1,14 +1,14 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
-import { dismissNotification } from '../actions/ControlActions.js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { dismissNotification } from '../actions/ControlActions.js';
 
 const notificationPropType = pt.shape({
   messageType: pt.string,
   message: pt.string,
 });
 
-export class Notifications extends React.Component {
+export class DisconnectedNotifications extends React.Component {
   static propTypes = {
     dispatch: pt.func,
     notifications: pt.arrayOf(notificationPropType),
@@ -66,4 +66,4 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps
-)(Notifications);
+)(DisconnectedNotifications);

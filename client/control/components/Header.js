@@ -7,7 +7,7 @@ export default function Header({ pageType: { ctaButtons }, currentLocation, rout
   if (ctaButtons) {
     ctaBtns = ctaButtons.map(({ text, icon, link }, index) =>
       <Link className="button" to={currentLocation + link} key={index}>
-        <i className={`pre fa fa-${icon}`}></i> {text}
+        <i className={`pre fa fa-${icon}`} /> {text}
       </Link>
     );
   }
@@ -20,7 +20,7 @@ export default function Header({ pageType: { ctaButtons }, currentLocation, rout
           params={params}
           displayMissing={false}
           hideNoPath
-          separator={<i className="fa fa-chevron-right"></i>}
+          separator={<i className="fa fa-chevron-right" />}
         />
       </h2>
       {ctaBtns}

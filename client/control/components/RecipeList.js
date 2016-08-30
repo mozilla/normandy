@@ -63,7 +63,7 @@ SwitchFilter.propTypes = {
   updateFilter: pt.func.isRequired,
 };
 
-class RecipeList extends React.Component {
+class DisconnectedRecipeList extends React.Component {
   propTypes = {
     dispatch: pt.func.isRequired,
     isFetching: pt.bool.isRequired,
@@ -79,6 +79,9 @@ class RecipeList extends React.Component {
       filteredRecipes: null,
       selectedFilter: 'All',
     };
+
+    this.updateFilter = ::this.updateFilter;
+    this.updateSearch = ::this.updateSearch;
   }
 
   componentWillMount() {
@@ -130,8 +133,8 @@ class RecipeList extends React.Component {
       <div>
         <FilterBar
           {...this.state}
-          updateFilter={::this.updateFilter}
-          updateSearch={::this.updateSearch}
+          updateFilter={this.updateFilter}
+          updateSearch={this.updateSearch}
         />
         <div className="fluid-8">
           <Table
@@ -147,7 +150,7 @@ class RecipeList extends React.Component {
               <Th column="last_updated"><span>Last Updated</span></Th>
             </Thead>
             {filteredRecipes.map(recipe =>
-              <Tr key={recipe.id} onClick={() => { ::this.viewRecipe(recipe); }}>
+              <Tr key={recipe.id} onClick={() => { this.viewRecipe(recipe); }}>
                 <Td column="name">{recipe.name}</Td>
                 <Td column="action">{recipe.action}</Td>
                 <Td column="enabled" value={recipe.enabled}>
@@ -175,4 +178,4 @@ const mapStateToProps = (state, ownProps) => ({
 
 export default connect(
   mapStateToProps
-)(RecipeList);
+)(DisconnectedRecipeList);

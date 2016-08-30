@@ -3,15 +3,15 @@ import { reduxForm } from 'redux-form';
 import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.js';
 import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.js';
 
-function ActionForm({ fields, ChildForm }) {
+export function DisconnectedActionForm({ fields, ChildForm }) {
   return (
     <div id="action-configuration">
-      <i className="fa fa-caret-up fa-lg"></i>
+      <i className="fa fa-caret-up fa-lg" />
       <ChildForm fields={fields} />
     </div>
   );
 }
-ActionForm.propTypes = {
+DisconnectedActionForm.propTypes = {
   fields: pt.object.isRequired,
   ChildForm: pt.child,
 };
@@ -47,4 +47,4 @@ export default reduxForm({
     fields,
     ChildForm,
   };
-})(ActionForm);
+})(DisconnectedActionForm);

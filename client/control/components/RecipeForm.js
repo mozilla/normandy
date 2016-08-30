@@ -12,7 +12,7 @@ import CheckboxField from './form_fields/CheckboxField.js';
 import FormField from './form_fields/FormFieldWrapper.js';
 import JexlEnvironment from '../../selfrepair/JexlEnvironment.js';
 
-export class RecipeForm extends React.Component {
+export class DisconnectedRecipeForm extends React.Component {
   static propTypes = {
     dispatch: pt.func.isRequired,
     fields: pt.object.isRequired,
@@ -31,6 +31,9 @@ export class RecipeForm extends React.Component {
       availableActions: ['console-log', 'show-heartbeat'],
       selectedAction: null,
     };
+
+    this.submitForm = ::this.submitForm;
+    this.changeAction = ::this.changeAction;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -98,7 +101,7 @@ export class RecipeForm extends React.Component {
     const { availableActions, selectedAction } = this.state;
 
     return (
-      <form onSubmit={handleSubmit(::this.submitForm)} className="crud-form fluid-8">
+      <form onSubmit={handleSubmit(this.submitForm)} className="crud-form fluid-8">
 
         {viewingRevision &&
           <p id="viewing-revision" className="notification info">
@@ -121,7 +124,7 @@ export class RecipeForm extends React.Component {
           field={action}
           containerClass="fluid-3"
           options={availableActions}
-          onChange={::this.changeAction}
+          onChange={this.changeAction}
         />
 
         {selectedAction && <ActionForm recipe={recipe} {...selectedAction} />}
@@ -143,8 +146,6 @@ export class RecipeForm extends React.Component {
     );
   }
 }
-RecipeForm.propTypes = {
-};
 
 export default composeRecipeContainer(reduxForm({
   form: 'recipe',
@@ -193,4 +194,4 @@ export default composeRecipeContainer(reduxForm({
     formState: state.form,
     onSubmitFail,
   };
-})(RecipeForm));
+})(DisconnectedRecipeForm));

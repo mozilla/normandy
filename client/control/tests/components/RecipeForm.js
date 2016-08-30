@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { shallow, mount } from 'enzyme';
 
-import ConnectedRecipeForm, { RecipeForm } from '../../components/RecipeForm.js';
+import RecipeForm, { DisconnectedRecipeForm } from '../../components/RecipeForm.js';
 import controlStore from '../../stores/ControlStore.js';
 
 describe('<RecipeForm>', () => {
@@ -10,7 +10,7 @@ describe('<RecipeForm>', () => {
   });
 
   it('should work unconnected', () => {
-    shallow(<RecipeForm
+    shallow(<DisconnectedRecipeForm
       dispatch={() => {}}
       fields={{}}
       formState={{}}
@@ -25,7 +25,7 @@ describe('<RecipeForm>', () => {
   it('should work connected', () => {
     const store = controlStore();
     mount(<Provider store={store}>
-      <ConnectedRecipeForm params={{}} location={{ query: '' }} />
+      <RecipeForm params={{}} location={{ query: '' }} />
     </Provider>);
   });
 });

@@ -23,7 +23,7 @@ describe('Self-Repair Runner', () => {
       const url = '/api/v1/classify/';
       const requestTime = '2016-01-01';
       document.documentElement.dataset.classifyUrl = url;
-      fetchMock.mock(url, 'GET', {
+      fetchMock.get(url, {
         request_time: requestTime,
         country: 'US',
       });
@@ -39,7 +39,7 @@ describe('Self-Repair Runner', () => {
   describe('filterContext', () => {
     it('should contain a valid user ID', async () => {
       document.documentElement.dataset.classifyUrl = '/api/v1/classify/';
-      fetchMock.mock('/api/v1/classify/', 'GET', {
+      fetchMock.get('/api/v1/classify/', {
         request_time: '2016-01-01',
         country: 'US',
       });
@@ -76,7 +76,7 @@ describe('Self-Repair Runner', () => {
       // make more than one request, then fetchAction will return different
       // values for the same recipe.
       let id = 0;
-      fetchMock.mock(`/api/v1/action/${recipe.action}/`, () => {
+      fetchMock.get(`/api/v1/action/${recipe.action}/`, () => {
         id++;
         return `{"mock": "action", "id": ${id}}`;
       });

@@ -21,7 +21,7 @@ describe('controlApp Actions', () => {
 
   it('creates REQUEST_IN_PROGRESS when initiating an api call', () => {
     const expectedAction = { type: actionTypes.REQUEST_IN_PROGRESS };
-    fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
+    fetchMock.get('/api/v1/recipe/', fixtureRecipes);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
     .then(() => {
@@ -32,7 +32,7 @@ describe('controlApp Actions', () => {
   describe('creates REQUEST_COMPLETE when an api response is returned', () => {
     it('returns with `status: success` if the request succeeded', () => {
       const expectedAction = { type: actionTypes.REQUEST_COMPLETE, status: 'success' };
-      fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
+      fetchMock.get('/api/v1/recipe/', fixtureRecipes);
 
       return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
       .then(() => {
@@ -42,7 +42,7 @@ describe('controlApp Actions', () => {
 
     it('returns with `status: error` if the request failed', () => {
       const expectedAction = { type: actionTypes.REQUEST_COMPLETE, status: 'error' };
-      fetchMock.mock('/api/v1/recipe/', 'GET', { status: 500 });
+      fetchMock.get('/api/v1/recipe/', { status: 500 });
 
       return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
       .catch(() => {
@@ -59,7 +59,7 @@ describe('controlApp Actions', () => {
           id: jasmine.any(Number),
         },
       };
-      fetchMock.mock('/api/v1/recipe/', 'GET', { status: 500 });
+      fetchMock.get('/api/v1/recipe/', { status: 500 });
 
       return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes')).catch(() => {
         expect(store.getActions()).toContain(expectedAction);
@@ -68,7 +68,7 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for fetchAllRecipes', () => {
-    fetchMock.mock('/api/v1/recipe/', 'GET', fixtureRecipes);
+    fetchMock.get('/api/v1/recipe/', fixtureRecipes);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchAllRecipes'))
     .then(() => {
@@ -77,7 +77,7 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for fetchSingleRecipe', () => {
-    fetchMock.mock('/api/v1/recipe/1/', 'GET', fixtureRecipes[0]);
+    fetchMock.get('/api/v1/recipe/1/', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchSingleRecipe', { recipeId: 1 }))
     .then(() => {
@@ -86,7 +86,7 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for fetchSingleRevision', () => {
-    fetchMock.mock('/api/v1/recipe_version/169/', 'GET', fixtureRecipes[0]);
+    fetchMock.get('/api/v1/recipe_version/169/', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
     .then(() => {
@@ -95,7 +95,7 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for addRecipe', () => {
-    fetchMock.mock('/api/v1/recipe/', 'POST', fixtureRecipes[0]);
+    fetchMock.post('/api/v1/recipe/', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('addRecipe', { recipe: fixtureRecipes[0] }))
     .then(() => {
@@ -105,7 +105,7 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for updateRecipe', () => {
-    fetchMock.mock('/api/v1/recipe/1/', 'PATCH', fixtureRecipes[0]);
+    fetchMock.mock('/api/v1/recipe/1/', fixtureRecipes[0], { method: 'PATCH' });
 
     return store.dispatch(actionTypes.makeApiRequest('updateRecipe', {
       recipe: fixtureRecipes[0], recipeId: 1,
@@ -117,7 +117,7 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for deleteRecipe', () => {
-    fetchMock.mock('/api/v1/recipe/1/', 'DELETE', fixtureRecipes[0]);
+    fetchMock.delete('/api/v1/recipe/1/', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('deleteRecipe', { recipeId: 1 }))
     .then(() => {

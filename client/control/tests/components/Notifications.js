@@ -1,13 +1,15 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { Notifications, Notification } from '../../components/Notifications.js';
+import { DisconnectedNotifications, Notification } from '../../components/Notifications.js';
 
 describe('Notification components', () => {
-  describe('<Notifications>', () => {
+  describe('<DisconnectedNotifications>', () => {
     it('should render a <Notification> for each given notification', () => {
       const notification1 = { messageType: 'success', message: 'message', id: 1 };
       const notification2 = { messageType: 'success', message: 'message', id: 2 };
-      const wrapper = shallow(<Notifications notifications={[notification1, notification2]} />);
+      const wrapper = shallow(
+        <DisconnectedNotifications notifications={[notification1, notification2]} />
+      );
 
       const notifications = wrapper.find(Notification);
       expect(notifications.length).toEqual(2);
