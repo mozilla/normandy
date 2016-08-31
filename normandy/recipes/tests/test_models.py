@@ -33,16 +33,6 @@ class TestAction(object):
         RecipeFactory.create_batch(2, action=action, enabled=False)
         assert list(action.recipes_used_by) == []
 
-    def test_in_use(self):
-        action = ActionFactory()
-        assert not action.in_use
-
-        RecipeFactory(action=action, enabled=False)
-        assert not action.in_use
-
-        RecipeFactory(action=action, enabled=True)
-        assert action.in_use
-
 
 @pytest.mark.django_db
 class TestRecipe(object):

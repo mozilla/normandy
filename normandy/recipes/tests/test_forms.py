@@ -2,28 +2,17 @@ from django.forms import modelform_factory
 
 import pytest
 
-from normandy.recipes.forms import ActionAdminForm, RecipeAdminForm
+from normandy.recipes.forms import RecipeAdminForm
 from normandy.recipes.models import Action, Recipe
 from normandy.recipes.tests import ActionFactory, RecipeFactory
 
 
 @pytest.mark.django_db()
 def test_action_admin_form_in_use():
-    """Actions that are in-use cannot be edited."""
+    """Actions that are in-use can be edited."""
     action = RecipeFactory(enabled=True).action
 
-    FormClass = modelform_factory(Action, form=ActionAdminForm, fields=['name'])
-    form = FormClass({'name': 'foo'}, instance=action)
-    assert not form.is_valid()
-    assert len(form.non_field_errors()) == 1
-
-
-@pytest.mark.django_db()
-def test_action_admin_form_not_in_use():
-    """Actions that are not in-use can be edited."""
-    action = RecipeFactory(enabled=False).action
-
-    FormClass = modelform_factory(Action, form=ActionAdminForm, fields=['name'])
+    FormClass = modelform_factory(Action, fields=['name'])
     form = FormClass({'name': 'foo'}, instance=action)
     assert form.is_valid()
 

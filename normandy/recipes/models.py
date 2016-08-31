@@ -177,11 +177,6 @@ class Action(models.Model):
         self.arguments_schema_json = json.dumps(value)
 
     @property
-    def in_use(self):
-        """True if this action is being used by any active recipes."""
-        return self.recipes_used_by.exists()
-
-    @property
     def recipes_used_by(self):
         """Set of enabled recipes that are using this action."""
         return self.recipe_set.filter(enabled=True)

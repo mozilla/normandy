@@ -67,7 +67,7 @@ class TestUpdateActions(object):
         assert action.implementation == 'new_impl'
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_disables_recipes_when_updating(self, mock_action):
+    def test_it_doesnt_disable_recipes(self, mock_action):
         recipe = RecipeFactory(
             action__name='test-action',
             action__implementation='old',
@@ -75,20 +75,6 @@ class TestUpdateActions(object):
         )
         action = recipe.action
         mock_action(action.name, 'impl', action.arguments_schema)
-
-        call_command('update_actions')
-        recipe.refresh_from_db()
-        assert not recipe.enabled
-
-    def test_it_doesnt_disable_recipes_if_action_doesnt_change(self, mock_action):
-        recipe = RecipeFactory(
-            action__name='test-action',
-            action__implementation='impl',
-            action__arguments_schema={},
-            enabled=True,
-        )
-        action = recipe.action
-        mock_action(action.name, action.implementation, action.arguments_schema)
 
         call_command('update_actions')
         recipe.refresh_from_db()
