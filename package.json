@@ -22,21 +22,24 @@
     {
       "name": "api_url",
       "title": "API URL",
-      "description": "URL prefix to use for server requests",
+      "description": "URL prefix to use for server requests, including API version",
       "type": "string",
       "value": "https://self-repair.mozilla.org/api/v1"
     }, {
       "name": "enabled",
       "title": "Enabled",
-      "description": "Enable the recipe client",
       "type": "bool",
       "value": true
     }, {
       "name": "log_level",
       "title": "Log Level",
-      "description": "Verbosity of logs",
       "type": "string",
       "value": "warning"
+    }, {
+      "name": "dev_mode",
+      "title": "Developer Mode",
+      "type": "bool",
+      "value": false
     }
   ],
   "devDependencies": {
