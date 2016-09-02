@@ -157,6 +157,13 @@ filter expressions.
       // Do not run recipe after January 1st.
       normandy.request_time < '2011-01-01'|date
 
+.. js:attribute:: normandy.distribution
+
+   String set to the user's distribution ID. This is commonly used to target
+   funnelcake builds of Firefox.
+
+   On Firefox versions prior to 48.0, this value is set to ``undefined``.
+
 Transforms
 ----------
 This section describes the transforms available to filter expressions, and what
