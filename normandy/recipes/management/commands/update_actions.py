@@ -21,13 +21,6 @@ class Command(BaseCommand):
             type=str,
             help='Only update the specified actions'
         )
-        parser.add_argument(
-            '--no-disable',
-            action='store_true',
-            dest='no-disable',
-            default=False,
-            help='Do not disable recipes using actions that are updated'
-        )
 
     @transaction.atomic
     @reversion.create_revision()

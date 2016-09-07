@@ -101,19 +101,6 @@ class TestUpdateActions(object):
         dont_update_action.refresh_from_db()
         assert dont_update_action.implementation == 'old'
 
-    def test_it_can_skip_disabling_recipes(self, mock_action):
-        recipe = RecipeFactory(
-            action__name='test-action',
-            action__implementation='old',
-            enabled=True
-        )
-        action = recipe.action
-        mock_action(action.name, 'impl', action.arguments_schema)
-
-        call_command('update_actions', '--no-disable')
-        recipe.refresh_from_db()
-        assert recipe.enabled
-
     def test_it_sets_the_revision_comment(self, mock_action):
         mock_action('test-action', 'console.log("foo");', {'type': 'int'})
 
