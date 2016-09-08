@@ -1,9 +1,13 @@
+import canonicaljson
 import jsonschema
 import pytest
+
+from normandy.recipes.utils import verify_signature
 
 
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
+    r.raise_for_status()
     response = r.json()
 
     # Verify we have at least one response and then grab the first record
@@ -18,6 +22,7 @@ def test_expected_action_types(conf, requests_session):
 
 def test_console_log(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
+    r.raise_for_status()
     response = r.json()
 
     # Verify we have at least one response and then grab the first record
@@ -42,12 +47,14 @@ def test_console_log(conf, requests_session):
 
     # Do we have a valid schema for 'arguments_schema'?
     r = requests_session.get(record['arguments_schema']['$schema'])
+    r.raise_for_status()
     schema = r.json()
     assert jsonschema.validate(record['arguments_schema'], schema) is None
 
 
 def test_show_heartbeat(conf, requests_session):
-    r = requests_session.get(conf.getoption('server') + '/api/v1/action')
+    r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
+    r.raise_for_status()
     response = r.json()
 
     # Verify we have at least one response and then grab the first record
@@ -71,5 +78,20 @@ def test_show_heartbeat(conf, requests_session):
 
     # Do we have a valid schema for 'arguments_schema'?
     r = requests_session.get(record['arguments_schema']['$schema'])
+    r.raise_for_status()
     schema = r.json()
     assert jsonschema.validate(record['arguments_schema'], schema) is None
+
+
+def test_recipe_signatures(conf, requests_session):
+    r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/signed/')
+    r.raise_for_status()
+    data = r.json()
+
+    for item in data:
+        canonical_recipe = canonicaljson.encode_canonical_json(item['recipe'])
+        signature_pairs = item['signature']['signature'].split(';')
+        signature_parts = dict(part.split('=') for part in signature_pairs)
+        signature = signature_parts['p384ecdsa']
+        pubkey = item['signature']['public_key']
+        assert verify_signature(canonical_recipe, signature, pubkey)

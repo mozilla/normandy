@@ -1,6 +1,7 @@
 import base64
 import hashlib
 
+import ecdsa
 import requests
 from requests_hawk import HawkAuth
 
@@ -115,3 +116,33 @@ class Autographer:
                 'public_key': res['public_key'],
             })
         return signatures
+
+
+def verify_signature(data, signature, pubkey):
+    if isinstance(data, str):
+        data = data.encode()
+
+    # add data template
+    data = b'Content-Signature:\x00' + data
+
+    signature = base64.b64decode(un_urlsafe(signature))
+    pubkey = un_urlsafe(pubkey)
+
+    verifying_pubkey = ecdsa.VerifyingKey.from_pem(pubkey)
+    verified = verifying_pubkey.verify(
+        signature,
+        data,
+        hashfunc=hashlib.sha384,
+        sigdecode=ecdsa.util.sigdecode_string)
+
+    print(dir(verifying_pubkey))
+
+    return verified
+
+
+def un_urlsafe(input):
+    input = input.replace("_", "/")
+    input = input.replace("-", "+")
+    if len(input) % 4 > 0:
+        input += "=" * (4 - len(input) % 4)
+    return input
