@@ -106,7 +106,7 @@ module.exports = [
           var cmd;
           if (argv['update-actions']) {
             // Don't disable actions since this is mostly for development.
-            cmd = 'python manage.py update_actions --no-disable';
+            cmd = 'python manage.py update_actions';
 
             childProcess.exec(cmd, function (err, stdout, stderr) {
               console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);

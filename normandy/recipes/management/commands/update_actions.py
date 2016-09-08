@@ -8,7 +8,7 @@ from django.db import transaction
 from reversion import revisions as reversion
 from webpack_loader.utils import get_loader
 
-from normandy.recipes.models import Action, Recipe
+from normandy.recipes.models import Action
 
 
 class Command(BaseCommand):
@@ -21,18 +21,10 @@ class Command(BaseCommand):
             type=str,
             help='Only update the specified actions'
         )
-        parser.add_argument(
-            '--no-disable',
-            action='store_true',
-            dest='no-disable',
-            default=False,
-            help='Do not disable recipes using actions that are updated'
-        )
 
     @transaction.atomic
     @reversion.create_revision()
     def handle(self, *args, **options):
-        disabled_recipes = []
         reversion.set_comment('Updating actions.')
 
         action_names = settings.ACTIONS.keys()
@@ -57,12 +49,6 @@ class Command(BaseCommand):
                     action.arguments_schema = arguments_schema
                     action.save()
 
-                    # As a precaution, disable any recipes that are
-                    # being used by an action that was just updated.
-                    if not options['no-disable']:
-                        recipes = Recipe.objects.filter(action=action, enabled=True)
-                        disabled_recipes += list(recipes)
-                        recipes.update(enabled=False)
             except Action.DoesNotExist:
                 action = Action(
                     name=name,
@@ -72,11 +58,6 @@ class Command(BaseCommand):
                 action.save()
 
             self.stdout.write('Done')
-
-        if disabled_recipes:
-            self.stdout.write('\nThe following recipes were disabled while updating actions:')
-            for recipe in disabled_recipes:
-                self.stdout.write(recipe.name)
 
 
 def get_implementation(action_name):
