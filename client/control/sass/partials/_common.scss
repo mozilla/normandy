@@ -199,23 +199,6 @@ tbody {
   }
 }
 
-
-/* Unordered List */
-li {
-  list-style-type: none;
-  padding: 25px;
-
-  &:nth-child(even) {
-    background: rgba($cream, 0.5);
-  }
-
-  &:hover {
-    background: rgba(26, 183, 218, 0.1);
-    cursor: pointer;
-  }
-}
-
-
 /* Icons */
 i {
   &.pre { margin-right: 5px; }

@@ -3,6 +3,9 @@ parser: babel-eslint
 plugins:
   - jasmine
   - babel
+globals:
+  PRODUCTION: false
+  DEVELOPMENT: false
 rules:
   arrow-parens: [off]
   no-console: [off]

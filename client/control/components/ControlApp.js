@@ -1,10 +1,12 @@
 import React, { PropTypes as pt } from 'react';
 import Header from './Header.js';
 import Notifications from './Notifications.js';
+import DevTools from './DevTools.js';
 
 export default function ControlApp({ children, location, routes, params }) {
   return (
     <div>
+      {DEVELOPMENT && <DevTools />}
       <Notifications />
       <Header
         pageType={children.props.route}
