@@ -119,6 +119,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
             # invalidating that signature. If anything else changed, remove the signature,
             # since it is now invalid.
             dirty_field_names = list(dirty_fields.keys())
+            should_sign = False
+
             if dirty_field_names == ['signature']:
                 super().save(*args, **kwargs)
                 return
@@ -126,11 +128,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 # Setting the signature while also changing something else is probably
                 # going to make the signature immediately invalid. Don't allow it.
                 raise ValidationError('Signatures must change alone')
-            elif self.signature is not None:
-                try:
-                    self.update_signature()
-                except ImproperlyConfigured:
-                    self.signature = None
+            else:
+                should_sign = True
 
             # Increment the revision ID, unless someone else tried to change it.
             if 'revision_id' not in dirty_field_names:
@@ -142,6 +141,12 @@ class Recipe(DirtyFieldsMixin, models.Model):
             if not skip_last_updated:
                 self.last_updated = timezone.now()
 
+            if should_sign:
+                try:
+                    self.update_signature()
+                except ImproperlyConfigured:
+                    self.signature = None
+
         super().save(*args, **kwargs)
 
     def canonical_json(self):
@@ -152,6 +157,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def update_signature(self):
         autographer = Autographer()
         # Convert to a list because order must be preserved
+
         signature_data = autographer.sign_data([self.canonical_json()])[0]
         signature = Signature(**signature_data)
         signature.save()

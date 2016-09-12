@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
@@ -162,11 +163,29 @@ class TestRecipe(object):
         ]
 
         recipe = RecipeFactory(signed=False)
-        assert recipe.signature is None
         recipe.update_signature()
         recipe.save()
         assert recipe.signature is not None
         assert recipe.signature.signature == 'fake signature'
+
+    def test_signatures_update_correctly_on_enable(self, mocker):
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+
+        def fake_sign(datas):
+            sigs = []
+            for d in datas:
+                sigs.append({'signature': hashlib.sha256(d).hexdigest()})
+            return sigs
+
+        mock_autograph.return_value.sign_data.side_effect = fake_sign
+
+        recipe = RecipeFactory(enabled=False, signed=False)
+        recipe.enabled = True
+        recipe.save()
+        recipe.refresh_from_db()
+
+        assert recipe.signature is not None
+        assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
 
 
 @pytest.mark.django_db
