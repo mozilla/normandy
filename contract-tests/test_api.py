@@ -88,6 +88,9 @@ def test_recipe_signatures(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
+    if len(data) == 0:
+        pytest.skip('No signed recipes')
+
     for item in data:
         canonical_recipe = canonicaljson.encode_canonical_json(item['recipe'])
         signature_pairs = item['signature']['signature'].split(';')
