@@ -90,10 +90,13 @@ export function fetchRecipes() {
  * @promise Resolves with an object containing client info.
  */
 export function classifyClient() {
-  const { classifyUrl } = document.documentElement.dataset;
+  let { classifyUrl } = document.documentElement.dataset;
   const headers = { Accept: 'application/json' };
 
-  return fetch(classifyUrl, { headers })
+  classifyUrl = new URL(classifyUrl, window.location.href);
+  classifyUrl.searchParams.set('oscpu', classifyClient.getOscpu() || 'unknown');
+
+  return fetch(classifyUrl.href, { headers })
   .then(response => response.json())
   .then(classification => {
     // Parse request time
@@ -101,6 +104,7 @@ export function classifyClient() {
     return classification;
   });
 }
+classifyClient.getOscpu = () => navigator.oscpu;
 
 
 /**

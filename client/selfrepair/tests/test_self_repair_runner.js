@@ -8,6 +8,7 @@ import {
   filterContext,
   loadActionImplementation,
 } from '../self_repair_runner.js';
+import { urlPathMatcher } from '../../tests/utils.js';
 
 
 const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
@@ -19,27 +20,47 @@ describe('Self-Repair Runner', () => {
   });
 
   describe('classifyClient', () => {
-    it('should make a request to the normandy server', async () => {
-      const url = '/api/v1/classify/';
-      const requestTime = '2016-01-01';
-      document.documentElement.dataset.classifyUrl = url;
-      fetchMock.get(url, {
-        request_time: requestTime,
-        country: 'US',
-      });
+    const url = '/api/v1/classify/';
+    const responseData = {
+      request_time: '2016-01-01',
+      country: 'US',
+    };
 
+    beforeEach(() => {
+      document.documentElement.dataset.classifyUrl = url;
+      fetchMock.get(urlPathMatcher(url), responseData);
+    });
+
+    it('should make a request to the normandy server', async () => {
       expect(await classifyClient()).toEqual(jasmine.objectContaining({
-        request_time: new Date(requestTime),
+        request_time: new Date(responseData.request_time),
         country: 'US',
       }));
-      expect(fetchMock.lastUrl()).toEqual(url);
+      expect(new URL(fetchMock.lastUrl()).pathname).toEqual(url);
+    });
+
+    it('should include navigator.oscpu in the query arguments', async () => {
+      const oscpu = 'fake oscpu';
+      spyOn(classifyClient, 'getOscpu').and.returnValue(oscpu);
+
+      await classifyClient();
+      const fetchUrl = new URL(fetchMock.lastUrl());
+      expect(fetchUrl.searchParams.get('oscpu')).toEqual(oscpu);
+    });
+
+    it('should indicate when it could not find navigator.oscpu', async () => {
+      spyOn(classifyClient, 'getOscpu').and.returnValue(undefined);
+
+      await classifyClient();
+      const fetchUrl = new URL(fetchMock.lastUrl());
+      expect(fetchUrl.searchParams.get('oscpu')).toEqual('unknown');
     });
   });
 
   describe('filterContext', () => {
     it('should contain a valid user ID', async () => {
       document.documentElement.dataset.classifyUrl = '/api/v1/classify/';
-      fetchMock.get('/api/v1/classify/', {
+      fetchMock.get(urlPathMatcher('/api/v1/classify/'), {
         request_time: '2016-01-01',
         country: 'US',
       });
