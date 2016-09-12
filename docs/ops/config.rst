@@ -179,6 +179,12 @@ in other Django projects.
 
     .. _mozlog: https://github.com/mozilla-services/Dockerflow/blob/master/docs/mozlog.md
 
+.. envvar:: DJANGO_LOG_OSCPU_RATE
+
+    :default: ``0.001``
+
+    Rate to log ``navigator.oscpu`` values sent by clients.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the
