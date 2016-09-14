@@ -41,9 +41,11 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
             data = recipe.canonical_json()
             signature = recipe.signature.signature
             pubkey = recipe.signature.public_key
-            if not verify_signature(data, signature, pubkey):
-                msg = ("Recipe '{recipe}' (id={recipe.id}) has a bad signature"
-                       .format(recipe=recipe))
+            try:
+                verify_signature(data, signature, pubkey)
+            except verify_signature.BadSignature as e:
+                msg = ("Recipe '{recipe}' (id={recipe.id}) has a bad signature: {detail}"
+                       .format(recipe=recipe, detail=e.detail))
                 errors.append(Warning(msg, id=WARNING_INVALID_RECIPE_SIGNATURE))
 
     return errors

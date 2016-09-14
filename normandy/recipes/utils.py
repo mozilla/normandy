@@ -1,4 +1,5 @@
 import base64
+import binascii
 import hashlib
 
 import ecdsa
@@ -119,13 +120,76 @@ class Autographer:
 
 
 def verify_signature(data, signature, pubkey):
+    """
+    Verify a signature.
+
+    If the signature is valid, returns True. If the signature is invalid, raise
+    an exception explaining why.
+    """
     if isinstance(data, str):
         data = data.encode()
 
     # Add data template
     data = b'Content-Signature:\x00' + data
-    signature = base64.urlsafe_b64decode(signature)
-    verifying_pubkey = ecdsa.VerifyingKey.from_pem(pubkey)
-    verified = verifying_pubkey.verify(signature, data, hashfunc=hashlib.sha384)
 
-    return verified
+    try:
+        verifying_pubkey = ecdsa.VerifyingKey.from_pem(pubkey)
+    except binascii.Error as e:
+        if e.args == ('Incorrect padding',):
+            raise WrongPublicKeySize()
+        else:
+            raise
+
+    try:
+        signature = base64.urlsafe_b64decode(signature)
+    except binascii.Error as e:
+        if e.args == ('Incorrect padding',):
+            raise WrongSignatureSize()
+        else:
+            raise
+
+    verified = False
+
+    try:
+        verified = verifying_pubkey.verify(signature, data, hashfunc=hashlib.sha384)
+    except ecdsa.keys.BadSignatureError:
+        raise SignatureDoesNotMatch()
+    except AssertionError as e:
+        # The signature verifier has a clause like
+        #     assert len(signature) == 2*l, (len(signature), 2*l)
+        # Check that the AssertionError is consistent with that
+        if (len(e.args) == 1 and
+                isinstance(e.args[0], tuple) and
+                len(e.args[0]) == 2 and
+                isinstance(e.args[0][0], int) and
+                isinstance(e.args[0][1], int)):
+            raise WrongSignatureSize()
+        else:
+            raise
+
+    if not verified:
+        raise BadSignature()
+
+    return True
+
+
+class BadSignature(Exception):
+    detail = 'Unknown signature problem'
+
+
+class SignatureDoesNotMatch(BadSignature):
+    detail = 'Signature is correct, but not valid for this data'
+
+
+class WrongSignatureSize(BadSignature):
+    detail = 'Signature is not the right number of bytes'
+
+
+class WrongPublicKeySize(BadSignature):
+    detail = 'Public Key is not the right number of bytes'
+
+
+verify_signature.BadSignature = BadSignature
+verify_signature.SignatureDoesNotMatch = SignatureDoesNotMatch
+verify_signature.WrongSignatureSize = WrongSignatureSize
+verify_signature.WrongPublicKeySize = WrongPublicKeySize

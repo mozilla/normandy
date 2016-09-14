@@ -23,5 +23,5 @@ class TestRecipeFactory:
     def test_signed_true(self):
         r = RecipeFactory(signed=True)
         assert r.signature is not None
-        assert r.signature.signature == 'fake signature'
+        assert len(r.signature.signature) == 128
         assert isinstance(r.signature.timestamp, datetime)

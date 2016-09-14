@@ -106,10 +106,29 @@ class TestAutographer(object):
 
 class TestVerifySignature(object):
 
-    def test_known_good_signature(self):
-        # known good data
-        data = '{"action":"console-log","approval":null,"arguments":{"message":"telemetry available"},"current_approval_request":null,"enabled":true,"filter_expression":"telemetry != undefined","id":22,"is_approved":false,"last_updated":"2016-09-01T23:03:17.360536Z","name":"mythmon\'s system addon test","revision_id":2}'  # noqa
-        signature = 'sSyFLu0fY7mcrMwueJlvV9JV7XCrBUyEJCx08awzhPhGcUXEO7gC0gA15GLMbkHEfC1ekOoK0WGhQwMZgEMbT_QOQf4BqquG8C1zsjOpUEf7d38D4nyFA7Ow7gPNzYLQ'  # noqa
-        pubkey = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
+    # known good data
+    data = '{"action":"console-log","approval":null,"arguments":{"message":"telemetry available"},"current_approval_request":null,"enabled":true,"filter_expression":"telemetry != undefined","id":22,"is_approved":false,"last_updated":"2016-09-01T23:03:17.360536Z","name":"mythmon\'s system addon test","revision_id":2}'  # noqa
+    signature = 'sSyFLu0fY7mcrMwueJlvV9JV7XCrBUyEJCx08awzhPhGcUXEO7gC0gA15GLMbkHEfC1ekOoK0WGhQwMZgEMbT_QOQf4BqquG8C1zsjOpUEf7d38D4nyFA7Ow7gPNzYLQ'  # noqa
+    pubkey = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
 
-        assert verify_signature(data, signature, pubkey)
+    def test_known_good_signature(self):
+        assert verify_signature(self.data, self.signature, self.pubkey)
+
+    def test_raises_nice_error_for_too_short_signatures_bad_padding(self):
+        signature = 'a_too_short_signature'
+
+        with pytest.raises(verify_signature.WrongSignatureSize):
+            verify_signature(self.data, signature, self.pubkey)
+
+    def test_raises_nice_error_for_too_short_signatures_good_base64(self):
+        signature = 'aa=='
+
+        with pytest.raises(verify_signature.WrongSignatureSize):
+            verify_signature(self.data, signature, self.pubkey)
+
+    def test_raises_nice_error_for_wrong_signature(self):
+        # change the signature, but keep it a valid signature
+        signature = self.signature.replace('s', 'S')
+
+        with pytest.raises(verify_signature.SignatureDoesNotMatch):
+            verify_signature(self.data, signature, self.pubkey)
