@@ -30,19 +30,21 @@ describe('<RecipeForm>', () => {
   });
 
   describe('changeAction', () => {
-    const store = controlStore();
-    const recipeFormWrapper = mount(<Provider store={store}>
-      <RecipeForm params={{}} recipe={{ action: 'show-heartbeat' }} location={{ query: '' }} />
-    </Provider>);
+    let store;
+    let recipeFormWrapper;
+    let disconnectedFormWrapper;
 
-    const disconnectedFormWrapper = recipeFormWrapper.find('DisconnectedRecipeForm').get(0);
-    disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
-
-    it('should update the selectedAction in state', () => {
-      expect(disconnectedFormWrapper.state.selectedAction).toEqual({ name: 'console-log' });
+    beforeEach(() => {
+      store = controlStore();
+      recipeFormWrapper = mount(<Provider store={store}>
+        <RecipeForm params={{}} recipe={{ action: 'show-heartbeat' }} location={{ query: '' }} />
+      </Provider>);
+      disconnectedFormWrapper = recipeFormWrapper.find('DisconnectedRecipeForm').get(0);
+      disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
     });
 
-    it('should change the action form component', () => {
+    it('should change the action in state & update the form', () => {
+      expect(disconnectedFormWrapper.state.selectedAction).toEqual({ name: 'console-log' });
       expect(recipeFormWrapper.find('ConsoleLogForm').length).toEqual(1);
     });
   });
