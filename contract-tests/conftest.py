@@ -29,3 +29,14 @@ def requests_session(conf):
     session = requests.Session()
     session.verify = conf.getoption('verify')
     return session
+
+
+@pytest.fixture
+def only_readonly(requests_session, conf):
+    """Check if the current server is a readonly server, skip if it is not"""
+    r = requests_session.get(conf.getoption('server') + '/__version__')
+    r.raise_for_status()
+    data = r.json()
+
+    if not data.get('configuration') == 'ProductionReadOnly':
+        pytest.skip('Server config is not ProductionReadOnly')
