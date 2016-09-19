@@ -98,7 +98,9 @@ class SignatureFactory(factory.DjangoModelFactory):
     class Meta:
         model = Signature
 
-    signature = 'fake signature'
+    signature = 'a' * 128
+    public_key = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
+    x5u = 'https://example.com/fake.x5u'
 
 
 ARGUMENTS_SCHEMA = {

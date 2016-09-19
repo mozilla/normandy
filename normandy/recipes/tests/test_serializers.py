@@ -127,9 +127,10 @@ class TestSignedRecipeSerializer:
         combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
         recipe_serializer = RecipeSerializer(instance=recipe, context=context)
 
+        # Testing for shape of data, not contents
         assert combined_serializer.data == {
             'signature': {
-                'signature': 'fake signature',
+                'signature': Whatever(),
                 'timestamp': Whatever(),
                 'x5u': Whatever(),
                 'public_key': Whatever(),
