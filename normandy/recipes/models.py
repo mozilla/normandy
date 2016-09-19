@@ -19,7 +19,7 @@ from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class Approval(models.Model):
@@ -42,6 +42,13 @@ class RecipeQuerySet(models.QuerySet):
         autographer = Autographer()
         # Convert to a list because order must be preserved
         recipes = list(self)
+
+        recipe_ids = [r.id for r in recipes]
+        logger.info(
+            'Requesting signatures for recipes with ids [%s] from Autograph',
+            (recipe_ids, ),
+            extra={'recipe_ids': recipe_ids})
+
         canonical_jsons = [r.canonical_json() for r in recipes]
         signatures_data = autographer.sign_data(canonical_jsons)
 
@@ -156,7 +163,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     def update_signature(self):
         autographer = Autographer()
-        # Convert to a list because order must be preserved
+
+        logger.info(
+            'Requesting signatures for recipes with ids [%s] from Autograph',
+            self.id,
+            extra={'recipe_ids': [self.id]})
 
         signature_data = autographer.sign_data([self.canonical_json()])[0]
         signature = Signature(**signature_data)
