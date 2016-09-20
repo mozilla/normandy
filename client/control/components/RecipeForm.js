@@ -47,7 +47,7 @@ export class DisconnectedRecipeForm extends React.Component {
 
   changeAction(event) {
     const { dispatch, fields } = this.props;
-    const selectedActionName = event.currentTarget.value;
+    const selectedActionName = event.target.value;
 
     dispatch(destroy('action'));
     fields.action.onChange(event);
