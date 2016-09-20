@@ -38,23 +38,6 @@ describe('Self-Repair Runner', () => {
       }));
       expect(new URL(fetchMock.lastUrl()).pathname).toEqual(url);
     });
-
-    it('should include navigator.oscpu in the query arguments', async () => {
-      const oscpu = 'fake oscpu';
-      spyOn(classifyClient, 'getOscpu').and.returnValue(oscpu);
-
-      await classifyClient();
-      const fetchUrl = new URL(fetchMock.lastUrl());
-      expect(fetchUrl.searchParams.get('oscpu')).toEqual(oscpu);
-    });
-
-    it('should indicate when it could not find navigator.oscpu', async () => {
-      spyOn(classifyClient, 'getOscpu').and.returnValue(undefined);
-
-      await classifyClient();
-      const fetchUrl = new URL(fetchMock.lastUrl());
-      expect(fetchUrl.searchParams.get('oscpu')).toEqual('unknown');
-    });
   });
 
   describe('filterContext', () => {

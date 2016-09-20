@@ -94,7 +94,6 @@ export function classifyClient() {
   const headers = { Accept: 'application/json' };
 
   classifyUrl = new URL(classifyUrl, window.location.href);
-  classifyUrl.searchParams.set('oscpu', classifyClient.getOscpu() || 'unknown');
 
   return fetch(classifyUrl.href, { headers })
   .then(response => response.json())
@@ -104,7 +103,6 @@ export function classifyClient() {
     return classification;
   });
 }
-classifyClient.getOscpu = () => navigator.oscpu;
 
 
 /**

@@ -599,19 +599,3 @@ class TestClassifyClient(object):
         res = api_client.get('/api/v1/classify_client/')
         assert res.status_code == 200
         assert res.client.cookies == {}
-
-    def test_it_logs_oscpu(self, api_client, settings, mocker):
-        settings.LOG_OSCPU_RATE = 1
-        logger = mocker.patch('normandy.recipes.api.views.logger')
-
-        api_client.get('/api/v1/classify_client/', {'oscpu': 'test_oscpu'})
-        logger.debug.assert_called_with('navigator.oscpu=test_oscpu', extra={
-            'navigator.oscpu': 'test_oscpu'
-        })
-
-    def test_it_doesnt_log_missing_oscpu(self, api_client, settings, mocker):
-        settings.LOG_OSCPU_RATE = 1
-        logger = mocker.patch('normandy.recipes.api.views.logger')
-
-        api_client.get('/api/v1/classify_client/')
-        assert not logger.debug.called
