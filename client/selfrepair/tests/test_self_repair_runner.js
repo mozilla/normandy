@@ -1,12 +1,14 @@
 import fetchMock from 'fetch-mock';
 
-import { mockNormandy } from '../../actions/tests/utils.js';
+import { mockNormandy, MockStorage } from '../../actions/tests/utils.js';
 import {
   classifyClient,
   doesRecipeMatch,
   fetchAction,
+  fetchRecipes,
   filterContext,
   loadActionImplementation,
+  getUserId,
 } from '../self_repair_runner.js';
 import { urlPathMatcher } from '../../tests/utils.js';
 
@@ -54,6 +56,21 @@ describe('Self-Repair Runner', () => {
       await classifyClient();
       const fetchUrl = new URL(fetchMock.lastUrl());
       expect(fetchUrl.searchParams.get('oscpu')).toEqual('unknown');
+    });
+  });
+
+  describe('fetchRecipes', () => {
+    it('should request recipes from server', async () => {
+      document.documentElement.dataset.recipeUrl = '/api/v1/recipe/';
+      fetchMock.get('/api/v1/recipe/?enabled=true', 200);
+
+      fetchRecipes();
+
+      expect(fetchMock.lastOptions()).toEqual({
+        headers: {
+          Accept: 'application/json',
+        },
+      });
     });
   });
 
@@ -123,6 +140,25 @@ describe('Self-Repair Runner', () => {
       const impl1 = await impl1Promise;
       const impl2 = await impl2Promise;
       expect(impl1).toEqual(impl2);
+    });
+  });
+
+  describe('getUserId', () => {
+    beforeEach(() => {
+      Object.defineProperty(window, 'localStorage', {
+        value: new MockStorage(),
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    it('should return the userId from localStorage', () => {
+      spyOn(window.localStorage, 'getItem').and.returnValue(null);
+      spyOn(window.localStorage, 'setItem');
+
+      getUserId();
+      expect(window.localStorage.getItem).toHaveBeenCalledWith('userId');
+      expect(window.localStorage.setItem).toHaveBeenCalledWith('userId', jasmine.any(String));
     });
   });
 });
