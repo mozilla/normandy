@@ -312,9 +312,14 @@ class ProductionInsecure(Production):
     CSRF_COOKIE_SECURE = values.BooleanValue(False)
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SESSION_COOKIE_SECURE = values.BooleanValue(False)
+
+    # These checks aren't useful for a purposefully insecure environment
     SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W004',  # check hsts seconds
         'security.W008',  # Secure SSL redirect
         'security.W009',  # Secret key length
+        'security.W012',  # Check session cookie secure
+        'security.W016',  # Check CSRF cookie secure
     ])
 
 
