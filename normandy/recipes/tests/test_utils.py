@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 import pytest
 
+from normandy.base.tests import Whatever
 from normandy.recipes.utils import Autographer, fraction_to_key, verify_signature
 
 
@@ -83,7 +84,7 @@ class TestAutographer(object):
         # assert doesn't raise
         Autographer()
 
-    def test_it_makes_good_requests(self, settings):
+    def test_it_interacts_with_autograph_correctly(self, settings):
         settings.AUTOGRAPH_URL = 'https://autograph.example.com'
         settings.AUTOGRAPH_HAWK_ID = 'hawk id'
         settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
@@ -91,11 +92,50 @@ class TestAutographer(object):
         autographer = Autographer()
         autographer.session = MagicMock()
 
+        autographer.session.post.return_value.json.return_value = [
+            {
+                'content-signature': (
+                    'x5u="https://example.com/fake_x5u_1";p384ecdsa=fake_signature_1'
+                ),
+                'x5u': 'https://example.com/fake_x5u_1',
+                'hash_algorithm': 'sha384',
+                'ref': 'fake_ref_1',
+                'signature': 'fake_signature_1',
+                'public_key': 'fake_pubkey_1',
+            },
+            {
+                'content-signature': (
+                    'x5u="https://example.com/fake_x5u_2";p384ecdsa=fake_signature_2'
+                ),
+                'x5u': 'https://example.com/fake_x5u_2',
+                'hash_algorithm': 'sha384',
+                'ref': 'fake_ref_2',
+                'signature': 'fake_signature_2',
+                'public_key': 'fake_pubkey_2',
+            }
+        ]
+
         url = self.test_settings['URL'] + 'sign/data'
         foo_base64 = base64.b64encode(b'foo').decode('utf8')
         bar_base64 = base64.b64encode(b'bar').decode('utf8')
 
-        autographer.sign_data([b'foo', b'bar'])
+        # Assert the correct data is returned
+        assert autographer.sign_data([b'foo', b'bar']) == [
+            {
+                'timestamp': Whatever(),
+                'signature': 'fake_signature_1',
+                'x5u': 'https://example.com/fake_x5u_1',
+                'public_key': 'fake_pubkey_1',
+            },
+            {
+                'timestamp': Whatever(),
+                'signature': 'fake_signature_2',
+                'x5u': 'https://example.com/fake_x5u_2',
+                'public_key': 'fake_pubkey_2',
+            }
+        ]
+
+        # Assert the correct request was made
         assert autographer.session.post.called_once_with(
             [url, [
                 {'template': 'content-signature', 'input': foo_base64},

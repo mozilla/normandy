@@ -1,6 +1,7 @@
 import base64
 import binascii
 import hashlib
+import logging
 
 import ecdsa
 import requests
@@ -10,6 +11,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django.utils.functional import cached_property
+
+
+logger = logging.getLogger(__name__)
 
 
 def fraction_to_key(frac):
@@ -108,11 +112,14 @@ class Autographer:
         res.raise_for_status()
         signing_responses = res.json()
 
+        logger.info('Got %s signatures from Autograph', len(signing_responses))
+
         signatures = []
         for res in signing_responses:
+
             signatures.append({
                 'timestamp': ts,
-                'signature': res['content-signature'],
+                'signature': res['signature'],
                 'x5u': res.get('x5u'),
                 'public_key': res['public_key'],
             })
