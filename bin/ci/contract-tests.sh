@@ -14,6 +14,7 @@ SERVER_ID=$(./docker-run.sh -e DJANGO_CONFIGURATION=ProductionInsecure -d)
 docker run --net host -e CHECK_PORT=8000 -e CHECK_HOST=localhost giorgos/takis
 echo "Running acceptance tests"
 ./docker-run.sh py.test contract-tests/ \
+  -vv \
   --server http://localhost:8000 \
   --junitxml=/test_artifacts/pytest.xml
 STATUS=$?

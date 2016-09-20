@@ -22,7 +22,7 @@ test:
     # Run lint checks
     - bin/ci/docker-run.sh therapist run --use-tracked-files
     # Run Python tests
-    - bin/ci/docker-run.sh py.test --junitxml=/test_artifacts/pytest.xml normandy/
+    - bin/ci/docker-run.sh py.test -vv --junitxml=/test_artifacts/pytest.xml normandy/
     # Start Karma test server, and run them in Firefox
     - |
       (
