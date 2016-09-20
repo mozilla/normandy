@@ -1,6 +1,3 @@
-import logging
-import random
-
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.cache import cache_control
@@ -28,9 +25,6 @@ from normandy.recipes.api.serializers import (
     RecipeVersionSerializer,
     SignedRecipeSerializer,
 )
-
-
-logger = logging.getLogger(__name__)
 
 
 class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
@@ -220,13 +214,6 @@ class ClassifyClient(views.APIView):
     serializer_class = ClientSerializer
 
     def get(self, request, format=None):
-        # Temporary: Log navigator.oscpu as sent by users.
-        if 'oscpu' in request.GET and random.random() <= settings.LOG_OSCPU_RATE:
-            oscpu = request.GET['oscpu']
-            logger.debug('navigator.oscpu={}'.format(oscpu), extra={
-                'navigator.oscpu': oscpu
-            })
-
         client = Client(request)
         serializer = self.serializer_class(client, context={'request': request})
         return Response(serializer.data)
