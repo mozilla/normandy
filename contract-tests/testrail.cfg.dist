@@ -1,0 +1,9 @@
+[API]
+url = https://testrail.stage.mozaws.net
+email =
+password =
+
+[TESTRUN]
+assignedto_id =
+project_id = 18
+suite_id = 153
