@@ -37,6 +37,7 @@ def version(request):
         'source': repo_url,
         'commit': commit,
         'commit_link': '{0}/commit/{1}'.format(repo_url, commit) if commit else None,
+        'configuration': os.environ.get('DJANGO_CONFIGURATION'),
     })
 
 
