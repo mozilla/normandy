@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.template.loader import render_to_string
 
 from normandy.recipes import models
-from normandy.recipes.forms import ActionAdminForm, RecipeAdminForm
+from normandy.recipes.forms import RecipeAdminForm
 
 from reversion.admin import VersionAdmin
 
@@ -39,8 +39,7 @@ class RecipeAdmin(VersionAdmin):
 
 @admin.register(models.Action)
 class ActionAdmin(VersionAdmin):
-    form = ActionAdminForm
-    list_display = ['name', 'implementation_hash', 'in_use']
+    list_display = ['name', 'implementation_hash']
     fieldsets = [
         [None, {
             'fields': [
@@ -61,17 +60,3 @@ class ActionAdmin(VersionAdmin):
             'recipes': action.recipes_used_by.order_by('name'),
         })
     recipe_list.short_description = 'Used in Recipes'
-
-    def in_use(self, action):
-        """
-        Wrapper around the Action.in_use property so that we can set the
-        boolean attribute to display a nice checkmark for the field in
-        the admin.
-        """
-        return action.in_use
-    in_use.boolean = True
-
-
-@admin.register(models.ReleaseChannel)
-class ReleaseChannelAdmin(admin.ModelAdmin):
-    fields = ['name', 'slug']

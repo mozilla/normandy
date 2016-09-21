@@ -3,10 +3,8 @@ import jsonschema
 import pytest
 
 from normandy.recipes.utils import verify_signature
-from pytest_testrail.plugin import testrail
 
 
-@testrail('C5603')
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -22,7 +20,6 @@ def test_expected_action_types(conf, requests_session):
         assert record['name'] in expected_records
 
 
-@testrail('C5604')
 def test_console_log(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -55,7 +52,6 @@ def test_console_log(conf, requests_session):
     assert jsonschema.validate(record['arguments_schema'], schema) is None
 
 
-@testrail('C5605')
 def test_show_heartbeat(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -87,7 +83,6 @@ def test_show_heartbeat(conf, requests_session):
     assert jsonschema.validate(record['arguments_schema'], schema) is None
 
 
-@testrail('C6570')
 def test_recipe_signatures(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/signed/')
     r.raise_for_status()

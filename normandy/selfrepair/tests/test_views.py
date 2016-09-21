@@ -25,3 +25,8 @@ class TestSelfRepair:
         assert client.get(url).status_code == 200
         url += '/'
         assert client.get(url).status_code == 200
+
+    def test_sets_no_cookies(self, client):
+        res = client.get('/en-US/repair')
+        assert res.status_code == 200
+        assert res.client.cookies == {}

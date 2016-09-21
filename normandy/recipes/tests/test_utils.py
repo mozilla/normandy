@@ -1,9 +1,14 @@
+import base64
+from unittest.mock import MagicMock
 from random import random
 from fractions import Fraction
 
+from django.core.exceptions import ImproperlyConfigured
+
 import pytest
 
-from normandy.recipes.utils import fraction_to_key
+from normandy.base.tests import Whatever
+from normandy.recipes.utils import Autographer, fraction_to_key, verify_signature
 
 
 class TestFractionToKey(object):
@@ -37,3 +42,133 @@ class TestFractionToKey(object):
             r = random()
             key = fraction_to_key(r)
             assert len(key) == 64
+
+
+class TestAutographer(object):
+    test_settings = {
+        'URL': 'https://autograph.example.com/',
+        'HAWK_ID': 'hawk id',
+        'HAWK_SECRET_KEY': 'hawk secret key',
+    }
+
+    def test_it_checks_settings(self, settings):
+        """Test that each required key is required individually"""
+        # Leave out URL
+        settings.AUTOGRAPH_URL = None
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+        with pytest.raises(ImproperlyConfigured) as exc:
+            Autographer()
+        assert 'AUTOGRAPH_URL' in str(exc)
+
+        # Leave out HAWK_ID
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = None
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+        with pytest.raises(ImproperlyConfigured) as exc:
+            Autographer()
+        assert 'AUTOGRAPH_HAWK_ID' in str(exc)
+
+        # Leave out HAWK_SECRET_KEY
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = None
+        with pytest.raises(ImproperlyConfigured) as exc:
+            Autographer()
+        assert 'AUTOGRAPH_HAWK_SECRET_KEY' in str(exc)
+
+        # Include everything
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+        # assert doesn't raise
+        Autographer()
+
+    def test_it_interacts_with_autograph_correctly(self, settings):
+        settings.AUTOGRAPH_URL = 'https://autograph.example.com'
+        settings.AUTOGRAPH_HAWK_ID = 'hawk id'
+        settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
+
+        autographer = Autographer()
+        autographer.session = MagicMock()
+
+        autographer.session.post.return_value.json.return_value = [
+            {
+                'content-signature': (
+                    'x5u="https://example.com/fake_x5u_1";p384ecdsa=fake_signature_1'
+                ),
+                'x5u': 'https://example.com/fake_x5u_1',
+                'hash_algorithm': 'sha384',
+                'ref': 'fake_ref_1',
+                'signature': 'fake_signature_1',
+                'public_key': 'fake_pubkey_1',
+            },
+            {
+                'content-signature': (
+                    'x5u="https://example.com/fake_x5u_2";p384ecdsa=fake_signature_2'
+                ),
+                'x5u': 'https://example.com/fake_x5u_2',
+                'hash_algorithm': 'sha384',
+                'ref': 'fake_ref_2',
+                'signature': 'fake_signature_2',
+                'public_key': 'fake_pubkey_2',
+            }
+        ]
+
+        url = self.test_settings['URL'] + 'sign/data'
+        foo_base64 = base64.b64encode(b'foo').decode('utf8')
+        bar_base64 = base64.b64encode(b'bar').decode('utf8')
+
+        # Assert the correct data is returned
+        assert autographer.sign_data([b'foo', b'bar']) == [
+            {
+                'timestamp': Whatever(),
+                'signature': 'fake_signature_1',
+                'x5u': 'https://example.com/fake_x5u_1',
+                'public_key': 'fake_pubkey_1',
+            },
+            {
+                'timestamp': Whatever(),
+                'signature': 'fake_signature_2',
+                'x5u': 'https://example.com/fake_x5u_2',
+                'public_key': 'fake_pubkey_2',
+            }
+        ]
+
+        # Assert the correct request was made
+        assert autographer.session.post.called_once_with(
+            [url, [
+                {'template': 'content-signature', 'input': foo_base64},
+                {'template': 'content-signature', 'input': bar_base64},
+            ]]
+        )
+
+
+class TestVerifySignature(object):
+
+    # known good data
+    data = '{"action":"console-log","approval":null,"arguments":{"message":"telemetry available"},"current_approval_request":null,"enabled":true,"filter_expression":"telemetry != undefined","id":22,"is_approved":false,"last_updated":"2016-09-01T23:03:17.360536Z","name":"mythmon\'s system addon test","revision_id":2}'  # noqa
+    signature = 'sSyFLu0fY7mcrMwueJlvV9JV7XCrBUyEJCx08awzhPhGcUXEO7gC0gA15GLMbkHEfC1ekOoK0WGhQwMZgEMbT_QOQf4BqquG8C1zsjOpUEf7d38D4nyFA7Ow7gPNzYLQ'  # noqa
+    pubkey = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
+
+    def test_known_good_signature(self):
+        assert verify_signature(self.data, self.signature, self.pubkey)
+
+    def test_raises_nice_error_for_too_short_signatures_bad_padding(self):
+        signature = 'a_too_short_signature'
+
+        with pytest.raises(verify_signature.WrongSignatureSize):
+            verify_signature(self.data, signature, self.pubkey)
+
+    def test_raises_nice_error_for_too_short_signatures_good_base64(self):
+        signature = 'aa=='
+
+        with pytest.raises(verify_signature.WrongSignatureSize):
+            verify_signature(self.data, signature, self.pubkey)
+
+    def test_raises_nice_error_for_wrong_signature(self):
+        # change the signature, but keep it a valid signature
+        signature = self.signature.replace('s', 'S')
+
+        with pytest.raises(verify_signature.SignatureDoesNotMatch):
+            verify_signature(self.data, signature, self.pubkey)

@@ -94,11 +94,11 @@ def heartbeat_level_to_text(level):
 
 def heartbeat_check_detail(check):
     errors = check(app_configs=None)
-    level = 0
-    level = max([level] + [e.level for e in errors])
+    errors = list(filter(lambda e: e.id not in settings.SILENCED_SYSTEM_CHECKS, errors))
+    level = max([0] + [e.level for e in errors])
 
     return {
         'status': heartbeat_level_to_text(level),
         'level': level,
-        'messages': [e.msg for e in errors],
+        'messages': {e.id: e.msg for e in errors},
     }

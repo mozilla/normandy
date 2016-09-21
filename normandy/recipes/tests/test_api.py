@@ -2,7 +2,8 @@ import hashlib
 from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction
+from django.db import connection, transaction
+from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
@@ -67,11 +68,22 @@ class TestActionAPI(object):
 
     def test_detail_view_includes_cache_headers(self, api_client):
         action = ActionFactory()
-        res = api_client.get('/api/v1/action/{name}/'.format(name=action))
+        res = api_client.get('/api/v1/action/{name}/'.format(name=action.name))
         assert res.status_code == 200
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+    def test_list_sets_no_cookies(self, api_client):
+        res = api_client.get('/api/v1/action/')
+        assert res.status_code == 200
+        assert 'Cookies' not in res
+
+    def test_detail_sets_no_cookies(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/'.format(name=action.name))
+        assert res.status_code == 200
+        assert res.client.cookies == {}
 
 
 @pytest.mark.django_db
@@ -111,6 +123,15 @@ class TestImplementationAPI(object):
         max_age = 'max-age={}'.format(settings.ACTION_IMPLEMENTATION_CACHE_TIME)
         assert max_age in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+    def test_sets_no_cookies(self, api_client):
+        action = ActionFactory()
+        res = api_client.get('/api/v1/action/{name}/implementation/{hash}/'.format(
+            name=action.name,
+            hash=action.implementation_hash,
+        ))
+        assert res.status_code == 200
+        assert res.client.cookies == {}
 
 
 @pytest.mark.django_db
@@ -161,6 +182,25 @@ class TestRecipeAPI(object):
         res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
                                                   'action': 'fake-action',
                                                   'arguments': '{}'})
+        assert res.status_code == 400
+
+        recipes = Recipe.objects.all()
+        assert recipes.count() == 0
+
+    def test_creation_when_arguments_are_invalid(self, api_client):
+        ActionFactory(
+            name='foobarbaz',
+            arguments_schema={
+                'type': 'object',
+                'properties': {'message': {'type': 'string'}},
+                'required': ['message']
+            }
+        )
+        res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
+                                                  'enabled': True,
+                                                  'filter_expression': 'true',
+                                                  'action': 'foobarbaz',
+                                                  'arguments': {'message': ''}})
         assert res.status_code == 400
 
         recipes = Recipe.objects.all()
@@ -275,6 +315,40 @@ class TestRecipeAPI(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
+    def test_signed_listing_works(self, api_client):
+        r1 = RecipeFactory(signed=True)
+        res = api_client.get('/api/v1/recipe/signed/')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['recipe']['id'] == r1.id
+        assert res.data[0]['signature']['signature'] == r1.signature.signature
+
+    def test_signed_only_lists_signed_recipes(self, api_client):
+        r1 = RecipeFactory(signed=True)
+        r2 = RecipeFactory(signed=True)
+        RecipeFactory(signed=False)
+        res = api_client.get('/api/v1/recipe/signed/')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+
+        res.data.sort(key=lambda r: r['recipe']['id'])
+
+        assert res.data[0]['recipe']['id'] == r1.id
+        assert res.data[0]['signature']['signature'] == r1.signature.signature
+        assert res.data[1]['recipe']['id'] == r2.id
+        assert res.data[1]['signature']['signature'] == r2.signature.signature
+
+    def test_list_sets_no_cookies(self, api_client):
+        res = api_client.get('/api/v1/recipe/')
+        assert res.status_code == 200
+        assert 'Cookies' not in res
+
+    def test_detail_sets_no_cookies(self, api_client):
+        recipe = RecipeFactory()
+        res = api_client.get('/api/v1/recipe/{id}/'.format(id=recipe.id))
+        assert res.status_code == 200
+        assert res.client.cookies == {}
+
 
 @pytest.mark.django_db
 class TestRecipeVersionAPI(object):
@@ -347,7 +421,7 @@ class TestApprovalRequestAPI(object):
                                {'active': False})
         assert res.status_code == 200
 
-        approval_request = ApprovalRequest.objects.get(id=approval_request.id)
+        approval_request.refresh_from_db()
         assert not approval_request.active
 
     def test_it_can_delete_approval_requests(self, api_client):
@@ -467,7 +541,7 @@ class TestApprovalRequestCommentAPI(object):
                                {'text': 'changed'})
         assert res.status_code == 200
 
-        comment = ApprovalRequestComment.objects.get(id=comment.id)
+        comment.refresh_from_db()
         assert comment.text == 'changed'
 
     def test_it_can_delete_comments(self, api_client):
@@ -513,3 +587,15 @@ class TestClassifyClient(object):
             'country': 'us',
             'request_time': '2016-01-01T00:00:00Z',
         }
+
+    def test_makes_no_db_queries(self, client):
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res = client.get('/api/v1/classify_client/')
+            assert res.status_code == 200
+        assert len(queries) == 0
+
+    def test_sets_no_cookies(self, api_client):
+        res = api_client.get('/api/v1/classify_client/')
+        assert res.status_code == 200
+        assert res.client.cookies == {}

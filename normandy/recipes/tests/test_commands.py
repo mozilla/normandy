@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.core.management import call_command
 
 import pytest
+from reversion.models import Version
 
 from normandy.recipes.models import Action
 from normandy.recipes.tests import ActionFactory, RecipeFactory
@@ -66,7 +67,7 @@ class TestUpdateActions(object):
         assert action.implementation == 'new_impl'
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_disables_recipes_when_updating(self, mock_action):
+    def test_it_doesnt_disable_recipes(self, mock_action):
         recipe = RecipeFactory(
             action__name='test-action',
             action__implementation='old',
@@ -74,20 +75,6 @@ class TestUpdateActions(object):
         )
         action = recipe.action
         mock_action(action.name, 'impl', action.arguments_schema)
-
-        call_command('update_actions')
-        recipe.refresh_from_db()
-        assert not recipe.enabled
-
-    def test_it_doesnt_disable_recipes_if_action_doesnt_change(self, mock_action):
-        recipe = RecipeFactory(
-            action__name='test-action',
-            action__implementation='impl',
-            action__arguments_schema={},
-            enabled=True,
-        )
-        action = recipe.action
-        mock_action(action.name, action.implementation, action.arguments_schema)
 
         call_command('update_actions')
         recipe.refresh_from_db()
@@ -114,15 +101,15 @@ class TestUpdateActions(object):
         dont_update_action.refresh_from_db()
         assert dont_update_action.implementation == 'old'
 
-    def test_it_can_skip_disabling_recipes(self, mock_action):
-        recipe = RecipeFactory(
-            action__name='test-action',
-            action__implementation='old',
-            enabled=True
-        )
-        action = recipe.action
-        mock_action(action.name, 'impl', action.arguments_schema)
+    def test_it_sets_the_revision_comment(self, mock_action):
+        mock_action('test-action', 'console.log("foo");', {'type': 'int'})
 
-        call_command('update_actions', '--no-disable')
-        recipe.refresh_from_db()
-        assert recipe.enabled
+        call_command('update_actions')
+        assert Action.objects.count() == 1
+
+        action = Action.objects.all()[0]
+        versions = Version.objects.get_for_object(action)
+        assert versions.count() == 1
+
+        version = versions[0]
+        assert version.revision.comment == 'Updating actions.'

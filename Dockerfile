@@ -1,4 +1,4 @@
-FROM python:3.5.1-slim
+FROM python:3.5.2-slim
 WORKDIR /app
 RUN groupadd --gid 1001 app && useradd -g app --uid 1001 --shell /usr/sbin/nologin app
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,14 +17,13 @@ RUN pip install -U 'pip>=8' && \
     npm install
 
 COPY . /app
-RUN ./node_modules/.bin/webpack && \
+RUN NODE_ENV=production ./node_modules/.bin/webpack && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media && \
     mkdir -p __version__ && \
     mkdir -p /test_artifacts && \
     chmod 777 /test_artifacts && \
-    git rev-parse HEAD > __version__/commit && \
-    rm -rf .git
+    git rev-parse HEAD > __version__/commit
 
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \

@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -11,51 +12,14 @@ from dirtyfields import DirtyFieldsMixin
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
+from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import get_client_ip
 from normandy.recipes.geolocation import get_country_code
+from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
 
 
-logger = logging.getLogger()
-
-
-class Locale(models.Model):
-    """Database table for locales from product_details."""
-    code = models.CharField(max_length=255, unique=True)
-    english_name = models.CharField(max_length=255, blank=True)
-    native_name = models.CharField(max_length=255, blank=True)
-    order = models.IntegerField(default=100)
-
-    class Meta:
-        ordering = ['order', 'code']
-
-    def __str__(self):
-        return '{self.code} ({self.english_name})'.format(self=self)
-
-
-class ReleaseChannel(models.Model):
-    """Release channel of Firefox"""
-    slug = models.SlugField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        ordering = ['slug']
-
-    def __str__(self):
-        return self.name
-
-
-class Country(models.Model):
-    """Database table for countries from django_countries."""
-    code = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-    order = models.IntegerField(default=100)
-
-    class Meta:
-        ordering = ['order', 'name']
-
-    def __str__(self):
-        return '{self.name} ({self.code})'.format(self=self)
+logger = logging.getLogger(__name__)
 
 
 class Approval(models.Model):
@@ -63,12 +27,46 @@ class Approval(models.Model):
     creator = models.ForeignKey(User)
 
 
+class Signature(models.Model):
+    signature = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
+    public_key = models.TextField()
+    x5u = models.TextField(null=True)
+
+
+class RecipeQuerySet(models.QuerySet):
+    def update_signatures(self):
+        """
+        Update the signatures on all Recipes in the queryset.
+        """
+        autographer = Autographer()
+        # Convert to a list because order must be preserved
+        recipes = list(self)
+
+        recipe_ids = [r.id for r in recipes]
+        logger.info(
+            'Requesting signatures for recipes with ids [%s] from Autograph',
+            (recipe_ids, ),
+            extra={'recipe_ids': recipe_ids})
+
+        canonical_jsons = [r.canonical_json() for r in recipes]
+        signatures_data = autographer.sign_data(canonical_jsons)
+
+        for recipe, sig_data in zip(recipes, signatures_data):
+            signature = Signature(**sig_data)
+            signature.save()
+            recipe.signature = signature
+            recipe.save()
+
+
 @reversion.register()
 class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
+    objects = RecipeQuerySet.as_manager()
+
     name = models.CharField(max_length=255, unique=True)
     revision_id = models.IntegerField(default=0, editable=False)
-    last_updated = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(default=timezone.now)
 
     action = models.ForeignKey('Action')
     arguments_json = models.TextField(default='{}', validators=[validate_json])
@@ -78,8 +76,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
     filter_expression = models.TextField(blank=False)
     approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
 
-    # A tuple of fields that can be edited without causing the recipe to be disabled
-    EDITABLE_FIELDS_WHITELIST = ('name', 'enabled', 'approval', 'last_updated')
+    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
 
     class Meta:
         ordering = ['-enabled', '-last_updated']
@@ -121,15 +118,61 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        # Increment the revision ID and save the reversion if we've
-        # changed
+    def save(self, *args, skip_last_updated=False, **kwargs):
         if self.is_dirty(check_relationship=True):
-            self.revision_id += 1
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+
+            # If only the signature changed, skip the rest of the updates here, to avoid
+            # invalidating that signature. If anything else changed, remove the signature,
+            # since it is now invalid.
+            dirty_field_names = list(dirty_fields.keys())
+            should_sign = False
+
+            if dirty_field_names == ['signature']:
+                super().save(*args, **kwargs)
+                return
+            elif 'signature' in dirty_field_names and self.signature is not None:
+                # Setting the signature while also changing something else is probably
+                # going to make the signature immediately invalid. Don't allow it.
+                raise ValidationError('Signatures must change alone')
+            else:
+                should_sign = True
+
+            # Increment the revision ID, unless someone else tried to change it.
+            if 'revision_id' not in dirty_field_names:
+                self.revision_id += 1
+
             if reversion.is_active():
                 reversion.add_to_revision(self)
 
+            if not skip_last_updated:
+                self.last_updated = timezone.now()
+
+            if should_sign:
+                try:
+                    self.update_signature()
+                except ImproperlyConfigured:
+                    self.signature = None
+
         super().save(*args, **kwargs)
+
+    def canonical_json(self):
+        from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
+        data = RecipeSerializer(self).data
+        return CanonicalJSONRenderer().render(data)
+
+    def update_signature(self):
+        autographer = Autographer()
+
+        logger.info(
+            'Requesting signatures for recipes with ids [%s] from Autograph',
+            self.id,
+            extra={'recipe_ids': [self.id]})
+
+        signature_data = autographer.sign_data([self.canonical_json()])[0]
+        signature = Signature(**signature_data)
+        signature.save()
+        self.signature = signature
 
 
 @reversion.register()
@@ -149,11 +192,6 @@ class Action(models.Model):
     @arguments_schema.setter
     def arguments_schema(self, value):
         self.arguments_schema_json = json.dumps(value)
-
-    @property
-    def in_use(self):
-        """True if this action is being used by any active recipes."""
-        return self.recipes_used_by.exists()
 
     @property
     def recipes_used_by(self):

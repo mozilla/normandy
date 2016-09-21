@@ -7,20 +7,6 @@ import jsonschema
 from jsonschema import SchemaError, ValidationError as JSONValidationError
 
 
-class ActionAdminForm(forms.ModelForm):
-    def clean(self):
-        """
-        Validate that the action being edited isn't currently in use.
-        """
-        super().clean()
-
-        if self.instance.in_use:
-            self.add_error(
-                None,
-                ValidationError('Action is currently in use and cannot be edited.')
-            )
-
-
 class RecipeAdminForm(forms.ModelForm):
     def clean(self):
         """Validate the arguments against their schema."""

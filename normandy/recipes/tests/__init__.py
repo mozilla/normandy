@@ -1,7 +1,6 @@
-import factory
+import hashlib
 
-from django.template.defaultfilters import slugify
-from django.test import RequestFactory
+import factory
 
 from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.recipes.models import (
@@ -9,11 +8,8 @@ from normandy.recipes.models import (
     Approval,
     ApprovalRequest,
     ApprovalRequestComment,
-    Client,
-    Country,
-    Locale,
     Recipe,
-    ReleaseChannel,
+    Signature,
 )
 
 
@@ -23,6 +19,10 @@ class ActionFactory(factory.DjangoModelFactory):
 
     name = FuzzyUnicode()
     implementation = 'console.log("test");'
+
+    @factory.lazy_attribute
+    def implementation_hash(action):
+        return hashlib.sha1(action.implementation.encode()).hexdigest()
 
 
 class ApprovalFactory(factory.DjangoModelFactory):
@@ -40,6 +40,15 @@ class RecipeFactory(factory.DjangoModelFactory):
     action = factory.SubFactory(ActionFactory)
     enabled = True
     approval = factory.SubFactory(ApprovalFactory)
+
+    @factory.post_generation
+    def signed(self, create, extracted=False, **kwargs):
+        if extracted:
+            self.signature = SignatureFactory()
+            self.signature.save()
+            self.save()
+        else:
+            return None
 
     @factory.post_generation
     def countries(self, create, extracted, **kwargs):
@@ -85,30 +94,29 @@ class ApprovalRequestCommentFactory(factory.DjangoModelFactory):
     creator = factory.SubFactory(UserFactory)
 
 
-class CountryFactory(factory.DjangoModelFactory):
+class SignatureFactory(factory.DjangoModelFactory):
     class Meta:
-        model = Country
+        model = Signature
 
-    code = factory.fuzzy.FuzzyText(length=3)
-
-
-class LocaleFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Locale
-
-    code = factory.fuzzy.FuzzyText(length=2)
+    signature = 'a' * 128
+    public_key = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
+    x5u = 'https://example.com/fake.x5u'
 
 
-class ReleaseChannelFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = ReleaseChannel
-
-    name = FuzzyUnicode()
-    slug = factory.LazyAttribute(lambda o: slugify(o.name))
-
-
-class ClientFactory(factory.Factory):
-    class Meta:
-        model = Client
-
-    request = factory.LazyAttribute(lambda o: RequestFactory().get('/'))
+ARGUMENTS_SCHEMA = {
+    "required": ["surveyId", "surveys"],
+    "properties": {
+        "surveyId": {"type": "string"},
+        "surveys": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "properties": {
+                    "title": {"type": "string"},
+                    "weight": {"type": "integer", "minimum": 1}
+                },
+                "required": ["title", "weight"]
+            },
+        },
+    },
+}

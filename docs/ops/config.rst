@@ -8,6 +8,12 @@ These settings map directly to built-in Django settings. An environment
 variable like ``DJANGO_FOO`` controls the Django setting ``FOO``. Not all
 Django settings are available for configuration.
 
+.. note::
+
+    Default values given refer to ``Production`` configurations, which is the
+    default in Docker images.. Other configurations may have defaults not
+    listed here.
+
 .. envvar:: DATABASE_URL
 
     :default: ``postgres://postgres@localhost/normandy``
@@ -129,7 +135,32 @@ in other Django projects.
     The amount of time in seconds to hold Recipes in the cache. This may be set
     to 0 in non-production environments to ease testing. In production
     environments, setting this value too low can be a denial-of-service risk.
-    Defaults to 5 minutes.
+
+..envvar:: DJANGO_AUTOGRAPH_URL
+
+    The URL where an Autograph_ server can be reached. If left blank, content
+    signing will be disabled.
+
+    .. _Autograph: https://github.com/mozilla-services/autograph/
+
+..envvar:: DJANGO_AUTOGRAPH_HAWK_ID
+
+    The pre-arranged ID to use for Hawk authentication with Autograph.
+
+..envvar:: DJANGO_AUTOGRAPH_SECRET_KEY
+
+    The pre-arranged secret key to use for Hawk authentication with Autograph.
+
+..envvar:: DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE
+
+    :default: ``604800`` (1 week)
+
+    Content with signature ages older than this are considered out of date and
+    will be re-signed. The keys used by Autograph to sign content are generally
+    only valid for a few weeks, and have a period of overlap where both the new
+    key and old key are valid. The aim with this setting is to be as long as
+    possible while still guaranteeing that actions will get resigned during the
+    overlap period.
 
 .. envvar:: DJANGO_API_CACHE_TIME
 
@@ -138,6 +169,15 @@ in other Django projects.
     The time in seconds to set in cache headers for cacheable APIs. This may be
     set to 0 in non-production environments to ease testing. In production
     environments, setting this value too low can be a denial-of-service risk.
+
+.. envvar:: DJANGO_LOGGING_USE_JSON
+
+    :default: ``True``
+
+    If this setting is true, standard logging will be output in mozlog_ format.
+    Otherwise logs will be unstructured.
+
+    .. _mozlog: https://github.com/mozilla-services/Dockerflow/blob/master/docs/mozlog.md
 
 Gunicorn settings
 -----------------

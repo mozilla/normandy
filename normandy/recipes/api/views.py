@@ -4,7 +4,7 @@ from django.views.decorators.cache import cache_control
 
 import django_filters
 from rest_framework import generics, permissions, status, views, viewsets
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from reversion.models import Version
@@ -18,11 +18,12 @@ from normandy.base.decorators import reversion_transaction
 from normandy.recipes.models import Action, Client, Recipe, ApprovalRequest, ApprovalRequestComment
 from normandy.recipes.api.serializers import (
     ActionSerializer,
+    ApprovalRequestCommentSerializer,
+    ApprovalRequestSerializer,
     ClientSerializer,
     RecipeSerializer,
     RecipeVersionSerializer,
-    ApprovalRequestSerializer,
-    ApprovalRequestCommentSerializer,
+    SignedRecipeSerializer,
 )
 
 
@@ -87,6 +88,12 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     @reversion_transaction
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
+
+    @list_route(methods=['GET'])
+    def signed(self, request, pk=None):
+        recipes = self.filter_queryset(self.get_queryset()).exclude(signature=None)
+        serializer = SignedRecipeSerializer(recipes, many=True)
+        return Response(serializer.data)
 
     @detail_route(methods=['GET'])
     def history(self, request, pk=None):
@@ -198,8 +205,7 @@ class RecipeVersionViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
     def get_queryset(self):
-        content_type = ContentType.objects.get_for_model(Recipe)
-        return Version.objects.filter(content_type=content_type)
+        return Version.objects.get_for_model(Recipe)
 
 
 class ClassifyClient(views.APIView):
