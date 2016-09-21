@@ -124,7 +124,7 @@ describe('Normandy Driver', () => {
 
     it('will not log debug level unless in testing mode', () => {
       spyOn(console, 'log');
-      driver.testing = false
+      driver.testing = false;
       driver.log('lorem ipsum');
       expect(console.log.calls.count()).toEqual(0);
     });
