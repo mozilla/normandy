@@ -78,9 +78,8 @@ pytz==2015.7 \
     --hash=sha256:fbd26746772c24cb93c8b97cbdad5cb9e46c86bbdb1b9d8a743ee00e2fb1fc5d \
     --hash=sha256:99266ef30a37e43932deec2b7ca73e83c8dbc3b9ff703ec73eca6b1dae6befea \
     --hash=sha256:8b6ce1c993909783bc96e0b4f34ea223bff7a4df2c90bdb9c4e0f1ac928689e3
-requests==2.9.1 \
-    --hash=sha256:113fbba5531a9e34945b7d36b33a084e8ba5d0664b703c81a7c572d91919a5b8 \
-    --hash=sha256:c577815dd00f1394203fc44eb979724b098f88264a9ef898ee45b8e5e9cf587f
+requests==2.11.1 \
+    --hash=sha256:545c4855cd9d7c12671444326337013766f4eea6068c3f0307fb2dc2696d580e
 setuptools==19.6 \
     --hash=sha256:57c63a363b37ffa2d64db4ffee26844e3ab81441fc02da4cd5e8cafcff9acb3a \
     --hash=sha256:ecd48d753c1a8ecc6a2826b863a6defaafbfd4ceafc0c1d62e5362f5a86912e9 \
@@ -202,3 +201,5 @@ mozilla-cloud-services-logger==1.0.1 \
 ecdsa==0.13 \
     --hash=sha256:40d002cf360d0e035cf2cb985e1308d41aaa087cbfc135b2dc2d844296ea546c \
     --hash=sha256:64cf1ee26d1cde3c73c6d7d107f835fed7c6a2904aef9eac223d57ad800c43fa
+pytest-testrail==0.0.9 \
+    --hash=sha256:74a46e3f61eecccb43b55e44a7c99ae22bdf75f85ecf10caf88f03e2a95d0eb3

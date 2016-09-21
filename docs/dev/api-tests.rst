@@ -8,6 +8,50 @@ To run these tests, use the following command from the root project directory.
 
 .. code-block:: bash
 
-    py.test --env=<environment> contract-tests/
+    py.test -v --server=<server> contract-tests/
 
-where ``<environment>`` is one of `dev`, `stage`, or `prod`
+where ``<server>`` is one of
+
+`https://normandy-admin.stage.mozaws.net`
+`https://normandy-admin.prod.mozaws.net`
+
+If you want to send results of the test run to TestRail, you need the following
+pre-requisites:
+
+1. You have VPN access to the staging environment
+2. You have an account on https://testrail.stage.mozaws.net
+3. Copy `testrail.cfg.dist` to `testrail.cfg`
+4. Modify that TestRail configuration file with your email, TestRail password and TestRail user ID
+
+
+Then, for any test case you want to report results for, make sure the
+script file the test is in imports the proper testrail module:
+
+.. code-block:: python
+
+    from pytest_testrail.plugin import testrail
+
+and then you use a decorator to indicate this test case will be reporting
+results. Here's an example:
+
+.. code-block:: python
+
+    @testrail('C5603')
+    def test_expected_action_types(conf, requests_session):
+
+To run the tests and report the results to TestRail, use the following command:
+
+.. code-block:: bash
+
+    py.test --server=<server> -v \
+    --no-ssl-cert-check \
+    --testrail=contract-tests/testrail.cfg contract-tests/
+
+The values for ``<server>`` are the same as before.
+
+`--no-ssl-cert-check` tells pytest to not check if the SSL certificate for the
+TestRail install is valid -- we are using a self-signed certificate and the
+underlying code throws an exception unless we tell it not to check.
+
+`--testrail=` tells pytest that we wish to report the results of TestRail
+decorated tests and where we can find the configuration file.
