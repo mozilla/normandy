@@ -275,7 +275,6 @@ class Development(Base):
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
 
-    CAN_EDIT_ACTIONS_IN_USE = values.BooleanValue(True)
     API_CACHE_TIME = values.IntegerValue(0)
 
 

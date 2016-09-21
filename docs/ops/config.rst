@@ -92,13 +92,6 @@ in other Django projects.
 
     Path to a Maxmind GeoIP Country database.
 
-.. envvar:: DJANGO_CAN_EDIT_ACTIONS_IN_USE
-
-    :default: ``false``
-
-    To avoid unexpected changes, Normandy can make actions in use read-only.
-    This setting controls that.
-
 .. envvar:: DJANGO_ADMIN_ENABLED
 
     :default: ``true``
@@ -136,22 +129,22 @@ in other Django projects.
     to 0 in non-production environments to ease testing. In production
     environments, setting this value too low can be a denial-of-service risk.
 
-..envvar:: DJANGO_AUTOGRAPH_URL
+.. envvar:: DJANGO_AUTOGRAPH_URL
 
     The URL where an Autograph_ server can be reached. If left blank, content
     signing will be disabled.
 
     .. _Autograph: https://github.com/mozilla-services/autograph/
 
-..envvar:: DJANGO_AUTOGRAPH_HAWK_ID
+.. envvar:: DJANGO_AUTOGRAPH_HAWK_ID
 
     The pre-arranged ID to use for Hawk authentication with Autograph.
 
-..envvar:: DJANGO_AUTOGRAPH_SECRET_KEY
+.. envvar:: DJANGO_AUTOGRAPH_SECRET_KEY
 
     The pre-arranged secret key to use for Hawk authentication with Autograph.
 
-..envvar:: DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE
+.. envvar:: DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE
 
     :default: ``604800`` (1 week)
 
