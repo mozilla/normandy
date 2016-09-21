@@ -10,13 +10,10 @@ const mockStore = configureMockStore(middlewares);
 const store = mockStore({ controlApp: initialState });
 
 describe('controlApp Actions', () => {
-  beforeEach(() => {
-    store.clearActions();
-    fetchMock.restore();
-  });
-
   afterEach(() => {
     expect(fetchMock.calls().unmatched).toEqual([]);
+    store.clearActions();
+    fetchMock.restore();
   });
 
   it('creates REQUEST_IN_PROGRESS when initiating an api call', () => {
