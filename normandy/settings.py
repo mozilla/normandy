@@ -94,7 +94,7 @@ class Core(Configuration):
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
         'DEFAULT_RENDERER_CLASSES': (
             'normandy.base.api.renderers.CanonicalJSONRenderer',
-            'rest_framework.renderers.BrowsableAPIRenderer',
+            'normandy.base.api.renderers.CustomBrowsableAPIRenderer',
         )
     }
 

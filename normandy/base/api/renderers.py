@@ -32,3 +32,8 @@ class CanonicalJSONRenderer(renderers.BaseRenderer):
 
     def render(self, data, media_type=None, renderer_context=None):
         return canonicaljson.encode_canonical_json(data)
+
+
+class CustomBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
+    def get_default_renderer(self, view):
+        return renderers.JSONRenderer()
