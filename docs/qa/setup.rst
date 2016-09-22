@@ -52,7 +52,7 @@ Starting the server, and initial setup
 
 4. Open the site. If you are using Docker Machine, get your VM's IP with
    ``docker-machine ip``. Otherwise, use localhost. A full URL (on Linux) is:
-   ``https://localhost:8443/admin``. Accept the self-signed certificate.
+   ``https://localhost:8443/control``. Accept the self-signed certificate.
 
 5. When finished, shut everything down.
 
