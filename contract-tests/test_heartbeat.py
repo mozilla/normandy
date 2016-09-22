@@ -1,3 +1,7 @@
+from pytest_testrail.plugin import testrail
+
+
+@testrail('C6889')
 def test_heartbeat_is_ok(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/__heartbeat__')
     # No r.raise_for_status() so we can check other things first
