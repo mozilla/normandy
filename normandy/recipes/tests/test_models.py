@@ -111,6 +111,11 @@ class TestRecipe(object):
         expected = expected.encode()
         assert recipe.canonical_json() == expected
 
+    def test_signature_is_correct_on_creation_if_autograph_available(self, mocked_autograph):
+        recipe = RecipeFactory()
+        expected_sig = hashlib.sha256(recipe.canonical_json()).hexdigest()
+        assert recipe.signature.signature == expected_sig
+
     def test_signature_is_updated_if_autograph_available(self, mocked_autograph):
         recipe = RecipeFactory(name='unchanged')
         original_signature = recipe.signature

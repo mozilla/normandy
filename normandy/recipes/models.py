@@ -154,6 +154,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
             if should_sign:
                 try:
+                    if self.id is None:
+                        # Save now, to get an ID for the signature.
+                        super().save(*args, **kwargs)
+                        # Change from insert to update, so the save() call at the end doesn't fail
+                        kwargs['force_insert'] = False
                     self.update_signature()
                 except ImproperlyConfigured:
                     self.signature = None
