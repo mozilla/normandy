@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 
 import pytest
@@ -23,5 +24,5 @@ class TestRecipeFactory:
     def test_signed_true(self):
         r = RecipeFactory(signed=True)
         assert r.signature is not None
-        assert len(r.signature.signature) == 128
+        assert r.signature.signature == hashlib.sha256(r.canonical_json()).hexdigest()
         assert isinstance(r.signature.timestamp, datetime)

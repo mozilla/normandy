@@ -41,10 +41,14 @@ class RecipeFactory(factory.DjangoModelFactory):
     enabled = True
     approval = factory.SubFactory(ApprovalFactory)
 
+    # It is important that the signature be based on the actual data, and not
+    # some static value so that tests can make assertions against what data was
+    # signed.
+
     @factory.post_generation
     def signed(self, create, extracted=False, **kwargs):
         if extracted:
-            self.signature = SignatureFactory()
+            self.signature = SignatureFactory(data=self.canonical_json())
             self.signature.save()
             self.save()
         else:
@@ -97,8 +101,10 @@ class ApprovalRequestCommentFactory(factory.DjangoModelFactory):
 class SignatureFactory(factory.DjangoModelFactory):
     class Meta:
         model = Signature
+        exclude = ['data']
 
-    signature = 'a' * 128
+    data = b''
+    signature = factory.LazyAttribute(lambda o: hashlib.sha256(o.data).hexdigest())
     public_key = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
     x5u = 'https://example.com/fake.x5u'
 
