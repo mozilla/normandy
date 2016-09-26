@@ -111,23 +111,21 @@ class TestRecipe(object):
         expected = expected.encode()
         assert recipe.canonical_json() == expected
 
-    def test_signature_is_updated_if_autograph_available(self, mocker):
-        # Mock the Autographer
-        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-        mock_autograph.return_value.sign_data.return_value = [
-            {'signature': 'fake signature'},
-        ]
-
-        recipe = RecipeFactory(name='unchanged', signed=True)
+    def test_signature_is_updated_if_autograph_available(self, mocked_autograph):
+        recipe = RecipeFactory(name='unchanged')
         original_signature = recipe.signature
+        assert original_signature is not None
+
         recipe.name = 'changed'
         recipe.save()
+
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
-        assert recipe.signature.signature == 'fake signature'
+        expected_sig = hashlib.sha256(recipe.canonical_json()).hexdigest()
+        assert recipe.signature.signature == expected_sig
 
     def test_signature_is_cleared_if_autograph_unavailable(self, mocker):
-        # Mock the Autographer
+        # Mock the Autographer to return an error
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
         mock_autograph.return_value.sign_data.side_effect = ImproperlyConfigured
 

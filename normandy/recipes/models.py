@@ -122,9 +122,13 @@ class Recipe(DirtyFieldsMixin, models.Model):
         if self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
 
-            # If only the signature changed, skip the rest of the updates here, to avoid
-            # invalidating that signature. If anything else changed, remove the signature,
-            # since it is now invalid.
+            # If only the signature changed, skip the rest of the updates here,
+            # to avoid invalidating that signature. If the signature changed
+            # along with something else, raise an error, since the signature
+            # will probably be invalid. Otherwise, try and generate a new
+            # signature for the object. If that fails, remove the signature,
+            # because it is invalid now.
+
             dirty_field_names = list(dirty_fields.keys())
             should_sign = False
 
