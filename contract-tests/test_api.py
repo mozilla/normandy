@@ -98,8 +98,6 @@ def test_recipe_signatures(conf, requests_session):
 
     for item in data:
         canonical_recipe = canonicaljson.encode_canonical_json(item['recipe'])
-        signature_pairs = item['signature']['signature'].split(';')
-        signature_parts = dict(part.split('=') for part in signature_pairs)
-        signature = signature_parts['p384ecdsa']
+        signature = item['signature']['signature']
         pubkey = item['signature']['public_key']
         assert verify_signature(canonical_recipe, signature, pubkey)
