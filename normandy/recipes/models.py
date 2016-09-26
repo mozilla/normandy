@@ -118,6 +118,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def __str__(self):
         return self.name
 
+    @transaction.atomic
     def save(self, *args, skip_last_updated=False, **kwargs):
         if self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)

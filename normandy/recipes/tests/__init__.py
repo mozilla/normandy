@@ -41,6 +41,10 @@ class RecipeFactory(factory.DjangoModelFactory):
     enabled = True
     approval = factory.SubFactory(ApprovalFactory)
 
+    # It is important that the signature be based on the actual data, and not
+    # some static value so that tests can make assertions against what data was
+    # signed.
+
     @factory.post_generation
     def signed(self, create, extracted=False, **kwargs):
         if extracted:
