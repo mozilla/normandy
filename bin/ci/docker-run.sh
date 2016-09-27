@@ -21,11 +21,11 @@ while [ $# -ge 1 ]; do
       shift
       break
       ;;
-    -d|-i|-t)
+    -d|--detach|-i|--interactive|-t|--tty)
       DOCKER_ARGS+=($1)
       shift
       ;;
-    -p|-e)
+    -p|--publish|-e|--env|-u|--user)
       DOCKER_ARGS+=($1 $2)
       shift
       shift

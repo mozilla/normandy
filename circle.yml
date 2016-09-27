@@ -31,7 +31,7 @@ test:
         echo Starting Firefox
         firefox localhost:9876
       ) &
-      bin/ci/docker-run.sh -e NODE_ENV=production -p 9876:9876 node bin/ci/karma-ci.js
+      bin/ci/docker-run.sh --user root -e NODE_ENV=production -p 9876:9876 node bin/ci/karma-ci.js
     # Start the app, and run acceptance tests
     - bin/ci/contract-tests.sh
 
