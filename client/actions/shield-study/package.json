@@ -1,0 +1,60 @@
+{
+    "name": "shield-study",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./index.js",
+    "normandy": {
+        "driverVersion": "1.x",
+        "argumentsSchema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "title": "Opt-in to a Shield Study",
+            "description": "This action allows users to opt-in to a specified shield study",
+
+            "type": "object",
+            "required": [
+                "studyName",
+                "addonName",
+                "addonUrl",
+                "duration",
+                "authors"
+            ],
+            "properties": {
+                "studyName": {
+                    "type": "string",
+                    "description": "Human-readable name for the SHIELD study",
+                    "propertyOrder": 100
+                },
+                "addonName": {
+                    "type": "string",
+                    "description": "Name of the addon that will be installed",
+                    "propertyOrder": 300
+                },
+                "addonUrl": {
+                    "type": "string",
+                    "description": "URL to study addon XPI",
+                    "propertyOrder": 400
+                },
+                "buttonText": {
+                    "type": "string",
+                    "description": "Text for opt-in button",
+                    "propertyOrder": 500
+                },
+                "thankYouText": {
+                    "type": "string",
+                    "description": "Button text after opt-in",
+                    "propertyOrder": 600
+                },
+                "duration": {
+                    "type": "string",
+                    "description": "How long the study will run",
+                    "propertyOrder": 700
+                },
+                "authors": {
+                    "type": "string",
+                    "description": "Authors of the study/addon",
+                    "propertyOrder": 800
+                }
+            }
+        }
+    }
+}

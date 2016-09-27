@@ -176,4 +176,8 @@ export default class NormandyDriver {
       resolve(emitter);
     });
   }
+
+  showStudyConsentPage(options) {
+    this.log(JSON.stringify(options), 'debug');
+  }
 }
