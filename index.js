@@ -26,11 +26,14 @@ exports.main = function() {
   }
 };
 
-// Called when the addon is uninstalled or disabled.
-exports.onUnload = function() {
+// Called when Firefox is shut down, or when the addon is uninstalled or disabled.
+exports.onUnload = function(reason) {
   if (didInit) {
     RecipeRunner.cleanup();
     didInit = false;
   }
-  SelfRepairInteraction.enableSelfRepair();
+
+  if (reason === 'uninstall' || reason === 'disable') {
+    SelfRepairInteraction.enableSelfRepair();
+  }
 };
