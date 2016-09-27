@@ -23,4 +23,8 @@ server.on('run_complete', (browsers, results) => {
   });
 });
 
+server.on('load_error', () => {
+  process.exit(1);
+});
+
 server.start();
