@@ -17,8 +17,12 @@ const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
 
 
 describe('Self-Repair Runner', () => {
-  afterEach(() => {
+  beforeEach(() => {
     fetchMock.restore();
+  });
+
+  afterEach(() => {
+    expect(fetchMock.calls().unmatched).toEqual([]);
   });
 
   describe('classifyClient', () => {
@@ -90,6 +94,18 @@ describe('Self-Repair Runner', () => {
   });
 
   describe('fetchAction', () => {
+    it('should request actions from server', async () => {
+      const recipe = { action: 'test' };
+      fetchMock.get(`/api/v1/action/${recipe.action}/`, {});
+      await fetchAction(recipe);
+
+      expect(fetchMock.lastOptions()).toEqual({
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+    });
+
     it('should not make more than one request for the same action', async () => {
       const recipe = { action: 'test' };
 
