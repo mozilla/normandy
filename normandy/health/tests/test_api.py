@@ -5,8 +5,8 @@ import pytest
 
 
 def test_version(client, mocker):
-    get_commit = mocker.patch('normandy.health.api.views.get_commit')
-    get_commit.return_value = '<git hash>'
+    get_version_info = mocker.patch('normandy.health.api.views.get_version_info')
+    get_version_info.return_value = ('<git hash>', '<tag>')
 
     res = client.get('/__version__')
     assert res.status_code == 200
@@ -15,6 +15,7 @@ def test_version(client, mocker):
         'commit': '<git hash>',
         'commit_link': 'https://github.com/mozilla/normandy/commit/<git hash>',
         'configuration': 'Test',
+        'version': '<tag>',
     }
 
 
