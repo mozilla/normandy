@@ -17,12 +17,9 @@ const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
 
 
 describe('Self-Repair Runner', () => {
-  beforeEach(() => {
-    fetchMock.restore();
-  });
-
   afterEach(() => {
     expect(fetchMock.calls().unmatched).toEqual([]);
+    fetchMock.restore();
   });
 
   describe('classifyClient', () => {
