@@ -34,7 +34,7 @@ steps, as they don't affect your setup if nothing has changed:
    git pull origin master
 
    # Install new dependencies or update existing ones.
-   pip install -r requirements.txt
+   pip install -r requirements/default.txt -c requirements/constraints.txt
    npm install
 
    # Run database migrations.
@@ -62,13 +62,15 @@ After running this command, the documentation should be available at
 Adding New Dependencies
 -----------------------
 Normandy uses hashed requirements for all of our dependencies. This means that
-``requirements.txt`` includes hashes that help verify that dependencies
+``requirements/default.txt`` includes hashes that help verify that dependencies
 downloaded by pip haven't been tampered with.
 
 When adding a new dependency, you must include hashes for it. For packages that
 use wheels, you will have to include hashes for all of the platforms that the
 wheel supports, as they will all have different hashes. Tools like hashin_ can
 make adding these hashes easier.
+
+Dependency's dependencies should go in ``requirements/constraints.txt``.
 
 .. _hashin: https://github.com/peterbe/hashin
 

@@ -321,6 +321,10 @@ class ProductionInsecure(Production):
     ])
 
 
+class ProductionReadOnlyInsecure(ProductionReadOnly, ProductionInsecure):
+    pass
+
+
 class Build(Production):
     """Settings for building the Docker image for production."""
     SECRET_KEY = values.Value('not a secret')
