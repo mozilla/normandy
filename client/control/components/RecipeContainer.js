@@ -17,6 +17,12 @@ export default function composeRecipeContainer(Component) {
       }
     }
 
+    componentWillReceiveProps(nextProps) {
+      if (nextProps.recipeId) {
+        this.getRecipeData(nextProps.recipeId);
+      }
+    }
+
     getRecipeData(recipeId) {
       const { dispatch, location, recipe } = this.props;
       if (!recipe) {

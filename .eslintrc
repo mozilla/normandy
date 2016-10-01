@@ -25,6 +25,7 @@ rules:
   react/jsx-filename-extension: [error, { extensions: [.js] }]
   react/no-multi-comp: [off]
   react/require-extension: [off]  # deprecated
+  jsx-a11y/label-has-for: [off]
 
   # generator-star-spacing is broken with parser: babel-eslint. Use a patched version
   generator-star-spacing: [off]

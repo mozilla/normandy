@@ -105,16 +105,6 @@
 }
 
 
-/* Content */
-#content {
-  h3 {
-    font-size: 16px;
-    font-weight: 300;
-    margin: 0 0 15px 0;
-  }
-}
-
-
 /* 404 NoMatch Page */
 .no-match {
   padding: 30px 45px;
@@ -130,203 +120,87 @@
 
 
 /* Add & Edit Forms */
-.crud-form {
+.recipe-form {
   padding: 30px 45px;
 
-  input[type="checkbox"] {
-    width: auto;
-    margin: 0 5px;
-  }
-
-  input[type="number"] { width: 20%; }
-
-  .fluid-1 { width: 6.25%; }
-  .fluid-3 { width: 46.875%; }
-
-  .help {
-    font-size: 11px;
-    margin: 5px 0px;
-    opacity: 0.5;
-  }
-
-  .validation-error {
-    color: $red;
-    float: right;
-    font-size: 11px;
-    text-transform: lowercase;
-  }
-
-  /* Custom checkbox toggle for enabled/disabled state */
-  .checkbox-container {
-    border: 1px solid;
-    border-radius: 3px;
-    float: right;
-    font-size: 12px;
-    line-height: 30px;
-    margin-top: 10px;
-    min-width: 110px;
-    padding: 5px 15px;
-    text-transform: uppercase;
-
-    &:hover { cursor: pointer; }
-  }
-
-  /* Select arrows for toggling locales & countries */
-  .select-arrows {
-    line-height: 35px;
-    margin-top: 30px;
+  &.loading {
     text-align: center;
-    width: 6.25%;
+  }
 
-    i {
-      display: block;
-      padding: 10px 0px;
+  & > .form-field {
+    margin: 0 0 1em;
+    position: relative;
+    width: 50%;
+  }
+
+  .error {
+    color: $red;
+    display: block;
+    padding-bottom: 5px;
+  }
+
+  .checkbox-field {
+    margin: 15px 0 10px;
+
+    .label {
+      display: inline;
+      margin-left: 20px;
+    }
+
+    input {
+      display: inline;
+      left: 0;
+      position: absolute;
+      width: auto;
     }
   }
 
-  a.batch-select {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 8px 0px;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
   /* Action buttons (submit, delete, etc) */
-  .form-action-buttons {
+  .form-actions {
+    @extend %clearfix;
     border-top: 1px solid $darkCream;
-    line-height: 30px;
     margin-top: 30px;
-    padding-top: 15px;
+    padding: 30px 15px 15px;
 
-    a.delete, input[type="submit"].delete {
+    .delete {
       background-color: $red;
       display: inline-block;
+      float: left;
 
       &:hover {
         background-color: $redHover;
       }
     }
+
+    .submit {
+      display: inline-block;
+      float: right;
+    }
   }
 }
 
 /* Action Forms */
-#action-configuration {
+.arguments-fields {
   background: $cream;
-  clear: both;
-  margin: 1em;
-  padding: 30px;
+  padding: 15px;
   position: relative;
 
-  i.fa-caret-up {
-    color: $cream;
+  &:before {
+    border: solid;
+    border-color: $cream transparent;
+    border-width: 0 8px 8px 8px;
+    content: "";
     left: 15px;
     position: absolute;
-    top: -10px;
+    top: -8px;
   }
 
-  h4 {
-    display: inline-block;
-    font-weight: 600;
-    line-height: 30px;
-  }
-
-  .row {
-    padding: 0.5em 0;
-  }
-
-  .active {
-    background-color: rgba(255,255,255,0.5);
-    border-bottom: 1px solid $darkCream;
-  }
-
-  .array-field {
-    margin-top: 25px;
-
-    a.add-field {
-      float: right;
-      padding: 0px 15px;
-    }
-
-    ul {
-      margin-top: 25px;
-
-      li {
-        border: 1px solid transparent;
-        font-size: 13px;
-        line-height: 30px;
-        list-style-type: none;
-        padding: 5px 1em;
-        transition: all 0.2s;
-
-        .delete-field {
-          display: inline-block;
-          float: right;
-        }
-
-        &:not(.active):hover {
-          background-color: transparent;
-          color: $cta;
-          cursor: pointer;
-        }
-
-        &.active {
-          margin: 0px -2em;
-          padding: 5px 3em;
-        }
-
-        &.invalid {
-          color: $red;
-          font-weight: 700;
-
-          &:before {
-            border: none;
-            color: $red;
-            content: "\f071"; // error icon, fa-exclamation-triangle
-            font: normal normal 400 11px/1 FontAwesome;
-            left: -1.5em;
-            margin-right: 4px;
-          }
-        }
-
-        &:before {
-          border-color: transparent $darkBrown;
-          border-style: solid;
-          border-width: 0.35em 0 0.35em 0.35em;
-          content: "";
-          display: inline-block;
-          height: 0;
-          left: -1em;
-          position: relative;
-          top: 50%;
-          width: 0;
-        }
-      }
-    }
-  }
-
-  /* Heartbeat Survey Form */
-  #survey-form {
-    margin-top: -50px;
-    padding: 40px;
-    position: relative;
-    transition: all 0.2s;
-
-    span.return-to-defaults {
-      font-size: 11px;
-      position: absolute;
-      right: 20px;
-      top: 15px;
-
-      &:hover {
-        color: $ctaHover;
-        cursor: pointer;
-      }
-    }
+  .info {
+    color: $darkBrown;
+    margin: 0 0 1em;
+    width: 50%;
   }
 }
-
 
 /* Recipe History */
 .recipe-history {
