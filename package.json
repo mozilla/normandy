@@ -40,6 +40,12 @@
       "title": "Developer Mode",
       "type": "bool",
       "value": false
+    }, {
+      "name": "startup_delay",
+      "title": "Startup Delay",
+      "description": "Number of seconds to wait after startup before running recipes",
+      "type": "integer",
+      "value": 300
     }
   ],
   "devDependencies": {
