@@ -95,10 +95,24 @@ exports['test it includes learnMoreTS if learn more is clicked'] = (assert, done
   closeAllNotifications();
 };
 
-//exports['test it opens an engagement page after interaction'] = assert => {
-//  assert.ok(false);
-//};
-//
+exports['test it opens an engagement page after interaction'] = (assert, done) => {
+  let hb = new Heartbeat(targetWindow, {
+    testing: true,
+    message: 'oh hai',
+    engagementButtonLabel: 'Engage whooo',
+    postAnswerURL: 'https://www.example.org/engaging',
+  });
+
+  tabs.on('load', (tab) => {
+    assert.equal(tabs.activeTab.url, 'https://www.example.org/engaging');
+    // Close engagement tab
+    tabs[tabs.length - 1].close();
+    done();
+  });
+
+  let engagementEl = hb.notice.querySelector('.notification-button');
+  engagementEl.click();
+};
 
 function closeAllNotifications() {
   if (notificationBox.allNotifications.length === 0) {
