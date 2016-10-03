@@ -11,6 +11,15 @@ exports['test it works'] = promiseTest(assert => {
   .then(val => assert.equal(val, 4));
 });
 
+exports['test it evaluate multiline expressions'] = promiseTest(assert => {
+  return EnvExpressions.eval(`
+    2
+    +
+    2
+  `)
+  .then(val => assert.equal(val, 4));
+});
+
 exports['test it can access telemetry'] = promiseTest(assert => {
   return EnvExpressions.eval('telemetry')
   .then(telemetry => assert.ok(typeof telemetry === 'object'));
@@ -20,7 +29,6 @@ exports['test it reads different types of telemetry'] = promiseTest(Task.async(f
   yield TelemetryController.submitExternalPing('testfoo', {foo: 1});
   yield TelemetryController.submitExternalPing('testbar', {bar: 2});
   const result = yield(EnvExpressions.eval('telemetry'));
-  console.log('!!!!!!!', result);
   assert.equal(result.testfoo.payload.foo, 1);
   assert.equal(result.testbar.payload.bar, 2);
 }));
