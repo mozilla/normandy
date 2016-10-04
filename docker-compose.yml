@@ -32,7 +32,7 @@ services:
       - ./etc/proxy.key:/etc/nginx/proxy.key:ro
 
   autograph:
-    image: mythmon/autograph
+    image: mozilla/autograph
     stop_signal: SIGKILL
     volumes:
       - ./etc/autograph.yaml:/etc/autograph/autograph.yaml:ro
