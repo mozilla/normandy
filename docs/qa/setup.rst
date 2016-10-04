@@ -80,13 +80,18 @@ editing ``services.normandy.environment``. For example, to change the time that
 recipes are cached for, add a line ``DJANGO_CACHES_RECIPE_TIME: 5`` in the
 ``environment`` section.
 
-Getting the addon
+Getting the add-on
 -----------------
-Some functionality of Normandy relies on an addon to provide additional features
-in the browser. This addon is under active development. The latest version of
-the addon can be found as a `CircleCI build artifact`_.
+Some functionality of Normandy relies on an add-on to provide additional features
+in the browser. This add-on is under active development. The latest version of
+the add-on can be found as a `CircleCI build artifact`_.
 
-.. _CircleCI build artifact: https://circle-artifacts.com/gh/mozilla/normandy-addon/latest/artifacts/0/$CIRCLE_ARTIFACTS/recipe-client.xpi
+.. note:: Visiting the link above may result in Firefox attempting and failing
+   to install the add-on since it is not hosted on a trusted domain. To install
+   it, you must right-click the file and save it to your computer, and then open
+   the XPI file in Firefox.
+
+.. _CircleCI build artifact: https://circleci.com/api/v1/project/mozilla/normandy-addon/latest/artifacts/0/$CIRCLE_ARTIFACTS/shield-recipe-client.xpi
 
 Configuring Firefox
 -------------------
@@ -102,12 +107,23 @@ actually running. When using Docker Machine, this is the output of
 .. describe:: browser.uitour.testingOrigins
 
   A comma-seperated list of domains UITour can run on. In order for Actions to
-  run correctly without the addon, add ``https://localhost:8443`` to this value.
+  run correctly without the add-on, add ``https://localhost:8443`` to this value.
 
 .. describe:: extensions.recipeclient.api_url
 
-  The URL that the addon will fetch recipes from. Set this to
+  The URL that the add-on will fetch recipes from. Set this to
   ``https://localhost:8443/api/v1`` to use the local Normandy.
 
-  Note that this value *must* start with ``https``, otherwise the addon will
+  Note that this value *must* start with ``https``, otherwise the add-on will
   reject it.
+
+.. describe:: security.content.signature.root_hash
+
+  Hash of the root key use for signing recipes. If you are testing against a
+  local development server (using normandy-compose_ as mentioned above), you
+  must set this to::
+
+    4C:35:B1:C3:E3:12:D9:55:E7:78:ED:D0:A7:E7:8A:38:83:04:EF:01:BF:FA:03:29:B2:46:9F:3C:C5:EC:36:04
+
+  If you are testing against the production Normandy server, leave this set to
+  its default value.
