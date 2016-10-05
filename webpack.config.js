@@ -14,7 +14,7 @@ const production = process.env.NODE_ENV === 'production';
 var plugins = [
   new BundleTracker({ filename: './webpack-stats.json' }),
   new webpack.optimize.OccurrenceOrderPlugin(true),
-  new ExtractTextPlugin('[name]-[hash].css'),
+  new ExtractTextPlugin(production ? '[name]-[hash].css' : '[name].css'),
   new webpack.DefinePlugin({
     PRODUCTION: production,
     DEVELOPMENT: !production,
@@ -61,7 +61,7 @@ module.exports = [
 
     output: {
       path: path.resolve('./assets/bundles/'),
-      filename: '[name]-[hash].js',
+      filename: production ? '[name]-[hash].js' : '[name].js',
       chunkFilename: '[id].bundle.js',
     },
     externals: {
@@ -129,7 +129,7 @@ module.exports = [
 
     output: {
       path: path.resolve('./assets/bundles/'),
-      filename: '[name]-[hash].js',
+      filename: production ? '[name]-[hash].js' : '[name].js',
     },
 
     module: {
