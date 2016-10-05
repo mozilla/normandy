@@ -45,5 +45,44 @@ describe('JexlEnvironment', () => {
       jexlEnv.eval('"test"|stableSample(0.0)')
       .then(val => expect(val).toEqual(false))
     ));
+
+    /**
+     * This test is not, and cannot, be perfect.
+     * It trades off reliably passing for accuracy of the test.
+     * In it's current form, it can detect inaccuracies of 6%, but will have a
+     * false failure 0.1% of the time.
+     *
+     * Those numbers were calculated with this Python code
+     *
+     *    from scipy.stats import binom
+     *
+     *    alpha = 0.001
+     *    sample = 10000
+     *    rate = 0.25
+     *    low, hi = binom.interval(1 - alpha, sample, rate)
+     *    expected = sample * rate
+     *    print(1.0 / (low / expected), high / expected)
+     *
+     * The test can be made more accurate, at the cost of a higher false,
+     * failure rate, and vice-versa. Accuracy can be increased without
+     * sacrificing false failure rate by increasing the number of samples.
+     */
+    it('should sample at about the right rate', () => {
+      const sample = 10000;
+      const rate = 0.25;
+      const accuracy = 0.06;
+      const promises = [];
+
+      for (let i = 0; i < sample; i++) {
+        promises.push(jexlEnv.eval(`"${Math.random()}"|stableSample(${rate})`));
+      }
+
+      return Promise.all(promises)
+      .then(results => {
+        let count = results.filter(x => x).length;
+        expect(count).toBeGreaterThan(sample * rate / (1 + accuracy));
+        expect(count).toBeLessThan(sample * rate * (1 + accuracy));
+      });
+    });
   });
 });
