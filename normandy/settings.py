@@ -125,6 +125,7 @@ class Core(Configuration):
     ACTIONS = {
         'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
         'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
+        'shield-study': os.path.join(BASE_DIR, 'client/actions/shield-study'),
     }
 
 

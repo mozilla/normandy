@@ -2,6 +2,7 @@ import React, { PropTypes as pt } from 'react';
 import { reduxForm } from 'redux-form';
 import HeartbeatForm, { HeartbeatFormFields } from './action_forms/HeartbeatForm.js';
 import ConsoleLogForm, { ConsoleLogFormFields } from './action_forms/ConsoleLogForm.js';
+import ShieldStudyForm, { ShieldStudyFormFields } from './action_forms/ShieldStudyForm.js';
 
 export function DisconnectedActionForm({ fields, ChildForm }) {
   return (
@@ -32,6 +33,11 @@ export default reduxForm({
     case 'console-log':
       ChildForm = ConsoleLogForm;
       fields = ConsoleLogFormFields;
+      break;
+
+    case 'shield-study':
+      ChildForm = ShieldStudyForm;
+      fields = ShieldStudyFormFields;
       break;
 
     default:

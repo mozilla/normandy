@@ -28,7 +28,7 @@ export class DisconnectedRecipeForm extends React.Component {
     super(props);
 
     this.state = {
-      availableActions: ['console-log', 'show-heartbeat'],
+      availableActions: ['console-log', 'show-heartbeat', 'shield-study'],
       selectedAction: null,
     };
 

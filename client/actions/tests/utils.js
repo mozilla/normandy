@@ -74,6 +74,9 @@ export function mockNormandy() {
     saveHeartbeatFlow() {
       return Promise.resolve();
     },
+    showStudyConsentPage() {
+      return Promise.resolve();
+    },
   };
 
   const toSpy = [
@@ -84,6 +87,7 @@ export function mockNormandy() {
     'client',
     'uuid',
     'saveHeartbeatFlow',
+    'showStudyConsentPage',
   ];
   for (const method of toSpy) {
     spyOn(normandy, method).and.callThrough();

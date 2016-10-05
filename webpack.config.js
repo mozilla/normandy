@@ -98,6 +98,7 @@ module.exports = [
     entry: {
       'console-log': './client/actions/console-log/index',
       'show-heartbeat': './client/actions/show-heartbeat/index',
+      'shield-study': './client/actions/shield-study/index',
     },
 
     plugins: [
