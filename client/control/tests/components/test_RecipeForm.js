@@ -40,6 +40,7 @@ describe('<RecipeForm>', () => {
         <RecipeForm params={{}} recipe={{ action: 'show-heartbeat' }} location={{ query: '' }} />
       </Provider>);
       disconnectedFormWrapper = recipeFormWrapper.find('DisconnectedRecipeForm').get(0);
+      expect(disconnectedFormWrapper).toBeDefined();
       disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
     });
 

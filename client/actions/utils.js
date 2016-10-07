@@ -31,7 +31,7 @@ export function weightedChoose(choices) {
     }
   }
 
-    // We shouldn't hit this, but if we do, return the last choice.
+  // We shouldn't hit this, but if we do, return the last choice.
   return choices[choices.length - 1];
 }
 
