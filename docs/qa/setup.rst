@@ -81,7 +81,7 @@ recipes are cached for, add a line ``DJANGO_CACHES_RECIPE_TIME: 5`` in the
 ``environment`` section.
 
 Getting the add-on
------------------
+------------------
 Some functionality of Normandy relies on an add-on to provide additional features
 in the browser. This add-on is under active development. The latest version of
 the add-on can be found as a `CircleCI build artifact`_.
