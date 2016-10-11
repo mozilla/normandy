@@ -103,7 +103,7 @@ exports['test it opens an engagement page after interaction'] = (assert, done) =
     postAnswerURL: 'https://www.example.org/engaging',
   });
 
-  tabs.on('load', (tab) => {
+  tabs.on('ready', (tab) => {
     assert.equal(tabs.activeTab.url, 'https://www.example.org/engaging');
     // Close engagement tab
     tabs[tabs.length - 1].close();
