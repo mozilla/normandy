@@ -1,6 +1,10 @@
 import fetchMock from 'fetch-mock';
 
-import NormandyDriver, { HeartbeatEmitter } from '../normandy_driver.js';
+import NormandyDriver, {
+  HeartbeatEmitter,
+  LocalStorage,
+  STORAGE_DURABILITY_KEY,
+} from '../normandy_driver.js';
 import { urlPathMatcher } from '../../tests/utils.js';
 
 describe('Normandy Driver', () => {
@@ -220,6 +224,57 @@ describe('Normandy Driver', () => {
       const spy = jasmine.createSpy('VotedCallback');
       emitter.on('Voted', spy);
       expect(spy).toHaveBeenCalledWith(data);
+    });
+  });
+});
+
+describe('LocalStorage', () => {
+  let store;
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    window.localStorage.setItem(STORAGE_DURABILITY_KEY, 2);
+    store = new LocalStorage('test-prefix');
+  });
+
+  it('can set and get items', async () => {
+    await store.setItem('key', 'value');
+    expect(await store.getItem('key')).toEqual('value');
+  });
+
+  it("returns null for values that haven't been set", async () => {
+    expect(await store.getItem('absent')).toBeNull();
+  });
+
+  it("can remove items after they've been set", async () => {
+    await store.setItem('toBeRemoved', 'value');
+    expect(await store.getItem('toBeRemoved')).toEqual('value');
+    await store.removeItem('toBeRemoved');
+    expect(await store.getItem('toBeRemoved')).toBeNull();
+  });
+
+  it('fails if storage is not known to be durable', async () => {
+    window.localStorage.setItem(STORAGE_DURABILITY_KEY, 0);
+    try {
+      await store.getItem('value');
+      throw new Error('Did not throw error');
+    } catch (err) {
+      expect(err).toEqual(new Error('Storage durability unconfirmed'));
+    }
+  });
+
+  describe('tests are independent', () => {
+    // If the tests are not independent, the one of these that runs second will fail
+    it('should not leak data between tests part 1', async () => {
+      const val = await store.getItem('counter') || 0;
+      await store.setItem('counter', val + 1);
+      expect(await store.getItem('counter')).toEqual(1);
+    });
+
+    it('should not leak data between tests part 2', async () => {
+      const val = await store.getItem('counter') || 0;
+      await store.setItem('counter', val + 1);
+      expect(await store.getItem('counter')).toEqual(1);
     });
   });
 });
