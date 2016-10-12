@@ -82,7 +82,6 @@ export function mockNormandy() {
   const toSpy = [
     'location',
     'log',
-    'createStorage',
     'showHeartbeat',
     'client',
     'uuid',

@@ -12,6 +12,16 @@ class LocalStorage {
    */
   constructor(prefix) {
     this.prefix = prefix;
+
+    return new Promise((resolve, reject) => {
+      try {
+        localStorage.setItem('normandy-test', true);
+        localStorage.removeItem('normandy-test');
+        return resolve(this);
+      } catch (error) {
+        return reject('localStorage unavailable');
+      }
+    });
   }
 
   _makeKey(key) {

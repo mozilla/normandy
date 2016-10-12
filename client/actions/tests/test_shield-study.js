@@ -14,4 +14,31 @@ describe('ShieldStudyAction', () => {
     await action.execute();
     expect(normandy.showStudyConsentPage).toHaveBeenCalledWith({ studyName: 'lorem ipsum' });
   });
+
+  it('should not run if it has already been shown', async () => {
+    const action = new ShieldStudyAction(normandy, { arguments: { studyName: 'lorem ipsum' } });
+
+    normandy.mock.storage.data.studyHasBeenShown = true;
+
+    await action.execute();
+    expect(normandy.showStudyConsentPage).not.toHaveBeenCalled();
+  });
+
+  it('should not run if localStorage is unavailable', async () => {
+    const action = new ShieldStudyAction(normandy, { arguments: { studyName: 'lorem ipsum' } });
+
+    normandy.testing = true;
+    spyOn(normandy, 'createStorage').and.returnValue(Promise.reject('err'));
+
+    expect(await action.execute()).toThrowError('err');
+  });
+
+  it('should always run in testing mode', async () => {
+    const action = new ShieldStudyAction(normandy, { arguments: { studyName: 'lorem ipsum' } });
+
+    normandy.testing = true;
+    normandy.mock.storage.data.studyHasBeenShown = true;
+    await action.execute();
+    expect(normandy.showStudyConsentPage).toHaveBeenCalled();
+  });
 });
