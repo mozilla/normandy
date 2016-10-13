@@ -23,7 +23,8 @@ RUN NODE_ENV=production ./node_modules/.bin/webpack && \
     mkdir -p __version__ && \
     mkdir -p /test_artifacts && \
     chmod 777 /test_artifacts && \
-    git rev-parse HEAD > __version__/commit
+    git rev-parse HEAD > __version__/commit && \
+    git describe --tags --exact-match > __version__/tag || true # may fail if not on a tag
 
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \

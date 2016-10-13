@@ -13,31 +13,41 @@ from normandy.base.decorators import short_circuit_middlewares
 
 
 _commit = None
+_tag = None
 
 
-def get_commit():
-    global _commit
+def get_version_info():
+    global _commit, _tag
     if _commit is None:
         path = os.path.join(settings.BASE_DIR, '__version__', 'commit')
         try:
             with open(path) as f:
-                _commit = f.read().strip()
+                _commit = f.read().strip() or 'unknown'
         except OSError:
-            _commit = None
+            _commit = 'unknown'
 
-    return _commit
+    if _tag is None:
+        path = os.path.join(settings.BASE_DIR, '__version__', 'tag')
+        try:
+            with open(path) as f:
+                _tag = f.read().strip() or 'unknown'
+        except OSError:
+            _tag = 'unknown'
+
+    return _commit, _tag
 
 
 @api_view(['GET'])
 def version(request):
     repo_url = 'https://github.com/mozilla/normandy'
-    commit = get_commit()
+    commit, tag = get_version_info()
 
     return Response({
         'source': repo_url,
         'commit': commit,
         'commit_link': '{0}/commit/{1}'.format(repo_url, commit) if commit else None,
         'configuration': os.environ.get('DJANGO_CONFIGURATION'),
+        'version': tag,
     })
 
 
