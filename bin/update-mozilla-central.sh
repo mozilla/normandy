@@ -13,7 +13,7 @@ dest=$1
 echo "Building XPI"
 npm run build > /dev/null
 echo "Clearing destination"
-rm -r "${dest}"/*
+rm -rf "${dest}"/*
 echo "Extracting XPI"
 unzip -quo "shield-recipe-client.xpi" -d "${dest}" > /dev/null
 
@@ -44,3 +44,6 @@ FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
   'node_modules',
   'package.json',
 ]" > "${dest}/moz.build"
+
+echo "Patching install.rdf"
+sed -i -e '/<em:creator>/d' -e '/<em:optionsURL>/d' "${dest}/install.rdf"

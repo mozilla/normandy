@@ -46,6 +46,11 @@
       "description": "Number of seconds to wait after startup before running recipes",
       "type": "integer",
       "value": 300
+    },
+    {
+      "name": "input_host",
+      "title": "Input Host",
+      "type": "string"
     }
   ],
   "devDependencies": {

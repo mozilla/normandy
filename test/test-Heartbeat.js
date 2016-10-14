@@ -12,13 +12,19 @@ let notificationBox;
 
 exports['test it shows a heartbeat panel'] = assert => {
   assert.equal(notificationBox.childElementCount, 0);
-  new Heartbeat(targetWindow, {testing: true});
+  new Heartbeat(targetWindow, {
+    testing: true,
+    flowId: 'test',
+    message: 'test',
+  });
   assert.equal(notificationBox.childElementCount, 1);
 };
 
 exports['test it shows five stars when there is no engagementButtonLabel'] = assert => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
+    flowId: 'test',
+    message: 'test',
     engagementButtonLabel: undefined,
   });
   assert.equal(hb.notice.querySelectorAll('.star-x').length, 5);
@@ -28,6 +34,8 @@ exports['test it shows five stars when there is no engagementButtonLabel'] = ass
 exports['test it shows a button when there is an engagementButtonLabel'] = assert => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
+    flowId: 'test',
+    message: 'test',
     engagementButtonLabel: 'Click me!',
   });
   assert.equal(hb.notice.querySelectorAll('.star-x').length, 0);
@@ -37,6 +45,8 @@ exports['test it shows a button when there is an engagementButtonLabel'] = asser
 exports['test it shows a learn more link'] = assert => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
+    flowId: 'test',
+    message: 'test',
     learnMoreMessage: 'Learn More',
     learnMoreURL: 'https://example.org/learnmore',
   });
@@ -48,20 +58,22 @@ exports['test it shows a learn more link'] = assert => {
 exports['test it shows the message'] = assert => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
-    message: 'oh hai',
+    flowId: 'test',
+    message: 'test',
   });
   let messageEl = targetWindow.document.getAnonymousElementByAttribute(
     hb.notice,
     'anonid',
     'messageText'
   );
-  assert.equal(messageEl.textContent, 'oh hai');
+  assert.equal(messageEl.textContent, 'test');
 };
 
 exports['test it pings telemetry'] = (assert, done) => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
-    message: 'oh hai',
+    flowId: 'test',
+    message: 'test',
   });
 
   hb.events.on('TelemetrySent', payload => {
@@ -76,7 +88,8 @@ exports['test it pings telemetry'] = (assert, done) => {
 exports['test it includes learnMoreTS if learn more is clicked'] = (assert, done) => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
-    message: 'oh hai',
+    flowId: 'test',
+    message: 'test',
     learnMoreMessage: 'Learn More',
     learnMoreURL: 'https://example.org/learnmore',
   });
@@ -98,13 +111,14 @@ exports['test it includes learnMoreTS if learn more is clicked'] = (assert, done
 exports['test it opens an engagement page after interaction'] = (assert, done) => {
   let hb = new Heartbeat(targetWindow, {
     testing: true,
-    message: 'oh hai',
+    flowId: 'test',
+    message: 'test',
     engagementButtonLabel: 'Engage whooo',
-    postAnswerURL: 'https://www.example.org/engaging',
+    postAnswerURL: 'about:about',
   });
 
   tabs.on('ready', (tab) => {
-    assert.equal(tabs.activeTab.url, 'https://www.example.org/engaging');
+    assert.equal(tabs.activeTab.url, 'about:about');
     // Close engagement tab
     tabs[tabs.length - 1].close();
     done();
