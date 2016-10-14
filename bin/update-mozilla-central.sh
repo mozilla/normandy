@@ -46,4 +46,8 @@ FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
 ]" > "${dest}/moz.build"
 
 echo "Patching install.rdf"
-sed -i -e '/<em:creator>/d' -e '/<em:optionsURL>/d' "${dest}/install.rdf"
+sed -i \
+    -e '/<em:creator>/d' \
+    -e '/<em:optionsURL>/d' \
+    -e '/<em:optionsType>/d' \
+    "${dest}/install.rdf"
