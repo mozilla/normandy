@@ -109,7 +109,7 @@ actually running. When using Docker Machine, this is the output of
   A comma-seperated list of domains UITour can run on. In order for Actions to
   run correctly without the add-on, add ``https://localhost:8443`` to this value.
 
-.. describe:: extensions.recipeclient.api_url
+.. describe:: extensions.shield-recipe-client@mozilla.org.api_url
 
   The URL that the add-on will fetch recipes from. Set this to
   ``https://localhost:8443/api/v1`` to use the local Normandy.
