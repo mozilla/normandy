@@ -1,131 +1,57 @@
 {
-    "name": "show-heartbeat",
-    "version": "0.0.1",
-    "private": true,
-    "main": "./index.js",
-    "normandy": {
-        "driverVersion": "1.x",
-        "argumentsSchema": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "title": "Show a Heartbeat survey.",
-            "description": "This action can show a single survey, or choose a single survey from multiple weighted ones.",
+  "name": "show-heartbeat",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.js",
+  "normandy": {
+    "driverVersion": "1.x",
+    "argumentsSchema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "title": "Show a Heartbeat survey.",
+      "description": "This action shows a single survey.",
 
-            "type": "object",
-            "required": [
-                "surveyId",
-                "surveys"
-            ],
-            "properties": {
-                "surveyId": {
-                    "type": "string",
-                    "description": "Slug uniquely identifying this survey in telemetry",
-                    "propertyOrder": 100
-                },
-                "defaults": {
-                    "$ref": "#/definitions/survey",
-                    "title": "Default values",
-                    "description": "Default values used for missing values in the list of surveys",
-                    "propertyOrder": 200
-                },
-                "surveys": {
-                    "type": "array",
-                    "format": "tabs",
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/weightedSurvey",
-                        "headerTemplate": "Survey {{ self.title }}"
-                    },
-                    "propertyOrder": 300
-                }
-            },
-
-            "definitions": {
-                "title": {
-                    "description": "Descriptive title. Not shown to users",
-                    "type": "string",
-                    "default": ""
-                },
-                "message": {
-                    "description": "Message to show to the user",
-                    "type": "string",
-                    "default": ""
-                },
-                "engagementButtonLabel": {
-                    "description": "Text for the engagement button. If specified, this button will be shown instead of rating stars.",
-                    "type": "string",
-                    "default": ""
-                },
-                "thanksMessage": {
-                    "description": "Thanks message to show to the user after they've rated Firefox",
-                    "type": "string",
-                    "default": ""
-                },
-                "postAnswerUrl": {
-                    "description": "URL to redirect the user to after rating Firefox or clicking the engagement button",
-                    "type": "string",
-                    "default": ""
-                },
-                "learnMoreMessage": {
-                    "description": "Message to show to the user to learn more",
-                    "type": "string",
-                    "default": ""
-                },
-                "learnMoreUrl": {
-                    "description": "URL to show to the user when they click Learn More",
-                    "type": "string",
-                    "default": ""
-                },
-                "survey": {
-                    "type": "object",
-                    "properties": {
-                        "message": {
-                            "$ref": "#/definitions/message",
-                            "propertyOrder": 100
-                        },
-                        "engagementButtonLabel": {
-                            "$ref": "#/definitions/engagementButtonLabel",
-                            "propertyOrder": 200
-                        },
-                        "thanksMessage": {
-                            "$ref": "#/definitions/thanksMessage",
-                            "propertyOrder": 300
-                        },
-                        "postAnswerUrl": {
-                            "$ref": "#/definitions/postAnswerUrl",
-                            "propertyOrder": 400
-                        },
-                        "learnMoreMessage": {
-                            "$ref": "#/definitions/learnMoreMessage",
-                            "propertyOrder": 500
-                        },
-                        "learnMoreUrl": {
-                            "$ref": "#/definitions/learnMoreUrl",
-                            "propertyOrder": 600
-                        }
-                    }
-                },
-                "weightedSurvey": {
-                    "allOf": [
-                        {"$ref": "#/definitions/survey"},
-                        {
-                            "properties": {
-                                "title": {
-                                    "$ref": "#/definitions/title",
-                                    "propertyOrder": 50
-                                },
-                                "weight": {
-                                    "type": "integer",
-                                    "description": "Frequency relative to other surveys",
-                                    "minimum": 1,
-                                    "default": 1,
-                                    "propertyOrder": 2000
-                                }
-                            },
-                            "required": ["weight"]
-                        }
-                    ]
-                }
-            }
+      "type": "object",
+      "required": [
+        "surveyId",
+        "message",
+        "thanksMessage"
+      ],
+      "properties": {
+        "surveyId": {
+          "type": "string",
+          "description": "Slug uniquely identifying this survey in telemetry"
+        },
+        "message": {
+          "description": "Message to show to the user",
+          "type": "string",
+          "default": ""
+        },
+        "engagementButtonLabel": {
+          "description": "Text for the engagement button. If specified, this button will be shown instead of rating stars.",
+          "type": "string",
+          "default": ""
+        },
+        "thanksMessage": {
+          "description": "Thanks message to show to the user after they've rated Firefox",
+          "type": "string",
+          "default": ""
+        },
+        "postAnswerUrl": {
+          "description": "URL to redirect the user to after rating Firefox or clicking the engagement button",
+          "type": "string",
+          "default": ""
+        },
+        "learnMoreMessage": {
+          "description": "Message to show to the user to learn more",
+          "type": "string",
+          "default": ""
+        },
+        "learnMoreUrl": {
+          "description": "URL to show to the user when they click Learn More",
+          "type": "string",
+          "default": ""
         }
+      }
     }
+  }
 }

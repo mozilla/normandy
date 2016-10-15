@@ -2,29 +2,23 @@ import { mockNormandy, pluginFactory } from './utils';
 import ShowHeartbeatAction from '../show-heartbeat/';
 
 
-function surveyFactory(props = {}) {
-  return Object.assign({
-    title: 'test survey',
-    message: 'test message',
-    engagementButtonLabel: '',
-    thanksMessage: 'thanks!',
-    postAnswerUrl: 'http://example.com',
-    learnMoreMessage: 'Learn More',
-    learnMoreUrl: 'http://example.com',
-    weight: 100,
-  }, props);
-}
-
-
 function recipeFactory(props = {}) {
+  // If we leave arguments, it will overwrite itself below.
+  const args = props.arguments;
+  delete props.arguments;
+
   return Object.assign({
     id: 1,
     revision_id: 1,
-    arguments: {
+    arguments: Object.assign({
       surveyId: 'mysurvey',
-      defaults: {},
-      surveys: [surveyFactory()],
-    },
+      message: 'test message',
+      engagementButtonLabel: '',
+      thanksMessage: 'thanks!',
+      postAnswerUrl: 'http://example.com',
+      learnMoreMessage: 'Learn More',
+      learnMoreUrl: 'http://example.com',
+    }, args),
   }, props);
 }
 
@@ -88,10 +82,12 @@ describe('ShowHeartbeatAction', () => {
 
   it('should pass the correct arguments to showHeartbeat', async () => {
     const showHeartbeatArgs = {
-      message: 'test message',
-      thanksMessage: 'thanks!',
-      learnMoreMessage: 'Learn More',
-      learnMoreUrl: 'http://example.com',
+      arguments: {
+        message: 'test message',
+        thanksMessage: 'thanks!',
+        learnMoreMessage: 'Learn More',
+        learnMoreUrl: 'http://example.com',
+      },
     };
     const recipe = recipeFactory(showHeartbeatArgs);
     const action = new ShowHeartbeatAction(normandy, recipe);
@@ -117,8 +113,11 @@ describe('ShowHeartbeatAction', () => {
   });
 
   it('should not bother to annotate an empty post-answer URL', async () => {
-    const recipe = recipeFactory();
-    recipe.arguments.surveys[0].postAnswerUrl = '';
+    const recipe = recipeFactory({
+      arguments: {
+        postAnswerUrl: '',
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     await action.execute();
@@ -128,8 +127,11 @@ describe('ShowHeartbeatAction', () => {
 
   it('should annotate the post-answer URL with extra query args', async () => {
     const url = 'https://example.com';
-    const recipe = recipeFactory();
-    recipe.arguments.surveys[0].postAnswerUrl = url;
+    const recipe = recipeFactory({
+      arguments: {
+        postAnswerUrl: url,
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     normandy.mock.client.version = '42.0.1';
@@ -152,8 +154,11 @@ describe('ShowHeartbeatAction', () => {
 
   it('should annotate the post-answer URL if it has an existing query string', async () => {
     const url = 'https://example.com?foo=bar';
-    const recipe = recipeFactory();
-    recipe.arguments.surveys[0].postAnswerUrl = url;
+    const recipe = recipeFactory({
+      arguments: {
+        postAnswerUrl: url,
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     normandy.mock.client.version = '42.0.1';
@@ -168,8 +173,11 @@ describe('ShowHeartbeatAction', () => {
 
   it('should annotate the post-answer URL with a testing param in testing mode', async () => {
     const url = 'https://example.com';
-    const recipe = recipeFactory();
-    recipe.arguments.surveys[0].postAnswerUrl = url;
+    const recipe = recipeFactory({
+      arguments: {
+        postAnswerUrl: url,
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     normandy.testing = true;
@@ -181,8 +189,12 @@ describe('ShowHeartbeatAction', () => {
   });
 
   it('should pass some extra telemetry arguments to showHeartbeat', async () => {
-    const recipe = recipeFactory({ revision_id: 42 });
-    recipe.arguments.surveyId = 'my-survey';
+    const recipe = recipeFactory({
+      revision_id: 42,
+      arguments: {
+        surveyId: 'my-survey',
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     await action.execute();
@@ -193,8 +205,12 @@ describe('ShowHeartbeatAction', () => {
   });
 
   it('should include a testing argument when in testing mode', async () => {
-    const recipe = recipeFactory({ revision_id: 42 });
-    recipe.arguments.surveyId = 'my-survey';
+    const recipe = recipeFactory({
+      revision_id: 42,
+      arguments: {
+        surveyId: 'my-survey',
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     normandy.testing = true;
@@ -215,33 +231,8 @@ describe('ShowHeartbeatAction', () => {
     expect(normandy.mock.storage.data.lastShown).toEqual('10');
   });
 
-  it('should choose a random survey based on the weights', async () => {
-    // This test relies on the order of surveys passed in, which sucks.
-    const survey20 = surveyFactory({ message: 'survey20', weight: 20 });
-    const survey30 = surveyFactory({ message: 'survey30', weight: 30 });
-    const survey50 = surveyFactory({ message: 'survey50', weight: 50 });
-    const recipe = recipeFactory({ arguments: { surveys: [survey20, survey30, survey50] } });
-
-    spyOn(Math, 'random').and.returnValues(0.1, 0.4);
-
-    let action = new ShowHeartbeatAction(normandy, recipe);
-    await action.execute();
-    expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-      message: survey20.message,
-    }));
-
-    // If the random number changes, return a different survey.
-    normandy = mockNormandy();
-    action = new ShowHeartbeatAction(normandy, recipe);
-    await action.execute();
-    expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-      message: survey30.message,
-    }));
-  });
-
   it('should save flow data via normandy.saveHeartbeatFlow', async () => {
     const recipe = recipeFactory();
-    const survey = recipe.arguments.surveys[0];
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     const client = normandy.mock.client;
@@ -271,9 +262,9 @@ describe('ShowHeartbeatAction', () => {
     const flowData = normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
     expect(flowData.response_version).toEqual(2);
     expect(flowData.survey_id).toEqual(recipe.arguments.surveyId);
-    expect(flowData.question_id).toEqual(survey.message);
+    expect(flowData.question_id).toEqual(recipe.arguments.message);
     expect(flowData.updated_ts).toEqual(10);
-    expect(flowData.question_text).toEqual(survey.message);
+    expect(flowData.question_text).toEqual(recipe.arguments.message);
     expect(flowData.variation_id).toEqual(recipe.revision_id.toString());
     expect(flowData.score).toEqual(3);
     expect(flowData.flow_began_ts).toEqual(10);
@@ -291,7 +282,7 @@ describe('ShowHeartbeatAction', () => {
     });
     expect(flowData.extra.flashVersion).toEqual(client.plugins['Shockwave Flash'].version);
     expect(flowData.extra.engage).toEqual([
-            [10, survey.learnMoreUrl, 'notice'],
+            [10, recipe.arguments.learnMoreUrl, 'notice'],
     ]);
     expect(flowData.extra.searchEngine).toEqual(client.searchEngine);
     expect(flowData.extra.syncSetup).toEqual(client.syncSetup);
@@ -302,11 +293,13 @@ describe('ShowHeartbeatAction', () => {
     const longString = 'A 50 character string.............................';
     const tooLongString = `${longString}XXXXXXXXXX`;
 
-    const recipe = recipeFactory();
+    const recipe = recipeFactory({
+      arguments: {
+        message: tooLongString,
+      },
+    });
     const action = new ShowHeartbeatAction(normandy, recipe);
-    const survey = recipe.arguments.surveys[0];
 
-    survey.message = tooLongString;
     normandy.locale = tooLongString;
     normandy.mock.client.channel = tooLongString;
     normandy.mock.client.version = tooLongString;
@@ -314,8 +307,8 @@ describe('ShowHeartbeatAction', () => {
 
     await action.execute();
 
-    // Checking per field makes recognizing which field failed
-    // _much_ easier.
+    // Checking per field makes recognizing which field failed _much_
+    // easier.
     const flowData = normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
     expect(flowData.question_id).toEqual(longString);
     expect(flowData.locale).toEqual(longString);
