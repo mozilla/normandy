@@ -95,6 +95,13 @@ filter expressions.
 
    The ``normandy`` object contains general information about the client.
 
+.. js:attribute:: normandy.userId
+
+   A `v4 UUID`_ uniquely identifying the user. This is not necessarily
+   correlated with any other unique IDs, such as Telemetry IDs.
+
+   .. _v4 UUID: https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29
+
 .. js:attribute:: normandy.version
 
    **Example:** ``'47.0.1'``
@@ -210,6 +217,49 @@ function is the value being transformed.
 
       // True 50% of the time, stable per-user per-recipe.
       [normandy.userId, normandy.recipe.id]|stableSample(0.5)
+
+.. js:function:: bucketSample(input, start, count, total)
+
+   Returns ``true`` or ``false`` if the current user falls within a "bucket" in
+   the given range.
+
+   Bucket sampling randomly groups users into a list of "buckets", in this case
+   based on the input parameter. Then, you specify which range of available
+   buckets you want your sampling to match, and users who fall into a bucket in
+   that range will be matched by this transform. Buckets are stable over the
+   input, meaning that the same input will always result in the same bucket
+   assignment.
+
+   Importantly, this means that you can use a recipe-independent input across
+   several recipes to ensure they do not get delivered to the same users. For
+   example, if you have two survey recipes that are variants of each other, you
+   can ensure they are not shown to the same people by using the
+   :js:attr:`normandy.userId` attribute:
+
+   .. code-block:: javascript
+
+      // Half of all users will match the first filter and not the
+      // second one, while the other half will match the second and not
+      // the first, _even across multiple recipes_.
+      [normandy.userId]|bucketSample(0, 5000, 10000)
+      [normandy.userId]|bucketSample(5000, 5000, 10000)
+
+   The range to check wraps around the total bucket range. This means that if
+   you have 100 buckets, and specify a range starting at bucket 70 that is 50
+   buckets long, this function will check buckets 70-99, and buckets 0-19.
+
+   :param input:
+      A value for the bucket sampling to be stable over.
+   :param integer start:
+      The bucket at the start of the range to check. Bucket indexes larger than
+      the total bucket count wrap to the start of the range, e.g. bucket 110 and
+      bucket 10 are the same bucket if the total bucket count is 100.
+   :param integer count:
+      The number of buckets to check, starting at the start bucket. If this is
+      large enough to cause the range to exceed the total number of buckets, the
+      search will wrap to the start of the range again.
+   :param integer total:
+      The number of buckets you want to group users into.
 
 .. js:function:: date(dateString)
 
