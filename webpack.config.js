@@ -95,6 +95,8 @@ module.exports = [
     },
   },
   {
+    devtool: production ? undefined : 'eval-source-map',
+
     entry: {
       'console-log': './client/actions/console-log/index',
       'show-heartbeat': './client/actions/show-heartbeat/index',
