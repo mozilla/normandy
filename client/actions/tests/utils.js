@@ -6,6 +6,11 @@ export class MockStorage {
     this.data = {};
   }
 
+  async isDurable() {
+    const durability = this.data['storageDurability'];
+    return (durability === 2 ? true : false);
+  }
+
   getItem(key) {
     const value = this.data[key];
     return Promise.resolve(value !== undefined ? value : null);
@@ -82,6 +87,7 @@ export function mockNormandy() {
   const toSpy = [
     'location',
     'log',
+    'createStorage',
     'showHeartbeat',
     'client',
     'uuid',

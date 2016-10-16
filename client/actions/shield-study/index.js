@@ -1,6 +1,11 @@
 import { Action, registerAction } from '../utils';
 
 export default class ShieldStudyAction extends Action {
+  constructor(normandy, recipe) {
+    super(normandy, recipe);
+    this.storage = normandy.createStorage(recipe.id);
+  }
+
   setHasBeenShown() {
     this.storage.setItem('studyHasBeenShown', true);
   }
@@ -11,10 +16,10 @@ export default class ShieldStudyAction extends Action {
   }
 
   async execute() {
-    try {
-      this.storage = await this.normandy.createStorage(this.recipe.id);
-    } catch (error) {
-      throw new Error(error);
+    const storageIsDurable = await this.storage.isDurable();
+
+    if (!storageIsDurable && !this.normandy.testing) {
+      throw new Error('Storage durability unconfirmed');
     }
 
     const hasBeenShown = await this.getHasBeenShown();

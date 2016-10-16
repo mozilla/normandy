@@ -12,16 +12,26 @@ class LocalStorage {
    */
   constructor(prefix) {
     this.prefix = prefix;
+    this._setDurabilityStatus();
+  }
 
-    return new Promise((resolve, reject) => {
-      try {
-        localStorage.setItem('normandy-test', true);
-        localStorage.removeItem('normandy-test');
-        return resolve(this);
-      } catch (error) {
-        return reject('localStorage unavailable');
-      }
-    });
+  async _setDurabilityStatus() {
+    let durabilityStatus = await this.getItem('storageDurability');
+
+    if (durabilityStatus && parseInt(durabilityStatus) < 2) {
+      this.setItem('storageDurability', 2);
+    } else {
+      this.setItem('storageDurability', 1);
+    }
+  }
+
+  async isDurable() {
+    let durabilityStatus = await this.getItem('storageDurability');
+    if (parseInt(durabilityStatus) === 2) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   _makeKey(key) {
