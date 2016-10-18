@@ -46,9 +46,9 @@ describe('Self-Repair Runner', () => {
   describe('fetchRecipes', () => {
     it('should request recipes from server', async () => {
       document.documentElement.dataset.recipeUrl = '/api/v1/recipe/';
-      fetchMock.get('/api/v1/recipe/?enabled=true', 200);
+      fetchMock.get('/api/v1/recipe/?enabled=true', []);
 
-      fetchRecipes();
+      await fetchRecipes();
 
       expect(fetchMock.lastOptions()).toEqual({
         headers: {
