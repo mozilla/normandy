@@ -1,8 +1,9 @@
+/* global exports:true, require:false */
 const {Cu} = require('chrome');
-Cu.import('resource://gre/modules/Services.jsm'); /* globals Services: false */
-const tabs = require("sdk/tabs");
+Cu.import('resource://gre/modules/Services.jsm'); /* global Services: false */
+const tabs = require('sdk/tabs');
 const testRunner = require('sdk/test');
-const {before, after} = require('sdk/test/utils');
+const {before} = require('sdk/test/utils');
 
 const {Heartbeat} = require('../lib/Heartbeat.js');
 
@@ -48,7 +49,7 @@ exports['test it shows a learn more link'] = assert => {
     flowId: 'test',
     message: 'test',
     learnMoreMessage: 'Learn More',
-    learnMoreURL: 'https://example.org/learnmore',
+    learnMoreUrl: 'https://example.org/learnmore',
   });
   let learnMoreEl = hb.notice.querySelector('.text-link');
   assert.equal(learnMoreEl.href, 'https://example.org/learnmore');
@@ -91,7 +92,7 @@ exports['test it includes learnMoreTS if learn more is clicked'] = (assert, done
     flowId: 'test',
     message: 'test',
     learnMoreMessage: 'Learn More',
-    learnMoreURL: 'https://example.org/learnmore',
+    learnMoreUrl: 'https://example.org/learnmore',
   });
 
   hb.events.on('TelemetrySent', payload => {
@@ -114,13 +115,13 @@ exports['test it opens an engagement page after interaction'] = (assert, done) =
     flowId: 'test',
     message: 'test',
     engagementButtonLabel: 'Engage whooo',
-    postAnswerURL: 'about:about',
+    postAnswerUrl: 'about:about',
   });
 
   tabs.on('ready', (tab) => {
     assert.equal(tabs.activeTab.url, 'about:about');
     // Close engagement tab
-    tabs[tabs.length - 1].close();
+    tabs[ tabs.length - 1 ].close();
     done();
   });
 
@@ -171,18 +172,6 @@ function isOrdered(arr) {
     }
   }
   return true;
-}
-
-/** Close all but one tab, since jpm requires this at the end of a test */
-function onlyOneTab () {
-  let first = true;
-  for (let tab of tabs) {
-    if (first) {
-      first = false;
-      continue;
-    }
-    tab.close();
-  }
 }
 
 before(exports, (testName, assert, done) => {
