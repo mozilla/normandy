@@ -1,4 +1,3 @@
-import EventEmitter from 'wolfy87-eventemitter';
 import uuid from 'node-uuid';
 
 import Mozilla from './uitour.js';
@@ -32,6 +31,56 @@ class LocalStorage {
 }
 
 /**
+ * EventEmitter for Heartbeat events. Unlike normal event emitters,
+ * Heartbeat events only occur once, and we guarantee that if a handler
+ * is registered _after_ an event occurs, it will still be executed.
+ */
+export class HeartbeatEmitter {
+  static EVENTS = [
+    'NotificationOffered',
+    'NotificationClosed',
+    'LearnMore',
+    'Voted',
+    'TelemetrySent',
+    'Engaged',
+  ]
+
+  constructor() {
+    this.callbacks = {};
+    this.eventData = {};
+    for (const event of HeartbeatEmitter.EVENTS) {
+      this.callbacks[event] = [];
+      this.eventData[event] = null;
+    }
+  }
+
+  on(eventName, callback) {
+    if (HeartbeatEmitter.EVENTS.indexOf(eventName) === -1) {
+      throw new Error(`${eventName} is an invalid Heartbeat event type.`);
+    }
+
+    this.callbacks[eventName].push(callback);
+
+    // Call the callback if the event already happened.
+    const data = this.eventData[eventName];
+    if (data !== null) {
+      callback(data);
+    }
+  }
+
+  emit(eventName, data) {
+    if (this.eventData[eventName] !== null) {
+      throw new Error(`Cannot emit a Heartbeat event more than once: ${eventName}`);
+    }
+
+    this.eventData[eventName] = data;
+    for (const callback of this.callbacks[eventName]) {
+      callback(data);
+    }
+  }
+}
+
+/**
  * Implementation of the Normandy driver.
  */
 export default class NormandyDriver {
@@ -39,16 +88,16 @@ export default class NormandyDriver {
     this._uitour = uitour;
   }
 
-  _heartbeatCallbacks = [];
+  _heartbeatCallbacks = {};
   registerCallbacks() {
     // Trigger heartbeat callbacks when the UITour tells us that Heartbeat
     // happened.
     this._uitour.observe((eventName, data) => {
       if (eventName.startsWith('Heartbeat:')) {
-        const flowId = data.flowId;
         const croppedEventName = eventName.slice(10); // Chop off "Heartbeat:"
-        if (flowId in this._heartbeatCallbacks) {
-          this._heartbeatCallbacks[flowId](croppedEventName, data);
+        const callback = this._heartbeatCallbacks[data.flowId];
+        if (callback !== undefined) {
+          callback(croppedEventName, data);
         }
       }
     });
@@ -150,11 +199,10 @@ export default class NormandyDriver {
     });
   }
 
-  heartbeatCallbacks = [];
   showHeartbeat(options) {
     return new Promise(resolve => {
-      const emitter = new EventEmitter();
-      this.heartbeatCallbacks[options.flowId] = (eventName, data) => emitter.emit(eventName, data);
+      const emitter = new HeartbeatEmitter();
+      this._heartbeatCallbacks[options.flowId] = (eventName, data) => emitter.emit(eventName, data);
 
       // Positional arguments are overridden by the final options
       // argument, but they're still required so we pass them anyway.
