@@ -154,6 +154,11 @@ export default class ShowHeartbeatAction extends Action {
       flow.save();
     });
 
+    heartbeat.on('Engaged', data => {
+      flow.setPhaseTimestamp('engaged', data.timestamp);
+      flow.save();
+    });
+
     this.setLastShownDate();
   }
 
