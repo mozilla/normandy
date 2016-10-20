@@ -117,6 +117,9 @@ export default class NormandyDriver {
         },
         sync(data) {
           client.syncSetup = data.setup;
+          client.syncDesktopDevices = data.desktopDevices;
+          client.syncMobileDevices = data.mobileDevices;
+          client.syncTotalDevices = data.totalDevices;
         },
       };
 

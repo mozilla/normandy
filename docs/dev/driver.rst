@@ -153,6 +153,15 @@ The driver object contains the following attributes:
       String containing the user's default search engine identifier.
    syncSetup
       Boolean containing whether the user has set up Firefox Sync.
+   syncDesktopDevices
+      Integer specifying the number of desktop clients the user has added to
+      their Firefox Sync account.
+   syncMobileDevices
+      Integer specifying the number of mobile clients the user has added to
+      their Firefox Sync account.
+   syncTotalDevices
+      Integer specifying the total number of clients the user has added to their
+      Firefox Sync account.
    plugins
       An object mapping of plugin names to :js:class:`Plugin` objects describing
       the plugins installed on the client.

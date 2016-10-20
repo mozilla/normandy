@@ -84,7 +84,10 @@ describe('Normandy Driver', () => {
           switch (config) {
             case 'sync':
               return cb({
-                setup: false,
+                setup: true,
+                desktopDevices: 1,
+                mobileDevices: 2,
+                totalDevices: 3,
               });
             case 'appinfo':
               return cb({
@@ -103,7 +106,10 @@ describe('Normandy Driver', () => {
       const driver = new NormandyDriver(uitour);
       const client = await driver.client();
 
-      expect(client.syncSetup).toEqual(false);
+      expect(client.syncSetup).toEqual(true);
+      expect(client.syncDesktopDevices).toEqual(1);
+      expect(client.syncMobileDevices).toEqual(2);
+      expect(client.syncTotalDevices).toEqual(3);
       expect(client.distribution).toEqual('funnelcake85');
       expect(client.isDefaultBrowser).toEqual(true);
       expect(client.searchEngine).toEqual('Yahoo');
