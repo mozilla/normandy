@@ -7,7 +7,7 @@ rules:
   mozilla/no-aArgs: [1]
   mozilla/this-top-level-scope: [1]
   no-console: [1]
-  quotes: [1, "double", {avoidEscape: true}]
+  quotes: [1, double, {avoidEscape: true}]
   mozilla/balanced-listeners: [0]
 
 globals:

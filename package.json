@@ -25,22 +25,26 @@
       "description": "URL prefix to use for server requests, including API version",
       "type": "string",
       "value": "https://self-repair.mozilla.org/api/v1"
-    }, {
+    },
+    {
       "name": "enabled",
       "title": "Enabled",
       "type": "bool",
       "value": true
-    }, {
+    },
+    {
       "name": "log_level",
       "title": "Log Level",
       "type": "string",
       "value": "warning"
-    }, {
+    },
+    {
       "name": "dev_mode",
       "title": "Developer Mode",
       "type": "bool",
       "value": false
-    }, {
+    },
+    {
       "name": "startup_delay",
       "title": "Startup Delay",
       "description": "Number of seconds to wait after startup before running recipes",
@@ -55,7 +59,7 @@
   ],
   "devDependencies": {
     "babel-eslint": "6.1.2",
-    "eslint": "1.10.3",
+    "eslint": "^3.8.1",
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-babel": "3.3.0",
     "eslint-plugin-mozilla": "0.0.3",

@@ -1,13 +1,13 @@
-const {Cu} = require('chrome');
-const testRunner = require('sdk/test');
-const {before, after} = require('sdk/test/utils');
+const {Cu} = require("chrome");
+const testRunner = require("sdk/test");
+const {before, after} = require("sdk/test/utils");
 
-const {NormandyDriver} = require('../lib/NormandyDriver.js');
+const {NormandyDriver} = require("../lib/NormandyDriver.js");
 
 let sandbox;
 let driver;
 
-exports['test uuid'] = assert => {
+exports["test uuid"] = assert => {
   let uuid = driver.uuid();
   assert.notEqual(/^[a-f0-9-]{36}$/.exec(uuid), null);
 };

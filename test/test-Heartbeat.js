@@ -1,83 +1,86 @@
 /* global exports:true, require:false */
-const {Cu} = require('chrome');
-Cu.import('resource://gre/modules/Services.jsm'); /* global Services: false */
-const tabs = require('sdk/tabs');
-const testRunner = require('sdk/test');
-const {before} = require('sdk/test/utils');
+const {Cu} = require("chrome");
+Cu.import("resource://gre/modules/Services.jsm"); /* global Services: false */
+const tabs = require("sdk/tabs");
+const testRunner = require("sdk/test");
+const {before} = require("sdk/test/utils");
 
-const {Heartbeat} = require('../lib/Heartbeat.js');
-
+const {Heartbeat} = require("../lib/Heartbeat.js");
+const {makeSandbox} = require("../lib/Sandbox.js");
 
 let targetWindow;
 let notificationBox;
+let sandbox;
 
-exports['test it shows a heartbeat panel'] = assert => {
+let eventEmitter;
+
+exports["test it shows a heartbeat panel"] = assert => {
   assert.equal(notificationBox.childElementCount, 0);
-  new Heartbeat(targetWindow, {
+  new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
+    flowId: "test",
+    message: "test",
   });
   assert.equal(notificationBox.childElementCount, 1);
 };
 
-exports['test it shows five stars when there is no engagementButtonLabel'] = assert => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it shows five stars when there is no engagementButtonLabel"] = assert => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
+    flowId: "test",
+    message: "test",
     engagementButtonLabel: undefined,
   });
-  assert.equal(hb.notice.querySelectorAll('.star-x').length, 5);
-  assert.equal(hb.notice.querySelectorAll('.notification-button').length, 0);
+  assert.equal(hb.notice.querySelectorAll(".star-x").length, 5);
+  assert.equal(hb.notice.querySelectorAll(".notification-button").length, 0);
 };
 
-exports['test it shows a button when there is an engagementButtonLabel'] = assert => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it shows a button when there is an engagementButtonLabel"] = assert => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
-    engagementButtonLabel: 'Click me!',
+    flowId: "test",
+    message: "test",
+    engagementButtonLabel: "Click me!",
   });
-  assert.equal(hb.notice.querySelectorAll('.star-x').length, 0);
-  assert.equal(hb.notice.querySelectorAll('.notification-button').length, 1);
+  assert.equal(hb.notice.querySelectorAll(".star-x").length, 0);
+  assert.equal(hb.notice.querySelectorAll(".notification-button").length, 1);
 };
 
-exports['test it shows a learn more link'] = assert => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it shows a learn more link"] = assert => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
-    learnMoreMessage: 'Learn More',
-    learnMoreUrl: 'https://example.org/learnmore',
+    flowId: "test",
+    message: "test",
+    learnMoreMessage: "Learn More",
+    learnMoreUrl: "https://example.org/learnmore",
   });
-  let learnMoreEl = hb.notice.querySelector('.text-link');
-  assert.equal(learnMoreEl.href, 'https://example.org/learnmore');
-  assert.equal(learnMoreEl.value, 'Learn More');
+  let learnMoreEl = hb.notice.querySelector(".text-link");
+  assert.equal(learnMoreEl.href, "https://example.org/learnmore");
+  assert.equal(learnMoreEl.value, "Learn More");
 };
 
-exports['test it shows the message'] = assert => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it shows the message"] = assert => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
+    flowId: "test",
+    message: "test",
   });
   let messageEl = targetWindow.document.getAnonymousElementByAttribute(
     hb.notice,
-    'anonid',
-    'messageText'
+    "anonid",
+    "messageText"
   );
-  assert.equal(messageEl.textContent, 'test');
+  assert.equal(messageEl.textContent, "test");
 };
 
-exports['test it pings telemetry'] = (assert, done) => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it pings telemetry"] = (assert, done) => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
+    flowId: "test",
+    message: "test",
   });
 
-  hb.events.on('TelemetrySent', payload => {
+  hb.events.on("TelemetrySent", payload => {
     assert.ok(isOrdered([0, payload.offeredTS, payload.closedTS]));
     done();
   });
@@ -86,46 +89,46 @@ exports['test it pings telemetry'] = (assert, done) => {
   closeAllNotifications();
 };
 
-exports['test it includes learnMoreTS if learn more is clicked'] = (assert, done) => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it includes learnMoreTS if learn more is clicked"] = (assert, done) => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
-    learnMoreMessage: 'Learn More',
-    learnMoreUrl: 'https://example.org/learnmore',
+    flowId: "test",
+    message: "test",
+    learnMoreMessage: "Learn More",
+    learnMoreUrl: "https://example.org/learnmore",
   });
 
-  hb.events.on('TelemetrySent', payload => {
+  hb.events.on("TelemetrySent", payload => {
     assert.ok(isOrdered([0, payload.offeredTS, payload.learnMoreTS, payload.closedTS]));
     // Close learn more tab
     tabs[tabs.length - 1].close();
     done();
   });
 
-  let learnMoreEl = hb.notice.querySelector('.text-link');
+  let learnMoreEl = hb.notice.querySelector(".text-link");
   learnMoreEl.click();
 
   // triggers sending ping to normandy
   closeAllNotifications();
 };
 
-exports['test it opens an engagement page after interaction'] = (assert, done) => {
-  let hb = new Heartbeat(targetWindow, {
+exports["test it opens an engagement page after interaction"] = (assert, done) => {
+  let hb = new Heartbeat(targetWindow, eventEmitter, {
     testing: true,
-    flowId: 'test',
-    message: 'test',
-    engagementButtonLabel: 'Engage whooo',
-    postAnswerUrl: 'about:about',
+    flowId: "test",
+    message: "test",
+    engagementButtonLabel: "Engage whooo",
+    postAnswerUrl: "about:about",
   });
 
-  tabs.on('ready', (tab) => {
-    assert.equal(tabs.activeTab.url, 'about:about');
+  tabs.on("ready", tab => {
+    assert.equal(tabs.activeTab.url, "about:about");
     // Close engagement tab
     tabs[ tabs.length - 1 ].close();
     done();
   });
 
-  let engagementEl = hb.notice.querySelector('.notification-button');
+  let engagementEl = hb.notice.querySelector(".notification-button");
   engagementEl.click();
 };
 
@@ -175,8 +178,10 @@ function isOrdered(arr) {
 }
 
 before(exports, (testName, assert, done) => {
-  targetWindow = Services.wm.getMostRecentWindow('navigator:browser');
-  notificationBox = targetWindow.document.querySelector('#high-priority-global-notificationbox');
+  targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
+  notificationBox = targetWindow.document.querySelector("#high-priority-global-notificationbox");
+  sandbox = makeSandbox();
+  eventEmitter = sandbox.EventEmitter();
 
   closeAllNotifications().then(done);
 });
