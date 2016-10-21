@@ -16,9 +16,9 @@ class LocalStorage {
   }
 
   async _setDurabilityStatus() {
-    let durabilityStatus = await this.getItem('storageDurability');
+    const durabilityStatus = await this.getItem('storageDurability');
 
-    if (durabilityStatus && parseInt(durabilityStatus) < 2) {
+    if (durabilityStatus && parseInt(durabilityStatus, 10) < 2) {
       this.setItem('storageDurability', 2);
     } else {
       this.setItem('storageDurability', 1);
@@ -26,12 +26,8 @@ class LocalStorage {
   }
 
   async isDurable() {
-    let durabilityStatus = await this.getItem('storageDurability');
-    if (parseInt(durabilityStatus) === 2) {
-      return true;
-    } else {
-      return false;
-    }
+    const durabilityStatus = await this.getItem('storageDurability');
+    return (parseInt(durabilityStatus, 10) === 2);
   }
 
   _makeKey(key) {

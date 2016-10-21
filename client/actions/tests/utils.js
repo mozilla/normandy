@@ -7,8 +7,8 @@ export class MockStorage {
   }
 
   async isDurable() {
-    const durability = this.data['storageDurability'];
-    return (durability === 2 ? true : false);
+    const durability = this.data.storageDurability;
+    return durability === 2;
   }
 
   getItem(key) {

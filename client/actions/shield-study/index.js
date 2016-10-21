@@ -10,9 +10,8 @@ export default class ShieldStudyAction extends Action {
     this.storage.setItem('studyHasBeenShown', true);
   }
 
-  async getHasBeenShown() {
-    const hasBeenShown = await this.storage.getItem('studyHasBeenShown');
-    return hasBeenShown;
+  getHasBeenShown() {
+    return this.storage.getItem('studyHasBeenShown');
   }
 
   async execute() {

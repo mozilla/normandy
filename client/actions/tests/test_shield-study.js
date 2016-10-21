@@ -33,7 +33,11 @@ describe('ShieldStudyAction', () => {
 
     normandy.mock.storage.data.storageDurability = 1;
 
-    expect(await action.execute()).toThrowError('err');
+    action.execute()
+      .then(() => fail())
+      .catch(error => {
+        expect(error.message).toEqual('Storage durability unconfirmed');
+      });
   });
 
   it('should always run in testing mode', async () => {
