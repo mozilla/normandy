@@ -1,8 +1,11 @@
+dependencies:
+  post:
+    - ./node_modules/.bin/get-firefox -b nightly -t nightly -e
 test:
   override:
     - ./node_modules/.bin/eslint lib
     - |
-      ./node_modules/.bin/jpm test --tbpl --binary /usr/bin/firefox | tee jpm.tbpl
+      ./node_modules/.bin/jpm test --tbpl --binary ./nightly/firefox | tee jpm.tbpl
       # exit with exit code of jpm, not tee
       (exit ${PIPESTATUS[0]})
   post:
