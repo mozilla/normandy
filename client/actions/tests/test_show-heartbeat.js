@@ -216,7 +216,7 @@ describe('ShowHeartbeatAction', () => {
   });
 
   it('should choose a random survey based on the weights', async () => {
-        // This test relies on the order of surveys passed in, which sucks.
+    // This test relies on the order of surveys passed in, which sucks.
     const survey20 = surveyFactory({ message: 'survey20', weight: 20 });
     const survey30 = surveyFactory({ message: 'survey30', weight: 30 });
     const survey50 = surveyFactory({ message: 'survey50', weight: 50 });
@@ -230,7 +230,7 @@ describe('ShowHeartbeatAction', () => {
       message: survey20.message,
     }));
 
-        // If the random number changes, return a different survey.
+    // If the random number changes, return a different survey.
     normandy = mockNormandy();
     action = new ShowHeartbeatAction(normandy, recipe);
     await action.execute();
@@ -264,9 +264,10 @@ describe('ShowHeartbeatAction', () => {
     emitter.emit('NotificationOffered', { timestamp: 20 });
     emitter.emit('LearnMore', { timestamp: 30 });
     emitter.emit('Voted', { timestamp: 40, score: 3 });
+    emitter.emit('Engaged', { timestamp: 50 });
 
-        // Checking per field makes recognizing which field failed
-        // _much_ easier.
+    // Checking per field makes recognizing which field failed
+    // _much_ easier.
     const flowData = normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
     expect(flowData.response_version).toEqual(2);
     expect(flowData.survey_id).toEqual(recipe.arguments.surveyId);
@@ -278,6 +279,7 @@ describe('ShowHeartbeatAction', () => {
     expect(flowData.flow_began_ts).toEqual(10);
     expect(flowData.flow_offered_ts).toEqual(20);
     expect(flowData.flow_voted_ts).toEqual(40);
+    expect(flowData.flow_engaged_ts).toEqual(50);
     expect(flowData.channel).toEqual(client.channel);
     expect(flowData.version).toEqual(client.version);
     expect(flowData.locale).toEqual(normandy.locale);
@@ -312,8 +314,8 @@ describe('ShowHeartbeatAction', () => {
 
     await action.execute();
 
-        // Checking per field makes recognizing which field failed
-        // _much_ easier.
+    // Checking per field makes recognizing which field failed
+    // _much_ easier.
     const flowData = normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
     expect(flowData.question_id).toEqual(longString);
     expect(flowData.locale).toEqual(longString);

@@ -19,6 +19,9 @@ export class UnwrappedRecipePreview extends React.Component {
       error: null,
       errorHelp: null,
     };
+
+    this.driver = new NormandyDriver();
+    this.driver.registerCallbacks();
   }
 
   componentWillMount() {
@@ -32,8 +35,6 @@ export class UnwrappedRecipePreview extends React.Component {
   attemptPreview() {
     const { recipe } = this.props;
     const { status } = this.state;
-    const driver = new NormandyDriver();
-    driver.registerCallbacks();
 
     if (recipe && status === 'start') {
       this.pingUITour();
@@ -42,7 +43,8 @@ export class UnwrappedRecipePreview extends React.Component {
         status: 'attempting',
       });
 
-      runRecipe(recipe, driver, { testing: true }).then(() => {
+      runRecipe(recipe, this.driver, { testing: true })
+      .then(() => {
         this.setState({
           status: 'executed',
         });

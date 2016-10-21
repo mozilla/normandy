@@ -55,7 +55,8 @@ The driver object contains the following attributes:
    :param learnMoreUrl: URL to open when the "Learn More" button is clicked.
    :param surveyId: Extra data to be stored in telemetry.
    :param surveyVersion: Extra data to be stored in telemetry.
-   :param testing: Extra data to be stored in telemetry when Normandy is in testing mode.
+   :param testing: Extra data to be stored in telemetry when Normandy is in
+      testing mode.
    :returns: A Promise that resolves with an event emitter.
 
    The emitter returned by this function can be subscribed to using ``on``
@@ -89,9 +90,17 @@ The driver object contains the following attributes:
       Emitted when the user clicks the star rating bar and submits a rating.
       An extra ``score`` attribute is included on the data object for this
       event containing the rating the user submitted.
+   Engaged
+      Emitted when the user clicks the engagement button. Only occurs if the
+      ``engagementButtonLabel`` parameter was given when ``showHeartbeat`` was
+      called.
    TelemetrySent
       Emitted after Heartbeat has sent flow data to the Telemetry servers. Only
       available on Firefox 46 and higher.
+
+   .. note:: Individual events are only emitted once; if `on` is called after an
+      event has already been emitted, the given callback will be called
+      immediately.
 
 .. js:function:: uuid()
 

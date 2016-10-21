@@ -1,27 +1,29 @@
 import fetchMock from 'fetch-mock';
 
-import NormandyDriver from '../normandy_driver.js';
+import NormandyDriver, { HeartbeatEmitter } from '../normandy_driver.js';
 import { urlPathMatcher } from '../../tests/utils.js';
 
 describe('Normandy Driver', () => {
   describe('showHeartbeat', () => {
+    const options = {
+      message: 'testMessage',
+      thanksMessage: 'testThanks',
+      flowId: 'testFlowId',
+      postAnswerUrl: 'testPostAnswerUrl',
+      learnMoreMessage: 'testLearnMoreMessage',
+      learnMoreUrl: 'testLearnMoreUrl',
+      engagementButtonLabel: 'testEngagementButtonLabel',
+      surveyId: 'testSurveyId',
+      surveyVersion: 'testSurveyVersion',
+      testing: true,
+    };
+
     it('should pass all the required arguments to the UITour helper', async () => {
       const uitour = jasmine.createSpyObj('uitour', ['showHeartbeat']);
       const driver = new NormandyDriver(uitour);
-      const options = {
-        message: 'testMessage',
-        thanksMessage: 'testThanks',
-        flowId: 'testFlowId',
-        postAnswerUrl: 'testPostAnswerUrl',
-        learnMoreMessage: 'testLearnMoreMessage',
-        learnMoreUrl: 'testLearnMoreUrl',
-        engagementButtonLabel: 'testEngagementButtonLabel',
-        surveyId: 'testSurveyId',
-        surveyVersion: 'testSurveyVersion',
-        testing: true,
-      };
 
-      await driver.showHeartbeat(options);
+      const emitter = await driver.showHeartbeat(options);
+      expect(emitter instanceof HeartbeatEmitter).toEqual(true);
       expect(uitour.showHeartbeat).toHaveBeenCalledWith(
         options.message,
         options.thanksMessage,
@@ -36,6 +38,29 @@ describe('Normandy Driver', () => {
           testing: options.testing,
         }),
       );
+    });
+
+    it('should emit events when UITour emits them', async () => {
+      let observer = null;
+      const uitour = {
+        showHeartbeat: jasmine.createSpy('showHeartbeat'),
+        observe(func) {
+          observer = func;
+        },
+      };
+
+      const driver = new NormandyDriver(uitour);
+      driver.registerCallbacks();
+      const emitter = await driver.showHeartbeat(options);
+      const offerSpy = jasmine.createSpy('OfferListener');
+      // flowId ties this offer to the showHeartbeat call
+      const offerData = { foo: 'bar', flowId: options.flowId };
+
+      // Manually emit offer event to UITour observer and check if the
+      // callback is called.
+      emitter.on('NotificationOffered', offerSpy);
+      observer('Heartbeat:NotificationOffered', offerData);
+      expect(offerSpy).toHaveBeenCalledWith(offerData);
     });
   });
 
@@ -141,6 +166,54 @@ describe('Normandy Driver', () => {
       spyOn(console, 'error');
       driver.log('lorem ipsum', 'error');
       expect(console.error.calls.count()).toEqual(1);
+    });
+  });
+
+  describe('HeartbeatEmitter', () => {
+    let emitter = null;
+    beforeEach(() => {
+      emitter = new HeartbeatEmitter();
+    });
+
+    it('does not allow invalid event handlers', () => {
+      expect(() => {
+        emitter.on('invalid', () => true);
+      }).toThrow();
+    });
+
+    it('cannot emit an event more than once', () => {
+      emitter.emit('Voted', {});
+      expect(() => {
+        emitter.emit('Voted', {});
+      }).toThrow();
+    });
+
+    it('emits events synchronously', () => {
+      const data = { foo: 1 };
+      const spy = jasmine.createSpy('VotedCallback');
+      emitter.on('Voted', spy);
+      emitter.emit('Voted', data);
+      expect(spy).toHaveBeenCalledWith(data);
+    });
+
+    it('can emit to multiple callbacks', () => {
+      const data = { foo: 1 };
+      const spy = jasmine.createSpy('VotedCallback');
+      const spy2 = jasmine.createSpy('VotedCallback2');
+      emitter.on('Voted', spy);
+      emitter.on('Voted', spy2);
+      emitter.emit('Voted', data);
+      expect(spy).toHaveBeenCalledWith(data);
+      expect(spy2).toHaveBeenCalledWith(data);
+    });
+
+    it('immediately calls callbacks for already-emitted events', () => {
+      const data = { foo: 1 };
+      emitter.emit('Voted', data);
+
+      const spy = jasmine.createSpy('VotedCallback');
+      emitter.on('Voted', spy);
+      expect(spy).toHaveBeenCalledWith(data);
     });
   });
 });

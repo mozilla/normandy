@@ -40,8 +40,7 @@
     "redux-thunk": "2.1.0",
     "sha.js": "2.4.5",
     "uglifyjs": "2.4.10",
-    "underscore": "1.8.3",
-    "wolfy87-eventemitter": "5.1.0"
+    "underscore": "1.8.3"
   },
   "devDependencies": {
     "babel-core": "6.14.0",

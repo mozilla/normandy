@@ -1,5 +1,4 @@
-import EventEmitter from 'wolfy87-eventemitter';
-
+import { HeartbeatEmitter } from '../../selfrepair/normandy_driver.js';
 
 export class MockStorage {
   constructor() {
@@ -37,7 +36,7 @@ export function mockNormandy() {
   const normandy = {
     mock: {
       storage: new MockStorage(),
-      heartbeatEmitter: new EventEmitter(),
+      heartbeatEmitter: new HeartbeatEmitter(),
       location: {
         countryCode: 'us',
       },
