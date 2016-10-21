@@ -126,6 +126,21 @@ filter expressions.
 
    Boolean containing whether the user has set up Firefox Sync.
 
+.. js:attribute:: normandy.syncDesktopDevices
+
+   Integer specifying the number of desktop clients the user has added to their
+   Firefox Sync account.
+
+.. js:attribute:: normandy.syncMobileDevices
+
+   Integer specifying the number of mobile clients the user has added to their
+   Firefox Sync account.
+
+.. js:attribute:: normandy.syncTotalDevices
+
+   Integer specifying the total number of clients the user has added to their
+   Firefox Sync account.
+
 .. js:attribute:: normandy.plugins
 
    An object mapping of plugin names to :js:class:`Plugin` objects describing
