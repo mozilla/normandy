@@ -15,7 +15,7 @@ COPY package.json yarn.lock /app/
 RUN pip install -U 'pip>=8' && \
     pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
     npm install -g yarn@^0.16 && \
-    yarn install --pure-lockfile
+    yarn install --pure-lockfile || cat /app/yarn-error.log
 
 COPY . /app
 RUN NODE_ENV=production ./node_modules/.bin/webpack && \
