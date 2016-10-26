@@ -9,7 +9,7 @@ This guide assumes you have already installed and set up the following:
 
 1. Git_
 2. `Python 3.5`_, `pip 8`_ or higher, and virtualenv_
-3. `Node.js`_ and npm.
+3. `Node.js`_, npm, and `Yarn`_
 4. `Postgres 9.4`_
 5. ``openssl``
 
@@ -21,6 +21,7 @@ intended to be run in a terminal.
 .. _Python 3.5: https://www.python.org/
 .. _pip 8: https://pip.pypa.io/en/stable/
 .. _Node.js: https://nodejs.org/en/
+.. _Yarn: https://yarnpkg.com/
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
 .. _Postgres 9.4: http://www.postgresql.org/
 
@@ -63,12 +64,18 @@ Installation
 
       therapist install
 
-5. Install frontend dependencies and build the frontend code using npm:
+5. Install frontend dependencies and build the frontend code using Yarn:
 
    .. code-block:: bash
 
-      npm install
+      yarn install
       npm run build
+
+.. note::
+
+   If you don't have Yarn, you can get install it with ``npm install -g yarn``.
+   If you don't want to get Yarn, you can use ``npm install``, but packages may
+   not install as expected.
 
 6. Create a Postgres database for Normandy. By default it is assumed to be named
    ``normandy``:
