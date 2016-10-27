@@ -7,10 +7,10 @@ function recipeFactory(props = {}) {
   const args = props.arguments;
   delete props.arguments;
 
-  return Object.assign({
+  return {
     id: 1,
     revision_id: 1,
-    arguments: Object.assign({
+    arguments: {
       surveyId: 'mysurvey',
       message: 'test message',
       engagementButtonLabel: '',
@@ -18,8 +18,10 @@ function recipeFactory(props = {}) {
       postAnswerUrl: 'http://example.com',
       learnMoreMessage: 'Learn More',
       learnMoreUrl: 'http://example.com',
-    }, args),
-  }, props);
+      ...args,
+    },
+    ...props,
+  };
 }
 
 

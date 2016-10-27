@@ -109,34 +109,24 @@ describe('bucketSample', () => {
       const total = randInt(100, 10000);
 
       // Create 10 buckets, with the end of the count as the last.
-      const bucketPoints = [];
-      for (let k = 0; k < 9; k++) {
-        bucketPoints.push(randInt(0, total));
+      const bucketCount = 10;
+      const bucketPoints = [0];
+      for (let k = 0; k < bucketCount - 1; k++) {
+        const delta = randInt(total / bucketCount / 2, total / bucketCount);
+        const last = bucketPoints[bucketPoints.length - 1];
+        bucketPoints.push(last + delta);
       }
       bucketPoints.push(total);
-      bucketPoints.sort((a, b) => a - b);
 
       // Generate a random value, and match it against the 10 buckets.
       // It should only match one of them.
       for (let j = 0; j < 10; j++) {
         const val = Math.random();
         let foundCount = 0;
-        for (let k = 0; k < bucketPoints.length; k++) {
-          const start = k === 0 ? 0 : bucketPoints[k - 1];
+        for (let k = 1; k < bucketPoints.length; k++) {
+          const start = bucketPoints[k - 1];
           const count = bucketPoints[k] - start;
           if (bucketSample(val, start, count, total)) {
-            // Edge case: If we encounter the same bucketPoint three times,
-            // we can get more than one match if the value is at the end
-            // of the bucket, since the buckets (e.g. [1,1] and [1,1]) are
-            // equivalent.
-            const threeInARow = (
-              k > 1 && count === 0 && start === bucketPoints[k - 2]
-            );
-            if (threeInARow && foundCount > 0) {
-              // We hit the edge case! Let's not count it.
-              continue;
-            }
-
             foundCount++;
           }
         }

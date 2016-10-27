@@ -15,8 +15,7 @@ export default function HeartbeatForm({ fields }) {
   return (
     <div className="row">
       <p className="help row">
-        This action can show a single survey, or choose a single survey from
-        multiple weighted ones.
+        This action shows a single message or survey prompt to the user.
       </p>
       <div className="fluid-4">
         <FormField type="text" label="Survey ID" field={fields.surveyId} />
