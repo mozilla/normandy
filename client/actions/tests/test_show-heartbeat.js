@@ -1,29 +1,6 @@
 import { mockNormandy, pluginFactory } from './utils';
 import ShowHeartbeatAction from '../show-heartbeat/';
-
-
-function recipeFactory(props = {}) {
-  // If we leave arguments, it will overwrite itself below.
-  const args = props.arguments;
-  delete props.arguments;
-
-  return {
-    id: 1,
-    revision_id: 1,
-    arguments: {
-      surveyId: 'mysurvey',
-      message: 'test message',
-      engagementButtonLabel: '',
-      thanksMessage: 'thanks!',
-      postAnswerUrl: 'http://example.com',
-      learnMoreMessage: 'Learn More',
-      learnMoreUrl: 'http://example.com',
-      ...args,
-    },
-    ...props,
-  };
-}
-
+import { recipeFactory } from '../../tests/utils.js';
 
 describe('ShowHeartbeatAction', () => {
   let normandy;

@@ -26,7 +26,8 @@ export const selector = formValueSelector('recipe');
  */
 export class RecipeForm extends React.Component {
   static propTypes = {
-    ...reduxFormPropTypes,
+    handleSubmit: reduxFormPropTypes.handleSubmit,
+    submitting: reduxFormPropTypes.submitting,
     selectedAction: pt.string,
     recipeId: pt.number,
     recipe: pt.shape({
@@ -91,9 +92,9 @@ export class RecipeForm extends React.Component {
 }
 
 /**
- * Wrapper function that hooks the RecipeForm component up to redux-form.
+ * Redux-Form config for the RecipeForm.
  */
-export const recipeReduxFormWrapper = reduxForm({
+export const formConfig = {
   form: 'recipe',
   asyncBlurFields: ['filter_expression'],
 
@@ -118,23 +119,17 @@ export const recipeReduxFormWrapper = reduxForm({
     }
   },
 
-  onSubmit(values, dispatch, { recipeId }) {
+  onSubmit(values, dispatch, { recipeId, updateRecipe, addRecipe }) {
     // Filter out unwanted keys for submission.
     const recipe = _.pick(values, [
       'name', 'enabled', 'filter_expression', 'action', 'arguments',
     ]);
-    const requestBody = { recipeId, recipe };
 
     let result = null;
     if (recipeId) {
-      result = dispatch(makeApiRequest('updateRecipe', requestBody))
-      .then(response => dispatch(recipeUpdated(response)));
+      result = updateRecipe(recipeId, recipe);
     } else {
-      result = dispatch(makeApiRequest('addRecipe', requestBody))
-      .then(response => {
-        dispatch(recipeAdded(response));
-        dispatch(push(`/control/recipe/${response.id}/`));
-      });
+      result = addRecipe(recipe);
     }
 
     // Wrap error responses with a SubmissionError for redux-form.
@@ -156,14 +151,14 @@ export const recipeReduxFormWrapper = reduxForm({
       message: 'Recipe cannot be saved. Please correct any errors listed in the form below.',
     }));
   },
-});
+};
 
 /**
  * Component wrapper that passes the recipe (or currently selected revision) as
  * the initialValues prop for the form.
  * @param Component Component to wrap.
  */
-export function recipeAsInitialValuesWrapper(Component) {
+export function initialValuesWrapper(Component) {
   function Wrapped(props) {
     const { recipe, location } = props;
     let initialValues = recipe;
@@ -180,17 +175,32 @@ export function recipeAsInitialValuesWrapper(Component) {
   return Wrapped;
 }
 
-// Pulls the selected action name from the redux-form state.
-const selectedActionConnector = connect(
+const connector = connect(
+  // Pull selected action from the form state.
   state => ({
     selectedAction: selector(state, 'action'),
+  }),
+
+  // Bound functions for writing to the server.
+  dispatch => ({
+    addRecipe(recipe) {
+      return dispatch(makeApiRequest('addRecipe', { recipe }))
+      .then(response => {
+        dispatch(recipeAdded(response));
+        dispatch(push(`/control/recipe/${response.id}/`));
+      });
+    },
+    updateRecipe(recipeId, recipe) {
+      return dispatch(makeApiRequest('updateRecipe', { recipeId, recipe }))
+      .then(response => dispatch(recipeUpdated(response)));
+    },
   }),
 );
 
 // Use reduce to call several wrapper functions in a row.
 export default [
-  recipeReduxFormWrapper,
-  selectedActionConnector,
-  recipeAsInitialValuesWrapper,
+  reduxForm(formConfig),
+  connector,
+  initialValuesWrapper,
   composeRecipeContainer,
 ].reduce((prev, func) => func(prev), RecipeForm);
