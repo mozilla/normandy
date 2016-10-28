@@ -1,5 +1,5 @@
 import { Jexl } from 'jexl';
-import { stableSample } from './utils.js';
+import { stableSample, bucketSample } from './utils.js';
 
 export default class JexlEnvironment {
   constructor(context) {
@@ -7,6 +7,7 @@ export default class JexlEnvironment {
     this.jexl = new Jexl();
     this.jexl.addTransform('date', value => new Date(value));
     this.jexl.addTransform('stableSample', stableSample);
+    this.jexl.addTransform('bucketSample', bucketSample);
   }
 
   eval(expr) {

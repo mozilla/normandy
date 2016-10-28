@@ -1,4 +1,4 @@
-import { Action, registerAction, weightedChoose } from '../utils';
+import { Action, registerAction } from '../utils';
 
 const VERSION = 52; // Increase when changed.
 const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
@@ -7,7 +7,7 @@ const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
 export class HeartbeatFlow {
   constructor(action) {
     this.action = action;
-    const { normandy, recipe, survey, client, location } = action;
+    const { normandy, recipe, client, location } = action;
 
     const flashPlugin = client.plugins['Shockwave Flash'];
     const plugins = {};
@@ -26,9 +26,9 @@ export class HeartbeatFlow {
       person_id: 'NA',
       survey_id: recipe.arguments.surveyId,
       flow_id: normandy.uuid(),
-      question_id: survey.message.slice(0, 50),
+      question_id: recipe.arguments.message.slice(0, 50),
       updated_ts: Date.now(),
-      question_text: survey.message,
+      question_text: recipe.arguments.message,
       variation_id: recipe.revision_id.toString(),
 
       // Optional fields
@@ -99,13 +99,21 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   async execute() {
-    const { surveys, defaults, surveyId } = this.recipe.arguments;
+    const {
+      surveyId,
+      message,
+      engagementButtonLabel,
+      thanksMessage,
+      postAnswerUrl,
+      learnMoreMessage,
+      learnMoreUrl,
+    } = this.recipe.arguments;
 
     const lastShown = await this.getLastShownDate();
     const shouldShowSurvey = (
-        this.normandy.testing
-        || lastShown === null
-        || Date.now() - lastShown > LAST_SHOWN_DELAY
+      this.normandy.testing
+      || lastShown === null
+      || Date.now() - lastShown > LAST_SHOWN_DELAY
     );
     if (!shouldShowSurvey) {
       return;
@@ -113,7 +121,6 @@ export default class ShowHeartbeatAction extends Action {
 
     this.location = await this.normandy.location();
     this.client = await this.normandy.client();
-    this.survey = this.chooseSurvey(surveys, defaults);
 
     const flow = new HeartbeatFlow(this);
     flow.save();
@@ -121,14 +128,14 @@ export default class ShowHeartbeatAction extends Action {
     // A bit redundant but the action argument names shouldn't necessarily rely
     // on the argument names showHeartbeat takes.
     const heartbeatData = {
-      message: this.survey.message,
-      engagementButtonLabel: this.survey.engagementButtonLabel,
-      thanksMessage: this.survey.thanksMessage,
-      flowId: flow.id,
-      postAnswerUrl: this.annotatePostAnswerUrl(this.survey.postAnswerUrl),
-      learnMoreMessage: this.survey.learnMoreMessage,
-      learnMoreUrl: this.survey.learnMoreUrl,
       surveyId,
+      message,
+      engagementButtonLabel,
+      thanksMessage,
+      postAnswerUrl: this.annotatePostAnswerUrl(postAnswerUrl),
+      learnMoreMessage,
+      learnMoreUrl,
+      flowId: flow.id,
       surveyVersion: this.recipe.revision_id,
     };
 
@@ -144,7 +151,7 @@ export default class ShowHeartbeatAction extends Action {
     });
 
     heartbeat.on('LearnMore', () => {
-      flow.addLink(this.survey.learnMoreUrl, 'notice');
+      flow.addLink(this.recipe.arguments.learnMoreUrl, 'notice');
       flow.save();
     });
 
@@ -202,27 +209,6 @@ export default class ShowHeartbeatAction extends Action {
     }
 
     return annotatedUrl.href;
-  }
-
-  /**
-   * From the given list of surveys, choose one based on their relative
-   * weights and return it.
-   *
-   * @param  {array}  surveys  Array of weighted surveys from the arguments
-   *                           object.
-   * @param  {object} defaults Default values for survey attributes if they aren't
-   *                           specified.
-   * @return {object}          The chosen survey, with the defaults applied.
-   */
-  chooseSurvey(surveys, defaults) {
-    const finalSurvey = Object.assign({}, weightedChoose(surveys));
-    for (const prop in defaults) {
-      if (!finalSurvey[prop]) {
-        finalSurvey[prop] = defaults[prop];
-      }
-    }
-
-    return finalSurvey;
   }
 }
 

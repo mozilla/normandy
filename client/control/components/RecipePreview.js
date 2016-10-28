@@ -50,6 +50,7 @@ export class UnwrappedRecipePreview extends React.Component {
         });
       })
       .catch(error => {
+        console.error(error);
         this.setState({
           status: 'error',
           error: `Error running recipe: ${error}`,
