@@ -11,6 +11,7 @@ User Documentation
    :maxdepth: 2
 
    user/filter_expressions
+   user/actions
 
 Developer Documentation
 -----------------------
