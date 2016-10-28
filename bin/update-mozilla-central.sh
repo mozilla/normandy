@@ -17,16 +17,19 @@ rm -rf "${dest}"/*
 echo "Extracting XPI"
 unzip -quo "shield-recipe-client.xpi" -d "${dest}" > /dev/null
 
+echo "Adding tests"
+cp -r test "${dest}/test"
+
 ### Adapt built addon to mozilla-central
 
 echo "Fixups:"
 
-echo "* Removing README and LICENSE"
+echo " * Removing README and LICENSE"
 rm "${dest}/README.md"
 rm "${dest}/LICENSE"
 
-echo "Creating moz.build"
-echo "
+echo " * Creating moz.build"
+echo "\
 # -*- Mode: python; indent-tabs-mode: nil; tab-width: 40 -*-
 # vim: set filetype=python:
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,11 +46,23 @@ FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
   'lib',
   'node_modules',
   'package.json',
-]" > "${dest}/moz.build"
+]
 
-echo "Patching install.rdf"
+JETPACK_PACKAGE_MANIFESTS += ['test/jetpack-package.ini']
+" > "${dest}/moz.build"
+
+echo " * Patching install.rdf"
 sed -i \
     -e '/<em:creator>/d' \
     -e '/<em:optionsURL>/d' \
     -e '/<em:optionsType>/d' \
     "${dest}/install.rdf"
+
+echo " * Adding test manifest"
+cd test
+for file in test-*.js; do
+    echo "[${file}]" >> "${dest}/test/jetpack-package.ini"
+done
+cd ..
+
+echo "Done"

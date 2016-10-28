@@ -2,11 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global setTimeout */
+// This file is meant to run inside action sandboxes
+
 "use strict";
 
-// This is meant to run inside action sandboxes
 
-exports.EventEmitter = function(driver) {
+function EventEmitter(driver) { // eslint-disable-line no-unused-vars
+  if (!driver) {
+    throw new Error("driver must be provided");
+  }
+
   const listeners = {};
 
   return {
@@ -36,19 +42,21 @@ exports.EventEmitter = function(driver) {
       if (!(eventName in listeners)) {
         throw new Error("Called off() for event that has no listeners");
       }
-      const index = this.listeners[eventName].indexOf(callback);
-      if (index !== -1) {
-        this.listeners[eventName].splice(index, 1);
-      } else {
-        throw new Error("Callback for off() not found");
+      if (eventName in listeners) {
+        listeners[eventName] = listeners[eventName].filter(l => l !== callback);
       }
     },
 
     once(eventName, callback) {
+      var hasRun = false;
       this.on(eventName, event => {
+        if (hasRun) {
+          return;
+        }
+        hasRun = true;
         callback(event);
         this.off(eventName, callback);
       });
     },
   };
-};
+}

@@ -7,25 +7,28 @@ const {before} = require("sdk/test/utils");
 
 const {Heartbeat} = require("../lib/Heartbeat.js");
 const {makeSandbox} = require("../lib/Sandbox.js");
+const {NormandyDriver} = require("../lib/NormandyDriver.js");
 
+let sandbox;
 let targetWindow;
 let notificationBox;
-let sandbox;
 
 let eventEmitter;
 
 exports["test it shows a heartbeat panel"] = assert => {
-  assert.equal(notificationBox.childElementCount, 0);
+  let preCount = notificationBox.childElementCount;
   new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
   });
-  assert.equal(notificationBox.childElementCount, 1);
+  assert.equal(notificationBox.childElementCount, preCount + 1);
 };
 
 exports["test it shows five stars when there is no engagementButtonLabel"] = assert => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
@@ -37,6 +40,7 @@ exports["test it shows five stars when there is no engagementButtonLabel"] = ass
 
 exports["test it shows a button when there is an engagementButtonLabel"] = assert => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
@@ -48,6 +52,7 @@ exports["test it shows a button when there is an engagementButtonLabel"] = asser
 
 exports["test it shows a learn more link"] = assert => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
@@ -61,6 +66,7 @@ exports["test it shows a learn more link"] = assert => {
 
 exports["test it shows the message"] = assert => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
@@ -75,12 +81,13 @@ exports["test it shows the message"] = assert => {
 
 exports["test it pings telemetry"] = (assert, done) => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
   });
 
-  hb.events.on("TelemetrySent", payload => {
+  hb.eventEmitter.on("TelemetrySent", payload => {
     assert.ok(isOrdered([0, payload.offeredTS, payload.closedTS]));
     done();
   });
@@ -89,8 +96,9 @@ exports["test it pings telemetry"] = (assert, done) => {
   closeAllNotifications();
 };
 
-exports["test it includes learnMoreTS if learn more is clicked"] = (assert, done) => {
+exports["test it includes learnMoreTS in payload if learn more is clicked"] = (assert, done) => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
@@ -98,7 +106,7 @@ exports["test it includes learnMoreTS if learn more is clicked"] = (assert, done
     learnMoreUrl: "https://example.org/learnmore",
   });
 
-  hb.events.on("TelemetrySent", payload => {
+  hb.eventEmitter.on("TelemetrySent", payload => {
     assert.ok(isOrdered([0, payload.offeredTS, payload.learnMoreTS, payload.closedTS]));
     // Close learn more tab
     tabs[tabs.length - 1].close();
@@ -114,6 +122,7 @@ exports["test it includes learnMoreTS if learn more is clicked"] = (assert, done
 
 exports["test it opens an engagement page after interaction"] = (assert, done) => {
   let hb = new Heartbeat(targetWindow, eventEmitter, {
+    sandbox,
     testing: true,
     flowId: "test",
     message: "test",
@@ -121,7 +130,7 @@ exports["test it opens an engagement page after interaction"] = (assert, done) =
     postAnswerUrl: "about:about",
   });
 
-  tabs.on("ready", tab => {
+  tabs.on("ready", () => {
     assert.equal(tabs.activeTab.url, "about:about");
     // Close engagement tab
     tabs[ tabs.length - 1 ].close();
@@ -179,9 +188,10 @@ function isOrdered(arr) {
 
 before(exports, (testName, assert, done) => {
   targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
-  notificationBox = targetWindow.document.querySelector("#high-priority-global-notificationbox");
+  notificationBox = targetWindow.gBrowser.getNotificationBox();
   sandbox = makeSandbox();
-  eventEmitter = sandbox.EventEmitter();
+  let driver = new NormandyDriver(sandbox);
+  eventEmitter = new sandbox.EventEmitter(Cu.cloneInto(driver, sandbox, {cloneFunctions: true}));
 
   closeAllNotifications().then(done);
 });
