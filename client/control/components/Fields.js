@@ -24,7 +24,7 @@ export function buildControlField({
   className = '',
   InputComponent,
   children,
-  ...args
+  ...args // eslint-disable-line comma-dangle
 }) {
   return (
     <label className={`${className} form-field`}>
