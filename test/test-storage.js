@@ -1,7 +1,7 @@
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
-const {Storage} = require("../lib/Storage.js");
+const {makeStorage} = require("../lib/Storage.js");
 const {SandboxManager} = require("../lib/SandboxManager.js");
 const {promiseTest} = require("./utils.js");
 
@@ -45,7 +45,7 @@ exports["test tests are independent 2 of 2"] = promiseTest(assert => {
 before(exports, () => {
   sandboxManager = new SandboxManager();
   sandboxManager.addHold("tests running");
-  store = new Storage("prefix", sandboxManager.sandbox);
+  store = makeStorage("prefix", sandboxManager.sandbox);
 });
 
 after(exports, (name, assert, done) => {
