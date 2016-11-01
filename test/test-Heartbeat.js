@@ -125,7 +125,7 @@ exports["test it opens an engagement page after interaction"] = (assert, done) =
   tabs.on("ready", () => {
     assert.equal(tabs.activeTab.url, "about:about");
     // Close engagement tab
-    tabs[ tabs.length - 1 ].close();
+    tabs[tabs.length - 1].close();
     done();
   });
 

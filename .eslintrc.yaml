@@ -3,6 +3,8 @@ plugins:
   - mozilla
 
 rules:
+  no-else-return: [2]
+  computed-property-spacing: [2]
   indent: [1, 2, {SwitchCase: 1}]
   mozilla/no-aArgs: [1]
   mozilla/this-top-level-scope: [1]
