@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global setTimeout */
 // This file is meant to run inside action sandboxes
 
 "use strict";
@@ -18,7 +17,7 @@ function EventEmitter(driver) { // eslint-disable-line no-unused-vars
   return {
     emit(eventName, event) {
       // Fire events async
-      setTimeout(() => {
+      driver.setTimeout(() => {
         if (!(eventName in listeners)) {
           driver.log(`EventEmitter: Event fired with no listeners: ${eventName}`);
           return;

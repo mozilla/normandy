@@ -1,11 +1,12 @@
 /* global exports:true */
 const {Cu} = require("chrome");
 const testRunner = require("sdk/test");
-const {before} = require("sdk/test/utils");
+const {before, after} = require("sdk/test/utils");
 
 const {NormandyDriver} = require("../lib/NormandyDriver.js");
-const {makeSandbox} = require("../lib/Sandbox.js");
+const {SandboxManager} = require("../lib/SandboxManager.js");
 
+let sandboxManager;
 let eventEmitter;
 
 exports["test it works"] = (assert, done) => {
@@ -97,9 +98,16 @@ exports["test once() works"] = (assert, done) => {
 };
 
 before(exports, () => {
-  let sandbox = makeSandbox();
-  let driver = new NormandyDriver(sandbox, {});
-  eventEmitter = new sandbox.EventEmitter(Cu.cloneInto(driver, sandbox, {cloneFunctions: true}));
+  sandboxManager = new SandboxManager();
+  sandboxManager.addHold("test running");
+  let driver = new NormandyDriver(sandboxManager);
+  let sandboxedDriver = Cu.cloneInto(driver, sandboxManager.sandbox, {cloneFunctions: true});
+  eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver);
+});
+
+after(exports, () => {
+  sandboxManager.removeHold("test running");
+  sandboxManager.assertNuked();
 });
 
 testRunner.run(exports);

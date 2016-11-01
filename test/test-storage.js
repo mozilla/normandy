@@ -2,9 +2,11 @@ const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
 const {Storage} = require("../lib/Storage.js");
+const {SandboxManager} = require("../lib/SandboxManager.js");
 const {promiseTest} = require("./utils.js");
 
 let store;
+let sandboxManager;
 
 exports["test set and get"] = promiseTest(assert => {
   return store.setItem("key", "value")
@@ -41,16 +43,20 @@ exports["test tests are independent 2 of 2"] = promiseTest(assert => {
 });
 
 before(exports, () => {
-  let sandbox = {Promise};
-  store = new Storage("prefix", sandbox);
+  sandboxManager = new SandboxManager();
+  sandboxManager.addHold("tests running");
+  store = new Storage("prefix", sandboxManager.sandbox);
 });
 
 after(exports, (name, assert, done) => {
   store.clear()
-  .then(() => done())
   .catch(err => {
     console.error(err); // eslint-disable-line no-console
     assert.ok(false, err);
+  })
+  .then(() => {
+    sandboxManager.removeHold("tests running");
+    sandboxManager.assertNuked();
     done();
   });
 });

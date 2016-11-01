@@ -1,10 +1,10 @@
-const {Cu} = require("chrome");
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
 const {NormandyDriver} = require("../lib/NormandyDriver.js");
+const {SandboxManager} = require("../lib/SandboxManager.js");
 
-let sandbox;
+let sandboxManager;
 let driver;
 
 exports["test uuid"] = assert => {
@@ -13,13 +13,15 @@ exports["test uuid"] = assert => {
 };
 
 before(exports, () => {
-  sandbox = new Cu.Sandbox(null);
-  driver = new NormandyDriver(sandbox, {});
+  sandboxManager = new SandboxManager();
+  sandboxManager.addHold("test running");
+  driver = new NormandyDriver(sandboxManager);
 });
 
 after(exports, () => {
   driver = null;
-  Cu.nukeSandbox(sandbox);
+  sandboxManager.removeHold("test running");
+  sandboxManager.assertNuked();
 });
 
 testRunner.run(exports);

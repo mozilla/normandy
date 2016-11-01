@@ -3,13 +3,13 @@ const {Cu} = require("chrome");
 Cu.import("resource://gre/modules/Services.jsm"); /* global Services: false */
 const tabs = require("sdk/tabs");
 const testRunner = require("sdk/test");
-const {before} = require("sdk/test/utils");
+const {before, after} = require("sdk/test/utils");
 
 const {Heartbeat} = require("../lib/Heartbeat.js");
-const {makeSandbox} = require("../lib/Sandbox.js");
+const {SandboxManager} = require("../lib/SandboxManager.js");
 const {NormandyDriver} = require("../lib/NormandyDriver.js");
 
-let sandbox;
+let sandboxManager;
 let targetWindow;
 let notificationBox;
 
@@ -17,8 +17,7 @@ let eventEmitter;
 
 exports["test it shows a heartbeat panel"] = assert => {
   let preCount = notificationBox.childElementCount;
-  new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -27,8 +26,7 @@ exports["test it shows a heartbeat panel"] = assert => {
 };
 
 exports["test it shows five stars when there is no engagementButtonLabel"] = assert => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -39,8 +37,7 @@ exports["test it shows five stars when there is no engagementButtonLabel"] = ass
 };
 
 exports["test it shows a button when there is an engagementButtonLabel"] = assert => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -51,8 +48,7 @@ exports["test it shows a button when there is an engagementButtonLabel"] = asser
 };
 
 exports["test it shows a learn more link"] = assert => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -65,8 +61,7 @@ exports["test it shows a learn more link"] = assert => {
 };
 
 exports["test it shows the message"] = assert => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -80,8 +75,7 @@ exports["test it shows the message"] = assert => {
 };
 
 exports["test it pings telemetry"] = (assert, done) => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -97,8 +91,7 @@ exports["test it pings telemetry"] = (assert, done) => {
 };
 
 exports["test it includes learnMoreTS in payload if learn more is clicked"] = (assert, done) => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -121,8 +114,7 @@ exports["test it includes learnMoreTS in payload if learn more is clicked"] = (a
 };
 
 exports["test it opens an engagement page after interaction"] = (assert, done) => {
-  let hb = new Heartbeat(targetWindow, eventEmitter, {
-    sandbox,
+  let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
     flowId: "test",
     message: "test",
@@ -186,14 +178,23 @@ function isOrdered(arr) {
   return true;
 }
 
-before(exports, (testName, assert, done) => {
+before(exports, () => {
   targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
   notificationBox = targetWindow.gBrowser.getNotificationBox();
-  sandbox = makeSandbox();
-  let driver = new NormandyDriver(sandbox);
-  eventEmitter = new sandbox.EventEmitter(Cu.cloneInto(driver, sandbox, {cloneFunctions: true}));
+  sandboxManager = new SandboxManager();
+  let driver = new NormandyDriver(sandboxManager);
+  sandboxManager.addHold("test running");
+  let sandboxedDriver = Cu.cloneInto(driver, sandboxManager.sandbox, {cloneFunctions: true});
+  eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver);
+});
 
-  closeAllNotifications().then(done);
+after(exports, (testName, assert, done) => {
+  closeAllNotifications()
+  .then(() => {
+    sandboxManager.removeHold("test running");
+    sandboxManager.assertNuked();
+    done();
+  });
 });
 
 testRunner.run(exports);
