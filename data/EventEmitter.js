@@ -17,17 +17,18 @@ function EventEmitter(driver) { // eslint-disable-line no-unused-vars
   return {
     emit(eventName, event) {
       // Fire events async
-      driver.setTimeout(() => {
-        if (!(eventName in listeners)) {
-          driver.log(`EventEmitter: Event fired with no listeners: ${eventName}`);
-          return;
-        }
-        let frozenEvent = Object.freeze(event);
-        const callbacks = listeners[eventName];
-        for (let cb of callbacks) {
-          cb(frozenEvent);
-        }
-      }, 0);
+      Promise.resolve()
+        .then(() => {
+          if (!(eventName in listeners)) {
+            driver.log(`EventEmitter: Event fired with no listeners: ${eventName}`);
+            return;
+          }
+          let frozenEvent = Object.freeze(event);
+          const callbacks = listeners[eventName];
+          for (let cb of callbacks) {
+            cb(frozenEvent);
+          }
+        });
     },
 
     on(eventName, callback) {

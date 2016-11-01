@@ -18,10 +18,10 @@ before(exports, () => {
   driver = new NormandyDriver(sandboxManager);
 });
 
-after(exports, () => {
+after(exports, (testName, assert, done) => {
   driver = null;
   sandboxManager.removeHold("test running");
-  sandboxManager.assertNuked();
+  sandboxManager.assertNuked(assert, done);
 });
 
 testRunner.run(exports);

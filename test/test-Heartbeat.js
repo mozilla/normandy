@@ -192,8 +192,7 @@ after(exports, (testName, assert, done) => {
   closeAllNotifications()
   .then(() => {
     sandboxManager.removeHold("test running");
-    sandboxManager.assertNuked();
-    done();
+    sandboxManager.assertNuked(assert, done);
   });
 });
 

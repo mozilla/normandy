@@ -105,9 +105,9 @@ before(exports, () => {
   eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver);
 });
 
-after(exports, () => {
+after(exports, (testName, assert, done) => {
   sandboxManager.removeHold("test running");
-  sandboxManager.assertNuked();
+  sandboxManager.assertNuked(assert, done);
 });
 
 testRunner.run(exports);
