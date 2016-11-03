@@ -1,9 +1,11 @@
 /* global exports:true, require:false */
 const {Cu} = require("chrome");
-Cu.import("resource://gre/modules/Services.jsm"); /* global Services: false */
 const tabs = require("sdk/tabs");
+const {browserWindows} = require("sdk/windows");
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
+
+Cu.import("resource://gre/modules/Services.jsm"); /* global Services */
 
 const {Heartbeat} = require("../lib/Heartbeat.js");
 const {SandboxManager} = require("../lib/SandboxManager.js");
@@ -133,6 +135,28 @@ exports["test it opens an engagement page after interaction"] = (assert, done) =
   engagementEl.click();
 };
 
+exports["test it sends telemetry when the window is closed"] = (assert, done) => {
+  browserWindows.open({
+    url: "about:blank",
+    onOpen: () => {
+      targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
+      let hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
+        testing: true,
+        flowId: "test",
+        message: "test",
+      });
+
+      hb.eventEmitter.on("TelemetrySent", payload => {
+        assert.ok(isOrdered([0, payload.offeredTS, payload.closedTS]));
+        done();
+      });
+
+      // triggers sending ping to normandy
+      targetWindow.close();
+    },
+  });
+};
+
 function closeAllNotifications() {
   if (notificationBox.allNotifications.length === 0) {
     return Promise.resolve();
@@ -185,7 +209,7 @@ before(exports, () => {
   let driver = new NormandyDriver(sandboxManager);
   sandboxManager.addHold("test running");
   let sandboxedDriver = Cu.cloneInto(driver, sandboxManager.sandbox, {cloneFunctions: true});
-  eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver);
+  eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver).wrappedJSObject;
 });
 
 after(exports, (testName, assert, done) => {

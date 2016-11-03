@@ -2,12 +2,10 @@
 .*
 !/data/**/*
 !/lib/**/*
-!/node_modules/jexl/dist/jexl.min.js
 !/node_modules/jexl/package.json
 !/node_modules/jexl/LICENSE.txt
 !/node_modules/jexl/lib/**/*.js
 !/index.js
-!/LICENSE
 !/README.md
 !/package.json
 !/chrome.manifest

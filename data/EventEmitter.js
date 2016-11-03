@@ -7,7 +7,8 @@
 "use strict";
 
 
-function EventEmitter(driver) { // eslint-disable-line no-unused-vars
+/** exported EventEmitter */
+function EventEmitter(driver) { 
   if (!driver) {
     throw new Error("driver must be provided");
   }
@@ -39,24 +40,20 @@ function EventEmitter(driver) { // eslint-disable-line no-unused-vars
     },
 
     off(eventName, callback) {
-      if (!(eventName in listeners)) {
-        throw new Error("Called off() for event that has no listeners");
-      }
       if (eventName in listeners) {
-        listeners[eventName] = listeners[eventName].filter(l => l !== callback);
+        let index = listeners[eventName].indexOf(callback);
+        if (index !== -1) {
+          listeners[eventName].splice(index, 1);
+        }
       }
     },
 
     once(eventName, callback) {
-      var hasRun = false;
-      this.on(eventName, event => {
-        if (hasRun) {
-          return;
-        }
-        hasRun = true;
+      const inner = event => {
         callback(event);
-        this.off(eventName, callback);
-      });
+        this.off(eventName, inner);
+      };
+      this.on(eventName, inner);
     },
   };
 }

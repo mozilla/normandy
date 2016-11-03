@@ -102,7 +102,7 @@ before(exports, () => {
   sandboxManager.addHold("test running");
   let driver = new NormandyDriver(sandboxManager);
   let sandboxedDriver = Cu.cloneInto(driver, sandboxManager.sandbox, {cloneFunctions: true});
-  eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver);
+  eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver).wrappedJSObject;
 });
 
 after(exports, (testName, assert, done) => {
