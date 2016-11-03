@@ -15,12 +15,6 @@ export default class ShieldStudyAction extends Action {
   }
 
   async execute() {
-    const storageIsDurable = await this.storage.isDurable();
-
-    if (!storageIsDurable && !this.normandy.testing) {
-      throw new Error('Storage durability unconfirmed');
-    }
-
     const hasBeenShown = await this.getHasBeenShown();
     const shouldShowStudyPrompt = (
       this.normandy.testing
