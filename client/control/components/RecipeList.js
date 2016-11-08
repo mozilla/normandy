@@ -86,7 +86,7 @@ class DisconnectedRecipeList extends React.Component {
    * @param  {Object} Original recipe object
    * @return {Object} Original recipe but with `metaData` and `searchData` properties added
    */
-  static applyRecipeMetadata(recipe) {
+  static applyRecipeMetaData(recipe) {
     const { action: recipeAction } = recipe;
     const newRecipe = {
       ...recipe,
@@ -176,7 +176,7 @@ class DisconnectedRecipeList extends React.Component {
   render() {
     const { recipes } = this.props;
     let filteredRecipes = this.state.filteredRecipes || recipes;
-    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
+    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetaData);
 
     return (
       <div>
