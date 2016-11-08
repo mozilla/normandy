@@ -65,6 +65,21 @@ SwitchFilter.propTypes = {
 
 class DisconnectedRecipeList extends React.Component {
   /**
+   * Recipe metadata properties and associated labels to display
+   * @type {Object}
+   */
+  static ActionMetaData = {
+    'show-heartbeat': {
+      // prop name : displayed label
+      surveyId: 'Survey ID',
+      thanksMessage: 'Thanks Message',
+    },
+    'console-log': {
+      message: 'Message',
+    },
+  };
+
+  /**
    * Given a recipe object, determines what type of recipe it is (based on its `action`),
    * and then compiles a hash of 'displayed metadata props' and their values. This hash
    * is saved on the recipe as `metaData`, and displayed in the 'Metadata'
@@ -77,29 +92,32 @@ class DisconnectedRecipeList extends React.Component {
    * @return {Object} Original recipe but with `metaData` and `searchData` properties added
    */
   static applyUniqueRecipeID(recipe) {
+    const { action: recipeAction } = recipe;
     const newRecipe = { ...recipe };
 
-    switch (recipe.action) {
-      case 'show-heartbeat':
-        newRecipe.metaData = {
-          'Survey ID': recipe.arguments.surveyId,
-        };
-        break;
-      case 'console-log':
-        newRecipe.metaData = {
-          Message: recipe.arguments.message,
-        };
-        break;
-      default:
-        newRecipe.metaData = {};
-        break;
-    }
+    // recipes should have empty metaData/searchData props,
+    // regardless if we set the values or not
+    newRecipe.metaData = {};
+    newRecipe.searchData = '';
 
-    // build a string of metadata values,
-    // which is used for table filtering/searching later
-    newRecipe.searchData = Object.keys(newRecipe.metaData)
-      .map(metaProp => newRecipe.metaData[metaProp])
-      .join(' ');
+    // check if there are specific properties/labels we want to grub
+    const requestedMetaProps = DisconnectedRecipeList.ActionMetaData[recipeAction];
+
+    // if there are metadata props we want to pull out,
+    // loop through them and extract the data from the recipe
+    for (const propName in requestedMetaProps) {
+      if (requestedMetaProps.hasOwnProperty(propName)) {
+        // get the displayed label value
+        const label = requestedMetaProps[propName];
+        // get the actual property value
+        const value = newRecipe.arguments[propName];
+        // save the label:property into the metadata
+        newRecipe.metaData[label] = value;
+
+        // add the value to the existing search data
+        newRecipe.searchData = `${newRecipe.searchData} ${value}`;
+      }
+    }
 
     return newRecipe;
   }
@@ -196,17 +214,18 @@ class DisconnectedRecipeList extends React.Component {
                   {moment(recipe.last_updated).fromNow()}
                 </Td>
                 <Td column="metadata" value={recipe.searchData}>
-                  <span>
+                  <ul className="metadata-list">
                     {
+                      /* Display each metadata property in a list */
                       Object
                         .keys(recipe.metaData)
                         .map(metaProp => (
-                          <span key={metaProp}>
-                            <b>{metaProp}:</b> {recipe.metaData[metaProp]}
-                          </span>
+                          <li key={metaProp}>
+                            <span>{metaProp}:</span> {recipe.metaData[metaProp]}
+                          </li>
                         ))
                     }
-                  </span>
+                  </ul>
                 </Td>
               </Tr>
               )

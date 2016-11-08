@@ -382,3 +382,12 @@
       white-space: nowrap;
     }
 }
+
+/* Recipe List */
+#recipe-list {
+  .metadata-list {
+    span {
+      font-weight: 800;
+    }
+  }
+}
