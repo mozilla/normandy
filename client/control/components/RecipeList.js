@@ -72,10 +72,6 @@ class DisconnectedRecipeList extends React.Component {
     'show-heartbeat': {
       // prop name : displayed label
       surveyId: 'Survey ID',
-      thanksMessage: 'Thanks Message',
-    },
-    'console-log': {
-      message: 'Message',
     },
   };
 
