@@ -64,18 +64,17 @@ SwitchFilter.propTypes = {
 };
 
 class DisconnectedRecipeList extends React.Component {
-
   /**
    * Given a recipe object, determines what type of recipe it is (based on its `action`),
    * and then compiles a hash of 'displayed metadata props' and their values. This hash
-   * is saved on the recipe as `metaData`.
+   * is saved on the recipe as `metaData`, and displayed in the 'Metadata'
    *
    * Beyond that, a string of metaData values is created, and attached to the
    * recipe as the `searchData` property. This is used by the `Table` component
-   * in to search/filter over the metaData.
+   * to search/filter/sort the metaData.
    *
-   * @param  {Object} Original recipe received/passed into reducer
-   * @return {Object} Original recipe, but with `metaData` and `searchData` properties added
+   * @param  {Object} Original recipe object
+   * @return {Object} Original recipe but with `metaData` and `searchData` properties added
    */
   static applyUniqueRecipeID(recipe) {
     const newRecipe = { ...recipe };
