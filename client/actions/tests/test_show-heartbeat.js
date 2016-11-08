@@ -141,17 +141,19 @@ describe('ShowHeartbeatAction', () => {
     normandy.mock.client.isDefaultBrowser = true;
     normandy.mock.client.searchEngine = 'shady-tims';
     normandy.mock.client.syncSetup = true;
+    normandy.uuid.and.returnValue('fake-uuid');
 
     await action.execute();
     const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
     const params = new URL(postAnswerUrl).searchParams;
     expect(params.get('source')).toEqual('heartbeat');
-    expect(params.get('surveyversion')).toEqual('52');
+    expect(params.get('surveyversion')).toEqual('53');
     expect(params.get('updateChannel')).toEqual('nightly');
     expect(params.get('fxVersion')).toEqual('42.0.1');
     expect(params.get('isDefaultBrowser')).toEqual('1');
     expect(params.get('searchEngine')).toEqual('shady-tims');
     expect(params.get('syncSetup')).toEqual('1');
+    expect(params.get('userId')).toEqual('fake-uuid');
   });
 
   it('should annotate the post-answer URL if it has an existing query string', async () => {
@@ -200,8 +202,13 @@ describe('ShowHeartbeatAction', () => {
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     await action.execute();
+
+    // stub a fake UUID
+    normandy.uuid.and.returnValue('fake-uuid');
+
     expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
-      surveyId: 'my-survey',
+      // returned surveyId should be `name::uuid`
+      surveyId: `my-survey::${normandy.uuid()}`,
       surveyVersion: 42,
     }));
   });

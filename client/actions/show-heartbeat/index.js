@@ -1,6 +1,6 @@
 import { Action, registerAction } from '../utils';
 
-const VERSION = 52; // Increase when changed.
+const VERSION = 53; // Increase when changed.
 const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 
@@ -128,11 +128,11 @@ export default class ShowHeartbeatAction extends Action {
     // A bit redundant but the action argument names shouldn't necessarily rely
     // on the argument names showHeartbeat takes.
     const heartbeatData = {
-      surveyId,
+      surveyId: `${surveyId}::${flow.id}`,
       message,
       engagementButtonLabel,
       thanksMessage,
-      postAnswerUrl: this.annotatePostAnswerUrl(postAnswerUrl),
+      postAnswerUrl: this.annotatePostAnswerUrl({ url: postAnswerUrl, userId: flow.id }),
       learnMoreMessage,
       learnMoreUrl,
       flowId: flow.id,
@@ -179,7 +179,7 @@ export default class ShowHeartbeatAction extends Action {
     return Number.isNaN(lastShown) ? null : lastShown;
   }
 
-  annotatePostAnswerUrl(url) {
+  annotatePostAnswerUrl({ url, userId }) {
     // Don't bother with empty URLs.
     if (!url) {
       return url;
@@ -193,6 +193,7 @@ export default class ShowHeartbeatAction extends Action {
       isDefaultBrowser: this.client.isDefaultBrowser ? 1 : 0,
       searchEngine: this.client.searchEngine,
       syncSetup: this.client.syncSetup ? 1 : 0,
+      userId,
     };
 
     // Append testing parameter if in testing mode.
