@@ -384,10 +384,8 @@
 }
 
 /* Recipe List */
-#recipe-list {
-  .metadata-list {
-    span {
-      font-weight: 800;
-    }
+.metadata-list {
+  .metadata-label {
+    font-weight: 800;
   }
 }

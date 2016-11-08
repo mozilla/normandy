@@ -217,7 +217,8 @@ class DisconnectedRecipeList extends React.Component {
                       recipe.metaData
                         .map((metaProp, index) => (
                           <li key={index}>
-                            <span>{metaProp.label}:</span> {metaProp.value}
+                            <span className="metadata-label">{metaProp.label}:</span>
+                            {metaProp.value}
                           </li>
                         ))
                     }
