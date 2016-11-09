@@ -58,7 +58,7 @@ function SwitchFilter({ options, selectedFilter, updateFilter }) {
   );
 }
 SwitchFilter.propTypes = {
-  options: pt.object.isRequired,
+  options: pt.array.isRequired,
   selectedFilter: pt.any.isRequired,
   updateFilter: pt.func.isRequired,
 };
