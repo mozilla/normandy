@@ -175,7 +175,7 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   async getLastShownDate() {
-    const lastShown = Number.parseInt(await this.storage.getItem('lastShown'), 10);
+    const lastShown = await this.storage.getItem('lastShown');
     return Number.isNaN(lastShown) ? null : lastShown;
   }
 
