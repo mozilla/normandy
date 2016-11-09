@@ -11,8 +11,9 @@ export class LocalStorage {
   /**
    * @param    {string} prefix Prefix to append to all incoming keys.
    */
-  constructor(prefix) {
+  constructor(prefix, { skipDurability = false }) {
     this.prefix = prefix;
+    this.skipDurability = skipDurability;
   }
 
   async isDurable() {
@@ -26,14 +27,13 @@ export class LocalStorage {
 
   async getItem(key) {
     const storageIsDurable = await this.isDurable();
-    if (!storageIsDurable && !this.testing) {
+    if (!storageIsDurable && !this.skipDurability) {
       throw new Error('Storage durability unconfirmed');
     }
     const val = localStorage.getItem(this._makeKey(key));
     try {
       return JSON.parse(val);
     } catch (e) {
-      this.log(e.toString());
       return null;
     }
   }
@@ -159,7 +159,7 @@ export default class NormandyDriver {
   }
 
   createStorage(prefix) {
-    return new LocalStorage(prefix);
+    return new LocalStorage(prefix, this.testing);
   }
 
   client() {

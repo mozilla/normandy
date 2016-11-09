@@ -234,7 +234,7 @@ describe('LocalStorage', () => {
   beforeEach(() => {
     window.localStorage.clear();
     window.localStorage.setItem(STORAGE_DURABILITY_KEY, 2);
-    store = new LocalStorage('test-prefix');
+    store = new LocalStorage('test-prefix', false);
   });
 
   it('can set and get items', async () => {
@@ -261,6 +261,17 @@ describe('LocalStorage', () => {
     } catch (err) {
       expect(err).toEqual(new Error('Storage durability unconfirmed'));
     }
+  });
+
+  it('has the expected key format', async () => {
+    // other tests rely on this, so fail fast if something changes
+    window.localStorage.setItem('test-prefix-key', '"value"');
+    expect(await store.getItem('key')).toEqual('value');
+  });
+
+  it('returns null for values with improper json', async () => {
+    window.localStorage.setItem('test-prefix-foo', '{"bad":');
+    expect(await store.getItem('foo')).toEqual(null);
   });
 
   describe('tests are independent', () => {

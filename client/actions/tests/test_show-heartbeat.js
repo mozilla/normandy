@@ -71,11 +71,11 @@ describe('ShowHeartbeatAction', () => {
     expect(normandy.showHeartbeat).toHaveBeenCalled();
   });
 
-  it('should show heartbeat if the last-shown date cannot be parsed', async () => {
+  it('should show heartbeat if the last-shown date is null', async () => {
     const recipe = recipeFactory();
     const action = new ShowHeartbeatAction(normandy, recipe);
 
-    normandy.mock.storage.data.lastShown = 'bigo310s0baba';
+    normandy.mock.storage.data.lastShown = null;
     spyOn(Date, 'now').and.returnValue(10);
 
     await action.execute();

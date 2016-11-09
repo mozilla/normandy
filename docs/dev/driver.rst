@@ -205,8 +205,9 @@ Storage
 -------
 .. js:class:: Storage
 
-   Storage objects allow actions to store data locally on the client, using an
-   API that is similar to localStorage, but is asynchronous.
+   Storage objects allow actions to store data locally on the client. All
+   methods return Promises, and can store any JSON serializable types. Unlike
+   localStorage, items are not converted to strings.
 
    .. js:function:: getItem(key)
 
