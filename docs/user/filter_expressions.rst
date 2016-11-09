@@ -97,8 +97,8 @@ filter expressions.
 
 .. js:attribute:: normandy.userId
 
-   A `v4 UUID`_ uniquely identifying the user. This is not necessarily
-   correlated with any other unique IDs, such as Telemetry IDs.
+   A `v4 UUID`_ uniquely identifying the user. This is uncorrelated with any
+   other unique IDs, such as Telemetry IDs.
 
    .. _v4 UUID: https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29
 
