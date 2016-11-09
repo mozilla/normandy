@@ -34,6 +34,11 @@
                     "description": "URL to study addon XPI",
                     "propertyOrder": 400
                 },
+                "promptMessage": {
+                    "type": "string",
+                    "description": "Message to show in the UI bar prompt to learn more about the study",
+                    "propertyOrder": 500
+                },
                 "buttonText": {
                     "type": "string",
                     "description": "Text for opt-in button",
