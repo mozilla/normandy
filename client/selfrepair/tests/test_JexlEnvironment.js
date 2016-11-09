@@ -79,7 +79,7 @@ describe('JexlEnvironment', () => {
 
       return Promise.all(promises)
       .then(results => {
-        let count = results.filter(x => x).length;
+        const count = results.filter(x => x).length;
         expect(count).toBeGreaterThan(sample * rate / (1 + accuracy));
         expect(count).toBeLessThan(sample * rate * (1 + accuracy));
       });
