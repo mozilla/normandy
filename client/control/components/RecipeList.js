@@ -64,13 +64,61 @@ SwitchFilter.propTypes = {
 };
 
 class DisconnectedRecipeList extends React.Component {
-  propTypes = {
-    dispatch: pt.func.isRequired,
-    isFetching: pt.bool.isRequired,
-    recipeListNeedsFetch: pt.bool.isRequired,
-    recipe: pt.object.isRequired,
-    recipes: pt.array.isRequired,
+  /**
+   * Recipe metadata properties and associated labels to display
+   * @type {Object}
+   */
+  static ActionMetaData = {
+    'show-heartbeat': recipe => [
+      { label: 'Survey ID', value: recipe.arguments.surveyId },
+    ],
+  };
+
+  /**
+   * Given a recipe object, determines what type of recipe it is (based on its `action`),
+   * and then compiles an array of 'displayed metadata props' and their values. This array
+   * is saved on the recipe as `metaData`, and displayed in the 'Metadata'
+   *
+   * Beyond that, a string of metaData values is created, and attached to the
+   * recipe as the `searchData` property. This is used by the `Table` component
+   * to search/filter/sort the metaData.
+   *
+   * @param  {Object} Original recipe object
+   * @return {Object} Original recipe but with `metaData` and `searchData` properties added
+   */
+  static applyRecipeMetaData(recipe) {
+    const { action: recipeAction } = recipe;
+    const newRecipe = {
+      ...recipe,
+      // recipes should have empty metaData/searchData props,
+      // regardless if we set the values or not
+      metaData: [],
+      searchData: '',
+    };
+
+    // check if there are specific properties/labels we want to display
+    const requestedMetaProps = DisconnectedRecipeList.ActionMetaData[recipeAction];
+
+    // if we have a metaData definition to fill...
+    if (requestedMetaProps) {
+      // ...get the data we want to display
+      const foundData = requestedMetaProps(newRecipe);
+
+      // ...and add it to the existing metaData collection
+      // (the data comes back as an array of objects,
+      // so we can just concat it to our existing array)
+      newRecipe.metaData = newRecipe.metaData.concat(foundData);
+    }
+
+    // update the searchdata string with whatever the values are
+    // (this is used for sorting/filtering/searching)
+    newRecipe.metaData.forEach(data => {
+      newRecipe.searchData = `${newRecipe.searchData} ${data.value}`;
+    });
+
+    return newRecipe;
   }
+
 
   constructor(props) {
     super(props);
@@ -127,7 +175,8 @@ class DisconnectedRecipeList extends React.Component {
 
   render() {
     const { recipes } = this.props;
-    const filteredRecipes = this.state.filteredRecipes || recipes;
+    let filteredRecipes = this.state.filteredRecipes || recipes;
+    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetaData);
 
     return (
       <div>
@@ -139,8 +188,9 @@ class DisconnectedRecipeList extends React.Component {
         <div className="fluid-8">
           <Table
             id="recipe-list"
-            sortable hideFilterInput
-            filterable={['name', 'action']}
+            sortable
+            hideFilterInput
+            filterable={['name', 'action', 'metadata']}
             filterBy={this.state.searchText}
           >
             <Thead>
@@ -148,6 +198,7 @@ class DisconnectedRecipeList extends React.Component {
               <Th column="action"><span>Action Name</span></Th>
               <Th column="enabled"><span>Enabled</span></Th>
               <Th column="last_updated"><span>Last Updated</span></Th>
+              <Th column="metadata"><span>Metadata</span></Th>
             </Thead>
             {filteredRecipes.map(recipe =>
               <Tr key={recipe.id} onClick={() => { this.viewRecipe(recipe); }}>
@@ -159,6 +210,20 @@ class DisconnectedRecipeList extends React.Component {
                 <Td column="last_updated" value={recipe.last_updated}>
                   {moment(recipe.last_updated).fromNow()}
                 </Td>
+                <Td column="metadata" value={recipe.searchData}>
+                  <ul className="metadata-list">
+                    {
+                      /* Display each metadata property in a list */
+                      recipe.metaData
+                        .map((metaProp, index) => (
+                          <li key={index}>
+                            <span className="metadata-label">{metaProp.label}:</span>
+                            {metaProp.value}
+                          </li>
+                        ))
+                    }
+                  </ul>
+                </Td>
               </Tr>
               )
             }
@@ -168,6 +233,14 @@ class DisconnectedRecipeList extends React.Component {
     );
   }
 }
+
+DisconnectedRecipeList.propTypes = {
+  dispatch: pt.func.isRequired,
+  isFetching: pt.bool.isRequired,
+  recipeListNeedsFetch: pt.bool.isRequired,
+  recipe: pt.object.isRequired,
+  recipes: pt.array.isRequired,
+};
 
 const mapStateToProps = (state, ownProps) => ({
   recipes: state.controlApp.recipes || [],
