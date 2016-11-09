@@ -99,21 +99,21 @@ class DisconnectedRecipeList extends React.Component {
     // check if there are specific properties/labels we want to display
     const requestedMetaProps = DisconnectedRecipeList.ActionMetaData[recipeAction];
 
-    // if we have a metadata definition to fill..
+    // if we have a metaData definition to fill...
     if (requestedMetaProps) {
+      // ...get the data we want to display
       const foundData = requestedMetaProps(newRecipe);
 
-      // add the data to the metaData collection
+      // ...and add it to the existing metaData collection
+      // (the data comes back as an array of objects,
+      // so we can just concat it to our existing array)
       newRecipe.metaData = newRecipe.metaData.concat(foundData);
     }
 
     // update the searchdata string with whatever the values are
     // (this is used for sorting/filtering/searching)
-    newRecipe.metaData.map(data => {
-      newRecipe.searchData += data.value;
-
-      // lint complains if we dont return
-      return data;
+    newRecipe.metaData.forEach(data => {
+      newRecipe.searchData = `${newRecipe.searchData} ${data.value}`;
     });
 
     return newRecipe;
