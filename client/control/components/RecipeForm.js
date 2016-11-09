@@ -103,6 +103,8 @@ export class DisconnectedRecipeForm extends React.Component {
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form fluid-8">
 
+        <Link to={`/control/recipe/${recipe.id}/clone/`}>Clone</Link>
+
         {viewingRevision &&
           <p id="viewing-revision" className="notification info">
             You are viewing a past version of this recipe. Saving this form
