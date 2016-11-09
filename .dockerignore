@@ -10,4 +10,3 @@ site-packages
 venv
 webpack-stats.json
 webpack-stats-actions.json
-Dockerfile

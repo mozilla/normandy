@@ -49,7 +49,8 @@ export function fetchAction(recipe) {
   const cache = fetchAction._cache;
 
   if (!(recipe.action in cache)) {
-    cache[recipe.action] = fetch(`/api/v1/action/${recipe.action}/`)
+    const headers = { Accept: 'application/json' };
+    cache[recipe.action] = fetch(`/api/v1/action/${recipe.action}/`, { headers })
       .then(response => response.json());
   }
 

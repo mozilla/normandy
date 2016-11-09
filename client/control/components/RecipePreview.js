@@ -1,11 +1,12 @@
 import React, { PropTypes as pt } from 'react';
 import classNames from 'classnames';
+
 import composeRecipeContainer from './RecipeContainer.js';
 import { runRecipe } from '../../selfrepair/self_repair_runner.js';
 import NormandyDriver from '../../selfrepair/normandy_driver.js';
 import Mozilla from '../../selfrepair/uitour.js';
 
-class RecipePreview extends React.Component {
+export class UnwrappedRecipePreview extends React.Component {
   static propTypes = {
     recipe: pt.object.isRequired,
   }
@@ -18,6 +19,9 @@ class RecipePreview extends React.Component {
       error: null,
       errorHelp: null,
     };
+
+    this.driver = new NormandyDriver();
+    this.driver.registerCallbacks();
   }
 
   componentWillMount() {
@@ -31,8 +35,6 @@ class RecipePreview extends React.Component {
   attemptPreview() {
     const { recipe } = this.props;
     const { status } = this.state;
-    const driver = new NormandyDriver();
-    driver.registerCallbacks();
 
     if (recipe && status === 'start') {
       this.pingUITour();
@@ -41,12 +43,14 @@ class RecipePreview extends React.Component {
         status: 'attempting',
       });
 
-      runRecipe(recipe, driver, { testing: true }).then(() => {
+      runRecipe(recipe, this.driver, { testing: true })
+      .then(() => {
         this.setState({
           status: 'executed',
         });
       })
       .catch(error => {
+        console.error(error);
         this.setState({
           status: 'error',
           error: `Error running recipe: ${error}`,
@@ -55,16 +59,22 @@ class RecipePreview extends React.Component {
     }
   }
 
+  currentURL() {
+    // This is for mocking out in tests
+    return new URL(window.location);
+  }
+
   pingUITour() {
     const timeout = setTimeout(() => {
-      const url = new URL(window.location);
+      const url = this.currentURL();
       const prefName = 'browser.uitour.testingOrigins';
-      const prefValue = `${url.protocol}//${url.hostname}${url.port ? `:${url.port}` : ':'}`;
+      const prefValue = `${url.protocol}//${url.hostname}${url.port ? `:${url.port}` : ''}`;
+
       this.setState({
         status: 'error',
         error: 'UITour unavailable',
         errorHelp: (
-          <span>
+          <span className="uitour-error-help">
             Make sure the pref <code>{prefName}</code> includes <code>{prefValue}</code>.
           </span>
         ),
@@ -146,5 +156,4 @@ ExecuteStatus.propTypes = {
   errorHelp: pt.node,
 };
 
-
-export default composeRecipeContainer(RecipePreview);
+export default composeRecipeContainer(UnwrappedRecipePreview);

@@ -376,4 +376,16 @@
       margin: 0 0 10px 20px;
       text-transform: none;
     }
+
+    code {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+}
+
+/* Recipe List */
+.metadata-list {
+  .metadata-label {
+    font-weight: 800;
+  }
 }
