@@ -18,12 +18,12 @@ exports["test it fires events async"] = (assert, done) => {
   let flag = 0;
   eventEmitter.on("foo", () => {
     flag += 1;
-    assert.equal(flag, 1);
+    assert.equal(flag, 1, "event handler fired multiple times");
     done();
   });
-  assert.equal(flag, 0);
+  assert.equal(flag, 0, "event handler fired before event");
   eventEmitter.emit("foo");
-  assert.equal(flag, 0);
+  assert.equal(flag, 0, "event handler fired syncronously");
 };
 
 exports["test it can safely fire events with no listeners"] = () => {
@@ -32,7 +32,7 @@ exports["test it can safely fire events with no listeners"] = () => {
 
 exports["test it passes arguments"] = (assert, done) => {
   eventEmitter.on("foo", arg => {
-    assert.equal(arg, "it works");
+    assert.equal(arg, "it works", "argument was not passed to event handler");
     done();
   });
   eventEmitter.emit("foo", "it works");
@@ -43,12 +43,12 @@ exports["test it works with multiple listeners in order"] = (assert, done) => {
 
   eventEmitter.on("foo", () => {
     counter += 1;
-    assert.equal(counter, 1);
+    assert.equal(counter, 1, "counter was not expected value");
   });
 
   eventEmitter.on("foo", () => {
     counter += 10;
-    assert.equal(counter, 11);
+    assert.equal(counter, 11, "counter was not expected value");
     done();
   });
 
@@ -66,7 +66,7 @@ exports["test off() works"] = (assert, done) => {
     eventEmitter.off("foo", cb2);
   }
   function allDone() {
-    assert.equal(count, 12);
+    assert.equal(count, 12, "counter was not expected value");
     done();
   }
 
@@ -85,7 +85,7 @@ exports["test once() works"] = (assert, done) => {
     count += 1;
   }
   function allDone() {
-    assert.equal(count, 1);
+    assert.equal(count, 1, "counter was not expected value");
     done();
   }
 
@@ -93,6 +93,25 @@ exports["test once() works"] = (assert, done) => {
   eventEmitter.once("foo", cb);
 
   eventEmitter.emit("foo");
+  eventEmitter.emit("foo");
+  eventEmitter.emit("done");
+};
+
+// Because of the way the event emitter iterates, this is a fragile case
+exports["test off() during event handler works"] = (assert, done) => {
+  let count = 0;
+  function cb() {
+    count += 1;
+  }
+  function allDone() {
+    assert.equal(count, 2, "counter was not expected value");
+    done();
+  }
+
+  eventEmitter.once("foo", cb);
+  eventEmitter.on("foo", cb);
+  eventEmitter.on("done", allDone);
+
   eventEmitter.emit("foo");
   eventEmitter.emit("done");
 };

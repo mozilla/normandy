@@ -7,8 +7,7 @@
 "use strict";
 
 
-/** exported EventEmitter */
-function EventEmitter(driver) { 
+this.EventEmitter = function(driver) {
   if (!driver) {
     throw new Error("driver must be provided");
   }
@@ -24,8 +23,10 @@ function EventEmitter(driver) {
             driver.log(`EventEmitter: Event fired with no listeners: ${eventName}`);
             return;
           }
+          // freeze event to prevent handlers from modifying it
           let frozenEvent = Object.freeze(event);
-          const callbacks = listeners[eventName];
+          // Clone callbacks array to avoid problems with mutation while iterating
+          const callbacks = Array.from(listeners[eventName]);
           for (let cb of callbacks) {
             cb(frozenEvent);
           }
@@ -56,4 +57,4 @@ function EventEmitter(driver) {
       this.on(eventName, inner);
     },
   };
-}
+};

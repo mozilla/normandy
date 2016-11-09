@@ -1,4 +1,4 @@
-/* global exports:true, require:false */
+  /* global exports:true, require:false */
 const {Cu} = require("chrome");
 const tabs = require("sdk/tabs");
 const {browserWindows} = require("sdk/windows");
@@ -24,7 +24,7 @@ exports["test it shows a heartbeat panel"] = assert => {
     flowId: "test",
     message: "test",
   });
-  assert.equal(notificationBox.childElementCount, preCount + 1);
+  assert.equal(notificationBox.childElementCount, preCount + 1, "wrong number of notifications open");
 };
 
 exports["test it shows five stars when there is no engagementButtonLabel"] = assert => {
@@ -34,8 +34,8 @@ exports["test it shows five stars when there is no engagementButtonLabel"] = ass
     message: "test",
     engagementButtonLabel: undefined,
   });
-  assert.equal(hb.notice.querySelectorAll(".star-x").length, 5);
-  assert.equal(hb.notice.querySelectorAll(".notification-button").length, 0);
+  assert.equal(hb.notice.querySelectorAll(".star-x").length, 5, "wrong number of stars");
+  assert.equal(hb.notice.querySelectorAll(".notification-button").length, 0, "engagement button shown when not expected");
 };
 
 exports["test it shows a button when there is an engagementButtonLabel"] = assert => {
@@ -45,8 +45,10 @@ exports["test it shows a button when there is an engagementButtonLabel"] = asser
     message: "test",
     engagementButtonLabel: "Click me!",
   });
-  assert.equal(hb.notice.querySelectorAll(".star-x").length, 0);
-  assert.equal(hb.notice.querySelectorAll(".notification-button").length, 1);
+  assert.equal(hb.notice.querySelectorAll(".star-x").length, 0, "stars shown when unexpected");
+  const engagementButton = hb.notice.querySelector(".notification-button");
+  assert.ok(engagementButton, "engagement button was not added");
+  assert.equal(engagementButton.label, "Click me!");
 };
 
 exports["test it shows a learn more link"] = assert => {
@@ -58,8 +60,8 @@ exports["test it shows a learn more link"] = assert => {
     learnMoreUrl: "https://example.org/learnmore",
   });
   let learnMoreEl = hb.notice.querySelector(".text-link");
-  assert.equal(learnMoreEl.href, "https://example.org/learnmore");
-  assert.equal(learnMoreEl.value, "Learn More");
+  assert.equal(learnMoreEl.href, "https://example.org/learnmore", "learn more url wrong");
+  assert.equal(learnMoreEl.value, "Learn More", "learn more label wrong");
 };
 
 exports["test it shows the message"] = assert => {
@@ -73,7 +75,7 @@ exports["test it shows the message"] = assert => {
     "anonid",
     "messageText"
   );
-  assert.equal(messageEl.textContent, "test");
+  assert.equal(messageEl.textContent, "test", "heartbeat prompt showed wrong message");
 };
 
 exports["test it pings telemetry"] = (assert, done) => {
@@ -84,7 +86,7 @@ exports["test it pings telemetry"] = (assert, done) => {
   });
 
   hb.eventEmitter.on("TelemetrySent", payload => {
-    assert.ok(isOrdered([0, payload.offeredTS, payload.closedTS]));
+    assertOrdered(assert, [0, payload.offeredTS, payload.closedTS, Date.now()]);
     done();
   });
 
@@ -102,7 +104,7 @@ exports["test it includes learnMoreTS in payload if learn more is clicked"] = (a
   });
 
   hb.eventEmitter.on("TelemetrySent", payload => {
-    assert.ok(isOrdered([0, payload.offeredTS, payload.learnMoreTS, payload.closedTS]));
+    assertOrdered(assert, [0, payload.offeredTS, payload.learnMoreTS, payload.closedTS, Date.now()]);
     // Close learn more tab
     tabs[tabs.length - 1].close();
     done();
@@ -125,7 +127,7 @@ exports["test it opens an engagement page after interaction"] = (assert, done) =
   });
 
   tabs.on("ready", () => {
-    assert.equal(tabs.activeTab.url, "about:about");
+    assert.equal(tabs.activeTab.url, "about:about", "wrong url loaded in learn more tab");
     // Close engagement tab
     tabs[tabs.length - 1].close();
     done();
@@ -147,7 +149,7 @@ exports["test it sends telemetry when the window is closed"] = (assert, done) =>
       });
 
       hb.eventEmitter.on("TelemetrySent", payload => {
-        assert.ok(isOrdered([0, payload.offeredTS, payload.closedTS]));
+        assertOrdered(assert, [0, payload.offeredTS, payload.windowClosedTS, Date.now()]);
         done();
       });
 
@@ -193,18 +195,16 @@ function waitForNotificationClose(notification) {
 /**
  * Check if an array is in non-descending order
  */
-function isOrdered(arr) {
+function assertOrdered(assert, arr) {
   for (let i = 0; i < arr.length - 1; i++) {
-    if (arr[i] > arr[i + 1]) {
-      return false;
-    }
+    assert.ok(arr[i] <= arr[i + 1],
+      `element ${i} (${arr[i]}) is not less than or equal to element ${i + 1} (${arr[i + 1]})`);
   }
-  return true;
 }
 
 before(exports, () => {
   targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
-  notificationBox = targetWindow.gBrowser.getNotificationBox();
+  notificationBox = targetWindow.document.querySelector("#high-priority-global-notificationbox");
   sandboxManager = new SandboxManager();
   let driver = new NormandyDriver(sandboxManager);
   sandboxManager.addHold("test running");

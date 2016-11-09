@@ -6,6 +6,5 @@
 !/node_modules/jexl/LICENSE.txt
 !/node_modules/jexl/lib/**/*.js
 !/index.js
-!/README.md
 !/package.json
 !/chrome.manifest

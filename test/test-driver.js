@@ -7,9 +7,15 @@ const {SandboxManager} = require("../lib/SandboxManager.js");
 let sandboxManager;
 let driver;
 
-exports["test uuid"] = assert => {
+exports["test uuid format"] = assert => {
   let uuid = driver.uuid();
-  assert.notEqual(/^[a-f0-9-]{36}$/.exec(uuid), null);
+  assert.ok(/^[a-f0-9-]{36}$/.test(uuid), "invalid uuid format");
+};
+
+exports["test uuid is unique"] = assert => {
+  let uuid1 = driver.uuid();
+  let uuid2 = driver.uuid();
+  assert.notEqual(uuid1, uuid2, "uuids are unique");
 };
 
 before(exports, () => {

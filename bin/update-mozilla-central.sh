@@ -24,10 +24,6 @@ cp -r test "${dest}/test"
 
 echo "Fixups:"
 
-echo " * Removing README and LICENSE"
-rm "${dest}/README.md"
-rm "${dest}/LICENSE"
-
 echo " * Creating moz.build"
 echo "\
 # -*- Mode: python; indent-tabs-mode: nil; tab-width: 40 -*-
