@@ -2,6 +2,7 @@ import fetchMock from 'fetch-mock';
 
 import NormandyDriver, { HeartbeatEmitter } from '../normandy_driver.js';
 import { urlPathMatcher } from '../../tests/utils.js';
+import { MockStorage } from '../../actions/tests/utils.js';
 
 describe('Normandy Driver', () => {
   describe('showHeartbeat', () => {
@@ -147,6 +148,27 @@ describe('Normandy Driver', () => {
       const driver = new NormandyDriver();
       const uuid = driver.uuid();
       expect(UUID_ISH_REGEX.test(uuid)).toBe(true);
+    });
+  });
+
+  describe('userId', () => {
+    beforeEach(() => {
+      Object.defineProperty(window, 'localStorage', {
+        value: new MockStorage(),
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    it('should return the userId from localStorage', () => {
+      spyOn(window.localStorage, 'getItem').and.returnValue(null);
+      spyOn(window.localStorage, 'setItem');
+
+      const driver = new NormandyDriver();
+      let userId = driver.userId;
+
+      expect(window.localStorage.getItem).toHaveBeenCalledWith('userId');
+      expect(window.localStorage.setItem).toHaveBeenCalledWith('userId', userId);
     });
   });
 
