@@ -33,6 +33,9 @@ const FormField = props => {
     case 'textarea':
       fieldType = (<textarea field={field} {...field} />);
       break;
+    case 'checkbox':
+      fieldType = (<input type="checkbox" {...field} />);
+      break;
     default:
       throw new Error(`Unexpected field type: "${type}"`);
   }
