@@ -197,6 +197,23 @@ describe('ShowHeartbeatAction', () => {
       revision_id: 42,
       arguments: {
         surveyId: 'my-survey',
+      },
+    });
+    const action = new ShowHeartbeatAction(normandy, recipe);
+
+    await action.execute();
+
+    expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
+      surveyId: 'my-survey',
+      surveyVersion: 42,
+    }));
+  });
+
+  it('should pass a UUID telemetry argument when the recipe calls for it', async () => {
+    const recipe = recipeFactory({
+      revision_id: 42,
+      arguments: {
+        surveyId: 'my-survey',
         includeTelemetryUUID: true,
       },
     });
