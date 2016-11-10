@@ -19,6 +19,9 @@ SelectMenu.propTypes = {
 const FormField = props => {
   const { label, type, field, containerClass } = props;
   let fieldType;
+  // in some instances (checkbox) we want to nest the label
+  // so that the input and the text appear inline
+  let nestInputInLabel = false;
 
   switch (type) {
     case 'select':
@@ -35,6 +38,7 @@ const FormField = props => {
       break;
     case 'checkbox':
       fieldType = (<input type="checkbox" {...field} />);
+      nestInputInLabel = true;
       break;
     default:
       throw new Error(`Unexpected field type: "${type}"`);
@@ -44,10 +48,11 @@ const FormField = props => {
     <div className="row">
       <div className={containerClass}>
         <label htmlFor={field.name}>
+          {nestInputInLabel && fieldType}
           {label}
           <span className="validation-error">{field.error}</span>
         </label>
-        {fieldType}
+        {!nestInputInLabel && fieldType}
       </div>
     </div>
   );
