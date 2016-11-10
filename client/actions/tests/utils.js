@@ -1,3 +1,5 @@
+import uuid from 'node-uuid';
+
 import { HeartbeatEmitter } from '../../selfrepair/normandy_driver.js';
 
 export class MockStorage {
@@ -70,6 +72,8 @@ export function mockNormandy() {
     uuid() {
       return 'fake-uuid';
     },
+    // this needs to be a valid UUID4 to pass regex tests later
+    userId: uuid(),
     saveHeartbeatFlow() {
       return Promise.resolve();
     },

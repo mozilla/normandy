@@ -154,8 +154,25 @@ export default class NormandyDriver {
     }
   }
 
+  /**
+   * Generate a fresh UUID
+   * @return {String} Generated UUID
+   */
   uuid() {
     return uuid.v4();
+  }
+
+  /**
+   * Get a user id. If one doesn't exist yet, make one up and store it in local storage.
+   * @return {String} A stored or generated UUID
+   */
+  get userId() {
+    let userId = localStorage.getItem('userId');
+    if (userId === null) {
+      userId = uuid.v4();
+      localStorage.setItem('userId', userId);
+    }
+    return userId;
   }
 
   createStorage(prefix) {

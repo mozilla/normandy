@@ -94,8 +94,6 @@ describe('ShowHeartbeatAction', () => {
     const recipe = recipeFactory(showHeartbeatArgs);
     const action = new ShowHeartbeatAction(normandy, recipe);
 
-    normandy.uuid.and.returnValue('fake-uuid');
-
     await action.execute();
     expect(normandy.showHeartbeat).toHaveBeenCalledWith(
             jasmine.objectContaining(showHeartbeatArgs)
@@ -146,13 +144,17 @@ describe('ShowHeartbeatAction', () => {
     const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
     const params = new URL(postAnswerUrl).searchParams;
     expect(params.get('source')).toEqual('heartbeat');
-    expect(params.get('surveyversion')).toEqual('52');
+    expect(params.get('surveyversion')).toEqual('54');
     expect(params.get('updateChannel')).toEqual('nightly');
     expect(params.get('fxVersion')).toEqual('42.0.1');
     expect(params.get('isDefaultBrowser')).toEqual('1');
     expect(params.get('searchEngine')).toEqual('shady-tims');
     expect(params.get('syncSetup')).toEqual('1');
+
+    // telemetry data is turned off, so no userId should be passed into params
+    expect(params.get('userId')).toBeNull();
   });
+
 
   it('should annotate the post-answer URL if it has an existing query string', async () => {
     const url = 'https://example.com?foo=bar';
@@ -200,8 +202,35 @@ describe('ShowHeartbeatAction', () => {
     const action = new ShowHeartbeatAction(normandy, recipe);
 
     await action.execute();
+
     expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
       surveyId: 'my-survey',
+      surveyVersion: 42,
+    }));
+  });
+
+  it('should pass a UUID telemetry argument when the recipe calls for it', async () => {
+    const recipe = recipeFactory({
+      revision_id: 42,
+      arguments: {
+        surveyId: 'my-survey',
+        includeTelemetryUUID: true,
+      },
+    });
+    const action = new ShowHeartbeatAction(normandy, recipe);
+
+    await action.execute();
+
+    // userId should be set
+    expect(normandy.userId).not.toBeNull();
+
+    // userId should be uuid4
+    const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
+    expect(normandy.userId).toMatch(UUID_ISH_REGEX);
+
+    expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
+      // returned surveyId should be `name::uuid`
+      surveyId: `my-survey::${normandy.userId}`,
       surveyVersion: 42,
     }));
   });

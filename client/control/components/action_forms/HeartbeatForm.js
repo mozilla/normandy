@@ -2,6 +2,7 @@ import React, { PropTypes as pt } from 'react';
 import FormField from '../form_fields/FormFieldWrapper.js';
 
 export const HeartbeatFormFields = [
+  'includeTelemetryUUID',
   'surveyId',
   'message',
   'engagementButtonLabel',
@@ -18,6 +19,11 @@ export default function HeartbeatForm({ fields }) {
         This action shows a single message or survey prompt to the user.
       </p>
       <div className="fluid-4">
+        <FormField
+          type="checkbox"
+          label="Include unique user ID in post-answer-url and Telemetry"
+          field={fields.includeTelemetryUUID}
+        />
         <FormField type="text" label="Survey ID" field={fields.surveyId} />
         <FormField label="Message" field={fields.message} />
         <FormField label="Engagement Button Label" field={fields.engagementButtonLabel} />

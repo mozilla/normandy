@@ -108,6 +108,10 @@ The driver object contains the following attributes:
 
    :returns: String containing the UUID.
 
+.. js:data:: userId
+
+   The v4 UUID currently assigned to the user, loaded from the client's localStorage. If no UUID exists, a new one is generated, and saved to localStorage.
+
 .. js:function:: createStorage(keyPrefix)
 
    Creates a storage object that can be used to store data on the client.

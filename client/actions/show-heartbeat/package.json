@@ -17,6 +17,11 @@
         "thanksMessage"
       ],
       "properties": {
+        "includeTelemetryUUID": {
+          "type": "boolean",
+          "description": "Include unique user ID in post-answer-url and Telemetry",
+          "default": false
+        },
         "surveyId": {
           "type": "string",
           "description": "Slug uniquely identifying this survey in telemetry"
