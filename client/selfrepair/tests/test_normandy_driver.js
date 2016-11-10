@@ -147,7 +147,7 @@ describe('Normandy Driver', () => {
       const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
       const driver = new NormandyDriver();
       const uuid = driver.uuid();
-      expect(UUID_ISH_REGEX.test(uuid)).toBe(true);
+      expect(uuid).toMatch(UUID_ISH_REGEX);
     });
   });
 

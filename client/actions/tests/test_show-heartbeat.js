@@ -226,7 +226,7 @@ describe('ShowHeartbeatAction', () => {
 
     // userId should be uuid4
     const UUID_ISH_REGEX = /^[a-f0-9-]{36}$/;
-    expect(UUID_ISH_REGEX.test(normandy.userId)).toBe(true);
+    expect(normandy.userId).toMatch(UUID_ISH_REGEX);
 
     expect(normandy.showHeartbeat).toHaveBeenCalledWith(jasmine.objectContaining({
       // returned surveyId should be `name::uuid`

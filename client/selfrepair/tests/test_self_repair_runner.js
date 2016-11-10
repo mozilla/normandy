@@ -68,7 +68,7 @@ describe('Self-Repair Runner', () => {
       const driver = mockNormandy();
       const context = await filterContext(driver);
       expect(context.normandy.userId).toBeDefined();
-      expect(UUID_ISH_REGEX.test(context.normandy.userId)).toBe(true);
+      expect(context.normandy.userId).toMatch(UUID_ISH_REGEX);
     });
   });
 
