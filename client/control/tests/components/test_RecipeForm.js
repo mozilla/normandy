@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { shallow, mount } from 'enzyme';
 
 import RecipeForm, { DisconnectedRecipeForm } from '../../components/RecipeForm.js';
+import ConsoleLogForm from '../../components/action_forms/ConsoleLogForm.js';
 import controlStore from '../../stores/ControlStore.js';
 
 describe('<RecipeForm>', () => {
@@ -30,23 +31,24 @@ describe('<RecipeForm>', () => {
   });
 
   describe('changeAction', () => {
-    let store;
     let recipeFormWrapper;
-    let disconnectedFormWrapper;
 
     beforeEach(() => {
-      store = controlStore();
+      const store = controlStore();
       recipeFormWrapper = mount(<Provider store={store}>
         <RecipeForm params={{}} recipe={{ action: 'show-heartbeat' }} location={{ query: '' }} />
       </Provider>);
-      disconnectedFormWrapper = recipeFormWrapper.find('DisconnectedRecipeForm').get(0);
-      expect(disconnectedFormWrapper).toBeDefined();
-      disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
+    });
+
+    it('should include the form wrapper', () => {
+      expect(recipeFormWrapper.find(DisconnectedRecipeForm).length).toEqual(1);
     });
 
     it('should change the action in state & update the form', () => {
+      const disconnectedFormWrapper = recipeFormWrapper.find(DisconnectedRecipeForm).get(0);
+      disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
       expect(disconnectedFormWrapper.state.selectedAction).toEqual({ name: 'console-log' });
-      expect(recipeFormWrapper.find('ConsoleLogForm').length).toEqual(1);
+      expect(recipeFormWrapper.find(ConsoleLogForm).get(0)).toBeTruthy();
     });
   });
 });
