@@ -1,5 +1,3 @@
-import uuid from 'node-uuid';
-
 import JexlEnvironment from './JexlEnvironment.js';
 
 const registeredActions = {};
@@ -57,21 +55,6 @@ export function fetchAction(recipe) {
   return cache[recipe.action];
 }
 fetchAction._cache = {};
-
-
-/**
- * Get a user id. If one doesn't exist yet, make one up and store it in local storage.
- * @return {String} A stored or generated UUID
- */
-export function getUserId() {
-  let userId = localStorage.getItem('userId');
-  if (userId === null) {
-    userId = uuid.v4();
-    localStorage.setItem('userId', userId);
-  }
-  return userId;
-}
-
 
 /**
  * Fetch all enabled recipes from the server.
@@ -134,7 +117,7 @@ export async function filterContext(driver) {
   return {
     normandy: {
       locale: driver.locale,
-      userId: getUserId(),
+      userId: driver.userId,
       ...client,
       ...classification,
     },
