@@ -9,7 +9,7 @@
   "scripts": {
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
-    "test": "karma start",
+    "test": "NODE_ENV=production karma start",
     "lint": "eslint normandy client webpack.config.js karam.conf.js"
   },
   "license": "MPL-2.0",

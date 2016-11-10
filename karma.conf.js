@@ -16,23 +16,18 @@ module.exports = function (config) {
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/jasmine-promises/dist/jasmine-promises.js',
-      'client/control/tests/index.js',
-      'client/actions/tests/index.js',
-      'client/selfrepair/tests/index.js',
+      'client/**/tests/index.js',
     ],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'client/control/tests/index.js': ['webpack', 'sourcemap'],
-      'client/selfrepair/tests/index.js': ['webpack', 'sourcemap'],
-      'client/control/components/*.js': ['react-jsx'],
-      'client/actions/tests/index.js': ['webpack', 'sourcemap'],
+      'client/**/*.js': ['webpack', 'sourcemap'],
     },
 
     // The first config is for the control interface. It is only coincidence
     // that this config works for the action code/tests as well.
-    webpack: WEBPACK_CONFIG[0],
+    webpack: Object.assign(WEBPACK_CONFIG[0], { devtool: '#cheap-module-eval-source-map' }),
 
     webpackMiddleware: {
       stats: 'errors-only', // Only show errors during webpack builds.
