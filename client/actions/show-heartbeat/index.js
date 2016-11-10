@@ -133,7 +133,6 @@ export default class ShowHeartbeatAction extends Action {
 
     if (includeTelemetryUUID) {
       // get the already-defined UUID from normandy
-      // #todo normandy.userId is undefined
       userId = this.normandy.userId;
 
       // if a userId exists,
@@ -142,7 +141,6 @@ export default class ShowHeartbeatAction extends Action {
         heartbeatSurveyId = `${surveyId}::${userId}`;
       }
     }
-
 
     // A bit redundant but the action argument names shouldn't necessarily rely
     // on the argument names showHeartbeat takes.
