@@ -1,6 +1,6 @@
 import { Action, registerAction } from '../utils';
 
-const VERSION = 53; // Increase when changed.
+const VERSION = 54; // Increase when changed.
 const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 
@@ -125,14 +125,33 @@ export default class ShowHeartbeatAction extends Action {
     const flow = new HeartbeatFlow(this);
     flow.save();
 
+    let userId;
+    let heartbeatSurveyId = surveyId;
+
+    // should user ID stuff be sent to telemetry?
+    const { includeTelemetryUUID } = this.recipe.arguments;
+
+    if (includeTelemetryUUID) {
+      // get the already-defined UUID from normandy
+      // #todo normandy.userId is undefined
+      userId = this.normandy.userId;
+
+      // if a userId exists,
+      if (userId) {
+        // alter the survey ID to include that UUID
+        heartbeatSurveyId = `${surveyId}::${userId}`;
+      }
+    }
+
+
     // A bit redundant but the action argument names shouldn't necessarily rely
     // on the argument names showHeartbeat takes.
     const heartbeatData = {
-      surveyId: `${surveyId}::${flow.id}`,
+      surveyId: heartbeatSurveyId,
       message,
       engagementButtonLabel,
       thanksMessage,
-      postAnswerUrl: this.annotatePostAnswerUrl({ url: postAnswerUrl, userId: flow.id }),
+      postAnswerUrl: this.annotatePostAnswerUrl({ url: postAnswerUrl, userId }),
       learnMoreMessage,
       learnMoreUrl,
       flowId: flow.id,
@@ -193,8 +212,14 @@ export default class ShowHeartbeatAction extends Action {
       isDefaultBrowser: this.client.isDefaultBrowser ? 1 : 0,
       searchEngine: this.client.searchEngine,
       syncSetup: this.client.syncSetup ? 1 : 0,
-      userId,
     };
+
+    // if a userId is given,
+    // we'll include it with the data passed through
+    // to SurveyGizmo (via query params)
+    if (userId) {
+      args.userId = userId;
+    }
 
     // Append testing parameter if in testing mode.
     if (this.normandy.testing) {
