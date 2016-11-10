@@ -156,9 +156,19 @@ describe('Normandy Driver', () => {
   });
 
   describe('userId', () => {
+    const originalLocalStorage = window.localStorage;
+
     beforeEach(() => {
       Object.defineProperty(window, 'localStorage', {
         value: new MockStorage(),
+        configurable: true,
+        writable: true,
+      });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'localStorage', {
+        value: originalLocalStorage,
         configurable: true,
         writable: true,
       });
@@ -169,7 +179,7 @@ describe('Normandy Driver', () => {
       spyOn(window.localStorage, 'setItem');
 
       const driver = new NormandyDriver();
-      let userId = driver.userId;
+      const userId = driver.userId;
 
       expect(window.localStorage.getItem).toHaveBeenCalledWith('userId');
       expect(window.localStorage.setItem).toHaveBeenCalledWith('userId', userId);
