@@ -1,8 +1,18 @@
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
-const {makeStorage} = require("../lib/Storage.js");
-const {promiseTest} = require("./utils.js");
+const {Loader, Require} = require("toolkit/loader");
+const loader = new Loader({
+  paths: {
+    "": "resource://gre/modules/commonjs/",
+    lib: "resource://shield-recipe-client-at-mozilla-dot-org/lib",
+    test: "resource://shield-recipe-client-at-mozilla-dot-org/test",
+  },
+});
+const extRequire = new Require(loader, module);
+
+const {makeStorage} = extRequire("lib/Storage.js");
+const {promiseTest} = extRequire("test/utils.js");
 
 let store;
 

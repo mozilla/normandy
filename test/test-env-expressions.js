@@ -3,8 +3,18 @@ Cu.import("resource://gre/modules/TelemetryController.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 const testRunner = require("sdk/test");
 
-const {EnvExpressions} = require("../lib/EnvExpressions.js");
-const {promiseTest} = require("./utils.js");
+const {Loader, Require} = require("toolkit/loader");
+const loader = new Loader({
+  paths: {
+    "": "resource://gre/modules/commonjs/",
+    lib: "resource://shield-recipe-client-at-mozilla-dot-org/lib",
+    test: "resource://shield-recipe-client-at-mozilla-dot-org/test",
+  },
+});
+const extRequire = new Require(loader, module);
+
+const {EnvExpressions} = extRequire("lib/EnvExpressions.js");
+const {promiseTest} = extRequire("test/utils.js");
 
 exports["test it works"] = promiseTest(assert => {
   return EnvExpressions.eval("2+2")

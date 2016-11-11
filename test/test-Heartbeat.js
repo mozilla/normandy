@@ -5,11 +5,21 @@ const {browserWindows} = require("sdk/windows");
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
-Cu.import("resource://gre/modules/Services.jsm"); /* global Services */
+Cu.import("resource://gre/modules/Services.jsm");
 
-const {Heartbeat} = require("../lib/Heartbeat.js");
-const {SandboxManager} = require("../lib/SandboxManager.js");
-const {NormandyDriver} = require("../lib/NormandyDriver.js");
+const {Loader, Require} = require("toolkit/loader");
+const loader = new Loader({
+  paths: {
+    "": "resource://gre/modules/commonjs/",
+    lib: "resource://shield-recipe-client-at-mozilla-dot-org/lib",
+    test: "resource://shield-recipe-client-at-mozilla-dot-org/test",
+  },
+});
+const extRequire = new Require(loader, module);
+
+const {Heartbeat} = extRequire("lib/Heartbeat.js");
+const {SandboxManager} = extRequire("lib/SandboxManager.js");
+const {NormandyDriver} = extRequire("lib/NormandyDriver.js");
 
 let sandboxManager;
 let targetWindow;
