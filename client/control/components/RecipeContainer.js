@@ -17,9 +17,21 @@ export default function composeRecipeContainer(Component) {
       }
     }
 
+    componentWillReceiveProps({ recipeId }) {
+      const { dispatch } = this.props;
+
+      if (recipeId !== this.props.recipeId) {
+        // select the recipe in memory
+        dispatch(setSelectedRecipe(recipeId));
+        // request that recipe be loaded
+        this.getRecipeData(this.props.recipeId);
+      }
+    }
+
     getRecipeData(recipeId) {
       const { dispatch, location, recipe } = this.props;
-      if (!recipe) {
+
+      if (!recipe.id !== recipeId) {
         dispatch(setSelectedRecipe(recipeId));
 
         if (location.query.revisionId) {
@@ -48,8 +60,11 @@ export default function composeRecipeContainer(Component) {
       .find(recipe => recipe.id === state.controlApp.selectedRecipe);
     }
 
+    const upcomingRecipeId = typeof props.params.id !== 'undefined' ? parseInt(props.params.id, 10)
+      : state.controlApp.selectedRecipe || null;
+
     return {
-      recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id, 10) || null,
+      recipeId: upcomingRecipeId,
       recipe: recipeData,
       dispatch: props.dispatch,
     };
