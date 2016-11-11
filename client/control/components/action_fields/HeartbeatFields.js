@@ -46,6 +46,7 @@ export default function HeartbeatFields() {
         name="arguments.includeTelemetryUUID"
         component="input"
         type="checkbox"
+        className="checkbox-field"
       />
       <ControlField
         label="Learn More Message"

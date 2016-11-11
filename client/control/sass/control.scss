@@ -139,21 +139,18 @@
     padding-bottom: 5px;
   }
 
+  /* Checkbox inputs should appear to the left of the label. */
   .checkbox-field {
-    margin: 15px 0 10px;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
 
-    .label {
-      display: inline;
-      margin-left: 20px;
-    }
-
-    input {
-      display: inline;
-      left: 0;
-      position: absolute;
-      width: auto;
+    input[type="checkbox"] {
+      flex: 0;
+      margin: 6px 6px 6px 0;
     }
   }
+
 
   /* Action buttons (submit, delete, etc) */
   .form-actions {
