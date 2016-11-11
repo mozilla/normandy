@@ -113,7 +113,19 @@ export class DisconnectedRecipeForm extends React.Component {
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form fluid-8">
         {
-          !isCloning &&
+          isCloning ?
+            <span>
+              You're cloning {recipe.name} ({recipe.action}).
+              <div>
+                <Link
+                  className="button delete"
+                  to={`/control/recipe/${recipe.id}/`}
+                >
+                  Cancel
+                </Link>
+              </div>
+            </span>
+          :
             <Link
               className="button"
               to={`/control/recipe/${recipe.id}/clone/`}
