@@ -72,8 +72,6 @@ const apiRequestMap = {
         body: JSON.stringify(recipeInfo.recipe),
         method: 'POST',
       },
-      successNotification: 'Recipe added.',
-      errorNotification: 'Error adding recipe.',
     };
   },
 
@@ -84,8 +82,6 @@ const apiRequestMap = {
         body: JSON.stringify(recipeInfo.recipe),
         method: 'PATCH',
       },
-      successNotification: 'Recipe updated.',
-      errorNotification: 'Error updating recipe.',
     };
   },
 

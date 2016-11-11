@@ -1,54 +1,174 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import { Provider } from 'react-redux';
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
+import { SubmissionError } from 'redux-form';
 
-import RecipeForm, { DisconnectedRecipeForm } from '../../components/RecipeForm.js';
-import ConsoleLogForm from '../../components/action_forms/ConsoleLogForm.js';
-import controlStore from '../../stores/ControlStore.js';
+import { RecipeForm, formConfig, initialValuesWrapper } from '../../components/RecipeForm.js';
+import ConsoleLogFields from '../../components/action_fields/ConsoleLogFields.js';
+import { recipeFactory } from '../../../tests/utils.js';
+
+/**
+ * Creates mock required props for RecipeForm.
+ */
+function propFactory(props = {}) {
+  return Object.assign({
+    handleSubmit: () => undefined,
+    submitting: false,
+  }, props);
+}
 
 describe('<RecipeForm>', () => {
-  beforeAll(() => {
+  it("should show a loading indicator if the recipe hasn't loaded yet", () => {
+    const wrapper = shallow(<RecipeForm recipeId={1} {...propFactory()} />);
+    expect(wrapper.hasClass('recipe-form loading')).toBe(true);
   });
 
-  it('should work unconnected', () => {
-    shallow(<DisconnectedRecipeForm
-      dispatch={() => {}}
-      fields={{}}
-      formState={{}}
-      recipeId={0}
-      submitting={false}
-      recipe={{}}
-      handleSubmit={() => {}}
-      viewingRevision={false}
-    />);
+  it('should render the fields for the specified action', () => {
+    const wrapper = shallow(
+      <RecipeForm selectedAction="console-log" {...propFactory()} />
+    );
+    expect(wrapper.find(ConsoleLogFields).length).toBe(1);
   });
 
-  it('should work connected', () => {
-    const store = controlStore();
-    mount(<Provider store={store}>
-      <RecipeForm params={{}} location={{ query: '' }} />
-    </Provider>);
+  it('should render a delete button if editing an existing recipe', () => {
+    const recipe = recipeFactory();
+    const wrapper = shallow(
+      <RecipeForm recipeId={recipe.id} recipe={recipe} {...propFactory()} />
+    );
+    expect(wrapper.find('.delete').length).toBe(1);
   });
 
-  describe('changeAction', () => {
-    let recipeFormWrapper;
+  it('should not render a delete button if creating a new recipe', () => {
+    const wrapper = shallow(
+      <RecipeForm {...propFactory()} />
+    );
+    expect(wrapper.find('.delete').length).toBe(0);
+  });
 
+  it('should disable the submit button if currently submitting the form', () => {
+    const wrapper = shallow(
+      <RecipeForm {...propFactory({ submitting: true })} />
+    );
+    expect(wrapper.find('.submit').prop('disabled')).toBe(true);
+  });
+
+  it('should enable the submit button if not currently submitting the form', () => {
+    const wrapper = shallow(
+      <RecipeForm {...propFactory({ submitting: false })} />
+    );
+    expect(wrapper.find('.submit').prop('disabled')).toBe(false);
+  });
+
+  describe('asyncValidate', () => {
+    it('should throw if the filter expression is blank', async () => {
+      try {
+        await formConfig.asyncValidate({ filter_expression: '' });
+        expect(false).toBe(true); // Fail if we don't throw.
+      } catch (err) {
+        expect('filter_expression' in err).toBe(true);
+      }
+    });
+
+    it('should throw if the filter expression is invalid JEXL', async () => {
+      try {
+        await formConfig.asyncValidate({ filter_expression: '2-- + 4 (' });
+        expect(false).toBe(true); // Fail if we don't throw.
+      } catch (err) {
+        expect('filter_expression' in err).toBe(true);
+      }
+    });
+
+    it('should pass if the filter expression is valid JEXL', async () => {
+      // Should not throw.
+      await formConfig.asyncValidate({ filter_expression: '1+1' });
+    });
+  });
+
+  describe('onSubmit', () => {
+    let updateRecipe = null;
+    let addRecipe = null;
     beforeEach(() => {
-      const store = controlStore();
-      recipeFormWrapper = mount(<Provider store={store}>
-        <RecipeForm params={{}} recipe={{ action: 'show-heartbeat' }} location={{ query: '' }} />
-      </Provider>);
+      updateRecipe = jasmine.createSpy('updateRecipe');
+      addRecipe = jasmine.createSpy('addRecipe');
     });
 
-    it('should include the form wrapper', () => {
-      expect(recipeFormWrapper.find(DisconnectedRecipeForm).length).toEqual(1);
+    it('should update the recipe if it already has an ID', async () => {
+      const recipe = recipeFactory();
+      updateRecipe.and.returnValue(Promise.resolve());
+
+      await formConfig.onSubmit(recipe, () => {}, {
+        recipeId: recipe.id,
+        updateRecipe,
+        addRecipe,
+      });
+
+      expect(updateRecipe).toHaveBeenCalledWith(recipe.id, {
+        name: recipe.name,
+        enabled: recipe.enabled,
+        filter_expression: recipe.filter_expression,
+        action: recipe.action,
+        arguments: recipe.arguments,
+      });
+      expect(addRecipe).not.toHaveBeenCalled();
     });
 
-    it('should change the action in state & update the form', () => {
-      const disconnectedFormWrapper = recipeFormWrapper.find(DisconnectedRecipeForm).get(0);
-      disconnectedFormWrapper.changeAction({ target: { value: 'console-log' } });
-      expect(disconnectedFormWrapper.state.selectedAction).toEqual({ name: 'console-log' });
-      expect(recipeFormWrapper.find(ConsoleLogForm).get(0)).toBeTruthy();
+    it("should add a new recipe if it doesn't have an ID", async () => {
+      const recipe = recipeFactory();
+      addRecipe.and.returnValue(Promise.resolve());
+
+      await formConfig.onSubmit(recipe, () => {}, {
+        recipeId: null,
+        updateRecipe,
+        addRecipe,
+      });
+
+      expect(addRecipe).toHaveBeenCalledWith({
+        name: recipe.name,
+        enabled: recipe.enabled,
+        filter_expression: recipe.filter_expression,
+        action: recipe.action,
+        arguments: recipe.arguments,
+      });
+      expect(updateRecipe).not.toHaveBeenCalled();
+    });
+
+    it('should wrap raised errors as SubmissionErrors', async () => {
+      const recipe = recipeFactory();
+      addRecipe.and.returnValue(Promise.reject('someerror'));
+
+      try {
+        await formConfig.onSubmit(recipe, () => {}, {
+          recipeId: null,
+          updateRecipe,
+          addRecipe,
+        });
+        expect(true).toBe(false);
+      } catch (err) {
+        expect(err).toEqual(jasmine.any(SubmissionError));
+      }
+    });
+  });
+
+  describe('initialValuesWrapper', () => {
+    it('should pass the recipe prop as initialValues to the child component', () => {
+      const Component = ({ initialValues }) => <div>{initialValues}</div>;
+      const WrappedComponent = initialValuesWrapper(Component);
+      const wrapper = shallow(
+        <WrappedComponent recipe="fakerecipe" location={{}} />
+      );
+
+      expect(wrapper.find(Component).prop('initialValues')).toBe('fakerecipe');
+    });
+
+    it('should pass the selected revision as initialValues when available', () => {
+      const Component = ({ initialValues }) => <div>{initialValues}</div>;
+      const WrappedComponent = initialValuesWrapper(Component);
+      const location = { state: { selectedRevision: 'fakerevision' } };
+      const wrapper = shallow(
+        <WrappedComponent recipe="fakerecipe" location={location} />
+      );
+
+      expect(wrapper.find(Component).prop('initialValues')).toBe('fakerevision');
     });
   });
 });

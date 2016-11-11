@@ -12,7 +12,8 @@ $grid-columns: 8;
   @include border-box;
 }
 
-[class*='fluid-'] {
+[class*='fluid-'],
+.fluid-base {
   float: left;
   padding: 1em;
   width: 100%;
