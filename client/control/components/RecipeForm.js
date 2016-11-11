@@ -44,7 +44,8 @@ export class DisconnectedRecipeForm extends React.Component {
   componentWillReceiveProps(nextProps) {
     const isGainingRecipe = !this.state.selectedAction && nextProps.recipe;
     const recipeIsChanging = nextProps.recipe && nextProps.recipe.id !== this.props.recipeId;
-    const userCancelledCloning = this.props.route.isCloning && !nextProps.route.isCloning;
+    const userCancelledCloning = (this.props.route && this.props.route.isCloning)
+      && !nextProps.route.isCloning;
 
     if (isGainingRecipe || recipeIsChanging) {
       const selectedActionName = nextProps.recipe.action;
@@ -78,7 +79,7 @@ export class DisconnectedRecipeForm extends React.Component {
 
   submitForm() {
     const { dispatch, formState, recipeId } = this.props;
-    const { isCloning } = this.props.route;
+    const isCloning = this.props.route && this.props.route.isCloning;
 
     const recipeFormValues = getValues(formState.recipe);
     const actionFormValues = getValues(formState.action);
@@ -111,10 +112,11 @@ export class DisconnectedRecipeForm extends React.Component {
   render() {
     const {
       fields: { name, filter_expression: filterExpression, enabled, action },
-      submitting, recipe, recipeId, handleSubmit, viewingRevision,
+      submitting, recipeId, handleSubmit, viewingRevision,
     } = this.props;
+    const displayedRecipe = this.props.recipe || {};
     const { availableActions, selectedAction } = this.state;
-    const { isCloning } = this.props.route;
+    const isCloning = this.props.route && this.props.route.isCloning;
 
     const submitButtonCaption = recipeId && !isCloning ? 'Update Recipe' : 'Add New Recipe';
 
@@ -122,12 +124,12 @@ export class DisconnectedRecipeForm extends React.Component {
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form fluid-8">
         {
           isCloning ?
-            <span>
-              You're cloning {recipe.name} ({recipe.action}).
+            <span className="cloning-message">
+              You're cloning {displayedRecipe.name} ({displayedRecipe.action}).
               <div>
                 <Link
                   className="button delete"
-                  to={`/control/recipe/${recipe.id}/`}
+                  to={`/control/recipe/${displayedRecipe.id}/`}
                 >
                   Cancel
                 </Link>
@@ -136,7 +138,7 @@ export class DisconnectedRecipeForm extends React.Component {
           :
             <Link
               className="button"
-              to={`/control/recipe/${recipe.id}/clone/`}
+              to={`/control/recipe/${displayedRecipe.id}/clone/`}
             >
                 Clone
             </Link>
@@ -166,7 +168,7 @@ export class DisconnectedRecipeForm extends React.Component {
           onChange={this.changeAction}
         />
 
-        {selectedAction && <ActionForm recipe={recipe} {...selectedAction} />}
+        {selectedAction && <ActionForm recipe={displayedRecipe} {...selectedAction} />}
 
         <div className="row form-action-buttons">
           <div className="fluid-2">
