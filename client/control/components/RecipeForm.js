@@ -116,6 +116,8 @@ export class DisconnectedRecipeForm extends React.Component {
     const { availableActions, selectedAction } = this.state;
     const { isCloning } = this.props.route;
 
+    const submitButtonCaption = recipeId && !isCloning ? 'Update Recipe' : 'Add New Recipe';
+
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form fluid-8">
         {
@@ -175,7 +177,13 @@ export class DisconnectedRecipeForm extends React.Component {
             }
           </div>
           <div className="fluid-2 float-right">
-            <button className="button" type="submit" disabled={submitting} >Submit</button>
+            <button
+              className="button"
+              type="submit"
+              disabled={submitting}
+            >
+              {submitButtonCaption}
+            </button>
           </div>
         </div>
 
