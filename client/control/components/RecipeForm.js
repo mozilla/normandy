@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import { push } from 'react-router-redux';
-import { destroy, stopSubmit, reduxForm, getValues } from 'redux-form';
+import { destroy, reset, stopSubmit, reduxForm, getValues } from 'redux-form';
 import { _ } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
@@ -44,12 +44,18 @@ export class DisconnectedRecipeForm extends React.Component {
   componentWillReceiveProps(nextProps) {
     const isGainingRecipe = !this.state.selectedAction && nextProps.recipe;
     const recipeIsChanging = nextProps.recipe && nextProps.recipe.id !== this.props.recipeId;
+    const userCancelledCloning = this.props.route.isCloning && !nextProps.route.isCloning;
 
     if (isGainingRecipe || recipeIsChanging) {
       const selectedActionName = nextProps.recipe.action;
       this.setState({
         selectedAction: { name: selectedActionName },
       });
+    } else if (userCancelledCloning) {
+      const { dispatch } = this.props;
+      // if the user decided to stop cloning,
+      // we want to revert fields back to what they were to begin with
+      dispatch(reset('recipe'));
     }
   }
 
