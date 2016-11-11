@@ -37,7 +37,10 @@ export class DisconnectedRecipeForm extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.state.selectedAction && nextProps.recipe) {
+    const isGainingRecipe = !this.state.selectedAction && nextProps.recipe;
+    const recipeIsChanging = nextProps.recipe && nextProps.recipe.id !== this.props.recipeId;
+
+    if (isGainingRecipe || recipeIsChanging) {
       const selectedActionName = nextProps.recipe.action;
       this.setState({
         selectedAction: { name: selectedActionName },
