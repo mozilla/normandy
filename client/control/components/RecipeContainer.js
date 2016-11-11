@@ -17,9 +17,9 @@ export default function composeRecipeContainer(Component) {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
-      if (nextProps.recipeId) {
-        this.getRecipeData(nextProps.recipeId);
+    componentWillReceiveProps({ recipeId }) {
+      if (recipeId && recipeId !== this.props.recipeId) {
+        this.getRecipeData(recipeId);
       }
     }
 

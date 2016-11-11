@@ -9,7 +9,7 @@ import {
   propTypes as reduxFormPropTypes,
   SubmissionError,
 } from 'redux-form';
-import _ from 'underscore';
+import { pick } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
   from '../actions/ControlActions.js';
@@ -121,7 +121,7 @@ export const formConfig = {
 
   onSubmit(values, dispatch, { recipeId, updateRecipe, addRecipe }) {
     // Filter out unwanted keys for submission.
-    const recipe = _.pick(values, [
+    const recipe = pick(values, [
       'name', 'enabled', 'filter_expression', 'action', 'arguments',
     ]);
 
