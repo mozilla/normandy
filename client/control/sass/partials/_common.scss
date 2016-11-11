@@ -107,11 +107,20 @@ input, select, textarea {
   border: 0px;
   border-radius: 0px;
   color: #fff;
+  display: inline-block;
   font: normal normal 600 13px/30px $OpenSans;
   padding: 10px 40px;
   text-align: center;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
   text-transform: uppercase;
+
+  &.delete {
+    background-color: $red;
+
+    &:hover {
+      background-color: $redHover;
+    }
+  }
 }
 
 .button:active, input[type="submit"]:active, input[type="button"]:active,

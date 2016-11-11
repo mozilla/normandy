@@ -201,12 +201,7 @@
     padding-top: 15px;
 
     a.delete, input[type="submit"].delete {
-      background-color: $red;
       display: inline-block;
-
-      &:hover {
-        background-color: $redHover;
-      }
     }
   }
 }
