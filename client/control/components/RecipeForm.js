@@ -22,6 +22,11 @@ export class DisconnectedRecipeForm extends React.Component {
     recipe: pt.object.isRequired,
     handleSubmit: pt.func.isRequired,
     viewingRevision: pt.bool.isRequired,
+    // route is passed in from redux/the router
+    route: pt.object,
+    // isCloning is `true` when the user is cloning
+    // a pre-existing recipe
+    isCloning: pt.bool,
   }
 
   constructor(props) {
@@ -67,11 +72,12 @@ export class DisconnectedRecipeForm extends React.Component {
 
   submitForm() {
     const { dispatch, formState, recipeId } = this.props;
+    const { isCloning } = this.props.route;
 
     const recipeFormValues = getValues(formState.recipe);
     const actionFormValues = getValues(formState.action);
     const combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
-    const requestBody = { recipe: combinedFormValues, recipeId };
+    const requestBody = { recipe: combinedFormValues, recipeId: isCloning ? null : recipeId };
 
     return this.validateForm(combinedFormValues)
     .catch(() => {
@@ -84,7 +90,7 @@ export class DisconnectedRecipeForm extends React.Component {
       };
     })
     .then(() => {
-      if (recipeId) {
+      if (recipeId && !isCloning) {
         return dispatch(makeApiRequest('updateRecipe', requestBody))
         .then(response => dispatch(recipeUpdated(response)));
       }
@@ -102,11 +108,19 @@ export class DisconnectedRecipeForm extends React.Component {
       submitting, recipe, recipeId, handleSubmit, viewingRevision,
     } = this.props;
     const { availableActions, selectedAction } = this.state;
+    const { isCloning } = this.props.route;
 
     return (
       <form onSubmit={handleSubmit(this.submitForm)} className="crud-form fluid-8">
-
-        <Link to={`/control/recipe/${recipe.id}/clone/`}>Clone</Link>
+        {
+          !isCloning &&
+            <Link
+              className="button"
+              to={`/control/recipe/${recipe.id}/clone/`}
+            >
+                Clone
+            </Link>
+        }
 
         {viewingRevision &&
           <p id="viewing-revision" className="notification info">
