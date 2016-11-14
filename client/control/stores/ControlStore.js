@@ -1,40 +1,23 @@
-import { compose, createStore, applyMiddleware, combineReducers } from 'redux';
+import { compose, createStore, applyMiddleware } from 'redux';
 import { browserHistory } from 'react-router';
-import { routerReducer, routerMiddleware } from 'react-router-redux';
+import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
-import { reducer as formReducer } from 'redux-form';
-import DevTools from '../components/DevTools.js';
+import DevTools from 'components/DevTools.js';
 
-import controlAppReducer from '../reducers/ControlAppReducer.js';
+import reducers from 'reducers';
 
 const reduxRouterMiddleware = routerMiddleware(browserHistory);
 
+// middleware
 const enhancer = compose(
   applyMiddleware(
     reduxRouterMiddleware,
     thunk
   ),
-
   // Only include DevTools in development mode
   DEVELOPMENT ? DevTools.instrument() : x => x,
 );
 
-export default function controlStore() {
-  return createStore(
-    combineReducers({
-      controlApp: controlAppReducer,
-      form: formReducer,
-      routing: routerReducer,
-    }),
-    {
-      controlApp: {
-        recipes: null,
-        isFetching: false,
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
-        notifications: [],
-      },
-    },
-    enhancer,
-  );
+export default function controlStore(initialState) {
+  return createStore(reducers, initialState, enhancer);
 }
