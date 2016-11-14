@@ -49,7 +49,7 @@ describe('<RecipeForm>', () => {
     });
   });
 
-  describe('creating and cloning', () => {
+  describe('updating a recipe', () => {
     let store;
     let recipeFormWrapper;
 
@@ -65,6 +65,59 @@ describe('<RecipeForm>', () => {
       const cloneMessage = recipeFormWrapper.find('.cloning-message');
       // message should not be on the page at all
       expect(cloneMessage.length).toBe(0);
+    });
+
+    it('should update a recipe if not cloning', () => {
+      store = controlStore();
+      recipeFormWrapper = mount(
+        <Provider store={store}>
+          <RecipeForm
+            recipe={{}}
+            params={{ id: 5 }}
+            location={{ query: '' }}
+            route={{ isCloning: false }}
+            recipeId={5}
+          />
+        </Provider>
+      );
+
+      // mock the 'update' endpoint
+      fetchMock
+        .mock('/api/v1/recipe/5/', fixtureRecipes[0]);
+        // .catch(500);
+
+      // stub the data the form would be submitting
+      const fakeClone = fixtureForm;
+
+      // directly call the API submission function
+      recipeFormWrapper.find('DisconnectedRecipeForm').get(0).submitRecipeToAPI(fakeClone);
+
+      // detect if an API call was actually made
+      const calls = fetchMock.calls('/api/v1/recipe/5/');
+
+      // only one call should be made
+      expect(calls.length).toBe(1);
+      // and that call should be a PATCH
+      expect(calls[0][1].method).toBe('PATCH');
+
+      fetchMock.reset();
+    });
+  });
+
+  describe('cloning a recipe', () => {
+    let store;
+    let recipeFormWrapper;
+
+    it('should display cloning messaging with isCloning enabled', () => {
+      store = controlStore();
+      recipeFormWrapper = mount(
+        <Provider store={store}>
+          <RecipeForm params={{}} location={{ query: '' }} route={{ isCloning: true }} />
+        </Provider>
+      );
+      const cloneMessage = recipeFormWrapper.find('.cloning-message');
+      // message should be on the page
+      expect(cloneMessage.length).toBe(1);
     });
 
     it('should create a new recipe if cloning', () => {
@@ -106,53 +159,6 @@ describe('<RecipeForm>', () => {
       expect(calls.length).toBe(1);
       // and that call should be a POST
       expect(calls[0][1].method).toBe('POST');
-
-      fetchMock.reset();
-    });
-
-    it('should display cloning messaging with isCloning enabled', () => {
-      recipeFormWrapper = mount(
-        <Provider store={store}>
-          <RecipeForm params={{}} location={{ query: '' }} route={{ isCloning: true }} />
-        </Provider>
-      );
-      const cloneMessage = recipeFormWrapper.find('.cloning-message');
-      // message should be on the page
-      expect(cloneMessage.length).toBe(1);
-    });
-
-    it('should update a recipe if not cloning', () => {
-      store = controlStore();
-      recipeFormWrapper = mount(
-        <Provider store={store}>
-          <RecipeForm
-            recipe={{}}
-            params={{ id: 5 }}
-            location={{ query: '' }}
-            route={{ isCloning: false }}
-            recipeId={5}
-          />
-        </Provider>
-      );
-
-      // mock the 'update' endpoint
-      fetchMock
-        .mock('/api/v1/recipe/5/', fixtureRecipes[0])
-        .catch(500);
-
-      // stub the data the form would be submitting
-      const fakeClone = fixtureForm;
-
-      // directly call the API submission function
-      recipeFormWrapper.find('DisconnectedRecipeForm').get(0).submitRecipeToAPI(fakeClone);
-
-      // detect if an API call was actually made
-      const calls = fetchMock.calls('/api/v1/recipe/5/');
-
-      // only one call should be made
-      expect(calls.length).toBe(1);
-      // and that call should be a PATCH
-      expect(calls[0][1].method).toBe('PATCH');
 
       fetchMock.reset();
     });
