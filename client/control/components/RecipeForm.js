@@ -152,12 +152,13 @@ export class DisconnectedRecipeForm extends React.Component {
               </div>
             </span>
           :
-            <Link
-              className="button"
-              to={`/control/recipe/${displayedRecipe.id}/clone/`}
-            >
-                Clone
-            </Link>
+            recipeId &&
+              <Link
+                className="button"
+                to={`/control/recipe/${displayedRecipe.id}/clone/`}
+              >
+                  Clone
+              </Link>
         }
 
         {viewingRevision &&
