@@ -31,7 +31,7 @@ export default function composeRecipeContainer(Component) {
     getRecipeData(recipeId) {
       const { dispatch, location, recipe } = this.props;
 
-      if (!recipe.id !== recipeId) {
+      if (recipe && recipe.id !== recipeId) {
         dispatch(setSelectedRecipe(recipeId));
 
         if (location.query.revisionId) {
