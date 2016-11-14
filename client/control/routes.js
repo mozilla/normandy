@@ -32,6 +32,12 @@ export default (
           ]}
         />
         <Route
+          path="clone/"
+          component={RecipeForm}
+          name="Clone"
+          isCloning
+        />
+        <Route
           path="preview/"
           component={RecipePreview}
           name="Preview"

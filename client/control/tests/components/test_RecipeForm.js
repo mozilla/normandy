@@ -38,11 +38,40 @@ describe('<RecipeForm>', () => {
     expect(wrapper.find('.delete').length).toBe(1);
   });
 
+  it('should render a clone button if editing an existing recipe', () => {
+    const recipe = recipeFactory();
+    const wrapper = shallow(
+      <RecipeForm recipeId={recipe.id} recipe={recipe} {...propFactory()} />
+    );
+    // button should exist
+    expect(wrapper.find('.clone-button').length).toBe(1);
+    // message should not
+    expect(wrapper.find('.clone-cancel').length).toBe(0);
+    expect(wrapper.find('.cloning-message').length).toBe(0);
+  });
+
   it('should not render a delete button if creating a new recipe', () => {
     const wrapper = shallow(
       <RecipeForm {...propFactory()} />
     );
     expect(wrapper.find('.delete').length).toBe(0);
+  });
+
+  it('should render a clone message if user is cloning', () => {
+    const recipe = recipeFactory();
+    const wrapper = shallow(
+      <RecipeForm
+        recipeId={recipe.id}
+        recipe={recipe}
+        {...propFactory()}
+        route={{ isCloning: true }}
+      />
+    );
+    // message should exist
+    expect(wrapper.find('.cloning-message').length).toBe(1);
+    expect(wrapper.find('.clone-cancel').length).toBe(1);
+    // button should not
+    expect(wrapper.find('.clone-button').length).toBe(0);
   });
 
   it('should disable the submit button if currently submitting the form', () => {
@@ -112,11 +141,32 @@ describe('<RecipeForm>', () => {
       expect(addRecipe).not.toHaveBeenCalled();
     });
 
-    it("should add a new recipe if it doesn't have an ID", async () => {
+    it('should add a new recipe if it doesn\'t have an ID', async () => {
       const recipe = recipeFactory();
       addRecipe.and.returnValue(Promise.resolve());
 
       await formConfig.onSubmit(recipe, () => {}, {
+        recipeId: null,
+        updateRecipe,
+        addRecipe,
+      });
+
+      expect(addRecipe).toHaveBeenCalledWith({
+        name: recipe.name,
+        enabled: recipe.enabled,
+        filter_expression: recipe.filter_expression,
+        action: recipe.action,
+        arguments: recipe.arguments,
+      });
+      expect(updateRecipe).not.toHaveBeenCalled();
+    });
+
+    it('should add clone a recipe correctly', async () => {
+      const recipe = recipeFactory();
+      addRecipe.and.returnValue(Promise.resolve());
+
+      await formConfig.onSubmit(recipe, () => {}, {
+        route: { isCloning: true },
         recipeId: null,
         updateRecipe,
         addRecipe,
