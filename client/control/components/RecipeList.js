@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
 import classNames from 'classnames';
 import moment from 'moment';
-import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js';
+import { makeApiRequest, recipesReceived, setSelectedRecipe } from 'actions/ControlActions.js';
 
 const BooleanIcon = props => {
   if (props.value) {

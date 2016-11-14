@@ -2,7 +2,7 @@ import {
   REQUEST_IN_PROGRESS, REQUEST_COMPLETE, RECIPES_RECEIVED,
   SINGLE_RECIPE_RECEIVED, RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
   SET_SELECTED_RECIPE, SHOW_NOTIFICATION, DISMISS_NOTIFICATION,
-} from '../actions/ControlActions.js';
+} from 'actions/ControlActions.js';
 
 const initialState = {
   recipes: null,

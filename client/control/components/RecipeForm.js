@@ -12,7 +12,7 @@ import {
 import { pick } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
-  from '../actions/ControlActions.js';
+  from 'actions/ControlActions.js';
 import composeRecipeContainer from './RecipeContainer.js';
 import { ControlField } from './Fields.js';
 import HeartbeatFields from './action_fields/HeartbeatFields.js';

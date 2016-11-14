@@ -3,8 +3,8 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { SubmissionError } from 'redux-form';
 
-import { RecipeForm, formConfig, initialValuesWrapper } from '../../components/RecipeForm.js';
-import ConsoleLogFields from '../../components/action_fields/ConsoleLogFields.js';
+import { RecipeForm, formConfig, initialValuesWrapper } from 'components/RecipeForm.js';
+import ConsoleLogFields from 'components/action_fields/ConsoleLogFields.js';
 import { recipeFactory } from '../../../tests/utils.js';
 
 /**

@@ -1,12 +1,12 @@
 import React from 'react';
 import { IndexRedirect, IndexRoute, Route } from 'react-router';
-import ControlApp from './components/ControlApp.js';
-import RecipeList from './components/RecipeList.js';
-import RecipeForm from './components/RecipeForm.js';
-import RecipeHistory from './components/RecipeHistory.js';
-import RecipePreview from './components/RecipePreview.js';
-import DeleteRecipe from './components/DeleteRecipe.js';
-import NoMatch from './components/NoMatch.js';
+import ControlApp from 'components/ControlApp';
+import RecipeList from 'components/RecipeList';
+import RecipeForm from 'components/RecipeForm';
+import RecipeHistory from 'components/RecipeHistory';
+import RecipePreview from 'components/RecipePreview';
+import DeleteRecipe from 'components/DeleteRecipe';
+import NoMatch from 'components/NoMatch';
 
 export default (
   <Route path="/control/" component={ControlApp}>

@@ -1,8 +1,9 @@
 import React, { PropTypes as pt } from 'react';
 import { push } from 'react-router-redux';
 import moment from 'moment';
-import composeRecipeContainer from './RecipeContainer.js';
-import { makeApiRequest } from '../actions/ControlActions.js';
+
+import composeRecipeContainer from 'components/RecipeContainer';
+import { makeApiRequest } from 'actions/ControlActions';
 
 export class DisconnectedRecipeHistory extends React.Component {
   static propTypes = {
