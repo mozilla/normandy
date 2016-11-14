@@ -16,61 +16,71 @@ function controlAppReducer(state = initialState, action) {
   switch (action.type) {
 
     case REQUEST_IN_PROGRESS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: true,
-      });
+      };
     case REQUEST_COMPLETE:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
-      });
+      };
 
     case RECIPES_RECEIVED:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         recipes: action.recipes,
         recipeListNeedsFetch: false,
-      });
+      };
     case SINGLE_RECIPE_RECEIVED:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         recipes: [action.recipe],
         recipeListNeedsFetch: true,
         selectedRecipe: action.recipe.id,
-      });
+      };
 
     case SET_SELECTED_RECIPE:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         selectedRecipe: action.recipeId,
-      });
+      };
 
     case SHOW_NOTIFICATION:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         notifications: [action.notification, ...state.notifications],
-      });
+      };
 
     case DISMISS_NOTIFICATION:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         notifications: state.notifications.filter(n => n.id !== action.notificationId),
-      });
+      };
 
     case RECIPE_ADDED:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         recipes: [
           ...state.recipes || [],
           action.recipe,
         ],
-      });
+      };
     case RECIPE_UPDATED:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         recipes: state.recipes.map(recipe => {
           if (recipe.id === action.recipe.id) {
             return Object.assign(recipe, action.recipe);
           }
           return recipe;
         }),
-      });
+      };
     case RECIPE_DELETED:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         recipes: state.recipes.filter(recipe => recipe.id !== action.recipeId),
-      });
+      };
 
     default:
       return state;
