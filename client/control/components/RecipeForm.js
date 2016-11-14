@@ -78,13 +78,12 @@ export class DisconnectedRecipeForm extends React.Component {
   }
 
   submitForm() {
-    const { dispatch, formState, recipeId } = this.props;
-    const isCloning = this.props.route && this.props.route.isCloning;
+    const { dispatch, formState } = this.props;
 
     const recipeFormValues = getValues(formState.recipe);
     const actionFormValues = getValues(formState.action);
+
     const combinedFormValues = { ...recipeFormValues, arguments: actionFormValues };
-    const requestBody = { recipe: combinedFormValues, recipeId: isCloning ? null : recipeId };
 
     return this.validateForm(combinedFormValues)
     .catch(() => {
@@ -97,15 +96,32 @@ export class DisconnectedRecipeForm extends React.Component {
       };
     })
     .then(() => {
-      if (recipeId && !isCloning) {
-        return dispatch(makeApiRequest('updateRecipe', requestBody))
-        .then(response => dispatch(recipeUpdated(response)));
-      }
-      return dispatch(makeApiRequest('addRecipe', requestBody))
-      .then(response => {
-        dispatch(recipeAdded(response));
-        dispatch(push(`/control/recipe/${response.id}/`));
-      });
+      this.submitRecipeToAPI(combinedFormValues);
+    });
+  }
+
+  submitRecipeToAPI(recipeValues) {
+    const isCloning = this.props.route && this.props.route.isCloning;
+    const { recipeId, dispatch } = this.props;
+
+    const requestBody = {
+      recipe: recipeValues,
+      recipeId: recipeId && isCloning ? null : recipeId,
+    };
+
+    // if a recipeId exists,
+    // we need to update an existing recipe
+    if (requestBody.recipeId) {
+      return dispatch(makeApiRequest('updateRecipe', requestBody))
+      .then(response => dispatch(recipeUpdated(response)));
+    }
+
+    // if we're here then there's no existing recipeId,
+    // we need to create a new recipe
+    return dispatch(makeApiRequest('addRecipe', requestBody))
+    .then(response => {
+      dispatch(recipeAdded(response));
+      dispatch(push(`/control/recipe/${response.id}/`));
     });
   }
 
