@@ -31,3 +31,19 @@ export const fixtureRevisions = [
     },
   },
 ];
+
+export const fixtureForm = {
+  name: 'Fake!',
+  filter_expression: 'true',
+  enabled: true,
+  action: 'show-heartbeat',
+  arguments: {
+    surveyId: '11111',
+    message: 'Fake!',
+    engagementButtonLabel: 'Fake!',
+    thanksMessage: 'Fake!',
+    postAnswerUrl: 'http://mozilla.org',
+    learnMoreMessage: 'Fake!',
+    learnMoreUrl: 'http://mozilla.org',
+  },
+};
