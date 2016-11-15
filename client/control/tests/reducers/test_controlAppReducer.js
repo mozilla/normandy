@@ -188,7 +188,7 @@ describe('controlApp reducer', () => {
           enabled: true,
         }],
         selectedRecipe: null,
-        recipeListNeedsFetch: false,
+        recipeListNeedsFetch: true,
       },
     });
   });
@@ -197,6 +197,7 @@ describe('controlApp reducer', () => {
     expect(appReducer({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: fixtureRecipes,
       },
     }, {
@@ -216,7 +217,7 @@ describe('controlApp reducer', () => {
           enabled: true,
         }],
         selectedRecipe: null,
-        recipeListNeedsFetch: false,
+        recipeListNeedsFetch: true,
       },
     });
   });
