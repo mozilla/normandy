@@ -56,8 +56,8 @@ export class RecipeForm extends React.Component {
     const displayedRecipe = this.props.recipe || {};
 
     return isCloning &&
-      (<span className="cloning-message">
-        You are cloning
+      (<span className="cloning-message callout">
+        {'You are cloning '}
         <Link to={`/control/recipe/${displayedRecipe.id}/`}>
           {displayedRecipe.name} ({displayedRecipe.action})
         </Link>.

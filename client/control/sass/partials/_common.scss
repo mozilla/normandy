@@ -292,3 +292,19 @@ i {
   }
 
 }
+
+
+.callout {
+  background: rgba(19, 124, 189, 0.15);
+  border-radius: 4px;
+  display: block;
+  padding: 1em;
+  width: 100%;
+}
+
+.recipe-form {
+  .callout {
+    float: right;
+    width: 45%;
+  }
+}
