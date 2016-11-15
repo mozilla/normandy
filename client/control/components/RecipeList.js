@@ -243,9 +243,9 @@ DisconnectedRecipeList.propTypes = {
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  recipes: state.controlApp.recipes || [],
+  recipes: state.recipes.list || [],
   dispatch: ownProps.dispatch,
-  recipeListNeedsFetch: state.controlApp.recipeListNeedsFetch,
+  recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
 });
 

@@ -37,7 +37,7 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
-  }
+  };
   static argumentsFields = {
     'console-log': ConsoleLogFields,
     'show-heartbeat': HeartbeatFields,
