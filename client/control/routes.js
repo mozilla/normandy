@@ -38,7 +38,7 @@ export default (
           name="Clone"
           isCloning
           ctaButtons={[
-            { text: 'Cancel', icon: 'ban', link: '..' },
+            { text: 'Cancel', icon: 'ban', link: '../' },
           ]}
         />
         <Route
