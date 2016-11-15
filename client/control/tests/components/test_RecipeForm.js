@@ -141,7 +141,7 @@ describe('<RecipeForm>', () => {
       expect(addRecipe).not.toHaveBeenCalled();
     });
 
-    it('should add a new recipe if it doesn\'t have an ID', async () => {
+    it("should add a new recipe if it doesn't have an ID", async () => {
       const recipe = recipeFactory();
       addRecipe.and.returnValue(Promise.resolve());
 
@@ -161,7 +161,7 @@ describe('<RecipeForm>', () => {
       expect(updateRecipe).not.toHaveBeenCalled();
     });
 
-    it('should add clone a recipe correctly', async () => {
+    it('should create a new recipe when cloning an existing one', async () => {
       const recipe = recipeFactory();
       addRecipe.and.returnValue(Promise.resolve());
 
