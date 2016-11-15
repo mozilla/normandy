@@ -18,6 +18,6 @@ const enhancer = compose(
   DEVELOPMENT ? DevTools.instrument() : x => x,
 );
 
-export default function controlStore(initialState) {
+export default function configureStore(initialState) {
   return createStore(reducers, initialState, enhancer);
 }
