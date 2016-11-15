@@ -53,29 +53,15 @@ export class RecipeForm extends React.Component {
 
   renderCloningMessage() {
     const isCloning = this.props.route && this.props.route.isCloning;
-    const { recipeId } = this.props;
     const displayedRecipe = this.props.recipe || {};
 
-    return isCloning ?
+    return isCloning &&
       (<span className="cloning-message">
-        You're cloning {displayedRecipe.name} ({displayedRecipe.action}).
-        <div>
-          <Link
-            className="button delete clone-cancel"
-            to={`/control/recipe/${displayedRecipe.id}/`}
-          >
-              Cancel
-          </Link>
-        </div>
-      </span>)
-      :
-      (recipeId &&
-        <Link
-          className="button clone-button"
-          to={`/control/recipe/${displayedRecipe.id}/clone/`}
-        >
-            Clone
-        </Link>);
+        You are cloning
+        <Link to={`/control/recipe/${displayedRecipe.id}/`}>
+          {displayedRecipe.name} ({displayedRecipe.action})
+        </Link>.
+      </span>);
   }
 
   render() {
@@ -127,7 +113,7 @@ export class RecipeForm extends React.Component {
         </ControlField>
         {ArgumentsFields && <ArgumentsFields />}
         <div className="form-actions">
-          {recipeId &&
+          {recipeId && !isCloning &&
             <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
               Delete
             </Link>
