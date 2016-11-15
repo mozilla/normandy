@@ -1,11 +1,10 @@
 import {
   REQUEST_IN_PROGRESS,
   REQUEST_COMPLETE,
-} from 'actions/ControlActions.js';
+} from 'actions/ControlActions';
 
 const initialState = {
   isFetching: false,
-  notifications: [],
 };
 
 function controlAppReducer(state = initialState, action) {

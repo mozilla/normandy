@@ -1,6 +1,6 @@
 import {
   SHOW_NOTIFICATION, DISMISS_NOTIFICATION,
-} from 'actions/ControlActions.js';
+} from 'actions/ControlActions';
 
 const initialState = [];
 

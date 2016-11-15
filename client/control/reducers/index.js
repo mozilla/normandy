@@ -5,9 +5,9 @@ import { reducer as formReducer } from 'redux-form';
 import { routerReducer } from 'react-router-redux';
 
 // app reducer imports
-import controlAppReducer from './ControlAppReducer';
-import recipesReducer from './RecipesReducer';
-import notificationReducer from './NotificationReducer';
+import controlAppReducer from 'reducers/ControlAppReducer';
+import recipesReducer from 'reducers/RecipesReducer';
+import notificationReducer from 'reducers/NotificationReducer';
 
 export default combineReducers({
   controlApp: controlAppReducer,

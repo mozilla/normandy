@@ -1,15 +1,15 @@
 import React, { PropTypes as pt } from 'react';
 import classNames from 'classnames';
 
-import composeRecipeContainer from './RecipeContainer.js';
-import { runRecipe } from '../../selfrepair/self_repair_runner.js';
-import NormandyDriver from '../../selfrepair/normandy_driver.js';
-import Mozilla from '../../selfrepair/uitour.js';
+import composeRecipeContainer from 'components/RecipeContainer';
+import { runRecipe } from 'selfrepair/self_repair_runner';
+import NormandyDriver from 'selfrepair/normandy_driver';
+import Mozilla from 'selfrepair/uitour';
 
 export class UnwrappedRecipePreview extends React.Component {
   static propTypes = {
     recipe: pt.object.isRequired,
-  }
+  };
 
   constructor(props) {
     super(props);

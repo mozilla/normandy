@@ -12,12 +12,12 @@ import {
 import { pick } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
-  from 'actions/ControlActions.js';
-import composeRecipeContainer from './RecipeContainer.js';
-import { ControlField } from './Fields.js';
-import HeartbeatFields from './action_fields/HeartbeatFields.js';
-import ConsoleLogFields from './action_fields/ConsoleLogFields.js';
-import JexlEnvironment from '../../selfrepair/JexlEnvironment.js';
+  from 'actions/ControlActions';
+import composeRecipeContainer from 'components/RecipeContainer';
+import { ControlField } from 'components/Fields';
+import HeartbeatFields from 'components/action_fields/HeartbeatFields';
+import ConsoleLogFields from 'components/action_fields/ConsoleLogFields';
+import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 export const selector = formValueSelector('recipe');
 

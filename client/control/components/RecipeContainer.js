@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
-  from 'actions/ControlActions.js';
+  from 'actions/ControlActions';
 
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {

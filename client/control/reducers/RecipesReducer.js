@@ -1,7 +1,7 @@
 import {
   RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED, RECIPE_ADDED,
   RECIPE_UPDATED, RECIPE_DELETED, SET_SELECTED_RECIPE,
-} from 'actions/ControlActions.js';
+} from 'actions/ControlActions';
 
 const initialState = {
   list: [],
@@ -35,25 +35,24 @@ function recipesReducer(state = initialState, action) {
       return {
         ...state,
         list: [].concat(state.list).concat([
-          ...state.recipes || [],
+          ...state.list || [],
           action.recipe,
         ]),
       };
     case RECIPE_UPDATED:
       return {
         ...state,
-        list: [].concat(state.list).concat(state.recipes.map(recipe => {
+        list: [].concat(state.list).map(recipe => {
           if (recipe.id === action.recipe.id) {
-            return Object.assign(recipe, action.recipe);
+            return { ...recipe, ...action.recipe };
           }
           return recipe;
-        })),
+        }),
       };
     case RECIPE_DELETED:
       return {
         ...state,
-        list: [].concat(state.list)
-          .concat(state.recipes.filter(recipe => recipe.id !== action.recipeId)),
+        list: [].concat(state.list).filter(recipe => recipe.id !== action.recipeId),
       };
 
     default:
