@@ -3,7 +3,7 @@ import {
   fetchRecipes,
   filterContext,
   doesRecipeMatch,
-  runRecipe
+  runRecipe,
 } from 'selfrepair/self_repair_runner';
 
 const driver = new NormandyDriver();

@@ -1,9 +1,9 @@
 import appReducer from 'reducers';
-import * as actions from '../../actions/ControlActions';
+import * as actions from 'actions/ControlActions';
 import {
   fixtureRecipes,
-  initialState
-} from '../fixtures.js';
+  initialState,
+} from 'tests/fixtures';
 
 describe('controlApp reducer', () => {
   it('should return initial state by default', () => {
@@ -17,7 +17,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       controlApp: {
         isFetching: true,
-      }
+      },
     });
   });
 
@@ -28,7 +28,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       controlApp: {
         isFetching: false,
-      }
+      },
     });
   });
 
@@ -97,12 +97,12 @@ describe('controlApp reducer', () => {
     const notification1 = {
       messageType: 'success',
       message: 'message1',
-      id: 1
+      id: 1,
     };
     const notification2 = {
       messageType: 'success',
       message: 'message2',
-      id: 2
+      id: 2,
     };
     const startState = {
       ...initialState,
@@ -125,7 +125,7 @@ describe('controlApp reducer', () => {
       expect(
         appReducer(startState, {
           type: actions.DISMISS_NOTIFICATION,
-          id: 99999
+          id: 99999,
         })
       ).toEqual({
         ...initialState,
