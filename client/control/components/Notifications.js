@@ -61,7 +61,7 @@ Notification.propTypes = {
 
 
 const mapStateToProps = state => ({
-  notifications: state.controlApp.notifications,
+  notifications: state.notifications,
 });
 
 export default connect(
