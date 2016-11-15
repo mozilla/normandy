@@ -4,10 +4,11 @@
 
 "use strict";
 
-const {Cu} = require("chrome");
+const {utils: Cu} = Components;
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
 Cu.importGlobalProperties(["crypto", "TextEncoder"]);
 
-const {Log} = require("./Log.js");
+this.EXPORTED_SYMBOLS = ["Sampling"];
 
 /**
  * Map from the range [0, 1] to [0, max(sha256)].
@@ -54,23 +55,25 @@ function bufferToHex(buffer) {
   return hexCodes.join("");
 }
 
-exports.stableSample = function(input, rate) {
-  const hasher = crypto.subtle;
+this.Sampling = {
+  stableSample(input, rate) {
+    const hasher = crypto.subtle;
 
-  return hasher.digest("SHA-256", new TextEncoder("utf-8").encode(JSON.stringify(input)))
-    .then(hash => {
-      // truncate hash to 12 characters (2^48)
-      const inputHash = bufferToHex(hash).slice(0, 12);
-      const samplePoint = fractionToKey(rate);
+    return hasher.digest("SHA-256", new TextEncoder("utf-8").encode(JSON.stringify(input)))
+      .then(hash => {
+        // truncate hash to 12 characters (2^48)
+        const inputHash = bufferToHex(hash).slice(0, 12);
+        const samplePoint = fractionToKey(rate);
 
-      if (samplePoint.length !== 12 || inputHash.length !== 12) {
-        throw new Error("Unexpected hash length");
-      }
+        if (samplePoint.length !== 12 || inputHash.length !== 12) {
+          throw new Error("Unexpected hash length");
+        }
 
-      return inputHash < samplePoint;
+        return inputHash < samplePoint;
 
-    })
-    .catch(error => {
-      Log.error(`Error: ${error}`);
-    });
+      })
+      .catch(error => {
+        Log.error(`Error: ${error}`);
+      });
+  },
 };

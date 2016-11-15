@@ -1,20 +1,16 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+"use strict";
+
 /* global exports:true */
 const {Cu} = require("chrome");
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
-const {Loader, Require} = require("toolkit/loader");
-const loader = new Loader({
-  paths: {
-    "": "resource://gre/modules/commonjs/",
-    lib: "resource://shield-recipe-client-at-mozilla-dot-org/lib",
-    test: "resource://shield-recipe-client-at-mozilla-dot-org/test",
-  },
-});
-const extRequire = new Require(loader, module);
-
-const {NormandyDriver} = extRequire("lib/NormandyDriver.js");
-const {SandboxManager} = extRequire("lib/SandboxManager.js");
+Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
+Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
 
 let sandboxManager;
 let eventEmitter;

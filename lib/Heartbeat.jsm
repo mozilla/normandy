@@ -4,16 +4,17 @@
 
 "use strict";
 
-const {Cu} = require("chrome");
+const {utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeout */
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 
 Cu.importGlobalProperties(["URL"]); /* globals URL */
 
-const {Log} = require("./Log.js");
-const {addCleanupHandler} = require("./CleanupManager.js");
+this.EXPORTED_SYMBOLS = ["Heartbeat"];
 
 const PREF_SURVEY_DURATION = "browser.uitour.surveyDuration";
 const NOTIFICATION_TIME = 3000;
@@ -53,7 +54,7 @@ const NOTIFICATION_TIME = 3000;
  * @param {String} [options.postAnswerURL=null]
  *        The url to visit after the user answers the question.
  */
-exports.Heartbeat = class {
+this.Heartbeat = class {
   constructor(chromeWindow, eventEmitter, sandboxManager, options) {
     if (typeof options.flowId !== "string") {
       throw new Error("flowId must be a string");
@@ -206,7 +207,7 @@ exports.Heartbeat = class {
     }, surveyDuration);
 
     this.sandboxManager.addHold("heartbeat");
-    addCleanupHandler(() => this.close());
+    CleanupManager.addCleanupHandler(() => this.close());
   }
 
   maybeNotifyHeartbeat(name, data={}) {

@@ -3,23 +3,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
+/* globals Components */
 
-const {uuid} = require("sdk/util/uuid");
-const {components, Cu, Cc, Ci} = require("chrome");
-const {prefs} = require("sdk/simple-prefs");
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource:///modules/ShellService.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeout */
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
+Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 
-const {Log} = require("./Log.js");
-const {makeStorage} = require("./Storage.js");
-const {Http} = require("./Http.js");
-const {Heartbeat} = require("./Heartbeat.js");
+const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
+this.EXPORTED_SYMBOLS = ["NormandyDriver"];
+
+const PREF_INPUT_HOST = "extensions.shield-recipe-client@mozilla.org.input_host";
 const actionLogger = Log.makeNamespace("actions");
 
-exports.NormandyDriver = function(sandboxManager, extraContext={}) {
+this.NormandyDriver = function(sandboxManager, extraContext={}) {
   if (!sandboxManager) {
     throw new Error("sandboxManager is required");
   }
@@ -64,16 +67,17 @@ exports.NormandyDriver = function(sandboxManager, extraContext={}) {
       } else {
         defaultURL = "https://input.allizom.org/api/v2/hb/";
       }
-      const url = prefs.input_host || defaultURL;
+      const url = Services.prefs.getStringPref(PREF_INPUT_HOST, defaultURL);
 
       let headers = {Accept: "application/json"};
 
       Log.debug("Sending heartbeat flow data to Input", data);
 
       // Make request to input
-      let p = Http.post({url, data, headers})
-        .then(response => {
-          Log.log("Input response:", response.text);
+      let p = fetch(url, {body: JSON.stringify(data), headers})
+        .then(response => response.text())
+        .then(responseText => {
+          Log.log("Input response:", responseText);
           // Resolve undefined instead of passing the response down.
           return undefined;
         })
@@ -102,7 +106,7 @@ exports.NormandyDriver = function(sandboxManager, extraContext={}) {
 
       const searchEnginePromise = new Promise(resolve => {
         Services.search.init(rv => {
-          if (components.isSuccessCode(rv)) {
+          if (Components.isSuccessCode(rv)) {
             appinfo.searchEngine = Services.search.defaultEngine.identifier;
           }
           resolve();
@@ -124,7 +128,7 @@ exports.NormandyDriver = function(sandboxManager, extraContext={}) {
     },
 
     uuid() {
-      let ret = uuid().toString();
+      let ret = generateUUID().toString();
       ret = ret.slice(1, ret.length - 1);
       return ret;
     },
@@ -132,7 +136,7 @@ exports.NormandyDriver = function(sandboxManager, extraContext={}) {
     createStorage(keyPrefix) {
       let storage;
       try {
-        storage = makeStorage(keyPrefix, sandbox);
+        storage = Storage.makeStorage(keyPrefix, sandbox);
       } catch (e) {
         Log.error(e.stack);
         throw e;

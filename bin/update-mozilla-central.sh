@@ -42,6 +42,7 @@ FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
   'lib',
   'node_modules',
   'package.json',
+  'test',
 ]
 
 JETPACK_PACKAGE_MANIFESTS += ['test/jetpack-package.ini']

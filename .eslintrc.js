@@ -19,10 +19,12 @@ module.exports = {
   },
 
   globals: {
-    require: false,
-    exports: true,
-    uneval: false,
+    Components: false,
     crypto: true,
+    exports: true,
+    fetch: false,
+    require: false,
     TextEncoder: true,
+    uneval: false,
   },
 };

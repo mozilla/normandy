@@ -5,17 +5,19 @@
 
 "use strict";
 
-const {Cu, Cc, Ci} = require("chrome");
+const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
-const {CanonicalJSON} = Cu.import("resource://gre/modules/CanonicalJSON.jsm");
-const {prefs} = require("sdk/simple-prefs");
+Cu.import("resource://gre/modules/CanonicalJSON.jsm");
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
 
-const {Http} = require("./Http.js");
-const {Log} = require("./Log.js");
+this.EXPORTED_SYMBOLS = ["NormandyApi"];
 
-exports.NormandyApi = {
+const PREF_API_URL = "extensions.shield-recipe-client@mozilla.org.api_url";
+
+this.NormandyApi = {
   apiCall(method, endpoint, data={}) {
-    const api_url = prefs.api_url;
+    const api_url = Services.prefs.getStringPref(PREF_API_URL);
     let url = `${api_url}/${endpoint}`;
     method = method.toLowerCase();
 
@@ -31,7 +33,10 @@ exports.NormandyApi = {
     }
 
     const headers = {"Accept": "application/json"};
-    return Http[method]({url, data, headers});
+    return fetch(url, {
+      body: JSON.stringify(data),
+      headers,
+    });
   },
 
   get(endpoint, data) {
@@ -43,7 +48,7 @@ exports.NormandyApi = {
   },
 
   fetchRecipes: Task.async(function* (filters={}) {
-    const rawText = (yield this.get("recipe/signed/", filters)).text;
+    const rawText = yield (yield this.get("recipe/signed/", filters)).text();
     const recipesWithSigs = JSON.parse(rawText);
 
     const verifiedRecipes = [];
@@ -54,7 +59,7 @@ exports.NormandyApi = {
         throw new Error("Canonical recipe serialization does not match!");
       }
 
-      let certChain = (yield Http.get({url: x5u})).text;
+      let certChain = yield (yield fetch(x5u)).text();
       let builtSignature = `p384ecdsa=${signature}`;
 
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
@@ -77,13 +82,14 @@ exports.NormandyApi = {
    */
   classifyClient() {
     return this.get("classify_client/")
-      .then(({json: clientData}) => {
+      .then(response => response.json())
+      .then(clientData => {
         clientData.request_time = new Date(clientData.request_time);
         return clientData;
       });
   },
 
   fetchAction(name) {
-    return this.get(`action/${name}/`).then(req => req.json);
+    return this.get(`action/${name}/`).then(req => req.json());
   },
 };

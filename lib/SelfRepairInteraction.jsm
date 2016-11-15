@@ -4,14 +4,15 @@
 
 "use strict";
 
-const {Cu} = require("chrome");
+const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
 
-const {Log} = require("./Log.js");
+this.EXPORTED_SYMBOLS = ["SelfRepairInteraction"];
 
 const PREF_SELF_SUPPORT_ENABLED = "browser.selfsupport.enabled";
 
-exports.SelfRepairInteraction = {
+this.SelfRepairInteraction = {
   enableSelfRepair() {
     if (!this.isEnabled()) {
       Log.info("Reenabling Self Repair");

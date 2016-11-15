@@ -4,31 +4,35 @@
 
 "use strict";
 
-const {prefs} = require("sdk/simple-prefs");
-const {Cu} = require("chrome");
+const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
 Cu.import("resource://gre/modules/Task.jsm");
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
+Cu.import("resource://shield-recipe-client/lib/EnvExpressions.jsm");
+Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
+Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
 
-const {Log} = require("./Log.js");
-const {Http} = require("./Http.js");
-const {NormandyDriver} = require("./NormandyDriver.js");
-const {EnvExpressions} = require("./EnvExpressions.js");
-const {NormandyApi} = require("./NormandyApi.js");
-const {SandboxManager} = require("../lib/SandboxManager.js");
+this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
-exports.RecipeRunner = {
+const PREF_API_URL = "extensions.shield-recipe-client@mozilla.org.api_url";
+const PREF_DEV_MODE = "extensions.shield-recipe-client@mozilla.org.dev_mode";
+const PREF_ENABLED = "extensions.shield-recipe-client@mozilla.org.enabled";
+const PREF_STARTUP_DELAY = "extensions.shield-recipe-client@mozilla.org.startup_delay";
+
+this.RecipeRunner = {
   init() {
     if (!this.checkPrefs()) {
       return;
     }
 
     let delay;
-    if (prefs.dev_mode) {
+    if (Preferences.get(PREF_DEV_MODE)) {
       delay = 0;
     } else {
       // startup delay is in seconds
-      delay = prefs.startup_delay * 1000;
+      delay = Preferences.get(PREF_STARTUP_DELAY) * 1000;
     }
 
     setTimeout(this.start.bind(this), delay);
@@ -41,13 +45,14 @@ exports.RecipeRunner = {
       return false;
     }
 
-    if (!prefs.enabled) {
+    if (Preferences.get(PREF_ENABLED)) {
       Log.info("Recipe Client is disabled.");
       return false;
     }
 
-    if (!prefs.api_url.startsWith("https://")) {
-      Log.error(`Non HTTPS URL provided: ${prefs.api_url}`);
+    const apiUrl = Preferences.get(PREF_API_URL);
+    if (!apiUrl.startsWith("https://")) {
+      Log.error(`Non HTTPS URL provided: ${apiUrl}`);
       return false;
     }
 
@@ -59,7 +64,8 @@ exports.RecipeRunner = {
     try {
       recipes = yield NormandyApi.fetchRecipes({enabled: true});
     } catch (e) {
-      Log.error(`Could not fetch recipes from ${prefs.api_url}: "${e}"`);
+      const apiUrl = Preferences.get(PREF_API_URL);
+      Log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
       return;
     }
 
@@ -127,9 +133,9 @@ exports.RecipeRunner = {
     const {sandbox} = sandboxManager;
 
     let action = yield NormandyApi.fetchAction(recipe.action);
-    let response = yield Http.get({url: action.implementation_url});
+    let response = yield fetch(action.implementation_url);
 
-    const actionScript = response.text;
+    const actionScript = yield response.text();
     const prepScript = `
       var pendingAction = null;
 

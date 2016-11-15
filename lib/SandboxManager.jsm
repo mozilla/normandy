@@ -1,8 +1,9 @@
-const {Cu} = require("chrome");
+const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 
+this.EXPORTED_SYMBOLS = ["SandboxManager"];
 
-exports.SandboxManager = class {
+this.SandboxManager = class {
   constructor() {
     this._sandbox = makeSandbox();
     this.holds = [];
@@ -62,7 +63,7 @@ function makeSandbox() {
 
   sandbox.window = Cu.cloneInto({}, sandbox);
 
-  const url = "resource://shield-recipe-client/EventEmitter.js";
+  const url = "resource://shield-recipe-client/data/EventEmitter.js";
   Services.scriptloader.loadSubScript(url, sandbox);
 
   return sandbox;

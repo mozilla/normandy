@@ -4,11 +4,12 @@
 
 "use strict";
 
+const {Cu} = require("chrome");
 const {prefs} = require("sdk/simple-prefs");
-const {Log} = require("./lib/Log.js");
-const {RecipeRunner} = require("./lib/RecipeRunner.js");
-const {SelfRepairInteraction} = require("./lib/SelfRepairInteraction.js");
-const {cleanup} = require("./lib/CleanupManager.js");
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm");
+Cu.import("resource://shield-recipe-client/lib/SelfRepairInteraction.jsm");
+Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 
 /* Called when the addon is loaded. This includes browser startup, addon
  * installation, and addon re-enabling. */
@@ -31,7 +32,7 @@ exports.main = function() {
 
 // Called when Firefox is shut down, or when the addon is uninstalled or disabled.
 exports.onUnload = function(reason) {
-  cleanup();
+  CleanupManager.cleanup();
 
   if (reason === "uninstall" || reason === "disable") {
     SelfRepairInteraction.enableSelfRepair();

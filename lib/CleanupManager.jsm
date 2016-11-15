@@ -4,14 +4,18 @@
 
 "use strict";
 
+this.EXPORTED_SYMBOLS = ["CleanupManager"];
+
 const cleanupHandlers = [];
 
-exports.addCleanupHandler = function(handler) {
-  cleanupHandlers.push(handler);
-};
+this.CleanupManager = {
+  addCleanupHandler(handler) {
+    cleanupHandlers.push(handler);
+  },
 
-exports.cleanup = function() {
-  for (let handler of cleanupHandlers) {
-    handler();
-  }
+  cleanup() {
+    for (let handler of cleanupHandlers) {
+      handler();
+    }
+  },
 };

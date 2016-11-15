@@ -1,4 +1,10 @@
-  /* global exports:true, require:false */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+"use strict";
+
+/* global exports:true, require:false */
 const {Cu} = require("chrome");
 const tabs = require("sdk/tabs");
 const {browserWindows} = require("sdk/windows");
@@ -7,19 +13,9 @@ const {before, after} = require("sdk/test/utils");
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-const {Loader, Require} = require("toolkit/loader");
-const loader = new Loader({
-  paths: {
-    "": "resource://gre/modules/commonjs/",
-    lib: "resource://shield-recipe-client-at-mozilla-dot-org/lib",
-    test: "resource://shield-recipe-client-at-mozilla-dot-org/test",
-  },
-});
-const extRequire = new Require(loader, module);
-
-const {Heartbeat} = extRequire("lib/Heartbeat.js");
-const {SandboxManager} = extRequire("lib/SandboxManager.js");
-const {NormandyDriver} = extRequire("lib/NormandyDriver.js");
+Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
+Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
+Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 
 let sandboxManager;
 let targetWindow;

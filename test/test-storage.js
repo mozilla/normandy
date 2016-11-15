@@ -1,18 +1,16 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+"use strict";
+
+const {Cu} = require("chrome");
 const testRunner = require("sdk/test");
 const {before, after} = require("sdk/test/utils");
 
-const {Loader, Require} = require("toolkit/loader");
-const loader = new Loader({
-  paths: {
-    "": "resource://gre/modules/commonjs/",
-    lib: "resource://shield-recipe-client-at-mozilla-dot-org/lib",
-    test: "resource://shield-recipe-client-at-mozilla-dot-org/test",
-  },
-});
-const extRequire = new Require(loader, module);
-
-const {makeStorage} = extRequire("lib/Storage.js");
-const {promiseTest} = extRequire("test/utils.js");
+Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
+Cu.import("resource://shield-recipe-client/test/TestUtils.jsm");
+const {promiseTest} = TestUtils;
 
 let store;
 
@@ -52,7 +50,7 @@ exports["test tests are independent 2 of 2"] = promiseTest(assert => {
 
 before(exports, () => {
   let fakeSandbox = {Promise};
-  store = makeStorage("prefix", fakeSandbox);
+  store = Storage.makeStorage("prefix", fakeSandbox);
 });
 
 after(exports, (name, assert, done) => {
