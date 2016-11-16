@@ -199,6 +199,13 @@ export default class ShowHeartbeatAction extends Action {
     return Number.isNaN(lastShown) ? null : lastShown;
   }
 
+  /**
+   * Gathers recipe action/message information, and formats the content into
+   * URL-safe query params. This is used by this.annotatePostAnswerUrl to
+   * inject Google Analytics params into the post-answer URL.
+   *
+   * @return {Object} Hash containing utm_ queries to append to post-answer URL
+   */
   getGAParams() {
     let message = this.recipe.arguments.message || '';
     // remove spaces
