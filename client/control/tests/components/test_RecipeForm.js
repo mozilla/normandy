@@ -11,10 +11,11 @@ import { recipeFactory } from '../../../tests/utils.js';
  * Creates mock required props for RecipeForm.
  */
 function propFactory(props = {}) {
-  return Object.assign({
+  return {
     handleSubmit: () => undefined,
     submitting: false,
-  }, props);
+    ...props,
+  };
 }
 
 describe('<RecipeForm>', () => {
