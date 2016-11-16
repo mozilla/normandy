@@ -203,8 +203,14 @@ export default class ShowHeartbeatAction extends Action {
     let message = this.recipe.arguments.message || '';
     // remove spaces
     message = message.replace(/\s+/g, '');
-    // url-ify
+    // escape what we can
     message = encodeURIComponent(message);
+
+    // use a fake URL object to get a legit URL-ified URL
+    const fakeUrl = new URL('http://mozilla.com');
+    fakeUrl.searchParams.set('message', message);
+    // pluck the (now encoded) message
+    message = fakeUrl.search.replace('?message=', '');
 
     return {
       utm_source: 'firefox',
