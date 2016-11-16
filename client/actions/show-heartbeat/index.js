@@ -1,6 +1,6 @@
 import { Action, registerAction } from '../utils';
 
-const VERSION = 54; // Increase when changed.
+const VERSION = 55; // Increase when changed.
 const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 
@@ -149,7 +149,10 @@ export default class ShowHeartbeatAction extends Action {
       message,
       engagementButtonLabel,
       thanksMessage,
-      postAnswerUrl: this.annotatePostAnswerUrl({ url: postAnswerUrl, userId }),
+      postAnswerUrl: this.annotatePostAnswerUrl({
+        url: postAnswerUrl,
+        userId,
+      }),
       learnMoreMessage,
       learnMoreUrl,
       flowId: flow.id,
@@ -196,6 +199,20 @@ export default class ShowHeartbeatAction extends Action {
     return Number.isNaN(lastShown) ? null : lastShown;
   }
 
+  getGAParams() {
+    let message = this.recipe.arguments.message || '';
+    // remove spaces
+    message = message.replace(/\s+/g, '');
+    // url-ify
+    message = encodeURIComponent(message);
+
+    return {
+      utm_source: 'firefox',
+      utm_medium: this.recipe.action, // action name
+      utm_campaign: message, // 'shortenedmesssagetext'
+    };
+  }
+
   annotatePostAnswerUrl({ url, userId }) {
     // Don't bother with empty URLs.
     if (!url) {
@@ -210,6 +227,8 @@ export default class ShowHeartbeatAction extends Action {
       isDefaultBrowser: this.client.isDefaultBrowser ? 1 : 0,
       searchEngine: this.client.searchEngine,
       syncSetup: this.client.syncSetup ? 1 : 0,
+      // Google Analytics parameters
+      ...this.getGAParams(),
     };
 
     // if a userId is given,
