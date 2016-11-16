@@ -3,6 +3,7 @@ import os
 from django.contrib.auth.models import User
 
 from factory import DjangoModelFactory, fuzzy, Sequence
+from rest_framework.authtoken.models import Token
 import pytest
 
 
@@ -32,6 +33,13 @@ class UserFactory(DjangoModelFactory):
 
     class Meta:
         model = User
+
+
+class TokenFactory(DjangoModelFactory):
+    user = UserFactory()
+
+    class Meta:
+        model = Token
 
 
 def skip_except_in_ci():

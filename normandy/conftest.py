@@ -16,6 +16,7 @@ def api_client():
     user = UserFactory(is_superuser=True)
     client = APIClient()
     client.force_authenticate(user=user)
+    client.user = user
     return client
 
 
