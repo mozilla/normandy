@@ -151,6 +151,7 @@ class TestRecipeAPI(object):
     def test_it_can_create_recipes(self, api_client):
         action = ActionFactory()
 
+        # Enabled recipe
         res = api_client.post('/api/v1/recipe/', {
             'name': 'Test Recipe',
             'action': action.name,
@@ -160,8 +161,18 @@ class TestRecipeAPI(object):
         })
         assert res.status_code == 201
 
+        # Disabled recipe
+        res = api_client.post('/api/v1/recipe/', {
+            'name': 'Test Recipe 2',
+            'action': action.name,
+            'arguments': {},
+            'filter_expression': 'whatever',
+            'enabled': False
+        })
+        assert res.status_code == 201
+
         recipes = Recipe.objects.all()
-        assert recipes.count() == 1
+        assert recipes.count() == 2
 
     def test_it_can_edit_recipes(self, api_client):
         recipe = RecipeFactory(name='unchanged', filter_expression='true')
