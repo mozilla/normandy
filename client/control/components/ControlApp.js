@@ -4,6 +4,8 @@ import Notifications from './Notifications.js';
 import DevTools from './DevTools.js';
 
 export default function ControlApp({ children, location, routes, params }) {
+  const appData = JSON.parse(document.querySelector('#app-data').textContent);
+
   return (
     <div>
       {DEVELOPMENT && <DevTools />}
@@ -13,6 +15,7 @@ export default function ControlApp({ children, location, routes, params }) {
         currentLocation={location.pathname}
         routes={routes}
         params={params}
+        user={appData.user}
       />
       <div id="content" className="wrapper">
         {

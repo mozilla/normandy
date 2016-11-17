@@ -5,5 +5,5 @@ import { createApp } from './app.js';
 const app = createApp();
 ReactDOM.render(
   app.rootComponent,
-  document.querySelector('#page-container')
+  document.querySelector('#container')
 );
