@@ -6,6 +6,7 @@ import { reducer as formReducer } from 'redux-form';
 import DevTools from '../components/DevTools.js';
 
 import controlAppReducer from '../reducers/ControlAppReducer.js';
+import authReducer from '../reducers/authReducer.js';
 
 const reduxRouterMiddleware = routerMiddleware(browserHistory);
 
@@ -22,6 +23,7 @@ const enhancer = compose(
 export default function controlStore() {
   return createStore(
     combineReducers({
+      auth: authReducer,
       controlApp: controlAppReducer,
       form: formReducer,
       routing: routerReducer,

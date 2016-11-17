@@ -269,3 +269,12 @@
     font-weight: 800;
   }
 }
+
+/* Buttons */
+.button-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transform: translate(0, -1px);
+}
