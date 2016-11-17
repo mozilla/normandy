@@ -3,8 +3,8 @@ import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
-import configureStore from 'stores/configureStore';
-import ControlAppRoutes from 'routes';
+import configureStore from 'control/stores/configureStore';
+import ControlAppRoutes from 'control/routes';
 
 /**
  * Root Component for the entire app.

@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
-import Header from 'components/Header';
-import Notifications from 'components/Notifications';
-import DevTools from 'components/DevTools';
+import Header from 'control/components/Header';
+import Notifications from 'control/components/Notifications';
+import DevTools from 'control/components/DevTools';
 
 export default function ControlApp({ children, location, routes, params }) {
   return (

@@ -1,7 +1,7 @@
 import {
   REQUEST_IN_PROGRESS,
   REQUEST_COMPLETE,
-} from 'actions/ControlActions';
+} from 'control/actions/ControlActions';
 
 const initialState = {
   isFetching: false,

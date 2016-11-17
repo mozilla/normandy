@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import classNames from 'classnames';
 
-import composeRecipeContainer from 'components/RecipeContainer';
+import composeRecipeContainer from 'control/components/RecipeContainer';
 import { runRecipe } from 'selfrepair/self_repair_runner';
 import NormandyDriver from 'selfrepair/normandy_driver';
 import Mozilla from 'selfrepair/uitour';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ControlField } from 'components/Fields';
+import { ControlField } from 'control/components/Fields';
 
 /**
  * Form fields for the show-heartbeat action.

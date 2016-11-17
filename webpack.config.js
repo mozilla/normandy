@@ -96,14 +96,10 @@ module.exports = [
 
     resolve: {
       alias: {
-        app: path.resolve(__dirname, './client/control/app.js'),
-        routes: path.resolve(__dirname, './client/control/routes.js'),
-        stores: path.resolve(__dirname, './client/control/stores'),
-        reducers: path.resolve(__dirname, './client/control/reducers'),
-        actions: path.resolve(__dirname, './client/control/actions'),
-        components: path.resolve(__dirname, './client/control/components'),
-        tests: path.resolve(__dirname, './client/control/tests'),
+        actions: path.resolve(__dirname, './client/actions'),
+        control: path.resolve(__dirname, './client/control'),
         selfrepair: path.resolve(__dirname, './client/selfrepair'),
+        tests: path.resolve(__dirname, './client/tests'),
       },
     },
   },

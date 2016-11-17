@@ -1,5 +1,5 @@
 import React, { PropTypes as pt } from 'react';
-import NumberField from 'components/form_fields/NumberField';
+import NumberField from 'control/components/form_fields/NumberField';
 
 const SelectMenu = props => {
   const { options, onChange, field } = props;

@@ -12,11 +12,11 @@ import {
 import { pick } from 'underscore';
 
 import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
-  from 'actions/ControlActions';
-import composeRecipeContainer from 'components/RecipeContainer';
-import { ControlField } from 'components/Fields';
-import HeartbeatFields from 'components/action_fields/HeartbeatFields';
-import ConsoleLogFields from 'components/action_fields/ConsoleLogFields';
+  from 'control/actions/ControlActions';
+import composeRecipeContainer from 'control/components/RecipeContainer';
+import { ControlField } from 'control/components/Fields';
+import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
+import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 export const selector = formValueSelector('recipe');

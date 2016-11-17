@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { Field } from 'redux-form';
 
-import { ControlField, buildControlField } from 'components/Fields.js';
+import { ControlField, buildControlField } from 'control/components/Fields.js';
 
 describe('<ControlField>', () => {
   it('should pass the component prop as InputComponent and pass through all others', () => {

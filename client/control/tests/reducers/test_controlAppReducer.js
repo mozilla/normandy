@@ -1,9 +1,9 @@
-import appReducer from 'reducers';
-import * as actions from 'actions/ControlActions';
+import appReducer from 'control/reducers';
+import * as actions from 'control/actions/ControlActions';
 import {
   fixtureRecipes,
   initialState,
-} from 'tests/fixtures';
+} from 'control/tests/fixtures';
 
 describe('controlApp reducer', () => {
   it('should return initial state by default', () => {

@@ -1,7 +1,7 @@
 import {
   RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED, RECIPE_ADDED,
   RECIPE_UPDATED, RECIPE_DELETED, SET_SELECTED_RECIPE,
-} from 'actions/ControlActions';
+} from 'control/actions/ControlActions';
 
 const initialState = {
   list: [],
