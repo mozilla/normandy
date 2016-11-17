@@ -1,7 +1,7 @@
 import { Action, registerAction } from '../utils';
 
 const VERSION = 54; // Increase when changed.
-const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
+const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24; // 24 hours
 
 
 export class HeartbeatFlow {
@@ -111,10 +111,13 @@ export default class ShowHeartbeatAction extends Action {
 
     const lastShown = await this.getLastShownDate();
     const shouldShowSurvey = (
+      // if we're testing,
       this.normandy.testing
-      || lastShown === null
-      || Date.now() - lastShown > LAST_SHOWN_DELAY
+      // or if it's more than 24 hours since
+      // the last time heartbeat was displayed...
+      || Date.now() - lastShown >= LAST_SHOWN_DELAY
     );
+
     if (!shouldShowSurvey) {
       return;
     }
@@ -193,7 +196,7 @@ export default class ShowHeartbeatAction extends Action {
 
   async getLastShownDate() {
     const lastShown = await this.storage.getItem('lastShown');
-    return Number.isNaN(lastShown) ? null : lastShown;
+    return Number.isNaN(lastShown) ? 0 : lastShown;
   }
 
   annotatePostAnswerUrl({ url, userId }) {
