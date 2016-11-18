@@ -27,8 +27,18 @@ export default (
         <IndexRoute
           component={RecipeForm}
           ctaButtons={[
+            { text: 'Clone', icon: 'files-o', link: 'clone/' },
             { text: 'Preview', icon: 'eye', link: 'preview/' },
             { text: 'History', icon: 'history', link: 'history/' },
+          ]}
+        />
+        <Route
+          path="clone/"
+          component={RecipeForm}
+          name="Clone"
+          isCloning
+          ctaButtons={[
+            { text: 'Cancel', icon: 'ban', link: '../' },
           ]}
         />
         <Route

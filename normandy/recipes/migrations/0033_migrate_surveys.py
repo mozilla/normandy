@@ -19,6 +19,7 @@ def split_recipes(apps, schema_editor):
         # Delete the original, and use it as a template for new recipes.
         recipe.delete()
         recipe.enabled = False
+        recipe.signature = None
 
         recipe_name = recipe.name
         arguments = json.loads(recipe.arguments_json)

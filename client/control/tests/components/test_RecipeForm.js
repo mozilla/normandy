@@ -46,6 +46,20 @@ describe('<RecipeForm>', () => {
     expect(wrapper.find('.delete').length).toBe(0);
   });
 
+  it('should render a clone message if user is cloning', () => {
+    const recipe = recipeFactory();
+    const wrapper = shallow(
+      <RecipeForm
+        recipeId={recipe.id}
+        recipe={recipe}
+        {...propFactory()}
+        route={{ isCloning: true }}
+      />
+    );
+    // message should exist
+    expect(wrapper.find('.cloning-message').length).toBe(1);
+  });
+
   it('should disable the submit button if currently submitting the form', () => {
     const wrapper = shallow(
       <RecipeForm {...propFactory({ submitting: true })} />
@@ -118,6 +132,27 @@ describe('<RecipeForm>', () => {
       addRecipe.and.returnValue(Promise.resolve());
 
       await formConfig.onSubmit(recipe, () => {}, {
+        recipeId: null,
+        updateRecipe,
+        addRecipe,
+      });
+
+      expect(addRecipe).toHaveBeenCalledWith({
+        name: recipe.name,
+        enabled: recipe.enabled,
+        filter_expression: recipe.filter_expression,
+        action: recipe.action,
+        arguments: recipe.arguments,
+      });
+      expect(updateRecipe).not.toHaveBeenCalled();
+    });
+
+    it('should create a new recipe when cloning an existing one', async () => {
+      const recipe = recipeFactory();
+      addRecipe.and.returnValue(Promise.resolve());
+
+      await formConfig.onSubmit(recipe, () => {}, {
+        route: { isCloning: true },
         recipeId: null,
         updateRecipe,
         addRecipe,
