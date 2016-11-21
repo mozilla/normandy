@@ -232,6 +232,30 @@ describe('ShowHeartbeatAction', () => {
     expect(normandy.mock.storage.data.lastShown).toEqual('10');
   });
 
+  it('should not run if the last heartbeat played less than 24 hours ago', async () => {
+    const action = new ShowHeartbeatAction(normandy, recipeFactory());
+    // first run, heartbeat stuff should not be set
+    const dateSpy = spyOn(Date, 'now').and.returnValue(10);
+    expect(normandy.mock.storage.data.lastShown).toBeUndefined();
+    await action.execute();
+    // now it's saved in storage that a heartbeat played at 10
+    expect(normandy.mock.storage.data.lastShown).toEqual('10');
+
+
+    // build a second heartbeat action
+    const secondAction = new ShowHeartbeatAction(normandy, recipeFactory());
+    // update the Date.now spy so it returns a different value
+    dateSpy.and.returnValue(20);
+
+    // confirm we already have been shown once before
+    expect(normandy.mock.storage.data.lastShown).toEqual('10');
+    await secondAction.execute();
+
+    // confirm that the lastShown has not changed
+    // (since nothing ran, the value was not updated)
+    expect(normandy.mock.storage.data.lastShown).toEqual('10');
+  });
+
   it('should save flow data via normandy.saveHeartbeatFlow', async () => {
     const recipe = recipeFactory();
     const action = new ShowHeartbeatAction(normandy, recipe);
