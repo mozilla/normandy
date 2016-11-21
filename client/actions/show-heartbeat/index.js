@@ -123,19 +123,20 @@ export default class ShowHeartbeatAction extends Action {
     // get the last shown for heartbeats in general
     const lastHeartbeatShown = await this.getLastHeartbeatDate();
 
+    // we can show the heartbeat if there has not been one shown recently,
+    const canShowHeartbeat = lastHeartbeatShown === null
+    // or if the last one shown was more than HEARTBEAT_THROTTLE ms ago
+      || Date.now() - lastHeartbeatShown >= HEARTBEAT_THROTTLE;
+
     // the survey should display itself if..
     const shouldShowSurvey = (
       // ..we're testing, or..
       this.normandy.testing ||
-      (
         // ..if this has never been shown..
-        lastShown === null
-        // ..and it's been more than HEARTBEAT_THROTTLE milliseconds
-        //   since the last one heartbeat
-        && Date.now() - lastHeartbeatShown >= HEARTBEAT_THROTTLE
-      )
+        (lastShown === null
+        // ..and we can show it, then we should
+        && canShowHeartbeat)
     );
-
 
     if (!shouldShowSurvey) {
       return;
@@ -227,7 +228,7 @@ export default class ShowHeartbeatAction extends Action {
 
   async getLastHeartbeatDate() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    return Number.isNaN(lastShown) || lastShown === null ? 0 : lastShown;
+    return Number.isNaN(lastShown) ? 0 : lastShown;
   }
 
   annotatePostAnswerUrl({ url, userId }) {
