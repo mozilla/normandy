@@ -1,8 +1,7 @@
 import { Action, registerAction } from '../utils';
 
-const VERSION = 54; // Increase when changed.
+const VERSION = 55; // Increase when changed.
 const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24; // 24 hours
-
 
 export class HeartbeatFlow {
   constructor(action) {
@@ -113,6 +112,7 @@ export default class ShowHeartbeatAction extends Action {
     const shouldShowSurvey = (
       // if we're testing,
       this.normandy.testing
+      || lastShown === null
       // or if it's more than 24 hours since
       // the last time heartbeat was displayed...
       || Date.now() - lastShown >= LAST_SHOWN_DELAY
