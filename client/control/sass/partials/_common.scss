@@ -112,6 +112,15 @@ input, select, textarea {
   text-align: center;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
   text-transform: uppercase;
+
+  &.delete {
+    display: inline-block;
+    background-color: $red;
+
+    &:hover {
+      background-color: $redHover;
+    }
+  }
 }
 
 .button:active, input[type="submit"]:active, input[type="button"]:active,
@@ -282,4 +291,20 @@ i {
     transition: height 200ms ease-in;
   }
 
+}
+
+
+.callout {
+  background: rgba(19, 124, 189, 0.15);
+  border-radius: 4px;
+  display: block;
+  padding: 1em;
+  width: 100%;
+}
+
+.recipe-form {
+  .callout {
+    float: right;
+    width: 45%;
+  }
 }

@@ -11,13 +11,20 @@ import {
 } from 'redux-form';
 import { pick } from 'underscore';
 
-import { makeApiRequest, recipeUpdated, recipeAdded, showNotification }
+import {
+  makeApiRequest,
+  recipeUpdated,
+  recipeAdded,
+  showNotification,
+  setSelectedRecipe,
+}
   from 'control/actions/ControlActions';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
+
 
 export const selector = formValueSelector('recipe');
 
@@ -37,14 +44,37 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
+    // route prop passed from router
+    route: pt.object,
   };
+
   static argumentsFields = {
     'console-log': ConsoleLogFields,
     'show-heartbeat': HeartbeatFields,
   };
 
+  renderCloningMessage() {
+    const isCloning = this.props.route && this.props.route.isCloning;
+    const displayedRecipe = this.props.recipe || {};
+
+    return isCloning &&
+      (<span className="cloning-message callout">
+        {'You are cloning '}
+        <Link to={`/control/recipe/${displayedRecipe.id}/`}>
+          {displayedRecipe.name} ({displayedRecipe.action})
+        </Link>.
+      </span>);
+  }
+
   render() {
-    const { handleSubmit, selectedAction, submitting, recipe, recipeId } = this.props;
+    const {
+      handleSubmit,
+      selectedAction,
+      submitting,
+      recipe,
+      recipeId,
+      route,
+    } = this.props;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || null;
 
     // Show a loading indicator if we haven't yet loaded the recipe.
@@ -57,8 +87,14 @@ export class RecipeForm extends React.Component {
       );
     }
 
+    const isCloning = route && route.isCloning;
+
+    const submitButtonCaption = recipeId && !isCloning ? 'Update Recipe' : 'Add New Recipe';
+
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
+        { this.renderCloningMessage() }
+
         <ControlField label="Name" name="name" component="input" type="text" />
         <ControlField
           label="Enabled"
@@ -79,12 +115,14 @@ export class RecipeForm extends React.Component {
         </ControlField>
         {ArgumentsFields && <ArgumentsFields />}
         <div className="form-actions">
-          {recipeId &&
+          {recipeId && !isCloning &&
             <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
               Delete
             </Link>
           }
-          <button className="button submit" type="submit" disabled={submitting}>Submit</button>
+          <button className="button submit" type="submit" disabled={submitting}>
+            {submitButtonCaption}
+          </button>
         </div>
       </form>
     );
@@ -100,7 +138,6 @@ export const formConfig = {
 
   async asyncValidate(values) {
     const errors = {};
-
     // Validate that filter expression is valid JEXL
     if (!values.filter_expression) {
       errors.filter_expression = 'Filter expression cannot be empty.';
@@ -119,18 +156,20 @@ export const formConfig = {
     }
   },
 
-  onSubmit(values, dispatch, { recipeId, updateRecipe, addRecipe }) {
+  onSubmit(values, dispatch, { route, recipeId, updateRecipe, addRecipe }) {
     // Filter out unwanted keys for submission.
     const recipe = pick(values, [
       'name', 'enabled', 'filter_expression', 'action', 'arguments',
     ]);
+    const isCloning = route && route.isCloning;
 
-    let result = null;
-    if (recipeId) {
+    let result;
+    if (recipeId && !isCloning) {
       result = updateRecipe(recipeId, recipe);
     } else {
       result = addRecipe(recipe);
     }
+
 
     // Wrap error responses with a SubmissionError for redux-form.
     return result.catch(errors => {
@@ -188,6 +227,7 @@ const connector = connect(
       .then(response => {
         dispatch(recipeAdded(response));
         dispatch(push(`/control/recipe/${response.id}/`));
+        dispatch(setSelectedRecipe(response.id));
       });
     },
     updateRecipe(recipeId, recipe) {
