@@ -3,6 +3,8 @@ import uuid from 'node-uuid';
 
 import Mozilla from './uitour.js';
 
+const STORAGE_DURABILITY_KEY = '_storageDurability';
+
 /**
  * Storage class that uses window.localStorage as it's backing store.
  */
@@ -12,6 +14,12 @@ class LocalStorage {
    */
   constructor(prefix) {
     this.prefix = prefix;
+    this._setDurabilityStatus();
+  }
+
+  async isDurable() {
+    const durabilityStatus = localStorage.getItem(STORAGE_DURABILITY_KEY);
+    return (parseInt(durabilityStatus, 10) >= 2);
   }
 
   _makeKey(key) {
@@ -19,6 +27,10 @@ class LocalStorage {
   }
 
   async getItem(key) {
+    const storageIsDurable = await this.storage.isDurable();
+    if (!storageIsDurable && !this.normandy.testing) {
+      throw new Error('Storage durability unconfirmed');
+    }
     return localStorage.getItem(this._makeKey(key));
   }
 
@@ -37,6 +49,15 @@ class LocalStorage {
 export default class NormandyDriver {
   constructor(uitour = Mozilla.UITour) {
     this._uitour = uitour;
+    this.setDurability();
+  }
+
+  setDurability() {
+    let durability = parseInt(localStorage.getItem(STORAGE_DURABILITY_KEY), 10);
+    if (isNaN(durability)) {
+      durability = 0;
+    }
+    localStorage.setItem(STORAGE_DURABILITY_KEY, durability + 1);
   }
 
   _heartbeatCallbacks = [];
