@@ -2,9 +2,10 @@ import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
-import classNames from 'classnames';
 import moment from 'moment';
 import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js';
+
+import RecipeFilters from './RecipeFilters';
 
 const BooleanIcon = props => {
   if (props.value) {
@@ -14,53 +15,6 @@ const BooleanIcon = props => {
 };
 BooleanIcon.propTypes = {
   value: pt.bool.isRequired,
-};
-
-function FilterBar({ searchText, selectedFilter, updateSearch, updateFilter }) {
-  return (
-    <div id="secondary-header" className="fluid-8">
-      <div className="fluid-2">
-        <div className="search input-with-icon">
-          <input type="text" placeholder="Search" value={searchText} onChange={updateSearch} />
-        </div>
-      </div>
-      <div id="filters-container" className="fluid-6">
-        <h4>Filter By:</h4>
-        <SwitchFilter
-          options={['All', 'Enabled', 'Disabled']}
-          selectedFilter={selectedFilter}
-          updateFilter={updateFilter}
-        />
-      </div>
-    </div>
-  );
-}
-FilterBar.propTypes = {
-  searchText: pt.string.isRequired,
-  selectedFilter: pt.any.isRequired,
-  updateSearch: pt.func.isRequired,
-  updateFilter: pt.func.isRequired,
-};
-
-function SwitchFilter({ options, selectedFilter, updateFilter }) {
-  return (
-    <div className="switch">
-      <div className={`switch-selection position-${options.indexOf(selectedFilter)}`}>&nbsp;</div>
-      {options.map(option =>
-        <span
-          key={option}
-          className={classNames({ active: (option === selectedFilter) })}
-          onClick={() => updateFilter(option)}
-        >{option}
-        </span>
-      )}
-    </div>
-  );
-}
-SwitchFilter.propTypes = {
-  options: pt.array.isRequired,
-  selectedFilter: pt.any.isRequired,
-  updateFilter: pt.func.isRequired,
 };
 
 class DisconnectedRecipeList extends React.Component {
@@ -180,7 +134,7 @@ class DisconnectedRecipeList extends React.Component {
 
     return (
       <div>
-        <FilterBar
+        <RecipeFilters
           {...this.state}
           updateFilter={this.updateFilter}
           updateSearch={this.updateSearch}
