@@ -22,7 +22,7 @@ class DisconnectedRecipeList extends React.Component {
    * Recipe metadata properties and associated labels to display
    * @type {Object}
    */
-  static ActionMetaData = {
+  static ActionMetadata = {
     'show-heartbeat': recipe => [
       { label: 'Survey ID', value: recipe.arguments.surveyId },
     ],
@@ -31,42 +31,42 @@ class DisconnectedRecipeList extends React.Component {
   /**
    * Given a recipe object, determines what type of recipe it is (based on its `action`),
    * and then compiles an array of 'displayed metadata props' and their values. This array
-   * is saved on the recipe as `metaData`, and displayed in the 'Metadata'
+   * is saved on the recipe as `metadata`, and displayed in the 'metadata'
    *
-   * Beyond that, a string of metaData values is created, and attached to the
+   * Beyond that, a string of metadata values is created, and attached to the
    * recipe as the `searchData` property. This is used by the `Table` component
-   * to search/filter/sort the metaData.
+   * to search/filter/sort the metadata.
    *
    * @param  {Object} Original recipe object
-   * @return {Object} Original recipe but with `metaData` and `searchData` properties added
+   * @return {Object} Original recipe but with `metadata` and `searchData` properties added
    */
-  static applyRecipeMetaData(recipe) {
+  static applyRecipeMetadata(recipe) {
     const { action: recipeAction } = recipe;
     const newRecipe = {
       ...recipe,
-      // recipes should have empty metaData/searchData props,
+      // recipes should have empty metadata/searchData props,
       // regardless if we set the values or not
-      metaData: [],
+      metadata: [],
       searchData: '',
     };
 
     // check if there are specific properties/labels we want to display
-    const requestedMetaProps = DisconnectedRecipeList.ActionMetaData[recipeAction];
+    const requestedMetaProps = DisconnectedRecipeList.ActionMetadata[recipeAction];
 
-    // if we have a metaData definition to fill...
+    // if we have a metadata definition to fill...
     if (requestedMetaProps) {
       // ...get the data we want to display
       const foundData = requestedMetaProps(newRecipe);
 
-      // ...and add it to the existing metaData collection
+      // ...and add it to the existing metadata collection
       // (the data comes back as an array of objects,
       // so we can just concat it to our existing array)
-      newRecipe.metaData = newRecipe.metaData.concat(foundData);
+      newRecipe.metadata = newRecipe.metadata.concat(foundData);
     }
 
     // update the searchdata string with whatever the values are
     // (this is used for sorting/filtering/searching)
-    newRecipe.metaData.forEach(data => {
+    newRecipe.metadata.forEach(data => {
       newRecipe.searchData = `${newRecipe.searchData} ${data.value}`;
     });
 
@@ -130,7 +130,7 @@ class DisconnectedRecipeList extends React.Component {
   render() {
     const { recipes } = this.props;
     let filteredRecipes = this.state.filteredRecipes || recipes;
-    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetaData);
+    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
 
     return (
       <div>
