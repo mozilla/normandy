@@ -3,63 +3,21 @@
 set -eu
 
 if [[ $# -lt 1 ]]; then
-  echo "usage: $(basename $0) DEST" >&2
+  echo "usage: $(basename $0) MOZ-CENTRAL" >&2
   exit 1
 fi
 
-BASE_DIR="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
-dest=$1
+baseDir="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
+mozCentral="$1"
+dest="${mozCentral}/browser/extensions/shield-recipe-client"
 
-echo "Building XPI"
-npm run build > /dev/null
 echo "Clearing destination"
 rm -rf "${dest}"/*
-echo "Extracting XPI"
-unzip -quo "shield-recipe-client.xpi" -d "${dest}" > /dev/null
 
-echo "Adding tests"
-cp -r test "${dest}/test"
-
-### Adapt built addon to mozilla-central
-
-echo "Fixups:"
-
-echo " * Creating moz.build"
-echo "\
-# -*- Mode: python; indent-tabs-mode: nil; tab-width: 40 -*-
-# vim: set filetype=python:
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-DEFINES['MOZ_APP_VERSION'] = CONFIG['MOZ_APP_VERSION']
-DEFINES['MOZ_APP_MAXVERSION'] = CONFIG['MOZ_APP_MAXVERSION']
-
-FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
-  'bootstrap.js',
-  'index.js',
-  'install.rdf',
-  'lib',
-  'node_modules',
-  'package.json',
-  'test',
-]
-
-JETPACK_PACKAGE_MANIFESTS += ['test/jetpack-package.ini']
-" > "${dest}/moz.build"
-
-echo " * Patching install.rdf"
-sed -i \
-    -e '/<em:creator>/d' \
-    -e '/<em:optionsURL>/d' \
-    -e '/<em:optionsType>/d' \
-    "${dest}/install.rdf"
-
-echo " * Adding test manifest"
-cd test
-for file in test-*.js; do
-    echo "[${file}]" >> "${dest}/test/jetpack-package.ini"
-done
-cd ..
+echo "Placing add-on files"
+while read -r line || [[ -n "${line}" ]]; do
+  mkdir -p "$(dirname "${dest}/${line}")"
+  cp -rv "${baseDir}/${line}" "$(dirname "${dest}/${line}")"
+done < "${baseDir}/build-includes.txt"
 
 echo "Done"

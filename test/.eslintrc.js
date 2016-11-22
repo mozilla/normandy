@@ -2,7 +2,10 @@
 
 module.exports = {
   globals: {
-    console: false,
-    module: false,
+    add_task: false,
+    ok: false,
   },
+  rules: {
+    "require-yield": 0,
+  }
 };
