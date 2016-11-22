@@ -194,8 +194,11 @@ class DisconnectedRecipeList extends React.Component {
           >
             <Thead>
               {
-                displayedColumns.map(col =>
-                  <Th column={col.value}>
+                displayedColumns.map((col, index) =>
+                  <Th
+                    key={col.value + index}
+                    column={col.value}
+                  >
                     <span>{col.label}</span>
                   </Th>
                 )
