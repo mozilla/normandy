@@ -11,10 +11,11 @@ Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 
 this.EXPORTED_SYMBOLS = ["EnvExpressions"];
 
+
 const {Loader, Require} = Cu.import("resource://gre/modules/commonjs/toolkit/loader.js", {});
 const loader = new Loader({
   paths: {
-    "": "resource://shield-recipe-client-at-mozilla-dot-org/node_modules/",
+    "": "resource://shield-recipe-client/node_modules/",
   },
 });
 const require = new Require(loader, {});
