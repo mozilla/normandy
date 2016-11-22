@@ -255,8 +255,15 @@
 }
 
 /* Recipe List */
-.metadata-list {
-  .metadata-label {
-    font-weight: 800;
+.recipe-list {
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nested-list {
+    .nested-label {
+      font-weight: 800;
+    }
   }
 }
