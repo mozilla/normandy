@@ -2,7 +2,6 @@ import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
-import moment from 'moment';
 import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js';
 
 import RecipeFilters from './RecipeFilters';
@@ -80,10 +79,12 @@ class DisconnectedRecipeList extends React.Component {
       searchText: '',
       filteredRecipes: null,
       selectedFilter: 'All',
+      displayedColumns: [],
     };
 
     this.updateFilter = ::this.updateFilter;
     this.updateSearch = ::this.updateSearch;
+    this.onFilterChange = ::this.onFilterChange;
   }
 
   componentWillMount() {
@@ -96,18 +97,24 @@ class DisconnectedRecipeList extends React.Component {
     }
   }
 
-  title = 'Recipes';
-
-  viewRecipe(recipe) {
-    const { dispatch } = this.props;
-    dispatch(setSelectedRecipe(recipe.id));
-    dispatch(push(`/control/recipe/${recipe.id}/`));
+  onFilterChange(filters) {
+    this.setState({
+      displayedColumns: [].concat(filters || []),
+    });
   }
 
   updateSearch(event) {
     this.setState({
       searchText: event.target.value,
     });
+  }
+
+  title = 'Recipes';
+
+  viewRecipe(recipe) {
+    const { dispatch } = this.props;
+    dispatch(setSelectedRecipe(recipe.id));
+    dispatch(push(`/control/recipe/${recipe.id}/`));
   }
 
   updateFilter(filterStatus) {
@@ -127,8 +134,45 @@ class DisconnectedRecipeList extends React.Component {
     }
   }
 
+  renderTableCell(recipe) {
+    return ({ value }) => {
+      let displayValue = recipe[value];
+      // if the value is a straight up boolean value,
+      if (displayValue === true || displayValue === false) {
+        // switch the displayed value to a ×/✓ mark
+        displayValue = (
+          <BooleanIcon
+            value={displayValue}
+          />
+        );
+      } else if (typeof displayValue === 'object') {
+        displayValue = (
+          <ul className="nested-list">
+            {
+              /* Display each nested property in a list */
+              displayValue
+                .map((nestedProp, index) => (
+                  <li key={index}>
+                    <span className="nested-label">{nestedProp.label}:</span>
+                    {nestedProp.value}
+                  </li>
+                ))
+            }
+          </ul>
+        );
+      }
+
+      return (
+        <Td column={value}>
+          {displayValue}
+        </Td>
+      );
+    };
+  }
+
   render() {
     const { recipes } = this.props;
+    const { displayedColumns } = this.state;
     let filteredRecipes = this.state.filteredRecipes || recipes;
     filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
 
@@ -138,49 +182,35 @@ class DisconnectedRecipeList extends React.Component {
           {...this.state}
           updateFilter={this.updateFilter}
           updateSearch={this.updateSearch}
+          onFilterChange={this.onFilterChange}
         />
         <div className="fluid-8">
           <Table
-            id="recipe-list"
+            className="recipe-list"
             sortable
             hideFilterInput
             filterable={['name', 'action', 'metadata']}
             filterBy={this.state.searchText}
           >
             <Thead>
-              <Th column="name"><span>Name</span></Th>
-              <Th column="action"><span>Action Name</span></Th>
-              <Th column="enabled"><span>Enabled</span></Th>
-              <Th column="last_updated"><span>Last Updated</span></Th>
-              <Th column="metadata"><span>Metadata</span></Th>
+              {
+                displayedColumns.map(col =>
+                  <Th column={col.value}>
+                    <span>{col.label}</span>
+                  </Th>
+                )
+              }
             </Thead>
             {filteredRecipes.map(recipe =>
-              <Tr key={recipe.id} onClick={() => { this.viewRecipe(recipe); }}>
-                <Td column="name">{recipe.name}</Td>
-                <Td column="action">{recipe.action}</Td>
-                <Td column="enabled" value={recipe.enabled}>
-                  <BooleanIcon value={recipe.enabled} />
-                </Td>
-                <Td column="last_updated" value={recipe.last_updated}>
-                  {moment(recipe.last_updated).fromNow()}
-                </Td>
-                <Td column="metadata" value={recipe.searchData}>
-                  <ul className="metadata-list">
-                    {
-                      /* Display each metadata property in a list */
-                      recipe.metaData
-                        .map((metaProp, index) => (
-                          <li key={index}>
-                            <span className="metadata-label">{metaProp.label}:</span>
-                            {metaProp.value}
-                          </li>
-                        ))
-                    }
-                  </ul>
-                </Td>
+              <Tr
+                key={recipe.id}
+                onClick={() => { this.viewRecipe(recipe); }}
+              >
+                {
+                  displayedColumns.map(this.renderTableCell(recipe))
+                }
               </Tr>
-              )
-            }
+            )}
           </Table>
         </div>
       </div>
