@@ -1,0 +1,14 @@
+.column-menu {
+  input {
+    display: inline-block;
+    margin-right: 0.5em;
+  }
+  
+  li {
+    margin: 0.5em 0;
+  }
+
+  label {
+    cursor: pointer;
+  }
+}
