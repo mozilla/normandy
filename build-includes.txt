@@ -1,6 +1,6 @@
 bootstrap.js
 data
-install.rdf
+install.rdf.in
 lib
 moz.build
 node_modules/jexl/lib
