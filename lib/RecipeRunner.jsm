@@ -50,7 +50,7 @@ this.RecipeRunner = {
       return false;
     }
 
-    const apiUrl = Preferences.get(PREF_API_URL);
+    const apiUrl = Preferences.get(PREF_API_URL, '');
     if (!apiUrl.startsWith("https://")) {
       Log.error(`Non HTTPS URL provided: ${apiUrl}`);
       return false;
