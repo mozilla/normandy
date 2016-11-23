@@ -3,18 +3,19 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { SubmissionError } from 'redux-form';
 
-import { RecipeForm, formConfig, initialValuesWrapper } from '../../components/RecipeForm.js';
-import ConsoleLogFields from '../../components/action_fields/ConsoleLogFields.js';
+import { RecipeForm, formConfig, initialValuesWrapper } from 'control/components/RecipeForm.js';
+import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields.js';
 import { recipeFactory } from '../../../tests/utils.js';
 
 /**
  * Creates mock required props for RecipeForm.
  */
 function propFactory(props = {}) {
-  return Object.assign({
+  return {
     handleSubmit: () => undefined,
     submitting: false,
-  }, props);
+    ...props,
+  };
 }
 
 describe('<RecipeForm>', () => {

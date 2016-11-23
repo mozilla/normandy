@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { HistoryItem, HistoryList } from '../../components/RecipeHistory.js';
+import { HistoryItem, HistoryList } from 'control/components/RecipeHistory.js';
 
 describe('Recipe history components', () => {
   describe('<HistoryList>', () => {

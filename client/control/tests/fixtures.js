@@ -5,11 +5,19 @@ export const fixtureRecipes = [
 ];
 
 export const initialState = {
-  recipes: null,
-  isFetching: false,
-  selectedRecipe: null,
-  recipeListNeedsFetch: true,
+  controlApp: {
+    isFetching: false,
+  },
+  recipes: {
+    list: [],
+    selectedRecipe: null,
+    recipeListNeedsFetch: true,
+  },
   notifications: [],
+  form: {},
+  routing: {
+    locationBeforeTransitions: null,
+  },
 };
 
 export const fixtureRevisions = [

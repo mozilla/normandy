@@ -1,5 +1,10 @@
-import NormandyDriver from './normandy_driver.js';
-import { fetchRecipes, filterContext, doesRecipeMatch, runRecipe } from './self_repair_runner.js';
+import NormandyDriver from 'selfrepair/normandy_driver';
+import {
+  fetchRecipes,
+  filterContext,
+  doesRecipeMatch,
+  runRecipe,
+} from 'selfrepair/self_repair_runner';
 
 const driver = new NormandyDriver();
 driver.registerCallbacks();

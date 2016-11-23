@@ -32,3 +32,7 @@ rules:
   # generator-star-spacing is broken with parser: babel-eslint. Use a patched version
   generator-star-spacing: [off]
   babel/generator-star-spacing: [warn]
+settings:
+  import/resolver:
+    webpack:
+      config: 'webpack.config.js'

@@ -93,6 +93,15 @@ module.exports = [
         },
       ],
     },
+
+    resolve: {
+      alias: {
+        actions: path.resolve(__dirname, './client/actions'),
+        control: path.resolve(__dirname, './client/control'),
+        selfrepair: path.resolve(__dirname, './client/selfrepair'),
+        tests: path.resolve(__dirname, './client/tests'),
+      },
+    },
   },
   {
     devtool: production ? undefined : 'cheap-module-eval-source-map',
