@@ -34,9 +34,6 @@ if (production) {
         warnings: false,
       },
     }),
-  ]);
-} else {
-  plugins = plugins.concat([
     new webpack.NoErrorsPlugin(),
   ]);
 }
@@ -44,7 +41,7 @@ if (production) {
 module.exports = [
   {
     context: __dirname,
-    devtool: production ? undefined : 'cheap-module-eval-source-map',
+    devtool: production ? undefined : 'source-map',
 
     entry: {
       selfrepair: [
@@ -95,7 +92,7 @@ module.exports = [
     },
   },
   {
-    devtool: production ? undefined : 'cheap-module-eval-source-map',
+    devtool: production ? undefined : 'source-map',
 
     entry: {
       'console-log': './client/actions/console-log/index',
