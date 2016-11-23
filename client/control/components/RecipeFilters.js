@@ -132,7 +132,12 @@ export default class RecipeFilters extends React.Component {
         </div>
         <div className="fluid-8">
           <DropdownMenu
-            trigger={<button>Menu!</button>}
+            trigger={
+              <span>
+                <span className="fa fa-columns" />
+                Columns
+              </span>
+            }
           >
             <ColumnMenu
               columns={this.state.columns}
