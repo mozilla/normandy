@@ -33,12 +33,12 @@ export default class DropdownMenu extends React.Component {
         >
           { this.props.trigger }
         </div>
-        <div className="dropdown-content">
-          {
-            this.state.isVisible &&
-            this.props.children
-          }
-        </div>
+        {
+          this.state.isVisible &&
+            <div className="dropdown-content">
+              { this.props.children }
+            </div>
+        }
       </div>
     );
   }
