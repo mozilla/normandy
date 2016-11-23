@@ -21,20 +21,18 @@ export default class ColumnMenu extends React.Component {
   render() {
     const { columns } = this.props;
     return (
-      <ul>
+      <ul className="column-menu">
         {
           (columns).map((option, index) =>
             <li key={option.value + index}>
-              <label htmlFor={option.value}>
+              <label>
                 <input
                   name={option.value}
                   type="checkbox"
                   checked={option.enabled}
                   onChange={this.handleInputChange(index)}
                 />
-                <span>
-                  { option.label }
-                </span>
+                { option.label }
               </label>
             </li>
           )
