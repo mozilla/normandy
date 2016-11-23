@@ -9,7 +9,10 @@ DEFINES['MOZ_APP_MAXVERSION'] = CONFIG['MOZ_APP_MAXVERSION']
 
 FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
   'bootstrap.js',
-  'install.rdf',
+]
+
+FINAL_TARGET_PP_FILES.features['shield-recipe-client@mozilla.org'] += [
+  'install.rdf.in'
 ]
 
 BROWSER_CHROME_MANIFESTS += [
