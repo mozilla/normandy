@@ -2,6 +2,7 @@ import React, { PropTypes as pt } from 'react';
 import * as localForage from 'localforage';
 
 import SwitchFilter from './SwitchFilter.js';
+import DropdownMenu from './DropdownMenu.js';
 import ColumnMenu from './ColumnMenu.js';
 
 export default class RecipeFilters extends React.Component {
@@ -130,10 +131,14 @@ export default class RecipeFilters extends React.Component {
           </div>
         </div>
         <div className="fluid-8">
-          <ColumnMenu
-            columns={this.state.columns}
-            onInputChange={this.handleColumnInput}
-          />
+          <DropdownMenu
+            trigger={<button>Menu!</button>}
+          >
+            <ColumnMenu
+              columns={this.state.columns}
+              onInputChange={this.handleColumnInput}
+            />
+          </DropdownMenu>
         </div>
       </div>
     );
