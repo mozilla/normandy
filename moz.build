@@ -7,15 +7,13 @@
 DEFINES['MOZ_APP_VERSION'] = CONFIG['MOZ_APP_VERSION']
 DEFINES['MOZ_APP_MAXVERSION'] = CONFIG['MOZ_APP_MAXVERSION']
 
-FINAL_TARGET_FILES.features['shield-recipe-client'] += [
+FINAL_TARGET_FILES.features['shield-recipe-client@mozilla.org'] += [
   'bootstrap.js',
   'install.rdf',
-  'lib',
-  'node_modules',
-  'package.json',
-  'test',
 ]
 
 BROWSER_CHROME_MANIFESTS += [
     'test/browser.ini',
 ]
+
+JAR_MANIFESTS += ['jar.mn']
