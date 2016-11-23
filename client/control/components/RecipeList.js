@@ -163,7 +163,10 @@ class DisconnectedRecipeList extends React.Component {
       }
 
       return (
-        <Td column={value}>
+        <Td
+          column={value}
+          data={displayValue}
+        >
           {displayValue}
         </Td>
       );
