@@ -3,8 +3,8 @@ import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
-import controlStore from './stores/ControlStore.js';
-import ControlAppRoutes from './routes.js';
+import configureStore from 'control/stores/configureStore';
+import ControlAppRoutes from 'control/routes';
 
 /**
  * Root Component for the entire app.
@@ -27,7 +27,7 @@ Root.propTypes = {
  * Initialize Redux store, history, and root component.
  */
 export function createApp() {
-  const store = controlStore();
+  const store = configureStore();
   const history = syncHistoryWithStore(browserHistory, store);
 
   return {

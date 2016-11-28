@@ -17,12 +17,13 @@ import {
   recipeAdded,
   showNotification,
   setSelectedRecipe,
-} from '../actions/ControlActions.js';
-import composeRecipeContainer from './RecipeContainer.js';
-import { ControlField } from './Fields.js';
-import HeartbeatFields from './action_fields/HeartbeatFields.js';
-import ConsoleLogFields from './action_fields/ConsoleLogFields.js';
-import JexlEnvironment from '../../selfrepair/JexlEnvironment.js';
+} from 'control/actions/ControlActions';
+import composeRecipeContainer from 'control/components/RecipeContainer';
+import { ControlField } from 'control/components/Fields';
+import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
+import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+import JexlEnvironment from 'selfrepair/JexlEnvironment';
+
 
 export const selector = formValueSelector('recipe');
 

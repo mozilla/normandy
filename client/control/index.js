@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom';
-import { createApp } from './app.js';
+import { createApp } from 'control/app';
 
 // Initialize the control app and render it.
 const app = createApp();

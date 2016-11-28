@@ -2,7 +2,10 @@ import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
-import { makeApiRequest, recipesReceived, setSelectedRecipe } from '../actions/ControlActions.js';
+
+import classNames from 'classnames';
+import moment from 'moment';
+import { makeApiRequest, recipesReceived, setSelectedRecipe } from 'control/actions/ControlActions';
 
 import RecipeFilters from './RecipeFilters';
 
@@ -228,14 +231,13 @@ DisconnectedRecipeList.propTypes = {
   dispatch: pt.func.isRequired,
   isFetching: pt.bool.isRequired,
   recipeListNeedsFetch: pt.bool.isRequired,
-  recipe: pt.object.isRequired,
   recipes: pt.array.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  recipes: state.controlApp.recipes || [],
+  recipes: state.recipes.list || [],
   dispatch: ownProps.dispatch,
-  recipeListNeedsFetch: state.controlApp.recipeListNeedsFetch,
+  recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
 });
 

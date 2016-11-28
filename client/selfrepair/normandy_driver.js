@@ -1,6 +1,6 @@
 import uuid from 'node-uuid';
 
-import Mozilla from './uitour.js';
+import Mozilla from 'selfrepair/uitour';
 
 export const STORAGE_DURABILITY_KEY = '_storageDurability';
 
@@ -228,22 +228,6 @@ export default class NormandyDriver {
           }
         });
       });
-    });
-  }
-
-  saveHeartbeatFlow(data) {
-    if (this.testing) {
-      this.log('Pretending to send flow to Input');
-      this.log(data);
-      return Promise.resolve();
-    }
-    return fetch('https://input.mozilla.org/api/v2/hb/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
     });
   }
 
