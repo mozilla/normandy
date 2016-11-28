@@ -1,6 +1,5 @@
 import React, { PropTypes as pt } from 'react';
 import * as localForage from 'localforage';
-import Fuse from 'fuse.js';
 
 import SwitchFilter from './SwitchFilter.js';
 import GroupMenu from './GroupMenu.js';
@@ -154,23 +153,6 @@ export default class RecipeFilters extends React.Component {
       updateFilter,
     } = this.props;
 
-    const options = {
-      shouldSort: true,
-      tokenize: true,
-      matchAllTokens: true,
-      threshold: 0.7,
-      location: 0,
-      distance: 5,
-      maxPatternLength: 32,
-      keys: [
-        'label',
-        'value',
-        'options.label',
-        'options.value',
-      ],
-    };
-    this.fuse = this.fuse || new Fuse(RecipeFilters.filterOptionGroups, options);
-    const result = this.fuse.search(searchText);
 
     return (
       <div className="fluid-8">
@@ -196,7 +178,7 @@ export default class RecipeFilters extends React.Component {
         </div>
         <div className="fluid-8">
           <GroupMenu
-            data={searchText ? result : RecipeFilters.filterOptionGroups}
+            data={searchText ? [] : RecipeFilters.filterOptionGroups}
           />
           <DropdownMenu
             trigger={
