@@ -231,22 +231,6 @@ export default class NormandyDriver {
     });
   }
 
-  saveHeartbeatFlow(data) {
-    if (this.testing) {
-      this.log('Pretending to send flow to Input');
-      this.log(data);
-      return Promise.resolve();
-    }
-    return fetch('https://input.mozilla.org/api/v2/hb/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-  }
-
   showHeartbeat(options) {
     return new Promise(resolve => {
       const emitter = new HeartbeatEmitter();

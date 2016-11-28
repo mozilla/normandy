@@ -3,95 +3,6 @@ import { Action, registerAction } from '../utils';
 const VERSION = 55; // Increase when changed.
 const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
 
-
-export class HeartbeatFlow {
-  constructor(action) {
-    this.action = action;
-    const { normandy, recipe, client, location } = action;
-
-    const flashPlugin = client.plugins['Shockwave Flash'];
-    const plugins = {};
-    for (const pluginName in client.plugins) {
-      if (!client.plugins.hasOwnProperty(pluginName)) {
-        continue;
-      }
-      const plugin = client.plugins[pluginName];
-      plugins[plugin.name] = plugin.version;
-    }
-
-    this.data = {
-      // Required fields
-      response_version: 2,
-      experiment_version: '-',
-      person_id: 'NA',
-      survey_id: recipe.arguments.surveyId,
-      flow_id: normandy.uuid(),
-      question_id: recipe.arguments.message.slice(0, 50),
-      updated_ts: Date.now(),
-      question_text: recipe.arguments.message,
-      variation_id: recipe.revision_id.toString(),
-
-      // Optional fields
-      score: null,
-      max_score: 5,
-      flow_began_ts: Date.now(),
-      flow_offered_ts: 0,
-      flow_voted_ts: 0,
-      flow_engaged_ts: 0,
-      platform: 'UNK',
-      channel: client.channel.slice(0, 50),
-      version: client.version.slice(0, 50),
-      locale: normandy.locale.slice(0, 50),
-      country: (location.countryCode || 'unk').toLowerCase().slice(0, 4),
-      build_id: '-',
-      partner_id: '-',
-      profile_age: 0,
-      profile_usage: {},
-      addons: {
-        addons: [],
-      },
-      extra: {
-        crashes: {},
-        engage: [],
-        numflows: 0,
-        searchEngine: client.searchEngine,
-        syncSetup: client.syncSetup,
-        defaultBrowser: client.isDefaultBrowser,
-        plugins,
-        flashVersion: flashPlugin ? flashPlugin.version : undefined,
-      },
-      is_test: normandy.testing,
-    };
-  }
-
-  get id() {
-    return this.data.flow_id;
-  }
-
-  save() {
-    this.data.updated_ts = Date.now();
-
-    const { normandy } = this.action;
-    normandy.saveHeartbeatFlow(this.data);
-  }
-
-  addLink(href, source) {
-    this.data.extra.engage.push([Date.now(), href, source]);
-  }
-
-  setPhaseTimestamp(phase, timestamp) {
-    const key = `flow_${phase}_ts`;
-    if (key in this.data && this.data[key] === 0) {
-      this.data[key] = timestamp;
-    }
-  }
-
-  setScore(score) {
-    this.data.score = score;
-  }
-}
-
-
 export default class ShowHeartbeatAction extends Action {
   constructor(normandy, recipe) {
     super(normandy, recipe);
@@ -121,9 +32,6 @@ export default class ShowHeartbeatAction extends Action {
 
     this.location = await this.normandy.location();
     this.client = await this.normandy.client();
-
-    const flow = new HeartbeatFlow(this);
-    flow.save();
 
     let userId;
     let heartbeatSurveyId = surveyId;
@@ -155,7 +63,7 @@ export default class ShowHeartbeatAction extends Action {
       }),
       learnMoreMessage,
       learnMoreUrl,
-      flowId: flow.id,
+      flowId: this.normandy.uuid(),
       surveyVersion: this.recipe.revision_id,
     };
 
@@ -163,29 +71,7 @@ export default class ShowHeartbeatAction extends Action {
       heartbeatData.testing = 1;
     }
 
-    const heartbeat = await this.normandy.showHeartbeat(heartbeatData);
-
-    heartbeat.on('NotificationOffered', data => {
-      flow.setPhaseTimestamp('offered', data.timestamp);
-      flow.save();
-    });
-
-    heartbeat.on('LearnMore', () => {
-      flow.addLink(this.recipe.arguments.learnMoreUrl, 'notice');
-      flow.save();
-    });
-
-    heartbeat.on('Voted', data => {
-      flow.setScore(data.score);
-      flow.setPhaseTimestamp('voted', data.timestamp);
-      flow.save();
-    });
-
-    heartbeat.on('Engaged', data => {
-      flow.setPhaseTimestamp('engaged', data.timestamp);
-      flow.save();
-    });
-
+    await this.normandy.showHeartbeat(heartbeatData);
     this.setLastShownDate();
   }
 

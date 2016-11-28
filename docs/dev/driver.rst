@@ -131,13 +131,6 @@ The driver object contains the following attributes:
    countryCode
       ISO 3166-1 country code for the country the user has been geolocated to.
 
-.. js:function:: saveHeartbeatFlow(data)
-
-   Sends flow data from Heartbeat to the Input server. See the
-   `Input documentation`_ for details about the data expected.
-
-   :param data: Object containing Heartbeat flow data.
-
 .. _Input Documentation: http://fjord.readthedocs.org/en/latest/hb_api.html
 
 .. js:function:: client()

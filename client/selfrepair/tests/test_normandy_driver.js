@@ -1,11 +1,8 @@
-import fetchMock from 'fetch-mock';
-
 import NormandyDriver, {
   HeartbeatEmitter,
   LocalStorage,
   STORAGE_DURABILITY_KEY,
 } from '../normandy_driver.js';
-import { urlPathMatcher } from '../../tests/utils.js';
 import { MockStorage } from '../../actions/tests/utils.js';
 
 describe('Normandy Driver', () => {
@@ -66,44 +63,6 @@ describe('Normandy Driver', () => {
       emitter.on('NotificationOffered', offerSpy);
       observer('Heartbeat:NotificationOffered', offerData);
       expect(offerSpy).toHaveBeenCalledWith(offerData);
-    });
-  });
-
-  describe('saveHeartbeatFlow', () => {
-    const driver = new NormandyDriver();
-
-    afterEach(() => {
-      expect(fetchMock.calls().unmatched).toEqual([]);
-      fetchMock.restore();
-    });
-
-    beforeEach(() => {
-      fetchMock.get(urlPathMatcher('/api/v2/hb/'), 200);
-    });
-
-    it('should not POST data if in testing mode', async () => {
-      driver.testing = true;
-      await driver.saveHeartbeatFlow({
-        flowId: '123456789',
-      });
-
-      expect(fetchMock.calls().matched.length).toEqual(0);
-    });
-
-    it('should POST flow data to input', async () => {
-      driver.testing = false;
-      await driver.saveHeartbeatFlow({
-        flowId: '123456789',
-      });
-
-      expect(fetchMock.lastOptions()).toEqual({
-        method: 'POST',
-        body: '{"flowId":"123456789"}',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
     });
   });
 
