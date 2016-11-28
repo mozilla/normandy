@@ -1,7 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import * as localForage from 'localforage';
 
-import SwitchFilter from './SwitchFilter.js';
 import GroupMenu from './GroupMenu.js';
 import DropdownMenu from './DropdownMenu.js';
 import ColumnMenu from './ColumnMenu.js';
@@ -149,15 +148,12 @@ export default class RecipeFilters extends React.Component {
     const {
       searchText,
       updateSearch,
-      selectedFilter,
-      updateFilter,
     } = this.props;
-
 
     return (
       <div className="fluid-8">
         <div id="secondary-header" className="fluid-8">
-          <div className="fluid-2">
+          <div className="header-search" className="fluid-2">
             <div className="search input-with-icon">
               <input
                 type="text"
@@ -168,31 +164,25 @@ export default class RecipeFilters extends React.Component {
             </div>
           </div>
           <div id="filters-container" className="fluid-6">
-            <h4>Filter By:</h4>
-            <SwitchFilter
-              options={['All', 'Enabled', 'Disabled']}
-              selectedFilter={selectedFilter}
-              updateFilter={updateFilter}
-            />
+            <DropdownMenu
+              trigger={
+                <span>
+                  <span className="fa fa-columns" />
+                  Columns
+                </span>
+              }
+            >
+              <ColumnMenu
+                columns={this.state.columns}
+                onInputChange={this.handleColumnInput}
+              />
+            </DropdownMenu>
           </div>
         </div>
         <div className="fluid-8">
           <GroupMenu
             data={searchText ? [] : RecipeFilters.filterOptionGroups}
           />
-          <DropdownMenu
-            trigger={
-              <span>
-                <span className="fa fa-columns" />
-                Columns
-              </span>
-            }
-          >
-            <ColumnMenu
-              columns={this.state.columns}
-              onInputChange={this.handleColumnInput}
-            />
-          </DropdownMenu>
         </div>
       </div>
     );
