@@ -1,62 +1,21 @@
 import React, { PropTypes as pt } from 'react';
 import * as localForage from 'localforage';
+import { connect } from 'react-redux';
 
-import GroupMenu from './GroupMenu.js';
-import DropdownMenu from './DropdownMenu.js';
-import ColumnMenu from './ColumnMenu.js';
+import GroupMenu from 'control/components/GroupMenu';
+import DropdownMenu from 'control/components/DropdownMenu';
+import ColumnMenu from 'control/components/ColumnMenu';
 
-export default class RecipeFilters extends React.Component {
+class RecipeFilters extends React.Component {
   static propTypes = {
     searchText: pt.string.isRequired,
-    selectedFilter: pt.any.isRequired,
     updateSearch: pt.func.isRequired,
     updateFilter: pt.func.isRequired,
     onFilterChange: pt.func.isRequired,
+    // connected
+    availableFilters: pt.array.isRequired,
+    selectedFilters: pt.array.isRequired,
   };
-
-  static filterOptionGroups = [{
-    label: 'Status',
-    value: 'status',
-    options: [{
-      label: 'Enabled',
-      value: 'enabled',
-    }, {
-      label: 'Disabled',
-      value: 'disabled',
-    }],
-  }, {
-    label: 'Channel',
-    value: 'channel',
-    options: [{
-      label: 'Release',
-      value: 'release',
-    }, {
-      label: 'Beta',
-      value: 'beta',
-    }, {
-      label: 'Aurora / Developer Edition',
-      value: 'aurora',
-    }, {
-      label: 'Nightly',
-      value: 'nightly',
-    }],
-  }, {
-    label: 'Locale',
-    value: 'locale',
-    options: [{
-      label: 'English (US)',
-      value: 'en-US',
-    }, {
-      label: 'English (UK)',
-      value: 'en-UK',
-    }, {
-      label: 'German',
-      value: 'de',
-    }, {
-      label: 'Russian',
-      value: 'ru',
-    }],
-  }];
 
   static defaultColumnConfig = [{
     label: 'Name',
@@ -107,7 +66,7 @@ export default class RecipeFilters extends React.Component {
     this.handleFilterChange = ::this.handleFilterChange;
     this.handleColumnInput = ::this.handleColumnInput;
 
-    this.handleFilterChange();
+    this.handleFilterChange(true);
   }
 
   componentWillMount() {
@@ -166,7 +125,7 @@ export default class RecipeFilters extends React.Component {
     let result;
 
     if (searchText) {
-      result = this.filterGroups(RecipeFilters.filterOptionGroups, searchText);
+      result = this.filterGroups(this.props.availableFilters, searchText);
     }
 
     return (
@@ -200,10 +159,19 @@ export default class RecipeFilters extends React.Component {
         </div>
         <div className="fluid-8">
           <GroupMenu
-            data={searchText ? result : RecipeFilters.filterOptionGroups}
+            data={searchText ? result : this.props.availableFilters}
           />
         </div>
       </div>
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  availableFilters: state.filters.available || [],
+  selectedFilters: state.filters.selected || [],
+});
+
+export default connect(
+  mapStateToProps
+)(RecipeFilters);
