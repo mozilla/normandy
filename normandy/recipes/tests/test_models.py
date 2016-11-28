@@ -8,10 +8,9 @@ from django.utils import timezone
 import pytest
 
 from normandy.base.tests import Whatever
-from normandy.recipes.models import ApprovalRequest, Client, Recipe
+from normandy.recipes.models import Client, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
-    ApprovalRequestFactory,
     RecipeFactory,
     SignatureFactory,
 )
@@ -80,7 +79,6 @@ class TestRecipe(object):
     def test_canonical_json(self):
         recipe = RecipeFactory.build(
             action=ActionFactory(name='action'),
-            approval=None,
             arguments={'foo': 1, 'bar': 2},
             enabled=False,
             filter_expression='2 + 2 == 4',
@@ -93,9 +91,7 @@ class TestRecipe(object):
         expected = (
             '{'
             '"action":"action",'
-            '"approval":null,'
             '"arguments":{"bar":2,"foo":1},'
-            '"current_approval_request":null,'
             '"enabled":false,'
             '"filter_expression":"2 + 2 == 4",'
             '"id":%(id)s,'
@@ -211,26 +207,6 @@ class TestRecipeQueryset(object):
         assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
         signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
         assert signatures == ['fake signature 1', 'fake signature 2']
-
-
-@pytest.mark.django_db
-class TestApprovalRequest(object):
-    def test_only_one_open_request_for_recipe(self):
-        recipe = RecipeFactory()
-        ApprovalRequestFactory(recipe=recipe, active=False)
-
-        # Should be able to create a new request because last one was not active
-        ApprovalRequestFactory(recipe=recipe, active=True)
-
-        # Should not be able to create a new request because an open request exists
-        with pytest.raises(ApprovalRequest.ActiveRequestAlreadyExists):
-            ApprovalRequestFactory(recipe=recipe, active=True)
-
-    def test_can_save_open_request(self):
-        request = ApprovalRequestFactory(active=True)
-
-        # Should be able to call save without an integrity error
-        request.save()
 
 
 class TestClient(object):

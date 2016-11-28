@@ -25,9 +25,6 @@ class TestRecipeSerializer:
             'arguments': {
                 'foo': 'bar',
             },
-            'current_approval_request': Whatever(),
-            'approval': Whatever(),
-            'is_approved': recipe.is_approved
         }
 
     # If the action specified cannot be found, raise validation
@@ -153,9 +150,6 @@ class TestSignedRecipeSerializer:
                 'revision_id': recipe.revision_id,
                 'action': action.name,
                 'arguments': recipe.arguments,
-                'current_approval_request': Whatever(),
-                'approval': Whatever(),
-                'is_approved': recipe.is_approved,
                 'last_updated': Whatever(),
             }
         }
