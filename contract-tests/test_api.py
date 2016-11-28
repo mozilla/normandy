@@ -17,7 +17,7 @@ def check_action_schema_format(action):
         assert jsonschema.validate(action['arguments_schema'], schema) is None
 
 
-@testrail('C5603')
+@testrail('C7108')
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -33,7 +33,7 @@ def test_expected_action_types(conf, requests_session):
         assert record['name'] in expected_records
 
 
-@testrail('C5604')
+@testrail('C7109')
 def test_console_log(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -62,7 +62,7 @@ def test_console_log(conf, requests_session):
     check_action_schema_format(record)
 
 
-@testrail('C5605')
+@testrail('C7110')
 def test_show_heartbeat(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -90,7 +90,7 @@ def test_show_heartbeat(conf, requests_session):
     check_action_schema_format(record)
 
 
-@testrail('C6570')
+@testrail('C7113')
 def test_recipe_signatures(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/signed/')
     r.raise_for_status()
