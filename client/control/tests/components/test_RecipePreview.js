@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { UnwrappedRecipePreview } from '../../components/RecipePreview.js';
+import { UnwrappedRecipePreview } from 'control/components/RecipePreview.js';
 
 describe('Recipe preview components', () => {
   describe('<UnwrappedRecipePreview>', () => {

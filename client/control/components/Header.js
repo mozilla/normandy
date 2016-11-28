@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import Breadcrumbs from 'react-breadcrumbs';
 import APITokenExpander from './APITokenExpander.js';
+import absolutePath from '../../utils/absolute-path';
 
 function Header({
   pageType: { ctaButtons },
@@ -15,7 +16,7 @@ function Header({
   let ctaBtns;
   if (ctaButtons) {
     ctaBtns = ctaButtons.map(({ text, icon, link }, index) =>
-      <Link className="button" to={currentLocation + link} key={index}>
+      <Link className="button" to={absolutePath(currentLocation, link)} key={index}>
         <i className={`pre fa fa-${icon}`} /> {text}
       </Link>
     );

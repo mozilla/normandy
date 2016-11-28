@@ -1,60 +1,76 @@
-import controlAppReducer from '../../reducers/ControlAppReducer';
-import * as actions from '../../actions/ControlActions';
-import { fixtureRecipes, initialState } from '../fixtures.js';
+import appReducer from 'control/reducers';
+import * as actions from 'control/actions/ControlActions';
+import {
+  fixtureRecipes,
+  initialState,
+} from 'control/tests/fixtures';
 
 describe('controlApp reducer', () => {
   it('should return initial state by default', () => {
-    expect(controlAppReducer(undefined, {})).toEqual(initialState);
+    expect(appReducer(undefined, {})).toEqual(initialState);
   });
 
   it('should handle REQUEST_IN_PROGRESS', () => {
-    expect(controlAppReducer(undefined, {
+    expect(appReducer(undefined, {
       type: actions.REQUEST_IN_PROGRESS,
     })).toEqual({
       ...initialState,
-      isFetching: true,
+      controlApp: {
+        isFetching: true,
+      },
     });
   });
 
   it('should handle REQUEST_COMPLETE', () => {
-    expect(controlAppReducer(undefined, {
+    expect(appReducer(undefined, {
       type: actions.REQUEST_COMPLETE,
     })).toEqual({
       ...initialState,
-      isFetching: false,
+      controlApp: {
+        isFetching: false,
+      },
     });
   });
 
   it('should handle RECIPES_RECEIVED', () => {
-    expect(controlAppReducer(undefined, {
+    expect(appReducer(undefined, {
       type: actions.RECIPES_RECEIVED,
       recipes: fixtureRecipes,
     })).toEqual({
       ...initialState,
-      recipes: fixtureRecipes,
-      recipeListNeedsFetch: false,
+      recipes: {
+        list: fixtureRecipes,
+        selectedRecipe: null,
+        recipeListNeedsFetch: false,
+      },
     });
   });
 
   it('should handle SINGLE_RECIPE_RECEIVED', () => {
-    expect(controlAppReducer(undefined, {
+    expect(appReducer(undefined, {
       type: actions.SINGLE_RECIPE_RECEIVED,
       recipe: fixtureRecipes[0],
     })).toEqual({
       ...initialState,
-      recipes: [fixtureRecipes[0]],
-      recipeListNeedsFetch: true,
-      selectedRecipe: 1,
+      recipes: {
+        list: [fixtureRecipes[0]],
+        selectedRecipe: 1,
+        recipeListNeedsFetch: true,
+      },
     });
   });
 
   it('should handle SET_SELECTED_RECIPE', () => {
-    expect(controlAppReducer(undefined, {
+    expect(appReducer(undefined, {
       type: actions.SET_SELECTED_RECIPE,
       recipeId: 2,
     })).toEqual({
       ...initialState,
-      selectedRecipe: 2,
+      recipes: {
+        list: [],
+        selectedRecipe: 2,
+        recipeListNeedsFetch: true,
+      },
     });
   });
 
@@ -68,7 +84,7 @@ describe('controlApp reducer', () => {
       id: 5,
     };
 
-    expect(controlAppReducer(undefined, {
+    expect(appReducer(undefined, {
       type: actions.SHOW_NOTIFICATION,
       notification,
     })).toEqual({
@@ -78,8 +94,16 @@ describe('controlApp reducer', () => {
   });
 
   describe('DISMISS_NOTIFICATION', () => {
-    const notification1 = { messageType: 'success', message: 'message1', id: 1 };
-    const notification2 = { messageType: 'success', message: 'message2', id: 2 };
+    const notification1 = {
+      messageType: 'success',
+      message: 'message1',
+      id: 1,
+    };
+    const notification2 = {
+      messageType: 'success',
+      message: 'message2',
+      id: 2,
+    };
     const startState = {
       ...initialState,
       notifications: [notification1, notification2],
@@ -87,7 +111,7 @@ describe('controlApp reducer', () => {
 
     it('should remove matching notifications from the notification list', () => {
       expect(
-        controlAppReducer(startState, {
+        appReducer(startState, {
           type: actions.DISMISS_NOTIFICATION,
           notificationId: notification1.id,
         })
@@ -99,7 +123,10 @@ describe('controlApp reducer', () => {
 
     it('should not remove any notifications when an invalid id is given', () => {
       expect(
-        controlAppReducer(startState, { type: actions.DISMISS_NOTIFICATION, id: 99999 })
+        appReducer(startState, {
+          type: actions.DISMISS_NOTIFICATION,
+          id: 99999,
+        })
       ).toEqual({
         ...initialState,
         notifications: [notification1, notification2],
@@ -108,7 +135,7 @@ describe('controlApp reducer', () => {
   });
 
   it('should handle RECIPE_ADDED', () => {
-    expect(controlAppReducer(initialState, {
+    expect(appReducer(initialState, {
       type: actions.RECIPE_ADDED,
       recipe: {
         id: 4,
@@ -117,16 +144,26 @@ describe('controlApp reducer', () => {
       },
     })).toEqual({
       ...initialState,
-      recipes: [{
-        id: 4,
-        name: 'Villis stebulum',
-        enabled: false,
-      }],
+      recipes: {
+        list: [{
+          id: 4,
+          name: 'Villis stebulum',
+          enabled: false,
+        }],
+        selectedRecipe: null,
+        recipeListNeedsFetch: true,
+      },
     });
   });
 
   it('should handle RECIPE_UPDATED', () => {
-    expect(controlAppReducer({ recipes: fixtureRecipes }, {
+    expect(appReducer({
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        list: fixtureRecipes,
+      },
+    }, {
       type: actions.RECIPE_UPDATED,
       recipe: {
         id: 3,
@@ -134,39 +171,54 @@ describe('controlApp reducer', () => {
         enabled: true,
       },
     })).toEqual({
-      recipes: [{
-        id: 1,
-        name: 'Lorem Ipsum',
-        enabled: true,
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        list: [{
+          id: 1,
+          name: 'Lorem Ipsum',
+          enabled: true,
+        }, {
+          id: 2,
+          name: 'Dolor set amet',
+          enabled: true,
+        }, {
+          id: 3,
+          name: 'Updated recipe name',
+          enabled: true,
+        }],
+        selectedRecipe: null,
+        recipeListNeedsFetch: true,
       },
-      {
-        id: 2,
-        name: 'Dolor set amet',
-        enabled: true,
-      },
-      {
-        id: 3,
-        name: 'Updated recipe name',
-        enabled: true,
-      }],
     });
   });
 
   it('should handle RECIPE_DELETED', () => {
-    expect(controlAppReducer({ recipes: fixtureRecipes }, {
+    expect(appReducer({
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        list: fixtureRecipes,
+      },
+    }, {
       type: actions.RECIPE_DELETED,
       recipeId: 3,
     })).toEqual({
-      recipes: [{
-        id: 1,
-        name: 'Lorem Ipsum',
-        enabled: true,
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        list: [{
+          id: 1,
+          name: 'Lorem Ipsum',
+          enabled: true,
+        }, {
+          id: 2,
+          name: 'Dolor set amet',
+          enabled: true,
+        }],
+        selectedRecipe: null,
+        recipeListNeedsFetch: true,
       },
-      {
-        id: 2,
-        name: 'Dolor set amet',
-        enabled: true,
-      }],
     });
   });
 });

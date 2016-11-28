@@ -1,7 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
-  from '../actions/ControlActions.js';
+  from 'control/actions/ControlActions';
 
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
@@ -49,13 +49,13 @@ export default function composeRecipeContainer(Component) {
 
   const mapStateToProps = (state, props) => {
     let recipeData = null;
-    if (state.controlApp.recipes) {
-      recipeData = state.controlApp.recipes
-      .find(recipe => recipe.id === state.controlApp.selectedRecipe);
+    if (state.recipes && state.recipes.list.length) {
+      recipeData = state.recipes.list
+        .find(recipe => recipe.id === state.recipes.selectedRecipe);
     }
 
     return {
-      recipeId: state.controlApp.selectedRecipe || parseInt(props.params.id, 10) || null,
+      recipeId: state.recipes.selectedRecipe || parseInt(props.params.id, 10) || null,
       recipe: recipeData,
       dispatch: props.dispatch,
     };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ControlField } from '../Fields.js';
+import { ControlField } from 'control/components/Fields';
 
 /**
  * Form fields for the console-log action.

@@ -121,7 +121,7 @@ describe('ShowHeartbeatAction', () => {
     const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
     const params = new URL(postAnswerUrl).searchParams;
     expect(params.get('source')).toEqual('heartbeat');
-    expect(params.get('surveyversion')).toEqual('54');
+    expect(params.get('surveyversion')).toEqual('55');
     expect(params.get('updateChannel')).toEqual('nightly');
     expect(params.get('fxVersion')).toEqual('42.0.1');
     expect(params.get('isDefaultBrowser')).toEqual('1');
@@ -130,6 +130,32 @@ describe('ShowHeartbeatAction', () => {
 
     // telemetry data is turned off, so no userId should be passed into params
     expect(params.get('userId')).toBeNull();
+  });
+
+
+  it('should annotate the post-answer URL with google analytics params', async () => {
+    const url = 'https://example.com';
+    const recipe = recipeFactory({
+      action: 'show-heartbeat',
+      arguments: {
+        postAnswerUrl: url,
+        message: 'This is a test message!!',
+      },
+    });
+    const action = new ShowHeartbeatAction(normandy, recipe);
+
+    normandy.mock.client.version = '42.0.1';
+    normandy.mock.client.channel = 'nightly';
+    normandy.mock.client.isDefaultBrowser = true;
+    normandy.mock.client.searchEngine = 'shady-tims';
+    normandy.mock.client.syncSetup = true;
+
+    await action.execute();
+    const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+    const params = new URL(postAnswerUrl).searchParams;
+    expect(params.get('utm_source')).toEqual('firefox');
+    expect(params.get('utm_medium')).toEqual('show-heartbeat');
+    expect(params.get('utm_campaign')).toEqual('Thisisatestmessage%21%21');
   });
 
 

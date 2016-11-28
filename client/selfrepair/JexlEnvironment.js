@@ -1,5 +1,5 @@
 import { Jexl } from 'jexl';
-import { stableSample, bucketSample } from './utils.js';
+import { stableSample, bucketSample } from 'selfrepair/utils';
 
 export default class JexlEnvironment {
   constructor(context) {

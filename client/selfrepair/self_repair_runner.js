@@ -1,4 +1,4 @@
-import JexlEnvironment from './JexlEnvironment.js';
+import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 const registeredActions = {};
 window.registerAction = (name, ActionClass) => {

@@ -1,4 +1,5 @@
 import canonicaljson
+import json
 import jsonschema
 import pytest
 
@@ -6,7 +7,17 @@ from normandy.recipes.utils import verify_signature
 from pytest_testrail.plugin import testrail
 
 
-@testrail('C5603')
+def check_action_schema_format(action):
+    """Given an action, make sure its argument schema is a valid json schema"""
+    # This avoids downloading the schema by asserting that it is using json schema draft v4, and
+    # checking against a local copy of it.
+    assert action['arguments_schema']['$schema'] == 'http://json-schema.org/draft-04/schema#'
+    with open('contract-tests/data/json-schema-draft-4-schema.json') as f:
+        schema = json.load(f)
+        assert jsonschema.validate(action['arguments_schema'], schema) is None
+
+
+@testrail('C7108')
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -22,7 +33,7 @@ def test_expected_action_types(conf, requests_session):
         assert record['name'] in expected_records
 
 
-@testrail('C5604')
+@testrail('C7109')
 def test_console_log(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -48,14 +59,10 @@ def test_console_log(conf, requests_session):
     for field in record:
         assert field in expected_action_fields
 
-    # Do we have a valid schema for 'arguments_schema'?
-    r = requests_session.get(record['arguments_schema']['$schema'])
-    r.raise_for_status()
-    schema = r.json()
-    assert jsonschema.validate(record['arguments_schema'], schema) is None
+    check_action_schema_format(record)
 
 
-@testrail('C5605')
+@testrail('C7110')
 def test_show_heartbeat(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
     r.raise_for_status()
@@ -80,14 +87,10 @@ def test_show_heartbeat(conf, requests_session):
     for field in record:
         assert field in expected_action_fields
 
-    # Do we have a valid schema for 'arguments_schema'?
-    r = requests_session.get(record['arguments_schema']['$schema'])
-    r.raise_for_status()
-    schema = r.json()
-    assert jsonschema.validate(record['arguments_schema'], schema) is None
+    check_action_schema_format(record)
 
 
-@testrail('C6570')
+@testrail('C7113')
 def test_recipe_signatures(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/signed/')
     r.raise_for_status()

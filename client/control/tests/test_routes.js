@@ -1,8 +1,9 @@
 import { replace } from 'react-router-redux';
 import { shallow } from 'enzyme';
 
-import { createApp } from '../app.js';
-import NoMatch from '../components/NoMatch.js';
+import { createApp } from 'control/app';
+
+import NoMatch from 'control/components/NoMatch.js';
 
 describe('Control routes', () => {
   let app;

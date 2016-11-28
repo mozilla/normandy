@@ -3,18 +3,19 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { SubmissionError } from 'redux-form';
 
-import { RecipeForm, formConfig, initialValuesWrapper } from '../../components/RecipeForm.js';
-import ConsoleLogFields from '../../components/action_fields/ConsoleLogFields.js';
+import { RecipeForm, formConfig, initialValuesWrapper } from 'control/components/RecipeForm.js';
+import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields.js';
 import { recipeFactory } from '../../../tests/utils.js';
 
 /**
  * Creates mock required props for RecipeForm.
  */
 function propFactory(props = {}) {
-  return Object.assign({
+  return {
     handleSubmit: () => undefined,
     submitting: false,
-  }, props);
+    ...props,
+  };
 }
 
 describe('<RecipeForm>', () => {
@@ -43,6 +44,20 @@ describe('<RecipeForm>', () => {
       <RecipeForm {...propFactory()} />
     );
     expect(wrapper.find('.delete').length).toBe(0);
+  });
+
+  it('should render a clone message if user is cloning', () => {
+    const recipe = recipeFactory();
+    const wrapper = shallow(
+      <RecipeForm
+        recipeId={recipe.id}
+        recipe={recipe}
+        {...propFactory()}
+        route={{ isCloning: true }}
+      />
+    );
+    // message should exist
+    expect(wrapper.find('.cloning-message').length).toBe(1);
   });
 
   it('should disable the submit button if currently submitting the form', () => {
@@ -117,6 +132,27 @@ describe('<RecipeForm>', () => {
       addRecipe.and.returnValue(Promise.resolve());
 
       await formConfig.onSubmit(recipe, () => {}, {
+        recipeId: null,
+        updateRecipe,
+        addRecipe,
+      });
+
+      expect(addRecipe).toHaveBeenCalledWith({
+        name: recipe.name,
+        enabled: recipe.enabled,
+        filter_expression: recipe.filter_expression,
+        action: recipe.action,
+        arguments: recipe.arguments,
+      });
+      expect(updateRecipe).not.toHaveBeenCalled();
+    });
+
+    it('should create a new recipe when cloning an existing one', async () => {
+      const recipe = recipeFactory();
+      addRecipe.and.returnValue(Promise.resolve());
+
+      await formConfig.onSubmit(recipe, () => {}, {
+        route: { isCloning: true },
         recipeId: null,
         updateRecipe,
         addRecipe,

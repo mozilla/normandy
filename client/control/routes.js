@@ -1,12 +1,12 @@
 import React from 'react';
 import { IndexRedirect, IndexRoute, Route } from 'react-router';
-import ControlApp from './components/ControlApp.js';
-import RecipeList from './components/RecipeList.js';
-import RecipeForm from './components/RecipeForm.js';
-import RecipeHistory from './components/RecipeHistory.js';
-import RecipePreview from './components/RecipePreview.js';
-import DeleteRecipe from './components/DeleteRecipe.js';
-import NoMatch from './components/NoMatch.js';
+import ControlApp from 'control/components/ControlApp';
+import RecipeList from 'control/components/RecipeList';
+import RecipeForm from 'control/components/RecipeForm';
+import RecipeHistory from 'control/components/RecipeHistory';
+import RecipePreview from 'control/components/RecipePreview';
+import DeleteRecipe from 'control/components/DeleteRecipe';
+import NoMatch from 'control/components/NoMatch';
 
 export default (
   <Route path="/control/" component={ControlApp}>
@@ -27,8 +27,18 @@ export default (
         <IndexRoute
           component={RecipeForm}
           ctaButtons={[
+            { text: 'Clone', icon: 'files-o', link: 'clone/' },
             { text: 'Preview', icon: 'eye', link: 'preview/' },
             { text: 'History', icon: 'history', link: 'history/' },
+          ]}
+        />
+        <Route
+          path="clone/"
+          component={RecipeForm}
+          name="Clone"
+          isCloning
+          ctaButtons={[
+            { text: 'Cancel', icon: 'ban', link: '../' },
           ]}
         />
         <Route

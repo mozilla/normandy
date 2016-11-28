@@ -1,6 +1,6 @@
 import uuid from 'node-uuid';
 
-import Mozilla from './uitour.js';
+import Mozilla from 'selfrepair/uitour';
 
 export const STORAGE_DURABILITY_KEY = '_storageDurability';
 
