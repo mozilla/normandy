@@ -5,8 +5,6 @@ import GroupMenu from './GroupMenu.js';
 import DropdownMenu from './DropdownMenu.js';
 import ColumnMenu from './ColumnMenu.js';
 
-import memo from '../../utils/memo.js';
-
 export default class RecipeFilters extends React.Component {
   static propTypes = {
     searchText: pt.string.isRequired,
@@ -109,9 +107,6 @@ export default class RecipeFilters extends React.Component {
     this.handleFilterChange = ::this.handleFilterChange;
     this.handleColumnInput = ::this.handleColumnInput;
 
-    this.searchGroup = memo(this.searchGroup);
-    this.filterGroups = memo(this.filterGroups);
-
     this.handleFilterChange();
   }
 
@@ -153,12 +148,10 @@ export default class RecipeFilters extends React.Component {
     const groupString = JSON.stringify(group).toLowerCase();
     const groupSearch = (search || '').toLowerCase();
 
-    console.log('wtf', groupString, groupSearch);
     return groupString.indexOf(groupSearch) > -1;
   }
 
   filterGroups(groups, search) {
-    console.log('here', groups, search);
     return groups.filter(group => this.searchGroup(group, search));
   }
 
