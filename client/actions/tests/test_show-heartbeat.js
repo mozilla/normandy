@@ -1,4 +1,4 @@
-import { mockNormandy, pluginFactory } from './utils';
+import { mockNormandy } from './utils';
 import ShowHeartbeatAction from '../show-heartbeat/';
 import { recipeFactory } from '../../tests/utils.js';
 
@@ -237,91 +237,5 @@ describe('ShowHeartbeatAction', () => {
     expect(normandy.mock.storage.data.lastShown).toBeUndefined();
     await action.execute();
     expect(normandy.mock.storage.data.lastShown).toEqual('10');
-  });
-
-  it('should save flow data via normandy.saveHeartbeatFlow', async () => {
-    const recipe = recipeFactory();
-    const action = new ShowHeartbeatAction(normandy, recipe);
-
-    const client = normandy.mock.client;
-    client.plugins = {
-      'Shockwave Flash': pluginFactory({
-        name: 'Shockwave Flash',
-        version: '2.5.0',
-      }),
-      'Another Plugin': pluginFactory({
-        name: 'Another Plugin',
-        version: '7',
-      }),
-    };
-    spyOn(Date, 'now').and.returnValue(10);
-    normandy.testing = true;
-
-    await action.execute();
-
-    const emitter = normandy.mock.heartbeatEmitter;
-    emitter.emit('NotificationOffered', { timestamp: 20 });
-    emitter.emit('LearnMore', { timestamp: 30 });
-    emitter.emit('Voted', { timestamp: 40, score: 3 });
-    emitter.emit('Engaged', { timestamp: 50 });
-
-    // Checking per field makes recognizing which field failed
-    // _much_ easier.
-    const flowData = normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
-    expect(flowData.response_version).toEqual(2);
-    expect(flowData.survey_id).toEqual(recipe.arguments.surveyId);
-    expect(flowData.question_id).toEqual(recipe.arguments.message);
-    expect(flowData.updated_ts).toEqual(10);
-    expect(flowData.question_text).toEqual(recipe.arguments.message);
-    expect(flowData.variation_id).toEqual(recipe.revision_id.toString());
-    expect(flowData.score).toEqual(3);
-    expect(flowData.flow_began_ts).toEqual(10);
-    expect(flowData.flow_offered_ts).toEqual(20);
-    expect(flowData.flow_voted_ts).toEqual(40);
-    expect(flowData.flow_engaged_ts).toEqual(50);
-    expect(flowData.channel).toEqual(client.channel);
-    expect(flowData.version).toEqual(client.version);
-    expect(flowData.locale).toEqual(normandy.locale);
-    expect(flowData.country).toEqual(normandy.mock.location.countryCode);
-    expect(flowData.is_test).toEqual(true);
-    expect(flowData.extra.plugins).toEqual({
-      'Shockwave Flash': '2.5.0',
-      'Another Plugin': '7',
-    });
-    expect(flowData.extra.flashVersion).toEqual(client.plugins['Shockwave Flash'].version);
-    expect(flowData.extra.engage).toEqual([
-            [10, recipe.arguments.learnMoreUrl, 'notice'],
-    ]);
-    expect(flowData.extra.searchEngine).toEqual(client.searchEngine);
-    expect(flowData.extra.syncSetup).toEqual(client.syncSetup);
-    expect(flowData.extra.defaultBrowser).toEqual(client.isDefaultBrowser);
-  });
-
-  it('should truncate long values in flow data', async () => {
-    const longString = 'A 50 character string.............................';
-    const tooLongString = `${longString}XXXXXXXXXX`;
-
-    const recipe = recipeFactory({
-      arguments: {
-        message: tooLongString,
-      },
-    });
-    const action = new ShowHeartbeatAction(normandy, recipe);
-
-    normandy.locale = tooLongString;
-    normandy.mock.client.channel = tooLongString;
-    normandy.mock.client.version = tooLongString;
-    normandy.mock.location.countryCode = tooLongString;
-
-    await action.execute();
-
-    // Checking per field makes recognizing which field failed _much_
-    // easier.
-    const flowData = normandy.saveHeartbeatFlow.calls.mostRecent().args[0];
-    expect(flowData.question_id).toEqual(longString);
-    expect(flowData.locale).toEqual(longString);
-    expect(flowData.channel).toEqual(longString);
-    expect(flowData.version).toEqual(longString);
-    expect(flowData.country).toEqual('a 50');
   });
 });

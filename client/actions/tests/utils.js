@@ -23,18 +23,6 @@ export class MockStorage {
   }
 }
 
-
-export function pluginFactory(props = {}) {
-  return {
-    name: 'Plugin',
-    description: 'A plugin',
-    filename: '/tmp/fake/path',
-    version: 'v1.0',
-    ...props,
-  };
-}
-
-
 export function mockNormandy() {
   const normandy = {
     mock: {
