@@ -1,7 +1,9 @@
 import React, { PropTypes as pt } from 'react';
 import * as localForage from 'localforage';
+import Fuse from 'fuse.js';
 
 import SwitchFilter from './SwitchFilter.js';
+import GroupMenu from './GroupMenu.js';
 import DropdownMenu from './DropdownMenu.js';
 import ColumnMenu from './ColumnMenu.js';
 
@@ -13,6 +15,50 @@ export default class RecipeFilters extends React.Component {
     updateFilter: pt.func.isRequired,
     onFilterChange: pt.func.isRequired,
   };
+
+  static filterOptionGroups = [{
+    label: 'Status',
+    value: 'status',
+    options: [{
+      label: 'Enabled',
+      value: 'enabled',
+    }, {
+      label: 'Disabled',
+      value: 'disabled',
+    }],
+  }, {
+    label: 'Channel',
+    value: 'channel',
+    options: [{
+      label: 'Release',
+      value: 'release',
+    }, {
+      label: 'Beta',
+      value: 'beta',
+    }, {
+      label: 'Aurora / Developer Edition',
+      value: 'aurora',
+    }, {
+      label: 'Nightly',
+      value: 'nightly',
+    }],
+  }, {
+    label: 'Locale',
+    value: 'locale',
+    options: [{
+      label: 'English (US)',
+      value: 'en-US',
+    }, {
+      label: 'English (UK)',
+      value: 'en-UK',
+    }, {
+      label: 'German',
+      value: 'de',
+    }, {
+      label: 'Russian',
+      value: 'ru',
+    }],
+  }];
 
   static defaultColumnConfig = [{
     label: 'Name',
@@ -108,6 +154,24 @@ export default class RecipeFilters extends React.Component {
       updateFilter,
     } = this.props;
 
+    const options = {
+      shouldSort: true,
+      tokenize: true,
+      matchAllTokens: true,
+      threshold: 0.7,
+      location: 0,
+      distance: 5,
+      maxPatternLength: 32,
+      keys: [
+        'label',
+        'value',
+        'options.label',
+        'options.value',
+      ],
+    };
+    this.fuse = this.fuse || new Fuse(RecipeFilters.filterOptionGroups, options);
+    const result = this.fuse.search(searchText);
+
     return (
       <div className="fluid-8">
         <div id="secondary-header" className="fluid-8">
@@ -131,6 +195,9 @@ export default class RecipeFilters extends React.Component {
           </div>
         </div>
         <div className="fluid-8">
+          <GroupMenu
+            data={searchText ? result : RecipeFilters.filterOptionGroups}
+          />
           <DropdownMenu
             trigger={
               <span>
