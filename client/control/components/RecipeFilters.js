@@ -115,11 +115,11 @@ export default class RecipeFilters extends React.Component {
       this.setState({
         columns: found || RecipeFilters.defaultColumnConfig,
       });
-      this.handleFilterChange();
+      this.handleFilterChange(true);
     });
   }
 
-  handleFilterChange() {
+  handleFilterChange(dontSave) {
     const selected = [];
     this.state.columns.forEach(col => {
       if (col.enabled === true) {
@@ -127,7 +127,9 @@ export default class RecipeFilters extends React.Component {
       }
     });
 
-    localForage.setItem('columns', this.state.columns);
+    if (!dontSave) {
+      localForage.setItem('columns', this.state.columns);
+    }
 
     this.props.onFilterChange(selected);
   }
