@@ -7,9 +7,6 @@ import factory
 from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.recipes.models import (
     Action,
-    Approval,
-    ApprovalRequest,
-    ApprovalRequestComment,
     Client,
     Recipe,
     Signature,
@@ -28,13 +25,6 @@ class ActionFactory(factory.DjangoModelFactory):
         return hashlib.sha1(action.implementation.encode()).hexdigest()
 
 
-class ApprovalFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Approval
-
-    creator = factory.SubFactory(UserFactory)
-
-
 class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
@@ -42,7 +32,6 @@ class RecipeFactory(factory.DjangoModelFactory):
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
     enabled = True
-    approval = factory.SubFactory(ApprovalFactory)
 
     # It is important that the signature be based on the actual data, and not
     # some static value so that tests can make assertions against what data was
@@ -83,22 +72,6 @@ class RecipeFactory(factory.DjangoModelFactory):
         if extracted:
             for channel in extracted:
                 self.release_channels.add(channel)
-
-
-class ApprovalRequestFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = ApprovalRequest
-
-    recipe = factory.SubFactory(RecipeFactory)
-    creator = factory.SubFactory(UserFactory)
-
-
-class ApprovalRequestCommentFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = ApprovalRequestComment
-
-    approval_request = factory.SubFactory(ApprovalRequestFactory)
-    creator = factory.SubFactory(UserFactory)
 
 
 class SignatureFactory(factory.DjangoModelFactory):
