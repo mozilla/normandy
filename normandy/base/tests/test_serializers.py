@@ -5,7 +5,7 @@ from normandy.base.api.serializers import TokenSerializer
 
 
 @pytest.mark.django_db()
-class TestTokenSerializer:
+class TestTokenSerializer(object):
     def test_it_works(self):
         token = TokenFactory()
         serializer = TokenSerializer(token)

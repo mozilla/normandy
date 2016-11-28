@@ -1,30 +1,31 @@
 import { BASE_API_URL, API_REQUEST_SETTINGS } from '../constants.js';
 import { showNotification } from './ControlActions.js';
 
-export const AUTH_TOKEN_REQUEST_IN_PROGRESS = 'AUTH_TOKEN_REQUEST';
-export const AUTH_TOKEN_REQUEST_COMPLETE = 'AUTH_TOKEN_REQUEST_SUCCESS';
+export const authTokenRequest = {
+  inProgress: 'AUTH_TOKEN_REQUEST',
+  complete: 'AUTH_TOKEN_REQUEST_SUCCESS',
+};
 
 
 export function requestAPIToken() {
   return async dispatch => {
-    dispatch({ type: AUTH_TOKEN_REQUEST_IN_PROGRESS });
+    dispatch({ type: authTokenRequest.inProgress });
     const response = await fetch(`${BASE_API_URL}token/`, API_REQUEST_SETTINGS);
+    const jsonResponse = await response.json();
 
     if (response.status >= 400) {
       dispatch({
-        type: AUTH_TOKEN_REQUEST_COMPLETE,
+        type: authTokenRequest.complete,
         status: 'error',
       });
       dispatch(showNotification('Error fetching API token'));
-      throw await response.json();
+      throw new Error(jsonResponse);
     }
 
-    const token = await response.json();
-
     dispatch({
-      type: AUTH_TOKEN_REQUEST_COMPLETE,
+      type: authTokenRequest.complete,
       status: 'success',
-      token,
+      token: jsonResponse,
     });
   };
 }

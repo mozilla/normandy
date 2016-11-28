@@ -1,7 +1,4 @@
-import {
-  AUTH_TOKEN_REQUEST_IN_PROGRESS,
-  AUTH_TOKEN_REQUEST_COMPLETE,
-} from '../actions/authActions.js';
+import { authTokenRequest } from '../actions/authActions.js';
 
 const initialState = {
   requestInProgress: false,
@@ -11,13 +8,13 @@ const initialState = {
 export default function authReducer(state = initialState, action) {
   switch (action.type) {
 
-    case AUTH_TOKEN_REQUEST_IN_PROGRESS:
+    case authTokenRequest.inProgress:
       return {
         ...state,
         requestInProgress: true,
       };
 
-    case AUTH_TOKEN_REQUEST_COMPLETE:
+    case authTokenRequest.complete:
       return {
         ...state,
         requestInProgress: false,

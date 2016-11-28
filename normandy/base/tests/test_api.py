@@ -18,8 +18,10 @@ class TestTokenAPI(object):
 
     def test_it_creates_new_tokens(self, api_client):
         res = api_client.get('/api/v1/token/')
+        token = Token.objects.get()
         assert res.status_code == 201
         assert res.data['user'] == api_client.user.username
+        assert res.data['key'] == token.key
 
     def test_it_deletes_existing_tokens(self, api_client):
         TokenFactory(user=api_client.user)

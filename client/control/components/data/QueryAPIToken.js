@@ -15,6 +15,10 @@ class QueryAPIToken extends Component {
     this.request();
   }
 
+  componentWillReceiveProps() {
+    this.request();
+  }
+
   request() {
     if (!this.props.tokenFetching && !this.props.token) {
       this.props.requestAPIToken();
