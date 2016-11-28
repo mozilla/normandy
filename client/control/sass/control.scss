@@ -66,6 +66,18 @@
   margin: 0 0 30px 0;
   padding: 0px;
 
+  #filters-container {
+    text-align: right;
+
+    > div {
+      display: inline-block;
+      float: right;
+      margin: 0 0 0 16px;
+    }
+  }
+}
+
+.header-search {
   h3 {
     color: $darkBrown;
     display: inline-block;
@@ -81,7 +93,6 @@
     line-height: 35px;
     margin: 0 0 0 35px;
   }
-
   input, .switch {
     background: rgba(0, 0, 0, 0.1);
     border: 0px;
@@ -93,16 +104,6 @@
     position: relative;
 
     &[type='text'] { padding: 7px 14px; }
-  }
-
-  #filters-container {
-    text-align: right;
-
-    > div {
-      display: inline-block;
-      float: right;
-      margin: 0 0 0 16px;
-    }
   }
 }
 

@@ -1,7 +1,9 @@
 .column-menu {
   input {
-    display: inline-block;
-    margin-right: 0.5em;
+    display: inline;
+    float: right;
+    margin-left: 0.5em;
+    width: auto;
   }
   
   li {
