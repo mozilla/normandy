@@ -1,16 +1,17 @@
-export const ADD_FILTER = 'ADD_FILTER';
+const ADD_FILTER = 'ADD_FILTER';
 
 function selectFilter({ group, option, isEnabled }) {
-  return dispatch =>
+  return dispatch => {
     dispatch({
       type: ADD_FILTER,
       group,
       option,
       isEnabled,
     });
+  };
 }
 
-export default {
+export {
   // action constants
   ADD_FILTER,
   // actions
