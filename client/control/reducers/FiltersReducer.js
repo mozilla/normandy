@@ -1,5 +1,5 @@
 import {
-  ADD_FILTER,
+  SET_FILTER,
 } from 'control/actions/FilterActions';
 
 const initialState = [
@@ -55,19 +55,24 @@ function filtersReducer(state = initialState, action) {
   let newState;
 
   switch (action.type) {
-    case ADD_FILTER:
+    case SET_FILTER:
       newState = [].concat(state);
 
       newState = newState.map(group => {
+        // get the group the action is for
         if (group.value === action.group.value) {
-          group.selected = action.isEnabled || false;
+          let hasSelected = false;
 
-          group.options = group.options.map(option => {
+          group.options = [].concat(group.options || []).map(option => {
             if (option.value === action.option.value) {
               option.selected = action.isEnabled || false;
             }
+
+            hasSelected = hasSelected || option.selected;
             return option;
           });
+
+          group.selected = hasSelected;
         }
 
         return group;

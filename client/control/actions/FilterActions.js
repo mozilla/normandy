@@ -1,9 +1,9 @@
-const ADD_FILTER = 'ADD_FILTER';
+const SET_FILTER = 'SET_FILTER';
 
 function selectFilter({ group, option, isEnabled }) {
   return dispatch => {
     dispatch({
-      type: ADD_FILTER,
+      type: SET_FILTER,
       group,
       option,
       isEnabled,
@@ -13,7 +13,7 @@ function selectFilter({ group, option, isEnabled }) {
 
 export {
   // action constants
-  ADD_FILTER,
+  SET_FILTER,
   // actions
   selectFilter,
 };
