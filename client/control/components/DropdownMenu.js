@@ -10,6 +10,9 @@ export default class DropdownMenu extends React.Component {
     children: pt.any.isRequired,
     useClick: pt.boolean,
     useFocus: pt.boolean,
+    // pin the dropdown to the right edge
+    // of the parent container?
+    pinRight: pt.boolean,
   };
 
   constructor(props) {
@@ -74,7 +77,10 @@ export default class DropdownMenu extends React.Component {
         </div>
         {
           this.state.isVisible &&
-            <div className="dropdown-content">
+            <div
+              className="dropdown-content"
+              style={this.props.pinRight ? { right: 0, left: 'auto' } : { left: 0, right: 'auto' }}
+            >
               { this.props.children }
             </div>
         }
