@@ -6,9 +6,7 @@ import GroupMenu from 'control/components/GroupMenu';
 import DropdownMenu from 'control/components/DropdownMenu';
 import ColumnMenu from 'control/components/ColumnMenu';
 
-import {
-  selectFilter,
-} from 'control/actions/FilterActions';
+import { selectFilter } from 'control/actions/FilterActions';
 
 class RecipeFilters extends React.Component {
   static propTypes = {
@@ -17,7 +15,7 @@ class RecipeFilters extends React.Component {
     updateFilter: pt.func.isRequired,
     onFilterChange: pt.func.isRequired,
     // connected
-    availableFilters: pt.array.isRequired,
+    filters: pt.array.isRequired,
     selectedFilters: pt.array.isRequired,
     dispatch: pt.func.isRequired,
   };
@@ -70,6 +68,7 @@ class RecipeFilters extends React.Component {
 
     this.handleFilterChange = ::this.handleFilterChange;
     this.handleColumnInput = ::this.handleColumnInput;
+    this.onGroupFilterSelect = ::this.onGroupFilterSelect;
 
     this.handleFilterChange(true);
   }
@@ -138,7 +137,7 @@ class RecipeFilters extends React.Component {
     let result;
 
     if (searchText) {
-      result = this.filterGroups(this.props.availableFilters, searchText);
+      result = this.filterGroups(this.props.filters, searchText);
     }
 
     return (
@@ -148,7 +147,6 @@ class RecipeFilters extends React.Component {
             <div className="search input-with-icon">
               <DropdownMenu
                 useFocus
-                useBlur
                 trigger={
                   <input
                     type="text"
@@ -159,7 +157,7 @@ class RecipeFilters extends React.Component {
                 }
               >
                 <GroupMenu
-                  data={searchText ? result : this.props.availableFilters}
+                  data={searchText ? result : this.props.filters}
                   onItemSelect={this.onGroupFilterSelect}
                 />
               </DropdownMenu>
@@ -181,16 +179,46 @@ class RecipeFilters extends React.Component {
               />
             </DropdownMenu>
           </div>
+          <div className="fluid-8">
+            {
+              this.props.selectedFilters.map(filter =>
+                <div>
+                  { filter.label }
+                  {
+                    filter.options
+                      .filter(option => option.selected)
+                      .map(option => <div>{ option.label }</div>)
+                  }
+                </div>
+              )
+            }
+          </div>
         </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  availableFilters: state.filters.available || [],
-  selectedFilters: state.filters.selected || [],
-});
+const mapStateToProps = state => {
+  const isEnabled = group => {
+    let enabled = false;
+
+    if (group.selected) {
+      group.options.forEach(option => {
+        if (!enabled && option.selected) {
+          enabled = true;
+        }
+      });
+    }
+
+    return enabled;
+  };
+
+  return {
+    filters: state.filters,
+    selectedFilters: state.filters.filter(isEnabled),
+  };
+};
 
 export default connect(
   mapStateToProps
