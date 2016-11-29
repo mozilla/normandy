@@ -1,5 +1,8 @@
 import React, { PropTypes as pt } from 'react';
-import closest from '../../utils/closest';
+import uuid from 'node-uuid';
+
+import closest from 'client/utils/closest';
+
 
 export default class DropdownMenu extends React.Component {
   static propTypes = {
@@ -20,6 +23,10 @@ export default class DropdownMenu extends React.Component {
     this.onMenuBlur = ::this.onMenuBlur;
   }
 
+  componentDidMount() {
+    this.id = this.id || `dropdown-menu-${uuid()}`;
+  }
+
   componentWillUnmount() {
     // just toggle it to hide when component unmounts
     // (this will automatically remove event bindings etc too)
@@ -27,8 +34,8 @@ export default class DropdownMenu extends React.Component {
   }
 
   onMenuBlur(evt) {
-    // determine if the click was inside of a .dropdown-menu
-    if (!closest(evt.target, '.dropdown-menu')) {
+    // determine if the click was inside of this .dropdown-menu
+    if (!closest(evt.target, `.${this.id}`)) {
       // and if so, close it
       this.toggleVisibility(false);
     }
@@ -56,7 +63,7 @@ export default class DropdownMenu extends React.Component {
   render() {
     return (
       <div
-        className="dropdown-menu"
+        className={`dropdown-menu ${this.id}`}
       >
         <div
           className="dropdown-trigger"

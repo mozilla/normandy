@@ -93,6 +93,7 @@ module.exports = [
 
     resolve: {
       alias: {
+        client: path.resolve(__dirname, './client'),
         actions: path.resolve(__dirname, './client/actions'),
         control: path.resolve(__dirname, './client/control'),
         selfrepair: path.resolve(__dirname, './client/selfrepair'),
