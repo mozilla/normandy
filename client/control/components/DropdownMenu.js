@@ -6,7 +6,6 @@ export default class DropdownMenu extends React.Component {
     trigger: pt.node.isRequired,
     children: pt.any.isRequired,
     useClick: pt.boolean,
-    useBlur: pt.boolean,
     useFocus: pt.boolean,
   };
 
@@ -62,7 +61,6 @@ export default class DropdownMenu extends React.Component {
         <div
           className="dropdown-trigger"
           onClick={this.props.useClick && this.toggleVisibility}
-          onBlur={this.props.useBlur && this.toggleVisibility}
           onFocus={this.props.useFocus && this.toggleVisibility}
         >
           { this.props.trigger }
