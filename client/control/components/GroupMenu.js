@@ -4,6 +4,7 @@ export default class GroupMenu extends React.Component {
   static propTypes = {
     data: pt.array.isRequired,
     children: pt.any.isRequired,
+    onItemSelect: pt.func.isRequired,
   };
 
   constructor(props) {
@@ -28,7 +29,12 @@ export default class GroupMenu extends React.Component {
               <h3>{group.label}</h3>
               {
                 group.options.map((option, index) =>
-                  <div key={index}>
+                  <div
+                    key={index}
+                    onClick={() => {
+                      this.props.onItemSelect(group, option);
+                    }}
+                  >
                     { option.label }
                   </div>
                 )
