@@ -1,5 +1,5 @@
 import {
-  SET_FILTER,
+  ADD_FILTER,
 } from 'control/actions/FilterActions';
 
 const initialState = {
@@ -9,6 +9,7 @@ const initialState = {
   available: [{
     label: 'Status',
     value: 'status',
+    multiple: false,
     options: [{
       label: 'Enabled',
       value: 'enabled',
@@ -19,6 +20,7 @@ const initialState = {
   }, {
     label: 'Channel',
     value: 'channel',
+    multiple: true,
     options: [{
       label: 'Release',
       value: 'release',
@@ -35,6 +37,7 @@ const initialState = {
   }, {
     label: 'Locale',
     value: 'locale',
+    multiple: true,
     options: [{
       label: 'English (US)',
       value: 'en-US',
@@ -52,11 +55,27 @@ const initialState = {
 };
 
 function filtersReducer(state = initialState, action) {
+  let newSelected;
+
   switch (action.type) {
-    case SET_FILTER:
+    case ADD_FILTER:
+      newSelected = [].concat(state.selected);
+
+      // add to selected
+      newSelected.push({
+        ...action.group,
+        ...action.option,
+      });
+
+      // remove from available
+      // const newAvailable = [].concat(state.available);
+      // newAvailable = newAvailable.filter((availableGroup)=>{
+      //   return availableGroup
+      // });
+
       return {
         ...state,
-        selected: action.selected,
+        selected: newSelected,
       };
 
     default:
