@@ -8,10 +8,8 @@ import { makeApiRequest, recipesReceived, setSelectedRecipe } from 'control/acti
 import RecipeFilters from './RecipeFilters';
 
 const BooleanIcon = props => {
-  if (props.value) {
-    return <i className="fa fa-lg fa-check green">&nbsp;</i>;
-  }
-  return <i className="fa fa-lg fa-times red">&nbsp;</i>;
+  const iconClass = props.value ? 'fa-check green' : 'fa-times red';
+  return <i className={`fa fa-lg ${iconClass}`}>&nbsp;</i>;
 };
 BooleanIcon.propTypes = {
   value: pt.bool.isRequired,
