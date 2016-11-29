@@ -9,6 +9,7 @@ import ColumnMenu from 'control/components/ColumnMenu';
 import { selectFilter } from 'control/actions/FilterActions';
 import {
   getSelectedFilters,
+  getAvailableFilters,
 } from 'control/selectors/FiltersSelector';
 
 class RecipeFilters extends React.Component {
@@ -20,6 +21,7 @@ class RecipeFilters extends React.Component {
     // connected
     filters: pt.array.isRequired,
     selectedFilters: pt.array.isRequired,
+    availableFilters: pt.array.isRequired,
     dispatch: pt.func.isRequired,
   };
 
@@ -139,7 +141,7 @@ class RecipeFilters extends React.Component {
 
     let result;
 
-    const availableFilters = this.props.filters;
+    const availableFilters = this.props.availableFilters;
 
     // if the user has typed in text,
     // filter the remaining options
@@ -172,6 +174,7 @@ class RecipeFilters extends React.Component {
           </div>
           <div id="filters-container" className="fluid-6">
             <DropdownMenu
+              pinRight
               useClick
               trigger={
                 <span className="col-trigger">
@@ -219,6 +222,7 @@ class RecipeFilters extends React.Component {
 const mapStateToProps = state => ({
   filters: state.filters,
   selectedFilters: getSelectedFilters(state.filters),
+  availableFilters: getAvailableFilters(state.filters),
 });
 
 export default connect(
