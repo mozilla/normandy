@@ -203,12 +203,22 @@ class RecipeFilters extends React.Component {
           <div className="fluid-8">
             {
               this.props.selectedFilters.map(filter =>
-                <div>
-                  { filter.label }
+                <div className="active-filter">
+                  <span className="filter-label">
+                    { filter.label }
+                  </span>
                   {
                     filter.options
                       .filter(option => option.selected)
-                      .map(option => <div>{ option.label }</div>)
+                      .map(option => <div
+                        onClick={() => {
+                          this.props.dispatch(selectFilter({
+                            group: filter,
+                            option,
+                            isEnabled: false,
+                          }));
+                        }}
+                      >{ option.label }</div>)
                   }
                 </div>
               )
