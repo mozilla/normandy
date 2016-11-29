@@ -6,7 +6,10 @@ import GroupMenu from 'control/components/GroupMenu';
 import DropdownMenu from 'control/components/DropdownMenu';
 import ColumnMenu from 'control/components/ColumnMenu';
 
-import { selectFilter } from 'control/actions/FilterActions';
+import {
+  selectFilter,
+  loadLastFilters,
+} from 'control/actions/FilterActions';
 import {
   getSelectedFilters,
   getAvailableFilters,
@@ -79,11 +82,19 @@ class RecipeFilters extends React.Component {
   }
 
   componentWillMount() {
+    // load the column settings the user last used
     localForage.getItem('columns', (err, found) => {
       this.setState({
         columns: found || RecipeFilters.defaultColumnConfig,
       });
       this.handleFilterChange(true);
+    });
+
+    // load the last filters the user viewed
+    localForage.getItem('last-filters', (err, found) => {
+      if (!err && found) {
+        this.props.dispatch(loadLastFilters(found));
+      }
     });
   }
 
@@ -200,6 +211,7 @@ class RecipeFilters extends React.Component {
                     filter.options
                       .filter(option => option.selected)
                       .map(option => <div
+                        className="filter-option"
                         onClick={() => {
                           this.props.dispatch(selectFilter({
                             group: filter,
