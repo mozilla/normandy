@@ -10,7 +10,8 @@
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
     "test": "NODE_ENV=production karma start",
-    "lint": "eslint normandy client webpack.config.js karma.conf.js"
+    "lint": "eslint normandy client webpack.config.js karma.conf.js || true",
+    "lint-fix": "eslint normandy client webpack.config.js karma.conf.js --fix || true"
   },
   "license": "MPL-2.0",
   "dependencies": {
