@@ -8,6 +8,20 @@ import ColumnMenu from 'control/components/ColumnMenu';
 
 import { selectFilter } from 'control/actions/FilterActions';
 
+const isEnabled = group => {
+  let enabled = false;
+
+  if (group.selected) {
+    group.options.forEach(option => {
+      if (!enabled && option.selected) {
+        enabled = true;
+      }
+    });
+  }
+
+  return enabled;
+};
+
 class RecipeFilters extends React.Component {
   static propTypes = {
     searchText: pt.string.isRequired,
@@ -136,8 +150,15 @@ class RecipeFilters extends React.Component {
 
     let result;
 
+    // #bug #todo
+    // this only allows ONE filter setting to be set at a time
+    // (e.g. if you filter by 'English UK' you can NOT filter by any other locale)
+    const availableFilters = this.props.filters.filter(group => !isEnabled(group));
+
+    // if the user has typed in text,
+    // filter the remaining options
     if (searchText) {
-      result = this.filterGroups(this.props.filters, searchText);
+      result = this.filterGroups(availableFilters, searchText);
     }
 
     return (
@@ -157,7 +178,7 @@ class RecipeFilters extends React.Component {
                 }
               >
                 <GroupMenu
-                  data={searchText ? result : this.props.filters}
+                  data={searchText ? result : availableFilters}
                   onItemSelect={this.onGroupFilterSelect}
                 />
               </DropdownMenu>
@@ -199,26 +220,10 @@ class RecipeFilters extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  const isEnabled = group => {
-    let enabled = false;
-
-    if (group.selected) {
-      group.options.forEach(option => {
-        if (!enabled && option.selected) {
-          enabled = true;
-        }
-      });
-    }
-
-    return enabled;
-  };
-
-  return {
-    filters: state.filters,
-    selectedFilters: state.filters.filter(isEnabled),
-  };
-};
+const mapStateToProps = state => ({
+  filters: state.filters,
+  selectedFilters: state.filters.filter(isEnabled),
+});
 
 export default connect(
   mapStateToProps
