@@ -7,20 +7,9 @@ import DropdownMenu from 'control/components/DropdownMenu';
 import ColumnMenu from 'control/components/ColumnMenu';
 
 import { selectFilter } from 'control/actions/FilterActions';
-
-const isEnabled = group => {
-  let enabled = false;
-
-  if (group.selected) {
-    group.options.forEach(option => {
-      if (!enabled && option.selected) {
-        enabled = true;
-      }
-    });
-  }
-
-  return enabled;
-};
+import {
+  getSelectedFilters,
+} from 'control/selectors/FiltersSelector';
 
 class RecipeFilters extends React.Component {
   static propTypes = {
@@ -150,10 +139,7 @@ class RecipeFilters extends React.Component {
 
     let result;
 
-    // #bug #todo
-    // this only allows ONE filter setting to be set at a time
-    // (e.g. if you filter by 'English UK' you can NOT filter by any other locale)
-    const availableFilters = this.props.filters.filter(group => !isEnabled(group));
+    const availableFilters = this.props.filters;
 
     // if the user has typed in text,
     // filter the remaining options
@@ -232,7 +218,7 @@ class RecipeFilters extends React.Component {
 
 const mapStateToProps = state => ({
   filters: state.filters,
-  selectedFilters: state.filters.filter(isEnabled),
+  selectedFilters: getSelectedFilters(state.filters),
 });
 
 export default connect(
