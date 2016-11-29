@@ -20,8 +20,8 @@ const initialState = [
       value: 'disabled',
     }],
   }, {
-    label: 'Channel',
-    value: 'channel',
+    label: 'Channels',
+    value: 'channels',
     multiple: true,
     options: [{
       label: 'Release',
@@ -37,8 +37,8 @@ const initialState = [
       value: 'nightly',
     }],
   }, {
-    label: 'Locale',
-    value: 'locale',
+    label: 'Locales',
+    value: 'locales',
     multiple: true,
     options: [{
       label: 'English (US)',

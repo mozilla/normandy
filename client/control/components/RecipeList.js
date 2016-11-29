@@ -3,9 +3,17 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
 
-import { makeApiRequest, recipesReceived, setSelectedRecipe } from 'control/actions/ControlActions';
+import {
+  makeApiRequest,
+  recipesReceived,
+  setSelectedRecipe,
+} from 'control/actions/ControlActions';
 
-import RecipeFilters from './RecipeFilters';
+import {
+  getActiveFilters,
+} from 'control/selectors/FiltersSelector';
+
+import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
   const iconClass = props.value ? 'fa-check green' : 'fa-times red';
@@ -16,6 +24,14 @@ BooleanIcon.propTypes = {
 };
 
 class DisconnectedRecipeList extends React.Component {
+  static propTypes = {
+    dispatch: pt.func.isRequired,
+    isFetching: pt.bool.isRequired,
+    recipeListNeedsFetch: pt.bool.isRequired,
+    recipes: pt.array.isRequired,
+    activeFilters: pt.array.isRequired,
+  };
+
   /**
    * Recipe metadata properties and associated labels to display
    * @type {Object}
@@ -46,6 +62,13 @@ class DisconnectedRecipeList extends React.Component {
       // regardless if we set the values or not
       metadata: [],
       searchData: '',
+      locales: [{
+        label: 'English (US)',
+        value: 'en-US',
+      }].concat(Math.random() > 0.5 ? [{
+        label: 'German',
+        value: 'de',
+      }] : []),
     };
 
     // check if there are specific properties/labels we want to display
@@ -76,12 +99,9 @@ class DisconnectedRecipeList extends React.Component {
     super(props);
     this.state = {
       searchText: '',
-      filteredRecipes: null,
-      selectedFilter: 'All',
       displayedColumns: [],
     };
 
-    this.updateFilter = ::this.updateFilter;
     this.updateSearch = ::this.updateSearch;
     this.onFilterChange = ::this.onFilterChange;
   }
@@ -116,21 +136,36 @@ class DisconnectedRecipeList extends React.Component {
     dispatch(push(`/control/recipe/${recipe.id}/`));
   }
 
-  updateFilter(filterStatus) {
-    const { recipes } = this.props;
+  applyFiltersToRecipes(filters, recipes) {
+    let newRecipes = [].concat(recipes);
 
-    if (filterStatus === 'All') {
-      this.setState({
-        filteredRecipes: null,
-        selectedFilter: filterStatus,
-      });
-    } else {
-      const enabledState = filterStatus === 'Enabled';
-      this.setState({
-        filteredRecipes: recipes.filter(recipe => recipe.enabled === enabledState),
-        selectedFilter: filterStatus,
-      });
+    if (!filters || filters.length === 0) {
+      return newRecipes;
     }
+
+    newRecipes = newRecipes.filter(recipe => {
+      let isValid = false;
+
+      filters.forEach(filter => {
+        const property = filter.value;
+        const filteredValues = filter.options
+          .filter(option => option.selected)
+          .map(option => option.value)
+          .join(' ');
+
+        const recipeValue = recipe[property]
+          .map(option => option.value)
+          .join(' ');
+
+        if (recipeValue && filteredValues.indexOf(recipeValue) > -1) {
+          isValid = true;
+        }
+      });
+
+      return isValid;
+    });
+
+    return newRecipes;
   }
 
   renderTableCell(recipe) {
@@ -152,7 +187,7 @@ class DisconnectedRecipeList extends React.Component {
               displayValue
                 .map((nestedProp, index) => (
                   <li key={index}>
-                    <span className="nested-label">{nestedProp.label}:</span>
+                    <span className="nested-label">{`${nestedProp.label}: `}</span>
                     {nestedProp.value}
                   </li>
                 ))
@@ -178,11 +213,12 @@ class DisconnectedRecipeList extends React.Component {
     let filteredRecipes = this.state.filteredRecipes || recipes;
     filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
 
+    filteredRecipes = this.applyFiltersToRecipes(this.props.activeFilters, filteredRecipes);
+
     return (
       <div>
         <RecipeFilters
           {...this.state}
-          updateFilter={this.updateFilter}
           updateSearch={this.updateSearch}
           onFilterChange={this.onFilterChange}
         />
@@ -223,18 +259,12 @@ class DisconnectedRecipeList extends React.Component {
   }
 }
 
-DisconnectedRecipeList.propTypes = {
-  dispatch: pt.func.isRequired,
-  isFetching: pt.bool.isRequired,
-  recipeListNeedsFetch: pt.bool.isRequired,
-  recipes: pt.array.isRequired,
-};
-
 const mapStateToProps = (state, ownProps) => ({
   recipes: state.recipes.list || [],
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
+  activeFilters: getActiveFilters(state.filters),
 });
 
 export default connect(

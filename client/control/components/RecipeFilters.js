@@ -19,7 +19,6 @@ class RecipeFilters extends React.Component {
   static propTypes = {
     searchText: pt.string.isRequired,
     updateSearch: pt.func.isRequired,
-    updateFilter: pt.func.isRequired,
     onFilterChange: pt.func.isRequired,
     // connected
     filters: pt.array.isRequired,
