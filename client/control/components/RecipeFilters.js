@@ -11,7 +11,7 @@ import {
   setAllFilters,
 } from 'control/actions/FilterActions';
 import {
-  getSelectedFilters,
+  getSelectedFilterGroups,
   getAvailableFilters,
 } from 'control/selectors/FiltersSelector';
 
@@ -250,7 +250,7 @@ class RecipeFilters extends React.Component {
 
 const mapStateToProps = state => ({
   filters: state.filters,
-  selectedFilters: getSelectedFilters(state.filters),
+  selectedFilters: getSelectedFilterGroups(state.filters),
   availableFilters: getAvailableFilters(state.filters),
 });
 
