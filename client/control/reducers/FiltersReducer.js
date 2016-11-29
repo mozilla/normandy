@@ -5,6 +5,8 @@ import {
 
 import * as localForage from 'localforage';
 
+const saveState = state => localForage.setItem('last-filters', state);
+
 const initialState = [
   {
     label: 'Status',
@@ -60,7 +62,7 @@ function filtersReducer(state = initialState, action) {
   switch (action.type) {
     case LOAD_LAST_FILTERS:
       newState = [].concat(action.state || initialState);
-      console.log('load last', action.state, newState);
+      saveState(newState);
       return newState;
 
     case SET_FILTER:
@@ -86,7 +88,7 @@ function filtersReducer(state = initialState, action) {
         return group;
       });
 
-      localForage.setItem('last-filters', newState);
+      saveState(newState);
 
       return newState;
 

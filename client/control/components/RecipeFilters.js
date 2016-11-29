@@ -8,7 +8,7 @@ import ColumnMenu from 'control/components/ColumnMenu';
 
 import {
   selectFilter,
-  loadLastFilters,
+  setAllFilters,
 } from 'control/actions/FilterActions';
 import {
   getSelectedFilters,
@@ -77,6 +77,7 @@ class RecipeFilters extends React.Component {
     this.handleFilterChange = ::this.handleFilterChange;
     this.handleColumnInput = ::this.handleColumnInput;
     this.onGroupFilterSelect = ::this.onGroupFilterSelect;
+    this.resetFilters = ::this.resetFilters;
 
     this.handleFilterChange(true);
   }
@@ -93,7 +94,7 @@ class RecipeFilters extends React.Component {
     // load the last filters the user viewed
     localForage.getItem('last-filters', (err, found) => {
       if (!err && found) {
-        this.props.dispatch(loadLastFilters(found));
+        this.props.dispatch(setAllFilters(found));
       }
     });
   }
@@ -142,6 +143,10 @@ class RecipeFilters extends React.Component {
     }
 
     this.props.onFilterChange(selected);
+  }
+
+  resetFilters() {
+    this.props.dispatch(setAllFilters());
   }
 
   render() {
@@ -223,6 +228,18 @@ class RecipeFilters extends React.Component {
                   }
                 </div>
               )
+            }
+            {
+              /* reset button */
+              this.props.selectedFilters.length > 0 &&
+                <div className="active-filter">
+                  <span
+                    onClick={this.resetFilters}
+                    className="filter-label"
+                  >
+                    Reset Filters
+                  </span>
+                </div>
             }
           </div>
         </div>

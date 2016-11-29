@@ -12,7 +12,7 @@ function selectFilter({ group, option, isEnabled }) {
   };
 }
 
-function loadLastFilters(state) {
+function setAllFilters(state) {
   return dispatch => {
     dispatch({
       type: LOAD_LAST_FILTERS,
@@ -27,5 +27,5 @@ export {
   LOAD_LAST_FILTERS,
   // actions
   selectFilter,
-  loadLastFilters,
+  setAllFilters,
 };
