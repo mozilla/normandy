@@ -2,11 +2,8 @@ import {
   ADD_FILTER,
 } from 'control/actions/FilterActions';
 
-const initialState = {
-  selected: [],
-
-  // list of available simple filters
-  available: [{
+const initialState = [
+  {
     label: 'Status',
     value: 'status',
     multiple: false,
@@ -51,32 +48,32 @@ const initialState = {
       label: 'Russian',
       value: 'ru',
     }],
-  }],
-};
+  },
+];
 
 function filtersReducer(state = initialState, action) {
-  let newSelected;
+  let newState;
 
   switch (action.type) {
     case ADD_FILTER:
-      newSelected = [].concat(state.selected);
+      newState = [].concat(state);
 
-      // add to selected
-      newSelected.push({
-        ...action.group,
-        ...action.option,
+      newState = newState.map(group => {
+        if (group.value === action.group.value) {
+          group.selected = action.isEnabled || false;
+
+          group.options = group.options.map(option => {
+            if (option.value === action.option.value) {
+              option.selected = action.isEnabled || false;
+            }
+            return option;
+          });
+        }
+
+        return group;
       });
 
-      // remove from available
-      // const newAvailable = [].concat(state.available);
-      // newAvailable = newAvailable.filter((availableGroup)=>{
-      //   return availableGroup
-      // });
-
-      return {
-        ...state,
-        selected: newSelected,
-      };
+      return newState;
 
     default:
       return state;
