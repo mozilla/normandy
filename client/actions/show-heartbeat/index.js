@@ -1,12 +1,21 @@
 import { Action, registerAction } from '../utils';
 
 const VERSION = 55; // Increase when changed.
-const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+// how much time should elapse between heartbeats?
+const HEARTBEAT_THROTTLE = 1000 * 60 * 60 * 24; // 24 hours
 
 export default class ShowHeartbeatAction extends Action {
   constructor(normandy, recipe) {
     super(normandy, recipe);
+
+    // 'local' storage
+    // (namespaced to recipe.id - only this heartbeat can access)
     this.storage = normandy.createStorage(recipe.id);
+
+    // 'global' storage
+    // (constant namespace - all heartbeats can access)
+    this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
   }
 
   async execute() {
@@ -21,11 +30,25 @@ export default class ShowHeartbeatAction extends Action {
     } = this.recipe.arguments;
 
     const lastShown = await this.getLastShownDate();
+
+    // get the last shown for heartbeats in general
+    const lastHeartbeatShown = await this.getLastHeartbeatDate();
+
+    // we can show the heartbeat if there has not been one shown recently,
+    const canShowHeartbeat = lastHeartbeatShown === null
+    // or if the last one shown was more than HEARTBEAT_THROTTLE ms ago
+      || Date.now() - lastHeartbeatShown >= HEARTBEAT_THROTTLE;
+
+    // the survey should display itself if..
     const shouldShowSurvey = (
-      this.normandy.testing
-      || lastShown === null
-      || Date.now() - lastShown > LAST_SHOWN_DELAY
+      // ..we're testing, or..
+      this.normandy.testing ||
+        // ..if this has never been shown..
+        (lastShown === null
+        // ..and we can show it, then we should
+        && canShowHeartbeat)
     );
+
     if (!shouldShowSurvey) {
       return;
     }
@@ -73,6 +96,9 @@ export default class ShowHeartbeatAction extends Action {
 
     await this.normandy.showHeartbeat(heartbeatData);
     this.setLastShownDate();
+
+    // and save the 'global' record that a heartbeat just played
+    this.setLastHeartbeatDate();
   }
 
   setLastShownDate() {
@@ -80,9 +106,18 @@ export default class ShowHeartbeatAction extends Action {
     this.storage.setItem('lastShown', Date.now());
   }
 
+  setLastHeartbeatDate() {
+    this.heartbeatStorage.setItem('lastShown', Date.now());
+  }
+
   async getLastShownDate() {
     const lastShown = await this.storage.getItem('lastShown');
-    return Number.isNaN(lastShown) ? null : lastShown;
+    return Number.isNaN(lastShown) ? 0 : lastShown;
+  }
+
+  async getLastHeartbeatDate() {
+    const lastShown = await this.heartbeatStorage.getItem('lastShown');
+    return Number.isNaN(lastShown) ? 0 : lastShown;
   }
 
   /**
