@@ -6,6 +6,10 @@ import GroupMenu from 'control/components/GroupMenu';
 import DropdownMenu from 'control/components/DropdownMenu';
 import ColumnMenu from 'control/components/ColumnMenu';
 
+import {
+  selectFilter,
+} from 'control/actions/FilterActions';
+
 class RecipeFilters extends React.Component {
   static propTypes = {
     searchText: pt.string.isRequired,
@@ -15,6 +19,7 @@ class RecipeFilters extends React.Component {
     // connected
     availableFilters: pt.array.isRequired,
     selectedFilters: pt.array.isRequired,
+    dispatch: pt.func.isRequired,
   };
 
   static defaultColumnConfig = [{
@@ -78,19 +83,23 @@ class RecipeFilters extends React.Component {
     });
   }
 
-  handleFilterChange(dontSave) {
-    const selected = [];
-    this.state.columns.forEach(col => {
-      if (col.enabled === true) {
-        selected.push(col);
-      }
-    });
+  onGroupFilterSelect(group, option) {
+    this.props.dispatch(selectFilter({
+      group,
+      option,
+      isEnabled: true,
+    }));
+  }
 
-    if (!dontSave) {
-      localForage.setItem('columns', this.state.columns);
-    }
+  searchGroup(group, search) {
+    const groupString = JSON.stringify(group).toLowerCase();
+    const groupSearch = (search || '').toLowerCase();
 
-    this.props.onFilterChange(selected);
+    return groupString.indexOf(groupSearch) > -1;
+  }
+
+  filterGroups(groups, search) {
+    return groups.filter(group => this.searchGroup(group, search));
   }
 
   handleColumnInput(columnIndex, isActive) {
@@ -105,15 +114,19 @@ class RecipeFilters extends React.Component {
     this.handleFilterChange();
   }
 
-  searchGroup(group, search) {
-    const groupString = JSON.stringify(group).toLowerCase();
-    const groupSearch = (search || '').toLowerCase();
+  handleFilterChange(dontSave) {
+    const selected = [];
+    this.state.columns.forEach(col => {
+      if (col.enabled === true) {
+        selected.push(col);
+      }
+    });
 
-    return groupString.indexOf(groupSearch) > -1;
-  }
+    if (!dontSave) {
+      localForage.setItem('columns', this.state.columns);
+    }
 
-  filterGroups(groups, search) {
-    return groups.filter(group => this.searchGroup(group, search));
+    this.props.onFilterChange(selected);
   }
 
   render() {
@@ -133,18 +146,30 @@ class RecipeFilters extends React.Component {
         <div id="secondary-header" className="fluid-8">
           <div className="header-search" className="fluid-2">
             <div className="search input-with-icon">
-              <input
-                type="text"
-                placeholder="Search"
-                initialValue={searchText}
-                onChange={updateSearch}
-              />
+              <DropdownMenu
+                useFocus
+                useBlur
+                trigger={
+                  <input
+                    type="text"
+                    placeholder="Search"
+                    initialValue={searchText}
+                    onChange={updateSearch}
+                  />
+                }
+              >
+                <GroupMenu
+                  data={searchText ? result : this.props.availableFilters}
+                  onItemSelect={this.onGroupFilterSelect}
+                />
+              </DropdownMenu>
             </div>
           </div>
           <div id="filters-container" className="fluid-6">
             <DropdownMenu
+              useClick
               trigger={
-                <span>
+                <span className="col-trigger">
                   <span className="fa fa-columns" />
                   Columns
                 </span>
@@ -157,17 +182,12 @@ class RecipeFilters extends React.Component {
             </DropdownMenu>
           </div>
         </div>
-        <div className="fluid-8">
-          <GroupMenu
-            data={searchText ? result : this.props.availableFilters}
-          />
-        </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   availableFilters: state.filters.available || [],
   selectedFilters: state.filters.selected || [],
 });

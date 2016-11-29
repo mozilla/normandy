@@ -5,6 +5,9 @@ export default class DropdownMenu extends React.Component {
   static propTypes = {
     trigger: pt.node.isRequired,
     children: pt.any.isRequired,
+    useClick: pt.boolean,
+    useBlur: pt.boolean,
+    useFocus: pt.boolean,
   };
 
   constructor(props) {
@@ -42,7 +45,7 @@ export default class DropdownMenu extends React.Component {
 
   toggleVisibility(force) {
     // if we get a parameter, use that instead of just straight up toggling
-    const newVisibleState = typeof force !== undefined ? force : !this.state.isVisible;
+    const newVisibleState = typeof force === 'boolean' ? force : !this.state.isVisible;
 
     this.setState({
       isVisible: newVisibleState,
@@ -58,7 +61,9 @@ export default class DropdownMenu extends React.Component {
       >
         <div
           className="dropdown-trigger"
-          onClick={this.toggleVisibility}
+          onClick={this.props.useClick && this.toggleVisibility}
+          onBlur={this.props.useBlur && this.toggleVisibility}
+          onFocus={this.props.useFocus && this.toggleVisibility}
         >
           { this.props.trigger }
         </div>
