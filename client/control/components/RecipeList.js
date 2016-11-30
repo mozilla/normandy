@@ -175,8 +175,6 @@ class DisconnectedRecipeList extends React.Component {
         // increase the 'valid count'
         if (recipeHasAllFilters) {
           validCount += 1;
-        } else {
-          console.log('recipe failed', property, filteredValues, recipeValues);
         }
       });
 
