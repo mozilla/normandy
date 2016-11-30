@@ -130,14 +130,6 @@ in other Django projects.
     The DSN for Raven to report errors to Sentry. Defaults to ``None``. Not
     required.
 
-.. envvar:: DJANGO_CACHES_RECIPE_TIME
-
-    :default: ``300`` (5 minutes)
-
-    The amount of time in seconds to hold Recipes in the cache. This may be set
-    to 0 in non-production environments to ease testing. In production
-    environments, setting this value too low can be a denial-of-service risk.
-
 .. envvar:: DJANGO_AUTOGRAPH_URL
 
     The URL where an Autograph_ server can be reached. If left blank, content

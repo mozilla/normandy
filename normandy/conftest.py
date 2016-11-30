@@ -1,8 +1,5 @@
 import hashlib
 
-from django.core.cache import caches
-from django.conf import settings
-
 import pytest
 from rest_framework.test import APIClient
 
@@ -17,14 +14,6 @@ def api_client():
     client = APIClient()
     client.force_authenticate(user=user)
     return client
-
-
-@pytest.yield_fixture(autouse=True)
-def django_cache(request):
-    """Require a django test cache"""
-    yield None
-    for cache_name in settings.CACHES.keys():
-        caches[cache_name].clear()
 
 
 @pytest.fixture
