@@ -61,7 +61,7 @@ function filtersReducer(state = initialState, action) {
 
   switch (action.type) {
     case LOAD_LAST_FILTERS:
-      newState = [].concat(action.state || initialState);
+      newState = [].concat((action && action.state) || initialState);
       saveState(newState);
       return newState;
 
