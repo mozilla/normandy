@@ -189,6 +189,7 @@ class Base(Core):
 
     # Remote services
     DATABASES = values.DatabaseURLValue('postgres://postgres@localhost/normandy')
+    CONN_MAX_AGE = values.IntegerValue(0)
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, 'GeoLite2-Country.mmdb'))
     # Email settings
     EMAIL_HOST_USER = values.Value()
