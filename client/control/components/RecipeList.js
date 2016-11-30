@@ -154,7 +154,7 @@ class DisconnectedRecipeList extends React.Component {
           .map(option => option.value);
 
         // Get the recipe's value for this property
-        let recipeValues = recipe[property] || [];
+        let recipeValues = typeof recipe[property] !== 'undefined' ? recipe[property] : [];
 
         // We compare using arrays,
         // so if the value is just a single value
@@ -165,7 +165,6 @@ class DisconnectedRecipeList extends React.Component {
         } else {
           recipeValues = [recipeValues];
         }
-
 
         // compare using Array.every and indexOf
         const recipeHasAllFilters = (filteredValues || [])

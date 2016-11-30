@@ -10,14 +10,14 @@ const saveState = state => localForage.setItem('last-filters', state);
 const initialState = [
   {
     label: 'Status',
-    value: 'status',
+    value: 'enabled',
     multiple: false,
     options: [{
       label: 'Enabled',
-      value: 'enabled',
+      value: true,
     }, {
       label: 'Disabled',
-      value: 'disabled',
+      value: false,
     }],
   }, {
     label: 'Action Name',
