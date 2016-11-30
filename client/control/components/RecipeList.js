@@ -232,6 +232,9 @@ class DisconnectedRecipeList extends React.Component {
 
     filteredRecipes = this.applyFiltersToRecipes(this.props.activeFilters, filteredRecipes);
 
+    const noResults = filteredRecipes.length === 0;
+    const isFiltering = !!this.props.activeFilters.length;
+
     return (
       <div>
         <RecipeFilters
@@ -270,6 +273,12 @@ class DisconnectedRecipeList extends React.Component {
               </Tr>
             )}
           </Table>
+
+          {
+            noResults && (isFiltering ?
+              <div className="callout">No recipes match those filters.</div>
+            : <div className="callout">No recipes to display.</div>)
+          }
         </div>
       </div>
     );

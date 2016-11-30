@@ -301,12 +301,14 @@ i {
   border-radius: 4px;
   display: block;
   padding: 1em;
+  text-align: center;
   width: 100%;
 }
 
 .recipe-form {
   .callout {
     float: right;
+    text-align: left;
     width: 45%;
   }
 }
