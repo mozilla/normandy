@@ -24,7 +24,7 @@ Django settings are available for configuration.
 .. envvar:: DJANGO_ALLOWED_HOSTS
 
     :default: Empty string
-    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#allowed-hosts
+    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#std:allowed-hosts
 
     A comma-seperated list of host values to accept. Examples:
     ``example.com,www.example.com``, ``.example.com``
@@ -49,7 +49,7 @@ Django settings are available for configuration.
 .. envvar:: DJANGO_DEBUG
 
     :default: ``false``
-    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#debug
+    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#std:debug
 
     ``true`` or ``false``. Enables Django's debug mode. This should never be
     enabled on permanent servers. It is inefficient and leaks memory.
@@ -57,7 +57,7 @@ Django settings are available for configuration.
 .. envvar:: DJANGO_MEDIA_URL
 
     :default: ``/media/``
-    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#media-url
+    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#std:media-url
 
     The URL prefix for media files (files uploaded to the service). Both
     host-relative (``/media/``) and host-absolute URLs
@@ -76,10 +76,19 @@ Django settings are available for configuration.
 .. envvar:: DJANGO_STATIC_URL
 
     :default: ``/static/``
-    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#static-url
+    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#std:static-url
 
     The URL prefix for static files (files shipped with the service). Both
     host-relative and host-absolute URLs work. Should end in a slash.
+
+.. envvar:: DJANGO_CONN_MAX_AGE
+
+    :default: ``0``
+    :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-CONN_MAX_AGE
+
+    Time to hold database connections open. If set to 0, will close every
+    database connection immediately. Each worker (as controlled by
+    ``WEB_CONCURRENCY``) will have its own connection.
 
 Normandy settings
 -----------------
