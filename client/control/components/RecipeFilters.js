@@ -67,6 +67,16 @@ class RecipeFilters extends React.Component {
     enabled: true,
   }];
 
+  static removeProperties(object, list) {
+    const newObject = { ...object };
+
+    list.forEach(property => {
+      delete newObject[property];
+    });
+
+    return newObject;
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -107,7 +117,21 @@ class RecipeFilters extends React.Component {
   }
 
   searchGroup(group, search) {
-    const groupString = JSON.stringify(group).toLowerCase();
+    // remove 'meta' properties the user doesn't actually
+    // want to search over
+    const groupProperties = RecipeFilters.removeProperties(group,
+      ['value', 'selected', 'multiple']);
+
+    // remove properties user doesnt care to search over
+    groupProperties.options = groupProperties.options.map(option =>
+      RecipeFilters.removeProperties(option, [
+        option.label ? 'value' : 'label',
+        'selected',
+        'multiple',
+      ]));
+
+    // quick and dirty 'deep object search'
+    const groupString = JSON.stringify(groupProperties).toLowerCase();
     const groupSearch = (search || '').toLowerCase();
 
     return groupString.indexOf(groupSearch) > -1;
