@@ -24,12 +24,7 @@ export default class ShowHeartbeatAction extends Action {
    */
   async heartbeatShownRecently() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    let timeSince = Infinity;
-
-    // If no heartbeat has ever been shown, lastShown will be falsey.
-    if (lastShown) {
-      timeSince = new Date() - lastShown;
-    }
+    const timeSince = lastShown ? new Date() - lastShown : Infinity;
 
     // Return a boolean indicating if a heartbeat
     // has shown within the last HEARTBEAT_THROTTLE ms
