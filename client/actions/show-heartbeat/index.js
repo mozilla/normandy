@@ -18,6 +18,33 @@ export default class ShowHeartbeatAction extends Action {
     this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
   }
 
+  /**
+   * Calculates the number of milliseconds since the last heartbeat from any recipe
+   * was shown. If no heartbeat has ever been shown, returns Infinity, or "forever ago".
+   */
+  async timeSinceLastHeartbeat() {
+    const lastShown = await this.heartbeatStorage.getItem('lastShown');
+    let timeSince = Infinity;
+
+    // If no heartbeat has ever been shown, lastShown will be falsey.
+    if (lastShown) {
+      timeSince = new Date() - lastShown;
+    }
+
+    return timeSince;
+  }
+
+  /**
+   * Checks when this survey was last shown,
+   * and returns a boolean indicating if the
+   * user has seen this survey already or not.
+   */
+  async surveyHasShown() {
+    const lastShown = await this.storage.getItem('lastShown');
+    // If no survey has been shown, lastShown will be falsey.
+    return !!lastShown;
+  }
+
   async execute() {
     const {
       surveyId,
@@ -29,27 +56,10 @@ export default class ShowHeartbeatAction extends Action {
       learnMoreUrl,
     } = this.recipe.arguments;
 
-    const lastShown = await this.getLastShownDate();
-
-    // get the last shown for heartbeats in general
-    const lastHeartbeatShown = await this.getLastHeartbeatDate();
-
-    // we can show the heartbeat if there has not been one shown recently,
-    const canShowHeartbeat = lastHeartbeatShown === null
-    // or if the last one shown was more than HEARTBEAT_THROTTLE ms ago
-      || Date.now() - lastHeartbeatShown >= HEARTBEAT_THROTTLE;
-
-    // the survey should display itself if..
-    const shouldShowSurvey = (
-      // ..we're testing, or..
-      this.normandy.testing ||
-        // ..if this has never been shown..
-        (lastShown === null
-        // ..and we can show it, then we should
-        && canShowHeartbeat)
-    );
-
-    if (!shouldShowSurvey) {
+    if (!this.normandy.testing && (
+      await this.timeSinceLastHeartbeat() < HEARTBEAT_THROTTLE ||
+      await this.surveyHasShown()
+    )) {
       return;
     }
 
@@ -112,12 +122,12 @@ export default class ShowHeartbeatAction extends Action {
 
   async getLastShownDate() {
     const lastShown = await this.storage.getItem('lastShown');
-    return Number.isNaN(lastShown) ? 0 : lastShown;
+    return Number.isNaN(lastShown) ? null : lastShown;
   }
 
   async getLastHeartbeatDate() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    return Number.isNaN(lastShown) ? 0 : lastShown;
+    return Number.isNaN(lastShown) ? null : lastShown;
   }
 
   /**
