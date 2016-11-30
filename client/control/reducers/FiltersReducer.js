@@ -70,7 +70,7 @@ function filtersReducer(state = initialState, action) {
 
   switch (action.type) {
     case LOAD_LAST_FILTERS:
-      newState = [].concat((action && action.state) || initialState);
+      newState = [].concat(action.state || initialState);
       saveState(newState);
       return newState;
 
@@ -78,11 +78,12 @@ function filtersReducer(state = initialState, action) {
       newState = [].concat(state);
 
       newState = newState.map(group => {
+        const newGroup = { ...group };
         // get the group the action is for
-        if (group.value === action.group.value) {
+        if (newGroup.value === action.group.value) {
           let hasSelected = false;
 
-          group.options = [].concat(group.options || []).map(option => {
+          newGroup.options = [].concat(newGroup.options || []).map(option => {
             if (option.value === action.option.value) {
               option.selected = action.isEnabled || false;
             }
@@ -91,10 +92,10 @@ function filtersReducer(state = initialState, action) {
             return option;
           });
 
-          group.selected = hasSelected;
+          newGroup.selected = hasSelected;
         }
 
-        return group;
+        return newGroup;
       });
 
       saveState(newState);
