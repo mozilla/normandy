@@ -143,6 +143,7 @@ class Base(Core):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'mozilla_cloud_services_logger.django.middleware.RequestSummaryLogger',
     ]
 
     def MIDDLEWARE_CLASSES(self):
@@ -180,6 +181,11 @@ class Base(Core):
             },
             'loggers': {
                 'normandy': {
+                    'propagate': False,
+                    'handlers': ['console'],
+                    'level': 'DEBUG',
+                },
+                'request.summary': {
                     'propagate': False,
                     'handlers': ['console'],
                     'level': 'DEBUG',
@@ -292,7 +298,10 @@ class ProductionReadOnly(Production):
     Settings for a production environment that is read-only. This is
     used on public-facing webheads.
     """
-    EXTRA_MIDDLEWARE_CLASSES = []  # No need for sessions!
+    EXTRA_MIDDLEWARE_CLASSES = [
+        # No need for sessions, so removing those middlewares helps us go fast
+        'mozilla_cloud_services_logger.django.middleware.RequestSummaryLogger',
+    ]
     ADMIN_ENABLED = values.BooleanValue(False)
     SILENCED_SYSTEM_CHECKS = values.ListValue(['security.W003'])  # CSRF check
 
