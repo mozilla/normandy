@@ -25,6 +25,8 @@ class RecipeFilters extends React.Component {
     selectedFilters: pt.array.isRequired,
     availableFilters: pt.array.isRequired,
     dispatch: pt.func.isRequired,
+    displayCount: pt.number,
+    totalCount: pt.number,
   };
 
   static defaultColumnConfig = [{
@@ -176,11 +178,18 @@ class RecipeFilters extends React.Component {
     const {
       searchText,
       updateSearch,
+      displayCount,
+      totalCount,
     } = this.props;
 
     let result;
 
     const availableFilters = this.props.availableFilters;
+
+    const displayPercentage = Math.round((displayCount / (totalCount || 1)) * 100);
+    const displayMessage = `Showing ${displayCount} recipe${displayCount === 1 ? '' : 's'}`;
+    const displayAddendum = this.props.selectedFilters.length > 0 ?
+      ` of ${totalCount} (${displayPercentage}%)` : '';
 
     // if the user has typed in text,
     // filter the remaining options
@@ -229,7 +238,7 @@ class RecipeFilters extends React.Component {
               />
             </DropdownMenu>
           </div>
-          <div className="fluid-8">
+          <div className="fluid-6">
             {
               this.props.selectedFilters.map(filter =>
                 <div className="active-filter">
@@ -265,6 +274,14 @@ class RecipeFilters extends React.Component {
                   </span>
                 </div>
             }
+          </div>
+          <div
+            className="fluid-2"
+            style={{ textAlign: 'right' }}
+          >
+            <span>
+              {displayMessage} {displayAddendum}
+            </span>
           </div>
         </div>
       </div>

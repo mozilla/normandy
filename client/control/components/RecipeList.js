@@ -241,6 +241,8 @@ class DisconnectedRecipeList extends React.Component {
           {...this.state}
           updateSearch={this.updateSearch}
           onFilterChange={this.onFilterChange}
+          displayCount={filteredRecipes.length}
+          totalCount={recipes.length}
         />
         <div className="fluid-8">
           <Table
