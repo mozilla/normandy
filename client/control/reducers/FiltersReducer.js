@@ -20,6 +20,15 @@ const initialState = [
       value: 'disabled',
     }],
   }, {
+    label: 'Action Name',
+    value: 'action',
+    multiple: false,
+    options: [{
+      value: 'console-log',
+    }, {
+      value: 'show-heartbeat',
+    }],
+  }, {
     label: 'Channels',
     value: 'channels',
     multiple: true,
