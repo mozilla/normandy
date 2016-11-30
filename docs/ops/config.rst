@@ -86,8 +86,8 @@ Django settings are available for configuration.
     :default: ``0``
     :documentation: https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-CONN_MAX_AGE
 
-    Time to hold database connections open. If set to 0, will close every
-    database connection immediately. Each worker (as controlled by
+    Time to hold database connections open in seconds. If set to 0, will close
+    every database connection immediately. Each worker (as controlled by
     ``WEB_CONCURRENCY``) will have its own connection.
 
 Normandy settings
