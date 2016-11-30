@@ -1,12 +1,45 @@
 import { Action, registerAction } from '../utils';
 
 const VERSION = 55; // Increase when changed.
-const LAST_SHOWN_DELAY = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+// how much time should elapse between heartbeats?
+const HEARTBEAT_THROTTLE = 1000 * 60 * 60 * 24; // 24 hours
 
 export default class ShowHeartbeatAction extends Action {
   constructor(normandy, recipe) {
     super(normandy, recipe);
+
+    // 'local' storage
+    // (namespaced to recipe.id - only this heartbeat can access)
     this.storage = normandy.createStorage(recipe.id);
+
+    // 'global' storage
+    // (constant namespace - all heartbeats can access)
+    this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
+  }
+
+  /**
+   * Calculates the number of milliseconds since the last heartbeat from any recipe
+   * was shown. Returns a boolean indicating if a heartbeat has been shown recently.
+   */
+  async heartbeatShownRecently() {
+    const lastShown = await this.heartbeatStorage.getItem('lastShown');
+    const timeSince = lastShown ? new Date() - lastShown : Infinity;
+
+    // Return a boolean indicating if a heartbeat
+    // has shown within the last HEARTBEAT_THROTTLE ms
+    return timeSince < HEARTBEAT_THROTTLE;
+  }
+
+  /**
+   * Checks when this survey was last shown,
+   * and returns a boolean indicating if the
+   * user has seen this survey already or not.
+   */
+  async surveyHasShown() {
+    const lastShown = await this.storage.getItem('lastShown');
+    // If no survey has been shown, lastShown will be falsey.
+    return !!lastShown;
   }
 
   async execute() {
@@ -20,13 +53,10 @@ export default class ShowHeartbeatAction extends Action {
       learnMoreUrl,
     } = this.recipe.arguments;
 
-    const lastShown = await this.getLastShownDate();
-    const shouldShowSurvey = (
-      this.normandy.testing
-      || lastShown === null
-      || Date.now() - lastShown > LAST_SHOWN_DELAY
-    );
-    if (!shouldShowSurvey) {
+    if (!this.normandy.testing && (
+      await this.heartbeatShownRecently() ||
+      await this.surveyHasShown()
+    )) {
       return;
     }
 
@@ -73,6 +103,9 @@ export default class ShowHeartbeatAction extends Action {
 
     await this.normandy.showHeartbeat(heartbeatData);
     this.setLastShownDate();
+
+    // and save the 'global' record that a heartbeat just played
+    this.setLastHeartbeatDate();
   }
 
   setLastShownDate() {
@@ -80,8 +113,17 @@ export default class ShowHeartbeatAction extends Action {
     this.storage.setItem('lastShown', Date.now());
   }
 
+  setLastHeartbeatDate() {
+    this.heartbeatStorage.setItem('lastShown', Date.now());
+  }
+
   async getLastShownDate() {
     const lastShown = await this.storage.getItem('lastShown');
+    return Number.isNaN(lastShown) ? null : lastShown;
+  }
+
+  async getLastHeartbeatDate() {
+    const lastShown = await this.heartbeatStorage.getItem('lastShown');
     return Number.isNaN(lastShown) ? null : lastShown;
   }
 

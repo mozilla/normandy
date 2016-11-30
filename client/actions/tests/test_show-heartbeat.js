@@ -14,14 +14,29 @@ describe('ShowHeartbeatAction', () => {
     await action.execute();
   });
 
-  it('should not show heartbeat if it has shown within the past 7 days', async () => {
+  it('should show heartbeat if it has not been shown yet', async() => {
     const recipe = recipeFactory();
     const action = new ShowHeartbeatAction(normandy, recipe);
 
-    normandy.mock.storage.data.lastShown = '100';
-    spyOn(Date, 'now').and.returnValue(10);
+    normandy.mock.storage.data.lastShown = null;
+    spyOn(Date, 'now').and.returnValue(99999999);
 
     await action.execute();
+    expect(normandy.showHeartbeat).toHaveBeenCalled();
+  });
+
+  it('should NOT show heartbeat if it has been shown already', async() => {
+    const recipe = recipeFactory();
+    const action = new ShowHeartbeatAction(normandy, recipe);
+
+    // set the lastShown value in storage,
+    // so heartbeat thinks it's run already before
+    normandy.mock.storage.data.lastShown = '100';
+
+    // attempt to run it again
+    await action.execute();
+
+    // it should NOT run since it's already 'run' once before
     expect(normandy.showHeartbeat).not.toHaveBeenCalled();
   });
 
@@ -31,28 +46,6 @@ describe('ShowHeartbeatAction', () => {
 
     normandy.testing = true;
     normandy.mock.storage.data.lastShown = '100';
-    spyOn(Date, 'now').and.returnValue(10);
-
-    await action.execute();
-    expect(normandy.showHeartbeat).toHaveBeenCalled();
-  });
-
-  it("should show heartbeat if it hasn't shown within the past 7 days", async () => {
-    const recipe = recipeFactory();
-    const action = new ShowHeartbeatAction(normandy, recipe);
-
-    normandy.mock.storage.data.lastShown = '100';
-    spyOn(Date, 'now').and.returnValue(9999999999);
-
-    await action.execute();
-    expect(normandy.showHeartbeat).toHaveBeenCalled();
-  });
-
-  it('should show heartbeat if the last-shown date is null', async () => {
-    const recipe = recipeFactory();
-    const action = new ShowHeartbeatAction(normandy, recipe);
-
-    normandy.mock.storage.data.lastShown = null;
     spyOn(Date, 'now').and.returnValue(10);
 
     await action.execute();
