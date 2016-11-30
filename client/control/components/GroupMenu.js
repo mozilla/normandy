@@ -35,7 +35,7 @@ export default class GroupMenu extends React.Component {
                       this.props.onItemSelect(group, option);
                     }}
                   >
-                    { option.label }
+                    { option.label || option.value }
                   </div>
                 )
               }

@@ -223,7 +223,7 @@ class RecipeFilters extends React.Component {
                             isEnabled: false,
                           }));
                         }}
-                      >{ option.label }</div>)
+                      >{ option.label || option.value }</div>)
                   }
                 </div>
               )
