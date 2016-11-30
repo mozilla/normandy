@@ -54,7 +54,7 @@ class DisconnectedRecipeList extends React.Component {
    * @param  {Object} Original recipe object
    * @return {Object} Original recipe but with `metadata` and `searchData` properties added
    */
-  static applyRecipeMetadata(recipe) {
+  static applyRecipeMetadata(recipe, index) {
     const { action: recipeAction } = recipe;
     const newRecipe = {
       ...recipe,
@@ -65,7 +65,7 @@ class DisconnectedRecipeList extends React.Component {
       locales: [{
         label: 'English (US)',
         value: 'en-US',
-      }].concat(Math.random() > 0.5 ? [{
+      }].concat(index % 2 === 0 ? [{
         label: 'German',
         value: 'de',
       }] : []),
@@ -137,32 +137,52 @@ class DisconnectedRecipeList extends React.Component {
   }
 
   applyFiltersToRecipes(filters, recipes) {
-    let newRecipes = [].concat(recipes);
+    let newRecipes = [].concat(recipes || []);
 
     if (!filters || filters.length === 0) {
       return newRecipes;
     }
 
     newRecipes = newRecipes.filter(recipe => {
-      let isValid = false;
+      let validCount = 0;
+      const filterCount = filters.length;
 
       filters.forEach(filter => {
         const property = filter.value;
-        const filteredValues = filter.options
+        const filteredValues = (filter.options || [])
           .filter(option => option.selected)
-          .map(option => option.value)
-          .join(' ');
+          .map(option => option.value);
 
-        const recipeValue = recipe[property]
-          .map(option => option.value)
-          .join(' ');
+        // Get the recipe's value for this property
+        let recipeValues = recipe[property] || [];
 
-        if (recipeValue && filteredValues.indexOf(recipeValue) > -1) {
-          isValid = true;
+        // We compare using arrays,
+        // so if the value is just a single value
+        // we need to wrap it in an array
+        if (recipeValues instanceof Array) {
+          // We want only an array of the values
+          recipeValues = recipeValues.map(option => option.value);
+        } else {
+          recipeValues = [recipeValues];
+        }
+
+
+        // compare using Array.every and indexOf
+        const recipeHasAllFilters = (filteredValues || [])
+          .every(val => recipeValues.indexOf(val) >= 0);
+
+        // if the recipe has all the filters for this property,
+        // increase the 'valid count'
+        if (recipeHasAllFilters) {
+          validCount += 1;
+        } else {
+          console.log('recipe failed', property, filteredValues, recipeValues);
         }
       });
 
-      return isValid;
+      // if all filter properties have been satisfied,
+      // this recipe can be shown!
+      return validCount === filterCount;
     });
 
     return newRecipes;
