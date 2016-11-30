@@ -20,9 +20,9 @@ export default class ShowHeartbeatAction extends Action {
 
   /**
    * Calculates the number of milliseconds since the last heartbeat from any recipe
-   * was shown. If no heartbeat has ever been shown, returns Infinity, or "forever ago".
+   * was shown. Returns a boolean indicating if a heartbeat has been shown recently.
    */
-  async timeSinceLastHeartbeat() {
+  async heartbeatShownRecently() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
     let timeSince = Infinity;
 
@@ -31,7 +31,9 @@ export default class ShowHeartbeatAction extends Action {
       timeSince = new Date() - lastShown;
     }
 
-    return timeSince;
+    // Return a boolean indicating if a heartbeat
+    // has shown within the last HEARTBEAT_THROTTLE ms
+    return timeSince < HEARTBEAT_THROTTLE;
   }
 
   /**
@@ -57,7 +59,7 @@ export default class ShowHeartbeatAction extends Action {
     } = this.recipe.arguments;
 
     if (!this.normandy.testing && (
-      await this.timeSinceLastHeartbeat() < HEARTBEAT_THROTTLE ||
+      await this.heartbeatShownRecently() ||
       await this.surveyHasShown()
     )) {
       return;
