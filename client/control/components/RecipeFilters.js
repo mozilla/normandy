@@ -205,6 +205,7 @@ class RecipeFilters extends React.Component {
                 }
               >
                 <GroupMenu
+                  searchText={searchText}
                   data={searchText ? result : availableFilters}
                   onItemSelect={this.onGroupFilterSelect}
                 />

@@ -5,6 +5,7 @@ export default class GroupMenu extends React.Component {
     data: pt.array.isRequired,
     children: pt.any.isRequired,
     onItemSelect: pt.func.isRequired,
+    searchText: pt.string,
   };
 
   constructor(props) {
@@ -14,12 +15,24 @@ export default class GroupMenu extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const {
+      data,
+      searchText,
+    } = this.props;
+
+    const noData = !data || !data.length;
 
     return (
       <div
         className="group-menu"
       >
+        {
+          noData &&
+          (
+            searchText ? <span>No results for <b>"{searchText}"</b></span>
+            : 'No filters to display.'
+          )
+        }
         {
           data.map(group =>
             <div
