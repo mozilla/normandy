@@ -176,9 +176,7 @@ export default class NormandyDriver {
   }
 
   createStorage(prefix) {
-    // TODO: Stop skipping durabilit checks after durability checking has
-    // been deployed for 2+days to avoid interupting surveys.
-    return new LocalStorage(prefix, { skipDurability: true });
+    return new LocalStorage(prefix);
   }
 
   client() {
