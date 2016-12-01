@@ -2,9 +2,10 @@ import React, { PropTypes as pt } from 'react';
 import * as localForage from 'localforage';
 import { connect } from 'react-redux';
 
-import GroupMenu from 'control/components/GroupMenu';
-import DropdownMenu from 'control/components/DropdownMenu';
 import ColumnMenu from 'control/components/ColumnMenu';
+import ActiveFilters from 'control/components/ActiveFilters';
+import RecipeCombobox from 'control/components/RecipeCombobox';
+import RecipeCount from 'control/components/RecipeCount';
 
 import {
   selectFilter,
@@ -69,16 +70,6 @@ class RecipeFilters extends React.Component {
     enabled: true,
   }];
 
-  static removeProperties(object, list) {
-    const newObject = { ...object };
-
-    list.forEach(property => {
-      delete newObject[property];
-    });
-
-    return newObject;
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -87,7 +78,7 @@ class RecipeFilters extends React.Component {
 
     this.handleFilterChange = ::this.handleFilterChange;
     this.handleColumnInput = ::this.handleColumnInput;
-    this.onGroupFilterSelect = ::this.onGroupFilterSelect;
+    this.handleGroupFilterSelect = ::this.handleGroupFilterSelect;
     this.resetFilters = ::this.resetFilters;
 
     this.handleFilterChange(true);
@@ -110,37 +101,12 @@ class RecipeFilters extends React.Component {
     });
   }
 
-  onGroupFilterSelect(group, option) {
+  handleGroupFilterSelect(group, option) {
     this.props.dispatch(selectFilter({
       group,
       option,
       isEnabled: true,
     }));
-  }
-
-  searchGroup(group, search) {
-    // remove 'meta' properties the user doesn't actually
-    // want to search over
-    const groupProperties = RecipeFilters.removeProperties(group,
-      ['value', 'selected', 'multiple']);
-
-    // remove properties user doesnt care to search over
-    groupProperties.options = groupProperties.options.map(option =>
-      RecipeFilters.removeProperties(option, [
-        option.label ? 'value' : 'label',
-        'selected',
-        'multiple',
-      ]));
-
-    // quick and dirty 'deep object search'
-    const groupString = JSON.stringify(groupProperties).toLowerCase();
-    const groupSearch = (search || '').toLowerCase();
-
-    return groupString.indexOf(groupSearch) > -1;
-  }
-
-  filterGroups(groups, search) {
-    return groups.filter(group => this.searchGroup(group, search));
   }
 
   handleColumnInput(columnIndex, isActive) {
@@ -180,102 +146,45 @@ class RecipeFilters extends React.Component {
       updateSearch,
       displayCount,
       totalCount,
+      availableFilters,
     } = this.props;
-
-    let result;
-
-    const availableFilters = this.props.availableFilters;
-
-    const displayPercentage = Math.round((displayCount / (totalCount || 1)) * 100);
-    const displayMessage = `Showing ${displayCount} recipe${displayCount === 1 ? '' : 's'}`;
-    const displayAddendum = this.props.selectedFilters.length > 0 ?
-      ` of ${totalCount} (${displayPercentage}%)` : '';
-
-    // if the user has typed in text,
-    // filter the remaining options
-    if (searchText) {
-      result = this.filterGroups(availableFilters, searchText);
-    }
 
     return (
       <div className="fluid-8">
         <div id="secondary-header" className="fluid-8">
           <div className="header-search" className="fluid-2">
-            <div className="search input-with-icon">
-              <DropdownMenu
-                useFocus
-                trigger={
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    initialValue={searchText}
-                    onChange={updateSearch}
-                  />
-                }
-              >
-                <GroupMenu
-                  searchText={searchText}
-                  data={searchText ? result : availableFilters}
-                  onItemSelect={this.onGroupFilterSelect}
-                />
-              </DropdownMenu>
-            </div>
+            <RecipeCombobox
+              searchText={searchText}
+              updateSearch={updateSearch}
+              onGroupFilterSelect={this.handleGroupFilterSelect}
+              availableFilters={availableFilters}
+            />
           </div>
+
           <div id="filters-container" className="fluid-6">
-            <span className="show-count">
-              {displayMessage} {displayAddendum}
-            </span>
-            <DropdownMenu
-              pinRight
-              useClick
-              trigger={
-                <span className="col-trigger">
-                  <span className="fa fa-columns" />
-                  Columns
-                </span>
-              }
-            >
-              <ColumnMenu
-                columns={this.state.columns}
-                onInputChange={this.handleColumnInput}
-              />
-            </DropdownMenu>
+            <RecipeCount
+              displayCount={displayCount}
+              totalCount={totalCount}
+              isFiltering={this.props.selectedFilters.length > 0}
+            />
+            <ColumnMenu
+              columns={this.state.columns}
+              onColumnChange={this.handleColumnInput}
+            />
           </div>
-          <div className="active-filters fluid-8">
-            {
-              this.props.selectedFilters.map(filter =>
-                <div className="enabled-filter">
-                  <span className="filter-label">
-                    { filter.label }
-                  </span>
-                  {
-                    filter.options
-                      .filter(option => option.selected)
-                      .map(option => <div
-                        className="filter-option"
-                        onClick={() => {
-                          this.props.dispatch(selectFilter({
-                            group: filter,
-                            option,
-                            isEnabled: false,
-                          }));
-                        }}
-                      >{ option.label || option.value }</div>)
-                  }
-                </div>
-              )
-            }
-            {
-              /* reset button */
-              this.props.selectedFilters.length > 0 &&
-                <div
-                  className="enabled-filter-button"
-                  onClick={this.resetFilters}
-                >
-                  Reset Filters
-                </div>
-            }
-          </div>
+
+          <ActiveFilters
+            className="fluid-8"
+            selectedFilters={this.props.selectedFilters}
+            onResetFilters={this.resetFilters}
+            onFilterSelect={({ group, option }) => {
+              this.props.dispatch(selectFilter({
+                group,
+                option,
+                isEnabled: false,
+              }));
+            }}
+          />
         </div>
       </div>
     );

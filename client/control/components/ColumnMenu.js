@@ -1,8 +1,11 @@
 import React, { PropTypes as pt } from 'react';
 
+import CheckboxList from 'control/components/CheckboxList';
+import DropdownMenu from 'control/components/DropdownMenu';
+
 export default class ColumnMenu extends React.Component {
   static propTypes = {
-    onInputChange: pt.func.isRequired,
+    onColumnChange: pt.func.isRequired,
     columns: pt.array.isRequired,
   };
 
@@ -12,32 +15,24 @@ export default class ColumnMenu extends React.Component {
     this.state = {};
   }
 
-  handleInputChange(index) {
-    return evt => {
-      this.props.onInputChange(index, evt.target.checked);
-    };
-  }
-
   render() {
     const { columns } = this.props;
     return (
-      <ul className="column-menu">
-        {
-          (columns).map((option, index) =>
-            <li key={option.value + index}>
-              <label>
-                <input
-                  name={option.value}
-                  type="checkbox"
-                  checked={option.enabled}
-                  onChange={this.handleInputChange(index)}
-                />
-                { option.label }
-              </label>
-            </li>
-          )
+      <DropdownMenu
+        pinRight
+        useClick
+        trigger={
+          <span className="col-trigger">
+            <span className="fa fa-columns" />
+            Columns
+          </span>
         }
-      </ul>
+      >
+        <CheckboxList
+          options={columns}
+          onInputChange={this.props.onColumnChange}
+        />
+      </DropdownMenu>
     );
   }
 }
