@@ -39,10 +39,11 @@ export default class GroupMenu extends React.Component {
               key={group.value}
               className={group.value}
             >
-              <h3>{group.label}</h3>
+              <h3 className="group-label">{group.label}</h3>
               {
                 group.options.map((option, index) =>
                   <div
+                    className={"menu-item"}
                     key={index}
                     onClick={() => {
                       this.props.onItemSelect(group, option);

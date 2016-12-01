@@ -319,24 +319,3 @@ i {
   border-radius: 2px;
   padding: 1em;
 }
-
-.active-filter {
-  display: inline-block;
-  max-width: 100px;
-  background: rgb(204, 204, 204);
-  margin-right: 1em;
-
-  .filter-label {
-    font-weight: bold;
-  }
-
-  .filter-option {
-    cursor: pointer;
-    margin: 0.25em 0;
-
-    &:hover,
-    &:focus {
-      text-decoration: line-through;
-    }
-  }
-}

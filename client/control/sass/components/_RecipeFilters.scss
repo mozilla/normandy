@@ -1,0 +1,61 @@
+.active-filters {
+  display: flex;
+  overflow: auto;
+
+  .enabled-filter,
+  .enabled-filter-button {
+    display: inline-block;
+    background: $darkCream;
+    margin-right: 1em;
+    padding: 0.5em 1em;
+    min-width: 100px;
+
+    &:hover,
+    &:focus {
+      background: $cream;
+    }
+
+    & > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .filter-label {
+      font-weight: bold;
+    }
+
+    .filter-option {
+      transition: 0.1s all ease;
+      cursor: pointer;
+      margin: 0.25em 0;
+
+      &:hover,
+      &:focus {
+        text-decoration: line-through;
+        background: $darkestCream;
+      }
+    }
+  }
+
+  .enabled-filter-button {
+    cursor: pointer;
+
+    font-weight: bold;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+
+    &:hover,
+    &:focus {
+      background: #eee;
+    }
+  }
+}
+
+.show-count {
+  display: inline-block;
+  // lazy centering
+  margin-top: 1em;
+}

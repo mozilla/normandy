@@ -1,6 +1,8 @@
 @import 'partials/common';
 @import 'components/ColumnMenu';
 @import 'components/DropdownMenu';
+@import 'components/GroupMenu';
+@import 'components/RecipeFilters';
 
 /* Layout */
 #container { margin: 0 auto; }
@@ -272,5 +274,9 @@
     .nested-label {
       font-weight: 800;
     }
+  }
+
+  & + .callout {
+    margin: 2em 0 1em;
   }
 }

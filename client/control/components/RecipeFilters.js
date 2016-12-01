@@ -222,6 +222,9 @@ class RecipeFilters extends React.Component {
             </div>
           </div>
           <div id="filters-container" className="fluid-6">
+            <span className="show-count">
+              {displayMessage} {displayAddendum}
+            </span>
             <DropdownMenu
               pinRight
               useClick
@@ -238,10 +241,10 @@ class RecipeFilters extends React.Component {
               />
             </DropdownMenu>
           </div>
-          <div className="fluid-6">
+          <div className="active-filters fluid-8">
             {
               this.props.selectedFilters.map(filter =>
-                <div className="active-filter">
+                <div className="enabled-filter">
                   <span className="filter-label">
                     { filter.label }
                   </span>
@@ -265,23 +268,13 @@ class RecipeFilters extends React.Component {
             {
               /* reset button */
               this.props.selectedFilters.length > 0 &&
-                <div className="active-filter">
-                  <span
-                    onClick={this.resetFilters}
-                    className="filter-label"
-                  >
-                    Reset Filters
-                  </span>
+                <div
+                  className="enabled-filter-button"
+                  onClick={this.resetFilters}
+                >
+                  Reset Filters
                 </div>
             }
-          </div>
-          <div
-            className="fluid-2"
-            style={{ textAlign: 'right' }}
-          >
-            <span>
-              {displayMessage} {displayAddendum}
-            </span>
           </div>
         </div>
       </div>
