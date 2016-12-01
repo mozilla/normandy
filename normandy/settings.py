@@ -98,18 +98,6 @@ class Core(Configuration):
         )
     }
 
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'default',
-        },
-        'recipes': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'recipes',
-            'TIMEOUT': values.IntegerValue(300, environ_name='CACHES_RECIPES_TIMEOUT'),
-        },
-    }
-
     WEBPACK_LOADER = {
         'DEFAULT': {
             'BUNDLE_DIR_NAME': 'bundles/',
