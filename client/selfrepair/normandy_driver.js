@@ -11,7 +11,7 @@ export class LocalStorage {
   /**
    * @param    {string} prefix Prefix to append to all incoming keys.
    */
-  constructor(prefix, { skipDurability = false }) {
+  constructor(prefix, { skipDurability = false } = {}) {
     this.prefix = prefix;
     this.skipDurability = skipDurability;
   }

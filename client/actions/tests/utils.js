@@ -63,9 +63,6 @@ export function mockNormandy() {
     },
     // this needs to be a valid UUID4 to pass regex tests later
     userId: uuid(),
-    saveHeartbeatFlow() {
-      return Promise.resolve();
-    },
   };
 
   const toSpy = [
@@ -75,7 +72,6 @@ export function mockNormandy() {
     'showHeartbeat',
     'client',
     'uuid',
-    'saveHeartbeatFlow',
   ];
   for (const method of toSpy) {
     spyOn(normandy, method).and.callThrough();
