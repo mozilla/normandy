@@ -225,7 +225,11 @@ describe('LocalStorage', () => {
   beforeEach(() => {
     window.localStorage.clear();
     window.localStorage.setItem(STORAGE_DURABILITY_KEY, 2);
-    store = new LocalStorage('test-prefix', false);
+    store = new LocalStorage('test-prefix', { skipDurability: false });
+  });
+
+  it('has an optional options argument', () => {
+    expect(() => new LocalStorage('test-prefix')).not.toThrow();
   });
 
   it('can set and get items', async () => {
@@ -251,6 +255,16 @@ describe('LocalStorage', () => {
       throw new Error('Did not throw error');
     } catch (err) {
       expect(err).toEqual(new Error('Storage durability unconfirmed'));
+    }
+  });
+
+  it('can disable durability checks', async () => {
+    store = new LocalStorage('test-prefix', { skipDurability: true });
+    window.localStorage.setItem(STORAGE_DURABILITY_KEY, 0);
+    try {
+      await store.getItem('value');
+    } catch (err) {
+      throw new Error('Expected getItem to not throw');
     }
   });
 
