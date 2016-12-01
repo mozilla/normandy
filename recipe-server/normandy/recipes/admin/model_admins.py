@@ -2,39 +2,8 @@ from django.contrib import admin
 from django.template.loader import render_to_string
 
 from normandy.recipes import models
-from normandy.recipes.forms import RecipeAdminForm
 
 from reversion.admin import VersionAdmin
-
-
-@admin.register(models.Recipe)
-class RecipeAdmin(VersionAdmin):
-    form = RecipeAdminForm
-    save_as = True
-    list_display = [
-        'name',
-        'enabled',
-        'action',
-        'filter_expression',
-    ]
-    search_fields = ['name']
-
-    list_filter = [
-        ('enabled', admin.BooleanFieldListFilter),
-        ('action', admin.RelatedOnlyFieldListFilter),
-    ]
-
-    fieldsets = [
-        [None, {
-            'fields': ['name', 'enabled', 'filter_expression']
-        }],
-        ['Action', {
-            'fields': [
-                'action',
-                'arguments_json',
-            ],
-        }],
-    ]
 
 
 @admin.register(models.Action)
