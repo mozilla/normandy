@@ -22,32 +22,36 @@ def migrate_reversion_data(apps, schema_editor):
     Version = apps.get_model('reversion', 'Version')
     ContentType = apps.get_model('contenttypes', 'ContentType')
 
-    ct = ContentType.objects.get(app_label='recipes', model='recipe')
+    try:
+        ct = ContentType.objects.get(app_label='recipes', model='recipe')
+    except ContentType.DoesNotExist:
+        # There are no content types so there is no data to be migrated
+        pass
+    else:
+        for r in Recipe.objects.all():
+            revision = None
 
-    for r in Recipe.objects.all():
-        revision = None
+            for v in Version.objects.filter(content_type=ct, object_id=r.id).order_by(
+                    'revision__date_created'):
 
-        for v in Version.objects.filter(content_type=ct, object_id=r.id).order_by(
-                'revision__date_created'):
+                v = Version.objects.get(revision_id=v.revision.id)
 
-            v = Version.objects.get(revision_id=v.revision.id)
+                data = json.loads(v.serialized_data)[0]['fields']
 
-            data = json.loads(v.serialized_data)[0]['fields']
+                action = Action.objects.get(id=data.get('action'))
 
-            action = Action.objects.get(id=data.get('action'))
+                revision = RecipeRevision(
+                    recipe=r, parent=revision, created=v.revision.date_created,
+                    comment=v.revision.comment, user=v.revision.user, name=data.get('name'),
+                    action=action, arguments_json=data.get('arguments_json', ''),
+                    filter_expression=data.get('filter_expression', ''))
 
-            revision = RecipeRevision(
-                recipe=r, parent=revision, created=v.revision.date_created,
-                comment=v.revision.comment, user=v.revision.user, name=data.get('name'),
-                action=action, arguments_json=data.get('arguments_json', ''),
-                filter_expression=data.get('filter_expression', ''))
+                revision.id = hash_revision_data(revision)
 
-            revision.id = hash_revision_data(revision)
+                revision.save()
 
-            revision.save()
-
-        r.latest_revision = revision
-        r.save()
+            r.latest_revision = revision
+            r.save()
 
 
 class Migration(migrations.Migration):
@@ -55,7 +59,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('contenttypes', '__latest__'),
         ('reversion', '__latest__'),
-        ('recipes', '0034_auto_20161128_1341'),
+        ('recipes', '0034_recipe_revisions'),
     ]
 
     operations = [
