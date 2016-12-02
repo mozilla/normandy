@@ -16,6 +16,8 @@ module.exports = {
     "no-console": 1,
     "no-else-return": 2,
     "quotes": [1, "double", {avoidEscape: true}],
+    "babel/new-cap": [0],
+    "prefer-const": [1],
   },
 
   globals: {

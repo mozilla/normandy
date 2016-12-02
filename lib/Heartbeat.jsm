@@ -135,27 +135,27 @@ this.Heartbeat = class {
     );
 
     // Holds the rating UI
-    let frag = this.chromeWindow.document.createDocumentFragment();
+    const frag = this.chromeWindow.document.createDocumentFragment();
 
     // Build the heartbeat stars
     if (!this.options.engagementButtonLabel) {
       const numStars = this.options.engagementButtonLabel ? 0 : 5;
-      let ratingContainer = this.chromeWindow.document.createElement("hbox");
+      const ratingContainer = this.chromeWindow.document.createElement("hbox");
       ratingContainer.id = "star-rating-container";
 
       for (let i = 0; i < numStars; i++) {
         // create a star rating element
-        let ratingElement = this.chromeWindow.document.createElement("toolbarbutton");
+        const ratingElement = this.chromeWindow.document.createElement("toolbarbutton");
 
         // style it
-        let starIndex = numStars - i;
+        const starIndex = numStars - i;
         ratingElement.className = "plain star-x";
         ratingElement.id = "star" + starIndex;
         ratingElement.setAttribute("data-score", starIndex);
 
         // Add the click handler
         ratingElement.addEventListener("click", ev => {
-          let rating = parseInt(ev.target.getAttribute("data-score"));
+          const rating = parseInt(ev.target.getAttribute("data-score"));
           this.maybeNotifyHeartbeat("Voted", {score: rating});
           this.userEngaged({type: "stars", score: rating, flowId: this.options.flowId});
         });
@@ -173,18 +173,18 @@ this.Heartbeat = class {
     this.messageText.classList.add("heartbeat");
 
     // Make sure the stars are not pushed to the right by the spacer.
-    let rightSpacer = this.chromeWindow.document.createElement("spacer");
+    const rightSpacer = this.chromeWindow.document.createElement("spacer");
     rightSpacer.flex = 20;
     frag.appendChild(rightSpacer);
 
     // collapse the space before the stars
     this.messageText.flex = 0;
-    let leftSpacer = this.messageText.nextSibling;
+    const leftSpacer = this.messageText.nextSibling;
     leftSpacer.flex = 0;
 
     // Add Learn More Link
     if (this.options.learnMoreMessage && this.options.learnMoreUrl) {
-      let learnMore = this.chromeWindow.document.createElement("label");
+      const learnMore = this.chromeWindow.document.createElement("label");
       learnMore.className = "text-link";
       learnMore.href = this.options.learnMoreUrl.toString();
       learnMore.setAttribute("value", this.options.learnMoreMessage);
@@ -200,7 +200,7 @@ this.Heartbeat = class {
     this.maybeNotifyHeartbeat("NotificationOffered");
     this.chromeWindow.addEventListener("SSWindowClosing", this.handleWindowClosed);
 
-    let surveyDuration = Services.prefs.getIntPref(PREF_SURVEY_DURATION) * 1000;
+    const surveyDuration = Services.prefs.getIntPref(PREF_SURVEY_DURATION) * 1000;
     this.surveyEndTimer = setTimeout(() => {
       this.maybeNotifyHeartbeat("SurveyExpired");
       this.close();
@@ -216,11 +216,11 @@ this.Heartbeat = class {
       return;
     }
 
-    let timestamp = Date.now();
+    const timestamp = Date.now();
     let sendPing = false;
     let cleanup = false;
 
-    let phases = {
+    const phases = {
       NotificationOffered: () => {
         this.surveyResults.flowId = this.options.flowId;
         this.surveyResults.offeredTS = timestamp;
@@ -263,8 +263,8 @@ this.Heartbeat = class {
 
     if (sendPing) {
       // Send the ping to Telemetry
-      let payload = Object.assign({version: 1}, this.surveyResults);
-      for (let meta of ["surveyId", "surveyVersion", "testing"]) {
+      const payload = Object.assign({version: 1}, this.surveyResults);
+      for (const meta of ["surveyId", "surveyVersion", "testing"]) {
         if (this.options.hasOwnProperty(meta)) {
           payload[meta] = this.options[meta];
         }
@@ -307,7 +307,7 @@ this.Heartbeat = class {
 
     // Open the engagement tab if we have a valid engagement URL.
     if (this.options.postAnswerUrl) {
-      for (let key in engagementParams) {
+      for (const key in engagementParams) {
         this.options.postAnswerUrl.searchParams.append(key, engagementParams[key]);
       }
       // Open the engagement URL in a new tab.

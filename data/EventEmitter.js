@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
+"";
 // This file is meant to run inside action sandboxes
 
 "use strict";
@@ -24,10 +24,10 @@ this.EventEmitter = function(driver) {
             return;
           }
           // freeze event to prevent handlers from modifying it
-          let frozenEvent = Object.freeze(event);
+          const frozenEvent = Object.freeze(event);
           // Clone callbacks array to avoid problems with mutation while iterating
           const callbacks = Array.from(listeners[eventName]);
-          for (let cb of callbacks) {
+          for (const cb of callbacks) {
             cb(frozenEvent);
           }
         });
@@ -42,7 +42,7 @@ this.EventEmitter = function(driver) {
 
     off(eventName, callback) {
       if (eventName in listeners) {
-        let index = listeners[eventName].indexOf(callback);
+        const index = listeners[eventName].indexOf(callback);
         if (index !== -1) {
           listeners[eventName].splice(index, 1);
         }

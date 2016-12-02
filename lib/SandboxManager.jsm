@@ -37,20 +37,15 @@ this.SandboxManager = class {
     }
   }
 
-  assertNuked(assert, done) {
+  isNuked() {
     // Do this in a promise, so other async things can resolve.
-    return new Promise(
-      (resolve, reject) => {
-        if (!this._sandbox) {
-          resolve();
-        } else {
-          reject(new Error(`Sandbox is not nuked. Holds left: ${this.holds}`));
-        }
-      })
-      .catch(err => {
-        assert.ok(false, err);
-      })
-      .then(done);
+    return new Promise((resolve, reject) => {
+      if (!this._sandbox) {
+        resolve();
+      } else {
+        reject(new Error(`Sandbox is not nuked. Holds left: ${this.holds}`));
+      }
+    });
   }
 };
 

@@ -8,6 +8,7 @@ const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/TelemetryArchive.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
+Cu.import("resource://shield-recipe-client/lib/Log.jsm");
 
 this.EXPORTED_SYMBOLS = ["EnvExpressions"];
 
@@ -42,6 +43,7 @@ const getLatestTelemetry = Task.async(function *() {
     const ping = mostRecentPings[key];
     telemetry[ping.type] = yield TelemetryArchive.promiseArchivedPingById(ping.id);
   }
+  Log.debug(telemetry);
   return telemetry;
 });
 
