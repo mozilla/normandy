@@ -42,11 +42,11 @@ function fractionToKey(frac) {
 }
 
 function bufferToHex(buffer) {
-  let hexCodes = [];
-  let view = new DataView(buffer);
+  const hexCodes = [];
+  const view = new DataView(buffer);
   for (let i = 0; i < view.byteLength; i += 4) {
     // Using getUint32 reduces the number of iterations needed (we process 4 bytes each time)
-    let value = view.getUint32(i);
+    const value = view.getUint32(i);
     // toString(16) will give the hex representation of the number without padding
     hexCodes.push(value.toString(16).padStart(8, "0"));
   }

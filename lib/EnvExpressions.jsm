@@ -24,11 +24,11 @@ const require = new Require(loader, {});
 const {Jexl} = require("jexl/lib/Jexl.js");
 
 const getLatestTelemetry = Task.async(function *() {
-  let pings = yield TelemetryArchive.promiseArchivedPingList();
+  const pings = yield TelemetryArchive.promiseArchivedPingList();
 
   // get most recent ping per type
-  let mostRecentPings = {};
-  for (let ping of pings) {
+  const mostRecentPings = {};
+  for (const ping of pings) {
     if (ping.type in mostRecentPings) {
       if (mostRecentPings[ping.type].timeStampCreated < ping.timeStampCreated) {
         mostRecentPings[ping.type] = ping;
@@ -38,12 +38,11 @@ const getLatestTelemetry = Task.async(function *() {
     }
   }
 
-  let telemetry = {};
-  for (let key in mostRecentPings) {
+  const telemetry = {};
+  for (const key in mostRecentPings) {
     const ping = mostRecentPings[key];
     telemetry[ping.type] = yield TelemetryArchive.promiseArchivedPingById(ping.id);
   }
-  Log.debug(telemetry);
   return telemetry;
 });
 
@@ -54,7 +53,7 @@ jexl.addTransforms({
 });
 
 this.EnvExpressions = {
-  eval(expr, extraContext={}) {
+  eval(expr, extraContext = {}) {
     const context = Object.assign({telemetry: getLatestTelemetry()}, extraContext);
     const onelineExpr = expr.replace(/[\t\n\r]/g, " ");
     return jexl.eval(onelineExpr, context);

@@ -50,7 +50,7 @@ this.RecipeRunner = {
       return false;
     }
 
-    const apiUrl = Preferences.get(PREF_API_URL, '');
+    const apiUrl = Preferences.get(PREF_API_URL, "");
     if (!apiUrl.startsWith("https://")) {
       Log.error(`Non HTTPS URL provided: ${apiUrl}`);
       return false;
@@ -79,7 +79,7 @@ this.RecipeRunner = {
 
     const recipesToRun = [];
 
-    for (let recipe of recipes) {
+    for (const recipe of recipes) {
       if (yield this.checkFilter(recipe, extraContext)) {
         recipesToRun.push(recipe);
       }
@@ -88,7 +88,7 @@ this.RecipeRunner = {
     if (recipesToRun.length === 0) {
       Log.debug("No recipes to execute");
     } else {
-      for (let recipe of recipesToRun) {
+      for (const recipe of recipesToRun) {
         try {
           Log.debug(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
           yield this.executeRecipe(recipe, extraContext);
@@ -132,8 +132,8 @@ this.RecipeRunner = {
     const sandboxManager = new SandboxManager();
     const {sandbox} = sandboxManager;
 
-    let action = yield NormandyApi.fetchAction(recipe.action);
-    let response = yield fetch(action.implementation_url);
+    const action = yield NormandyApi.fetchAction(recipe.action);
+    const response = yield fetch(action.implementation_url);
 
     const actionScript = yield response.text();
     const prepScript = `

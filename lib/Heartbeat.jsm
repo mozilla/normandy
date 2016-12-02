@@ -210,7 +210,7 @@ this.Heartbeat = class {
     CleanupManager.addCleanupHandler(() => this.close());
   }
 
-  maybeNotifyHeartbeat(name, data={}) {
+  maybeNotifyHeartbeat(name, data = {}) {
     if (this.pingSent) {
       Log.warn("Heartbeat event recieved after Telemetry ping sent. name:", name, "data:", data);
       return;

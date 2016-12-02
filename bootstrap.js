@@ -7,13 +7,13 @@ const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Preferences.jsm");
 
 const REASONS = {
-  APP_STARTUP: 1,      //The application is starting up.
-  APP_SHUTDOWN: 2,     //The application is shutting down.
-  ADDON_ENABLE: 3,     //The add-on is being enabled.
-  ADDON_DISABLE: 4,    //The add-on is being disabled. (Also sent during uninstallation)
-  ADDON_INSTALL: 5,    //The add-on is being installed.
-  ADDON_UNINSTALL: 6,  //The add-on is being uninstalled.
-  ADDON_UPGRADE: 7,    //The add-on is being upgraded.
+  APP_STARTUP: 1,      // The application is starting up.
+  APP_SHUTDOWN: 2,     // The application is shutting down.
+  ADDON_ENABLE: 3,     // The add-on is being enabled.
+  ADDON_DISABLE: 4,    // The add-on is being disabled. (Also sent during uninstallation)
+  ADDON_INSTALL: 5,    // The add-on is being installed.
+  ADDON_UNINSTALL: 6,  // The add-on is being uninstalled.
+  ADDON_UPGRADE: 7,    // The add-on is being upgraded.
   ADDON_DOWNGRADE: 8,  //The add-on is being downgraded.
 };
 
@@ -22,7 +22,7 @@ const PREF_SELF_SUPPORT_ENABLED = "browser.selfsupport.enabled";
 
 let shouldRun = true;
 
-this.install = function () {
+this.install = function() {
   // Self Repair only checks its pref on start, so if we disable it, wait until
   // next startup to run, unless the dev_mode preference is set.
   if (Preferences.get(PREF_SELF_SUPPORT_ENABLED, true)) {
@@ -33,7 +33,7 @@ this.install = function () {
   }
 };
 
-this.startup = function () {
+this.startup = function() {
   Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm");
 
   if (!shouldRun) {
@@ -43,7 +43,7 @@ this.startup = function () {
   RecipeRunner.init();
 };
 
-this.shutdown = function (data, reason) {
+this.shutdown = function(data, reason) {
   Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 
   CleanupManager.cleanup();
@@ -53,5 +53,5 @@ this.shutdown = function (data, reason) {
   }
 };
 
-this.uninstall = function () {
+this.uninstall = function() {
 };

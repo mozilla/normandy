@@ -18,8 +18,8 @@ let storePromise;
 
 function loadStorage() {
   if (storePromise === undefined) {
-    let path = OS.Path.join(OS.Constants.Path.profileDir, "shield-recipe-client.json");
-    let storage = new JSONFile({path});
+    const path = OS.Path.join(OS.Constants.Path.profileDir, "shield-recipe-client.json");
+    const storage = new JSONFile({path});
     storePromise = Task.spawn(function* () {
       yield storage.load();
       return storage;
@@ -45,7 +45,7 @@ this.Storage = {
         return new sandbox.Promise((resolve, reject) => {
           loadStorage()
             .then(store => {
-              let namespace = store.data[prefix] || {};
+              const namespace = store.data[prefix] || {};
               const value = namespace[keySuffix] || null;
               resolve(Cu.cloneInto(value, sandbox));
             })

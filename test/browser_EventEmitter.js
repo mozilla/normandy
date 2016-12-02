@@ -20,17 +20,17 @@ const evidence = {
   log: [],
 };
 
-function listenerA(x=1) {
+function listenerA(x = 1) {
   evidence.a += x;
   evidence.log += "a";
 }
 
-function listenerB(x=1) {
+function listenerB(x = 1) {
   evidence.b += x;
   evidence.log += "b";
 }
 
-function listenerC(x=1) {
+function listenerC(x = 1) {
   evidence.c += x;
   evidence.log += "c";
 }

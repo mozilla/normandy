@@ -22,7 +22,7 @@ this.EXPORTED_SYMBOLS = ["NormandyDriver"];
 const PREF_INPUT_HOST = "extensions.shield-recipe-client@mozilla.org.input_host";
 const actionLogger = Log.makeNamespace("actions");
 
-this.NormandyDriver = function(sandboxManager, extraContext={}) {
+this.NormandyDriver = function(sandboxManager, extraContext = {}) {
   if (!sandboxManager) {
     throw new Error("sandboxManager is required");
   }
@@ -37,8 +37,8 @@ this.NormandyDriver = function(sandboxManager, extraContext={}) {
         .getSelectedLocale("browser");
     },
 
-    log(message, level="debug") {
-      let levels = ["debug", "info", "warn", "error"];
+    log(message, level = "debug") {
+      const levels = ["debug", "info", "warn", "error"];
       if (levels.indexOf(level) === -1) {
         throw new Error(`Invalid log level "${level}"`);
       }
@@ -47,7 +47,7 @@ this.NormandyDriver = function(sandboxManager, extraContext={}) {
 
     showHeartbeat(options) {
       Log.info(`Showing heartbeat prompt "${options.message}"`);
-      let aWindow = Services.wm.getMostRecentWindow("navigator:browser");
+      const aWindow = Services.wm.getMostRecentWindow("navigator:browser");
 
       if (!aWindow) {
         return sandbox.Promise.reject(new sandbox.Error("No window to show heartbeat in"));
@@ -69,12 +69,12 @@ this.NormandyDriver = function(sandboxManager, extraContext={}) {
       }
       const url = Services.prefs.getStringPref(PREF_INPUT_HOST, defaultURL);
 
-      let headers = {Accept: "application/json"};
+      const headers = {Accept: "application/json"};
 
       Log.debug("Sending heartbeat flow data to Input", data);
 
       // Make request to input
-      let p = fetch(url, {body: JSON.stringify(data), headers})
+      const p = fetch(url, {body: JSON.stringify(data), headers})
         .then(response => response.text())
         .then(responseText => {
           Log.log("Input response:", responseText);
@@ -145,7 +145,7 @@ this.NormandyDriver = function(sandboxManager, extraContext={}) {
     },
 
     location() {
-      let location = Cu.cloneInto({countryCode: extraContext.country}, sandbox);
+      const location = Cu.cloneInto({countryCode: extraContext.country}, sandbox);
       return sandbox.Promise.resolve(location);
     },
 

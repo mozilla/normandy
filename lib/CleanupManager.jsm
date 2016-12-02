@@ -14,7 +14,7 @@ this.CleanupManager = {
   },
 
   cleanup() {
-    for (let handler of cleanupHandlers) {
+    for (const handler of cleanupHandlers) {
       handler();
     }
   },

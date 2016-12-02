@@ -16,15 +16,15 @@ this.EXPORTED_SYMBOLS = ["NormandyApi"];
 const PREF_API_URL = "extensions.shield-recipe-client@mozilla.org.api_url";
 
 this.NormandyApi = {
-  apiCall(method, endpoint, data={}) {
+  apiCall(method, endpoint, data = {}) {
     const api_url = Services.prefs.getStringPref(PREF_API_URL);
     let url = `${api_url}/${endpoint}`;
     method = method.toLowerCase();
 
     if (method === "get") {
       if (data === {}) {
-        let paramObj = new URLSearchParams();
-        for (let key in data) {
+        const paramObj = new URLSearchParams();
+        for (const key in data) {
           paramObj.append(key, data[key]);
         }
         url += "?" + paramObj.toString();
@@ -47,7 +47,7 @@ this.NormandyApi = {
     return this.apiCall("post", endpoint, data);
   },
 
-  fetchRecipes: Task.async(function* (filters={}) {
+  fetchRecipes: Task.async(function* (filters = {}) {
     const rawText = yield (yield this.get("recipe/signed/", filters)).text();
     const recipesWithSigs = JSON.parse(rawText);
 
@@ -59,8 +59,8 @@ this.NormandyApi = {
         throw new Error("Canonical recipe serialization does not match!");
       }
 
-      let certChain = yield (yield fetch(x5u)).text();
-      let builtSignature = `p384ecdsa=${signature}`;
+      const certChain = yield (yield fetch(x5u)).text();
+      const builtSignature = `p384ecdsa=${signature}`;
 
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
         .createInstance(Ci.nsIContentSignatureVerifier);

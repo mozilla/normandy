@@ -21,7 +21,7 @@ this.SandboxManager = class {
   }
 
   removeHold(name) {
-    let index = this.holds.indexOf(name);
+    const index = this.holds.indexOf(name);
     if (index === -1) {
       throw new Error(`Tried to remove non-existant hold "${name}"`);
     }
@@ -31,7 +31,7 @@ this.SandboxManager = class {
 
   tryCleanup() {
     if (this.holds.length === 0) {
-      let sandbox = this._sandbox;
+      const sandbox = this._sandbox;
       this._sandbox = null;
       Cu.nukeSandbox(sandbox);
     }

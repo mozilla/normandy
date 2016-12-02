@@ -18,45 +18,6 @@
   "keywords": [
     "jetpack"
   ],
-  "preferences": [
-    {
-      "name": "api_url",
-      "title": "API URL",
-      "description": "URL prefix to use for server requests, including API version",
-      "type": "string",
-      "value": "https://self-repair.mozilla.org/api/v1"
-    },
-    {
-      "name": "enabled",
-      "title": "Enabled",
-      "type": "bool",
-      "value": true
-    },
-    {
-      "name": "log_level",
-      "title": "Log Level",
-      "type": "string",
-      "value": "warning"
-    },
-    {
-      "name": "dev_mode",
-      "title": "Developer Mode",
-      "type": "bool",
-      "value": false
-    },
-    {
-      "name": "startup_delay",
-      "title": "Startup Delay",
-      "description": "Number of seconds to wait after startup before running recipes",
-      "type": "integer",
-      "value": 300
-    },
-    {
-      "name": "input_host",
-      "title": "Input Host",
-      "type": "string"
-    }
-  ],
   "devDependencies": {
     "babel-eslint": "6.1.2",
     "eslint": "^3.8.1",
