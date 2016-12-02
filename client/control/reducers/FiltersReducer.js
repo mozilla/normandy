@@ -1,12 +1,31 @@
+/**
+ * Store for tracking front-end 'filter list' status
+ *
+ * Exists as an array of objects denoting option groups,
+ * containing each set of options per group.
+ *
+ * Active/enabled filters have a `selected` property,
+ * which is mostly used later in the filter selectors
+ */
+
 import {
   SET_FILTER,
-  LOAD_LAST_FILTERS,
+  SET_ALL_FILTERS,
 } from 'control/actions/FilterActions';
 
 import * as localForage from 'localforage';
 
+/**
+ * Utility function to save the state via localForage.
+ *
+ * @param  {Array}  state Filter state
+ * @return {void}
+ */
 const saveState = state => localForage.setItem('last-filters', state);
 
+
+// #TODO: this shouldn't be hardcoded - we need to
+// create an action and pull this list from the API
 const initialState = [
   {
     label: 'Status',
@@ -69,37 +88,51 @@ function filtersReducer(state = initialState, action) {
   let newState;
 
   switch (action.type) {
-    case LOAD_LAST_FILTERS:
+
+    // App has found the user's previous filter settings,
+    // and has dispatched an action to update the store
+    // with prior settings
+    case SET_ALL_FILTERS:
       newState = [].concat(action.state || initialState);
       saveState(newState);
       return newState;
 
+    // User has de/activated a filter
     case SET_FILTER:
       newState = [].concat(state);
 
+      // for each group,
       newState = newState.map(group => {
         const newGroup = { ...group };
-        // get the group the action is for
+
+        // determine if this is the action's filter
         if (newGroup.value === action.group.value) {
+          // var to determine if this group has ANY selected options
           let hasSelected = false;
 
+          // loop through each option..
           newGroup.options = [].concat(newGroup.options || []).map(option => {
+            // ..find the option that this action is targeting..
             if (option.value === action.option.value) {
+              // ..and then de/select it based on the action
               option.selected = action.isEnabled || false;
             }
 
+            // hasSelected will be true if any option is selected
             hasSelected = hasSelected || option.selected;
             return option;
           });
 
+          // finally, we check if any options are selected,
+          // and update the main group accordingly
           newGroup.selected = hasSelected;
         }
 
         return newGroup;
       });
 
+      // save the new filterstate locally
       saveState(newState);
-
       return newState;
 
     default:

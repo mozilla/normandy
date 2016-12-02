@@ -1,23 +1,33 @@
 import React, { PropTypes as pt } from 'react';
 
+/**
+ * Simple component which lists a bunch of checkboxes,
+ * and emits input changes.
+ */
+
 export default class CheckboxList extends React.Component {
   static propTypes = {
     onInputChange: pt.func.isRequired,
     options: pt.array.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {};
-  }
-
+  /**
+   * Handler factory. Given an index,
+   * returns an event handler that calls the
+   * onInputChange prop.
+   *
+   * @param  {Number}   index Checkbox index which updated
+   * @return {Function}       Wrapped handler
+   */
   handleInputChange(index) {
     return evt => {
       this.props.onInputChange(index, evt.target.checked);
     };
   }
 
+  /**
+   * Render
+   */
   render() {
     const { options } = this.props;
     return (

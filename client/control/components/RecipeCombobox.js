@@ -2,14 +2,28 @@ import React, { PropTypes as pt } from 'react';
 import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
 
+/**
+ * Text/dropdown combobox displayed in RecipeFilters.
+ * Used to display and search over filter options
+ * based on user input.
+ */
 export default class RecipeCombobox extends React.Component {
   static propTypes = {
     availableFilters: pt.array.isRequired,
     onGroupFilterSelect: pt.func.isRequired,
     updateSearch: pt.func.isRequired,
+    // #TODO this should NOT be inherited
     searchText: pt.string,
   };
 
+  /**
+   * Utility function to remove a set of properties
+   * from a given object.
+   *
+   * @param  {Object}         object Object to remove props form
+   * @param  {Array<string>}  list   List of properties to remove
+   * @return {Object}         New object without selected properties
+   */
   static removeProperties(object, list) {
     const newObject = { ...object };
 
@@ -22,34 +36,49 @@ export default class RecipeCombobox extends React.Component {
 
   constructor(props) {
     super(props);
+    // #TODO searchText should be tracked locally in state,
+    // currently it's being passed in through props
     this.state = {};
   }
 
-  searchGroup(group, search) {
-    // remove 'meta' properties the user doesn't actually
-    // want to search over
-    const groupProperties = RecipeCombobox.removeProperties(group,
-      ['value', 'selected', 'multiple']);
-
-    // remove properties user doesnt care to search over
-    groupProperties.options = groupProperties.options.map(option =>
-      RecipeCombobox.removeProperties(option, [
-        option.label ? 'value' : 'label',
-        'selected',
-        'multiple',
-      ]));
-
-    // quick and dirty 'deep object search'
-    const groupString = JSON.stringify(groupProperties).toLowerCase();
-    const groupSearch = (search || '').toLowerCase();
-
-    return groupString.indexOf(groupSearch) > -1;
-  }
-
+  /**
+   * Given a set of filter groups + options, and a search text value,
+   * returns a set of filters in which the search value is found.
+   *
+   * Certain properties are NOT searched over, such as `value`,
+   * `selected`, and `multiple` - this would allow for searching
+   * the words 'true' or 'false' to return hits incorrectly.
+   *
+   * @param  {Array<Object>} groups   Array of filter groups/options to search
+   * @param  {string}        search   Text value to find in the filter groups
+   * @return {Array<Object>} Array of filter groups containing search value
+   */
   filterGroups(groups, search) {
-    return groups.filter(group => this.searchGroup(group, search));
+    return [].concat(groups).filter(group => {
+      // remove 'meta' properties the user doesn't actually
+      // want to search over
+      const groupProperties = RecipeCombobox.removeProperties(group,
+        ['value', 'selected', 'multiple']);
+
+      // remove properties user doesnt care to search over
+      groupProperties.options = groupProperties.options.map(option =>
+        RecipeCombobox.removeProperties(option, [
+          option.label ? 'value' : 'label',
+          'selected',
+          'multiple',
+        ]));
+
+      // quick and dirty 'deep object search'
+      const groupString = JSON.stringify(groupProperties).toLowerCase();
+      const groupSearch = (search || '').toLowerCase();
+
+      return groupString.indexOf(groupSearch) > -1;
+    });
   }
 
+  /**
+   * Render
+   */
   render() {
     const {
       availableFilters,
@@ -58,13 +87,9 @@ export default class RecipeCombobox extends React.Component {
       updateSearch,
     } = this.props;
 
-    let result;
-
-    // if the user has typed in text,
-    // filter the remaining options
-    if (searchText) {
-      result = this.filterGroups(availableFilters, searchText);
-    }
+    // #TODO text filtering should work like other filters
+    // if the user has typed in text, filter the remaining options
+    const result = searchText && this.filterGroups(availableFilters, searchText);
 
     return (
       <div className="search input-with-icon">

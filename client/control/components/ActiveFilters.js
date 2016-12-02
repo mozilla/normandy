@@ -1,5 +1,11 @@
 import React, { PropTypes as pt } from 'react';
 
+/**
+ * Section above RecipeList's table that displays
+ * active filter options and settings, and allows
+ * users to reset all/individual filters.
+ */
+
 export default class ActiveFilters extends React.Component {
   static propTypes = {
     selectedFilters: pt.array.isRequired,
@@ -11,8 +17,13 @@ export default class ActiveFilters extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+
+    this.cacheElements();
   }
 
+  /**
+   * Render
+   */
   render() {
     const {
       className,
@@ -21,6 +32,7 @@ export default class ActiveFilters extends React.Component {
       onFilterSelect,
     } = this.props;
 
+    // optional className prop
     const displayedClass = `active-filters ${className || ''}`;
 
     // no filters = we dont render anything at all
@@ -30,19 +42,18 @@ export default class ActiveFilters extends React.Component {
 
     return (
       <div className={displayedClass}>
-        {
-          selectedFilters.map(filter =>
-            <div
-              key={filter.value}
-              className="enabled-filter"
-            >
-              <span className="filter-label">
-                { filter.label }
-              </span>
-              {
-                filter.options
-                  .filter(option => option.selected)
-                  .map((option, index) => <div
+        { selectedFilters.map(filter =>
+          <div
+            key={filter.value}
+            className="enabled-filter"
+          >
+            <span className="filter-label">
+              { filter.label }
+            </span>
+            { filter.options
+                .filter(option => option.selected)
+                .map((option, index) =>
+                  <div
                     key={option.value + index}
                     className="filter-option"
                     onClick={() => {
@@ -52,20 +63,17 @@ export default class ActiveFilters extends React.Component {
                         isEnabled: false,
                       });
                     }}
-                  >{ option.label || option.value }</div>)
-              }
-            </div>
-          )
+                    children={option.label || option.value}
+                  />)
+            }
+          </div>)
         }
-        {
-          /* reset button */
-          selectedFilters.length > 0 &&
-            <div
-              className="enabled-filter-button"
-              onClick={onResetFilters}
-            >
-              Reset Filters
-            </div>
+        { selectedFilters.length &&
+          <div
+            className="enabled-filter-button"
+            onClick={onResetFilters}
+            children={'Reset Filters'}
+          />
         }
       </div>
     );
