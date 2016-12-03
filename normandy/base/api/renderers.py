@@ -31,7 +31,12 @@ class CanonicalJSONRenderer(renderers.BaseRenderer):
     charset = None
 
     def render(self, data, media_type=None, renderer_context=None):
-        return canonicaljson.encode_canonical_json(data)
+        # Get canonical json as bytes
+        rendered = canonicaljson.encode_canonical_json(data)
+        # Convert to a unicode string
+        rendered = rendered.decode('utf8')
+        # Encode *all* unicode characters as \u1234 escapes (and convert to bytes)
+        return rendered.encode('unicode_escape')
 
 
 class CustomBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
