@@ -103,11 +103,7 @@ class DisconnectedRecipeList extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      searchText: '',
-    };
-
-    this.updateSearch = ::this.updateSearch;
+    this.state = {};
   }
 
   componentWillMount() {
@@ -118,12 +114,6 @@ class DisconnectedRecipeList extends React.Component {
       dispatch(makeApiRequest('fetchAllRecipes', {}))
       .then(recipes => dispatch(recipesReceived(recipes)));
     }
-  }
-
-  updateSearch(event) {
-    this.setState({
-      searchText: event.target.value,
-    });
   }
 
   title = 'Recipes';
@@ -239,7 +229,6 @@ class DisconnectedRecipeList extends React.Component {
       <div>
         <RecipeFilters
           {...this.state}
-          updateSearch={this.updateSearch}
           displayCount={filteredRecipes.length}
           totalCount={recipes.length}
         />
@@ -249,7 +238,6 @@ class DisconnectedRecipeList extends React.Component {
             sortable
             hideFilterInput
             filterable={['name', 'action', 'metadata']}
-            filterBy={this.state.searchText}
           >
             <Thead>
               {

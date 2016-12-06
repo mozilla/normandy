@@ -11,9 +11,6 @@ export default class RecipeCombobox extends React.Component {
   static propTypes = {
     availableFilters: pt.array.isRequired,
     onGroupFilterSelect: pt.func.isRequired,
-    updateSearch: pt.func.isRequired,
-    // #TODO this should NOT be inherited
-    searchText: pt.string,
   };
 
   /**
@@ -36,9 +33,12 @@ export default class RecipeCombobox extends React.Component {
 
   constructor(props) {
     super(props);
-    // #TODO searchText should be tracked locally in state,
-    // currently it's being passed in through props
-    this.state = {};
+
+    this.state = {
+      searchText: '',
+    };
+
+    this.updateSearch = ::this.updateSearch;
   }
 
   /**
@@ -76,16 +76,24 @@ export default class RecipeCombobox extends React.Component {
     });
   }
 
+  updateSearch(event) {
+    this.setState({
+      searchText: event.target.value,
+    });
+  }
+
   /**
    * Render
    */
   render() {
     const {
       availableFilters,
-      searchText,
       onGroupFilterSelect,
-      updateSearch,
     } = this.props;
+
+    const {
+      searchText,
+    } = this.state;
 
     // #TODO text filtering should work like other filters
     // if the user has typed in text, filter the remaining options
@@ -100,7 +108,7 @@ export default class RecipeCombobox extends React.Component {
               type="text"
               placeholder="Search"
               initialValue={searchText}
-              onChange={updateSearch}
+              onChange={this.updateSearch}
             />
           }
         >

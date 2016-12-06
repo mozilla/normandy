@@ -30,8 +30,6 @@ import {
  */
 class RecipeFilters extends React.Component {
   static propTypes = {
-    searchText: pt.string.isRequired,
-    updateSearch: pt.func.isRequired,
     displayCount: pt.number,
     totalCount: pt.number,
     // connected
@@ -108,8 +106,6 @@ class RecipeFilters extends React.Component {
    */
   render() {
     const {
-      searchText,
-      updateSearch,
       displayCount,
       totalCount,
       availableFilters,
@@ -121,8 +117,6 @@ class RecipeFilters extends React.Component {
         <div id="secondary-header" className="fluid-8">
           <div className="header-search" className="fluid-2">
             <RecipeCombobox
-              searchText={searchText}
-              updateSearch={updateSearch}
               onGroupFilterSelect={this.handleGroupFilterSelect}
               availableFilters={availableFilters}
             />
