@@ -45,7 +45,8 @@ class RecipeFilters extends React.Component {
     super(props);
     this.state = {};
 
-    this.handleGroupFilterSelect = ::this.handleGroupFilterSelect;
+    this.handleAddFilter = ::this.handleAddFilter;
+    this.handleRemoveFilter = ::this.handleRemoveFilter;
     this.resetFilters = ::this.resetFilters;
   }
 
@@ -82,13 +83,30 @@ class RecipeFilters extends React.Component {
    * @param  {Object} option Selected option
    * @return {void}
    */
-  handleGroupFilterSelect(group, option) {
+  handleAddFilter(group, option) {
     this.props.dispatch(selectFilter({
       group,
       option,
       // if this handler is fired, we know the user is
       // ADDING the filter - it's removed later
       isEnabled: true,
+    }));
+  }
+
+  /**
+   * User has clicked on an individual filter/option
+   * in order to deactivate it. Basically calls a
+   * select filter action with `isEnabled` set to `false`
+   *
+   * @param  {Object} group  Relevant group that was updated
+   * @param  {Object} option Relevant option that was removed
+   * @return {void}
+   */
+  handleRemoveFilter(group, option) {
+    this.props.dispatch(selectFilter({
+      group,
+      option,
+      isEnabled: false,
     }));
   }
 
@@ -117,7 +135,7 @@ class RecipeFilters extends React.Component {
         <div id="secondary-header" className="fluid-8">
           <div className="header-search" className="fluid-2">
             <RecipeCombobox
-              onGroupFilterSelect={this.handleGroupFilterSelect}
+              onGroupFilterSelect={this.handleAddFilter}
               availableFilters={availableFilters}
             />
           </div>
@@ -138,14 +156,7 @@ class RecipeFilters extends React.Component {
             className="fluid-8"
             selectedFilters={this.props.selectedFilters}
             onResetFilters={this.resetFilters}
-            onFilterSelect={({ group, option }) => {
-              // #TODO this shouldn't be an anon fn
-              this.props.dispatch(selectFilter({
-                group,
-                option,
-                isEnabled: false,
-              }));
-            }}
+            onFilterSelect={this.handleRemoveFilter}
           />
         </div>
       </div>
