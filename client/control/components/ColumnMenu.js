@@ -1,20 +1,23 @@
 import React, { PropTypes as pt } from 'react';
+import { connect } from 'react-redux';
 
 import CheckboxList from 'control/components/CheckboxList';
 import DropdownMenu from 'control/components/DropdownMenu';
 
+import {
+  updateColumn,
+} from 'control/actions/ColumnActions';
+
 /**
  * Simple dropdown/checkbox list combo used to handle
  * managing visible columns in RecipeList.
- *
- * #TODO Column management should happen in here, NOT
- * in RecipeFilters
  */
 
-export default class ColumnMenu extends React.Component {
+class ColumnMenu extends React.Component {
   static propTypes = {
-    onColumnChange: pt.func.isRequired,
     columns: pt.array.isRequired,
+    // connected
+    dispatch: pt.func.isRequired,
   };
 
   // The trigger element never changes,
@@ -25,6 +28,32 @@ export default class ColumnMenu extends React.Component {
       Columns
     </span>
   );
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+
+    this.handleColumnInput = ::this.handleColumnInput;
+  }
+
+  /**
+   * User has de/activated a column. This handler
+   * simply updates the component's column state,
+   * and notifies the parent of what's selected
+   *
+   * Note: it seems a little fragile to use the index for this,
+   * may be useful to switch to something more identifying.
+   *
+   * @param  {Number}  columnIndex Integer, index of relevant column
+   * @param  {Boolean} isActive    Is the column now active?
+   * @return {void}
+   */
+  handleColumnInput(columnIndex, isActive) {
+    this.props.dispatch(updateColumn({
+      index: columnIndex,
+      isActive,
+    }));
+  }
 
   /**
    * Render
@@ -39,9 +68,18 @@ export default class ColumnMenu extends React.Component {
       >
         <CheckboxList
           options={columns}
-          onInputChange={this.props.onColumnChange}
+          onInputChange={this.handleColumnInput}
         />
       </DropdownMenu>
     );
   }
 }
+
+const mapStateToProps = state => ({
+  // columns
+  columns: state.columns,
+});
+
+export default connect(
+  mapStateToProps
+)(ColumnMenu);

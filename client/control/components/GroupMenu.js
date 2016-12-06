@@ -7,7 +7,6 @@ import React, { PropTypes as pt } from 'react';
 export default class GroupMenu extends React.Component {
   static propTypes = {
     data: pt.array.isRequired,
-    children: pt.any.isRequired,
     onItemSelect: pt.func.isRequired,
     searchText: pt.string,
   };

@@ -8,7 +8,7 @@ export default class RecipeCount extends React.Component {
   static propTypes = {
     displayCount: pt.number.isRequired,
     totalCount: pt.number.isRequired,
-    isFiltering: pt.boolean,
+    isFiltering: pt.bool,
   };
 
   constructor(props) {

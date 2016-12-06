@@ -7,6 +7,11 @@ import ActiveFilters from 'control/components/ActiveFilters';
 import RecipeCombobox from 'control/components/RecipeCombobox';
 import RecipeCount from 'control/components/RecipeCount';
 
+
+import {
+  setColumns,
+} from 'control/actions/ColumnActions';
+
 import {
   selectFilter,
   setAllFilters,
@@ -27,7 +32,6 @@ class RecipeFilters extends React.Component {
   static propTypes = {
     searchText: pt.string.isRequired,
     updateSearch: pt.func.isRequired,
-    onFilterChange: pt.func.isRequired,
     displayCount: pt.number,
     totalCount: pt.number,
     // connected
@@ -35,67 +39,16 @@ class RecipeFilters extends React.Component {
     filters: pt.array.isRequired,
     selectedFilters: pt.array.isRequired,
     availableFilters: pt.array.isRequired,
+    columns: pt.array.isRequired,
   };
 
 
-  // This is the basic settings for the RecipeList columns
-  // #TODO abstract this out, possibly into ColumnMenu
-  // #TODO this should probably be its own store
-  static defaultColumnConfig = [{
-    label: 'Name',
-    value: 'name',
-    enabled: true,
-  }, {
-    label: 'Action Name',
-    value: 'action',
-    enabled: true,
-  }, {
-    label: 'Enabled',
-    value: 'enabled',
-    enabled: true,
-  }, {
-    label: 'Channels',
-    value: 'channels',
-  }, {
-    label: 'Locales',
-    value: 'locales',
-  }, {
-    label: 'Countries',
-    value: 'countries',
-  }, {
-    label: 'Start Time',
-    value: 'startTime',
-  }, {
-    label: 'End Time',
-    value: 'endTime',
-  }, {
-    label: 'Additional Filters',
-    value: 'additionalFilter',
-  }, {
-    label: 'Last Updated',
-    value: 'last_updated',
-    enabled: true,
-  }, {
-    label: 'Metadata',
-    value: 'metadata',
-    enabled: true,
-  }];
-
   constructor(props) {
     super(props);
-    this.state = {
-      columns: [],
-    };
+    this.state = {};
 
-    this.handleFilterChange = ::this.handleFilterChange;
-    this.handleColumnInput = ::this.handleColumnInput;
     this.handleGroupFilterSelect = ::this.handleGroupFilterSelect;
     this.resetFilters = ::this.resetFilters;
-
-    // we basically need to handle a change in order
-    // for the parent to be notified of what columns are available
-    // #TODO (this could be avoided by using a store for columns)
-    this.handleFilterChange(true);
   }
 
 
@@ -108,15 +61,14 @@ class RecipeFilters extends React.Component {
   componentWillMount() {
     // load the column settings the user last used
     localForage.getItem('columns', (err, found) => {
-      this.setState({
-        columns: found || RecipeFilters.defaultColumnConfig,
-      });
-      this.handleFilterChange(true);
+      if (!err && found && found.length) {
+        this.props.dispatch(setColumns(found));
+      }
     });
 
     // load the last filters the user viewed
     localForage.getItem('last-filters', (err, found) => {
-      if (!err && found) {
+      if (!err && found && found.length) {
         this.props.dispatch(setAllFilters(found));
       }
     });
@@ -143,71 +95,6 @@ class RecipeFilters extends React.Component {
   }
 
   /**
-   * User has de/activated a column. This handler
-   * simply updates the component's column state,
-   * and notifies the parent of what's selected
-   *
-   * Note: it seems a little fragile to use the index for this,
-   * may be useful to switch to something more identifying.
-   *
-   * @param  {Number}  columnIndex Integer, index of relevant column
-   * @param  {Boolean} isActive    Is the column now active?
-   * @return {void}
-   */
-  handleColumnInput(columnIndex, isActive) {
-    const newColumns = [].concat(this.state.columns || []);
-    newColumns[columnIndex].enabled = isActive;
-
-    // update local state
-    // #TODO this could be replaced by an action..
-    this.setState({
-      columns: newColumns,
-    });
-
-    // #TODO (cnt'd) ..which would make this unnecessary
-    this.handleFilterChange();
-  }
-
-  /**
-   * Utility function to save column state
-   * via localForage (which is asynchronous).
-   *
-   * @return {void}
-   */
-  saveColumnState() {
-    localForage.setItem('columns', this.state.columns);
-  }
-
-  /**
-   * For each column, determine which is 'enabled' (showing)
-   * and then sends an array of visible columns up to props.onFilterChange.
-   *
-   * Automatically saves column data locally, unless `true` param is passed in.
-   *
-   * @param  {Boolean} dontSave Prevent column data from being stored locally
-   * @return {void}
-   */
-  handleFilterChange(dontSave) {
-    const {
-      columns,
-    } = this.state;
-
-    // get only the selected columns
-    const selected = [].concat(columns)
-      .map(col => (col.enabled ? col : null))
-      .filter(col => col);
-
-    // in general, we want to save all the time
-    // EXCEPT when we first start up and load saved data
-    if (!dontSave) {
-      this.saveColumnState();
-    }
-
-    // send the array of selected/active columns to the parent
-    this.props.onFilterChange(selected);
-  }
-
-  /**
    * Simple helper to dispatch a 'reset filters' action.
    *
    * @return {void}
@@ -226,6 +113,7 @@ class RecipeFilters extends React.Component {
       displayCount,
       totalCount,
       availableFilters,
+      columns,
     } = this.props;
 
     return (
@@ -247,7 +135,7 @@ class RecipeFilters extends React.Component {
               isFiltering={this.props.selectedFilters.length > 0}
             />
             <ColumnMenu
-              columns={this.state.columns}
+              columns={columns}
               onColumnChange={this.handleColumnInput}
             />
           </div>
@@ -276,6 +164,8 @@ const mapStateToProps = state => ({
   // use selectors to pull specific store data
   selectedFilters: getSelectedFilterGroups(state.filters),
   availableFilters: getAvailableFilters(state.filters),
+  // columns
+  columns: state.columns,
 });
 
 export default connect(

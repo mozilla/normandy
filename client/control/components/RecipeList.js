@@ -13,6 +13,10 @@ import {
   getActiveFilters,
 } from 'control/selectors/FiltersSelector';
 
+import {
+  getActiveColumns,
+} from 'control/selectors/ColumnSelector';
+
 import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
@@ -25,11 +29,13 @@ BooleanIcon.propTypes = {
 
 class DisconnectedRecipeList extends React.Component {
   static propTypes = {
+    // connected
     dispatch: pt.func.isRequired,
     isFetching: pt.bool.isRequired,
     recipeListNeedsFetch: pt.bool.isRequired,
     recipes: pt.array.isRequired,
     activeFilters: pt.array.isRequired,
+    displayedColumns: pt.array.isRequired,
   };
 
   /**
@@ -99,11 +105,9 @@ class DisconnectedRecipeList extends React.Component {
     super(props);
     this.state = {
       searchText: '',
-      displayedColumns: [],
     };
 
     this.updateSearch = ::this.updateSearch;
-    this.onFilterChange = ::this.onFilterChange;
   }
 
   componentWillMount() {
@@ -114,12 +118,6 @@ class DisconnectedRecipeList extends React.Component {
       dispatch(makeApiRequest('fetchAllRecipes', {}))
       .then(recipes => dispatch(recipesReceived(recipes)));
     }
-  }
-
-  onFilterChange(filters) {
-    this.setState({
-      displayedColumns: [].concat(filters || []),
-    });
   }
 
   updateSearch(event) {
@@ -225,8 +223,10 @@ class DisconnectedRecipeList extends React.Component {
   }
 
   render() {
-    const { recipes } = this.props;
-    const { displayedColumns } = this.state;
+    const {
+      recipes,
+      displayedColumns,
+    } = this.props;
     let filteredRecipes = this.state.filteredRecipes || recipes;
     filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
 
@@ -240,7 +240,6 @@ class DisconnectedRecipeList extends React.Component {
         <RecipeFilters
           {...this.state}
           updateSearch={this.updateSearch}
-          onFilterChange={this.onFilterChange}
           displayCount={filteredRecipes.length}
           totalCount={recipes.length}
         />
@@ -293,6 +292,7 @@ const mapStateToProps = (state, ownProps) => ({
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
   activeFilters: getActiveFilters(state.filters),
+  displayedColumns: getActiveColumns(state.columns),
 });
 
 export default connect(

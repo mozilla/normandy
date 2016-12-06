@@ -17,8 +17,6 @@ export default class ActiveFilters extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-
-    this.cacheElements();
   }
 
   /**

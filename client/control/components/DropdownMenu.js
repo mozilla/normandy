@@ -18,12 +18,12 @@ export default class DropdownMenu extends React.Component {
     // children is the content displayed when open
     children: pt.any.isRequired,
     // track clicks to display menu?
-    useClick: pt.boolean,
+    useClick: pt.bool,
     // track trigger's focus to display menu?
-    useFocus: pt.boolean,
+    useFocus: pt.bool,
     // pin the dropdown to the right edge
     // of the parent container?
-    pinRight: pt.boolean,
+    pinRight: pt.bool,
   };
 
   constructor(props) {
@@ -114,9 +114,9 @@ export default class DropdownMenu extends React.Component {
 
   /**
    * Render
-   * #TODO: stop using `style`, just use classes
    */
   render() {
+    const pinClass = this.props.pinRight && 'pin-right';
     return (
       <div
         className={`dropdown-menu ${this.id}`}
@@ -131,8 +131,7 @@ export default class DropdownMenu extends React.Component {
         {
           this.state.isVisible &&
             <div
-              className="dropdown-content"
-              style={this.props.pinRight ? { right: 0, left: 'auto' } : { left: 0, right: 'auto' }}
+              className={`dropdown-content ${pinClass || ''}`}
             >
               { this.props.children }
             </div>
