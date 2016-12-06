@@ -11,6 +11,8 @@
 import {
   SET_FILTER,
   SET_ALL_FILTERS,
+  ADD_TEXT_FILTER,
+  REMOVE_TEXT_FILTER,
 } from 'control/actions/FilterActions';
 
 import * as localForage from 'localforage';
@@ -81,11 +83,17 @@ const initialState = [
       label: 'Russian',
       value: 'ru',
     }],
+  }, {
+    label: 'Text Search',
+    value: 'text',
+    options: [],
+    multiple: true,
   },
 ];
 
 function filtersReducer(state = initialState, action) {
   let newState;
+  let textOptions;
 
   switch (action.type) {
 
@@ -132,6 +140,54 @@ function filtersReducer(state = initialState, action) {
       });
 
       // save the new filterstate locally
+      saveState(newState);
+      return newState;
+
+
+    case ADD_TEXT_FILTER:
+      newState = [].concat(state || []);
+
+      newState = newState.map(group => {
+        if (group.value === 'text') {
+          const newGroup = { ...group };
+
+          textOptions = [].concat(newGroup.options);
+          textOptions.push({
+            value: action.filter,
+            selected: true,
+          });
+
+          newGroup.options = textOptions;
+          newGroup.selected = true;
+
+          return newGroup;
+        }
+
+        return group;
+      });
+
+      saveState(newState);
+      return newState;
+
+    case REMOVE_TEXT_FILTER:
+      newState = [].concat(state || []);
+
+      newState = newState.map(group => {
+        console.log('here?', group);
+        if (group.value === 'text') {
+          const newGroup = { ...group };
+
+          textOptions = [].concat(newGroup.options);
+          textOptions = textOptions.filter(option => option.value !== action.filter);
+
+          console.log('here', textOptions, newGroup.options);
+          newGroup.options = textOptions;
+          return newGroup;
+        }
+
+        return group;
+      });
+
       saveState(newState);
       return newState;
 

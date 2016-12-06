@@ -1,5 +1,7 @@
 const SET_FILTER = 'SET_FILTER';
 const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
+const ADD_TEXT_FILTER = 'ADD_TEXT_FILTER';
+const REMOVE_TEXT_FILTER = 'REMOVE_TEXT_FILTER';
 
 /**
  * Given an option and its parent group, update the
@@ -11,12 +13,19 @@ const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
  */
 function selectFilter({ group, option, isEnabled }) {
   return dispatch => {
-    dispatch({
-      type: SET_FILTER,
-      group,
-      option,
-      isEnabled,
-    });
+    if (group.value === 'text') {
+      dispatch({
+        type: isEnabled ? ADD_TEXT_FILTER : REMOVE_TEXT_FILTER,
+        filter: option.value,
+      });
+    } else {
+      dispatch({
+        type: SET_FILTER,
+        group,
+        option,
+        isEnabled,
+      });
+    }
   };
 }
 
@@ -47,13 +56,35 @@ function setAllFilters(state) {
 const resetFilters = () => setAllFilters();
 
 
+function addTextFilter(filter) {
+  return dispatch => {
+    dispatch({
+      type: ADD_TEXT_FILTER,
+      filter,
+    });
+  };
+}
+
+function removeTextFilter(filter) {
+  return dispatch => {
+    dispatch({
+      type: REMOVE_TEXT_FILTER,
+      filter,
+    });
+  };
+}
+
 // Exports
 export {
   // action constants
   SET_FILTER,
   SET_ALL_FILTERS,
+  ADD_TEXT_FILTER,
+  REMOVE_TEXT_FILTER,
   // actions
   selectFilter,
   setAllFilters,
   resetFilters,
+  addTextFilter,
+  removeTextFilter,
 };

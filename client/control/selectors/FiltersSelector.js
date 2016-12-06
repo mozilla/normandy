@@ -17,9 +17,7 @@ const isGroupSelected = group => {
 
   if (group.selected) {
     group.options.forEach(option => {
-      if (option.selected) {
-        enabled = true;
-      }
+      enabled = enabled || option.selected;
     });
   }
 
@@ -93,5 +91,18 @@ export const getAvailableFilters = groups =>
 
       // if there are no options left, just remove this group from the list
       return newGroup.options.length === 0 ? null : newGroup;
-      // finally, filter nulls out of the array
-    }).filter(x => x);
+    })
+    // finally, filter nulls out of the array
+    .filter(x => x);
+
+
+export const getTextFilters = groups =>
+  [].concat(groups || [])
+    .map(group => {
+      if (group.value !== 'text') {
+        return null;
+      }
+
+      return group;
+    })
+    .filter(x => x);

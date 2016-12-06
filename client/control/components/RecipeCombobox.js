@@ -1,16 +1,23 @@
 import React, { PropTypes as pt } from 'react';
+import { connect } from 'react-redux';
+
 import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
+
+import {
+  addTextFilter,
+} from 'control/actions/FilterActions';
 
 /**
  * Text/dropdown combobox displayed in RecipeFilters.
  * Used to display and search over filter options
  * based on user input.
  */
-export default class RecipeCombobox extends React.Component {
+class RecipeCombobox extends React.Component {
   static propTypes = {
     availableFilters: pt.array.isRequired,
-    onGroupFilterSelect: pt.func.isRequired,
+    onFilterSelect: pt.func.isRequired,
+    dispatch: pt.func.isRequired,
   };
 
   /**
@@ -63,6 +70,8 @@ export default class RecipeCombobox extends React.Component {
       // remove properties user doesnt care to search over
       groupProperties.options = groupProperties.options.map(option =>
         RecipeCombobox.removeProperties(option, [
+          // if an option has a label,
+          // remove the hidden value
           option.label ? 'value' : 'label',
           'selected',
           'multiple',
@@ -76,10 +85,23 @@ export default class RecipeCombobox extends React.Component {
     });
   }
 
-  updateSearch(event) {
+  clearInput() {
     this.setState({
-      searchText: event.target.value,
+      searchText: '',
     });
+  }
+
+  updateSearch({ target, keyCode }) {
+    // Enter key
+    if (keyCode === 13) {
+      this.props.dispatch(addTextFilter(target.value));
+
+      this.clearInput();
+    } else {
+      this.setState({
+        searchText: target.value,
+      });
+    }
   }
 
   /**
@@ -88,7 +110,7 @@ export default class RecipeCombobox extends React.Component {
   render() {
     const {
       availableFilters,
-      onGroupFilterSelect,
+      onFilterSelect,
     } = this.props;
 
     const {
@@ -108,17 +130,23 @@ export default class RecipeCombobox extends React.Component {
               type="text"
               placeholder="Search"
               initialValue={searchText}
-              onChange={this.updateSearch}
+              onKeyUp={this.updateSearch}
             />
           }
         >
           <GroupMenu
             searchText={searchText}
             data={searchText ? result : availableFilters}
-            onItemSelect={onGroupFilterSelect}
+            onItemSelect={onFilterSelect}
           />
         </DropdownMenu>
       </div>
     );
   }
 }
+
+const mapStateToProps = () => ({});
+export default connect(
+  mapStateToProps
+)(RecipeCombobox);
+

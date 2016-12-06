@@ -135,7 +135,7 @@ class RecipeFilters extends React.Component {
         <div id="secondary-header" className="fluid-8">
           <div className="header-search" className="fluid-2">
             <RecipeCombobox
-              onGroupFilterSelect={this.handleAddFilter}
+              onFilterSelect={this.handleAddFilter}
               availableFilters={availableFilters}
             />
           </div>
