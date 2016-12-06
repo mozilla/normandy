@@ -216,6 +216,7 @@ class DisconnectedRecipeList extends React.Component {
     const {
       recipes,
       displayedColumns,
+      recipeListNeedsFetch,
     } = this.props;
     let filteredRecipes = this.state.filteredRecipes || recipes;
     filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
@@ -266,7 +267,10 @@ class DisconnectedRecipeList extends React.Component {
           {
             noResults && (isFiltering ?
               <div className="callout">No recipes match those filters.</div>
-            : <div className="callout">No recipes to display.</div>)
+            : <div
+              className="callout"
+              children={recipeListNeedsFetch ? 'Loading...' : 'No recipes to display.'}
+            />)
           }
         </div>
       </div>
