@@ -70,6 +70,9 @@ module.exports = [
     plugins,
 
     module: {
+      // ignore localforage parsing
+      // (removes warning in console)
+      noParse: /node_modules\/localforage\/dist\/localforage.js/,
       loaders: [
         {
           test: /\.js$/,
