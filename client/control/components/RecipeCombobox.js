@@ -89,6 +89,10 @@ class RecipeCombobox extends React.Component {
     this.setState({
       searchText: '',
     });
+
+    if (this.inputRef) {
+      this.inputRef.value = '';
+    }
   }
 
   updateSearch({ target, keyCode }) {
@@ -131,6 +135,7 @@ class RecipeCombobox extends React.Component {
               placeholder="Search"
               initialValue={searchText}
               onKeyUp={this.updateSearch}
+              ref={input => { this.inputRef = input; }}
             />
           }
         >
