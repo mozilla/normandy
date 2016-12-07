@@ -13,20 +13,12 @@ import {
   SET_ALL_FILTERS,
   ADD_TEXT_FILTER,
   REMOVE_TEXT_FILTER,
+  saveLocalFilters as saveState,
 } from 'control/actions/FilterActions';
 
-import hash from 'client/utils/hash';
-
-import * as localForage from 'localforage';
-
-/**
- * Utility function to save the state via localForage.
- *
- * @param  {Array}  state Filter state
- * @return {void}
- */
-const saveState = state => localForage.setItem('last-filters', state);
-
+import {
+  compare,
+} from 'client/utils/hash';
 
 // #TODO: this shouldn't be hardcoded - we need to
 // create an action and pull this list from the API
@@ -70,9 +62,6 @@ const initialState = [
   },
 ];
 
-// get a hash of the value strings
-const defaultHash = hash(initialState.map(option => option.value));
-
 function filtersReducer(state = initialState, action) {
   let newState;
   let textOptions;
@@ -83,25 +72,15 @@ function filtersReducer(state = initialState, action) {
     // and has dispatched an action to update the store
     // with prior settings
     case SET_ALL_FILTERS: {
-      // no action.state == use initialState
-      let foundState = initialState;
+      const valuesMatch = compare(
+        initialState.map(option => option.value + option.label),
+        action.filters.map(option => option.value + option.label)
+      );
 
-      // double check that the loaded filters
-      // have the same properties as initState
-      // (this prevents weird mismatches when filters
-      // are changed/updated in code but old
-      // settings are still saved in storage)
-      if (action.state) {
-        const foundHash = hash(action.state.map(option => option.value));
-        // if the loaded hash has the same values
-        // as the initial hash, then we can set
-        // the filter state as the action state
-        if (foundHash === defaultHash) {
-          foundState = action.state;
-        }
+      if (valuesMatch) {
+        newState = action.filters;
       }
 
-      newState = [].concat(foundState);
       saveState(newState);
       return newState;
     }

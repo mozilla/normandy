@@ -1,20 +1,14 @@
 import {
   SET_COLUMNS,
   UPDATE_COLUMN,
+  saveLocalColumns as saveState,
 } from 'control/actions/ColumnActions';
 
-import * as localForage from 'localforage';
+import {
+  compare,
+} from 'client/utils/hash';
 
-/**
- * Utility function to save the state via localForage.
- *
- * @param  {Array}  state Filter state
- * @return {void}
- */
-const saveState = state => localForage.setItem('columns', state);
-
-// #TODO: this shouldn't be hardcoded - we need to
-// create an action and pull this list from the API
+// this could be sexier
 const initialState = [{
   label: 'Name',
   value: 'name',
@@ -73,7 +67,18 @@ function columnReducer(state = initialState, action) {
     }
 
     case SET_COLUMNS: {
-      newState = action.columns;
+      // double check that the incoming columns
+      // have the all the same values as our
+      // initialState. this prevents a user loading
+      // outdated columns from localStorage
+      const valuesMatch = compare(
+        initialState.map(option => option.value + option.label),
+        action.columns.map(option => option.value + option.label)
+      );
+
+      if (valuesMatch) {
+        newState = action.columns;
+      }
       return newState;
     }
 
