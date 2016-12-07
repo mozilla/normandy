@@ -24,6 +24,23 @@ export default class GroupMenu extends React.Component {
     return () => this.props.onItemSelect(group, option);
   }
 
+  buildEmptyResultsMessage(hasData, searchText) {
+    let resultMessage;
+    if (!hasData) {
+      // if the user has entered text, but there
+      // are no matches for it..
+      if (searchText) {
+        resultMessage = <span>No results for <b>"{searchText}"</b></span>;
+      } else {
+        // if we don't have any results,
+        // but it's unrelated to the text search..
+        resultMessage = <span>No filters to display.</span>;
+      }
+    }
+
+    return resultMessage;
+  }
+
   /**
    * Render
    */
@@ -33,21 +50,10 @@ export default class GroupMenu extends React.Component {
       searchText,
     } = this.props;
 
-    // no array or an empty array = no filters to show
-    const noData = !data || !data.length;
+    // build "no results" messaging
+    const hasData = data && data.length;
 
-    let noResults;
-    if (noData) {
-      // if the user has entered text, but there
-      // are no matches for it..
-      if (searchText) {
-        noResults = <span>No results for <b>"{searchText}"</b></span>;
-      } else {
-        // if we don't have any results,
-        // but it's unrelated to the text search..
-        noResults = <span>No filters to display.</span>;
-      }
-    }
+    const noResults = this.buildEmptyResultsMessage(hasData, searchText);
 
     return (
       <div
