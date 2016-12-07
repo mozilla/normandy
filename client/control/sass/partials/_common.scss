@@ -8,6 +8,8 @@ body {
   font: normal normal 400 13px/16px $OpenSans;
   margin: 0 auto;
   padding: 0px 40px;
+
+  min-width: 640px;
 }
 
 
@@ -22,27 +24,29 @@ a:hover {
 }
 
 
-/* Form Elements */
-label, .label {
-  color: rgba($darkBrown, 0.6);
-  display: block;
-  font: normal normal 400 12px/16px $OpenSans;
-  padding: 5px 0px;
-  text-transform: uppercase;
-}
-
-input, select, textarea {
-  border: 1px solid $darkCream;
-  border-radius: 3px;
-  font: normal normal 300 15px/30px $SourceSansPro;
-  padding: 5px 10px;
-  width: 100%;
-
-  &:focus {
-    border-color: $darkestCream;
-    outline: 0;
+// .recipe-form {
+    /* Form Elements */
+  label, .label {
+    color: rgba($darkBrown, 0.6);
+    display: block;
+    font: normal normal 400 12px/16px $OpenSans;
+    padding: 5px 0px;
+    text-transform: uppercase;
   }
-}
+
+  input, select, textarea {
+    border: 1px solid $darkCream;
+    border-radius: 3px;
+    font: normal normal 300 15px/30px $SourceSansPro;
+    padding: 5px 10px;
+    width: 100%;
+
+    &:focus {
+      border-color: $darkestCream;
+      outline: 0;
+    }
+  }
+// }
 
 .input-with-icon {
   position: relative;
@@ -159,8 +163,6 @@ thead {
     padding: 5px 0px;
     position: relative;
     &:hover { cursor: pointer; }
-
-    &.reactable-th-name { width: 30%; }
 
     span::after {
       color: $secondaryColor;
@@ -299,12 +301,21 @@ i {
   border-radius: 4px;
   display: block;
   padding: 1em;
+  text-align: center;
   width: 100%;
 }
 
 .recipe-form {
   .callout {
     float: right;
+    text-align: left;
     width: 45%;
   }
+}
+
+
+.col-trigger {
+  display: block;
+  border-radius: 2px;
+  padding: 1em;
 }

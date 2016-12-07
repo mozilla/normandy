@@ -37,7 +37,7 @@ Installation
 
    .. code-block:: bash
 
-      virtualenv venv
+      virtualenv --python=python3.5 venv
       source ./venv/bin/activate
 
    .. note::

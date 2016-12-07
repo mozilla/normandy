@@ -34,9 +34,6 @@ if (production) {
         warnings: false,
       },
     }),
-  ]);
-} else {
-  plugins = plugins.concat([
     new webpack.NoErrorsPlugin(),
   ]);
 }
@@ -44,7 +41,7 @@ if (production) {
 module.exports = [
   {
     context: __dirname,
-    devtool: production ? undefined : 'cheap-module-eval-source-map',
+    devtool: production ? undefined : 'source-map',
 
     entry: {
       selfrepair: [
@@ -73,6 +70,9 @@ module.exports = [
     plugins,
 
     module: {
+      // ignore localforage parsing
+      // (removes warning in console)
+      noParse: /node_modules\/localforage\/dist\/localforage.js/,
       loaders: [
         {
           test: /\.js$/,
@@ -96,6 +96,7 @@ module.exports = [
 
     resolve: {
       alias: {
+        client: path.resolve(__dirname, './client'),
         actions: path.resolve(__dirname, './client/actions'),
         control: path.resolve(__dirname, './client/control'),
         selfrepair: path.resolve(__dirname, './client/selfrepair'),
@@ -104,7 +105,7 @@ module.exports = [
     },
   },
   {
-    devtool: production ? undefined : 'cheap-module-eval-source-map',
+    devtool: production ? undefined : 'source-map',
 
     entry: {
       'console-log': './client/actions/console-log/index',

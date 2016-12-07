@@ -1,0 +1,15 @@
+.group-menu {
+  .menu-item {
+    cursor: pointer;
+    transition: 0.15s background-color ease;
+    background-color: transparent;
+
+    &:hover, &:focus {
+      background-color: rgba(0,0,0,0.1);
+    }
+
+    &:last-child {
+      margin-bottom: 0.5em;
+    }
+  }
+}
