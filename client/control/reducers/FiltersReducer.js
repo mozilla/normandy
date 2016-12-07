@@ -94,8 +94,6 @@ function filtersReducer(state = initialState, action) {
       newState = newState.map(group => {
         const newGroup = { ...group };
 
-        console.log('wtf', action, group);
-
         // determine if this is the action's filter
         if (newGroup.value === action.group.value) {
           // var to determine if this group has ANY selected options
