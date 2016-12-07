@@ -35,10 +35,10 @@ if (production) {
         warnings: false,
       },
     }),
-    new webpack.NoErrorsPlugin(),
   ]);
 } else {
   plugins = plugins.concat([
+    new webpack.NoErrorsPlugin(),
     new StyleLintPlugin({
       files: ['**/*.s?(a|c)ss'],
       // if we're in production (building)
