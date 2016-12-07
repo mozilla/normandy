@@ -15,6 +15,8 @@ import {
   REMOVE_TEXT_FILTER,
 } from 'control/actions/FilterActions';
 
+import hash from 'client/utils/hash';
+
 import * as localForage from 'localforage';
 
 /**
@@ -30,66 +32,46 @@ const saveState = state => localForage.setItem('last-filters', state);
 // create an action and pull this list from the API
 const initialState = [
   {
-    label: 'Status',
-    value: 'enabled',
+    value: 'status',
     multiple: false,
-    options: [{
-      label: 'Enabled',
-      value: true,
-    }, {
-      label: 'Disabled',
-      value: false,
-    }],
+    options: [
+      'Enabled',
+      'Disabled',
+    ],
   }, {
-    label: 'Action Name',
     value: 'action',
     multiple: false,
-    options: [{
-      value: 'console-log',
-    }, {
-      value: 'show-heartbeat',
-    }],
+    options: [
+      'console-log',
+      'show-heartbeat',
+    ],
   }, {
-    label: 'Channels',
     value: 'channels',
     multiple: true,
-    options: [{
-      label: 'Release',
-      value: 'release',
-    }, {
-      label: 'Beta',
-      value: 'beta',
-    }, {
-      label: 'Aurora / Developer Edition',
-      value: 'aurora',
-    }, {
-      label: 'Nightly',
-      value: 'nightly',
-    }],
+    options: [
+      'release',
+      'beta',
+      'aurora',
+      'nightly',
+    ],
   }, {
-    label: 'Locales',
     value: 'locales',
     multiple: true,
-    options: [{
-      label: 'English (US)',
-      value: 'en-US',
-    }, {
-      label: 'English (UK)',
-      value: 'en-UK',
-    }, {
-      label: 'German',
-      value: 'de',
-    }, {
-      label: 'Russian',
-      value: 'ru',
-    }],
+    options: [
+      'en-US',
+      'en-UK',
+      'de',
+      'ru',
+    ],
   }, {
-    label: 'Text Search',
     value: 'text',
     options: [],
     multiple: true,
   },
 ];
+
+// get a hash of the value strings
+const defaultHash = hash(initialState.map(option => option.value));
 
 function filtersReducer(state = initialState, action) {
   let newState;
@@ -100,13 +82,32 @@ function filtersReducer(state = initialState, action) {
     // App has found the user's previous filter settings,
     // and has dispatched an action to update the store
     // with prior settings
-    case SET_ALL_FILTERS:
-      newState = [].concat(action.state || initialState);
+    case SET_ALL_FILTERS: {
+      // no action.state == use initialState
+      let foundState = initialState;
+
+      // double check that the loaded filters
+      // have the same properties as initState
+      // (this prevents weird mismatches when filters
+      // are changed/updated in code but old
+      // settings are still saved in storage)
+      if (action.state) {
+        const foundHash = hash(action.state.map(option => option.value));
+        // if the loaded hash has the same values
+        // as the initial hash, then we can set
+        // the filter state as the action state
+        if (foundHash === defaultHash) {
+          foundState = action.state;
+        }
+      }
+
+      newState = [].concat(foundState);
       saveState(newState);
       return newState;
+    }
 
     // User has de/activated a filter
-    case SET_FILTER:
+    case SET_FILTER: {
       newState = [].concat(state);
 
       // for each group,
@@ -142,9 +143,10 @@ function filtersReducer(state = initialState, action) {
       // save the new filterstate locally
       saveState(newState);
       return newState;
+    }
 
 
-    case ADD_TEXT_FILTER:
+    case ADD_TEXT_FILTER: {
       newState = [].concat(state || []);
 
       newState = newState.map(group => {
@@ -168,19 +170,18 @@ function filtersReducer(state = initialState, action) {
 
       saveState(newState);
       return newState;
+    }
 
-    case REMOVE_TEXT_FILTER:
+    case REMOVE_TEXT_FILTER: {
       newState = [].concat(state || []);
 
       newState = newState.map(group => {
-        console.log('here?', group);
         if (group.value === 'text') {
           const newGroup = { ...group };
 
           textOptions = [].concat(newGroup.options);
           textOptions = textOptions.filter(option => option.value !== action.filter);
 
-          console.log('here', textOptions, newGroup.options);
           newGroup.options = textOptions;
           return newGroup;
         }
@@ -190,9 +191,11 @@ function filtersReducer(state = initialState, action) {
 
       saveState(newState);
       return newState;
+    }
 
-    default:
+    default: {
       return state;
+    }
   }
 }
 
