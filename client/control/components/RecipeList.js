@@ -10,7 +10,7 @@ import {
 } from 'control/actions/ControlActions';
 
 import {
-  getActiveFilters,
+  isFilteringActive,
 } from 'control/selectors/FiltersSelector';
 
 import {
@@ -34,7 +34,7 @@ class DisconnectedRecipeList extends React.Component {
     isFetching: pt.bool.isRequired,
     recipeListNeedsFetch: pt.bool.isRequired,
     recipes: pt.array.isRequired,
-    activeFilters: pt.array.isRequired,
+    isFiltering: pt.bool.isRequired,
     displayedColumns: pt.array.isRequired,
   };
 
@@ -124,55 +124,6 @@ class DisconnectedRecipeList extends React.Component {
     dispatch(push(`/control/recipe/${recipe.id}/`));
   }
 
-  applyFiltersToRecipes(filters, recipes) {
-    let newRecipes = [].concat(recipes || []);
-
-    if (!filters || filters.length === 0) {
-      return newRecipes;
-    }
-
-    newRecipes = newRecipes.filter(recipe => {
-      let validCount = 0;
-      const filterCount = filters.length;
-
-      filters.forEach(filter => {
-        const property = filter.value;
-        const filteredValues = (filter.options || [])
-          .filter(option => option.selected)
-          .map(option => option.value);
-
-        // Get the recipe's value for this property
-        let recipeValues = typeof recipe[property] !== 'undefined' ? recipe[property] : [];
-
-        // We compare using arrays,
-        // so if the value is just a single value
-        // we need to wrap it in an array
-        if (recipeValues instanceof Array) {
-          // We want only an array of the values
-          recipeValues = recipeValues.map(option => option.value);
-        } else {
-          recipeValues = [recipeValues];
-        }
-
-        // compare using Array.every and indexOf
-        const recipeHasAllFilters = (filteredValues || [])
-          .every(val => recipeValues.indexOf(val) >= 0);
-
-        // if the recipe has all the filters for this property,
-        // increase the 'valid count'
-        if (recipeHasAllFilters) {
-          validCount += 1;
-        }
-      });
-
-      // if all filter properties have been satisfied,
-      // this recipe can be shown!
-      return validCount === filterCount;
-    });
-
-    return newRecipes;
-  }
-
   renderTableCell(recipe) {
     return ({ value }) => {
       let displayValue = recipe[value];
@@ -217,14 +168,13 @@ class DisconnectedRecipeList extends React.Component {
       recipes,
       displayedColumns,
       recipeListNeedsFetch,
+      isFiltering,
     } = this.props;
-    let filteredRecipes = this.state.filteredRecipes || recipes;
-    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetadata);
 
-    filteredRecipes = this.applyFiltersToRecipes(this.props.activeFilters, filteredRecipes);
+    const noResults = false;
 
-    const noResults = filteredRecipes.length === 0;
-    const isFiltering = !!this.props.activeFilters.length;
+    const filteredRecipes = (this.state.filteredRecipes || recipes)
+      .map(DisconnectedRecipeList.applyRecipeMetadata);
 
     return (
       <div>
@@ -283,7 +233,7 @@ const mapStateToProps = (state, ownProps) => ({
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
-  activeFilters: getActiveFilters(state.filters),
+  isFiltering: isFilteringActive(state.filters),
   displayedColumns: getActiveColumns(state.columns),
 });
 

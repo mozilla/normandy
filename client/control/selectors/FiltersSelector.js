@@ -95,7 +95,19 @@ export const getAvailableFilters = groups =>
     // finally, filter nulls out of the array
     .filter(x => x);
 
+/**
+ * [description]
+ * @param  {[type]} groups [description]
+ * @return {[type]}        [description]
+ */
+export const isFilteringActive = groups =>
+  getActiveFilters(groups).length > 0;
 
+/**
+ * Not used
+ * @param  {[type]} groups [description]
+ * @return {[type]}        [description]
+ */
 export const getTextFilters = groups =>
   [].concat(groups || [])
     .map(group => {
