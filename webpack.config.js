@@ -4,6 +4,7 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var StyleLintPlugin = require('stylelint-webpack-plugin');
 var argv = require('yargs').argv;
 var childProcess = require('child_process');
 
@@ -34,10 +35,17 @@ if (production) {
         warnings: false,
       },
     }),
+    new webpack.NoErrorsPlugin(),
   ]);
 } else {
   plugins = plugins.concat([
-    new webpack.NoErrorsPlugin(),
+    new StyleLintPlugin({
+      files: ['**/*.s?(a|c)ss'],
+      // if we're in production (building)
+      // we want to fail
+      failOnError: production,
+      syntax: 'scss',
+    }),
   ]);
 }
 
