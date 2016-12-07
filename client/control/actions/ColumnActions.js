@@ -41,14 +41,13 @@ function loadLocalColumns() {
 
 /**
  * Utility function to save the state via localForage.
+ * Slightly weird since it doesn't ever dispatch anything.
  *
  * @param  {Array}  state Filter state
  * @return {void}
  */
 function saveLocalColumns(state) {
-  return () => {
-    localForage.setItem(STORAGE_ID, state);
-  };
+  localForage.setItem(STORAGE_ID, state);
 }
 
 

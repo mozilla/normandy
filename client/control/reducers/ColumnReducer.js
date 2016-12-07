@@ -14,7 +14,7 @@ const initialState = [{
   value: 'name',
   enabled: true,
 }, {
-  label: 'Action Name',
+  label: 'Action',
   value: 'action',
   enabled: true,
 }, {
@@ -61,9 +61,7 @@ function columnReducer(state = initialState, action) {
 
       newState = [].concat(state || []);
       newState[index].enabled = isActive;
-
-      saveState(newState);
-      return newState;
+      break;
     }
 
     case SET_COLUMNS: {
@@ -77,15 +75,23 @@ function columnReducer(state = initialState, action) {
       );
 
       if (valuesMatch) {
-        newState = action.columns;
+        newState = [].concat(action.columns);
+      } else {
+        newState = [].concat(initialState);
       }
-      return newState;
+      break;
     }
 
     default: {
-      return state;
+      break;
     }
   }
+
+  if (newState) {
+    saveState(newState);
+  }
+
+  return newState || state;
 }
 
 export default columnReducer;

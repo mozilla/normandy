@@ -74,15 +74,16 @@ function filtersReducer(state = initialState, action) {
     case SET_ALL_FILTERS: {
       const valuesMatch = compare(
         initialState.map(option => option.value + option.label),
-        action.filters.map(option => option.value + option.label)
+        (action.filters || []).map(option => option.value + option.label)
       );
 
       if (valuesMatch) {
         newState = action.filters;
+      } else {
+        newState = [].concat(initialState);
       }
 
-      saveState(newState);
-      return newState;
+      break;
     }
 
     // User has de/activated a filter
@@ -92,6 +93,8 @@ function filtersReducer(state = initialState, action) {
       // for each group,
       newState = newState.map(group => {
         const newGroup = { ...group };
+
+        console.log('wtf', action, group);
 
         // determine if this is the action's filter
         if (newGroup.value === action.group.value) {
@@ -119,11 +122,8 @@ function filtersReducer(state = initialState, action) {
         return newGroup;
       });
 
-      // save the new filterstate locally
-      saveState(newState);
-      return newState;
+      break;
     }
-
 
     case ADD_TEXT_FILTER: {
       newState = [].concat(state || []);
@@ -146,9 +146,7 @@ function filtersReducer(state = initialState, action) {
 
         return group;
       });
-
-      saveState(newState);
-      return newState;
+      break;
     }
 
     case REMOVE_TEXT_FILTER: {
@@ -168,14 +166,20 @@ function filtersReducer(state = initialState, action) {
         return group;
       });
 
-      saveState(newState);
-      return newState;
+      break;
     }
 
     default: {
-      return state;
+      break;
     }
   }
+
+  if (newState) {
+    // save the state locally
+    saveState(newState);
+  }
+
+  return newState || state;
 }
 
 export default filtersReducer;
