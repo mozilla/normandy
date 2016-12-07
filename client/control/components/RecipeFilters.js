@@ -9,7 +9,7 @@ import RecipeCount from 'control/components/RecipeCount';
 
 
 import {
-  setColumns,
+  loadLocalColumns,
 } from 'control/actions/ColumnActions';
 
 import {
@@ -58,12 +58,8 @@ class RecipeFilters extends React.Component {
    * @return {void}
    */
   componentWillMount() {
-    // load the column settings the user last used
-    localForage.getItem('columns', (err, found) => {
-      if (!err && found && found.length) {
-        this.props.dispatch(setColumns(found));
-      }
-    });
+    // load the last column setup user was viewing
+    this.props.dispatch(loadLocalColumns());
 
     // load the last filters the user viewed
     localForage.getItem('last-filters', (err, found) => {

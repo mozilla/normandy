@@ -1,3 +1,5 @@
+import * as localForage from 'localforage';
+
 const SET_FILTER = 'SET_FILTER';
 const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
 const ADD_TEXT_FILTER = 'ADD_TEXT_FILTER';
@@ -13,19 +15,12 @@ const REMOVE_TEXT_FILTER = 'REMOVE_TEXT_FILTER';
  */
 function selectFilter({ group, option, isEnabled }) {
   return dispatch => {
-    if (group.value === 'text') {
-      dispatch({
-        type: isEnabled ? ADD_TEXT_FILTER : REMOVE_TEXT_FILTER,
-        filter: option.value,
-      });
-    } else {
-      dispatch({
-        type: SET_FILTER,
-        group,
-        option,
-        isEnabled,
-      });
-    }
+    dispatch({
+      type: SET_FILTER,
+      group,
+      option,
+      isEnabled,
+    });
   };
 }
 
@@ -56,21 +51,31 @@ function setAllFilters(state) {
 const resetFilters = () => setAllFilters();
 
 
-function addTextFilter(filter) {
+const STORAGE_ID = 'last-filters';
+
+function loadLocalFilters() {
   return dispatch => {
-    dispatch({
-      type: ADD_TEXT_FILTER,
-      filter,
+    // load the column settings the user last used
+    localForage.getItem(STORAGE_ID, (err, found) => {
+      if (!err && found && found.length) {
+        dispatch({
+          type: SET_ALL_FILTERS,
+          filters: found,
+        });
+      }
     });
   };
 }
 
-function removeTextFilter(filter) {
-  return dispatch => {
-    dispatch({
-      type: REMOVE_TEXT_FILTER,
-      filter,
-    });
+/**
+ * Utility function to save the state via localForage.
+ *
+ * @param  {Array}  state Filter state
+ * @return {void}
+ */
+function saveLocalFilters(state) {
+  return () => {
+    localForage.setItem(STORAGE_ID, state);
   };
 }
 
@@ -85,6 +90,6 @@ export {
   selectFilter,
   setAllFilters,
   resetFilters,
-  addTextFilter,
-  removeTextFilter,
+  loadLocalFilters,
+  saveLocalFilters,
 };
