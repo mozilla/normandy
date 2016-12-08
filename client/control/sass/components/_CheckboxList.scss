@@ -1,0 +1,16 @@
+.checkbox-list {
+  input {
+    display: inline;
+    float: right;
+    margin-left: 0.5em;
+    width: auto;
+  }
+  
+  li {
+    margin: 0.5em 0;
+  }
+
+  label {
+    cursor: pointer;
+  }
+}

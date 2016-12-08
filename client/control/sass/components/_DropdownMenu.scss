@@ -1,0 +1,53 @@
+.dropdown-menu {
+  display: block;
+  float: right;
+  background: #ccc;
+  position: relative;
+
+  .dropdown-trigger {
+    cursor: pointer;
+
+    .fa {
+      display: inline-block;
+      margin-right: 0.5em;
+    }
+  }
+
+  .dropdown-content {
+    background: #fff;
+
+    position: absolute;
+    top: 100%;
+    min-width: 138px;
+    width: auto;
+    max-width: none;
+    max-height: 30vh;
+    z-index: 25;
+    padding: 1em 2em;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.15);
+    overflow: auto;
+
+    // pin left by default
+    &,
+    &.pin-left {
+      left: 0;
+      right: auto;
+    }
+
+    &.pin-right {
+      right: 0;
+      left: auto;
+    }
+
+    ul, li {
+      list-style: none;
+      list-style-type: none;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+}
