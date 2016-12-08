@@ -147,7 +147,7 @@ class TestAutographer(object):
 class TestVerifySignature(object):
 
     # known good data
-    data = '{"action":"console-log","arguments":{"message":"telemetry available"},"enabled":true,"filter_expression":"telemetry != undefined","id":22,"is_approved":false,"last_updated":"2016-09-01T23:03:17.360536Z","name":"mythmon\'s system addon test","revision_id":2}'  # noqa
+    data = '{"action":"console-log","arguments":{"message":"telemetry available"},"enabled":true,"filter_expression":"telemetry != undefined","id":22,"last_updated":"2016-09-01T23:03:17.360536Z","name":"mythmon\'s system addon test","revision_id":2}'  # noqa
     signature = 'sSyFLu0fY7mcrMwueJlvV9JV7XCrBUyEJCx08awzhPhGcUXEO7gC0gA15GLMbkHEfC1ekOoK0WGhQwMZgEMbT_QOQf4BqquG8C1zsjOpUEf7d38D4nyFA7Ow7gPNzYLQ'  # noqa
     pubkey = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
 
