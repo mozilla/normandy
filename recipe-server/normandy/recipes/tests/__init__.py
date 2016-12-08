@@ -4,11 +4,12 @@ from django.utils import timezone
 
 import factory
 
-from normandy.base.tests import FuzzyUnicode, UserFactory
+from normandy.base.tests import FuzzyUnicode
 from normandy.recipes.models import (
     Action,
     Client,
     Recipe,
+    RecipeRevision,
     Signature,
 )
 
@@ -29,9 +30,19 @@ class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
-    name = FuzzyUnicode()
-    action = factory.SubFactory(ActionFactory)
     enabled = True
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        obj = model_class(*args, **kwargs)
+        obj.save()
+
+        kwargs.pop('enabled')
+
+        revision = RecipeRevisionFactory(**kwargs)
+        revision.action.save()
+        obj.update(**revision.data)
+        return obj
 
     # It is important that the signature be based on the actual data, and not
     # some static value so that tests can make assertions against what data was
@@ -46,32 +57,15 @@ class RecipeFactory(factory.DjangoModelFactory):
         else:
             return None
 
-    @factory.post_generation
-    def countries(self, create, extracted, **kwargs):
-        if not create:
-            return
 
-        if extracted:
-            for country in extracted:
-                self.countries.add(country)
+@factory.use_strategy(factory.BUILD_STRATEGY)
+class RecipeRevisionFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = RecipeRevision
 
-    @factory.post_generation
-    def locales(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for locale in extracted:
-                self.locales.add(locale)
-
-    @factory.post_generation
-    def release_channels(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for channel in extracted:
-                self.release_channels.add(channel)
+    name = FuzzyUnicode()
+    action = factory.SubFactory(ActionFactory)
+    recipe = factory.SubFactory(RecipeFactory)
 
 
 class SignatureFactory(factory.DjangoModelFactory):

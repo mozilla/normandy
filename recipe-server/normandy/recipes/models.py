@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -67,12 +68,6 @@ class Recipe(models.Model):
     class Meta:
         ordering = ['-enabled', '-latest_revision__updated']
 
-    class IsNotApproved(Exception):
-        pass
-
-    # TODO: Figure out what this is?
-    _registered_matchers = []
-
     def __repr__(self):
         return '<Recipe "{name}">'.format(name=self.name)
 
@@ -81,7 +76,11 @@ class Recipe(models.Model):
 
     @property
     def name(self):
-        return self.latest_revision.name
+        return self.latest_revision.name if self.latest_revision else None
+
+    @property
+    def action(self):
+        return self.latest_revision.action if self.latest_revision else None
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -110,7 +109,10 @@ class Recipe(models.Model):
 
         if not is_clean or force:
             RecipeRevision.objects.create(recipe=self, parent=self.latest_revision, **data)
-            self.update_signature()
+            try:
+                self.update_signature()
+            except ImproperlyConfigured:
+                pass
             self.save()
 
 
@@ -129,6 +131,15 @@ class RecipeRevision(models.Model):
     action = models.ForeignKey('Action')
     arguments_json = models.TextField(default='{}', validators=[validate_json])
     filter_expression = models.TextField(blank=False)
+
+    @property
+    def data(self):
+        return {
+            'name': self.name,
+            'action': self.action,
+            'arguments_json': self.arguments_json,
+            'filter_expression': self.filter_expression,
+        }
 
     @property
     def arguments(self):
