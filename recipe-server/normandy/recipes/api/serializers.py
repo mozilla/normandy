@@ -24,7 +24,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     last_updated = serializers.DateTimeField(source='latest_revision.updated', read_only=True)
     revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
     name = serializers.CharField(source='latest_revision.name')
-    action = serializers.SlugRelatedField(source='latest_revision.action.name', slug_field='name',
+    action = serializers.SlugRelatedField(source='latest_revision.action', slug_field='name',
                                           queryset=Action.objects.all())
     arguments = serializers.JSONField(source='latest_revision.arguments')
     filter_expression = serializers.CharField(source='latest_revision.filter_expression')
