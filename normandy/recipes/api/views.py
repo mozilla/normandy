@@ -70,13 +70,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
-    def handle_exception(self, exc):
-        if isinstance(exc, Recipe.IsNotApproved):
-            return Response({'is_approved': 'This recipe cannot be enabled until it is approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        return super().handle_exception(exc)
-
     @reversion_transaction
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -102,7 +95,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
-        recipe.enable()
+        recipe.enabled = True
         recipe.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -110,7 +103,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     @detail_route(methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
-        recipe.disable()
+        recipe.enabled = False
         recipe.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -39,6 +39,7 @@ class RecipeFactory(factory.DjangoModelFactory):
         revision = RecipeRevisionFactory(**kwargs)
         revision.action.save()
         obj.update(**revision.data)
+
         return obj
 
     # It is important that the signature be based on the actual data, and not

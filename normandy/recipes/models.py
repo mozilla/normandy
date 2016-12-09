@@ -82,6 +82,14 @@ class Recipe(models.Model):
     def action(self):
         return self.latest_revision.action if self.latest_revision else None
 
+    @property
+    def filter_expression(self):
+        return self.latest_revision.filter_expression if self.latest_revision else None
+
+    @property
+    def arguments_json(self):
+        return self.latest_revision.arguments_json if self.latest_revision else None
+
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
         data = RecipeSerializer(self).data
@@ -104,15 +112,22 @@ class Recipe(models.Model):
     def update(self, force=False, **data):
         if self.latest_revision:
             is_clean = RecipeRevision.objects.filter(id=self.latest_revision.id, **data).exists()
+
+            revision_data = self.latest_revision.data
+            revision_data.update(data)
+            data = revision_data
         else:
             is_clean = False
 
         if not is_clean or force:
-            RecipeRevision.objects.create(recipe=self, parent=self.latest_revision, **data)
+            self.latest_revision = RecipeRevision.objects.create(
+                recipe=self, parent=self.latest_revision, **data)
+
             try:
                 self.update_signature()
             except ImproperlyConfigured:
                 pass
+
             self.save()
 
 
