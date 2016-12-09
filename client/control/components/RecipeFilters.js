@@ -9,9 +9,6 @@ import {
 
 /**
  * Filters displayed above the RecipeList table.
- *
- * Contains the big filter combobox, the 'active filters' section,
- * and the column menu.
  */
 class RecipeFilters extends React.Component {
   static propTypes = {
@@ -21,12 +18,10 @@ class RecipeFilters extends React.Component {
     columns: pt.array.isRequired,
   };
 
-
   constructor(props) {
     super(props);
     this.state = {};
   }
-
 
   /**
    * Loads user's last column display setup,
