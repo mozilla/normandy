@@ -11,12 +11,13 @@ from reversion import revisions as reversion
 from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
-from normandy.base.tests import Whatever, UserFactory
+from normandy.base.tests import Whatever
 from normandy.base.utils import aware_datetime
 from normandy.recipes.models import Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     RecipeFactory,
+    RecipeRevisionFactory
 )
 
 
@@ -257,16 +258,9 @@ class TestRecipeAPI(object):
         assert res.data['detail'] == AdminEnabledOrReadOnly.message
 
     def test_history(self, api_client):
-        with reversion.create_revision():
-            recipe = RecipeFactory(name='version 1')
-
-        with reversion.create_revision():
-            recipe.name = 'version 2'
-            recipe.save()
-
-        with reversion.create_revision():
-            recipe.name = 'version 3'
-            recipe.save()
+        recipe = RecipeFactory(name='version 1')
+        recipe.update(name='version 2')
+        recipe.update(name='version 3')
 
         res = api_client.get('/api/v1/recipe/%s/history/' % recipe.id)
 
@@ -351,33 +345,17 @@ class TestRecipeAPI(object):
 
 
 @pytest.mark.django_db
-class TestRecipeVersionAPI(object):
+class TestRecipeRevisionAPI(object):
     def test_it_works(self, api_client):
-        res = api_client.get('/api/v1/recipe_version/')
+        res = api_client.get('/api/v1/recipe_revision/')
         assert res.status_code == 200
         assert res.data == []
 
-    def test_it_serves_recipes(self, api_client):
-        with transaction.atomic(), reversion.create_revision():
-            recipe = RecipeFactory()
-
-        content_type = ContentType.objects.get_for_model(recipe)
-        version = Version.objects.filter(content_type=content_type, object_id=recipe.pk).first()
-
-        res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
+    def test_it_serves_revisions(self, api_client):
+        recipe = RecipeFactory()
+        res = api_client.get('/api/v1/recipe_revision/%s/' % recipe.latest_revision.id)
         assert res.status_code == 200
-        assert res.data['id'] == version.id
-
-    def test_it_filters_only_recipe_versions(self, api_client):
-        with transaction.atomic(), reversion.create_revision():
-            recipe = RecipeFactory()
-
-        action = recipe.action
-        content_type = ContentType.objects.get_for_model(action)
-        version = Version.objects.filter(content_type=content_type, object_id=action.pk).first()
-
-        res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
-        assert res.status_code == 404
+        assert res.data['id'] == recipe.latest_revision.id
 
 
 @pytest.mark.django_db
