@@ -15,6 +15,7 @@ import {
  */
 class RecipeFilters extends React.Component {
   static propTypes = {
+    onSearchChange: pt.func.isRequired,
     // connected
     dispatch: pt.func.isRequired,
     columns: pt.array.isRequired,
@@ -44,6 +45,7 @@ class RecipeFilters extends React.Component {
   render() {
     const {
       columns,
+      onSearchChange,
     } = this.props;
 
     const {
@@ -59,7 +61,7 @@ class RecipeFilters extends React.Component {
                 type="text"
                 placeholder="Search"
                 value={searchText}
-                onChange={() => {}}
+                onChange={onSearchChange}
               />
             </div>
           </div>

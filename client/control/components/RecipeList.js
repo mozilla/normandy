@@ -30,7 +30,6 @@ class DisconnectedRecipeList extends React.Component {
     isFetching: pt.bool.isRequired,
     recipeListNeedsFetch: pt.bool.isRequired,
     recipes: pt.array.isRequired,
-    isFiltering: pt.bool.isRequired,
     displayedColumns: pt.array.isRequired,
   };
 
@@ -96,7 +95,11 @@ class DisconnectedRecipeList extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      searchText: '',
+    };
+
+    this.handleSearchChange = ::this.handleSearchChange;
   }
 
   componentWillMount() {
@@ -109,7 +112,11 @@ class DisconnectedRecipeList extends React.Component {
     }
   }
 
-  title = 'Recipes';
+  handleSearchChange(event) {
+    this.setState({
+      searchText: event.target.value || '',
+    });
+  }
 
   viewRecipe(recipe) {
     const { dispatch } = this.props;
@@ -160,11 +167,11 @@ class DisconnectedRecipeList extends React.Component {
     const {
       recipes,
       displayedColumns,
-      recipeListNeedsFetch,
-      isFiltering,
     } = this.props;
 
-    const noResults = false;
+    const {
+      searchText,
+    } = this.state;
 
     const filteredRecipes = (this.state.filteredRecipes || recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
@@ -175,6 +182,7 @@ class DisconnectedRecipeList extends React.Component {
           {...this.state}
           displayCount={filteredRecipes.length}
           totalCount={recipes.length}
+          onSearchChange={this.handleSearchChange}
         />
         <div className="fluid-8">
           <Table
@@ -182,6 +190,7 @@ class DisconnectedRecipeList extends React.Component {
             sortable
             hideFilterInput
             filterable={['name', 'action', 'metadata']}
+            filterBy={searchText}
           >
             <Thead>
               {
@@ -206,15 +215,6 @@ class DisconnectedRecipeList extends React.Component {
               </Tr>
             )}
           </Table>
-
-          {
-            noResults && (isFiltering ?
-              <div className="callout">No recipes match those filters.</div>
-            : <div
-              className="callout"
-              children={recipeListNeedsFetch ? 'Loading...' : 'No recipes to display.'}
-            />)
-          }
         </div>
       </div>
     );
@@ -222,10 +222,10 @@ class DisconnectedRecipeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  recipes: state.recipes.list || [],
   dispatch: ownProps.dispatch,
-  recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
+  recipes: state.recipes.list || [],
+  recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   displayedColumns: getActiveColumns(state.columns),
 });
 
