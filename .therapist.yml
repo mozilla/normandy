@@ -6,3 +6,8 @@ actions:
   eslint:
     run: ./node_modules/.bin/eslint {files}
     include: "*.js"
+  stylelint:
+    run: ./node_modules/.bin/stylelint {files}
+    include:
+      - "client/**/*.css"
+      - "client/**/*.scss"

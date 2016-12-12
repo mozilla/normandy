@@ -7,7 +7,7 @@
     "url": "git://github.com/mozilla/normandy.git"
   },
   "bin": {
-    "stylelint": "./node_modules/stylelint/dist/cli.js"
+    "stylelint": "./node_modules/.bin/stylelint"
   },
   "scripts": {
     "watch": "webpack --config ./webpack.config.js --watch",
@@ -15,7 +15,7 @@
     "test": "NODE_ENV=production karma start",
     "lint": "npm run lint-js; npm run lint-css;",
     "lint-js": "eslint normandy client webpack.config.js karma.conf.js --fix || true",
-    "lint-css": "stylelint '**/*.s?(a|c)ss' --config .stylelintrc || true"
+    "lint-css": "stylelint 'client/**/*.s?(a|c)ss' --config .stylelintrc || true"
   },
   "license": "MPL-2.0",
   "dependencies": {
