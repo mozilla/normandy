@@ -1,7 +1,7 @@
 import * as localForage from 'localforage';
 
 const UPDATE_COLUMN = 'UPDATE_COLUMN';
-const SET_COLUMNS = 'SET_COLUMNS';
+const LOAD_SAVED_COLUMNS = 'LOAD_SAVED_COLUMNS';
 
 function updateColumn({ index, isActive }) {
   return dispatch => {
@@ -13,16 +13,6 @@ function updateColumn({ index, isActive }) {
   };
 }
 
-function setColumns(columns) {
-  return dispatch => {
-    dispatch({
-      type: SET_COLUMNS,
-      columns,
-    });
-  };
-}
-
-
 const STORAGE_ID = 'columns';
 
 function loadLocalColumns() {
@@ -31,7 +21,7 @@ function loadLocalColumns() {
     localForage.getItem(STORAGE_ID, (err, found) => {
       if (!err && found && found.length) {
         dispatch({
-          type: SET_COLUMNS,
+          type: LOAD_SAVED_COLUMNS,
           columns: found,
         });
       }
@@ -41,7 +31,7 @@ function loadLocalColumns() {
 
 /**
  * Utility function to save the state via localForage.
- * Slightly weird since it doesn't ever dispatch anything.
+ * Slightly weird since it doesn't actually dispatch anything
  *
  * @param  {Array}  state Filter state
  * @return {void}
@@ -55,10 +45,9 @@ function saveLocalColumns(state) {
 export {
   // action constants
   UPDATE_COLUMN,
-  SET_COLUMNS,
+  LOAD_SAVED_COLUMNS,
   // actions
   updateColumn,
-  setColumns,
   loadLocalColumns,
   saveLocalColumns,
 };

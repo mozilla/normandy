@@ -1,5 +1,5 @@
 import {
-  SET_COLUMNS,
+  LOAD_SAVED_COLUMNS,
   UPDATE_COLUMN,
   saveLocalColumns as saveState,
 } from 'control/actions/ColumnActions';
@@ -49,49 +49,50 @@ const initialState = [{
   enabled: true,
 }];
 
+/**
+ * Given an array, clones items _by value_
+ * and returns a new array instance.
+ *
+ * @param  {Array}  arr Array of values to clone
+ * @return {Array}      New array of new values
+ */
+const cloneArrayValues = arr => JSON.parse(JSON.stringify(arr));
+
 function columnReducer(state = initialState, action) {
   let newState;
+  let valuesMatch;
+
+  const {
+    index,
+    isActive,
+  } = action;
 
   switch (action.type) {
-    case UPDATE_COLUMN: {
-      const {
-        index,
-        isActive,
-      } = action;
-
-      newState = [].concat(state || []);
+    case UPDATE_COLUMN:
+      newState = cloneArrayValues(state || []);
       newState[index].enabled = isActive;
-      break;
-    }
 
-    case SET_COLUMNS: {
+      saveState(newState);
+      return newState;
+
+    case LOAD_SAVED_COLUMNS:
       // double check that the incoming columns
       // have the all the same values as our
       // initialState. this prevents a user loading
       // outdated columns from localStorage
-      const valuesMatch = compare(
-        initialState.map(option => option.value + option.label),
+      valuesMatch = compare(
+        state.map(option => option.value + option.label),
         action.columns.map(option => option.value + option.label)
       );
 
       if (valuesMatch) {
-        newState = [].concat(action.columns);
-      } else {
-        newState = [].concat(initialState);
+        newState = cloneArrayValues(action.columns);
       }
-      break;
-    }
+      return newState || state;
 
-    default: {
-      break;
-    }
+    default:
+      return state;
   }
-
-  if (newState) {
-    saveState(newState);
-  }
-
-  return newState || state;
 }
 
 export default columnReducer;
