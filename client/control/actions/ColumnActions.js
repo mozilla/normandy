@@ -35,11 +35,10 @@ function loadLocalColumns() {
  * Slightly weird since it doesn't actually dispatch anything
  *
  * @param  {Array}     state    Filter state
- * @param  {Function}  callback (Optional) callback function
  * @return {void}
  */
-function saveLocalColumns(state, callback) {
-  localForage.setItem(localStorageID, state, callback);
+async function saveLocalColumns(state) {
+  await localForage.setItem(localStorageID, state);
 }
 
 

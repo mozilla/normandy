@@ -9,15 +9,15 @@ import closest from 'client/utils/closest';
  * to determine the element which should be used to
  * trigger the menu's appearance
  *
- * @property {node} trigger
+ * @prop {node} trigger
  *   Element the user interacts with to display the menu
- * @property {node} children
+ * @prop {node} children
  *   Element(s) displayed in the content section when open
- * @property {boolean} useClick (Optional)
+ * @prop {boolean} useClick (Optional)
  *   Track clicks on the display menu?
- * @property {boolean} useFocus (Optional)
+ * @prop {boolean} useFocus (Optional)
  *   Track focus state on trigger element to display the menu?
- * @property {boolean} pinRight (Optional)
+ * @prop {boolean} pinRight (Optional)
  *   Should the dropdown be pinned to the right edge?
  */
 export default class DropdownMenu extends React.Component {

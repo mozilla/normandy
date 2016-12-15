@@ -41,11 +41,9 @@ class ColumnMenu extends React.Component {
    * simply updates the component's column state,
    * and notifies the parent of what's selected
    *
-   * Note: it seems a little fragile to use the index for this,
-   * may be useful to switch to something more identifying.
    *
-   * @param  {String} TODO
-   * @param  {Boolean} isActive    Is the column now active?
+   * @param  {String}  columnValue  Value of the column ('name', 'endTime', etc)
+   * @param  {Boolean} isActive     Is the column now active?
    * @return {void}
    */
   handleColumnInput(columnValue, isActive) {

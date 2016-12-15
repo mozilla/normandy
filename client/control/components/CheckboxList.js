@@ -8,7 +8,7 @@ import React, { PropTypes as pt } from 'react';
  *   Fires when user has changed a checkbox, with
  *   params (Item index, Checkbox 'checked' status)
  *
- * @property {Array<Object>} options
+ * @prop {Array<Object>} options
  *   List of options to be made into checkboxes, shaped as:
  *   [{
  *     label: 'Display label',

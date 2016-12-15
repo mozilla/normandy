@@ -36,7 +36,7 @@ describe('Column Actions', () => {
   });
 
   describe('saveLocalColumns', () => {
-    it('uses localForage to save column setup locally', done => {
+    it('uses localForage to save column setup locally', async () => {
       const {
         saveLocalColumns,
         localStorageID,
@@ -44,18 +44,16 @@ describe('Column Actions', () => {
 
       const testState = { test: true };
 
-      saveLocalColumns(testState, () => {
-        localForage.getItem(localStorageID, (err, found) => {
-          expect(err).toBeNull();
+      await saveLocalColumns(testState);
+      await localForage.getItem(localStorageID)
+        .then(found => {
           expect(found).toEqual(testState);
-          done();
         });
-      });
     });
   });
 
   describe('loadLocalColumns', () => {
-    it('should load column setup from localForage and put it into the column store', done => {
+    it('should load columns from localForage and put it into the column store', async () => {
       const {
         localStorageID,
         LOAD_SAVED_COLUMNS,
@@ -68,22 +66,16 @@ describe('Column Actions', () => {
       expectedColumns[0].testProperty = 'should exist';
 
       // set the fake columns in memory
-      localForage.setItem(localStorageID, expectedColumns)
-        .then(() =>
-          // fire the action
-          store.dispatch(loadLocalColumns())
-            .then(() => {
-              // columns should match ours, with the
-              // custom property and everything
-              expect(store.getActions()).toContain({
-                type: LOAD_SAVED_COLUMNS,
-                columns: expectedColumns,
-              });
+      await localForage.setItem(localStorageID, expectedColumns);
 
-              // done testing
-              done();
-            })
-        );
+      // fire the action
+      await store.dispatch(loadLocalColumns());
+
+      // check the store
+      expect(store.getActions()).toContain({
+        type: LOAD_SAVED_COLUMNS,
+        columns: expectedColumns,
+      });
     });
   });
 });

@@ -9,11 +9,16 @@ import {
 
 /**
  * Filters displayed above the RecipeList table.
+ *
+ * @prop {Function} onSearchChange   Handler to trigger when user has altered search text.
+ * @prop {string}   searchText       String user is filtering recipes against
+ * @prop {string}   loadLocalColumns Connect'd fn to load columns from localForage
+ * @prop {Array<object>}   columns   Connect'd array of columns ({ label, value, enabled })
  */
 class RecipeFilters extends React.Component {
   static propTypes = {
     onSearchChange: pt.func.isRequired,
-    // connected
+    searchText: pt.string.isRequired,
     loadLocalColumns: pt.func.isRequired,
     columns: pt.array.isRequired,
   };
@@ -36,11 +41,8 @@ class RecipeFilters extends React.Component {
     const {
       columns,
       onSearchChange,
-    } = this.props;
-
-    const {
       searchText,
-    } = this.state;
+    } = this.props;
 
     return (
       <div className="fluid-8">
