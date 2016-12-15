@@ -6,9 +6,6 @@
     "type": "git",
     "url": "git://github.com/mozilla/normandy.git"
   },
-  "bin": {
-    "stylelint": "./node_modules/.bin/stylelint"
-  },
   "scripts": {
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
