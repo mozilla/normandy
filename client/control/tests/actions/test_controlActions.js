@@ -7,7 +7,7 @@ import * as actionTypes from '../../actions/ControlActions.js';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
-const store = mockStore({ controlApp: initialState });
+const store = mockStore({ ...initialState });
 
 describe('controlApp Actions', () => {
   afterEach(() => {

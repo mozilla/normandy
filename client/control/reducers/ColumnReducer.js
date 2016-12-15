@@ -8,6 +8,8 @@ import {
   compare,
 } from 'client/utils/hash';
 
+import cloneArrayValues from 'client/utils/clone-array-values';
+
 // this could be sexier
 const initialState = [{
   label: 'Name',
@@ -48,15 +50,6 @@ const initialState = [{
   value: 'metadata',
   enabled: true,
 }];
-
-/**
- * Given an array, clones items _by value_
- * and returns a new array instance.
- *
- * @param  {Array}  arr Array of values to clone
- * @return {Array}      New array of new values
- */
-const cloneArrayValues = arr => JSON.parse(JSON.stringify(arr));
 
 function columnReducer(state = initialState, action) {
   let newState;

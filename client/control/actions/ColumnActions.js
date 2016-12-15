@@ -13,12 +13,12 @@ function updateColumn({ index, isActive }) {
   };
 }
 
-const STORAGE_ID = 'columns';
+const localStorageID = 'columns';
 
 function loadLocalColumns() {
-  return dispatch => {
+  return dispatch =>
     // load the column settings the user last used
-    localForage.getItem(STORAGE_ID, (err, found) => {
+    localForage.getItem(localStorageID, (err, found) => {
       if (!err && found && found.length) {
         dispatch({
           type: LOAD_SAVED_COLUMNS,
@@ -26,23 +26,25 @@ function loadLocalColumns() {
         });
       }
     });
-  };
 }
 
 /**
  * Utility function to save the state via localForage.
  * Slightly weird since it doesn't actually dispatch anything
  *
- * @param  {Array}  state Filter state
+ * @param  {Array}     state    Filter state
+ * @param  {Function}  callback (Optional) callback function
  * @return {void}
  */
-function saveLocalColumns(state) {
-  localForage.setItem(STORAGE_ID, state);
+function saveLocalColumns(state, callback) {
+  localForage.setItem(localStorageID, state, callback);
 }
 
 
 // Exports
 export {
+  // used for testing
+  localStorageID,
   // action constants
   UPDATE_COLUMN,
   LOAD_SAVED_COLUMNS,
