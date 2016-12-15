@@ -7,14 +7,15 @@ body {
   color: $darkBrown;
   font: normal normal 400 13px/16px $OpenSans;
   margin: 0 auto;
-  padding: 0px 40px;
-
+  
+  padding: 0 40px;
   min-width: 640px;
 }
 
 
 /* Links */
-a:link, a:visited {
+a:link,
+a:visited {
   color: $cta;
   text-decoration: none;
 }
@@ -24,15 +25,18 @@ a:hover {
 }
 
 /* Form Elements */
-label, .label {
+label,
+.label {
   color: rgba($darkBrown, 0.6);
   display: block;
   font: normal normal 400 12px/16px $OpenSans;
-  padding: 5px 0px;
+  padding: 5px 0;
   text-transform: uppercase;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   border: 1px solid $darkCream;
   border-radius: 3px;
   font: normal normal 300 15px/30px $SourceSansPro;
@@ -67,10 +71,10 @@ input, select, textarea {
 .switch span {
   color: $darkBrown;
   cursor: pointer;
-  font-size: 12px;
   float: left;
+  font-size: 12px;
   line-height: 26px;
-  padding: 0px;
+  padding: 0;
   position: relative;
   text-align: center;
   text-transform: none;
@@ -103,20 +107,24 @@ input, select, textarea {
 
 
 /* Call to Action Buttons & Links */
-.button, input[type="submit"], input[type="button"], .submit-row input, a.button {
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
   background: $cta;
-  border: 0px;
-  border-radius: 0px;
-  color: #fff;
+  border: 0;
+  border-radius: 0;
+  color: #FFF;
   font: normal normal 600 13px/30px $OpenSans;
   padding: 10px 40px;
   text-align: center;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
   text-transform: uppercase;
 
   &.delete {
-    display: inline-block;
     background-color: $red;
+    display: inline-block;
 
     &:hover {
       background-color: $redHover;
@@ -124,9 +132,15 @@ input, select, textarea {
   }
 }
 
-.button:active, input[type="submit"]:active, input[type="button"]:active,
-.button:focus, input[type="submit"]:focus, input[type="button"]:focus,
-.button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+.button:active,
+input[type="submit"]:active,
+input[type="button"]:active,
+.button:focus,
+input[type="submit"]:focus,
+input[type="button"]:focus,
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
   background: $ctaHover;
   cursor: pointer;
 }
@@ -144,20 +158,21 @@ table {
   table-layout: fixed;
   width: 100%;
 
-  a:link, a:visited {
+  a:link,
+  a:visited {
     color: $darkBrown;
   }
 }
 
 thead {
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 13px;
   font-family: $OpenSans;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
 
   th {
     outline: 0;
-    padding: 5px 0px;
+    padding: 5px 0;
     position: relative;
     &:hover { cursor: pointer; }
 
@@ -195,7 +210,7 @@ tr:nth-child(even) {
 }
 
 td {
-  border-bottom: 0px;
+  border-bottom: 0;
   padding: 25px;
   text-align: center;
 }
@@ -227,36 +242,40 @@ i {
   $line-height: 22px;
   $top-padding: 15px;
 
+  /* Notification animation variable(s).
+    These assume only one line of text but that's fine. */
+  $notificationHeight: ($top-padding * 2) + $line-height;
+
   background-color: #FFF;
-  color: rgba(0,0,0, 0.6);
+  color: rgba(0, 0, 0, 0.6);
   font-size: 12px;
   line-height: $line-height;
-  text-indent: 20px;
   margin-bottom: 2px;
   overflow: hidden;
+  text-indent: 20px;
 
   .message {
     padding: $top-padding 30px;
 
     &::before {
       font: normal normal 400 14px/1 FontAwesome;
-      opacity: 0.75;
       margin-right: 10px;
+      opacity: 0.75;
     }
 
     &.success {
       background-color: rgba($green, 0.75);
-      &::before {  content: "\f00c"; }
+      &::before { content: "\f00c"; }
     }
 
     &.error {
       background-color: rgba($red, 0.75);
-      &::before {  content: "\f12a"; }
+      &::before { content: "\f12a"; }
     }
 
     &.info {
       background-color: rgba($yellow, 0.75);
-      &::before {  content: "\f129"; }
+      &::before { content: "\f129"; }
     }
   }
 
@@ -269,27 +288,24 @@ i {
     }
   }
 
-  /* Notification animations
-     These assume only one line of text but that's fine. */
-  $height: ($top-padding * 2) + $line-height;
+  /* Notification animation classes */
   &.notification-enter {
     height: 0;
   }
 
   &.notification-enter-active {
-    height: $height;
+    height: $notificationHeight;
     transition: height 200ms ease-out;
   }
 
   &.notification-leave {
-    height: $height;
+    height: $notificationHeight;
   }
 
   &.notification-leave-active {
     height: 0;
     transition: height 200ms ease-in;
   }
-
 }
 
 
@@ -309,7 +325,6 @@ i {
     width: 45%;
   }
 }
-
 
 .col-trigger {
   display: block;

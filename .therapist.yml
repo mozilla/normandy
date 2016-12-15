@@ -5,4 +5,11 @@ actions:
     exclude: "docs/"
   eslint:
     run: ./node_modules/.bin/eslint {files}
-    include: "*.js"
+    include:
+      - "*.js"
+      - "*.jsx"
+  stylelint:
+    run: ./node_modules/.bin/stylelint {files}
+    include:
+      - "*.css"
+      - "*.scss"
