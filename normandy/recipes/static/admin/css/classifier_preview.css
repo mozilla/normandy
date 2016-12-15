@@ -1,18 +1,20 @@
 /* Line up fields horizontally. */
 .client-properties {
-    display: flex;
-    margin-bottom: 1em;
+  display: flex;
+  margin-bottom: 1em;
 }
+
 .client-properties .field {
-    flex: 1;
+  flex: 1;
 }
+
 .field label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: .5em;
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5em;
 }
 
 /* Stretch result table to full width. */
 .matched-recipes {
-    width: 100%;
+  width: 100%;
 }
