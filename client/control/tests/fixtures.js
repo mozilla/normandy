@@ -13,6 +13,45 @@ export const initialState = {
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },
+  columns: [{
+    label: 'Name',
+    value: 'name',
+    enabled: true,
+  }, {
+    label: 'Action',
+    value: 'action',
+    enabled: true,
+  }, {
+    label: 'Enabled',
+    value: 'enabled',
+    enabled: true,
+  }, {
+    label: 'Channels',
+    value: 'channels',
+  }, {
+    label: 'Locales',
+    value: 'locales',
+  }, {
+    label: 'Countries',
+    value: 'countries',
+  }, {
+    label: 'Start Time',
+    value: 'startTime',
+  }, {
+    label: 'End Time',
+    value: 'endTime',
+  }, {
+    label: 'Additional Filters',
+    value: 'additionalFilter',
+  }, {
+    label: 'Last Updated',
+    value: 'last_updated',
+    enabled: true,
+  }, {
+    label: 'Metadata',
+    value: 'metadata',
+    enabled: true,
+  }],
   notifications: [],
   form: {},
   routing: {
