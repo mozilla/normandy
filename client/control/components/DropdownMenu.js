@@ -8,21 +8,24 @@ import closest from 'client/utils/closest';
  * based on focus/clicking. Uses a `trigger` property
  * to determine the element which should be used to
  * trigger the menu's appearance
+ *
+ * @property {node} trigger
+ *   Element the user interacts with to display the menu
+ * @property {node} children
+ *   Element(s) displayed in the content section when open
+ * @property {boolean} useClick (Optional)
+ *   Track clicks on the display menu?
+ * @property {boolean} useFocus (Optional)
+ *   Track focus state on trigger element to display the menu?
+ * @property {boolean} pinRight (Optional)
+ *   Should the dropdown be pinned to the right edge?
  */
-
 export default class DropdownMenu extends React.Component {
   static propTypes = {
-    // trigger is the element the user interacts with
-    // to display the dropdown menu
     trigger: pt.node.isRequired,
-    // children is the content displayed when open
-    children: pt.any.isRequired,
-    // track clicks to display menu?
+    children: pt.node.isRequired,
     useClick: pt.bool,
-    // track trigger's focus to display menu?
     useFocus: pt.bool,
-    // pin the dropdown to the right edge
-    // of the parent container?
     pinRight: pt.bool,
   };
 
@@ -45,7 +48,6 @@ export default class DropdownMenu extends React.Component {
    * (This prevents components interfering,
    * due to how the component uses class selectors)
    *
-   * @return {void}
    */
   componentDidMount() {
     this.id = this.id || `dropdown-menu-${uuid()}`;
@@ -55,7 +57,6 @@ export default class DropdownMenu extends React.Component {
    * On unmount, hides the modal (if visible)
    * and removes all relevant bindings.
    *
-   * @return {void}
    */
   componentWillUnmount() {
     // just toggle it to hide when component unmounts
@@ -68,7 +69,6 @@ export default class DropdownMenu extends React.Component {
    * If the user clicked OUTSIDE of the menu, it is closed.
    *
    * @param  {MouseEvent} evt Original click event
-   * @return {void}
    */
   onMenuBlur(evt) {
     // determine if the click was inside of this .dropdown-menu
@@ -84,7 +84,6 @@ export default class DropdownMenu extends React.Component {
    * based on the `shouldBind` param.
    *
    * @param  {boolean} shouldBind Should the event be attached?
-   * @return {void}
    */
   updateWindowBinding(shouldBind) {
     if (shouldBind) {
@@ -98,7 +97,6 @@ export default class DropdownMenu extends React.Component {
    * Shows or hides the menu based on previous state
    * or if the `force` param is passed.
    * @param  {Boolean} force (Optional) Value to set visibility
-   * @return {void}
    */
   toggleVisibility(force) {
     // if we get a parameter, use that instead of just straight up toggling

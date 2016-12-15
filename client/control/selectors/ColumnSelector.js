@@ -10,10 +10,11 @@
  * @param  {Array<Object>} columns Initial set of columns to look through
  * @return {Array<Object>}         Columns that are enabled/visible to user
  */
-export const getActiveColumns = columns =>
-  [].concat(columns)
+export function getActiveColumns(columns) {
+  return [].concat(columns)
     .map(col => (col.enabled ? col : null))
     .filter(col => col);
+}
 
 /**
  * Given a set of columns, returns an array of
@@ -22,7 +23,8 @@ export const getActiveColumns = columns =>
  * @param  {Array<Object>} columns Initial set of columns to look through
  * @return {Array<Object>}         Columns that are disabled/hidden from the user
  */
-export const getInactiveColumns = columns =>
-  [].concat(columns)
+export function getInactiveColumns(columns) {
+  return [].concat(columns)
     .map(col => (!col.enabled ? col : null))
     .filter(col => col);
+}

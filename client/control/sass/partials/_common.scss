@@ -23,30 +23,27 @@ a:hover {
   color: $ctaHover;
 }
 
+/* Form Elements */
+label, .label {
+  color: rgba($darkBrown, 0.6);
+  display: block;
+  font: normal normal 400 12px/16px $OpenSans;
+  padding: 5px 0px;
+  text-transform: uppercase;
+}
 
-// .recipe-form {
-    /* Form Elements */
-  label, .label {
-    color: rgba($darkBrown, 0.6);
-    display: block;
-    font: normal normal 400 12px/16px $OpenSans;
-    padding: 5px 0px;
-    text-transform: uppercase;
+input, select, textarea {
+  border: 1px solid $darkCream;
+  border-radius: 3px;
+  font: normal normal 300 15px/30px $SourceSansPro;
+  padding: 5px 10px;
+  width: 100%;
+
+  &:focus {
+    border-color: $darkestCream;
+    outline: 0;
   }
-
-  input, select, textarea {
-    border: 1px solid $darkCream;
-    border-radius: 3px;
-    font: normal normal 300 15px/30px $SourceSansPro;
-    padding: 5px 10px;
-    width: 100%;
-
-    &:focus {
-      border-color: $darkestCream;
-      outline: 0;
-    }
-  }
-// }
+}
 
 .input-with-icon {
   position: relative;

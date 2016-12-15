@@ -26,7 +26,7 @@ describe('Column Actions', () => {
 
       const expectedAction = {
         type: UPDATE_COLUMN,
-        index: 0,
+        value: 'name',
         isActive: true,
       };
 
@@ -64,6 +64,7 @@ describe('Column Actions', () => {
 
       // fake some 'loaded' columns
       const expectedColumns = cloneArrayValues(initialState.columns);
+      // add some 'custom' data to check for later
       expectedColumns[0].testProperty = 'should exist';
 
       // set the fake columns in memory
@@ -72,13 +73,13 @@ describe('Column Actions', () => {
           // fire the action
           store.dispatch(loadLocalColumns())
             .then(() => {
-              // check that our property was added to the column
-              expect(expectedColumns[0].testProperty).toEqual('should exist');
-              // rest of the columns should still match
+              // columns should match ours, with the
+              // custom property and everything
               expect(store.getActions()).toContain({
                 type: LOAD_SAVED_COLUMNS,
                 columns: expectedColumns,
               });
+
               // done testing
               done();
             })

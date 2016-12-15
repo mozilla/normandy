@@ -5,13 +5,17 @@ import {
   initialState,
 } from 'control/tests/fixtures';
 
+import cloneArrayValues from 'client/utils/clone-array-values';
+
 /**
  * Utility function to clone the initialState column array and its values
  * (This prevents nested objects from being cloned by reference)
  *
  * @return {Array} New array with cloned initialState values
  */
-const cloneInitialArray = () => JSON.parse(JSON.stringify(initialState.columns));
+function cloneInitialArray() {
+  return cloneArrayValues(initialState.columns);
+}
 
 
 /**
@@ -28,8 +32,22 @@ const getNondefaultColumn = () => {
       return !col.enabled;
     });
 
-  if (!foundIndex) {
-    console.warn('Warning! No non-default columns to test against.');
+  if (typeof foundIndex === 'undefined') {
+    throw new Error('Warning! No non-default columns to test against.');
+  }
+  return foundIndex;
+};
+
+const getDefaultColumn = () => {
+  let foundIndex;
+  initialState.columns
+    .find((col, index) => {
+      foundIndex = index;
+      return col.enabled;
+    });
+
+  if (typeof foundIndex === 'undefined') {
+    throw new Error('Warning! No default columns to test against.');
   }
   return foundIndex;
 };
@@ -42,55 +60,44 @@ describe('Column reducer', () => {
     expect(appReducer(undefined, {})).toEqual(initialState);
   });
 
-  it('should have default columns to display', () => {
-    const defaults = [
-      'name',
-      'action',
-      'enabled',
-      'last_updated',
-      'metadata',
-    ];
+  describe('handling UPDATE_COLUMN', () => {
+    it('should enable columns appropriately', () => {
+      const expectedColumns = cloneInitialArray();
 
-    // get the columns that are enabled,
-    // and their shorthand values
-    const foundDefaults = cloneInitialArray()
-      .filter(col => col.enabled)
-      .map(col => col.value);
+      // grab a non-default'd column
+      const colId = getNondefaultColumn();
+      expectedColumns[colId].enabled = true;
 
-    // arrays of default enableds should match
-    expect(foundDefaults).toEqual(defaults);
-  });
+      const colValue = expectedColumns[colId].value;
 
-  it('should handle UPDATE_COLUMN (enable)', () => {
-    const expectedColumns = cloneInitialArray();
+      expect(appReducer(undefined, {
+        type: actions.UPDATE_COLUMN,
+        value: colValue,
+        isActive: true,
+      })).toEqual({
+        ...initialState,
+        columns: expectedColumns,
+      });
+    });
 
-    // grab a non-default'd column
-    const colId = getNondefaultColumn();
-    expectedColumns[colId].enabled = true;
+    it('should disable columns appropriately', () => {
+      const expectedColumns = cloneInitialArray();
+      const colId = getDefaultColumn();
 
-    expect(appReducer(undefined, {
-      type: actions.UPDATE_COLUMN,
-      index: colId,
-      isActive: true,
-    })).toEqual({
-      ...initialState,
-      columns: expectedColumns,
+      expectedColumns[colId].enabled = false;
+      const colValue = expectedColumns[colId].value;
+
+      expect(appReducer(undefined, {
+        type: actions.UPDATE_COLUMN,
+        value: colValue,
+        isActive: false,
+      })).toEqual({
+        ...initialState,
+        columns: expectedColumns,
+      });
     });
   });
 
-  it('should handle UPDATE_COLUMN (disable)', () => {
-    const expectedColumns = cloneInitialArray();
-    expectedColumns[0].enabled = false;
-
-    expect(appReducer(undefined, {
-      type: actions.UPDATE_COLUMN,
-      index: 0,
-      isActive: false,
-    })).toEqual({
-      ...initialState,
-      columns: expectedColumns,
-    });
-  });
 
   describe('handling LOAD_SAVED_COLUMNS', () => {
     // when loading, the values/labels are compared against what's

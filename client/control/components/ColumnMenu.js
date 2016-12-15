@@ -44,13 +44,13 @@ class ColumnMenu extends React.Component {
    * Note: it seems a little fragile to use the index for this,
    * may be useful to switch to something more identifying.
    *
-   * @param  {Number}  columnIndex Integer, index of relevant column
+   * @param  {String} TODO
    * @param  {Boolean} isActive    Is the column now active?
    * @return {void}
    */
-  handleColumnInput(columnIndex, isActive) {
+  handleColumnInput(columnValue, isActive) {
     this.props.dispatch(updateColumn({
-      index: columnIndex,
+      value: columnValue,
       isActive,
     }));
   }

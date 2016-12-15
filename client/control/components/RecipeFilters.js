@@ -14,14 +14,9 @@ class RecipeFilters extends React.Component {
   static propTypes = {
     onSearchChange: pt.func.isRequired,
     // connected
-    dispatch: pt.func.isRequired,
+    loadLocalColumns: pt.func.isRequired,
     columns: pt.array.isRequired,
   };
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
 
   /**
    * Loads user's last column display setup,
@@ -31,7 +26,7 @@ class RecipeFilters extends React.Component {
    */
   componentWillMount() {
     // load the last column setup user was viewing
-    this.props.dispatch(loadLocalColumns());
+    this.props.loadLocalColumns();
   }
 
   /**
@@ -79,5 +74,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  { loadLocalColumns }
 )(RecipeFilters);

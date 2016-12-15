@@ -4,13 +4,8 @@ import {
   saveLocalColumns as saveState,
 } from 'control/actions/ColumnActions';
 
-import {
-  compare,
-} from 'client/utils/hash';
-
 import cloneArrayValues from 'client/utils/clone-array-values';
 
-// this could be sexier
 const initialState = [{
   label: 'Name',
   value: 'name',
@@ -56,15 +51,23 @@ function columnReducer(state = initialState, action) {
   let valuesMatch;
 
   const {
-    index,
+    value,
     isActive,
   } = action;
 
   switch (action.type) {
     case UPDATE_COLUMN:
       newState = cloneArrayValues(state || []);
-      newState[index].enabled = isActive;
+      // find the updated column and set
+      // its 'enabled' property
+      newState = newState.map(col => {
+        if (col.value === value) {
+          col.enabled = isActive;
+        }
+        return col;
+      });
 
+      // save column config locally
       saveState(newState);
       return newState;
 
@@ -73,10 +76,9 @@ function columnReducer(state = initialState, action) {
       // have the all the same values as our
       // initialState. this prevents a user loading
       // outdated columns from localStorage
-      valuesMatch = compare(
-        state.map(option => option.value + option.label),
-        action.columns.map(option => option.value + option.label)
-      );
+      valuesMatch =
+        JSON.stringify(state.map(option => option.value + option.label)) ===
+        JSON.stringify(action.columns.map(option => option.value + option.label));
 
       if (valuesMatch) {
         newState = cloneArrayValues(action.columns);

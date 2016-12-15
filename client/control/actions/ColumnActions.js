@@ -3,11 +3,11 @@ import * as localForage from 'localforage';
 const UPDATE_COLUMN = 'UPDATE_COLUMN';
 const LOAD_SAVED_COLUMNS = 'LOAD_SAVED_COLUMNS';
 
-function updateColumn({ index, isActive }) {
+function updateColumn({ value, isActive }) {
   return dispatch => {
     dispatch({
       type: UPDATE_COLUMN,
-      index,
+      value,
       isActive,
     });
   };
@@ -18,14 +18,16 @@ const localStorageID = 'columns';
 function loadLocalColumns() {
   return dispatch =>
     // load the column settings the user last used
-    localForage.getItem(localStorageID, (err, found) => {
-      if (!err && found && found.length) {
-        dispatch({
-          type: LOAD_SAVED_COLUMNS,
-          columns: found,
-        });
-      }
-    });
+    localForage
+      .getItem(localStorageID)
+      .then(found => {
+        if (found && found.length) {
+          dispatch({
+            type: LOAD_SAVED_COLUMNS,
+            columns: found,
+          });
+        }
+      });
 }
 
 /**
