@@ -6,18 +6,21 @@ $grid-columns: 8;
   box-sizing: border-box;
 }
 
-*, *:after, *:before {
+*,
+*::after,
+*::before {
+  @include border-box;
+
   margin: 0;
   padding: 0;
-  @include border-box;
 }
 
 [class*='fluid-'],
 .fluid-base {
   float: left;
+  min-height: 1px;
   padding: 1em;
   width: 100%;
-  min-height: 1px;
 
   &.float-right {
     float: right;
@@ -27,17 +30,19 @@ $grid-columns: 8;
 %clearfix {
   *zoom: 1;
 
-  &:before, &:after {
+  &::before,
+  &::after {
     content: " ";
     display: table;
   }
 
-  &:after {
+  &::after {
     clear: both;
   }
 }
 
-.row, .wrapper {
+.row,
+.wrapper {
   @extend %clearfix;
 }
 

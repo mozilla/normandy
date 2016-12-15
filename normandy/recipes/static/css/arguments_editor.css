@@ -1,52 +1,52 @@
 /* Hide the field for the argument JSON. */
 #id_arguments_json {
-    display: none;
+  display: none;
 }
 
 /* Show argument JSON label above arguments editor. */
 .field-arguments_json label[for="id_arguments_json"] {
-    display: block;
-    float: none;
+  display: block;
+  float: none;
 }
 
 /* Styling tweaks to the argument editor. */
 .field-arguments_json .arguments-editor h3 {
-    background: #79AEC8;
-    font-size: 12px;
-    font-weight: 400;
-    text-transform: uppercase;
-    padding: 8px;
-    text-align: right;
+  background: #79AEC8;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 8px;
+  text-align: right;
+  text-transform: uppercase;
 }
 
 .arguments-editor h3 span {
-    color: #FFF;
-    float: left;
+  color: #FFF;
+  float: left;
 }
 
 .arguments-editor .row {
-    clear: both;
+  clear: both;
 }
 
 .arguments-editor .form-control label {
-    text-align: right;
+  text-align: right;
 }
 
 .arguments-editor .tabs div {
-    margin-bottom: 4px;
+  margin-bottom: 4px;
 }
 
 .arguments-editor .tabs span {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 /* The JSON editor modal hangs off the button, which is floated right.
-   It's absolutely positioned, so we set it's right edge to the button's
-   right edge to be able to see it.
+ It's absolutely positioned, so we set it's right edge to the button's
+ right edge to be able to see it.
 
-   We use !important because these are set as style attributes on the DOM
-   nodes in question in a place we can't easily override. */
+ We use !important because these are set as style attributes on the DOM
+ nodes in question in a place we can't easily override. */
 .arguments-editor .modal {
-    left: unset !important;
-    right: 0 !important;
+  left: unset !important;
+  right: 0 !important;
 }
