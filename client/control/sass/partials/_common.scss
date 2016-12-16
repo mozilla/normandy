@@ -7,9 +7,8 @@ body {
   color: $darkBrown;
   font: normal normal 400 13px/16px $OpenSans;
   margin: 0 auto;
-  
-  padding: 0 40px;
   min-width: 640px;
+  padding: 0 40px;
 }
 
 
@@ -327,7 +326,7 @@ i {
 }
 
 .col-trigger {
-  display: block;
   border-radius: 2px;
+  display: block;
   padding: 1em;
 }
