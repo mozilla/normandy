@@ -5,7 +5,7 @@ Cu.import("resource://gre/modules/TelemetryController.jsm", this);
 Cu.import("resource://gre/modules/Task.jsm", this);
 
 Cu.import("resource://shield-recipe-client/lib/EnvExpressions.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/Log.jsm", this);
+Cu.import("resource://gre/modules/Log.jsm", this);
 
 add_task(function* () {
   // setup

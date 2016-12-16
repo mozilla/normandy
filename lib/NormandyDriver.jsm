@@ -8,10 +8,11 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource:///modules/ShellService.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeout */
-Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 
@@ -19,8 +20,8 @@ const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUID
 
 this.EXPORTED_SYMBOLS = ["NormandyDriver"];
 
-const PREF_INPUT_HOST = "extensions.shield-recipe-client@mozilla.org.input_host";
-const actionLogger = Log.makeNamespace("actions");
+const log = Log.repository.getLogger("extensions.shield-recipe-client");
+const actionLog = Log.repository.getLogger("extensions.shield-recipe-client.actions");
 
 this.NormandyDriver = function(sandboxManager, extraContext = {}) {
   if (!sandboxManager) {
@@ -42,11 +43,11 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
       if (levels.indexOf(level) === -1) {
         throw new Error(`Invalid log level "${level}"`);
       }
-      actionLogger[level](message);
+      actionLog[level](message);
     },
 
     showHeartbeat(options) {
-      Log.info(`Showing heartbeat prompt "${options.message}"`);
+      log.info(`Showing heartbeat prompt "${options.message}"`);
       const aWindow = Services.wm.getMostRecentWindow("navigator:browser");
 
       if (!aWindow) {
@@ -60,37 +61,8 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
       return sandbox.Promise.resolve(ee);
     },
 
-    saveHeartbeatFlow(data) {
-      let defaultURL;
-      if (!this.testing) {
-        defaultURL = "https://input.mozilla.org/api/v2/hb/";
-      } else {
-        defaultURL = "https://input.allizom.org/api/v2/hb/";
-      }
-      const url = Services.prefs.getStringPref(PREF_INPUT_HOST, defaultURL);
-
-      const headers = {Accept: "application/json"};
-
-      Log.debug("Sending heartbeat flow data to Input", data);
-
-      // Make request to input
-      const p = fetch(url, {body: JSON.stringify(data), headers})
-        .then(response => response.text())
-        .then(responseText => {
-          Log.log("Input response:", responseText);
-          // Resolve undefined instead of passing the response down.
-          return undefined;
-        })
-        .catch(error => {
-          if (error.response) {
-            Log.error("Input error response:", error.response.json);
-          } else {
-            Log.error("Error sending heartbeat flow data to Input:", error);
-          }
-          throw new sandbox.Error(error.toString());
-        });
-      // Wrap the promise for the sandbox
-      return sandbox.Promise.resolve(p);
+    saveHeartbeatFlow() {
+      // no-op required by spec
     },
 
     client() {
@@ -99,9 +71,9 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
         channel: Services.appinfo.defaultUpdateChannel,
         isDefaultBrowser: ShellService.isDefaultBrowser() || null,
         searchEngine: null,
-        syncSetup: Services.prefs.prefHasUserValue("services.sync.username"),
+        syncSetup: Preferences.isSet("services.sync.username"),
         plugins: {},
-        doNotTrack: Services.prefs.getBoolPref("privacy.donottrackheader.enabled"),
+        doNotTrack: Preferences.get("privacy.donottrackheader.enabled", false),
       };
 
       const searchEnginePromise = new Promise(resolve => {
@@ -138,7 +110,7 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
       try {
         storage = Storage.makeStorage(keyPrefix, sandbox);
       } catch (e) {
-        Log.error(e.stack);
+        log.error(e.stack);
         throw e;
       }
       return storage;

@@ -5,23 +5,33 @@
 "use strict";
 
 const {utils: Cu} = Components;
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/TelemetryArchive.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
-Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
 
 this.EXPORTED_SYMBOLS = ["EnvExpressions"];
 
-
-const {Loader, Require} = Cu.import("resource://gre/modules/commonjs/toolkit/loader.js", {});
-const loader = new Loader({
-  paths: {
-    "": "resource://shield-recipe-client/node_modules/",
-  },
+XPCOMUtils.defineLazyGetter(this, "nodeRequire", () => {
+  const {Loader, Require} = Cu.import("resource://gre/modules/commonjs/toolkit/loader.js", {});
+  const loader = new Loader({
+    paths: {
+      "": "resource://shield-recipe-client/node_modules/",
+    },
+  });
+  return new Require(loader, {});
 });
-const require = new Require(loader, {});
 
-const {Jexl} = require("jexl/lib/Jexl.js");
+XPCOMUtils.defineLazyGetter(this, "jexl", () => {
+  const {Jexl} = global.nodeRequire("jexl/lib/Jexl.js");
+  const jexl = new Jexl();
+  jexl.addTransforms({
+    date: dateString => new Date(dateString),
+    stableSample: Sampling.stableSample,
+  });
+  return jexl;
+});
 
 const getLatestTelemetry = Task.async(function *() {
   const pings = yield TelemetryArchive.promiseArchivedPingList();
@@ -46,16 +56,10 @@ const getLatestTelemetry = Task.async(function *() {
   return telemetry;
 });
 
-const jexl = new Jexl();
-jexl.addTransforms({
-  date: dateString => new Date(dateString),
-  stableSample: Sampling.stableSample,
-});
-
 this.EnvExpressions = {
   eval(expr, extraContext = {}) {
     const context = Object.assign({telemetry: getLatestTelemetry()}, extraContext);
     const onelineExpr = expr.replace(/[\t\n\r]/g, " ");
-    return jexl.eval(onelineExpr, context);
+    return global.jexl.eval(onelineExpr, context);
   },
 };

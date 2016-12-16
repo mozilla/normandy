@@ -1,11 +1,9 @@
 bootstrap.js
 data
 install.rdf.in
+jar.mn
 lib
 moz.build
 node_modules/jexl/lib
 node_modules/jexl/LICENSE.txt
-node_modules/jexl/package.json
-package.json
 test
-jar.mn

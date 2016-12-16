@@ -1,18 +1,11 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 "use strict";
 
 const {utils: Cu} = Components;
-// const tabs = require("sdk/tabs");
-// const {browserWindows} = require("sdk/windows");
 
-Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/Services.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/Log.jsm", this);
 
 /**
  * Assert an array is in non-descending order, and that every element is a number
@@ -33,33 +26,50 @@ function closeAllNotifications(targetWindow, notificationBox) {
     return Promise.resolve();
   }
 
-  const promises = [];
 
-  for (const notification of notificationBox.allNotifications) {
-    promises.push(waitForNotificationClose(targetWindow, notification));
-    notification.close();
-  }
-
-  return Promise.all(promises);
-}
-
-/* Wait for the event that a notification has closed */
-function waitForNotificationClose(targetWindow, notification) {
   return new Promise(resolve => {
-    const parent = notification.parentNode;
+    const notificationSet = new Set(notificationBox.allNotifications);
 
     const observer = new targetWindow.MutationObserver(mutations => {
       for (const mutation of mutations) {
         for (let i = 0; i < mutation.removedNodes.length; i++) {
-          if (mutation.removedNodes.item(i) === notification) {
-            observer.disconnect();
-            resolve();
+          const node = mutation.removedNodes.item(i);
+          if (notificationSet.has(node)) {
+            notificationSet.delete(node);
           }
         }
       }
+      if (notificationSet.size === 0) {
+        Assert.equal(notificationBox.allNotifications.length, 0, "No notifications left");
+        observer.disconnect();
+        resolve();
+      }
     });
-    observer.observe(parent, {childList: true});
+
+    observer.observe(notificationBox, {childList: true});
+
+    for (const notification of notificationBox.allNotifications) {
+      notification.close();
+    }
   });
+}
+
+/* Check that the correct telmetry was sent */
+function assertTelemetrySent(hb, eventNames) {
+  let telemetrySentResolve;
+  const telemetrySentPromise = new Promise(resolve => { telemetrySentResolve = resolve; });
+  hb.eventEmitter.once("TelemetrySent", payload => {
+    const events = [0];
+    for (const name of eventNames) {
+      Assert.equal(typeof payload[name], "number", `payload field ${name} is a number`);
+      events.push(payload[name]);
+    }
+    events.push(Date.now());
+
+    assertOrdered(events);
+    telemetrySentResolve();
+  });
+  return telemetrySentPromise;
 }
 
 
@@ -99,32 +109,19 @@ add_task(function* () {
   Assert.equal(messageEl.textContent, "test", "Message is correct");
 
   // Check that when clicking the learn more link, a tab opens with the right URL
-  let tabLoadPromise;
-
-  const tabOpenPromise = BrowserTestUtils.waitForNewTab(targetWindow.gBrowser)
-    .then(tab => {
-      tabLoadPromise = BrowserTestUtils.browserLoaded(
-        tab.linkedBrowser, true, url => url && url !== "about:blank");
-    });
-
+  const tabOpenPromise = BrowserTestUtils.waitForNewTab(targetWindow.gBrowser);
   learnMoreEl.click();
-  yield tabOpenPromise;
-  tabLoadPromise.then(tabUrl => {
-    Assert.equal(tabUrl, "https://example.org/learnmore", "Learn more link opened the right url");
-  });
-  yield tabLoadPromise;
+  const tab = yield tabOpenPromise;
+  const tabUrl = yield BrowserTestUtils.browserLoaded(
+    tab.linkedBrowser, true, url => url && url !== "about:blank");
 
-  // Check that the correct telmetry was sent
-  let telemetrySentResolve;
-  const telemetrySentPromise = new Promise(resolve => { telemetrySentResolve = resolve; });
-  hb.eventEmitter.once("TelemetrySent", payload => {
-    assertOrdered([0, payload.offeredTS, payload.learnMoreTS, payload.closedTS, Date.now()]);
-    telemetrySentResolve();
-  });
+  Assert.equal(tabUrl, "https://example.org/learnmore", "Learn more link opened the right url");
 
+  const telemetrySentPromise = assertTelemetrySent(hb, ["offeredTS", "learnMoreTS", "closedTS"]);
   // Close notification to trigger telemetry to be sent
   yield closeAllNotifications(targetWindow, notificationBox);
   yield telemetrySentPromise;
+  yield BrowserTestUtils.removeTab(tab);
 });
 
 
@@ -148,49 +145,26 @@ add_task(function* () {
   Assert.ok(engagementButton, "Engagement button added");
   Assert.equal(engagementButton.label, "Click me!", "Engagement button has correct label");
 
-  let tabLoadPromise;
-  const tabOpenPromise = BrowserTestUtils.waitForNewTab(targetWindow.gBrowser)
-    .then(tab => {
-      tabLoadPromise = BrowserTestUtils.browserLoaded(
-        tab.linkedBrowser, true, url => url && url !== "about:blank");
-    });
-
   const engagementEl = hb.notice.querySelector(".notification-button");
+  const tabOpenPromise = BrowserTestUtils.waitForNewTab(targetWindow.gBrowser);
   engagementEl.click();
+  const tab = yield tabOpenPromise;
+  const tabUrl = yield BrowserTestUtils.browserLoaded(
+        tab.linkedBrowser, true, url => url && url !== "about:blank");
+  // the postAnswer url gets query parameters appended onto the end, so use Assert.startsWith instead of Assert.equal
+  Assert.ok(tabUrl.startsWith("https://example.org/postAnswer"), "Engagement button opened the right url");
 
-  yield tabOpenPromise;
-
-  tabLoadPromise.then(tabUrl => {
-    // the postAnswer url gets query parameters appended onto the end, so use Assert.startsWith instead of Assert.equal
-    Assert.ok(tabUrl.startsWith("https://example.org/postAnswer"), "Engagement button opened the right url");
-  });
-  yield tabLoadPromise;
-
-  let telemetrySentResolve;
-  const telemetrySentPromise = new Promise(resolve => { telemetrySentResolve = resolve; });
-  hb.eventEmitter.once("TelemetrySent", payload => {
-    assertOrdered([0, payload.offeredTS, payload.engagedTS, payload.closedTS, Date.now()]);
-    telemetrySentResolve();
-  });
-
+  const telemetrySentPromise = assertTelemetrySent(hb, ["offeredTS", "engagedTS", "closedTS"]);
   // Close notification to trigger telemetry to be sent
   yield closeAllNotifications(targetWindow, notificationBox);
   yield telemetrySentPromise;
+  yield BrowserTestUtils.removeTab(tab);
 });
 
 // Batch 3 - Closing the window while heartbeat is open
 add_task(function* () {
   const eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver).wrappedJSObject;
-  const parentWindow = Services.wm.getMostRecentWindow("navigator:browser");
-
-  let windowOpenResolve = null;
-  const windowOpenPromise = new Promise(resolve => windowOpenResolve = resolve);
-  const targetWindow = parentWindow.OpenBrowserWindow();
-  targetWindow.addEventListener("load", function onLoad() {
-    targetWindow.removeEventListener("load", onLoad);
-    windowOpenResolve();
-  });
-  yield windowOpenPromise;
+  const targetWindow = yield BrowserTestUtils.openNewBrowserWindow();
 
   const hb = new Heartbeat(targetWindow, eventEmitter, sandboxManager, {
     testing: true,
@@ -198,27 +172,15 @@ add_task(function* () {
     message: "test",
   });
 
-  let telemetrySentResolve;
-  const telemetrySentPromise = new Promise(resolve => telemetrySentResolve = resolve);
-  hb.eventEmitter.once("TelemetrySent", payload => {
-    assertOrdered([0, payload.offeredTS, payload.windowClosedTS, Date.now()]);
-    telemetrySentResolve();
-  });
-
+  const telemetrySentPromise = assertTelemetrySent(hb, ["offeredTS", "windowClosedTS"]);
   // triggers sending ping to normandy
-  targetWindow.close();
+  yield BrowserTestUtils.closeWindow(targetWindow);
   yield telemetrySentPromise;
 });
 
 
 // Cleanup
 add_task(function* () {
-  // Close all tabs
-  const targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
-  for (let i = 0; i < targetWindow.gBrowser.tabs.length; i++) {
-    yield BrowserTestUtils.removeTab(targetWindow.gBrowser.tabs[i]);
-  }
-
   // Make sure the sandbox is clean.
   sandboxManager.removeHold("test running");
   yield sandboxManager.isNuked()

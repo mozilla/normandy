@@ -5,21 +5,20 @@
 "use strict";
 
 const {utils: Cu} = Components;
-Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
 Cu.import("resource://gre/modules/Task.jsm");
-Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/EnvExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
+Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
-const PREF_API_URL = "extensions.shield-recipe-client@mozilla.org.api_url";
-const PREF_DEV_MODE = "extensions.shield-recipe-client@mozilla.org.dev_mode";
-const PREF_ENABLED = "extensions.shield-recipe-client@mozilla.org.enabled";
-const PREF_STARTUP_DELAY = "extensions.shield-recipe-client@mozilla.org.startup_delay";
+const log = Log.repository.getLogger("extensions.shield-recipe-client");
+const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
 this.RecipeRunner = {
   init() {
@@ -28,11 +27,11 @@ this.RecipeRunner = {
     }
 
     let delay;
-    if (Preferences.get(PREF_DEV_MODE)) {
+    if (prefs.getBoolPref("dev_mode")) {
       delay = 0;
     } else {
       // startup delay is in seconds
-      delay = Preferences.get(PREF_STARTUP_DELAY) * 1000;
+      delay = prefs.getIntPref("startup_delay_seconds") * 1000;
     }
 
     setTimeout(this.start.bind(this), delay);
@@ -40,19 +39,19 @@ this.RecipeRunner = {
 
   checkPrefs() {
     // Only run if Unified Telemetry is enabled.
-    if (!Preferences.get("toolkit.telemetry.unified", false)) {
-      Log.info("Disabling RecipeRunner because Unified Telemetry is disabled.");
+    if (!Services.prefs.getBoolPref("toolkit.telemetry.unified")) {
+      log.info("Disabling RecipeRunner because Unified Telemetry is disabled.");
       return false;
     }
 
-    if (Preferences.get(PREF_ENABLED)) {
-      Log.info("Recipe Client is disabled.");
+    if (!prefs.getBoolPref("enabled")) {
+      log.info("Recipe Client is disabled.");
       return false;
     }
 
-    const apiUrl = Preferences.get(PREF_API_URL, "");
-    if (!apiUrl.startsWith("https://")) {
-      Log.error(`Non HTTPS URL provided: ${apiUrl}`);
+    const apiUrl = prefs.getCharPref("api_url");
+    if (!apiUrl || !apiUrl.startsWith("https://")) {
+      log.error(`Non HTTPS URL provided for extensions.shield-recipe-client.api_url: ${apiUrl}`);
       return false;
     }
 
@@ -64,8 +63,8 @@ this.RecipeRunner = {
     try {
       recipes = yield NormandyApi.fetchRecipes({enabled: true});
     } catch (e) {
-      const apiUrl = Preferences.get(PREF_API_URL);
-      Log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
+      const apiUrl = prefs.getCharPref("api_url");
+      log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
       return;
     }
 
@@ -73,7 +72,7 @@ this.RecipeRunner = {
     try {
       extraContext = yield this.getExtraContext();
     } catch (e) {
-      Log.warning(`Couldn't get extra filter context: ${e}`);
+      log.warning(`Couldn't get extra filter context: ${e}`);
       extraContext = {};
     }
 
@@ -86,14 +85,14 @@ this.RecipeRunner = {
     }
 
     if (recipesToRun.length === 0) {
-      Log.debug("No recipes to execute");
+      log.debug("No recipes to execute");
     } else {
       for (const recipe of recipesToRun) {
         try {
-          Log.debug(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
+          log.debug(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
           yield this.executeRecipe(recipe, extraContext);
         } catch (e) {
-          Log.error(`Could not execute recipe ${recipe.name}:`, e);
+          log.error(`Could not execute recipe ${recipe.name}:`, e);
         }
       }
     }
@@ -117,9 +116,9 @@ this.RecipeRunner = {
         return !!result;
       })
       .catch(error => {
-        Log.error(`Error checking filter for "${recipe.name}"`);
-        Log.error(`Filter: "${recipe.filter_expression}"`);
-        Log.error(`Error: "${error}"`);
+        log.error(`Error checking filter for "${recipe.name}"`);
+        log.error(`Filter: "${recipe.filter_expression}"`);
+        log.error(`Error: "${error}"`);
       });
   },
 

@@ -27,7 +27,7 @@ module.exports = {
     Components: false,
     crypto: true,
     exports: true,
-    fetch: false,
+    global: false,
     require: false,
     TextEncoder: true,
     uneval: false,

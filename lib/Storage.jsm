@@ -6,7 +6,7 @@
 
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "JSONFile", "resource://gre/modules/JSONFile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
@@ -14,6 +14,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "Task", "resource://gre/modules/Task.jsm
 
 this.EXPORTED_SYMBOLS = ["Storage"];
 
+const log = Log.repository.getLogger("extensions.shield-recipe-client");
 let storePromise;
 
 function loadStorage() {
@@ -50,7 +51,7 @@ this.Storage = {
               resolve(Cu.cloneInto(value, sandbox));
             })
             .catch(err => {
-              Log.error(err);
+              log.error(err);
               reject(new sandbox.Error());
             });
         });
@@ -74,7 +75,7 @@ this.Storage = {
               resolve();
             })
             .catch(err => {
-              Log.error(err);
+              log.error(err);
               reject(new sandbox.Error());
             });
         });
@@ -98,7 +99,7 @@ this.Storage = {
               resolve();
             })
             .catch(err => {
-              Log.error(err);
+              log.error(err);
               reject(new sandbox.Error());
             });
         });
@@ -119,7 +120,7 @@ this.Storage = {
               resolve();
             })
             .catch(err => {
-              Log.error(err);
+              log.error(err);
               reject(new sandbox.Error());
             });
         });

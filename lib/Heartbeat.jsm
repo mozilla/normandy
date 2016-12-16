@@ -6,16 +6,17 @@
 
 const {utils: Cu} = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeout */
-Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 
 Cu.importGlobalProperties(["URL"]); /* globals URL */
 
 this.EXPORTED_SYMBOLS = ["Heartbeat"];
 
+const log = Log.repository.getLogger("shield-recipe-client");
 const PREF_SURVEY_DURATION = "browser.uitour.surveyDuration";
 const NOTIFICATION_TIME = 3000;
 
@@ -200,7 +201,7 @@ this.Heartbeat = class {
     this.maybeNotifyHeartbeat("NotificationOffered");
     this.chromeWindow.addEventListener("SSWindowClosing", this.handleWindowClosed);
 
-    const surveyDuration = Services.prefs.getIntPref(PREF_SURVEY_DURATION) * 1000;
+    const surveyDuration = Preferences.get(PREF_SURVEY_DURATION, 300) * 1000;
     this.surveyEndTimer = setTimeout(() => {
       this.maybeNotifyHeartbeat("SurveyExpired");
       this.close();
@@ -212,7 +213,7 @@ this.Heartbeat = class {
 
   maybeNotifyHeartbeat(name, data = {}) {
     if (this.pingSent) {
-      Log.warn("Heartbeat event recieved after Telemetry ping sent. name:", name, "data:", data);
+      log.warn("Heartbeat event recieved after Telemetry ping sent. name:", name, "data:", data);
       return;
     }
 
@@ -251,7 +252,7 @@ this.Heartbeat = class {
         sendPing = true;
       },
       default: () => {
-        Log.error("Unrecognized Heartbeat event:", name);
+        log.error("Unrecognized Heartbeat event:", name);
       },
     };
 
@@ -270,7 +271,7 @@ this.Heartbeat = class {
         }
       }
 
-      Log.debug("Sending telemetry");
+      log.debug("Sending telemetry");
       TelemetryController.submitExternalPing("heartbeat", payload, {
         addClientId: true,
         addEnvironment: true,

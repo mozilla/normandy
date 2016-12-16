@@ -1,8 +1,7 @@
 "use strict";
 
 const {utils: Cu} = Components;
-Cu.import("resource://gre/modules/Services.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/Log.jsm", this);
+Cu.import("resource://gre/modules/Log.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 
@@ -17,7 +16,7 @@ const evidence = {
   a: 0,
   b: 0,
   c: 0,
-  log: [],
+  log: "",
 };
 
 function listenerA(x = 1) {
@@ -57,8 +56,16 @@ add_task(function* () {
     log: "",
   }, "events are fired async");
 
-  // Spin the event loop to run events
+  // Spin the event loop to run events, so we can safely "off"
   yield Promise.resolve();
+
+  // Check intermediate event results
+  Assert.deepEqual(evidence, {
+    a: 11,
+    b: 11,
+    c: 1,
+    log: "",
+  }, "intermediate events are fired");
 
   // one more event for a
   eventEmitter.off("event", listenerB);

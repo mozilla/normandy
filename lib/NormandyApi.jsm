@@ -9,15 +9,17 @@ const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/CanonicalJSON.jsm");
-Cu.import("resource://shield-recipe-client/lib/Log.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
+Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 this.EXPORTED_SYMBOLS = ["NormandyApi"];
 
-const PREF_API_URL = "extensions.shield-recipe-client@mozilla.org.api_url";
+const log = Log.repository.getLogger("extensions.shield-recipe-client");
+const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
 this.NormandyApi = {
   apiCall(method, endpoint, data = {}) {
-    const api_url = Services.prefs.getStringPref(PREF_API_URL);
+    const api_url = prefs.getCharPref("api_url");
     let url = `${api_url}/${endpoint}`;
     method = method.toLowerCase();
 
@@ -48,18 +50,21 @@ this.NormandyApi = {
   },
 
   fetchRecipes: Task.async(function* (filters = {}) {
-    const rawText = yield (yield this.get("recipe/signed/", filters)).text();
+    const recipeResponse = yield this.get("recipe/signed/", filters);
+    const rawText = yield recipeResponse.text();
     const recipesWithSigs = JSON.parse(rawText);
 
     const verifiedRecipes = [];
 
-    for (let {recipe, signature: {signature, x5u}} of recipesWithSigs) {
+    for (const {recipe, signature: {signature, x5u}} of recipesWithSigs) {
       const serialized = CanonicalJSON.stringify(recipe);
       if (!rawText.includes(serialized)) {
+        log.debug(rawText, serialized);
         throw new Error("Canonical recipe serialization does not match!");
       }
 
-      const certChain = yield (yield fetch(x5u)).text();
+      const certChainResponse = yield fetch(x5u);
+      const certChain = yield certChainResponse.text();
       const builtSignature = `p384ecdsa=${signature}`;
 
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
@@ -71,7 +76,7 @@ this.NormandyApi = {
       verifiedRecipes.push(recipe);
     }
 
-    Log.debug(`Fetched ${verifiedRecipes.length} recipes from the server:`, verifiedRecipes.map(r => r.name).join(", "));
+    log.debug(`Fetched ${verifiedRecipes.length} recipes from the server:`, verifiedRecipes.map(r => r.name).join(", "));
 
     return verifiedRecipes;
   }),
