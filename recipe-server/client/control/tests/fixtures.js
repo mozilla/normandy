@@ -57,6 +57,7 @@ export const initialState = {
     slug: 'metadata',
     enabled: true,
   }],
+  filters: [],
   notifications: [],
   form: {},
   routing: {
