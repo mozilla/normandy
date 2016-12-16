@@ -1,10 +1,13 @@
-import canonicaljson
 import json
 import jsonschema
 import pytest
 
 from normandy.recipes.utils import verify_signature
 from pytest_testrail.plugin import testrail
+
+
+def canonical_json(data):
+    return json.dumps(data, ensure_ascii=True, separators=(',', ':'), sort_keys=True).encode()
 
 
 def check_action_schema_format(action):
@@ -100,7 +103,14 @@ def test_recipe_signatures(conf, requests_session):
         pytest.skip('No signed recipes')
 
     for item in data:
-        canonical_recipe = canonicaljson.encode_canonical_json(item['recipe'])
+        canonical_recipe = canonical_json(item['recipe'])
         signature = item['signature']['signature']
         pubkey = item['signature']['public_key']
         assert verify_signature(canonical_recipe, signature, pubkey)
+
+
+def test_recipe_api_is_json(conf, requests_session):
+    r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/')
+    r.raise_for_status()
+    data = r.json()
+    assert isinstance(data, list)
