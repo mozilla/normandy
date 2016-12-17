@@ -1,4 +1,5 @@
-import canonicaljson
+import json
+
 from rest_framework import renderers
 
 
@@ -31,12 +32,7 @@ class CanonicalJSONRenderer(renderers.BaseRenderer):
     charset = None
 
     def render(self, data, media_type=None, renderer_context=None):
-        # Get canonical json as bytes
-        rendered = canonicaljson.encode_canonical_json(data)
-        # Convert to a unicode string
-        rendered = rendered.decode('utf8')
-        # Encode *all* unicode characters as \u1234 escapes (and convert to bytes)
-        return rendered.encode('unicode_escape')
+        return json.dumps(data, ensure_ascii=True, separators=(',', ':'), sort_keys=True).encode()
 
 
 class CustomBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
