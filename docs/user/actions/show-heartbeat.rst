@@ -1,24 +1,5 @@
-Actions
-=======
-:ref:`Actions <actions>` implement the things that :ref:`recipes <recipes>` can
-actually do, like showing a prompt or logging a message. This document describes
-the actions that are available for use in Normandy, as well as the arguments
-they accept.
-
-console-log: Log to the Console
--------------------------------
-The ``console-log`` action logs a message to the `Browser Console`_. It's
-mostly used for testing purposes.
-
-Arguments
-^^^^^^^^^
-Message
-   The message to log to the console.
-
-.. _Browser Console: https://developer.mozilla.org/en-US/docs/Tools/Browser_Console
-
 show-heartbeat: Show Heartbeat Prompt
--------------------------------------
+=====================================
 The ``show-heartbeat`` action shows a bar at the top of the browser viewport
 with a message and either a set of rating stars or a button that the user can
 interact with.
@@ -42,7 +23,7 @@ time it was shown. This happens on a per-recipe basis. This does not apply when
 the recipe is viewed in testing mode, such as within the admin preview.
 
 Arguments
-^^^^^^^^^
+---------
 Survey ID
    An identifier for the survey used to distinguish between different surveys
    during analysis. Typically this is alphanumeric and dashes (``-``).

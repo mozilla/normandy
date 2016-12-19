@@ -1,6 +1,5 @@
 API Contract Tests
 ==================
-
 These tests are designed to look for changes to the recipe server API that are
 not expected.
 
