@@ -26,7 +26,7 @@ describe('Column Actions', () => {
 
       const expectedAction = {
         type: UPDATE_COLUMN,
-        slug: 'name',
+        value: 'name',
         isActive: true,
       };
 

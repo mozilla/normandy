@@ -12,7 +12,8 @@
  */
 export function getActiveColumns(columns) {
   return [].concat(columns)
-    .filter(col => col.enabled);
+    .map(col => (col.enabled ? col : null))
+    .filter(col => col);
 }
 
 /**
@@ -24,5 +25,6 @@ export function getActiveColumns(columns) {
  */
 export function getInactiveColumns(columns) {
   return [].concat(columns)
-    .filter(col => !col.enabled);
+    .map(col => (!col.enabled ? col : null))
+    .filter(col => col);
 }
