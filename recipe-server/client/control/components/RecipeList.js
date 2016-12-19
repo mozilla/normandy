@@ -72,6 +72,10 @@ export class DisconnectedRecipeList extends React.Component {
       // regardless if we set the values or not
       metadata: [],
       searchData: '',
+      locales: [{
+        label: 'English (US)',
+        value: 'en-US',
+      }],
     };
 
     // check if there are specific properties/labels we want to display
@@ -101,7 +105,6 @@ export class DisconnectedRecipeList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-
     this.handlerCache = {};
 
     this.handleSearchChange = ::this.handleSearchChange;
@@ -142,8 +145,8 @@ export class DisconnectedRecipeList extends React.Component {
   }
 
   renderTableCell(recipe) {
-    return ({ slug }) => {
-      let displayValue = recipe[slug];
+    return ({ value }) => {
+      let displayValue = recipe[value];
       // if the value is a straight up boolean value,
       if (displayValue === true || displayValue === false) {
         // switch the displayed value to a ×/✓ mark
@@ -171,7 +174,7 @@ export class DisconnectedRecipeList extends React.Component {
 
       return (
         <Td
-          column={slug}
+          column={value}
           data={displayValue}
         >
           {displayValue}
@@ -211,8 +214,8 @@ export class DisconnectedRecipeList extends React.Component {
               {
                 displayedColumns.map((col, index) =>
                   <Th
-                    key={col.slug + index}
-                    column={col.slug}
+                    key={col.value + index}
+                    column={col.value}
                   >
                     <span>{col.label}</span>
                   </Th>
@@ -222,7 +225,7 @@ export class DisconnectedRecipeList extends React.Component {
             {filteredRecipes.map(recipe =>
               <Tr
                 key={recipe.id}
-                onClick={this.handleViewRecipe(recipe.id)}
+                onClick={() => { this.viewRecipe(recipe); }}
               >
                 {
                   displayedColumns.map(this.renderTableCell(recipe))

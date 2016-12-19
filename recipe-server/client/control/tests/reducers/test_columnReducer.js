@@ -68,11 +68,11 @@ describe('Column reducer', () => {
       const colId = getNondefaultColumn();
       expectedColumns[colId].enabled = true;
 
-      const colSlug = expectedColumns[colId].slug;
+      const colValue = expectedColumns[colId].value;
 
       expect(appReducer(undefined, {
         type: actions.UPDATE_COLUMN,
-        slug: colSlug,
+        value: colValue,
         isActive: true,
       })).toEqual({
         ...initialState,
@@ -85,11 +85,11 @@ describe('Column reducer', () => {
       const colId = getDefaultColumn();
 
       expectedColumns[colId].enabled = false;
-      const colSlug = expectedColumns[colId].slug;
+      const colValue = expectedColumns[colId].value;
 
       expect(appReducer(undefined, {
         type: actions.UPDATE_COLUMN,
-        slug: colSlug,
+        value: colValue,
         isActive: false,
       })).toEqual({
         ...initialState,

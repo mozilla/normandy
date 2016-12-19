@@ -12,15 +12,12 @@ describe('Column Selectors', () => {
       // enable the selected columns
       const testColumns = cloneArrayValues(initialState.columns)
         .map(col => {
-          col.enabled = enabled.indexOf(col.slug) > -1;
+          col.enabled = enabled.indexOf(col.value) > -1;
           return col;
         });
 
       // compare the values that are returned
-      const active = columnSelectors
-        .getActiveColumns(testColumns)
-        .map(col => col.slug);
-
+      const active = columnSelectors.getActiveColumns(testColumns).map(col => col.value);
       expect(active).toEqual(enabled);
     });
   });
@@ -32,15 +29,12 @@ describe('Column Selectors', () => {
       // disable the chosen columns
       const testColumns = cloneArrayValues(initialState.columns)
         .map(col => {
-          col.enabled = disabled.indexOf(col.slug) === -1;
+          col.enabled = disabled.indexOf(col.value) === -1;
           return col;
         });
 
       // compare the values that are returned
-      const inactive = columnSelectors
-        .getInactiveColumns(testColumns)
-        .map(col => col.slug);
-
+      const inactive = columnSelectors.getInactiveColumns(testColumns).map(col => col.value);
       expect(inactive).toEqual(disabled);
     });
   });

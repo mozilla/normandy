@@ -29,27 +29,6 @@ class ColumnMenu extends React.Component {
     </span>
   );
 
-  /**
-   * Given an object, adds necessary properties to
-   * be displayed in a CheckboxList.
-   *
-   * Basically just adds a `value` property from
-   * the col's `slug`. We need this as a function due to some
-   * weird linter issue WRT anon functions returning objects.
-   *
-   * @param  {Object} column Column to format into checkbox format
-   * @return {Object}        Checkbox'd column object
-   */
-  static columnToCheckbox(column) {
-    return {
-      ...column,
-      value: column.slug,
-    };
-  }
-
-  /**
-   * Constructor
-   */
   constructor(props) {
     super(props);
     this.state = {};
@@ -63,13 +42,13 @@ class ColumnMenu extends React.Component {
    * and notifies the parent of what's selected
    *
    *
-   * @param  {String}  columnSlug  Value of the column ('name', 'endTime', etc)
+   * @param  {String}  columnValue  Value of the column ('name', 'endTime', etc)
    * @param  {Boolean} isActive     Is the column now active?
    * @return {void}
    */
-  handleColumnInput(columnSlug, isActive) {
+  handleColumnInput(columnValue, isActive) {
     this.props.dispatch(updateColumn({
-      slug: columnSlug,
+      value: columnValue,
       isActive,
     }));
   }
@@ -86,7 +65,7 @@ class ColumnMenu extends React.Component {
         trigger={ColumnMenu.trigger}
       >
         <CheckboxList
-          options={columns.map(ColumnMenu.columnToCheckbox)}
+          options={columns}
           onInputChange={this.handleColumnInput}
         />
       </DropdownMenu>
