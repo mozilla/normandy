@@ -6,7 +6,7 @@ import React, { PropTypes as pt } from 'react';
  *
  * @prop {Function} onInputChange
  *   Fires when user has changed a checkbox, with
- *   params (Item index, Checkbox 'checked' status)
+ *   params (Item value/slug, Checkbox 'checked' status)
  *
  * @prop {Array<Object>} options
  *   List of options to be made into checkboxes, shaped as:

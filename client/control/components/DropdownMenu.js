@@ -51,6 +51,10 @@ export default class DropdownMenu extends React.Component {
    */
   componentDidMount() {
     this.id = this.id || `dropdown-menu-${uuid()}`;
+
+    // Track mounted state, since the `blur` target handler
+    // can sometimes fire after the element has been removed
+    this.mounted = true;
   }
 
   /**
@@ -62,6 +66,9 @@ export default class DropdownMenu extends React.Component {
     // just toggle it to hide when component unmounts
     // (this will automatically remove event bindings etc too)
     this.toggleVisibility(false);
+
+    // update the 'mounted' flag
+    this.mounted = false;
   }
 
   /**
@@ -102,9 +109,13 @@ export default class DropdownMenu extends React.Component {
     // if we get a parameter, use that instead of just straight up toggling
     const newVisibleState = typeof force === 'boolean' ? force : !this.state.isVisible;
 
-    this.setState({
-      isVisible: newVisibleState,
-    });
+    // this event can fire sometimes when the target has already left the page
+    // so we track if the component is still mounted or not to update state
+    if (this.mounted) {
+      this.setState({
+        isVisible: newVisibleState,
+      });
+    }
 
     // add or remove the event based on visibility
     this.updateWindowBinding(newVisibleState);

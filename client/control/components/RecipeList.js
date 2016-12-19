@@ -63,10 +63,6 @@ class DisconnectedRecipeList extends React.Component {
       // regardless if we set the values or not
       metadata: [],
       searchData: '',
-      locales: [{
-        label: 'English (US)',
-        value: 'en-US',
-      }],
     };
 
     // check if there are specific properties/labels we want to display
@@ -99,7 +95,10 @@ class DisconnectedRecipeList extends React.Component {
       searchText: '',
     };
 
+    this.handlerCache = {};
+
     this.handleSearchChange = ::this.handleSearchChange;
+    this.handleViewRecipe = ::this.handleViewRecipe;
   }
 
   componentWillMount() {
@@ -118,15 +117,32 @@ class DisconnectedRecipeList extends React.Component {
     });
   }
 
-  viewRecipe(recipe) {
-    const { dispatch } = this.props;
-    dispatch(setSelectedRecipe(recipe.id));
-    dispatch(push(`/control/recipe/${recipe.id}/`));
+  /**
+   * Event handler factory for user attempting to 'view recipe.'
+   * Caches generated functions to prevent lots of function
+   * creation on each render loop.
+   *
+   * @param  {string}   id  Recipe ID user has attempted to view
+   * @return {function}     Generated event handler for this recipe
+   */
+  handleViewRecipe(id) {
+    if (!this.handlerCache[id]) {
+      const { dispatch } = this.props;
+
+      this.handlerCache[id] = () => {
+        dispatch(setSelectedRecipe(id));
+        dispatch(push(`/control/recipe/${id}/`));
+      };
+    }
+
+    return () => {
+      this.handlerCache[id]();
+    };
   }
 
   renderTableCell(recipe) {
-    return ({ value }) => {
-      let displayValue = recipe[value];
+    return ({ slug }) => {
+      let displayValue = recipe[slug];
       // if the value is a straight up boolean value,
       if (displayValue === true || displayValue === false) {
         // switch the displayed value to a ×/✓ mark
@@ -154,7 +170,7 @@ class DisconnectedRecipeList extends React.Component {
 
       return (
         <Td
-          column={value}
+          column={slug}
           data={displayValue}
         >
           {displayValue}
@@ -196,8 +212,8 @@ class DisconnectedRecipeList extends React.Component {
               {
                 displayedColumns.map((col, index) =>
                   <Th
-                    key={col.value + index}
-                    column={col.value}
+                    key={col.slug + index}
+                    column={col.slug}
                   >
                     <span>{col.label}</span>
                   </Th>
@@ -207,7 +223,7 @@ class DisconnectedRecipeList extends React.Component {
             {filteredRecipes.map(recipe =>
               <Tr
                 key={recipe.id}
-                onClick={() => { this.viewRecipe(recipe); }}
+                onClick={this.handleViewRecipe(recipe.id)}
               >
                 {
                   displayedColumns.map(this.renderTableCell(recipe))
