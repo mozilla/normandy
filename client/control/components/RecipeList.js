@@ -2,73 +2,42 @@ import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
-import classNames from 'classnames';
-import moment from 'moment';
-import { makeApiRequest, recipesReceived, setSelectedRecipe } from 'control/actions/ControlActions';
+
+import {
+  makeApiRequest,
+  recipesReceived,
+  setSelectedRecipe,
+} from 'control/actions/ControlActions';
+
+import {
+  getActiveColumns,
+} from 'control/selectors/ColumnSelector';
+
+import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
-  if (props.value) {
-    return <i className="fa fa-lg fa-check green">&nbsp;</i>;
-  }
-  return <i className="fa fa-lg fa-times red">&nbsp;</i>;
+  const iconClass = props.value ? 'fa-check green' : 'fa-times red';
+  return <i className={`fa fa-lg ${iconClass}`}>&nbsp;</i>;
 };
 BooleanIcon.propTypes = {
   value: pt.bool.isRequired,
 };
 
-function FilterBar({ searchText, selectedFilter, updateSearch, updateFilter }) {
-  return (
-    <div id="secondary-header" className="fluid-8">
-      <div className="fluid-2">
-        <div className="search input-with-icon">
-          <input type="text" placeholder="Search" value={searchText} onChange={updateSearch} />
-        </div>
-      </div>
-      <div id="filters-container" className="fluid-6">
-        <h4>Filter By:</h4>
-        <SwitchFilter
-          options={['All', 'Enabled', 'Disabled']}
-          selectedFilter={selectedFilter}
-          updateFilter={updateFilter}
-        />
-      </div>
-    </div>
-  );
-}
-FilterBar.propTypes = {
-  searchText: pt.string.isRequired,
-  selectedFilter: pt.any.isRequired,
-  updateSearch: pt.func.isRequired,
-  updateFilter: pt.func.isRequired,
-};
-
-function SwitchFilter({ options, selectedFilter, updateFilter }) {
-  return (
-    <div className="switch">
-      <div className={`switch-selection position-${options.indexOf(selectedFilter)}`}>&nbsp;</div>
-      {options.map(option =>
-        <span
-          key={option}
-          className={classNames({ active: (option === selectedFilter) })}
-          onClick={() => updateFilter(option)}
-        >{option}
-        </span>
-      )}
-    </div>
-  );
-}
-SwitchFilter.propTypes = {
-  options: pt.array.isRequired,
-  selectedFilter: pt.any.isRequired,
-  updateFilter: pt.func.isRequired,
-};
-
 class DisconnectedRecipeList extends React.Component {
+  static propTypes = {
+    // connected
+    dispatch: pt.func.isRequired,
+    isFetching: pt.bool.isRequired,
+    recipeListNeedsFetch: pt.bool.isRequired,
+    recipes: pt.array.isRequired,
+    displayedColumns: pt.array.isRequired,
+  };
+
   /**
    * Recipe metadata properties and associated labels to display
    * @type {Object}
    */
-  static ActionMetaData = {
+  static ActionMetadata = {
     'show-heartbeat': recipe => [
       { label: 'Survey ID', value: recipe.arguments.surveyId },
     ],
@@ -77,42 +46,42 @@ class DisconnectedRecipeList extends React.Component {
   /**
    * Given a recipe object, determines what type of recipe it is (based on its `action`),
    * and then compiles an array of 'displayed metadata props' and their values. This array
-   * is saved on the recipe as `metaData`, and displayed in the 'Metadata'
+   * is saved on the recipe as `metadata`, and displayed in the 'metadata'
    *
-   * Beyond that, a string of metaData values is created, and attached to the
+   * Beyond that, a string of metadata values is created, and attached to the
    * recipe as the `searchData` property. This is used by the `Table` component
-   * to search/filter/sort the metaData.
+   * to search/filter/sort the metadata.
    *
    * @param  {Object} Original recipe object
-   * @return {Object} Original recipe but with `metaData` and `searchData` properties added
+   * @return {Object} Original recipe but with `metadata` and `searchData` properties added
    */
-  static applyRecipeMetaData(recipe) {
+  static applyRecipeMetadata(recipe) {
     const { action: recipeAction } = recipe;
     const newRecipe = {
       ...recipe,
-      // recipes should have empty metaData/searchData props,
+      // recipes should have empty metadata/searchData props,
       // regardless if we set the values or not
-      metaData: [],
+      metadata: [],
       searchData: '',
     };
 
     // check if there are specific properties/labels we want to display
-    const requestedMetaProps = DisconnectedRecipeList.ActionMetaData[recipeAction];
+    const requestedMetaProps = DisconnectedRecipeList.ActionMetadata[recipeAction];
 
-    // if we have a metaData definition to fill...
+    // if we have a metadata definition to fill...
     if (requestedMetaProps) {
       // ...get the data we want to display
       const foundData = requestedMetaProps(newRecipe);
 
-      // ...and add it to the existing metaData collection
+      // ...and add it to the existing metadata collection
       // (the data comes back as an array of objects,
       // so we can just concat it to our existing array)
-      newRecipe.metaData = newRecipe.metaData.concat(foundData);
+      newRecipe.metadata = newRecipe.metadata.concat(foundData);
     }
 
     // update the searchdata string with whatever the values are
     // (this is used for sorting/filtering/searching)
-    newRecipe.metaData.forEach(data => {
+    newRecipe.metadata.forEach(data => {
       newRecipe.searchData = `${newRecipe.searchData} ${data.value}`;
     });
 
@@ -124,12 +93,12 @@ class DisconnectedRecipeList extends React.Component {
     super(props);
     this.state = {
       searchText: '',
-      filteredRecipes: null,
-      selectedFilter: 'All',
     };
 
-    this.updateFilter = ::this.updateFilter;
-    this.updateSearch = ::this.updateSearch;
+    this.handlerCache = {};
+
+    this.handleSearchChange = ::this.handleSearchChange;
+    this.handleViewRecipe = ::this.handleViewRecipe;
   }
 
   componentWillMount() {
@@ -142,91 +111,125 @@ class DisconnectedRecipeList extends React.Component {
     }
   }
 
-  title = 'Recipes';
-
-  viewRecipe(recipe) {
-    const { dispatch } = this.props;
-    dispatch(setSelectedRecipe(recipe.id));
-    dispatch(push(`/control/recipe/${recipe.id}/`));
-  }
-
-  updateSearch(event) {
+  handleSearchChange(event) {
     this.setState({
-      searchText: event.target.value,
+      searchText: event.target.value || '',
     });
   }
 
-  updateFilter(filterStatus) {
-    const { recipes } = this.props;
+  /**
+   * Event handler factory for user attempting to 'view recipe.'
+   * Caches generated functions to prevent lots of function
+   * creation on each render loop.
+   *
+   * @param  {string}   id  Recipe ID user has attempted to view
+   * @return {function}     Generated event handler for this recipe
+   */
+  handleViewRecipe(id) {
+    if (!this.handlerCache[id]) {
+      const { dispatch } = this.props;
 
-    if (filterStatus === 'All') {
-      this.setState({
-        filteredRecipes: null,
-        selectedFilter: filterStatus,
-      });
-    } else {
-      const enabledState = filterStatus === 'Enabled';
-      this.setState({
-        filteredRecipes: recipes.filter(recipe => recipe.enabled === enabledState),
-        selectedFilter: filterStatus,
-      });
+      this.handlerCache[id] = () => {
+        dispatch(setSelectedRecipe(id));
+        dispatch(push(`/control/recipe/${id}/`));
+      };
     }
+
+    return () => {
+      this.handlerCache[id]();
+    };
+  }
+
+  renderTableCell(recipe) {
+    return ({ slug }) => {
+      let displayValue = recipe[slug];
+      // if the value is a straight up boolean value,
+      if (displayValue === true || displayValue === false) {
+        // switch the displayed value to a ×/✓ mark
+        displayValue = (
+          <BooleanIcon
+            value={displayValue}
+          />
+        );
+      } else if (typeof displayValue === 'object') {
+        displayValue = (
+          <ul className="nested-list">
+            {
+              /* Display each nested property in a list */
+              displayValue
+                .map((nestedProp, index) => (
+                  <li key={index}>
+                    <span className="nested-label">{`${nestedProp.label}: `}</span>
+                    {nestedProp.value}
+                  </li>
+                ))
+            }
+          </ul>
+        );
+      }
+
+      return (
+        <Td
+          column={slug}
+          data={displayValue}
+        >
+          {displayValue}
+        </Td>
+      );
+    };
   }
 
   render() {
-    const { recipes } = this.props;
-    let filteredRecipes = this.state.filteredRecipes || recipes;
-    filteredRecipes = filteredRecipes.map(DisconnectedRecipeList.applyRecipeMetaData);
+    const {
+      recipes,
+      displayedColumns,
+    } = this.props;
+
+    const {
+      searchText,
+    } = this.state;
+
+    const filteredRecipes = (this.state.filteredRecipes || recipes)
+      .map(DisconnectedRecipeList.applyRecipeMetadata);
 
     return (
       <div>
-        <FilterBar
+        <RecipeFilters
           {...this.state}
-          updateFilter={this.updateFilter}
-          updateSearch={this.updateSearch}
+          displayCount={filteredRecipes.length}
+          totalCount={recipes.length}
+          onSearchChange={this.handleSearchChange}
         />
         <div className="fluid-8">
           <Table
-            id="recipe-list"
+            className="recipe-list"
             sortable
             hideFilterInput
             filterable={['name', 'action', 'metadata']}
-            filterBy={this.state.searchText}
+            filterBy={searchText}
           >
             <Thead>
-              <Th column="name"><span>Name</span></Th>
-              <Th column="action"><span>Action Name</span></Th>
-              <Th column="enabled"><span>Enabled</span></Th>
-              <Th column="last_updated"><span>Last Updated</span></Th>
-              <Th column="metadata"><span>Metadata</span></Th>
+              {
+                displayedColumns.map((col, index) =>
+                  <Th
+                    key={col.slug + index}
+                    column={col.slug}
+                  >
+                    <span>{col.label}</span>
+                  </Th>
+                )
+              }
             </Thead>
             {filteredRecipes.map(recipe =>
-              <Tr key={recipe.id} onClick={() => { this.viewRecipe(recipe); }}>
-                <Td column="name">{recipe.name}</Td>
-                <Td column="action">{recipe.action}</Td>
-                <Td column="enabled" value={recipe.enabled}>
-                  <BooleanIcon value={recipe.enabled} />
-                </Td>
-                <Td column="last_updated" value={recipe.last_updated}>
-                  {moment(recipe.last_updated).fromNow()}
-                </Td>
-                <Td column="metadata" value={recipe.searchData}>
-                  <ul className="metadata-list">
-                    {
-                      /* Display each metadata property in a list */
-                      recipe.metaData
-                        .map((metaProp, index) => (
-                          <li key={index}>
-                            <span className="metadata-label">{metaProp.label}:</span>
-                            {metaProp.value}
-                          </li>
-                        ))
-                    }
-                  </ul>
-                </Td>
+              <Tr
+                key={recipe.id}
+                onClick={this.handleViewRecipe(recipe.id)}
+              >
+                {
+                  displayedColumns.map(this.renderTableCell(recipe))
+                }
               </Tr>
-              )
-            }
+            )}
           </Table>
         </div>
       </div>
@@ -234,18 +237,12 @@ class DisconnectedRecipeList extends React.Component {
   }
 }
 
-DisconnectedRecipeList.propTypes = {
-  dispatch: pt.func.isRequired,
-  isFetching: pt.bool.isRequired,
-  recipeListNeedsFetch: pt.bool.isRequired,
-  recipes: pt.array.isRequired,
-};
-
 const mapStateToProps = (state, ownProps) => ({
-  recipes: state.recipes.list || [],
   dispatch: ownProps.dispatch,
-  recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
+  recipes: state.recipes.list || [],
+  recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
+  displayedColumns: getActiveColumns(state.columns),
 });
 
 export default connect(

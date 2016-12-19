@@ -1,4 +1,7 @@
 @import 'partials/common';
+@import 'components/CheckboxList';
+@import 'components/DropdownMenu';
+@import 'components/GroupMenu';
 
 /* Layout */
 #container { margin: 0 auto; }
@@ -67,6 +70,22 @@
   margin: 0 0 30px;
   padding: 0;
 
+  .input-with-icon.search {
+    position: absolute;
+  }
+
+  #filters-container {
+    text-align: right;
+
+    > div {
+      display: inline-block;
+      float: right;
+      margin: 0 0 0 16px;
+    }
+  }
+}
+
+.header-search {
   h3 {
     color: $darkBrown;
     display: inline-block;
@@ -95,16 +114,6 @@
     position: relative;
 
     &[type='text'] { padding: 7px 14px; }
-  }
-
-  #filters-container {
-    text-align: right;
-
-    > div {
-      display: inline-block;
-      float: right;
-      margin: 0 0 0 16px;
-    }
   }
 }
 
@@ -260,8 +269,19 @@
 }
 
 /* Recipe List */
-.metadata-list {
-  .metadata-label {
-    font-weight: 800;
+.recipe-list {
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nested-list {
+    .nested-label {
+      font-weight: 800;
+    }
+  }
+
+  & + .callout {
+    margin: 2em 0 1em;
   }
 }

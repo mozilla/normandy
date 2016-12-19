@@ -7,6 +7,7 @@ body {
   color: $darkBrown;
   font: normal normal 400 13px/16px $OpenSans;
   margin: 0 auto;
+  min-width: 640px;
   padding: 0 40px;
 }
 
@@ -21,7 +22,6 @@ a:visited {
 a:hover {
   color: $ctaHover;
 }
-
 
 /* Form Elements */
 label,
@@ -175,8 +175,6 @@ thead {
     position: relative;
     &:hover { cursor: pointer; }
 
-    &.reactable-th-name { width: 30%; }
-
     span::after {
       color: $secondaryColor;
       content: "\f0dc";
@@ -315,12 +313,20 @@ i {
   border-radius: 4px;
   display: block;
   padding: 1em;
+  text-align: center;
   width: 100%;
 }
 
 .recipe-form {
   .callout {
     float: right;
+    text-align: left;
     width: 45%;
   }
+}
+
+.col-trigger {
+  border-radius: 2px;
+  display: block;
+  padding: 1em;
 }
