@@ -22,6 +22,16 @@ and not show itself to the user again until 7 days have passed since the last
 time it was shown. This happens on a per-recipe basis. This does not apply when
 the recipe is viewed in testing mode, such as within the admin preview.
 
+Telemetry Ping
+--------------
+Whenever the user interacts with the prompt, a ping is written to Telemetry_
+with information on how the user has interacted with the current prompt thusfar.
+The `"heartbeat" ping documentation`_ has more information on the contents of
+the ping.
+
+.. _Telemetry: https://wiki.mozilla.org/Telemetry
+.. _"heartbeat" ping documentation: https://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/heartbeat-ping.html
+
 Arguments
 ---------
 Survey ID
