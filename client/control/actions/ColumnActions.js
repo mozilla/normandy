@@ -3,11 +3,11 @@ import * as localForage from 'localforage';
 const UPDATE_COLUMN = 'UPDATE_COLUMN';
 const LOAD_SAVED_COLUMNS = 'LOAD_SAVED_COLUMNS';
 
-function updateColumn({ value, isActive }) {
+function updateColumn({ slug, isActive }) {
   return dispatch => {
     dispatch({
       type: UPDATE_COLUMN,
-      value,
+      slug,
       isActive,
     });
   };

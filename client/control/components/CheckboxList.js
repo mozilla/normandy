@@ -31,33 +31,23 @@ export default class CheckboxList extends React.Component {
   }
 
   /**
-   * @param  {[type]} newProps [description]
-   * @return {[type]}          [description]
-   */
-  componentWillReceiveProps(newProps) {
-    if (JSON.stringify(newProps.options) !== JSON.stringify(this.props.options)) {
-      this.handlerCache = {};
-    }
-  }
-
-  /**
    * Handler factory. Given a column value,
    * returns an event handler that calls the
    * onInputChange prop.
    *
-   * @param  {string}   colValue Checkbox value which updated
+   * @param  {string}   boxValue Checkbox value which updated
    * @return {Function}          Wrapped handler
    */
-  handleCheckboxChange(colValue) {
+  handleCheckboxChange(boxValue) {
     // check if an existing event handler exists
-    if (!this.handlerCache[colValue]) {
-      // if not, create it with the colValue given
-      this.handlerCache[colValue] = evt =>
-        this.props.onInputChange(colValue, evt.target.checked);
+    if (!this.handlerCache[boxValue]) {
+      // if not, create it with the boxValue given
+      this.handlerCache[boxValue] = evt =>
+        this.props.onInputChange(boxValue, evt.target.checked);
     }
 
     // return the handling function
-    return this.handlerCache[colValue];
+    return this.handlerCache[boxValue];
   }
 
   /**

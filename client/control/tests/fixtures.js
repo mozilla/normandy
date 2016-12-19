@@ -15,41 +15,41 @@ export const initialState = {
   },
   columns: [{
     label: 'Name',
-    value: 'name',
+    slug: 'name',
     enabled: true,
   }, {
     label: 'Action',
-    value: 'action',
+    slug: 'action',
     enabled: true,
   }, {
     label: 'Enabled',
-    value: 'enabled',
+    slug: 'enabled',
     enabled: true,
   }, {
     label: 'Channels',
-    value: 'channels',
+    slug: 'channels',
   }, {
     label: 'Locales',
-    value: 'locales',
+    slug: 'locales',
   }, {
     label: 'Countries',
-    value: 'countries',
+    slug: 'countries',
   }, {
     label: 'Start Time',
-    value: 'startTime',
+    slug: 'startTime',
   }, {
     label: 'End Time',
-    value: 'endTime',
+    slug: 'endTime',
   }, {
     label: 'Additional Filters',
-    value: 'additionalFilter',
+    slug: 'additionalFilter',
   }, {
     label: 'Last Updated',
-    value: 'last_updated',
+    slug: 'last_updated',
     enabled: true,
   }, {
     label: 'Metadata',
-    value: 'metadata',
+    slug: 'metadata',
     enabled: true,
   }],
   notifications: [],
