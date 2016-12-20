@@ -74,7 +74,7 @@ function loadFilteredRecipes() {
     const filterParams = getFilterParams(getState().filters);
 
     dispatch(makeApiRequest('fetchFilteredRecipes', filterParams))
-      .then(recipes => dispatch(recipesReceived(recipes)));
+      .then(recipes => dispatch(recipesReceived(recipes, filterParams)));
   };
 }
 

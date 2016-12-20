@@ -126,10 +126,11 @@ function requestComplete(result) {
   };
 }
 
-function recipesReceived(recipes) {
+function recipesReceived(recipes, cacheKey) {
   return {
     type: RECIPES_RECEIVED,
     recipes,
+    key: cacheKey,
   };
 }
 

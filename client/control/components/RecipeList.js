@@ -15,6 +15,10 @@ import {
   getActiveColumns,
 } from 'control/selectors/ColumnSelector';
 
+import {
+  getCachedRecipes,
+} from 'control/selectors/RecipeSelector';
+
 import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
@@ -178,10 +182,11 @@ class DisconnectedRecipeList extends React.Component {
       recipeListNeedsFetch,
     } = this.props;
 
-    const noResults = false;
 
     const filteredRecipes = cloneArrayValues(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
+
+    const noResults = filteredRecipes.length > 0;
 
     return (
       <div>
@@ -234,7 +239,7 @@ class DisconnectedRecipeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  recipes: state.recipes.list || [],
+  recipes: getCachedRecipes(state.recipes, state.filters),
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
