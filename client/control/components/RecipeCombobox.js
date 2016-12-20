@@ -1,24 +1,18 @@
 import React, { PropTypes as pt } from 'react';
-import { connect } from 'react-redux';
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
-
-import {
-  selectFilter,
-} from 'control/actions/FilterActions';
 
 /**
  * Text/dropdown combobox displayed in RecipeFilters.
  * Used to display and search over filter options
  * based on user input.
  */
-class RecipeCombobox extends React.Component {
+export default class RecipeCombobox extends React.Component {
   static propTypes = {
     availableFilters: pt.array.isRequired,
     onFilterSelect: pt.func.isRequired,
-    dispatch: pt.func.isRequired,
   };
 
   /**
@@ -39,6 +33,9 @@ class RecipeCombobox extends React.Component {
     return newObject;
   }
 
+  /**
+   * Constructor
+   */
   constructor(props) {
     super(props);
 
@@ -101,7 +98,6 @@ class RecipeCombobox extends React.Component {
 
     if (this.inputRef) {
       this.inputRef.value = '';
-      this.inputRef.blur();
     }
   }
 
@@ -117,11 +113,7 @@ class RecipeCombobox extends React.Component {
   updateSearch({ target, keyCode }) {
     // Enter key
     if (keyCode === 13) {
-      this.props.dispatch(selectFilter({
-        group: 'text',
-        option: target.value,
-        isEnabled: true,
-      }));
+      this.props.onFilterSelect('text', target.value);
 
       this.clearInput();
     } else {
@@ -156,14 +148,17 @@ class RecipeCombobox extends React.Component {
       searchText,
     } = this.state;
 
-    // #TODO text filtering should work like other filters
-    // if the user has typed in text, filter the remaining options
+    // if we have search text,
+    // use that to filter out the option groups
     const result = searchText && this.filterGroups(availableFilters, searchText);
+
+    const filterOptions = searchText ? result : availableFilters;
 
     return (
       <div className="search input-with-icon">
         <DropdownMenu
           useFocus
+          disabled={!searchText && filterOptions.length === 0}
           trigger={
             <input
               type="text"
@@ -176,7 +171,7 @@ class RecipeCombobox extends React.Component {
         >
           <GroupMenu
             searchText={searchText}
-            data={searchText ? result : availableFilters}
+            data={filterOptions}
             onItemSelect={this.handleFilterSelect}
           />
         </DropdownMenu>
@@ -184,9 +179,3 @@ class RecipeCombobox extends React.Component {
     );
   }
 }
-
-const mapStateToProps = () => ({});
-export default connect(
-  mapStateToProps
-)(RecipeCombobox);
-

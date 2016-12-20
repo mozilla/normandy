@@ -5,7 +5,7 @@ import {
   initialState,
 } from 'control/tests/fixtures';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 /**
  * Utility function to clone the initialState column array and its values

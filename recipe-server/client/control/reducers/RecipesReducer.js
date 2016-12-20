@@ -8,7 +8,7 @@ import {
   RECIPES_NEED_FETCH,
 } from 'control/actions/ControlActions';
 
-import cloneArray from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 const initialState = {
   entries: {},

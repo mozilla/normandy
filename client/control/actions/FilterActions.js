@@ -2,6 +2,7 @@ import {
   makeApiRequest,
   recipesNeedFetch,
   recipesReceived,
+  filtersReceived,
 } from 'control/actions/ControlActions';
 
 import {
@@ -13,38 +14,16 @@ const SET_FILTER = 'SET_FILTER';
 const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
 const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
 
+
+/**
+ * Load list of possible filters from remote API.
+ * This is stored in the `filters` reducer, and
+ * later used to populate relevant RecipeFilters components.
+ */
 function loadFilters() {
-  return dispatch => {
-    dispatch({
-      type: LOAD_FILTERS,
-      filters: {
-        status: [
-          {
-            key: 'enabled',
-            value: 'Enabled',
-          },
-          'disabled',
-        ],
-        channel: [
-          'release',
-          'beta',
-          'aurora',
-          'nightly',
-        ],
-        locale: [
-          'de',
-          'en-CA',
-          'en-US',
-          'ru',
-        ],
-        country: [
-          'CA',
-          'RU',
-          'US',
-        ],
-      },
-    });
-  };
+  return dispatch =>
+    dispatch(makeApiRequest('fetchFilters'))
+      .then(recipes => dispatch(filtersReceived(recipes)));
 }
 
 /**
@@ -58,7 +37,7 @@ function loadFilters() {
 function selectFilter({ group, option, isEnabled }) {
   return dispatch => {
     dispatch({
-      type: group === 'text' ? SET_TEXT_FILTER : SET_FILTER,
+      type: group.value === 'text' ? SET_TEXT_FILTER : SET_FILTER,
       group,
       option,
       isEnabled,
@@ -77,7 +56,7 @@ function loadFilteredRecipes() {
 
     const filterParams = getFilterParamString(getState().filters);
 
-    dispatch(makeApiRequest('fetchFilteredRecipes', filterParams))
+    return dispatch(makeApiRequest('fetchFilteredRecipes', filterParams))
       .then(recipes => dispatch(recipesReceived(recipes, filterParams)));
   };
 }
@@ -88,13 +67,21 @@ function loadFilteredRecipes() {
  * the filters reducer will reset the state
  * to its initialState.
  *
- * @param {Array} state Filter state to set (optional)
+ * The difference between SET_ALL_FILTERS and LOAD_FILTERS
+ * is that LOAD_ parses data from the backend before
+ * inserting into the store. SET_ALL assumes that
+ * the filters are already parsed, and the _app_ is
+ * manipulating the existing store.
+ *
+ * This is pretty much only used for FilterActions#resetFilters
+ *
+ * @param {Array} filters Filter state to set (optional)
  */
-function setAllFilters(state) {
+function setAllFilters(filters) {
   return dispatch => {
     dispatch({
       type: SET_ALL_FILTERS,
-      state,
+      filters,
     });
   };
 }
@@ -106,8 +93,9 @@ function setAllFilters(state) {
  *
  * @return {Function} Result of FilterActions#setAllFilters
  */
-const resetFilters = () => setAllFilters();
-
+function resetFilters() {
+  return setAllFilters();
+}
 
 // Exports
 export {
@@ -116,7 +104,7 @@ export {
   SET_ALL_FILTERS,
   SET_TEXT_FILTER,
   LOAD_FILTERS,
-  // actions
+  // action functions
   loadFilters,
   selectFilter,
   setAllFilters,

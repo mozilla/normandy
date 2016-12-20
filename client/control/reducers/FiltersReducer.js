@@ -15,7 +15,7 @@ import {
   SET_TEXT_FILTER,
 } from 'control/actions/FilterActions';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 function formatLabel(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -93,21 +93,34 @@ function filtersReducer(state = initialState, action) {
           let hasSelected = false;
 
           // loop through each option..
-          newGroup.options = cloneArrayValues(newGroup.options || []).map(option => {
+          newGroup.options = cloneArrayValues(newGroup.options).map(option => {
+            const newOption = { ...option };
+
             // ..find the option that this action is targeting..
-            if (option.value === action.option.value) {
-              // ..and then de/select it based on the action
-              option.selected = action.isEnabled || false;
+            if (newOption.value === action.option.value) {
+              const selectStatus = action.isEnabled || false;
+
+              if (selectStatus) {
+                // ..and then de/select it based on the action
+                newOption.selected = action.isEnabled || false;
+              } else if (newOption.selected) {
+                delete newOption.selected;
+              }
             }
 
             // hasSelected will be true if any option is selected
-            hasSelected = hasSelected || option.selected;
-            return option;
+            hasSelected = !!(hasSelected || newOption.selected);
+            return newOption;
           });
 
           // finally, we check if any options are selected,
           // and update the main group accordingly
-          newGroup.selected = hasSelected;
+          if (!hasSelected && newGroup.selected) {
+            // remove the 'selected' prop all together if it exists
+            delete newGroup.selected;
+          } else if (hasSelected) {
+            newGroup.selected = hasSelected;
+          }
         }
 
         return newGroup;
@@ -117,7 +130,7 @@ function filtersReducer(state = initialState, action) {
     }
 
     case SET_TEXT_FILTER: {
-      newState = cloneArrayValues(state || []);
+      newState = cloneArrayValues(state);
 
       // function which modifies an existing text group
       // or creates an entirely new one, and appends the
@@ -128,18 +141,22 @@ function filtersReducer(state = initialState, action) {
         // get existing options
         textOptions = cloneArrayValues(newGroup.options || []);
 
-        // we allow multiple text options,
-        // so we just push onto the option array
-        textOptions.push({
-          value: action.option,
-          selected: true,
-        });
+        textOptions = [];
+
+        if (action.isEnabled) {
+          // we only allow for one text filter at a time,
+          // so just set the whole 'text' options array to just this one
+          textOptions = [{
+            value: action.option.value || action.option,
+            selected: true,
+          }];
+        }
 
         // various display options
         newGroup.value = 'text';
         newGroup.label = formatLabel('Text Search');
         newGroup.options = textOptions;
-        newGroup.selected = true;
+        newGroup.selected = action.isEnabled || false;
 
         return newGroup;
       };
@@ -152,6 +169,8 @@ function filtersReducer(state = initialState, action) {
         // if a text group is found
         if (group.value === 'text') {
           wasFound = true;
+
+          console.log('wtf', group);
           // update it
           return formatGroup(group);
         }

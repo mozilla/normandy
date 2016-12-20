@@ -5,7 +5,7 @@
  * This simplifies in-view logic - no more .maps or .filters in mapStateToProps!
  */
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 /**
  * Given a group, determines if any option has been selected
@@ -46,7 +46,7 @@ export const getSelectedFilterGroups = groups => groups.filter(isGroupSelected);
  * @return {Array<Object>}        Active filter groups and their selected options
  */
 export const getActiveFilters = groups =>
-  cloneArrayValues(groups || [])
+  cloneArrayValues(groups)
     .map(group => {
       // group has no selection = remove it
       if (!group.selected) {
@@ -83,7 +83,7 @@ export const getFilterParamString = groups =>
         }
       });
 
-      return `${param}=${encodeURIComponent(selected.join(','))}`;
+      return `${param}=${selected.map(encodeURIComponent).join(',')}`;
     })
     .join('&');
 
@@ -96,7 +96,7 @@ export const getFilterParamString = groups =>
  * @return {Array<Object>}        Array of non-selected options/groups
  */
 export const getAvailableFilters = groups =>
-  cloneArrayValues(groups || [])
+  cloneArrayValues(groups)
     .map(group => {
       const newGroup = { ...group };
 
