@@ -1,7 +1,9 @@
 import {
   RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED, RECIPE_ADDED,
-  RECIPE_UPDATED, RECIPE_DELETED, SET_SELECTED_RECIPE,
+  RECIPE_UPDATED, RECIPE_DELETED, SET_SELECTED_RECIPE, RECIPES_NEED_FETCH,
 } from 'control/actions/ControlActions';
+
+import cloneArray from 'client/utils/clone-array-values';
 
 const initialState = {
   entries: {},

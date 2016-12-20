@@ -1,4 +1,12 @@
-import * as localForage from 'localforage';
+import {
+  makeApiRequest,
+  recipesNeedFetch,
+  recipesReceived,
+} from 'control/actions/ControlActions';
+
+import {
+  getFilterParams,
+} from 'control/selectors/FiltersSelector';
 
 const LOAD_FILTERS = 'LOAD_FILTERS';
 const SET_FILTER = 'SET_FILTER';
@@ -10,9 +18,12 @@ function loadFilters() {
   return dispatch => {
     dispatch({
       type: LOAD_FILTERS,
-      filters: [{
+      filters: {
         status: [
-          'enabled',
+          {
+            key: 'enabled',
+            value: 'Enabled',
+          },
           'disabled',
         ],
         channel: [
@@ -23,15 +34,16 @@ function loadFilters() {
         ],
         locale: [
           'de',
-          'en-uk',
-          'en-us',
+          'en-CA',
+          'en-US',
+          'ru',
         ],
         country: [
           'CA',
           'RU',
           'US',
         ],
-      }],
+      },
     });
   };
 }
@@ -52,6 +64,17 @@ function selectFilter({ group, option, isEnabled }) {
       option,
       isEnabled,
     });
+  };
+}
+
+function loadFilteredRecipes() {
+  return (dispatch, getState) => {
+    dispatch(recipesNeedFetch());
+
+    const filterParams = getFilterParams(getState().filters);
+
+    dispatch(makeApiRequest('fetchFilteredRecipes', filterParams))
+      .then(recipes => dispatch(recipesReceived(recipes)));
   };
 }
 
@@ -82,34 +105,6 @@ function setAllFilters(state) {
 const resetFilters = () => setAllFilters();
 
 
-const STORAGE_ID = 'last-filters';
-
-function loadLocalFilters() {
-  return dispatch => {
-    // load the column settings the user last used
-    localForage.getItem(STORAGE_ID, (err, found) => {
-      if (!err && found && found.length) {
-        dispatch({
-          type: SET_ALL_FILTERS,
-          filters: found,
-        });
-      }
-    });
-  };
-}
-
-/**
- * Utility function to save the state via localForage.
- *
- * @param  {Array}  state Filter state
- * @return {void}
- */
-function saveLocalFilters(state) {
-  return () => {
-    localForage.setItem(STORAGE_ID, state);
-  };
-}
-
 // Exports
 export {
   // action constants
@@ -123,6 +118,5 @@ export {
   selectFilter,
   setAllFilters,
   resetFilters,
-  loadLocalFilters,
-  saveLocalFilters,
+  loadFilteredRecipes,
 };

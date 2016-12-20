@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
+import cloneArrayValues from 'client/utils/clone-array-values';
 
 import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
@@ -61,7 +62,7 @@ class RecipeCombobox extends React.Component {
    * @return {Array<Object>} Array of filter groups containing search value
    */
   filterGroups(groups, search) {
-    return [].concat(groups).filter(group => {
+    return cloneArrayValues(groups).filter(group => {
       // remove 'meta' properties the user doesn't actually
       // want to search over
       const groupProperties = RecipeCombobox.removeProperties(group,
@@ -150,7 +151,7 @@ class RecipeCombobox extends React.Component {
   }
 }
 
-const mapStateToProps = () => {};
+const mapStateToProps = () => ({});
 export default connect(
   mapStateToProps
 )(RecipeCombobox);

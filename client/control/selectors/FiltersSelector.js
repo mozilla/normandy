@@ -5,6 +5,7 @@
  * This simplifies in-view logic - no more .maps or .filters in mapStateToProps!
  */
 
+import cloneArrayValues from 'client/utils/clone-array-values';
 
 /**
  * Given a group, determines if an option has been selected
@@ -44,7 +45,7 @@ export const getSelectedFilterGroups = groups => groups.filter(isGroupSelected);
  * @return {Array<Object>}        Active filter groups and their selected options
  */
 export const getActiveFilters = groups =>
-  [].concat(groups || [])
+  cloneArrayValues(groups || [])
     .map(group => {
       // group has no selection = remove it
       if (!group.selected) {
@@ -53,7 +54,7 @@ export const getActiveFilters = groups =>
 
       const newGroup = { ...group };
       // remove non-selected filters
-      const activeOptions = [].concat(group.options).filter(option => option.selected);
+      const activeOptions = cloneArrayValues(group.options).filter(option => option.selected);
       newGroup.options = activeOptions;
 
       return newGroup;
@@ -61,6 +62,21 @@ export const getActiveFilters = groups =>
       // (e.g. [1,null,2] becomes [1,2])
     }).filter(x => x);
 
+export const getFilterParams = groups =>
+  getActiveFilters(groups)
+    .map(group => {
+      const param = group.value;
+      const selected = [];
+
+      group.options.forEach(option => {
+        if (option.selected) {
+          selected.push(option.value);
+        }
+      });
+
+      return `${param}=${selected.join(',')}`;
+    })
+    .join('&');
 
 /**
  * Given a set of groups, returns only the groups/options that
@@ -71,13 +87,13 @@ export const getActiveFilters = groups =>
  * @return {Array<Object>}        Array of non-selected options/groups
  */
 export const getAvailableFilters = groups =>
-  [].concat(groups || [])
+  cloneArrayValues(groups || [])
     .map(group => {
       const newGroup = { ...group };
 
       // get the non/selected options
-      let availableOptions = [].concat(group.options).filter(option => !option.selected);
-      const activeOptions = [].concat(group.options).filter(option => option.selected);
+      let availableOptions = cloneArrayValues(group.options).filter(option => !option.selected);
+      const activeOptions = cloneArrayValues(group.options).filter(option => option.selected);
 
       // if there is at least one option selected,
       // and this group DOES NOT allow multiples,
@@ -102,19 +118,3 @@ export const getAvailableFilters = groups =>
  */
 export const isFilteringActive = groups =>
   getActiveFilters(groups).length > 0;
-
-/**
- * Not used
- * @param  {[type]} groups [description]
- * @return {[type]}        [description]
- */
-export const getTextFilters = groups =>
-  [].concat(groups || [])
-    .map(group => {
-      if (group.value !== 'text') {
-        return null;
-      }
-
-      return group;
-    })
-    .filter(x => x);

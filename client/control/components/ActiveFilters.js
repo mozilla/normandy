@@ -17,6 +17,22 @@ export default class ActiveFilters extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+
+    this.handlerCache = {};
+  }
+
+  handleFilterSelect(group, option) {
+    const cacheKey = group.value + option.value;
+
+    // check if an existing event handler exists
+    if (!this.handlerCache[cacheKey]) {
+      // if not, create it with the group and option given
+      this.handlerCache[cacheKey] = () =>
+        this.props.onFilterSelect(group, option);
+    }
+
+    // return the handling function
+    return this.handlerCache[cacheKey];
   }
 
   /**
@@ -27,7 +43,6 @@ export default class ActiveFilters extends React.Component {
       className,
       selectedFilters,
       onResetFilters,
-      onFilterSelect,
     } = this.props;
 
     // optional className prop
@@ -54,13 +69,7 @@ export default class ActiveFilters extends React.Component {
                   <div
                     key={option.value + index}
                     className="filter-option"
-                    onClick={() => {
-                      onFilterSelect({
-                        group: filter,
-                        option,
-                        isEnabled: false,
-                      });
-                    }}
+                    onClick={this.handleFilterSelect(filter, option)}
                     children={option.label || option.value}
                   />)
             }

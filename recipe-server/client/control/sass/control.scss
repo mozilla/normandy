@@ -281,8 +281,8 @@
       font-weight: 800;
     }
   }
+}
 
-  & + .callout {
-    margin: 2em 0 1em;
-  }
+.callout.loading {
+  margin: -2em 0 2em;
 }

@@ -2,6 +2,7 @@
  * RecipeList column selectors
  */
 
+import cloneArrayValues from 'client/utils/clone-array-values';
 
 /**
  * Given a set of columns, returns an array of
@@ -11,7 +12,7 @@
  * @return {Array<Object>}         Columns that are enabled/visible to user
  */
 export function getActiveColumns(columns) {
-  return [].concat(columns)
+  return cloneArrayValues(columns)
     .map(col => (col.enabled ? col : null))
     .filter(col => col);
 }
@@ -24,7 +25,7 @@ export function getActiveColumns(columns) {
  * @return {Array<Object>}         Columns that are disabled/hidden from the user
  */
 export function getInactiveColumns(columns) {
-  return [].concat(columns)
+  return cloneArrayValues(columns)
     .map(col => (!col.enabled ? col : null))
     .filter(col => col);
 }
