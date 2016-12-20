@@ -1,4 +1,5 @@
 import React, { PropTypes as pt } from 'react';
+import compare from 'client/utils/deep-compare';
 
 /**
  * Simple component which lists a bunch of checkboxes,
@@ -35,7 +36,7 @@ export default class CheckboxList extends React.Component {
    * @return {[type]}          [description]
    */
   componentWillReceiveProps(newProps) {
-    if (JSON.stringify(newProps.options) !== JSON.stringify(this.props.options)) {
+    if (compare(newProps.options, this.props.options)) {
       this.handlerCache = {};
     }
   }

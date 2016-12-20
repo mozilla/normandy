@@ -6,6 +6,7 @@ import ActiveFilters from 'control/components/ActiveFilters';
 import RecipeCombobox from 'control/components/RecipeCombobox';
 import RecipeCount from 'control/components/RecipeCount';
 
+import compare from 'client/utils/deep-compare';
 
 import {
   loadLocalColumns,
@@ -70,7 +71,7 @@ class RecipeFilters extends React.Component {
   }
 
   componentWillReceiveProps({ selectedFilters }) {
-    if (JSON.stringify(selectedFilters) !== JSON.stringify(this.props.selectedFilters)) {
+    if (!compare(selectedFilters, this.props.selectedFilters)) {
       this.props.loadFilteredRecipes();
     }
   }
@@ -142,11 +143,14 @@ class RecipeFilters extends React.Component {
           </div>
 
           <div id="filters-container" className="fluid-6">
-            <RecipeCount
-              displayCount={displayCount}
-              totalCount={totalCount}
-              isFiltering={this.props.selectedFilters.length > 0}
-            />
+            {
+              !!(displayCount && totalCount) &&
+                <RecipeCount
+                  displayCount={displayCount}
+                  totalCount={totalCount}
+                  isFiltering={this.props.selectedFilters.length > 0}
+                />
+            }
             <ColumnMenu
               columns={columns}
               onColumnChange={this.handleColumnInput}

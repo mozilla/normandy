@@ -48,6 +48,7 @@ describe('controlApp reducer', () => {
       recipes: {
         ...initialState.recipes,
         entries: fixtureRecipeDict,
+        selectedRecipe: null,
         recipeListNeedsFetch: false,
       },
     });

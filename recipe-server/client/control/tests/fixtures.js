@@ -15,6 +15,7 @@ export const initialState = {
   },
   recipes: {
     entries: {},
+    cache: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },
