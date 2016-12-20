@@ -3,15 +3,13 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
 
+import cloneArrayValues from 'client/utils/clone-array-values';
+
 import {
   makeApiRequest,
   recipesReceived,
   setSelectedRecipe,
 } from 'control/actions/ControlActions';
-
-import {
-  isFilteringActive,
-} from 'control/selectors/FiltersSelector';
 
 import {
   getActiveColumns,
@@ -34,7 +32,6 @@ class DisconnectedRecipeList extends React.Component {
     isFetching: pt.bool.isRequired,
     recipeListNeedsFetch: pt.bool.isRequired,
     recipes: pt.array.isRequired,
-    isFiltering: pt.bool.isRequired,
     displayedColumns: pt.array.isRequired,
   };
 
@@ -51,7 +48,7 @@ class DisconnectedRecipeList extends React.Component {
   /**
    * Given a recipe object, determines what type of recipe it is (based on its `action`),
    * and then compiles an array of 'displayed metadata props' and their values. This array
-   * is saved on the recipe as `metadata`, and displayed in the 'metadata'
+   * is saved on the recipe as `metadata`, and displayed in the 'metadata' column.
    *
    * Beyond that, a string of metadata values is created, and attached to the
    * recipe as the `searchData` property. This is used by the `Table` component
@@ -68,10 +65,6 @@ class DisconnectedRecipeList extends React.Component {
       // regardless if we set the values or not
       metadata: [],
       searchData: '',
-      locales: [{
-        label: 'English (US)',
-        value: 'en-US',
-      }],
     };
 
     // check if there are specific properties/labels we want to display
@@ -96,7 +89,6 @@ class DisconnectedRecipeList extends React.Component {
 
     return newRecipe;
   }
-
 
   constructor(props) {
     super(props);
@@ -184,22 +176,28 @@ class DisconnectedRecipeList extends React.Component {
       recipes,
       displayedColumns,
       recipeListNeedsFetch,
-      isFiltering,
     } = this.props;
 
     const noResults = false;
 
-    const filteredRecipes = (this.state.filteredRecipes || recipes)
+    const filteredRecipes = cloneArrayValues(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
 
     return (
       <div>
         <RecipeFilters
-          {...this.state}
           displayCount={filteredRecipes.length}
           totalCount={recipes.length}
         />
         <div className="fluid-8">
+          {
+            !noResults && recipeListNeedsFetch &&
+              <div
+                className="loading callout"
+                children={'Loading...'}
+              />
+          }
+
           <Table
             className="recipe-list"
             sortable
@@ -229,15 +227,6 @@ class DisconnectedRecipeList extends React.Component {
               </Tr>
             )}
           </Table>
-
-          {
-            noResults && (isFiltering ?
-              <div className="callout">No recipes match those filters.</div>
-            : <div
-              className="callout"
-              children={recipeListNeedsFetch ? 'Loading...' : 'No recipes to display.'}
-            />)
-          }
         </div>
       </div>
     );
@@ -249,7 +238,6 @@ const mapStateToProps = (state, ownProps) => ({
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
-  isFiltering: isFilteringActive(state.filters),
   displayedColumns: getActiveColumns(state.columns),
 });
 

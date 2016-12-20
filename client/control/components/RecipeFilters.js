@@ -1,5 +1,4 @@
 import React, { PropTypes as pt } from 'react';
-import * as localForage from 'localforage';
 import { connect } from 'react-redux';
 
 import ColumnMenu from 'control/components/ColumnMenu';
@@ -17,6 +16,7 @@ import {
   selectFilter,
   setAllFilters,
   resetFilters,
+  loadFilteredRecipes,
 } from 'control/actions/FilterActions';
 import {
   getSelectedFilterGroups,
@@ -43,6 +43,7 @@ class RecipeFilters extends React.Component {
     selectFilter: pt.func.isRequired,
     resetFilters: pt.func.isRequired,
     setAllFilters: pt.func.isRequired,
+    loadFilteredRecipes: pt.func.isRequired,
   };
 
 
@@ -66,15 +67,13 @@ class RecipeFilters extends React.Component {
     // load the last column setup user was viewing
     this.props.loadLocalColumns();
     this.props.loadFilters();
-
-    // load the last filters the user viewed
-    localForage.getItem('last-filters', (err, found) => {
-      if (!err && found && found.length) {
-        this.props.setAllFilters(found);
-      }
-    });
   }
 
+  componentWillReceiveProps({ selectedFilters }) {
+    if (JSON.stringify(selectedFilters) !== JSON.stringify(this.props.selectedFilters)) {
+      this.props.loadFilteredRecipes();
+    }
+  }
 
   /**
    * User has selected a filter option from the
@@ -181,6 +180,7 @@ const mapDispatchToProps = {
   selectFilter,
   resetFilters,
   setAllFilters,
+  loadFilteredRecipes,
 };
 
 export default connect(

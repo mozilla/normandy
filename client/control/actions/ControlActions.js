@@ -4,6 +4,8 @@ export const REQUEST_COMPLETE = 'REQUEST_COMPLETE';
 export const RECIPES_RECEIVED = 'RECIPES_RECEIVED';
 export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
 
+export const RECIPES_NEED_FETCH = 'RECIPES_NEED_FETCH';
+
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
 export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
@@ -32,6 +34,16 @@ const apiRequestMap = {
         method: 'GET',
       },
       errorNotification: 'Error fetching recipes.',
+    };
+  },
+
+  fetchFilteredRecipes(filterParams) {
+    return {
+      url: `${BASE_API_URL}recipe/?${filterParams}`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error fetching filtered recipes.',
     };
   },
 
@@ -118,6 +130,12 @@ function recipesReceived(recipes) {
   return {
     type: RECIPES_RECEIVED,
     recipes,
+  };
+}
+
+function recipesNeedFetch() {
+  return {
+    type: RECIPES_NEED_FETCH,
   };
 }
 
@@ -209,6 +227,7 @@ function makeApiRequest(requestType, requestData) {
 export {
   makeApiRequest,
   recipesReceived,
+  recipesNeedFetch,
   singleRecipeReceived,
   setSelectedRecipe,
   showNotification,
