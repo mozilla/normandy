@@ -24,21 +24,34 @@ export default class GroupMenu extends React.Component {
     return () => this.props.onItemSelect(group, option);
   }
 
-  buildEmptyResultsMessage(hasData, searchText) {
-    let resultMessage;
-    if (!hasData) {
-      // if the user has entered text, but there
-      // are no matches for it..
-      if (searchText) {
-        resultMessage = <span>No results for <b>"{searchText}"</b></span>;
-      } else {
-        // if we don't have any results,
-        // but it's unrelated to the text search..
-        resultMessage = <span>No filters to display.</span>;
-      }
+  /**
+   * Given a searchText param, creates a filter menu item
+   * indicating user can add a custom text filter.
+   *
+   * @param  {string} searchText (Optional) Text user has entered into combobox
+   * @return {Node}              Compiled menu item displaying 'add [text] filter'
+   */
+  buildTextSearchMessage(searchText) {
+    let searchMessage;
+
+    if (searchText) {
+      searchMessage = (
+        <div
+          key={'text'}
+          className={'text'}
+        >
+          <h3 className="group-label">Text Search</h3>
+          <div
+            className={"menu-item"}
+            key={searchText}
+            onClick={this.handleItemClick('text', searchText)}
+            children={searchText}
+          />
+        </div>
+      );
     }
 
-    return resultMessage;
+    return searchMessage;
   }
 
   /**
@@ -50,16 +63,13 @@ export default class GroupMenu extends React.Component {
       searchText,
     } = this.props;
 
-    // build "no results" messaging
-    const hasData = data && data.length;
-
-    const noResults = this.buildEmptyResultsMessage(hasData, searchText);
+    const textSearchMessage = this.buildTextSearchMessage(searchText);
 
     return (
       <div
         className="group-menu"
       >
-        { noResults }
+        { textSearchMessage }
         {
           data.map(group =>
             <div

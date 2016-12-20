@@ -12,8 +12,7 @@ import {
   LOAD_FILTERS,
   SET_FILTER,
   SET_ALL_FILTERS,
-  ADD_TEXT_FILTER,
-  REMOVE_TEXT_FILTER,
+  SET_TEXT_FILTER,
 } from 'control/actions/FilterActions';
 
 import cloneArrayValues from 'client/utils/clone-array-values';
@@ -117,46 +116,54 @@ function filtersReducer(state = initialState, action) {
       break;
     }
 
-    case ADD_TEXT_FILTER: {
+    case SET_TEXT_FILTER: {
       newState = cloneArrayValues(state || []);
 
+      // function which modifies an existing text group
+      // or creates an entirely new one, and appends the
+      // text search to the group options
+      const formatGroup = group => {
+        const newGroup = { ...group };
+
+        // get existing options
+        textOptions = cloneArrayValues(newGroup.options || []);
+
+        // we allow multiple text options,
+        // so we just push onto the option array
+        textOptions.push({
+          value: action.option,
+          selected: true,
+        });
+
+        // various display options
+        newGroup.value = 'text';
+        newGroup.label = formatLabel('Text Search');
+        newGroup.options = textOptions;
+        newGroup.selected = true;
+
+        return newGroup;
+      };
+
+      // track if we've found an existing text group
+      let wasFound = false;
+
+      // look through existing groups
       newState = newState.map(group => {
+        // if a text group is found
         if (group.value === 'text') {
-          const newGroup = { ...group };
-
-          textOptions = cloneArrayValues(newGroup.options);
-          textOptions.push({
-            value: action.filter,
-            selected: true,
-          });
-
-          newGroup.options = textOptions;
-          newGroup.selected = true;
-
-          return newGroup;
+          wasFound = true;
+          // update it
+          return formatGroup(group);
         }
 
         return group;
       });
-      break;
-    }
 
-    case REMOVE_TEXT_FILTER: {
-      newState = cloneArrayValues(state || []);
-
-      newState = newState.map(group => {
-        if (group.value === 'text') {
-          const newGroup = { ...group };
-
-          textOptions = cloneArrayValues(newGroup.options);
-          textOptions = textOptions.filter(option => option.value !== action.filter);
-
-          newGroup.options = textOptions;
-          return newGroup;
-        }
-
-        return group;
-      });
+      // if we do NOT have an existing text group,
+      // create one
+      if (!wasFound) {
+        newState.push(formatGroup());
+      }
 
       break;
     }

@@ -284,5 +284,9 @@
 }
 
 .callout.loading {
-  margin: -2em 0 2em;
+  bottom: 2em;
+  left: 2em;
+  position: fixed;
+  right: 2em;
+  width: auto;
 }

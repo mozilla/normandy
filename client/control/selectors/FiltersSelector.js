@@ -8,7 +8,8 @@
 import cloneArrayValues from 'client/utils/clone-array-values';
 
 /**
- * Given a group, determines if an option has been selected
+ * Given a group, determines if any option has been selected
+ * somewhere within it.
  *
  * @param  {Object} group Group to detect options in
  * @return {Boolean}       Does the group have a selected option?
@@ -62,7 +63,15 @@ export const getActiveFilters = groups =>
       // (e.g. [1,null,2] becomes [1,2])
     }).filter(x => x);
 
-export const getFilterParams = groups =>
+
+/**
+ * Given a set of groups, finds the activated groups and options,
+ * and then creates a query string with all selected values.
+ *
+ * @param  {Array<Object>} groups All possible filter groups
+ * @return {string}        URL-safe query param string
+ */
+export const getFilterParamString = groups =>
   getActiveFilters(groups)
     .map(group => {
       const param = group.value;
@@ -74,7 +83,7 @@ export const getFilterParams = groups =>
         }
       });
 
-      return `${param}=${selected.join(',')}`;
+      return `${param}=${encodeURIComponent(selected.join(','))}`;
     })
     .join('&');
 
@@ -112,9 +121,10 @@ export const getAvailableFilters = groups =>
     .filter(x => x);
 
 /**
- * [description]
- * @param  {[type]} groups [description]
- * @return {[type]}        [description]
+ * Determines if any filters are activated.
+ *
+ * @param  {Array<Object>} groups All possible filter groups
+ * @return {boolean}              Does user have at least one filter active?
  */
 export const isFilteringActive = groups =>
   getActiveFilters(groups).length > 0;

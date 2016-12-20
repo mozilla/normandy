@@ -8,7 +8,7 @@
  */
 
 import {
-  getFilterParams,
+  getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
 /**
@@ -24,7 +24,7 @@ import {
  * @return {Array<Object>}  List of recipes that match the provided 'filters' config
  */
 export function getCachedRecipes(recipes, filters) {
-  const filterCacheKey = getFilterParams(filters);
+  const filterCacheKey = getFilterParamString(filters);
   const foundList = (filterCacheKey ? recipes.cache[filterCacheKey] : recipes.list) || [];
 
   return foundList;
