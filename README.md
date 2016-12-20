@@ -18,3 +18,6 @@ http://normandy.readthedocs.org/.
 # License
 
 Normandy is licensed under the MPLv2. See the `LICENSE` file for details.
+
+
+node ~/Documents/dev/watch-yo-profamity/dist/watch-yo-profamity.js -i "client/**/*.+(js|jsx|css|scss)"

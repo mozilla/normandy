@@ -24,6 +24,7 @@ export default class DropdownMenu extends React.Component {
   static propTypes = {
     trigger: pt.node.isRequired,
     children: pt.node.isRequired,
+    disabled: pt.bool,
     useClick: pt.bool,
     useFocus: pt.bool,
     pinRight: pt.bool,
@@ -38,6 +39,8 @@ export default class DropdownMenu extends React.Component {
     };
 
     this.toggleVisibility = ::this.toggleVisibility;
+    this.enableVisibility = ::this.enableVisibility;
+    this.disableVisibility = ::this.disableVisibility;
     this.onMenuBlur = ::this.onMenuBlur;
   }
 
@@ -93,6 +96,14 @@ export default class DropdownMenu extends React.Component {
     }
   }
 
+  enableVisibility() {
+    return this.toggleVisibility(true);
+  }
+
+  disableVisibility() {
+    return this.toggleVisibility(false);
+  }
+
   /**
    * Shows or hides the menu based on previous state
    * or if the `force` param is passed.
@@ -100,7 +111,12 @@ export default class DropdownMenu extends React.Component {
    */
   toggleVisibility(force) {
     // if we get a parameter, use that instead of just straight up toggling
-    const newVisibleState = typeof force === 'boolean' ? force : !this.state.isVisible;
+    let newVisibleState = !this.state.isVisible;
+
+    // check if we are forcing the state
+    if (typeof force === 'boolean') {
+      newVisibleState = force;
+    }
 
     this.setState({
       isVisible: newVisibleState,
@@ -115,18 +131,25 @@ export default class DropdownMenu extends React.Component {
    */
   render() {
     const pinClass = this.props.pinRight && 'pin-right';
+
     return (
       <div
         className={`dropdown-menu ${this.id}`}
       >
         <div
           className="dropdown-trigger"
-          onClick={this.props.useClick && this.toggleVisibility}
-          onFocus={this.props.useFocus && this.toggleVisibility}
+          onClick={this.props.useClick && this.enableVisibility}
+
+          onFocus={this.props.useFocus && this.enableVisibility}
+          onChange={this.props.useFocus && this.enableVisibility}
+          onKeyDown={this.props.useFocus && this.enableVisibility}
+
+          onBlur={this.props.useFocus && this.disableVisibility}
         >
           { this.props.trigger }
         </div>
         {
+          !this.props.disabled &&
           this.state.isVisible &&
             <div
               className={`dropdown-content ${pinClass || ''}`}

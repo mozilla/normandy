@@ -2,7 +2,7 @@
  * RecipeList column selectors
  */
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 /**
  * Given a set of columns, returns an array of

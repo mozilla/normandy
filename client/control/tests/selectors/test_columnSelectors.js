@@ -1,7 +1,7 @@
 import { initialState } from 'control/tests/fixtures';
 import * as columnSelectors from 'control/selectors/ColumnSelector';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 
 describe('Column Selectors', () => {

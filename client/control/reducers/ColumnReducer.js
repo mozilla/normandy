@@ -5,7 +5,7 @@ import {
 } from 'control/actions/ColumnActions';
 
 import compare from 'client/utils/deep-compare';
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 const initialState = [{
   label: 'Name',

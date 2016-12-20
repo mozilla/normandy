@@ -8,7 +8,7 @@ import {
   RECIPES_NEED_FETCH,
 } from 'control/actions/ControlActions';
 
-import cloneArray from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 const initialState = {
   list: [],
@@ -24,7 +24,7 @@ function recipesReducer(state = initialState, action) {
     case RECIPES_RECEIVED:
       newState = {
         ...state,
-        list: cloneArray(state.list).concat(action.recipes),
+        list: cloneArrayValues(state.list).concat(action.recipes),
         recipeListNeedsFetch: false,
       };
 
@@ -47,7 +47,7 @@ function recipesReducer(state = initialState, action) {
     case SINGLE_RECIPE_RECEIVED:
       newState = {
         ...state,
-        list: cloneArray(state.list).concat([action.recipe]),
+        list: cloneArrayValues(state.list).concat([action.recipe]),
         recipeListNeedsFetch: true,
         selectedRecipe: action.recipe.id,
       };
@@ -75,7 +75,7 @@ function recipesReducer(state = initialState, action) {
     case RECIPE_ADDED:
       newState = {
         ...state,
-        list: cloneArray(state.list).concat([
+        list: cloneArrayValues(state.list).concat([
           ...state.list || [],
           action.recipe,
         ]),
@@ -85,7 +85,7 @@ function recipesReducer(state = initialState, action) {
     case RECIPE_UPDATED:
       newState = {
         ...state,
-        list: cloneArray(state.list).map(recipe => {
+        list: cloneArrayValues(state.list).map(recipe => {
           if (recipe.id === action.recipe.id) {
             return { ...recipe,
               ...action.recipe,
@@ -99,7 +99,7 @@ function recipesReducer(state = initialState, action) {
     case RECIPE_DELETED:
       newState = {
         ...state,
-        list: cloneArray(state.list).filter(recipe => recipe.id !== action.recipeId),
+        list: cloneArrayValues(state.list).filter(recipe => recipe.id !== action.recipeId),
       };
       break;
 

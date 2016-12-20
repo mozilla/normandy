@@ -14,6 +14,8 @@ export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
 
+export const LOAD_FILTERS = 'LOAD_FILTERS';
+
 
 const BASE_API_URL = '/api/v1/';
 
@@ -34,6 +36,16 @@ const apiRequestMap = {
         method: 'GET',
       },
       errorNotification: 'Error fetching recipes.',
+    };
+  },
+
+  fetchFilters() {
+    return {
+      url: `${BASE_API_URL}filters/`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error fetching filter options.',
     };
   },
 
@@ -134,6 +146,13 @@ function recipesReceived(recipes, cacheKey) {
   };
 }
 
+function filtersReceived(filters) {
+  return {
+    type: LOAD_FILTERS,
+    filters,
+  };
+}
+
 function recipesNeedFetch() {
   return {
     type: RECIPES_NEED_FETCH,
@@ -226,6 +245,7 @@ function makeApiRequest(requestType, requestData) {
 
 
 export {
+  API_REQUEST_SETTINGS,
   makeApiRequest,
   recipesReceived,
   recipesNeedFetch,
@@ -236,4 +256,5 @@ export {
   recipeAdded,
   recipeUpdated,
   recipeDeleted,
+  filtersReceived,
 };

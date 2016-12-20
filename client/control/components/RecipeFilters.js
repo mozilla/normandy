@@ -15,7 +15,6 @@ import {
 import {
   loadFilters,
   selectFilter,
-  setAllFilters,
   resetFilters,
   loadFilteredRecipes,
 } from 'control/actions/FilterActions';
@@ -43,7 +42,6 @@ class RecipeFilters extends React.Component {
     loadFilters: pt.func.isRequired,
     selectFilter: pt.func.isRequired,
     resetFilters: pt.func.isRequired,
-    setAllFilters: pt.func.isRequired,
     loadFilteredRecipes: pt.func.isRequired,
   };
 
@@ -86,8 +84,11 @@ class RecipeFilters extends React.Component {
    * @return {void}
    */
   handleAddFilter(group, option) {
+    const filterGroup = typeof group === 'object' ?
+      group : { value: group };
+
     this.props.selectFilter({
-      group,
+      group: filterGroup,
       option,
       // if this handler is fired, we know the user is
       // ADDING the filter - it's removed later
@@ -183,7 +184,6 @@ const mapDispatchToProps = {
   loadLocalColumns,
   selectFilter,
   resetFilters,
-  setAllFilters,
   loadFilteredRecipes,
 };
 
