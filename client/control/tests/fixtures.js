@@ -10,6 +10,7 @@ export const initialState = {
   },
   recipes: {
     list: [],
+    cache: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },

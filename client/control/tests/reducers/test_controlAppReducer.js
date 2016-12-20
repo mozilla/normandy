@@ -39,6 +39,7 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: fixtureRecipes,
         selectedRecipe: null,
         recipeListNeedsFetch: false,
@@ -53,6 +54,7 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: [fixtureRecipes[0]],
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
@@ -67,6 +69,7 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: [],
         selectedRecipe: 2,
         recipeListNeedsFetch: true,
@@ -145,6 +148,7 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: [{
           id: 4,
           name: 'Villis stebulum',

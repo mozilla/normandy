@@ -36,6 +36,7 @@ class DisconnectedRecipeList extends React.Component {
     isFetching: pt.bool.isRequired,
     recipeListNeedsFetch: pt.bool.isRequired,
     recipes: pt.array.isRequired,
+    recipeList: pt.array.isRequired,
     displayedColumns: pt.array.isRequired,
   };
 
@@ -178,6 +179,7 @@ class DisconnectedRecipeList extends React.Component {
   render() {
     const {
       recipes,
+      recipeList,
       displayedColumns,
       recipeListNeedsFetch,
     } = this.props;
@@ -192,7 +194,7 @@ class DisconnectedRecipeList extends React.Component {
       <div>
         <RecipeFilters
           displayCount={filteredRecipes.length}
-          totalCount={recipes.length}
+          totalCount={recipeList.length}
         />
         <div className="fluid-8">
           {
@@ -240,6 +242,7 @@ class DisconnectedRecipeList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   recipes: getCachedRecipes(state.recipes, state.filters),
+  recipeList: state.recipes.list,
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,

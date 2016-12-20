@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+
 /**
  * Recipe selectors
  *
@@ -21,7 +23,7 @@ import {
  * @param  {Array<Object>}  filters Filters array from the redux store
  * @return {Array<Object>}  List of recipes that match the provided 'filters' config
  */
-export default function getCachedRecipes(recipes, filters) {
+export function getCachedRecipes(recipes, filters) {
   const filterCacheKey = getFilterParams(filters);
   const foundList = (filterCacheKey ? recipes.cache[filterCacheKey] : recipes.list) || [];
 

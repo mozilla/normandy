@@ -44,6 +44,7 @@ function formatFilterOption(option) {
   };
 }
 
+// Filters start out empty, as we need to load them from the API
 let initialState = [];
 
 function filtersReducer(state = initialState, action) {
@@ -69,7 +70,7 @@ function filtersReducer(state = initialState, action) {
         newState.push(newGroup);
       }
 
-      initialState = JSON.parse(JSON.stringify(newState));
+      initialState = cloneArrayValues(newState);
 
       break;
     }
