@@ -5,14 +5,13 @@ import {
 } from 'control/actions/ControlActions';
 
 import {
-  getFilterParams,
+  getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
 const LOAD_FILTERS = 'LOAD_FILTERS';
 const SET_FILTER = 'SET_FILTER';
+const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
 const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
-const ADD_TEXT_FILTER = 'ADD_TEXT_FILTER';
-const REMOVE_TEXT_FILTER = 'REMOVE_TEXT_FILTER';
 
 function loadFilters() {
   return dispatch => {
@@ -59,7 +58,7 @@ function loadFilters() {
 function selectFilter({ group, option, isEnabled }) {
   return dispatch => {
     dispatch({
-      type: SET_FILTER,
+      type: group === 'text' ? SET_TEXT_FILTER : SET_FILTER,
       group,
       option,
       isEnabled,
@@ -67,11 +66,16 @@ function selectFilter({ group, option, isEnabled }) {
   };
 }
 
+
+/**
+ * Detects activated filters, creates the URL param string,
+ * and queries API for a filtered list based on params.
+ */
 function loadFilteredRecipes() {
   return (dispatch, getState) => {
     dispatch(recipesNeedFetch());
 
-    const filterParams = getFilterParams(getState().filters);
+    const filterParams = getFilterParamString(getState().filters);
 
     dispatch(makeApiRequest('fetchFilteredRecipes', filterParams))
       .then(recipes => dispatch(recipesReceived(recipes, filterParams)));
@@ -110,8 +114,7 @@ export {
   // action constants
   SET_FILTER,
   SET_ALL_FILTERS,
-  ADD_TEXT_FILTER,
-  REMOVE_TEXT_FILTER,
+  SET_TEXT_FILTER,
   LOAD_FILTERS,
   // actions
   loadFilters,

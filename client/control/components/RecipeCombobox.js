@@ -6,7 +6,7 @@ import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
 
 import {
-  addTextFilter,
+  selectFilter,
 } from 'control/actions/FilterActions';
 
 /**
@@ -47,6 +47,7 @@ class RecipeCombobox extends React.Component {
     };
 
     this.updateSearch = ::this.updateSearch;
+    this.handleFilterSelect = ::this.handleFilterSelect;
   }
 
   /**
@@ -86,6 +87,13 @@ class RecipeCombobox extends React.Component {
     });
   }
 
+  /**
+   * Resets the text field input, blurs the input,
+   * and updates the 'searchText' state.
+   *
+   * Fired after user selects a filter option or enters
+   * a text filter.
+   */
   clearInput() {
     this.setState({
       searchText: '',
@@ -93,13 +101,27 @@ class RecipeCombobox extends React.Component {
 
     if (this.inputRef) {
       this.inputRef.value = '';
+      this.inputRef.blur();
     }
   }
 
+  /**
+   * Key event handler for text field. Updates local
+   * searchText state. Also detects if user
+   * has hit the ENTER key, and if so, will update activated
+   * filters to include this text search.
+   *
+   * @param  {node}   options.target  Event target
+   * @param  {string} options.keyCode Keyboard event key code
+   */
   updateSearch({ target, keyCode }) {
     // Enter key
     if (keyCode === 13) {
-      this.props.dispatch(addTextFilter(target.value));
+      this.props.dispatch(selectFilter({
+        group: 'text',
+        option: target.value,
+        isEnabled: true,
+      }));
 
       this.clearInput();
     } else {
@@ -110,12 +132,24 @@ class RecipeCombobox extends React.Component {
   }
 
   /**
+   * Handler for user selecting a filter to enable.
+   * Basically clears the input field and then fires
+   * the parent onFilterSelect prop.
+   *
+   * @param  {Object} group  Filter group that was activated
+   * @param  {Object} option Filter option that was activated
+   */
+  handleFilterSelect(group, option) {
+    this.clearInput();
+    return this.props.onFilterSelect(group, option);
+  }
+
+  /**
    * Render
    */
   render() {
     const {
       availableFilters,
-      onFilterSelect,
     } = this.props;
 
     const {
@@ -143,7 +177,7 @@ class RecipeCombobox extends React.Component {
           <GroupMenu
             searchText={searchText}
             data={searchText ? result : availableFilters}
-            onItemSelect={onFilterSelect}
+            onItemSelect={this.handleFilterSelect}
           />
         </DropdownMenu>
       </div>
