@@ -56,20 +56,19 @@ function closeAllNotifications(targetWindow, notificationBox) {
 
 /* Check that the correct telmetry was sent */
 function assertTelemetrySent(hb, eventNames) {
-  let telemetrySentResolve;
-  const telemetrySentPromise = new Promise(resolve => { telemetrySentResolve = resolve; });
-  hb.eventEmitter.once("TelemetrySent", payload => {
-    const events = [0];
-    for (const name of eventNames) {
-      Assert.equal(typeof payload[name], "number", `payload field ${name} is a number`);
-      events.push(payload[name]);
-    }
-    events.push(Date.now());
+  return new Promise(resolve => {
+    hb.eventEmitter.once("TelemetrySent", payload => {
+      const events = [0];
+      for (const name of eventNames) {
+        Assert.equal(typeof payload[name], "number", `payload field ${name} is a number`);
+        events.push(payload[name]);
+      }
+      events.push(Date.now());
 
-    assertOrdered(events);
-    telemetrySentResolve();
+      assertOrdered(events);
+      resolve();
+    });
   });
-  return telemetrySentPromise;
 }
 
 

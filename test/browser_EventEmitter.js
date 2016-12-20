@@ -64,7 +64,7 @@ add_task(function* () {
     a: 11,
     b: 11,
     c: 1,
-    log: "",
+    log: "abcab",
   }, "intermediate events are fired");
 
   // one more event for a

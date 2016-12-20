@@ -4,7 +4,6 @@
 
 [features/shield-recipe-client@mozilla.org] chrome.jar:
 % resource shield-recipe-client %content/
-  content/bootstrap.js  (./bootstrap.js)
   content/lib/ (./lib/*)
   content/data/ (./data/*)
   content/node_modules/jexl/ (/node_modules/jexl/*)

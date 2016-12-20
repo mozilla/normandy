@@ -34,8 +34,8 @@ this.install = function() {
   // Self Repair only checks its pref on start, so if we disable it, wait until
   // next startup to run, unless the dev_mode preference is set.
   if (Preferences.get(PREF_SELF_SUPPORT_ENABLED, true)) {
-    Preferences.setBoolPref(PREF_SELF_SUPPORT_ENABLED, false);
-    if (!Services.prefs.setBoolPref(PREF_DEV_MODE, false)) {
+    Preferences.set(PREF_SELF_SUPPORT_ENABLED, false);
+    if (!Services.prefs.getBoolPref(PREF_DEV_MODE, false)) {
       shouldRun = false;
     }
   }
@@ -66,7 +66,6 @@ this.shutdown = function(data, reason) {
     "lib/CleanupManager.jsm",
     "lib/EnvExpressions.jsm",
     "lib/Heartbeat.jsm",
-    "lib/Log.jsm",
     "lib/NormandyApi.jsm",
     "lib/NormandyDriver.jsm",
     "lib/RecipeRunner.jsm",

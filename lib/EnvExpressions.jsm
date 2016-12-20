@@ -24,7 +24,7 @@ XPCOMUtils.defineLazyGetter(this, "nodeRequire", () => {
 });
 
 XPCOMUtils.defineLazyGetter(this, "jexl", () => {
-  const {Jexl} = global.nodeRequire("jexl/lib/Jexl.js");
+  const {Jexl} = nodeRequire("jexl/lib/Jexl.js");
   const jexl = new Jexl();
   jexl.addTransforms({
     date: dateString => new Date(dateString),
@@ -60,6 +60,6 @@ this.EnvExpressions = {
   eval(expr, extraContext = {}) {
     const context = Object.assign({telemetry: getLatestTelemetry()}, extraContext);
     const onelineExpr = expr.replace(/[\t\n\r]/g, " ");
-    return global.jexl.eval(onelineExpr, context);
+    return jexl.eval(onelineExpr, context);
   },
 };
