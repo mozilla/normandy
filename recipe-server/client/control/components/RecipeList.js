@@ -17,6 +17,7 @@ import {
 
 import {
   getRecipesList,
+  getCachedRecipes,
 } from 'control/selectors/RecipesSelector';
 
 import RecipeFilters from 'control/components/RecipeFilters';
@@ -182,10 +183,11 @@ export class DisconnectedRecipeList extends React.Component {
       recipeListNeedsFetch,
     } = this.props;
 
-    const noResults = false;
 
     const filteredRecipes = [].concat(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
+
+    const noResults = filteredRecipes.length > 0;
 
     return (
       <div>
@@ -238,8 +240,8 @@ export class DisconnectedRecipeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+  recipes: getCachedRecipes(state.recipes, state.filters),
   dispatch: ownProps.dispatch,
-  recipes: getRecipesList(state.recipes),
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,
   displayedColumns: getActiveColumns(state.columns),

@@ -74,20 +74,8 @@ function filtersReducer(state = initialState, action) {
       break;
     }
 
-    // App has found the user's previous filter settings,
-    // and has dispatched an action to update the store
-    // with prior settings
     case SET_ALL_FILTERS: {
-      const valuesMatch =
-        JSON.stringify(initialState.map(option => option.value + option.label)) ===
-        JSON.stringify((action.filters || []).map(option => option.value + option.label));
-
-      if (valuesMatch) {
-        newState = action.filters;
-      } else {
-        newState = cloneArrayValues(initialState);
-      }
-
+      newState = cloneArrayValues(action.filters || initialState);
       break;
     }
 
