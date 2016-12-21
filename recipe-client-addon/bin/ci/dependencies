@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -eu
+
+npm install
+./node_modules/.bin/get-firefox -b nightly -t nightly -e

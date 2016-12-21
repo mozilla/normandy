@@ -1,8 +1,5 @@
-#!/bin/bash
-
-# THIS IS MEANT TO BE RUN BY CI
-
-set -e
+#!/usr/bin/env bash
+set -eu
 
 # Usage: retry MAX CMD...
 # Retry CMD up to MAX times. If it fails MAX times, returns failure.
