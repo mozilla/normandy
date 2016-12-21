@@ -23,7 +23,7 @@
     "eslint": "^3.8.1",
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-babel": "3.3.0",
-    "eslint-plugin-mozilla": "^0.2.3",
+    "eslint-plugin-mozilla": "0.2.5",
     "jpm": "1.2.2",
     "woodchipper": "0.9.1"
   },
