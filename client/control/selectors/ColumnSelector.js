@@ -13,8 +13,7 @@ import cloneArrayValues from 'client/utils/clone-array';
  */
 export function getActiveColumns(columns) {
   return cloneArrayValues(columns)
-    .map(col => (col.enabled ? col : null))
-    .filter(col => col);
+    .filter(col => col.enabled);
 }
 
 /**
@@ -26,6 +25,5 @@ export function getActiveColumns(columns) {
  */
 export function getInactiveColumns(columns) {
   return cloneArrayValues(columns)
-    .map(col => (!col.enabled ? col : null))
-    .filter(col => col);
+    .filter(col => !col.enabled);
 }
