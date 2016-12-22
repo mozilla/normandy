@@ -8,10 +8,11 @@ fi
 
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../.. && pwd)"
 PROJECTS=(
-    #compose
-    #eslint-config-normandy
     recipe-client-addon
     recipe-server
+    lints
+    compose
+    eslint-config-normandy
 )
 
 count=0

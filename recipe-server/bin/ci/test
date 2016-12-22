@@ -19,15 +19,15 @@ echo "Running contract tests"
 # Set up the app, run it, and run tests against it
 echo "* Setting up recipe-server"
 createdb normandy
-./docker-run.sh -i -t ./manage.py migrate
-./docker-run.sh -i -t ./manage.py update_actions
+bin/ci/docker-run.sh -i -t ./manage.py migrate
+bin/ci/docker-run.sh -i -t ./manage.py update_actions
 echo "* Starting recipe-server"
-SERVER_ID=$(./docker-run.sh -e DJANGO_CONFIGURATION=ProductionInsecure -d)
+SERVER_ID=$(bin/ci/docker-run.sh -e DJANGO_CONFIGURATION=ProductionInsecure -d)
 
 echo "* Waiting for server to be ready"
 docker run --net host -e CHECK_PORT=8000 -e CHECK_HOST=localhost giorgos/takis
 echo "* Running acceptance tests"
-./docker-run.sh py.test contract-tests/ \
+bin/ci/docker-run.sh py.test contract-tests/ \
   -vv \
   --server http://localhost:8000 \
   --junitxml=/test_artifacts/pytest.xml
