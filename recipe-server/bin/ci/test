@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -eu
 
-echo "Running lint tests"
-bin/ci/docker-run.sh therapist run --use-tracked-files
-
 echo "Running Python tests"
 bin/ci/docker-run.sh py.test -vv --junitxml=/test_artifacts/pytest.xml normandy/
 

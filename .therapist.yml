@@ -4,12 +4,12 @@ actions:
     include: "*.py"
     exclude: "docs/"
   eslint:
-    run: ./node_modules/.bin/eslint {files}
+    run: eslint {files}
     include:
       - "*.js"
       - "*.jsx"
   stylelint:
-    run: ./node_modules/.bin/stylelint {files}
+    run: stylelint {files}
     include:
       - "*.css"
       - "*.scss"

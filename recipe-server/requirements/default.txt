@@ -117,8 +117,6 @@ sphinxcontrib-httpdomain==1.4.0 \
 statsd==3.2.1 \
     --hash=sha256:7aff40c6cdda703193fac6231410c6c0ad5939ce053a168016501e982c755c84 \
     --hash=sha256:3fa92bf0192af926f7a0d9be031fe3fd0fbaa1992d42cf2f07e68f76ac18288e
-therapist==0.3.1 \
-    --hash=sha256:b14b91f24edfd7678b591449511a62c5db13682129f8cf89f121255ff04d00ae
 whitenoise==2.0.6 \
     --hash=sha256:826ffe5d608c9dc8daebef1b0b43d01f7958f17c2fce36e75c80e26160172c4f \
     --hash=sha256:5aea935dfc09ef2beeb76960b4a808b0bbe65e85fb0b0312434b9c365ca02a41
