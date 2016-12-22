@@ -44,7 +44,7 @@ if (production) {
 module.exports = [
   {
     context: __dirname,
-    devtool: production ? undefined : undefined,
+    devtool: production ? undefined : 'cheap-module-eval-source-map',
 
     entry: {
       selfrepair: [
@@ -108,7 +108,7 @@ module.exports = [
     },
   },
   {
-    devtool: production ? undefined : undefined,
+    devtool: production ? undefined : 'cheap-module-eval-source-map',
 
     entry: {
       'console-log': './client/actions/console-log/index',

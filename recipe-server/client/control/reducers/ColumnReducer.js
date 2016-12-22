@@ -9,60 +9,60 @@ import cloneArrayValues from 'client/utils/clone-array';
 
 const initialState = [{
   label: 'Name',
-  value: 'name',
+  slug: 'name',
   enabled: true,
 }, {
   label: 'Action',
-  value: 'action',
+  slug: 'action',
   enabled: true,
 }, {
   label: 'Enabled',
-  value: 'enabled',
+  slug: 'enabled',
   enabled: true,
 }, {
   label: 'Channels',
-  value: 'channels',
+  slug: 'channels',
 }, {
   label: 'Locales',
-  value: 'locales',
+  slug: 'locales',
 }, {
   label: 'Countries',
-  value: 'countries',
+  slug: 'countries',
 }, {
   label: 'Start Time',
-  value: 'startTime',
+  slug: 'startTime',
 }, {
   label: 'End Time',
-  value: 'endTime',
+  slug: 'endTime',
 }, {
   label: 'Additional Filters',
-  value: 'additionalFilter',
+  slug: 'additionalFilter',
 }, {
   label: 'Last Updated',
-  value: 'last_updated',
+  slug: 'last_updated',
   enabled: true,
 }, {
   label: 'Metadata',
-  value: 'metadata',
+  slug: 'metadata',
   enabled: true,
 }];
 
 function columnReducer(state = initialState, action) {
   let newState;
-  let valuesMatch;
+  let slugsMatch;
 
   const {
-    value,
+    slug,
     isActive,
   } = action;
 
   switch (action.type) {
     case UPDATE_COLUMN:
-      newState = cloneArrayValues(state || []);
+      newState = cloneArrayValues(state);
       // find the updated column and set
       // its 'enabled' property
       newState = newState.map(col => {
-        if (col.value === value) {
+        if (col.slug === slug) {
           col.enabled = isActive;
         }
         return col;
@@ -77,12 +77,12 @@ function columnReducer(state = initialState, action) {
       // have the all the same values as our
       // initialState. this prevents a user loading
       // outdated columns from localStorage
-      valuesMatch = compare(
-        state.map(option => option.value + option.label),
-        action.columns.map(option => option.value + option.label)
+      slugsMatch = compare(
+        state.map(option => option.slug + option.label),
+        action.columns.map(option => option.slug + option.label)
       );
 
-      if (valuesMatch) {
+      if (slugsMatch) {
         newState = cloneArrayValues(action.columns);
       }
       return newState || state;

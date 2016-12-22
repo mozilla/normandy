@@ -42,13 +42,13 @@ class ColumnMenu extends React.Component {
    * and notifies the parent of what's selected
    *
    *
-   * @param  {String}  columnValue  Value of the column ('name', 'endTime', etc)
+   * @param  {String}  columnSlug   Slug of the column ('name', 'endTime', etc)
    * @param  {Boolean} isActive     Is the column now active?
    * @return {void}
    */
-  handleColumnInput(columnValue, isActive) {
+  handleColumnInput(columnSlug, isActive) {
     this.props.dispatch(updateColumn({
-      value: columnValue,
+      slug: columnSlug,
       isActive,
     }));
   }
