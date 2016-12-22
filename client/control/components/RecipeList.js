@@ -100,7 +100,6 @@ class DisconnectedRecipeList extends React.Component {
     this.state = {};
     this.handlerCache = {};
 
-    this.handleSearchChange = ::this.handleSearchChange;
     this.handleViewRecipe = ::this.handleViewRecipe;
   }
 
@@ -138,8 +137,8 @@ class DisconnectedRecipeList extends React.Component {
   }
 
   renderTableCell(recipe) {
-    return ({ value }) => {
-      let displayValue = recipe[value];
+    return ({ slug }) => {
+      let displayValue = recipe[slug];
       // if the value is a straight up boolean value,
       if (displayValue === true || displayValue === false) {
         // switch the displayed value to a ×/✓ mark
@@ -167,7 +166,7 @@ class DisconnectedRecipeList extends React.Component {
 
       return (
         <Td
-          column={value}
+          column={slug}
           data={displayValue}
         >
           {displayValue}
@@ -183,7 +182,6 @@ class DisconnectedRecipeList extends React.Component {
       displayedColumns,
       recipeListNeedsFetch,
     } = this.props;
-
 
     const filteredRecipes = cloneArrayValues(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
