@@ -1,6 +1,9 @@
-// detect if what's passed is actually an array
-// since we can stringify/parse anything, it's
-// helpful to the dev to know what's going in isn't what's expected
+/**
+ * Utility function to detect if the argument passed
+ * is an array or not. Throws an error if it is NOT an array.
+ *
+ * @param  {Array?} arr Object to determine is an array
+ */
 function ensureArray(arr) {
   if (arr && !(arr instanceof Array)) {
     throw new Error('cloneArrayValues was not given an array');
