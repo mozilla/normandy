@@ -216,8 +216,8 @@ export class DisconnectedRecipeList extends React.Component {
               {
                 displayedColumns.map((col, index) =>
                   <Th
-                    key={col.value + index}
-                    column={col.value}
+                    key={col.slug + index}
+                    column={col.slug}
                   >
                     <span>{col.label}</span>
                   </Th>
@@ -227,7 +227,7 @@ export class DisconnectedRecipeList extends React.Component {
             {filteredRecipes.map(recipe =>
               <Tr
                 key={recipe.id}
-                onClick={() => { this.viewRecipe(recipe); }}
+                onClick={this.handleViewRecipe(recipe.id)}
               >
                 {
                   displayedColumns.map(this.renderTableCell(recipe))

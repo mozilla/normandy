@@ -29,6 +29,9 @@ class ColumnMenu extends React.Component {
     </span>
   );
 
+  /**
+   * Constructor
+   */
   constructor(props) {
     super(props);
     this.state = {};
@@ -42,7 +45,7 @@ class ColumnMenu extends React.Component {
    * and notifies the parent of what's selected
    *
    *
-   * @param  {String}  columnSlug   Slug of the column ('name', 'endTime', etc)
+   * @param  {String}  columnSlug  Value of the column ('name', 'endTime', etc)
    * @param  {Boolean} isActive     Is the column now active?
    * @return {void}
    */
@@ -65,7 +68,10 @@ class ColumnMenu extends React.Component {
         trigger={ColumnMenu.trigger}
       >
         <CheckboxList
-          options={columns}
+          options={columns.map(column => ({
+            ...column,
+            value: column.slug,
+          }))}
           onInputChange={this.handleColumnInput}
         />
       </DropdownMenu>
