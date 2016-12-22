@@ -170,7 +170,6 @@ function filtersReducer(state = initialState, action) {
         if (group.value === 'text') {
           wasFound = true;
 
-          console.log('wtf', group);
           // update it
           return formatGroup(group);
         }
