@@ -192,7 +192,7 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.name == 'changed'
         assert recipe.filter_expression == 'false'
-        assert recipe.revision_id == old_revision_id + 1
+        assert not recipe.revision_id == old_revision_id
 
     def test_creation_when_action_does_not_exist(self, api_client):
         res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
