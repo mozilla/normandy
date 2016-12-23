@@ -90,6 +90,14 @@ class Recipe(models.Model):
     def arguments_json(self):
         return self.latest_revision.arguments_json if self.latest_revision else None
 
+    @property
+    def arguments(self):
+        return self.latest_revision.arguments if self.latest_revision else None
+
+    @property
+    def revision_id(self):
+        return self.latest_revision.id if self.latest_revision else None
+
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
         data = RecipeSerializer(self).data

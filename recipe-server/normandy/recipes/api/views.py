@@ -70,14 +70,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         AdminEnabledOrReadOnly,
     ]
 
-    @reversion_transaction
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @reversion_transaction
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
     @list_route(methods=['GET'])
     def signed(self, request, pk=None):
         recipes = self.filter_queryset(self.get_queryset()).exclude(signature=None)
