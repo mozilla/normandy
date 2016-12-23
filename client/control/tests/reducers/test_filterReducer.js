@@ -6,9 +6,18 @@ import {
 } from 'control/tests/fixtures';
 
 /**
- * Column reducer tests
+ * Filter reducer tests
  */
 describe('Filter reducer', () => {
+  afterEach(() => {
+    // in the event that filters are 'loaded'
+    // we want to blank them out for each test
+    appReducer(undefined, {
+      type: actions.LOAD_FILTERS,
+      filters: [],
+    });
+  });
+
   it('should return initial state by default', () => {
     expect(appReducer(undefined, {})).toEqual({ ...initialState });
   });
