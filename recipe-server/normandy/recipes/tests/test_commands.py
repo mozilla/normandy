@@ -69,11 +69,8 @@ class TestUpdateActions(object):
         assert action.arguments_schema == {'type': 'int'}
 
     def test_it_doesnt_disable_recipes(self, mock_action):
-        recipe = RecipeFactory(
-            action__name='test-action',
-            action__implementation='old',
-            enabled=True
-        )
+        action = ActionFactory(name='test-action', implementation='old')
+        recipe = RecipeFactory(action=action, enabled=True)
         action = recipe.action
         mock_action(action.name, 'impl', action.arguments_schema)
 

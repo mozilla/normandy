@@ -42,6 +42,28 @@ class RecipeSerializer(serializers.ModelSerializer):
             'filter_expression',
         ]
 
+    def update(self, instance, validated_data):
+        if 'enabled' in validated_data:
+            instance.enabled = validated_data.pop('enabled')
+
+        instance.save()
+
+        if 'latest_revision' in validated_data:
+            if 'action' in validated_data['latest_revision']:
+                validated_data['latest_revision'].update({
+                    'action': Action.objects.get(name=validated_data['latest_revision']['action'])
+                })
+
+            instance.update(**validated_data['latest_revision'])
+
+        return instance
+
+    def create(self, validated_data):
+        recipe = Recipe.objects.create(enabled=validated_data.pop('enabled'))
+        recipe.save()
+
+        return self.update(recipe, validated_data)
+
     def validate_arguments(self, value):
         # Get the schema associated with the selected action
         try:
