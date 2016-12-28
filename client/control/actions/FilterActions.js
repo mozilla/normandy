@@ -1,26 +1,37 @@
+import makeApiRequest from 'control/api';
+
 import {
-  makeApiRequest,
-  recipesNeedFetch,
   recipesReceived,
-  filtersReceived,
-} from 'control/actions/ControlActions';
+  recipesNeedFetch,
+} from 'control/actions/RecipeActions';
 
 import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
-const LOAD_FILTERS = 'LOAD_FILTERS';
-const SET_FILTER = 'SET_FILTER';
-const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
-const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
+export const LOAD_FILTERS = 'LOAD_FILTERS';
+export const SET_FILTER = 'SET_FILTER';
+export const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
+export const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
 
+
+/**
+ *
+ * @param  {[type]} filters [description]
+ */
+export function filtersReceived(filters) {
+  return {
+    type: LOAD_FILTERS,
+    filters,
+  };
+}
 
 /**
  * Load list of possible filters from remote API.
  * This is stored in the `filters` reducer, and
  * later used to populate relevant RecipeFilters components.
  */
-function loadFilters() {
+export function loadFilters() {
   return dispatch =>
     dispatch(makeApiRequest('fetchFilters'))
       .then(recipes => dispatch(filtersReceived(recipes)));
@@ -34,7 +45,7 @@ function loadFilters() {
  * @param  {Object}  option    Option that was affected
  * @param  {Boolean} isEnabled Is the option selected?
  */
-function selectFilter({ group, option, isEnabled }) {
+export function selectFilter({ group, option, isEnabled }) {
   return dispatch => {
     dispatch({
       type: group.value === 'text' ? SET_TEXT_FILTER : SET_FILTER,
@@ -50,7 +61,7 @@ function selectFilter({ group, option, isEnabled }) {
  * Detects activated filters, creates the URL param string,
  * and queries API for a filtered list based on params.
  */
-function loadFilteredRecipes() {
+export function loadFilteredRecipes() {
   return (dispatch, getState) => {
     dispatch(recipesNeedFetch());
 
@@ -77,7 +88,7 @@ function loadFilteredRecipes() {
  *
  * @param {Array} filters Filter state to set (optional)
  */
-function setAllFilters(filters) {
+export function setAllFilters(filters) {
   return dispatch => {
     dispatch({
       type: SET_ALL_FILTERS,
@@ -93,21 +104,6 @@ function setAllFilters(filters) {
  *
  * @return {Function} Result of FilterActions#setAllFilters
  */
-function resetFilters() {
+export function resetFilters() {
   return setAllFilters();
 }
-
-// Exports
-export {
-  // action constants
-  SET_FILTER,
-  SET_ALL_FILTERS,
-  SET_TEXT_FILTER,
-  LOAD_FILTERS,
-  // action functions
-  loadFilters,
-  selectFilter,
-  setAllFilters,
-  resetFilters,
-  loadFilteredRecipes,
-};

@@ -2,8 +2,9 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 
+import { API_REQUEST_SETTINGS } from 'control/api';
 import { initialState } from 'control/tests/fixtures';
-import { API_REQUEST_SETTINGS } from 'control/actions/ControlActions';
+
 import * as filterActions from 'control/actions/FilterActions';
 import { getFilterParamString } from 'control/selectors/FiltersSelector';
 
