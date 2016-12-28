@@ -6,6 +6,9 @@ export const RECIPE_DELETED = 'RECIPE_DELETED';
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 export const RECIPES_NEED_FETCH = 'RECIPES_NEED_FETCH';
 
+/**
+ * Dispatched events
+ */
 export function recipesNeedFetch() {
   return {
     type: RECIPES_NEED_FETCH,

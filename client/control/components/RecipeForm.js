@@ -21,7 +21,7 @@ import {
 
 import {
   showNotification,
-} from 'control/actions/ControlActions';
+} from 'control/actions/NotificationActions';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';

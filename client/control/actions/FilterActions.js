@@ -9,16 +9,15 @@ import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
+/**
+ * Action constants
+ */
 export const LOAD_FILTERS = 'LOAD_FILTERS';
 export const SET_FILTER = 'SET_FILTER';
 export const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
 export const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
 
 
-/**
- *
- * @param  {[type]} filters [description]
- */
 export function filtersReceived(filters) {
   return {
     type: LOAD_FILTERS,

@@ -14,8 +14,8 @@ import notificationReducer from 'control/reducers/NotificationReducer';
 export default combineReducers({
   controlApp: controlAppReducer,
   recipes: recipesReducer,
-  filters: filtersReducer,
   columns: columnReducer,
+  filters: filtersReducer,
   notifications: notificationReducer,
   form: formReducer,
   routing: routerReducer,
