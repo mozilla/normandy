@@ -229,8 +229,10 @@ class Action(models.Model):
 class Client(object):
     """A client attempting to fetch a set of recipes."""
 
-    def __init__(self, request=None):
+    def __init__(self, request=None, **kwargs):
         self.request = request
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     @cached_property
     def country(self):
