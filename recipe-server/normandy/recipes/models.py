@@ -3,11 +3,12 @@ import json
 import logging
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from dirtyfields import DirtyFieldsMixin
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
@@ -53,7 +54,7 @@ class RecipeQuerySet(models.QuerySet):
             recipe.save()
 
 
-class Recipe(models.Model):
+class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
     objects = RecipeQuerySet.as_manager()
 
@@ -98,6 +99,10 @@ class Recipe(models.Model):
     def revision_id(self):
         return self.latest_revision.id if self.latest_revision else None
 
+    @property
+    def last_updated(self):
+        return self.latest_revision.updated if self.latest_revision else None
+
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
         data = RecipeSerializer(self).data
@@ -130,13 +135,27 @@ class Recipe(models.Model):
         if not is_clean or force:
             self.latest_revision = RecipeRevision.objects.create(
                 recipe=self, parent=self.latest_revision, **data)
+            self.save()
 
             try:
                 self.update_signature()
             except ImproperlyConfigured:
-                pass
+                self.signature = None
+            finally:
+                self.save()
 
-            self.save()
+    def save(self, *args, **kwargs):
+        if self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+            dirty_field_names = list(dirty_fields.keys())
+
+            if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
+                    and self.signature is not None):
+                # Setting the signature while also changing something else is probably
+                # going to make the signature immediately invalid. Don't allow it.
+                raise ValidationError('Signatures must change alone')
+
+        super().save(*args, **kwargs)
 
 
 class RecipeRevision(models.Model):
@@ -151,7 +170,7 @@ class RecipeRevision(models.Model):
     comment = models.TextField()
 
     name = models.CharField(max_length=255)
-    action = models.ForeignKey('Action')
+    action = models.ForeignKey('Action', related_name='recipe_revisions')
     arguments_json = models.TextField(default='{}', validators=[validate_json])
     filter_expression = models.TextField(blank=False)
 
@@ -213,7 +232,9 @@ class Action(models.Model):
     @property
     def recipes_used_by(self):
         """Set of enabled recipes that are using this action."""
-        return self.recipe_set.filter(enabled=True)
+        return Recipe.objects.filter(
+            latest_revision_id__in=self.recipe_revisions.values_list('id', flat=True),
+            enabled=True)
 
     def __str__(self):
         return self.name
