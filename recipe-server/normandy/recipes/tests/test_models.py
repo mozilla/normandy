@@ -36,18 +36,7 @@ class TestAction(object):
 
 @pytest.mark.django_db
 class TestRecipe(object):
-    def test_revision_id_increments(self):
-        """Ensure that the revision id is incremented on each save"""
-        recipe = RecipeFactory()
-
-        # The factory saves a couple times so revision id is not 0
-        revision_id = recipe.revision_id
-
-        recipe.action = ActionFactory()
-        recipe.save()
-        assert recipe.revision_id == revision_id + 1
-
-    def test_revision_id_doesnt_increment_if_no_changes(self):
+    def test_revision_id_doesnt_change_if_no_changes(self):
         """
         revision_id should not increment if a recipe is saved with no
         changes.
@@ -60,32 +49,14 @@ class TestRecipe(object):
         recipe.save()
         assert recipe.revision_id == revision_id
 
-    def test_skip_last_updated(self):
-        # set last_updated to avoid timestamp precision problems
-        recipe = RecipeFactory(name='one', last_updated=datetime.now() - timedelta(30))
-        last_updated_1 = recipe.last_updated
-
-        recipe.name = 'two'
-        recipe.save()
-        last_updated_2 = recipe.last_updated
-
-        recipe.name = 'three'
-        recipe.save(skip_last_updated=True)
-        last_updated_3 = recipe.last_updated
-
-        assert last_updated_1 != last_updated_2
-        assert last_updated_2 == last_updated_3
-
     def test_canonical_json(self):
-        recipe = RecipeFactory.build(
+        recipe = RecipeFactory(
             action=ActionFactory(name='action'),
-            arguments={'foo': 1, 'bar': 2},
+            arguments_json='{"foo": 1, "bar": 2}',
             enabled=False,
             filter_expression='2 + 2 == 4',
             name='canonical',
-            last_updated=datetime(2016, 6, 27, 13, 54, 51, 1234, tzinfo=timezone.utc),
         )
-        recipe.save(skip_last_updated=True)
         # Yes, this is really ugly, but we really do need to compare an exact
         # byte sequence, since this is used for hashing and signing
         expected = (
@@ -95,14 +66,14 @@ class TestRecipe(object):
             '"enabled":false,'
             '"filter_expression":"2 + 2 == 4",'
             '"id":%(id)s,'
-            '"is_approved":false,'
-            '"last_updated":"2016-06-27T13:54:51.001234Z",'
+            '"last_updated":"%(last_updated)s",'
             '"name":"canonical",'
-            '"revision_id":%(revision_id)s'
+            '"revision_id":"%(revision_id)s"'
             '}'
         ) % {
             'id': recipe.id,
             'revision_id': recipe.revision_id,
+            'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         }
         expected = expected.encode()
         assert recipe.canonical_json() == expected
@@ -117,8 +88,7 @@ class TestRecipe(object):
         original_signature = recipe.signature
         assert original_signature is not None
 
-        recipe.name = 'changed'
-        recipe.save()
+        recipe.update(name='changed')
 
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
@@ -132,8 +102,7 @@ class TestRecipe(object):
 
         recipe = RecipeFactory(name='unchanged', signed=True)
         original_signature = recipe.signature
-        recipe.name = 'changed'
-        recipe.save()
+        recipe.update(name='changed')
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
         assert recipe.signature is None
@@ -149,9 +118,8 @@ class TestRecipe(object):
     def test_cant_change_signature_and_other_fields(self):
         recipe = RecipeFactory(name='unchanged', signed=False)
         recipe.signature = SignatureFactory()
-        recipe.name = 'changed'
         with pytest.raises(ValidationError) as exc_info:
-            recipe.save()
+            recipe.update(name='changed')
         assert exc_info.value.message == 'Signatures must change alone'
 
     def test_update_signature(self, mocker):
