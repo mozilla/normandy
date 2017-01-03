@@ -5,10 +5,14 @@ Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 
 add_task(function* () {
   // Point the add-on to the test server.
-  SpecialPowers.setCharPref(
-    "extensions.shield-recipe-client.api_url",
-    "http://mochi.test:8888/browser/browser/extensions/shield-recipe-client/test",
-  );
+  yield SpecialPowers.pushPrefEnv({
+    set: [
+      [
+        "extensions.shield-recipe-client.api_url",
+        "http://mochi.test:8888/browser/browser/extensions/shield-recipe-client/test",
+      ]
+    ]
+  })
 
   // Test that NormandyApi can fetch from the test server.
   const response = yield NormandyApi.get("test_server.sjs");
