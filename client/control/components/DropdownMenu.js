@@ -154,8 +154,6 @@ export default class DropdownMenu extends React.Component {
           onFocus={this.props.useFocus && this.enableVisibility}
           onChange={this.props.useFocus && this.enableVisibility}
           onKeyDown={this.props.useFocus && this.enableVisibility}
-
-          onBlur={this.props.useFocus && this.disableVisibility}
         >
           { this.props.trigger }
         </div>
