@@ -5,7 +5,7 @@ import * as localForage from 'localforage';
 import { initialState } from 'control/tests/fixtures';
 import * as columnActions from 'control/actions/ColumnActions';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);

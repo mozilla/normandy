@@ -6,7 +6,7 @@ import React, { PropTypes as pt } from 'react';
  *
  * @prop {Function} onInputChange
  *   Fires when user has changed a checkbox, with
- *   params (Item value/slug, Checkbox 'checked' status)
+ *   params (Item index, Checkbox 'checked' status)
  *
  * @prop {Array<Object>} options
  *   List of options to be made into checkboxes, shaped as:
@@ -35,19 +35,19 @@ export default class CheckboxList extends React.Component {
    * returns an event handler that calls the
    * onInputChange prop.
    *
-   * @param  {string}   boxValue Checkbox value which updated
+   * @param  {string}   colValue Checkbox value which updated
    * @return {Function}          Wrapped handler
    */
-  handleCheckboxChange(boxValue) {
+  handleCheckboxChange(colValue) {
     // check if an existing event handler exists
-    if (!this.handlerCache[boxValue]) {
-      // if not, create it with the boxValue given
-      this.handlerCache[boxValue] = evt =>
-        this.props.onInputChange(boxValue, evt.target.checked);
+    if (!this.handlerCache[colValue]) {
+      // if not, create it with the colValue given
+      this.handlerCache[colValue] = evt =>
+        this.props.onInputChange(colValue, evt.target.checked);
     }
 
     // return the handling function
-    return this.handlerCache[boxValue];
+    return this.handlerCache[colValue];
   }
 
   /**

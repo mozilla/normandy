@@ -1,6 +1,7 @@
 import {
-  SHOW_NOTIFICATION, DISMISS_NOTIFICATION,
-} from 'control/actions/ControlActions';
+  SHOW_NOTIFICATION,
+  DISMISS_NOTIFICATION,
+} from 'control/actions/NotificationActions';
 
 const initialState = [];
 

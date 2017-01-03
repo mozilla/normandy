@@ -1,7 +1,11 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
-import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
-  from 'control/actions/ControlActions';
+import {
+  singleRecipeReceived,
+  setSelectedRecipe,
+} from 'control/actions/RecipeActions';
+
+import makeApiRequest from 'control/api';
 
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {

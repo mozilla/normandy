@@ -1,9 +1,9 @@
 import * as localForage from 'localforage';
 
-const UPDATE_COLUMN = 'UPDATE_COLUMN';
-const LOAD_SAVED_COLUMNS = 'LOAD_SAVED_COLUMNS';
+export const UPDATE_COLUMN = 'UPDATE_COLUMN';
+export const LOAD_SAVED_COLUMNS = 'LOAD_SAVED_COLUMNS';
 
-function updateColumn({ slug, isActive }) {
+export function updateColumn({ slug, isActive }) {
   return dispatch => {
     dispatch({
       type: UPDATE_COLUMN,
@@ -13,9 +13,10 @@ function updateColumn({ slug, isActive }) {
   };
 }
 
-const localStorageID = 'columns';
+// Exported for testing purposes
+export const localStorageID = 'columns';
 
-function loadLocalColumns() {
+export function loadLocalColumns() {
   return dispatch =>
     // load the column settings the user last used
     localForage
@@ -37,20 +38,6 @@ function loadLocalColumns() {
  * @param  {Array}     state    Filter state
  * @return {void}
  */
-async function saveLocalColumns(state) {
+export async function saveLocalColumns(state) {
   await localForage.setItem(localStorageID, state);
 }
-
-
-// Exports
-export {
-  // used for testing
-  localStorageID,
-  // action constants
-  UPDATE_COLUMN,
-  LOAD_SAVED_COLUMNS,
-  // actions
-  updateColumn,
-  loadLocalColumns,
-  saveLocalColumns,
-};

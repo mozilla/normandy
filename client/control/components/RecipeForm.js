@@ -11,13 +11,18 @@ import {
 } from 'redux-form';
 import { pick } from 'underscore';
 
+import makeApiRequest from 'control/api';
+
 import {
-  makeApiRequest,
   recipeUpdated,
   recipeAdded,
-  showNotification,
   setSelectedRecipe,
-} from 'control/actions/ControlActions';
+} from 'control/actions/RecipeActions';
+
+import {
+  showNotification,
+} from 'control/actions/NotificationActions';
+
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';

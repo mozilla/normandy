@@ -3,7 +3,7 @@ import { push } from 'react-router-redux';
 import moment from 'moment';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
-import { makeApiRequest } from 'control/actions/ControlActions';
+import makeApiRequest from 'control/api';
 
 export class DisconnectedRecipeHistory extends React.Component {
   static propTypes = {
