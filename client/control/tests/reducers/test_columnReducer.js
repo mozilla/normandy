@@ -5,7 +5,7 @@ import {
   initialState,
 } from 'control/tests/fixtures';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 /**
  * Utility function to clone the initialState column array and its values
@@ -100,12 +100,12 @@ describe('Column reducer', () => {
 
 
   describe('handling LOAD_SAVED_COLUMNS', () => {
-    // when loading, the values/labels are compared against what's
+    // when loading, the slugs/labels are compared against what's
     // inside initial state - this prevents the user loading outdated columns
     it('should ignore an action with unrecognized columns', () => {
       const newColumns = [{
         label: 'This column doesnt exist',
-        value: 'so it should fail',
+        slug: 'so it should fail',
       }];
 
       // expect the columns to remain the default
@@ -115,7 +115,7 @@ describe('Column reducer', () => {
       })).toEqual(initialState);
     });
 
-    it('should set the column state if column labels/values match', () => {
+    it('should set the column state if column labels/slugs match', () => {
       // after checking values/labels, the column state should be updated
       // with whatever column set is passed in
       const expectedState = cloneInitialArray()

@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
 
+import cloneArrayValues from 'client/utils/clone-array';
+
 import {
   makeApiRequest,
   recipesReceived,
@@ -12,6 +14,10 @@ import {
 import {
   getActiveColumns,
 } from 'control/selectors/ColumnSelector';
+
+import {
+  getCachedRecipes,
+} from 'control/selectors/RecipeSelector';
 
 import RecipeFilters from 'control/components/RecipeFilters';
 
@@ -30,6 +36,7 @@ class DisconnectedRecipeList extends React.Component {
     isFetching: pt.bool.isRequired,
     recipeListNeedsFetch: pt.bool.isRequired,
     recipes: pt.array.isRequired,
+    recipeList: pt.array.isRequired,
     displayedColumns: pt.array.isRequired,
   };
 
@@ -46,7 +53,7 @@ class DisconnectedRecipeList extends React.Component {
   /**
    * Given a recipe object, determines what type of recipe it is (based on its `action`),
    * and then compiles an array of 'displayed metadata props' and their values. This array
-   * is saved on the recipe as `metadata`, and displayed in the 'metadata'
+   * is saved on the recipe as `metadata`, and displayed in the 'metadata' column.
    *
    * Beyond that, a string of metadata values is created, and attached to the
    * recipe as the `searchData` property. This is used by the `Table` component
@@ -88,16 +95,11 @@ class DisconnectedRecipeList extends React.Component {
     return newRecipe;
   }
 
-
   constructor(props) {
     super(props);
-    this.state = {
-      searchText: '',
-    };
-
+    this.state = {};
     this.handlerCache = {};
 
-    this.handleSearchChange = ::this.handleSearchChange;
     this.handleViewRecipe = ::this.handleViewRecipe;
   }
 
@@ -109,12 +111,6 @@ class DisconnectedRecipeList extends React.Component {
       dispatch(makeApiRequest('fetchAllRecipes', {}))
       .then(recipes => dispatch(recipesReceived(recipes)));
     }
-  }
-
-  handleSearchChange(event) {
-    this.setState({
-      searchText: event.target.value || '',
-    });
   }
 
   /**
@@ -182,31 +178,36 @@ class DisconnectedRecipeList extends React.Component {
   render() {
     const {
       recipes,
+      recipeList,
       displayedColumns,
+      recipeListNeedsFetch,
     } = this.props;
 
-    const {
-      searchText,
-    } = this.state;
-
-    const filteredRecipes = (this.state.filteredRecipes || recipes)
+    const filteredRecipes = cloneArrayValues(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
+
+    const noResults = filteredRecipes.length > 0;
 
     return (
       <div>
         <RecipeFilters
-          {...this.state}
           displayCount={filteredRecipes.length}
-          totalCount={recipes.length}
-          onSearchChange={this.handleSearchChange}
+          totalCount={recipeList.length}
         />
         <div className="fluid-8">
+          {
+            !noResults && recipeListNeedsFetch &&
+              <div
+                className="loading callout"
+                children={'Loading...'}
+              />
+          }
+
           <Table
             className="recipe-list"
             sortable
             hideFilterInput
             filterable={['name', 'action', 'metadata']}
-            filterBy={searchText}
           >
             <Thead>
               {
@@ -238,10 +239,11 @@ class DisconnectedRecipeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+  recipes: getCachedRecipes(state.recipes, state.filters),
+  recipeList: state.recipes.list,
   dispatch: ownProps.dispatch,
-  isFetching: state.controlApp.isFetching,
-  recipes: state.recipes.list || [],
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
+  isFetching: state.controlApp.isFetching,
   displayedColumns: getActiveColumns(state.columns),
 });
 

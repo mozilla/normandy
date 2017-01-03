@@ -1,7 +1,7 @@
 import { initialState } from 'control/tests/fixtures';
 import * as columnSelectors from 'control/selectors/ColumnSelector';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
+import cloneArrayValues from 'client/utils/clone-array';
 
 
 describe('Column Selectors', () => {
@@ -16,7 +16,7 @@ describe('Column Selectors', () => {
           return col;
         });
 
-      // compare the values that are returned
+      // compare the slugs that are returned
       const active = columnSelectors
         .getActiveColumns(testColumns)
         .map(col => col.slug);

@@ -10,6 +10,7 @@ export const initialState = {
   },
   recipes: {
     list: [],
+    cache: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },
@@ -52,6 +53,7 @@ export const initialState = {
     slug: 'metadata',
     enabled: true,
   }],
+  filters: [],
   notifications: [],
   form: {},
   routing: {
