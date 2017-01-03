@@ -1,6 +1,6 @@
-import json
-
 from rest_framework import renderers
+
+from normandy.base.utils import canonical_json_dumps
 
 
 class TextRenderer(renderers.BaseRenderer):
@@ -32,7 +32,7 @@ class CanonicalJSONRenderer(renderers.BaseRenderer):
     charset = None
 
     def render(self, data, media_type=None, renderer_context=None):
-        return json.dumps(data, ensure_ascii=True, separators=(',', ':'), sort_keys=True).encode()
+        return canonical_json_dumps(data).encode()
 
 
 class CustomBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):

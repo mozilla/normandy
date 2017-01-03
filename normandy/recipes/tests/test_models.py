@@ -242,3 +242,10 @@ class TestClient(object):
         with patch('normandy.recipes.models.get_country_code') as get_country_code:
             assert client.country == get_country_code.return_value
             assert get_country_code.called_with('1.1.1.1')
+
+    def test_initial_values(self, rf):
+        """Ensure that computed properties can be overridden."""
+        req = rf.post('/', X_FORWARDED_FOR='fake, 1.1.1.1', REMOTE_ADDR='2.2.2.2')
+        client = Client(req, country='FAKE', request_time='FAKE')
+        assert client.country == 'FAKE'
+        assert client.request_time == 'FAKE'

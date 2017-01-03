@@ -1,5 +1,7 @@
 import hashlib
 
+from django.utils import timezone
+
 import factory
 
 from normandy.base.tests import FuzzyUnicode, UserFactory
@@ -8,6 +10,7 @@ from normandy.recipes.models import (
     Approval,
     ApprovalRequest,
     ApprovalRequestComment,
+    Client,
     Recipe,
     Signature,
 )
@@ -107,6 +110,14 @@ class SignatureFactory(factory.DjangoModelFactory):
     signature = factory.LazyAttribute(lambda o: hashlib.sha256(o.data).hexdigest())
     public_key = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
     x5u = 'https://example.com/fake.x5u'
+
+
+class ClientFactory(factory.Factory):
+    class Meta:
+        model = Client
+
+    country = 'US'
+    request_time = factory.LazyAttribute(lambda o: timezone.now)
 
 
 ARGUMENTS_SCHEMA = {

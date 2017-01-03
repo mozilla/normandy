@@ -1,4 +1,6 @@
-from normandy.base.utils import get_client_ip
+import json
+
+from normandy.base.utils import canonical_json_dumps, get_client_ip
 
 
 class TestGetClientIp(object):
@@ -33,3 +35,19 @@ class TestGetClientIp(object):
         forwarded_for = ', '.join(['fake', client_ip, elb_ip])
         req = rf.get('/', HTTP_X_FORWARDED_FOR=forwarded_for, REMOTE_ADDR=nginx_ip)
         assert get_client_ip(req) == client_ip
+
+
+class TestCanonicalJsonDumps(object):
+    def test_it_works(self):
+        data = {'a': 1, 'b': 2}
+        assert canonical_json_dumps(data) == '{"a":1,"b":2}'
+
+    def test_it_works_with_euro_signs(self):
+        data = {'USD': '$', 'EURO': '€'}
+        assert canonical_json_dumps(data) == r'{"EURO":"\u20ac","USD":"$"}'
+
+    def test_it_escapes_quotes_properly(self):
+        data = {'message': 'It "works", I think'}
+        dumped = canonical_json_dumps(data)
+        assert dumped == r'{"message":"It \"works\", I think"}'
+        json.loads(dumped)

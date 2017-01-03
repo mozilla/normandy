@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
@@ -46,3 +47,7 @@ def get_client_ip(request):
             return ips[-settings.NUM_PROXIES]
         except IndexError:
             return None
+
+
+def canonical_json_dumps(data):
+    return json.dumps(data, ensure_ascii=True, separators=(',', ':'), sort_keys=True)
