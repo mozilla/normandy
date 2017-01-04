@@ -4,5 +4,5 @@ function handleRequest(request, response) {
   // Avoid confusing cache behaviors
   response.setHeader("Cache-Control", "no-cache", false);
   response.setHeader("Content-Type", "application/json", false);
-  response.write("{\"test\":\"data\"}");
+  response.write(JSON.stringify({test: "data"}))
 }
