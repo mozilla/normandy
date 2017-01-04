@@ -25,5 +25,5 @@ add_task(function*() {
   `;
 
   const result = yield RecipeRunner.executeAction(recipe, {}, actionScript);
-  is(result, "bar", "Recipe was not executed.");
+  is(result, "bar", "Recipe executed correctly");
 });

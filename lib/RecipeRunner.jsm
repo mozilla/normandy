@@ -147,11 +147,9 @@ this.RecipeRunner = {
       const sandboxManager = new SandboxManager();
       const {sandbox} = sandboxManager;
       const prepScript = `
-        var pendingAction = null;
-
         function registerAction(name, Action) {
           let a = new Action(sandboxedDriver, sandboxedRecipe);
-          pendingAction = a.execute()
+          a.execute()
             .then(actionFinished)
             .catch(err => sandboxedDriver.log(err, 'error'));
         };
