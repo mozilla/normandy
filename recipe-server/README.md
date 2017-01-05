@@ -1,19 +1,10 @@
-# Normandy
+# Recipe Server
 
-Normandy is the server-side implementation of the [Recipe Server][]. It serves
-bundles of JavaScript to various clients (Firefox browsers) based on certain
-rules.
-
-[![CircleCI](https://img.shields.io/circleci/project/mozilla/normandy/master.svg?maxAge=2592000&label=CI)](https://circleci.com/gh/mozilla/normandy/tree/master)
-[![Requires.io](https://img.shields.io/requires/github/mozilla/normandy.svg?maxAge=2592000&label=PyPI)](https://requires.io/github/mozilla/normandy/requirements/?branch=master)
-[![David](https://img.shields.io/david/mozilla/normandy.svg?maxAge=2592000&label=NPM)](https://david-dm.org/mozilla/normandy)
+The Recipce Server serves bundles of JavaScript to various clients (Firefox
+browsers) based on certain rules.
 
 [Recipe Server]: https://wiki.mozilla.org/Firefox/Recipe_Server
 
-## Documentation
-
-Developer documentation for the service can be found at
-http://normandy.readthedocs.org/.
 
 # License
 

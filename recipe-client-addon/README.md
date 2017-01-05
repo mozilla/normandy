@@ -1,8 +1,14 @@
-# Recipe Client [![CircleCI](https://img.shields.io/circleci/project/mozilla/normandy-addon.svg)](https://circleci.com/gh/mozilla/normandy-addon/tree/master)
+# Recipe Client
 
-Client to download and run recipes from [Normandy](https://github.com/mozilla/normandy).
+Client to download and run recipes from [Normandy Recipe Server][server].
+
+[server](https://github.com/mozilla/normandy)
 
 # Development
+
+Currently this add-on is only designed to run in the context of a system
+add-on. That means you need a full checkout of mozilla-central, and must build
+Firefox. This will change soon.
 
 To install requirements:
 
@@ -10,26 +16,22 @@ To install requirements:
 $ npm install
 ```
 
-To build the addon:
+To build the add-on into mozilla-central
 
 ```bash
-$ npm run build
+$ ./bin/update-mozilla-central.sh path/to/mozilla-central
 ```
 
-This will create `recipe-client.xpi`, which you can install in Firefox.
+This will populate `browser/extensions/shield-recipe-client`.
 
-For hacking on the addon, consider using [`jpm post`][].
+# Preferences
 
-[`jpm post`]: https://www.npmjs.com/package/jpm#using-post-and-watchpost
+The preference `extensions.shield-recipe-client.api_url` is read to contact a
+recipe server. The default is the production instance. It can be changed for
+local development or testing. It must be a HTTPS url.
 
-# Normandy
-
-The preference `extensions.recipeclient.api_url` is read to contact a Normandy
-server. There is no default yet. It should be set to something like
-`https://localhost:8443/api/v1/`.
-
-The easiest way to run a Normandy server locally is using [normandy-compose][].
-This uses a development mode key for signing, which has a root hash of 
+The easiest way to run a Normandy server locally is using [compose][].
+This uses a development mode key for signing, which has a root hash of
 
 ```
 4C:35:B1:C3:E3:12:D9:55:E7:78:ED:D0:A7:E7:8A:38:83:04:EF:01:BF:FA:03:29:B2:46:9F:3C:C5:EC:36:04
@@ -38,10 +40,4 @@ This uses a development mode key for signing, which has a root hash of
 Set the pref `security.content.signature.root_hash` to this value to mark the
 key used by the normandy-compose server as trusted.
 
-[normandy-compose]: https://github.com/mozilla/normandy-compose
-
-# Bugs
-
-Bugs can be field in [the Normandy product on Bugzilla][normandy-bugs].
-
-[normandy-bugs]: https://bugzilla.mozilla.org/buglist.cgi?quicksearch=product%3ANormandy
+[compose]: https://github.com/mozilla/normandy/tree/master/compose
