@@ -8,6 +8,8 @@ actions:
     include:
       - "*.js"
       - "*.jsx"
+    exclude:
+      - ".eslintrc.js"
   stylelint:
     run: stylelint {files}
     include:

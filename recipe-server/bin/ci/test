@@ -14,6 +14,7 @@ echo "Running JS tests"
 ) &
 echo "* Starting Karma server"
 bin/ci/docker-run.sh --user root -e NODE_ENV=production -p 9876:9876 node bin/ci/karma-ci.js
+pkill firefox
 
 echo "Running contract tests"
 # Set up the app, run it, and run tests against it

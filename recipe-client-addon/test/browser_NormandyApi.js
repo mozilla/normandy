@@ -10,9 +10,9 @@ add_task(function* () {
       [
         "extensions.shield-recipe-client.api_url",
         "http://mochi.test:8888/browser/browser/extensions/shield-recipe-client/test",
-      ]
-    ]
-  })
+      ],
+    ],
+  });
 
   // Test that NormandyApi can fetch from the test server.
   const response = yield NormandyApi.get("test_server.sjs");
