@@ -1,0 +1,12 @@
+.cache
+.env*
+.floo*
+docs/_build
+GeoLite2-Country.mmdb
+media
+node_modules
+pip-cache
+site-packages
+venv
+webpack-stats.json
+webpack-stats-actions.json

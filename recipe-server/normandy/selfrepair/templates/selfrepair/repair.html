@@ -1,0 +1,17 @@
+{% load staticfiles %}
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+<html lang="en"
+      data-locale="{{ locale }}"
+      data-recipe-url="{% url 'recipes:recipe-list' %}"
+      data-classify-url="{% url 'recipes:classify-client' %}"
+>
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" href="data:;base64,=">
+  </head>
+  <body>
+    {% render_bundle 'selfrepair' %}
+  </body>
+</html>

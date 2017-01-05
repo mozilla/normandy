@@ -1,0 +1,38 @@
+extends: airbnb
+parser: babel-eslint
+plugins:
+  - jasmine
+  - babel
+globals:
+  PRODUCTION: false
+  DEVELOPMENT: false
+rules:
+  arrow-parens: [off]
+  comma-dangle: [warn]
+  no-console: [off]
+  no-continue: [off]
+  no-mixed-operators: [warn, { allowSamePrecedence: true }]
+  no-param-reassign: [warn, { props: false }]
+  no-prototype-builtins: [off]
+  no-restricted-syntax: [off]
+  no-throw-literal: [off]
+  no-underscore-dangle: [off]
+  no-use-before-define: [warn, { functions: false }]
+  prefer-const: [warn]
+
+  babel/arrow-parens: [warn, as-needed]
+  import/no-extraneous-dependencies: [error, {devDependencies: true}]
+  import/no-mutable-exports: [off]
+  import/no-named-as-default: [off]
+  react/jsx-filename-extension: [error, { extensions: [.js] }]
+  react/no-multi-comp: [off]
+  react/require-extension: [off]  # deprecated
+  jsx-a11y/label-has-for: [off]
+
+  # generator-star-spacing is broken with parser: babel-eslint. Use a patched version
+  generator-star-spacing: [off]
+  babel/generator-star-spacing: [warn]
+settings:
+  import/resolver:
+    webpack:
+      config: 'webpack.config.js'

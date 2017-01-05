@@ -1,0 +1,53 @@
+$grid-columns: 8;
+
+@mixin border-box {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before {
+  @include border-box;
+
+  margin: 0;
+  padding: 0;
+}
+
+[class*='fluid-'],
+.fluid-base {
+  float: left;
+  min-height: 1px;
+  padding: 1em;
+  width: 100%;
+
+  &.float-right {
+    float: right;
+  }
+}
+
+%clearfix {
+  *zoom: 1;
+
+  &::before,
+  &::after {
+    content: " ";
+    display: table;
+  }
+
+  &::after {
+    clear: both;
+  }
+}
+
+.row,
+.wrapper {
+  @extend %clearfix;
+}
+
+@for $i from 1 through $grid-columns {
+  .fluid-#{$i} {
+    width: 100% / $grid-columns * $i;
+  }
+}

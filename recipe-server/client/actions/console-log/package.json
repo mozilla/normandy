@@ -1,0 +1,24 @@
+{
+    "name": "console-log",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./index.js",
+    "normandy": {
+        "driverVersion": "1.x",
+        "argumentsSchema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "title": "Log a message to the console",
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "description": "Message to log to the console",
+                    "type": "string",
+                    "default": ""
+                }
+            }
+        }
+    }
+}

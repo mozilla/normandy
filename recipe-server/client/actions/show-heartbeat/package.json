@@ -1,0 +1,62 @@
+{
+  "name": "show-heartbeat",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.js",
+  "normandy": {
+    "driverVersion": "1.x",
+    "argumentsSchema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "title": "Show a Heartbeat survey.",
+      "description": "This action shows a single survey.",
+
+      "type": "object",
+      "required": [
+        "surveyId",
+        "message",
+        "thanksMessage"
+      ],
+      "properties": {
+        "includeTelemetryUUID": {
+          "type": "boolean",
+          "description": "Include unique user ID in post-answer-url and Telemetry",
+          "default": false
+        },
+        "surveyId": {
+          "type": "string",
+          "description": "Slug uniquely identifying this survey in telemetry"
+        },
+        "message": {
+          "description": "Message to show to the user",
+          "type": "string",
+          "default": ""
+        },
+        "engagementButtonLabel": {
+          "description": "Text for the engagement button. If specified, this button will be shown instead of rating stars.",
+          "type": "string",
+          "default": ""
+        },
+        "thanksMessage": {
+          "description": "Thanks message to show to the user after they've rated Firefox",
+          "type": "string",
+          "default": ""
+        },
+        "postAnswerUrl": {
+          "description": "URL to redirect the user to after rating Firefox or clicking the engagement button",
+          "type": "string",
+          "default": ""
+        },
+        "learnMoreMessage": {
+          "description": "Message to show to the user to learn more",
+          "type": "string",
+          "default": ""
+        },
+        "learnMoreUrl": {
+          "description": "URL to show to the user when they click Learn More",
+          "type": "string",
+          "default": ""
+        }
+      }
+    }
+  }
+}

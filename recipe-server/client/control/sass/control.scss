@@ -1,0 +1,287 @@
+@import 'partials/common';
+@import 'components/CheckboxList';
+@import 'components/DropdownMenu';
+@import 'components/GroupMenu';
+
+/* Layout */
+#container { margin: 0 auto; }
+#content { background: #FFF; }
+
+#header {
+  color: $darkBrown;
+  line-height: 55px;
+
+  h1 {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 300;
+
+    a:link,
+    a:visited { color: $darkBrown; }
+  }
+
+  span {
+    float: right;
+    font-size: 11px;
+
+    a:link,
+    a:visited { font-weight: 600; }
+  }
+}
+
+
+#page-header {
+  background: $darkBrown;
+  display: flex;
+  position: relative;
+
+  h2 {
+    color: $cream;
+    flex: 1;
+    font: normal normal 300 20px/30px $SourceSansPro;
+    padding: 15px 30px;
+
+    a:link,
+    a:visited { color: $cream; }
+
+    .fa {
+      font-size: 15px;
+      margin: 0 5px;
+    }
+
+    span:last-child .fa {
+      display: none;
+    }
+  }
+
+  .button {
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    border-right: 1px solid rgba(0, 0, 0, 0.15);
+    height: 100%;
+    line-height: 40px;
+    min-width: 165px;
+  }
+}
+
+
+#secondary-header {
+  background-color: $secondaryColor;
+  border-top: 1px solid #FFF;
+  margin: 0 0 30px;
+  padding: 0;
+
+  .input-with-icon.search {
+    position: absolute;
+  }
+
+  #filters-container {
+    text-align: right;
+
+    > div {
+      display: inline-block;
+      float: right;
+      margin: 0 0 0 16px;
+    }
+  }
+}
+
+.header-search {
+  h3 {
+    color: $darkBrown;
+    display: inline-block;
+    float: left;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 15px;
+    padding: 0 15px;
+  }
+
+  h4 {
+    display: inline-block;
+    line-height: 35px;
+    margin: 0 0 0 35px;
+  }
+
+  input,
+  .switch {
+    background: rgba(0, 0, 0, 0.1);
+    border: 0;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+    font: normal normal 300 13px/22px $OpenSans;
+    min-width: 210px;
+    padding: 5px;
+    position: relative;
+
+    &[type='text'] { padding: 7px 14px; }
+  }
+}
+
+
+/* 404 NoMatch Page */
+.no-match {
+  padding: 30px 45px;
+
+  h2 {
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+}
+
+
+/* Add & Edit Forms */
+.recipe-form {
+  padding: 30px 45px;
+
+  &.loading {
+    text-align: center;
+  }
+
+  & > .form-field {
+    margin: 0 0 1em;
+    position: relative;
+    width: 50%;
+  }
+
+  .error {
+    color: $red;
+    display: block;
+    padding-bottom: 5px;
+  }
+
+  /* Checkbox inputs should appear to the left of the label. */
+  .checkbox-field {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+
+    input[type="checkbox"] {
+      flex: 0;
+      margin: 6px 6px 6px 0;
+    }
+  }
+
+
+  /* Action buttons (submit, delete, etc) */
+  .form-actions {
+    @extend %clearfix;
+
+    border-top: 1px solid $darkCream;
+    margin-top: 30px;
+    padding: 30px 15px 15px;
+
+    .delete {
+      background-color: $red;
+      display: inline-block;
+      float: left;
+
+      &:hover {
+        background-color: $redHover;
+      }
+    }
+
+    .submit {
+      display: inline-block;
+      float: right;
+    }
+  }
+}
+
+/* Action Forms */
+.arguments-fields {
+  background: $cream;
+  padding: 15px;
+  position: relative;
+
+  &::before {
+    border: solid;
+    border-color: $cream transparent;
+    border-width: 0 8px 8px;
+    content: "";
+    left: 15px;
+    position: absolute;
+    top: -8px;
+  }
+
+  .info {
+    color: $darkBrown;
+    margin: 0 0 1em;
+    width: 50%;
+  }
+}
+
+/* Recipe History */
+.recipe-history {
+  td {
+    text-align: left;
+  }
+
+  .revision-number {
+    font-weight: 600;
+
+    /* Force table cell to smallest width */
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .status-indicator {
+    margin: 0 20px; /* Reset .status-indicator margin */
+  }
+
+  .label {
+    padding: 0;
+  }
+}
+
+
+/* Login Page */
+.login {
+  padding: 100px 0;
+
+  #container { width: 28em; }
+  #header { display: none; }
+  #content { padding: 20px; }
+}
+
+/* Status Indicator */
+.status-indicator {
+  border: 1px solid;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 30px;
+  margin-top: 10px;
+  padding: 5px 15px;
+  text-transform: uppercase;
+
+  p {
+    line-height: 15px;
+    margin: 0 0 10px 20px;
+    text-transform: none;
+  }
+
+  code {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+/* Recipe List */
+.recipe-list {
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nested-list {
+    .nested-label {
+      font-weight: 800;
+    }
+  }
+
+  & + .callout {
+    margin: 2em 0 1em;
+  }
+}
