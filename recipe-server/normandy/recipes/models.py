@@ -137,13 +137,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 recipe=self, parent=self.latest_revision, **data)
             self.save()
 
-            try:
-                self.update_signature()
-            except ImproperlyConfigured:
-                self.signature = None
-            finally:
-                self.save()
-
     def save(self, *args, **kwargs):
         if self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
@@ -154,6 +147,15 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 # Setting the signature while also changing something else is probably
                 # going to make the signature immediately invalid. Don't allow it.
                 raise ValidationError('Signatures must change alone')
+
+            if dirty_field_names != ['signature']:
+                super().save(*args, **kwargs)
+                kwargs['force_insert'] = False
+
+                try:
+                    self.update_signature()
+                except ImproperlyConfigured:
+                    self.signature = None
 
         super().save(*args, **kwargs)
 

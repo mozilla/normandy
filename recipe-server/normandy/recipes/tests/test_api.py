@@ -1,14 +1,11 @@
 import hashlib
 from unittest.mock import patch
 
-from django.contrib.contenttypes.models import ContentType
-from django.db import connection, transaction
+from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
-from reversion import revisions as reversion
-from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import Whatever
@@ -17,7 +14,6 @@ from normandy.recipes.models import Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     RecipeFactory,
-    RecipeRevisionFactory
 )
 
 

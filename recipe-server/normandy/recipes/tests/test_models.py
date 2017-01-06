@@ -1,9 +1,7 @@
 import hashlib
-from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils import timezone
 
 import pytest
 
