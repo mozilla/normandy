@@ -147,9 +147,9 @@ class TestAutographer(object):
 class TestVerifySignature(object):
 
     # known good data
-    data = '{"action":"console-log","arguments":{"message":"telemetry available"},"enabled":true,"filter_expression":"telemetry != undefined","id":22,"last_updated":"2016-09-01T23:03:17.360536Z","name":"mythmon\'s system addon test","revision_id":2}'  # noqa
-    signature = 'sSyFLu0fY7mcrMwueJlvV9JV7XCrBUyEJCx08awzhPhGcUXEO7gC0gA15GLMbkHEfC1ekOoK0WGhQwMZgEMbT_QOQf4BqquG8C1zsjOpUEf7d38D4nyFA7Ow7gPNzYLQ'  # noqa
-    pubkey = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
+    data = '{"action":"console-log","arguments":{"message":"telemetry available"},"enabled":true,"filter_expression":"telemetry != undefined","id":1,"last_updated":"2017-01-02T11:32:07.687408Z","name":"mython\'s system addon test","revision_id":"6dc874ded7d14af9ef9c147c5d2ceef9d15b56ca933681e574cd96a50b75946e"}'  # noqa
+    signature = 'Prb0Jnb3icT0g_hZkgEyuzTlWrsTYrURXy6mzDTDh9WmqXdQBS05cV1mL1GUBbKIgcs02V8P1JvYR4LaJmSUvfZWYS66Jo8AdhcfEikoEZ0jvlLtiJDFxpT4eh2pk3XW'  # noqa
+    pubkey = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEVEKiCAIkwRg1VFsP8JOYdSF6a3qvgbRPoEK9eTuLbrB6QixozscKR4iWJ8ZOOX6RPCRgFdfVDoZqjFBFNJN9QtRBk0mVtHbnErx64d2vMF0oWencS1hyLW2whgOgOz7p'  # noqa
 
     def test_known_good_signature(self):
         assert verify_signature(self.data, self.signature, self.pubkey)
