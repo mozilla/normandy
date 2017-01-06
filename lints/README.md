@@ -1,11 +1,11 @@
 # Lints
 
-This is a unified linting tool for all Normandy project.
+This is a unified linting tool for all Normandy projects.
 
 # Usage
 
 The lints are run in a Docker container which sets up all tools needed. To
-provide the code to lint, mount it as a Docker volume at ``/app/code`. The
+provide the code to lint, mount it as a Docker volume at ``/app/code``. The
 default command for the Dockerfile is the lint tool.
 
 ```shell

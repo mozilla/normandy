@@ -1,6 +1,6 @@
 # Recipe Server
 
-The Recipce Server serves bundles of JavaScript to various clients (Firefox
+The Recipe Server serves bundles of JavaScript to various clients (Firefox
 browsers) based on certain rules.
 
 [Recipe Server]: https://wiki.mozilla.org/Firefox/Recipe_Server
