@@ -1,0 +1,16 @@
+.env
+db.sqlite3
+.DS_Store
+webpack-stats.json
+webpack-stats-actions.json
+__pycache__/
+/assets/
+/static/
+/media/
+GeoLite2-Country.mmdb
+_build
+/.cache/
+/etc/ssl
+/__version__/
+/tmp
+/node_modules

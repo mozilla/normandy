@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cd /app/code
+therapist run --use-tracked-files

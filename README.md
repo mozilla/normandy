@@ -1,8 +1,19 @@
 # Normandy
 
-Normandy is the server-side implementation of the [Recipe Server][]. It serves
-bundles of JavaScript to various clients (Firefox browsers) based on certain
-rules.
+Normandy is a collection of projects that provide a fast and accurate way to
+interact with unbiased subsets of Firefox users.
+
+This repo is a *monorepo*. It contains several projects, each represented by a
+top level directory:
+
+* recipe-server - Django server that manages and delivers recipes
+  efficiently and securely.
+* recipe-client-addon - Firefox system add-on to fetch, verify, and execute
+  recipes.
+* lints - Shared tools and configs for linting. (Each project may have separate
+  configs as well)
+* compose - Scripts and configurations to create multi-server environments for
+  development and testing.
 
 [![CircleCI](https://img.shields.io/circleci/project/mozilla/normandy/master.svg?maxAge=2592000&label=CI)](https://circleci.com/gh/mozilla/normandy/tree/master)
 [![Requires.io](https://img.shields.io/requires/github/mozilla/normandy.svg?maxAge=2592000&label=PyPI)](https://requires.io/github/mozilla/normandy/requirements/?branch=master)

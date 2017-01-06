@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -eu
+
+echo "Running lint tests"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../.. && pwd)"
+DOCKER_ARGS=( )
+
+if [[ -v CIRCLE_TEST_REPORTS ]]; then
+  DOCKER_ARGS+=(--volume $CIRCLE_TEST_REPORTS:/test_artifacts)
+fi
+
+docker run \
+  --net host \
+  --volume $REPO_DIR:/app/code \
+  "${DOCKER_ARGS[@]}" \
+  normandy-lint:build

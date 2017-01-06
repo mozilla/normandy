@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable no-var, prefer-template */
 var path = require('path');
 var karma = require('karma');
