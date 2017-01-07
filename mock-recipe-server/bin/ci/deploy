@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -eu
+
+./bin/upload.sh $MOCK_SERVER_ARTIFACTS $MOCK_SERVER_S3_BUCKET
