@@ -61,7 +61,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     latest_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
                                         related_name='latest_for_recipe')
 
-    # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
     signature = models.OneToOneField(Signature, related_name='recipe_revision', null=True,
                                      blank=True)
@@ -199,7 +198,7 @@ class RecipeRevision(models.Model):
         recipe.latest_revision = self
         return recipe
 
-    def save(self, *args, skip_updated=False, **kwargs):
+    def save(self, *args, **kwargs):
         if not self.created:
             self.created = timezone.now()
 
@@ -207,8 +206,7 @@ class RecipeRevision(models.Model):
                                      self.arguments_json, self.filter_expression)
         self.id = hashlib.sha256(data.encode()).hexdigest()
 
-        if not skip_updated:
-            self.updated = timezone.now()
+        self.updated = timezone.now()
 
         super().save(*args, **kwargs)
 
