@@ -21,13 +21,12 @@ class ActionSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     enabled = serializers.BooleanField(required=False)
-    last_updated = serializers.DateTimeField(source='latest_revision.updated', read_only=True)
+    last_updated = serializers.DateTimeField(read_only=True)
     revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
-    name = serializers.CharField(source='latest_revision.name')
-    action = serializers.SlugRelatedField(source='latest_revision.action', slug_field='name',
-                                          queryset=Action.objects.all())
-    arguments = serializers.JSONField(source='latest_revision.arguments')
-    filter_expression = serializers.CharField(source='latest_revision.filter_expression')
+    name = serializers.CharField()
+    action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
+    arguments = serializers.JSONField()
+    filter_expression = serializers.CharField()
 
     class Meta:
         model = Recipe
@@ -48,13 +47,12 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.save()
 
-        if 'latest_revision' in validated_data:
-            if 'action' in validated_data['latest_revision']:
-                validated_data['latest_revision'].update({
-                    'action': Action.objects.get(name=validated_data['latest_revision']['action'])
-                })
+        if 'action' in validated_data:
+            validated_data.update({
+                'action': Action.objects.get(name=validated_data['action'])
+            })
 
-            instance.update(**validated_data['latest_revision'])
+        instance.update(**validated_data)
 
         return instance
 
