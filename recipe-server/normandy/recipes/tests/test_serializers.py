@@ -92,18 +92,16 @@ class TestRecipeSerializer:
 
         assert serializer.is_valid()
         assert serializer.validated_data == {
+            'name': 'bar',
             'enabled': True,
-            'latest_revision': {
-                'name': 'bar',
-                'filter_expression': '[]',
-                'action': mockAction,
-                'arguments': {
-                    'surveyId': 'lorem-ipsum-dolor',
-                    'surveys': [
-                        {'title': 'adipscing', 'weight': 1},
-                        {'title': 'consequetar', 'weight': 1}
-                    ]
-                }
+            'filter_expression': '[]',
+            'action': mockAction,
+            'arguments': {
+                'surveyId': 'lorem-ipsum-dolor',
+                'surveys': [
+                    {'title': 'adipscing', 'weight': 1},
+                    {'title': 'consequetar', 'weight': 1}
+                ]
             }
         }
         assert serializer.errors == {}
