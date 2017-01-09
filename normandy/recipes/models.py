@@ -136,6 +136,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 recipe=self, parent=self.latest_revision, **data)
             self.save()
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         if self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
