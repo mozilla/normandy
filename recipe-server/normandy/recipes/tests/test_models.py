@@ -152,6 +152,29 @@ class TestRecipe(object):
         assert recipe.signature is not None
         assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
 
+    def test_recipe_update_partial(self):
+        a1 = ActionFactory()
+        recipe = RecipeFactory(name='unchanged', action=a1, arguments={'message': 'something'},
+                               filter_expression='something !== undefined')
+        a2 = ActionFactory()
+        recipe.update(name='changed', action=a2)
+        assert recipe.action == a2
+        assert recipe.name == 'changed'
+        assert recipe.arguments == {'message': 'something'}
+        assert recipe.filter_expression == 'something !== undefined'
+
+    def test_recipe_doesnt_update_when_clean(self):
+        recipe = RecipeFactory(name='my name')
+        revision_id = recipe.revision_id
+        recipe.update(name='my name')
+        assert revision_id == recipe.revision_id
+
+    def test_recipe_force_update(self):
+        recipe = RecipeFactory(name='my name')
+        revision_id = recipe.revision_id
+        recipe.update(name='my name', force=True)
+        assert revision_id != recipe.revision_id
+
 
 @pytest.mark.django_db
 class TestRecipeQueryset(object):
