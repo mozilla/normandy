@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import uuid from 'node-uuid';
+import cx from 'classnames';
 
 import closest from 'client/utils/closest';
 
@@ -137,33 +138,44 @@ export default class DropdownMenu extends React.Component {
     this.updateWindowBinding(newVisibleState);
   }
 
-  /**
-   * Render
-   */
+
   render() {
-    const pinClass = this.props.pinRight && 'pin-right';
+    const {
+      useClick,
+      useFocus,
+      trigger,
+      disabled,
+      children,
+    } = this.props;
+
+    const {
+      isVisible,
+    } = this.state;
+
+    const menuClass = cx('dropdown-menu', this.id);
+    const contentClass = cx('dropdown-content',
+      this.props.pinRight && 'pin-right');
 
     return (
       <div
-        className={`dropdown-menu ${this.id}`}
+        className={menuClass}
       >
         <div
           className="dropdown-trigger"
-          onClick={this.props.useClick && this.enableVisibility}
+          onClick={useClick && this.enableVisibility}
 
-          onFocus={this.props.useFocus && this.enableVisibility}
-          onChange={this.props.useFocus && this.enableVisibility}
-          onKeyDown={this.props.useFocus && this.enableVisibility}
+          onFocus={useFocus && this.enableVisibility}
+          onChange={useFocus && this.enableVisibility}
+          onKeyDown={useFocus && this.enableVisibility}
         >
-          { this.props.trigger }
+          { trigger }
         </div>
         {
-          !this.props.disabled &&
-          this.state.isVisible &&
+          !disabled && isVisible &&
             <div
-              className={`dropdown-content ${pinClass || ''}`}
+              className={contentClass}
             >
-              { this.props.children }
+              { children }
             </div>
         }
       </div>

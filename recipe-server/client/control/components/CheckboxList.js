@@ -50,9 +50,7 @@ export default class CheckboxList extends React.Component {
     return this.handlerCache[colValue];
   }
 
-  /**
-   * Render
-   */
+
   render() {
     const { options } = this.props;
     return (

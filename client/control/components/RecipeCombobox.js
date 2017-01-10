@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import cloneArrayValues from 'client/utils/clone-array';
+import removeProps from 'client/utils/remove-props';
 
 import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
@@ -14,24 +15,6 @@ export default class RecipeCombobox extends React.Component {
     availableFilters: pt.array.isRequired,
     onFilterSelect: pt.func.isRequired,
   };
-
-  /**
-   * Utility function to remove a set of properties
-   * from a given object.
-   *
-   * @param  {Object}         object Object to remove props form
-   * @param  {Array<string>}  list   List of properties to remove
-   * @return {Object}         New object without selected properties
-   */
-  static removeProperties(object, list) {
-    const newObject = { ...object };
-
-    list.forEach(property => {
-      delete newObject[property];
-    });
-
-    return newObject;
-  }
 
   /**
    * Constructor
@@ -63,12 +46,12 @@ export default class RecipeCombobox extends React.Component {
     return cloneArrayValues(groups).filter(group => {
       // remove 'meta' properties the user doesn't actually
       // want to search over
-      const groupProperties = RecipeCombobox.removeProperties(group,
+      const groupProperties = removeProps(group,
         ['value', 'selected', 'multiple']);
 
       // remove properties user doesnt care to search over
       groupProperties.options = groupProperties.options.map(option =>
-        RecipeCombobox.removeProperties(option, [
+        removeProps(option, [
           // if an option has a label,
           // remove the hidden value
           option.label ? 'value' : 'label',
@@ -136,9 +119,7 @@ export default class RecipeCombobox extends React.Component {
     return this.props.onFilterSelect(group, option);
   }
 
-  /**
-   * Render
-   */
+
   render() {
     const {
       availableFilters,

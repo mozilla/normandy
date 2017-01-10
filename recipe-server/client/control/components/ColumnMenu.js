@@ -56,9 +56,7 @@ class ColumnMenu extends React.Component {
     }));
   }
 
-  /**
-   * Render
-   */
+
   render() {
     const { columns } = this.props;
     return (

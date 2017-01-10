@@ -11,40 +11,35 @@
 import {
   LOAD_FILTERS,
   SET_FILTER,
-  SET_ALL_FILTERS,
+  RESET_FILTERS,
   SET_TEXT_FILTER,
 } from 'control/actions/FilterActions';
 
 import cloneArrayValues from 'client/utils/clone-array';
+import { capFirstLetter } from 'client/utils/string-man';
 
-function formatLabel(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function formatFilterOption(option) {
-  let label;
-  let value;
-
-  // string type = we were given just an option
-  // (no keyed value/label)
-  if (typeof option === 'string') {
-    value = option;
-    label = formatLabel(option);
-  // else if we get an object, then we
-  // can extract the key/value props
-  } else if (typeof option === 'object') {
-    label = option.value;
-    value = option.key;
-  }
-
-  return {
-    value,
-    label,
-  };
-}
+/**
+ * Utility to remove `selected` props from
+ * filter groups and their options.
+ *
+ * @param  {Array} filters  Array of filter groups + options
+ * @return {Array}          Array with de`select`ed groups + options
+ */
+const deleteSelects = filters =>
+  cloneArrayValues(filters || [])
+    .map(filter => {
+      delete filter.selected;
+      (filter.options || []).forEach(option => {
+        delete option.selected;
+      });
+      return filter;
+    });
 
 // Filters start out empty, as we need to load them from the API
-let initialState = [];
+const initialState = {
+  list: [],
+  active: [],
+};
 
 function filtersReducer(state = initialState, action) {
   let newState;
@@ -52,39 +47,23 @@ function filtersReducer(state = initialState, action) {
 
   switch (action.type) {
     case LOAD_FILTERS: {
-      newState = [];
-      const { filters } = action;
-
-      for (const group in filters) {
-        if (!filters.hasOwnProperty(group)) {
-          break;
-        }
-        const newGroup = {
-          value: group,
-          label: formatLabel(group),
-          multiple: filters[group].length > 2,
-          options: cloneArrayValues(filters[group]).map(formatFilterOption),
-        };
-
-        newState.push(newGroup);
-      }
-
-      initialState = cloneArrayValues(newState);
-
+      newState = { ...state };
+      newState.list = deleteSelects(action.filters);
+      newState.active = deleteSelects(action.filters);
       break;
     }
 
-    case SET_ALL_FILTERS: {
-      newState = cloneArrayValues(action.filters || initialState);
+    case RESET_FILTERS: {
+      newState = { ...state };
+      newState.active = deleteSelects(newState.list);
       break;
     }
 
     // User has de/activated a filter
     case SET_FILTER: {
-      newState = cloneArrayValues(state);
-
+      newState = { ...state };
       // for each group,
-      newState = newState.map(group => {
+      newState.active = [].concat(newState.active).map(group => {
         const newGroup = { ...group };
 
         // determine if this is the action's filter
@@ -102,20 +81,20 @@ function filtersReducer(state = initialState, action) {
 
               if (selectStatus) {
                 // ..and then de/select it based on the action
-                newOption.selected = action.isEnabled || false;
+                newOption.selected = selectStatus;
               } else if (newOption.selected) {
                 delete newOption.selected;
               }
             }
 
             // hasSelected will be true if any option is selected
-            hasSelected = !!(hasSelected || newOption.selected);
+            hasSelected = hasSelected || newOption.selected;
             return newOption;
           });
 
           // finally, we check if any options are selected,
           // and update the main group accordingly
-          if (!hasSelected && newGroup.selected) {
+          if (!hasSelected) {
             // remove the 'selected' prop all together if it exists
             delete newGroup.selected;
           } else if (hasSelected) {
@@ -125,12 +104,12 @@ function filtersReducer(state = initialState, action) {
 
         return newGroup;
       });
-
       break;
     }
 
     case SET_TEXT_FILTER: {
-      newState = cloneArrayValues(state);
+      newState = { ...state };
+      newState.active = cloneArrayValues(state.active);
 
       // function which modifies an existing text group
       // or creates an entirely new one, and appends the
@@ -154,7 +133,7 @@ function filtersReducer(state = initialState, action) {
 
         // various display options
         newGroup.value = 'text';
-        newGroup.label = formatLabel('Text Search');
+        newGroup.label = capFirstLetter('Text Search');
         newGroup.options = textOptions;
         newGroup.selected = action.isEnabled || false;
 
@@ -165,7 +144,7 @@ function filtersReducer(state = initialState, action) {
       let wasFound = false;
 
       // look through existing groups
-      newState = newState.map(group => {
+      newState.active = newState.active.map(group => {
         // if a text group is found
         if (group.value === 'text') {
           wasFound = true;
@@ -180,7 +159,7 @@ function filtersReducer(state = initialState, action) {
       // if we do NOT have an existing text group,
       // create one
       if (!wasFound) {
-        newState.push(formatGroup());
+        newState.active.push(formatGroup());
       }
 
       break;

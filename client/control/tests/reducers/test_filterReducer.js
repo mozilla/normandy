@@ -3,6 +3,7 @@ import * as actions from 'control/actions/FilterActions';
 
 import {
   initialState,
+  stubbedFilters,
 } from 'control/tests/fixtures';
 
 /**
@@ -10,8 +11,8 @@ import {
  */
 describe('Filter reducer', () => {
   afterEach(() => {
-    // in the event that filters are 'loaded'
-    // we want to blank them out for each test
+    // reset the filters stored in memory all together
+    // (this wipes both the active AND list props)
     appReducer(undefined, {
       type: actions.LOAD_FILTERS,
       filters: [],
@@ -25,136 +26,58 @@ describe('Filter reducer', () => {
   it('should handle LOAD_FILTERS', () => {
     expect(appReducer(undefined, {
       type: actions.LOAD_FILTERS,
-      filters: {
-        status: [
-          // string values should convert to objs
-          'enabled',
-          // objects should apply key/value appropriately
-          {
-            key: 'disabled',
-            value: 'Disable option',
-          },
-        ],
-      },
+      filters: stubbedFilters,
     })).toEqual({
       ...initialState,
-      filters: [{
-        value: 'status',
-        label: 'Status',
-        multiple: false,
-        options: [{
-          label: 'Enabled',
-          value: 'enabled',
-        }, {
-          label: 'Disable option',
-          value: 'disabled',
-        }],
-      }],
+      filters: {
+        list: stubbedFilters,
+        active: stubbedFilters,
+      },
     });
   });
 
-  describe('handling SET_ALL_FILTERS', () => {
-    it('should set the store to the passed filters', () => {
-      expect(appReducer(undefined, {
-        type: actions.SET_ALL_FILTERS,
-        filters: [{
-          value: 'status',
-          label: 'Status',
-          multiple: false,
-          options: [{
-            label: 'Enabled',
-            value: 'enabled',
-            // use 'selected' prop for testing
-            selected: true,
-          }, {
-            label: 'Disable option',
-            value: 'disabled',
-            // use 'selected' prop for testing
-            selected: false,
-          }],
-        }],
-      })).toEqual({
-        ...initialState,
-        filters: [{
-          value: 'status',
-          label: 'Status',
-          multiple: false,
-          options: [{
-            label: 'Enabled',
-            value: 'enabled',
-            selected: true,
-          }, {
-            label: 'Disable option',
-            value: 'disabled',
-            selected: false,
-          }],
-        }],
-      });
-    });
-
-    it('should reset to initialState if no params are passed', () => {
+  describe('handling RESET_FILTERS', () => {
+    it('should reset the `active` array to the `list` array', () => {
       let testState = appReducer(undefined, {});
 
       // use LOAD_FILTERS to set the in-store initialState
-      testState = appReducer({ ...testState }, {
+      testState = appReducer(testState, {
         type: actions.LOAD_FILTERS,
-        filters: {
-          status: [
-            'enabled',
-            'disabled',
-          ],
-        },
+        filters: stubbedFilters,
       });
 
-      // hold onto the 'new' initialState
+      // save the loaded, pre-manipulated state
       const testInitialState = { ...testState };
 
-      // use SET_ALL to alter the in-store memory
-      testState = appReducer({ ...testState }, {
-        type: actions.SET_ALL_FILTERS,
-        filters: [{
+      // set some filters (to reset later)
+      testState = appReducer(testState, {
+        type: actions.SET_FILTER,
+        group: {
           value: 'status',
-          label: 'Status',
-          multiple: false,
-          options: [{
-            label: 'Enabled',
-            value: 'enabled',
-            // use 'selected' prop for testing
-            selected: true,
-          }, {
-            label: 'Disabled',
-            value: 'disabled',
-            // use 'selected' prop for testing
-            selected: false,
-          }],
-        }],
+        },
+        option: {
+          label: 'Enabled',
+          value: 'enabled',
+        },
+        isEnabled: true,
       });
 
       // the actual test - pass empty SET_ALL,
       // which should reset to the prepped init state
-      expect(appReducer({ ...testState }, {
-        type: actions.SET_ALL_FILTERS,
-      })).toEqual({
-        ...testInitialState,
-      });
+      expect(appReducer(testState, {
+        type: actions.RESET_FILTERS,
+      })).toEqual(testInitialState);
     });
   });
 
   describe('handling SET_FILTER', () => {
-    // init the filters
-
-    it('should enable options appropriately', () => {
+    it('should enable options', () => {
       const testState = appReducer(undefined, {
         type: actions.LOAD_FILTERS,
-        filters: {
-          status: [
-            'enabled',
-            'disabled',
-          ],
-        },
+        filters: stubbedFilters,
       });
 
-      expect(appReducer({ ...testState }, {
+      expect(appReducer(testState, {
         type: actions.SET_FILTER,
         // group of options this affects
         group: {
@@ -169,44 +92,33 @@ describe('Filter reducer', () => {
         isEnabled: true,
       })).toEqual({
         ...initialState,
-        filters: [{
-          value: 'status',
-          label: 'Status',
-          multiple: false,
-          selected: true,
-          options: [{
-            label: 'Enabled',
-            value: 'enabled',
+        filters: {
+          active: [{
+            value: 'status',
+            label: 'Status',
+            multiple: false,
             selected: true,
-          }, {
-            label: 'Disabled',
-            value: 'disabled',
+            options: [{
+              label: 'Enabled',
+              value: 'enabled',
+              selected: true,
+            }, {
+              label: 'Disabled',
+              value: 'disabled',
+            }],
           }],
-        }],
+          list: stubbedFilters,
+        },
       });
     });
 
-    it('should disable options appropriately', () => {
-      // set up some pre-existing filters that are already selected
+    it('should disable options', () => {
       const testState = appReducer(undefined, {
-        type: actions.SET_ALL_FILTERS,
-        filters: [{
-          value: 'status',
-          label: 'Status',
-          multiple: false,
-          selected: true,
-          options: [{
-            label: 'Enabled',
-            value: 'enabled',
-            selected: true,
-          }, {
-            label: 'Disabled',
-            value: 'disabled',
-          }],
-        }],
+        type: actions.LOAD_FILTERS,
+        filters: stubbedFilters,
       });
 
-      expect(appReducer({ ...testState }, {
+      expect(appReducer(testState, {
         type: actions.SET_FILTER,
         // group of options this affects
         group: {
@@ -221,18 +133,10 @@ describe('Filter reducer', () => {
         isEnabled: false,
       })).toEqual({
         ...initialState,
-        filters: [{
-          value: 'status',
-          label: 'Status',
-          multiple: false,
-          options: [{
-            label: 'Enabled',
-            value: 'enabled',
-          }, {
-            label: 'Disabled',
-            value: 'disabled',
-          }],
-        }],
+        filters: {
+          active: stubbedFilters,
+          list: stubbedFilters,
+        },
       });
     });
   });
@@ -240,12 +144,7 @@ describe('Filter reducer', () => {
   it('should handle SET_TEXT_FILTER', () => {
     const testState = appReducer(undefined, {
       type: actions.LOAD_FILTERS,
-      filters: {
-        status: [
-          'enabled',
-          'disabled',
-        ],
-      },
+      filters: stubbedFilters,
     });
 
     expect(appReducer({ ...testState }, {
@@ -255,26 +154,18 @@ describe('Filter reducer', () => {
       isEnabled: true,
     })).toEqual({
       ...initialState,
-      filters: [{
-        value: 'status',
-        label: 'Status',
-        multiple: false,
-        options: [{
-          label: 'Enabled',
-          value: 'enabled',
-        }, {
-          label: 'Disabled',
-          value: 'disabled',
-        }],
-      }, {
-        value: 'text',
-        label: 'Text Search',
-        selected: true,
-        options: [{
-          value: 'this is the text search',
+      filters: {
+        active: [...stubbedFilters, {
+          value: 'text',
+          label: 'Text Search',
           selected: true,
+          options: [{
+            value: 'this is the text search',
+            selected: true,
+          }],
         }],
-      }],
+        list: stubbedFilters,
+      },
     });
   });
 });

@@ -9,10 +9,35 @@ import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
-const LOAD_FILTERS = 'LOAD_FILTERS';
+import cloneArrayValues from 'client/utils/clone-array';
+import { capFirstLetter } from 'client/utils/string-man';
+
 const SET_FILTER = 'SET_FILTER';
 const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
-const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
+const LOAD_FILTERS = 'LOAD_FILTERS';
+const RESET_FILTERS = 'RESET_FILTERS';
+
+function formatFilterOption(option) {
+  let label;
+  let value;
+
+  // string type = we were given just an option
+  // (no keyed value/label)
+  if (typeof option === 'string') {
+    value = option;
+    label = capFirstLetter(option);
+  // else if we get an object, then we
+  // can extract the key/value props
+  } else if (typeof option === 'object') {
+    label = option.value;
+    value = option.key;
+  }
+
+  return {
+    value,
+    label,
+  };
+}
 
 
 /**
@@ -23,7 +48,28 @@ const SET_ALL_FILTERS = 'SET_ALL_FILTERS';
 function loadFilters() {
   return dispatch =>
     dispatch(makeApiRequest('fetchFilters'))
-      .then(recipes => dispatch(filtersReceived(recipes)));
+      .then(filters => {
+        if (!filters) {
+          return;
+        }
+        const newFilters = [];
+        // format each recipe
+        for (const group in filters) {
+          if (!filters.hasOwnProperty(group)) {
+            break;
+          }
+          const newGroup = {
+            value: group,
+            label: capFirstLetter(group),
+            multiple: filters[group].length > 2,
+            options: cloneArrayValues(filters[group]).map(formatFilterOption),
+          };
+
+          newFilters.push(newGroup);
+        }
+
+        dispatch(filtersReceived(newFilters));
+      });
 }
 
 /**
@@ -35,13 +81,11 @@ function loadFilters() {
  * @param  {Boolean} isEnabled Is the option selected?
  */
 function selectFilter({ group, option, isEnabled }) {
-  return dispatch => {
-    dispatch({
-      type: group.value === 'text' ? SET_TEXT_FILTER : SET_FILTER,
-      group,
-      option,
-      isEnabled,
-    });
+  return {
+    type: group.value === 'text' ? SET_TEXT_FILTER : SET_FILTER,
+    group,
+    option,
+    isEnabled,
   };
 }
 
@@ -62,52 +106,25 @@ function loadFilteredRecipes() {
 }
 
 /**
- * Dispatches a SET_ALL_FILTERS event.
- * If called without a state param,
- * the filters reducer will reset the state
- * to its initialState.
- *
- * The difference between SET_ALL_FILTERS and LOAD_FILTERS
- * is that LOAD_ parses data from the backend before
- * inserting into the store. SET_ALL assumes that
- * the filters are already parsed, and the _app_ is
- * manipulating the existing store.
- *
- * This is pretty much only used for FilterActions#resetFilters
- *
- * @param {Array} filters Filter state to set (optional)
- */
-function setAllFilters(filters) {
-  return dispatch => {
-    dispatch({
-      type: SET_ALL_FILTERS,
-      filters,
-    });
-  };
-}
-
-/**
- * Resetting filters is basically just calling
- * FilterActions#setAllFilters with an empty state. This is just
- * a nicer function to call from components.
- *
- * @return {Function} Result of FilterActions#setAllFilters
+ * Dispatches a RESET_FILTERS event, which resets
+ * the 'active' filters to what was loaded earlier.
  */
 function resetFilters() {
-  return setAllFilters();
+  return {
+    type: RESET_FILTERS,
+  };
 }
 
 // Exports
 export {
   // action constants
   SET_FILTER,
-  SET_ALL_FILTERS,
+  RESET_FILTERS,
   SET_TEXT_FILTER,
   LOAD_FILTERS,
   // action functions
   loadFilters,
   selectFilter,
-  setAllFilters,
   resetFilters,
   loadFilteredRecipes,
 };

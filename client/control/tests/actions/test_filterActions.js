@@ -2,7 +2,11 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import fetchMock from 'fetch-mock';
 
-import { initialState } from 'control/tests/fixtures';
+import {
+  initialState,
+  stubbedFilters,
+} from 'control/tests/fixtures';
+
 import { API_REQUEST_SETTINGS } from 'control/actions/ControlActions';
 import * as filterActions from 'control/actions/FilterActions';
 import { getFilterParamString } from 'control/selectors/FiltersSelector';
@@ -29,16 +33,23 @@ describe('Filter Actions', () => {
       LOAD_FILTERS,
     } = filterActions;
 
-    it('creates an LOAD_FILTERS action', () => {
+    it('creates an LOAD_FILTERS action', async () => {
       const expectedAction = {
         type: LOAD_FILTERS,
-        filters: [],
+        filters: stubbedFilters,
       };
 
-      store.dispatch(loadFilters())
-      .then(() => {
-        expect(store.getActions()).toContain({ ...expectedAction });
+      fetchMock.get('/api/v1/filters/', {
+        body: {
+          status: [
+            'enabled',
+            'disabled',
+          ],
+        },
       });
+
+      await store.dispatch(loadFilters());
+      expect(store.getActions()).toContain(expectedAction);
     });
 
     it('should request filters from server', async () => {
@@ -149,41 +160,17 @@ describe('Filter Actions', () => {
     });
   });
 
-  describe('setAllFilters', () => {
-    it('should create a SET_ALL_FILTERS action', () => {
-      const {
-        setAllFilters,
-        SET_ALL_FILTERS,
-      } = filterActions;
-
-      const filters = [{
-        value: 'test',
-        label: 'Test',
-      }, {
-        value: 'test2',
-        label: 'Test 2',
-      }];
-
-      store.dispatch(setAllFilters(filters));
-      expect(store.getActions()).toContain({
-        type: SET_ALL_FILTERS,
-        filters,
-      });
-    });
-  });
-
   describe('resetFilters', () => {
-    it('should create an empty SET_ALL_FILTERS action', () => {
+    it('should create a RESET_FILTERS action', () => {
       const {
         resetFilters,
-        SET_ALL_FILTERS,
+        RESET_FILTERS,
       } = filterActions;
 
       store.dispatch(resetFilters());
 
       expect(store.getActions()).toContain({
-        type: SET_ALL_FILTERS,
-        filters: undefined,
+        type: RESET_FILTERS,
       });
     });
   });

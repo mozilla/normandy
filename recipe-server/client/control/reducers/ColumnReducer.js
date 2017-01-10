@@ -4,7 +4,7 @@ import {
   saveLocalColumns as saveState,
 } from 'control/actions/ColumnActions';
 
-import compare from 'client/utils/deep-compare';
+import { isEqual } from 'underscore';
 import cloneArrayValues from 'client/utils/clone-array';
 
 const initialState = [{
@@ -77,7 +77,7 @@ function columnReducer(state = initialState, action) {
       // have the all the same values as our
       // initialState. this prevents a user loading
       // outdated columns from localStorage
-      slugsMatch = compare(
+      slugsMatch = isEqual(
         state.map(option => option.slug + option.label),
         action.columns.map(option => option.slug + option.label)
       );

@@ -20,8 +20,23 @@ export default class GroupMenu extends React.Component {
    * @param  {Object} option Option which was clicked
    * @return {Function}      Wrapped handler
    */
-  handleItemClick(group, option) {
-    return () => this.props.onItemSelect(group, option);
+  makeClickItemHandler(group, option) {
+    // if no cache exists, build it real quick
+    this.clickItemCache = this.clickItemCache || {};
+    // reference variable for brevity
+    const cache = this.clickItemCache;
+
+    // if the cache misses,
+    if (!cache[group] || !cache[group][option]) {
+      // build the group cache (if necessary)
+      cache[group] = cache[group] || {};
+      // and then generate the actual handler
+      cache[group][option] = () =>
+        this.props.onItemSelect(group, option);
+    }
+
+    // return the (now cached) handler function
+    return cache[group][option];
   }
 
   /**
@@ -44,7 +59,7 @@ export default class GroupMenu extends React.Component {
           <div
             className={"menu-item"}
             key={searchText}
-            onClick={this.handleItemClick('text', searchText)}
+            onClick={this.makeClickItemHandler('text', searchText)}
             children={searchText}
           />
         </div>
@@ -54,9 +69,7 @@ export default class GroupMenu extends React.Component {
     return searchMessage;
   }
 
-  /**
-   * Render
-   */
+
   render() {
     const {
       data,
@@ -82,7 +95,7 @@ export default class GroupMenu extends React.Component {
                   <div
                     className={"menu-item"}
                     key={index}
-                    onClick={this.handleItemClick(group, option)}
+                    onClick={this.makeClickItemHandler(group, option)}
                   >
                     { option.label || option.value }
                   </div>

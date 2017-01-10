@@ -58,7 +58,10 @@ export const initialState = {
     slug: 'metadata',
     enabled: true,
   }],
-  filters: [],
+  filters: {
+    list: [],
+    active: [],
+  },
   notifications: [],
   form: {},
   routing: {
@@ -85,3 +88,16 @@ export const fixtureRevisions = [
     },
   },
 ];
+
+export const stubbedFilters = [{
+  value: 'status',
+  label: 'Status',
+  multiple: false,
+  options: [{
+    label: 'Enabled',
+    value: 'enabled',
+  }, {
+    label: 'Disabled',
+    value: 'disabled',
+  }],
+}];

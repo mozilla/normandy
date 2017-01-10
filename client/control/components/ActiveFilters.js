@@ -1,4 +1,5 @@
 import React, { PropTypes as pt } from 'react';
+import cx from 'classnames';
 
 /**
  * Section above RecipeList's table that displays
@@ -35,9 +36,7 @@ export default class ActiveFilters extends React.Component {
     return this.handlerCache[cacheKey];
   }
 
-  /**
-   * Render
-   */
+
   render() {
     const {
       className,
@@ -45,13 +44,13 @@ export default class ActiveFilters extends React.Component {
       onResetFilters,
     } = this.props;
 
-    // optional className prop
-    const displayedClass = `active-filters ${className || ''}`;
-
     // no filters = we dont render anything at all
     if (!selectedFilters || !selectedFilters.length) {
       return null;
     }
+
+    // optional className prop
+    const displayedClass = cx('active-filters', className);
 
     return (
       <div className={displayedClass}>

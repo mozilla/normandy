@@ -6,7 +6,7 @@ import ActiveFilters from 'control/components/ActiveFilters';
 import RecipeCombobox from 'control/components/RecipeCombobox';
 import RecipeCount from 'control/components/RecipeCount';
 
-import compare from 'client/utils/deep-compare';
+import { isEqual } from 'underscore';
 
 import {
   loadLocalColumns,
@@ -69,7 +69,7 @@ class RecipeFilters extends React.Component {
   }
 
   componentWillReceiveProps({ selectedFilters }) {
-    if (!compare(selectedFilters, this.props.selectedFilters)) {
+    if (!isEqual(selectedFilters, this.props.selectedFilters)) {
       this.props.loadFilteredRecipes();
     }
   }
@@ -122,9 +122,7 @@ class RecipeFilters extends React.Component {
     this.props.resetFilters();
   }
 
-  /**
-   * Render
-   */
+
   render() {
     const {
       displayCount,
@@ -171,7 +169,6 @@ class RecipeFilters extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  filters: state.filters,
   // use selectors to pull specific store data
   selectedFilters: getSelectedFilterGroups(state.filters),
   availableFilters: getAvailableFilters(state.filters),

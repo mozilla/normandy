@@ -33,7 +33,7 @@ const isGroupSelected = group => {
  * @param  {Array<Object>} groups List of groups to find selected options within
  * @return {Array<Object>}        Filtered groups with at least one selected option
  */
-export const getSelectedFilterGroups = groups => groups.filter(isGroupSelected);
+export const getSelectedFilterGroups = state => state.active.filter(isGroupSelected);
 
 
 /**
@@ -45,8 +45,8 @@ export const getSelectedFilterGroups = groups => groups.filter(isGroupSelected);
  * @param  {Array<Object>} groups All possible filter groups
  * @return {Array<Object>}        Active filter groups and their selected options
  */
-export const getActiveFilters = groups =>
-  cloneArrayValues(groups)
+export const getActiveFilters = state =>
+  cloneArrayValues(state.active)
     .map(group => {
       // group has no selection = remove it
       if (!group.selected) {
@@ -71,8 +71,8 @@ export const getActiveFilters = groups =>
  * @param  {Array<Object>} groups All possible filter groups
  * @return {string}        URL-safe query param string
  */
-export const getFilterParamString = groups =>
-  getActiveFilters(groups)
+export const getFilterParamString = state =>
+  getActiveFilters(state)
     .map(group => {
       const param = group.value;
       const selected = [];
@@ -95,8 +95,8 @@ export const getFilterParamString = groups =>
  * @param  {Array<Object>} groups Array of option group objects
  * @return {Array<Object>}        Array of non-selected options/groups
  */
-export const getAvailableFilters = groups =>
-  cloneArrayValues(groups)
+export const getAvailableFilters = state =>
+  cloneArrayValues(state.active)
     .map(group => {
       const newGroup = { ...group };
 
@@ -126,5 +126,5 @@ export const getAvailableFilters = groups =>
  * @param  {Array<Object>} groups All possible filter groups
  * @return {boolean}              Does user have at least one filter active?
  */
-export const isFilteringActive = groups =>
-  getActiveFilters(groups).length > 0;
+export const isFilteringActive = state =>
+  getActiveFilters(state).length > 0;
