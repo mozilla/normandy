@@ -2,7 +2,7 @@
 
 Client to download and run recipes from [Normandy Recipe Server][server].
 
-[server](https://github.com/mozilla/normandy)
+[server]: https://github.com/mozilla/normandy
 
 # Development
 
