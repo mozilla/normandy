@@ -175,9 +175,6 @@ class TestRecipe(object):
         recipe.update(name='my name', force=True)
         assert revision_id != recipe.revision_id
 
-
-@pytest.mark.django_db
-class TestRecipeQueryset(object):
     def test_revision_id_changes(self):
         """Ensure that the revision id is incremented on each save"""
         recipe = RecipeFactory()
@@ -185,6 +182,9 @@ class TestRecipeQueryset(object):
         recipe.update(action=ActionFactory())
         assert recipe.revision_id != revision_id
 
+
+@pytest.mark.django_db
+class TestRecipeQueryset(object):
     def test_update_signatures(self, mocker):
         # Make sure the test environment is clean. This test is invalid otherwise.
         assert Recipe.objects.all().count() == 0
