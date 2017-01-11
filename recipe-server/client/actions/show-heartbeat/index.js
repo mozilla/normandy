@@ -19,8 +19,13 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   /**
-   * Calculates the number of milliseconds since the last heartbeat from any recipe
-   * was shown. Returns a boolean indicating if a heartbeat has been shown recently.
+   * Returns a boolean indicating if a heartbeat has been shown recently.
+   *
+   * Checks the saved `lastShown` value against the current time
+   * and returns if the time is under HEARTBEAT_THROTTLE milliseconds.
+   *
+   * @async
+   * @return {Boolean}  Has any heartbeat been shown recently?
    */
   async heartbeatShownRecently() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
@@ -34,7 +39,10 @@ export default class ShowHeartbeatAction extends Action {
   /**
    * Checks when this survey was last shown,
    * and returns a boolean indicating if the
-   * user has seen this survey already or not.
+   * user has ever seen this survey or not.
+   *
+   * @async
+   * @return {Boolean}  Has the survey ever been shown?
    */
   async surveyHasShown() {
     const lastShown = await this.storage.getItem('lastShown');
@@ -42,9 +50,44 @@ export default class ShowHeartbeatAction extends Action {
     return !!lastShown;
   }
 
+
+  /**
+   * Returns a surveyId value. If recipe calls
+   * to include the Telemetry UUID value,
+   * then the UUID is attached to the surveyId
+   * in `<surveyId>::<userId>` format.
+   *
+   * @return {String} Survey ID, possibly with user UUID
+   */
+  generateSurveyId() {
+    const {
+      includeTelemetryUUID,
+      surveyId,
+    } = this.recipe.arguments;
+    const { userId } = this.normandy;
+
+    let value = surveyId;
+
+    // should user ID stuff be sent to telemetry?
+    if (includeTelemetryUUID && !!userId) {
+      // alter the survey ID to include that UUID
+      value = `${surveyId}::${userId}`;
+    }
+
+    return value;
+  }
+
+
+  /**
+   * Main action function.
+   *
+   * Determines if the heartbeat should be shown,
+   * and if so, does so. Also records last shown
+   * times to local storage to track when any
+   * heartbeat was last shown to the user.
+   */
   async execute() {
     const {
-      surveyId,
       message,
       engagementButtonLabel,
       thanksMessage,
@@ -53,6 +96,7 @@ export default class ShowHeartbeatAction extends Action {
       learnMoreUrl,
     } = this.recipe.arguments;
 
+    // Test mode skips the 'last shown' checks
     if (!this.normandy.testing && (
       await this.heartbeatShownRecently() ||
       await this.surveyHasShown()
@@ -63,73 +107,50 @@ export default class ShowHeartbeatAction extends Action {
     this.location = await this.normandy.location();
     this.client = await this.normandy.client();
 
-    let userId;
-    let heartbeatSurveyId = surveyId;
-
-    // should user ID stuff be sent to telemetry?
-    const { includeTelemetryUUID } = this.recipe.arguments;
-
-    if (includeTelemetryUUID) {
-      // get the already-defined UUID from normandy
-      userId = this.normandy.userId;
-
-      // if a userId exists,
-      if (userId) {
-        // alter the survey ID to include that UUID
-        heartbeatSurveyId = `${surveyId}::${userId}`;
-      }
-    }
+    const { userId } = this.normandy;
+    const surveyId = this.generateSurveyId();
 
     // A bit redundant but the action argument names shouldn't necessarily rely
     // on the argument names showHeartbeat takes.
     const heartbeatData = {
-      surveyId: heartbeatSurveyId,
+      surveyId,
       message,
       engagementButtonLabel,
       thanksMessage,
-      postAnswerUrl: this.annotatePostAnswerUrl({
-        url: postAnswerUrl,
-        userId,
-      }),
       learnMoreMessage,
       learnMoreUrl,
+      postAnswerUrl: this.generatePostURL(postAnswerUrl, userId),
+      // generate a new uuid for this heartbeat flow
       flowId: this.normandy.uuid(),
       surveyVersion: this.recipe.revision_id,
     };
 
+    // Add a flag to the heartbeat data if in test mode
     if (this.normandy.testing) {
       heartbeatData.testing = 1;
     }
 
     await this.normandy.showHeartbeat(heartbeatData);
-    this.setLastShownDate();
 
-    // and save the 'global' record that a heartbeat just played
-    this.setLastHeartbeatDate();
+    // Let the record show that a heartbeat has been executed
+    this.updateLastShown();
   }
 
-  setLastShownDate() {
-    // Returns a promise, but there's nothing to do if it fails.
+  /**
+   * Updates the local storage values of when a/this heartbeat
+   * was last displayed to the user with the current time.
+   */
+  updateLastShown() {
+    // update the 'personal' storage of this heartbeat
     this.storage.setItem('lastShown', Date.now());
-  }
 
-  setLastHeartbeatDate() {
+    // also update the 'global' storage of all heartbeats
     this.heartbeatStorage.setItem('lastShown', Date.now());
-  }
-
-  async getLastShownDate() {
-    const lastShown = await this.storage.getItem('lastShown');
-    return Number.isNaN(lastShown) ? null : lastShown;
-  }
-
-  async getLastHeartbeatDate() {
-    const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    return Number.isNaN(lastShown) ? null : lastShown;
   }
 
   /**
    * Gathers recipe action/message information, and formats the content into
-   * URL-safe query params. This is used by this.annotatePostAnswerUrl to
+   * URL-safe query params. This is used by generatePostURL to
    * inject Google Analytics params into the post-answer URL.
    *
    * @return {Object} Hash containing utm_ queries to append to post-answer URL
@@ -154,7 +175,17 @@ export default class ShowHeartbeatAction extends Action {
     };
   }
 
-  annotatePostAnswerUrl({ url, userId }) {
+  /**
+   * Given a post-answer url (and optionally a userId), returns an
+   * updated string with query params of relevant data for the
+   * page the user will be directed to. Includes survey version,
+   * google analytics params, etc.
+   *
+   * @param  {String} url     Post-answer URL (without query params)
+   * @param  {String} userId? Optional, UUID to associate with user
+   * @return {String}         URL with post-answer query params
+   */
+  generatePostURL(url, userId) {
     // Don't bother with empty URLs.
     if (!url) {
       return url;
@@ -175,7 +206,7 @@ export default class ShowHeartbeatAction extends Action {
     // if a userId is given,
     // we'll include it with the data passed through
     // to SurveyGizmo (via query params)
-    if (userId) {
+    if (this.recipe.arguments.includeTelemetryUUID && userId) {
       args.userId = userId;
     }
 
@@ -184,14 +215,18 @@ export default class ShowHeartbeatAction extends Action {
       args.testing = 1;
     }
 
+    // create a URL object to append arguments to
     const annotatedUrl = new URL(url);
     for (const key in args) {
       if (!args.hasOwnProperty(key)) {
         continue;
       }
+      // explicitly set the query param
+      // (this makes our args URL-safe)
       annotatedUrl.searchParams.set(key, args[key]);
     }
 
+    // return the address with encoded queries
     return annotatedUrl.href;
   }
 }
