@@ -51,7 +51,13 @@ def migrate_reversion_data(apps, schema_editor):
 
                 revision.save()
 
+            if revision is None:
+                revision = RecipeRevision(recipe=r, parent=None, name=r.name, action=r.action,
+                                          arguments_json=r.arguments_json,
+                                          filter_expression=r.filter_expression)
+
             r.latest_revision = revision
+
             r.save()
 
 
