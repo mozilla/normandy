@@ -16,7 +16,7 @@ export class LocalStorage {
     this.skipDurability = skipDurability;
   }
 
-  async isDurable() {
+  isDurable() {
     const durabilityStatus = localStorage.getItem(STORAGE_DURABILITY_KEY);
     return (parseInt(durabilityStatus, 10) >= 2);
   }
@@ -25,8 +25,8 @@ export class LocalStorage {
     return `${this.prefix}-${key}`;
   }
 
-  async getItem(key) {
-    const storageIsDurable = await this.isDurable();
+  getItem(key) {
+    const storageIsDurable = this.isDurable();
     if (!storageIsDurable && !this.skipDurability) {
       throw new Error('Storage durability unconfirmed');
     }
@@ -38,11 +38,11 @@ export class LocalStorage {
     }
   }
 
-  async setItem(key, value) {
+  setItem(key, value) {
     return localStorage.setItem(this._makeKey(key), JSON.stringify(value));
   }
 
-  async removeItem(key) {
+  removeItem(key) {
     return localStorage.removeItem(this._makeKey(key));
   }
 }

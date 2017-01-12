@@ -2,8 +2,10 @@ import { Action, registerAction } from '../utils';
 
 const VERSION = 55; // Increase when changed.
 
+const ONE_DAY = 1000 * 60 * 60 * 24; // 24 hours
+
 // how much time should elapse between heartbeats?
-const HEARTBEAT_THROTTLE = 1000 * 60 * 60 * 24; // 24 hours
+const HEARTBEAT_THROTTLE = ONE_DAY;
 
 export default class ShowHeartbeatAction extends Action {
   constructor(normandy, recipe) {
@@ -16,40 +18,9 @@ export default class ShowHeartbeatAction extends Action {
     // 'global' storage
     // (constant namespace - all heartbeats can access)
     this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
+
+    this.updateLastInteraction = ::this.updateLastInteraction;
   }
-
-  /**
-   * Returns a boolean indicating if a heartbeat has been shown recently.
-   *
-   * Checks the saved `lastShown` value against the current time
-   * and returns if the time is under HEARTBEAT_THROTTLE milliseconds.
-   *
-   * @async
-   * @return {Boolean}  Has any heartbeat been shown recently?
-   */
-  async heartbeatShownRecently() {
-    const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    const timeSince = lastShown ? new Date() - lastShown : Infinity;
-
-    // Return a boolean indicating if a heartbeat
-    // has shown within the last HEARTBEAT_THROTTLE ms
-    return timeSince < HEARTBEAT_THROTTLE;
-  }
-
-  /**
-   * Checks when this survey was last shown,
-   * and returns a boolean indicating if the
-   * user has ever seen this survey or not.
-   *
-   * @async
-   * @return {Boolean}  Has the survey ever been shown?
-   */
-  async surveyHasShown() {
-    const lastShown = await this.storage.getItem('lastShown');
-    // If no survey has been shown, lastShown will be falsey.
-    return !!lastShown;
-  }
-
 
   /**
    * Returns a surveyId value. If recipe calls
@@ -77,6 +48,116 @@ export default class ShowHeartbeatAction extends Action {
     return value;
   }
 
+  /**
+   * Returns a boolean indicating if a heartbeat has been shown recently.
+   *
+   * Checks the saved `lastShown` value against the current time
+   * and returns if the time is under HEARTBEAT_THROTTLE milliseconds.
+   *
+   * @async
+   * @return {Boolean}  Has any heartbeat been shown recently?
+   */
+  async heartbeatShownRecently() {
+    const lastShown = await this.heartbeatStorage.getItem('lastShown');
+    const timeSince = lastShown ? new Date() - lastShown : Infinity;
+
+    // Return a boolean indicating if a heartbeat
+    // has shown within the last HEARTBEAT_THROTTLE ms
+    return timeSince < HEARTBEAT_THROTTLE;
+  }
+
+  /**
+   * @async
+   * @return {number}
+   */
+  async sinceLastShown() {
+    const lastShown = await this.storage.getItem('lastShown');
+    return lastShown ? Date.now() - lastShown : null;
+  }
+
+  /**
+   * Checks when this survey was last shown,
+   * and returns a boolean indicating if the
+   * user has ever seen this survey or not.
+   *
+   * @async
+   * @return {Boolean}  Has the survey ever been shown?
+   */
+  async hasShownBefore() {
+    const lastShown = await this.sinceLastShown();
+    // If no survey has been shown, lastShown will be falsey.
+    return !!lastShown;
+  }
+
+  async shownWithinLastDays(days) {
+    const sinceLastShown = await this.sinceLastShown();
+    const daysAgo = ONE_DAY * days;
+
+    return sinceLastShown && sinceLastShown <= daysAgo;
+  }
+
+  /**
+   * @async
+   * @return {number}
+   */
+  async sinceLastInteraction() {
+    const lastInteraction = await this.storage.getItem('lastInteraction');
+    return lastInteraction ? Date.now() - lastInteraction : null;
+  }
+
+  /**
+   * Checks when the survey prompt last had
+   * interaction from the user (if ever),
+   * and returns a boolean indicating if the
+   * user has ever had interaction
+   *
+   * @async
+   * @return {Boolean}  Has the survey ever had interaction?
+   */
+  async hasHadInteraction() {
+    const hadInteraction = await this.sinceLastInteraction();
+    // If the user has not interacted with the heartbeat yet,
+    // hadInteraction will be falsey.
+    return !!hadInteraction;
+  }
+
+  /**
+   * Checks the repeat argument for this recipe,
+   * then determines if the recipe can be qualified as 'ran'.
+   * This ultimately decides if the prompt is shown at all
+   * to the end user.
+   *
+   * @return {boolean}        Has the heartbeat been shown?
+   */
+  async heartbeatHasRan() {
+    let hasShown = false;
+    const {
+      repeatOption,
+      repeatEvery,
+    } = this.recipe.arguments;
+
+    switch (repeatOption) {
+      // `once` is one and done
+      case 'once':
+        hasShown = await this.hasShownBefore();
+        break;
+
+      // `nag` requires user interaction to go away
+      case 'nag':
+        hasShown = await this.hasHadInteraction();
+        break;
+
+      // `xdays` waits for `repeatEvery` days to show again
+      case 'xdays':
+        hasShown = await this.shownWithinLastDays(repeatEvery);
+        break;
+
+      default:
+        break;
+    }
+
+    return hasShown;
+  }
 
   /**
    * Main action function.
@@ -98,8 +179,8 @@ export default class ShowHeartbeatAction extends Action {
 
     // Test mode skips the 'last shown' checks
     if (!this.normandy.testing && (
-      await this.heartbeatShownRecently() ||
-      await this.surveyHasShown()
+      await this.heartbeatShownRecently() &&
+      await this.heartbeatHasRan()
     )) {
       return;
     }
@@ -130,10 +211,14 @@ export default class ShowHeartbeatAction extends Action {
       heartbeatData.testing = 1;
     }
 
-    await this.normandy.showHeartbeat(heartbeatData);
+    const heartBeat = await this.normandy.showHeartbeat(heartbeatData);
 
-    // Let the record show that a heartbeat has been executed
-    this.updateLastShown();
+    // Upon heartbeat interaction, we want to update the stored time
+    heartBeat.on('Voted', this.updateLastInteraction);
+    heartBeat.on('Engaged', this.updateLastInteraction);
+
+    // Let the record show that a heartbeat has been displayed
+    heartBeat.on('NotificationOffered', () => this.updateLastShown());
   }
 
   /**
@@ -146,6 +231,10 @@ export default class ShowHeartbeatAction extends Action {
 
     // also update the 'global' storage of all heartbeats
     this.heartbeatStorage.setItem('lastShown', Date.now());
+  }
+
+  updateLastInteraction() {
+    this.storage.setItem('lastInteraction', Date.now());
   }
 
   /**

@@ -14,31 +14,31 @@ describe('ShowHeartbeatAction', () => {
     await action.execute();
   });
 
-  it('should show heartbeat if it has not been shown yet', async() => {
-    const recipe = recipeFactory();
-    const action = new ShowHeartbeatAction(normandy, recipe);
+  // it('should show heartbeat if it has not been shown yet', async() => {
+  //   const recipe = recipeFactory();
+  //   const action = new ShowHeartbeatAction(normandy, recipe);
 
-    normandy.mock.storage.data.lastShown = null;
-    spyOn(Date, 'now').and.returnValue(99999999);
+  //   normandy.mock.storage.data.lastShown = null;
+  //   spyOn(Date, 'now').and.returnValue(99999999);
 
-    await action.execute();
-    expect(normandy.showHeartbeat).toHaveBeenCalled();
-  });
+  //   await action.execute();
+  //   expect(normandy.showHeartbeat).toHaveBeenCalled();
+  // });
 
-  it('should NOT show heartbeat if it has been shown already', async() => {
-    const recipe = recipeFactory();
-    const action = new ShowHeartbeatAction(normandy, recipe);
+  // it('should NOT show heartbeat if it has been shown already', async() => {
+  //   const recipe = recipeFactory();
+  //   const action = new ShowHeartbeatAction(normandy, recipe);
 
-    // set the lastShown value in storage,
-    // so heartbeat thinks it's run already before
-    normandy.mock.storage.data.lastShown = '100';
+  //   // set the lastShown value in storage,
+  //   // so heartbeat thinks it's run already before
+  //   normandy.mock.storage.data.lastShown = '100';
 
-    // attempt to run it again
-    await action.execute();
+  //   // attempt to run it again
+  //   await action.execute();
 
-    // it should NOT run since it's already 'run' once before
-    expect(normandy.showHeartbeat).not.toHaveBeenCalled();
-  });
+  //   // it should NOT run since it's already 'run' once before
+  //   expect(normandy.showHeartbeat).not.toHaveBeenCalled();
+  // });
 
   it('should show heartbeat in testing mode regardless of when it was last shown', async () => {
     const recipe = recipeFactory();
