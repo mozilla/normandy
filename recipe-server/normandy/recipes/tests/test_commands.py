@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from datetime import timedelta
 
 from django.core.management import call_command
 
@@ -113,3 +114,49 @@ class TestUpdateActions(object):
 
         version = versions[0]
         assert version.revision.comment == 'Updating actions.'
+
+
+@pytest.mark.django_db
+class TestUpdateRecipeSignantures(object):
+    def test_it_works(self):
+        """
+        Verify that the update_recipe_signatures command doesn't throw an error.
+        """
+        call_command('update_recipe_signatures')
+
+    def test_it_signs_unsigned_enabled_recipes(self, mocked_autograph):
+        r = RecipeFactory(enabled=True, signed=False)
+        call_command('update_recipe_signatures')
+        r.refresh_from_db()
+        assert r.signature is not None
+
+    def test_it_signs_out_of_date_recipes(self, settings, mocked_autograph):
+        r = RecipeFactory(enabled=True, signed=True)
+        r.signature.timestamp -= timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE * 2)
+        r.signature.signature = 'old signature'
+        r.signature.save()
+        call_command('update_recipe_signatures')
+        r.refresh_from_db()
+        assert r.signature.signature is not 'old signature'
+
+    def test_it_unsigns_disabled_recipes(self, mocked_autograph):
+        r = RecipeFactory(enabled=False, signed=True)
+        call_command('update_recipe_signatures')
+        r.refresh_from_db()
+        assert r.signature is None
+
+    def test_it_unsigns_out_of_date_disabled_recipes(self, settings, mocked_autograph):
+        r = RecipeFactory(enabled=False, signed=True)
+        r.signature.timestamp -= timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE * 2)
+        r.signature.save()
+        call_command('update_recipe_signatures')
+        r.refresh_from_db()
+        assert r.signature is None
+
+    def test_it_resigns_signed_recipes_with_force(self, mocked_autograph):
+        r = RecipeFactory(enabled=True, signed=True)
+        r.signature.signature = 'old signature'
+        r.signature.save()
+        call_command('update_recipe_signatures', '--force')
+        r.refresh_from_db()
+        assert r.signature.signature is not 'old signature'
