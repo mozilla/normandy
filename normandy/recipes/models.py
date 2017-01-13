@@ -13,13 +13,37 @@ from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
-from normandy.base.utils import get_client_ip
+from normandy.base.utils import filter_m2m, get_client_ip
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
 
 
 logger = logging.getLogger(__name__)
+
+
+class Channel(models.Model):
+    slug = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ('slug',)
+
+
+class Country(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ('name',)
+
+
+class Locale(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ('name',)
 
 
 class Signature(models.Model):
@@ -83,8 +107,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.latest_revision.action if self.latest_revision else None
 
     @property
-    def filter_expression(self):
-        return self.latest_revision.filter_expression if self.latest_revision else None
+    def extra_filter_expression(self):
+        return self.latest_revision.extra_filter_expression if self.latest_revision else None
 
     @property
     def arguments_json(self):
@@ -101,6 +125,22 @@ class Recipe(DirtyFieldsMixin, models.Model):
     @property
     def last_updated(self):
         return self.latest_revision.updated if self.latest_revision else None
+
+    @property
+    def filter_expression(self):
+        return self.latest_revision.filter_expression if self.latest_revision else None
+
+    @property
+    def channels(self):
+        return self.latest_revision.channels if self.latest_revision else None
+
+    @property
+    def countries(self):
+        return self.latest_revision.countries if self.latest_revision else None
+
+    @property
+    def locales(self):
+        return self.latest_revision.locales if self.latest_revision else None
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -122,18 +162,52 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     @transaction.atomic
     def update(self, force=False, **data):
-        if self.latest_revision:
-            is_clean = RecipeRevision.objects.filter(id=self.latest_revision.id, **data).exists()
+        revision = self.latest_revision
 
-            revision_data = self.latest_revision.data
+        channels = data.pop('channels', [])
+        countries = data.pop('countries', [])
+        locales = data.pop('locales', [])
+
+        if revision:
+            revision_data = revision.data
             revision_data.update(data)
+
+            revisions = RecipeRevision.objects.filter(id=self.latest_revision.id, **data)
+
+            if channels:
+                revisions = filter_m2m(revisions, 'channels', list(channels))
+            else:
+                channels = revision_data.pop('channels')
+
+            if countries:
+                revisions = filter_m2m(revisions, 'countries', list(countries))
+            else:
+                countries = revision_data.pop('countries')
+
+            if locales:
+                revisions = filter_m2m(revisions, 'locales', list(locales))
+            else:
+                locales = revision_data.pop('locales')
+
+            is_clean = revisions.exists()
+
             data = revision_data
         else:
             is_clean = False
 
         if not is_clean or force:
-            self.latest_revision = RecipeRevision.objects.create(
-                recipe=self, parent=self.latest_revision, **data)
+            self.latest_revision = RecipeRevision.objects.create(recipe=self, parent=revision,
+                                                                 **data)
+
+            for channel in channels:
+                self.latest_revision.channels.add(channel)
+
+            for country in countries:
+                self.latest_revision.countries.add(country)
+
+            for locale in locales:
+                self.latest_revision.locales.add(locale)
+
             self.save()
 
     @transaction.atomic
@@ -174,7 +248,10 @@ class RecipeRevision(models.Model):
     name = models.CharField(max_length=255)
     action = models.ForeignKey('Action', related_name='recipe_revisions')
     arguments_json = models.TextField(default='{}', validators=[validate_json])
-    filter_expression = models.TextField(blank=False)
+    extra_filter_expression = models.TextField(blank=False)
+    channels = models.ManyToManyField(Channel)
+    countries = models.ManyToManyField(Country)
+    locales = models.ManyToManyField(Locale)
 
     @property
     def data(self):
@@ -182,8 +259,15 @@ class RecipeRevision(models.Model):
             'name': self.name,
             'action': self.action,
             'arguments_json': self.arguments_json,
-            'filter_expression': self.filter_expression,
+            'extra_filter_expression': self.extra_filter_expression,
+            'channels': list(self.channels.all()),
+            'countries': list(self.countries.all()),
+            'locales': list(self.locales.all()),
         }
+
+    @property
+    def filter_expression(self):
+        return self.extra_filter_expression
 
     @property
     def arguments(self):

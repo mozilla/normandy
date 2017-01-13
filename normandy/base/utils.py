@@ -2,6 +2,7 @@ from datetime import datetime
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from django.conf import settings
+from django.db.models import Count
 from django.utils import timezone
 
 
@@ -46,3 +47,10 @@ def get_client_ip(request):
             return ips[-settings.NUM_PROXIES]
         except IndexError:
             return None
+
+
+def filter_m2m(qs, field, values):
+    qs.annotate(_count=Count(field)).filter(_count=len(values))
+
+    for value in values:
+        qs.filter(**{field: value})
