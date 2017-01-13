@@ -32,10 +32,7 @@ def migrate_reversion_data(apps, schema_editor):
         for r in Recipe.objects.all():
             revision = None
 
-            for v in Version.objects.filter(content_type=ct, object_id=r.id).order_by(
-                    'revision__date_created'):
-
-                v = Version.objects.get(revision_id=v.revision.id)
+            for v in Version.objects.filter(content_type=ct, object_id=r.id).order_by('revision__date_created'):
 
                 data = json.loads(v.serialized_data)[0]['fields']
 
@@ -55,10 +52,46 @@ def migrate_reversion_data(apps, schema_editor):
                 revision = RecipeRevision(recipe=r, parent=None, name=r.name, action=r.action,
                                           arguments_json=r.arguments_json,
                                           filter_expression=r.filter_expression)
+                revision.id = hash_revision_data(revision)
+                revision.save()
 
             r.latest_revision = revision
 
             r.save()
+
+
+def reverse_migrate_reversion_data(apps, schema_editor):
+    Action = apps.get_model('recipes', 'Action')
+    Recipe = apps.get_model('recipes', 'Recipe')
+    Version = apps.get_model('reversion', 'Version')
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+
+    ct = ContentType.objects.get(app_label='recipes', model='recipe')
+
+    for r in Recipe.objects.all():
+        rev = r.latest_revision
+
+        if rev:
+            r.name = rev.name
+            r.arguments_json = rev.arguments_json
+            r.filter_expression = rev.filter_expression
+            r.action = rev.action
+        else:
+            v = Version.objects.filter(content_type=ct, object_id=r.id).order_by('-revision__date_created').first()
+
+            if v:
+                data = json.loads(v.serialized_data)[0]['fields']
+
+                try:
+                    r.action = Action.objects.get(id=data.get('action'))
+                except Action.DoesNotExist:
+                    r.action = Action.objects.first()
+
+                r.name = data.get('name', 'recipe-{}'.format(r.id))
+                r.arguments_json = data.get('arguments_json', '')
+                r.filter_expression = data.get('filter_expression', '')
+
+        r.save()
 
 
 class Migration(migrations.Migration):
@@ -70,5 +103,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_reversion_data),
+        migrations.RunPython(migrate_reversion_data, reverse_migrate_reversion_data),
     ]
