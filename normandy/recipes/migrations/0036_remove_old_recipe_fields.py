@@ -22,6 +22,12 @@ class Migration(migrations.Migration):
             model_name='recipe',
             name='arguments_json',
         ),
+        migrations.AlterField(
+            model_name='recipe',
+            name='filter_expression',
+            field=models.TextField(blank=False, default=''),
+            preserve_default=True,
+        ),
         migrations.RemoveField(
             model_name='recipe',
             name='filter_expression',
