@@ -15,6 +15,7 @@ class Core(Configuration):
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
+        'product_details',
         'rest_framework',
         'rest_framework.authtoken',
         'reversion',
@@ -114,6 +115,8 @@ class Core(Configuration):
         'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
         'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
     }
+
+    PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
 
 
 class Base(Core):

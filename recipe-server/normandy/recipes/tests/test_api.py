@@ -151,7 +151,7 @@ class TestRecipeAPI(object):
             'name': 'Test Recipe',
             'action': action.name,
             'arguments': {},
-            'filter_expression': 'whatever',
+            'extra_filter_expression': 'whatever',
             'enabled': True
         })
         assert res.status_code == 201
@@ -167,7 +167,7 @@ class TestRecipeAPI(object):
             'name': 'Test Recipe',
             'action': action.name,
             'arguments': {},
-            'filter_expression': 'whatever',
+            'extra_filter_expression': 'whatever',
             'enabled': False
         })
         assert res.status_code == 201
@@ -176,12 +176,12 @@ class TestRecipeAPI(object):
         assert recipes.count() == 1
 
     def test_it_can_edit_recipes(self, api_client):
-        recipe = RecipeFactory(name='unchanged', filter_expression='true')
+        recipe = RecipeFactory(name='unchanged', extra_filter_expression='true')
         old_revision_id = recipe.revision_id
 
         res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {
             'name': 'changed',
-            'filter_expression': 'false',
+            'extra_filter_expression': 'false',
         })
         assert res.status_code == 200
 
@@ -210,7 +210,7 @@ class TestRecipeAPI(object):
         )
         res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
                                                   'enabled': True,
-                                                  'filter_expression': 'true',
+                                                  'extra_filter_expression': 'true',
                                                   'action': 'foobarbaz',
                                                   'arguments': {'message': ''}})
         assert res.status_code == 400

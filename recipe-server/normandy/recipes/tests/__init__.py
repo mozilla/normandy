@@ -8,10 +8,28 @@ from normandy.base.tests import FuzzyUnicode
 from normandy.recipes.models import (
     Action,
     Client,
+    Channel,
+    Country,
+    Locale,
     Recipe,
     RecipeRevision,
     Signature,
 )
+
+
+class ChannelFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Channel
+
+
+class CountryFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Country
+
+
+class LocaleFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Locale
 
 
 class ActionFactory(factory.DjangoModelFactory):
@@ -55,6 +73,33 @@ class RecipeFactory(factory.DjangoModelFactory):
             self.save()
         else:
             return None
+
+    @factory.post_generation
+    def channels(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for channel in extracted:
+                self.channels.add(channel)
+
+    @factory.post_generation
+    def countries(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for country in extracted:
+                self.countries.add(country)
+
+    @factory.post_generation
+    def locales(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for locale in extracted:
+                self.locales.add(locale)
 
 
 @factory.use_strategy(factory.BUILD_STRATEGY)

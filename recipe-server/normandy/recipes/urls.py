@@ -6,6 +6,7 @@ from normandy.recipes.api.views import (
     ActionImplementationView,
     ActionViewSet,
     ClassifyClient,
+    Filters,
     RecipeViewSet,
     RecipeRevisionViewSet,
 )
@@ -27,4 +28,5 @@ urlpatterns = [
         name='action-implementation'
     ),
     url(r'^api/v1/classify_client/$', ClassifyClient.as_view(), name='classify-client'),
+    url(r'^api/v1/filters/$', Filters.as_view(), name='filters'),
 ]
