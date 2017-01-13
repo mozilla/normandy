@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
-set -eu
+set -e
+
+if [[ -z $MOCK_SERVER_ARTIFACTS || -z $MOCK_SERVER_S3_BUCKET ]]; then
+  echo 'Skipping deployment because MOCK_SERVER_ARTIFACTS and MOCK_SERVER_S3_BUCKET are not both set'
+  exit 0
+fi
+
+set -u
 
 ./bin/upload.sh $MOCK_SERVER_ARTIFACTS $MOCK_SERVER_S3_BUCKET
