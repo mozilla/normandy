@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  testgen:
+    extends:
+      file: normandy-base.yml
+      service: normandy-base
+    links:
+      - database
+      - autograph
+      - proxy
+    volumes: # Relative to /compose/docker-compose.yml
+      - ../mock-recipe-server:/mock-server
+      - "${MOCK_SERVER_ARTIFACTS}:/build"

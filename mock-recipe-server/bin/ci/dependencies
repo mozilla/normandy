@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -eu
+
+# Install docker-compose
+sudo pip install docker-compose
+
+# Setup normandy-compose used in build
+./bin/setup.sh

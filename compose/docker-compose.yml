@@ -5,19 +5,12 @@ services:
     image: postgres:9.5.2
 
   normandy:
-    image: mozilla/normandy:latest
+    extends:
+      file: normandy-base.yml
+      service: normandy-base
     links:
       - database
       - autograph
-    environment:
-      DATABASE_URL: "postgres://postgres@database/postgres"
-      DJANGO_CONFIGURATION: ProductionInsecure
-      DJANGO_AUTOGRAPH_URL: http://autograph:8000/
-      # From etc/autograph.yaml
-      DJANGO_AUTOGRAPH_HAWK_ID: normandev
-      DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: 3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
-      DJANGO_CAN_EDIT_ACTIONS_IN_USE: "true"
-    stop_signal: SIGKILL
 
   proxy:
     image: nginx:1.9.14
