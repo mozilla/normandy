@@ -2,7 +2,15 @@ from rest_framework import serializers
 from reversion.models import Version
 
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import Action, Recipe, RecipeRevision, Signature
+from normandy.recipes.models import (
+    Action,
+    Channel,
+    Country,
+    Locale,
+    Recipe,
+    RecipeRevision,
+    Signature
+)
 from normandy.recipes.validators import JSONSchemaValidator
 
 
@@ -26,7 +34,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
-    filter_expression = serializers.CharField()
+    channels = serializers.SlugRelatedField(slug_field='slug', queryset=Channel.objects.all(),
+                                            many=True, required=False)
+    countries = serializers.SlugRelatedField(slug_field='code', queryset=Country.objects.all(),
+                                             many=True, required=False)
+    locales = serializers.SlugRelatedField(slug_field='code', queryset=Locale.objects.all(),
+                                           many=True, required=False)
+    extra_filter_expression = serializers.CharField()
+    filter_expression = serializers.CharField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -38,6 +53,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             'revision_id',
             'action',
             'arguments',
+            'channels',
+            'countries',
+            'locales',
+            'extra_filter_expression',
             'filter_expression',
         ]
 
@@ -50,6 +69,21 @@ class RecipeSerializer(serializers.ModelSerializer):
         if 'action' in validated_data:
             validated_data.update({
                 'action': Action.objects.get(name=validated_data['action'])
+            })
+
+        if 'channels' in validated_data:
+            validated_data.update({
+                'channels': Channel.objects.filter(slug__in=validated_data['channels'])
+            })
+
+        if 'countries' in validated_data:
+            validated_data.update({
+                'countries': Country.objects.filter(code__in=validated_data['countries'])
+            })
+
+        if 'locales' in validated_data:
+            validated_data.update({
+                'locales': Locale.objects.filter(code__in=validated_data['locales'])
             })
 
         instance.update(**validated_data)

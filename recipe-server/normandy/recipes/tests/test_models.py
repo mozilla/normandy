@@ -9,6 +9,9 @@ from normandy.base.tests import Whatever
 from normandy.recipes.models import Client, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
+    ChannelFactory,
+    CountryFactory,
+    LocaleFactory,
     RecipeFactory,
     SignatureFactory,
 )
@@ -51,8 +54,11 @@ class TestRecipe(object):
         recipe = RecipeFactory(
             action=ActionFactory(name='action'),
             arguments_json='{"foo": 1, "bar": 2}',
+            channels=[ChannelFactory(slug='beta')],
+            countries=[CountryFactory(code='CA')],
             enabled=False,
-            filter_expression='2 + 2 == 4',
+            extra_filter_expression='2 + 2 == 4',
+            locales=[LocaleFactory(code='en-US')],
             name='canonical',
         )
         # Yes, this is really ugly, but we really do need to compare an exact
@@ -61,10 +67,14 @@ class TestRecipe(object):
             '{'
             '"action":"action",'
             '"arguments":{"bar":2,"foo":1},'
+            '"channels":["beta"],'
+            '"countries":["CA"],'
             '"enabled":false,'
+            '"extra_filter_expression":"2 + 2 == 4",'
             '"filter_expression":"2 + 2 == 4",'
             '"id":%(id)s,'
             '"last_updated":"%(last_updated)s",'
+            '"locales":["en-US"],'
             '"name":"canonical",'
             '"revision_id":"%(revision_id)s"'
             '}'
@@ -155,7 +165,7 @@ class TestRecipe(object):
     def test_recipe_update_partial(self):
         a1 = ActionFactory()
         recipe = RecipeFactory(name='unchanged', action=a1, arguments={'message': 'something'},
-                               filter_expression='something !== undefined')
+                               extra_filter_expression='something !== undefined')
         a2 = ActionFactory()
         recipe.update(name='changed', action=a2)
         assert recipe.action == a2
