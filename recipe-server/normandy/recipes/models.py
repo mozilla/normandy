@@ -14,6 +14,7 @@ from reversion import revisions as reversion
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip
+from normandy.recipes.decorators import latest_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
@@ -98,49 +99,49 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def __str__(self):
         return self.name
 
-    @property
+    @latest_revision_property
     def name(self):
-        return self.latest_revision.name if self.latest_revision else None
+        return self.latest_revision.name
 
-    @property
+    @latest_revision_property
     def action(self):
-        return self.latest_revision.action if self.latest_revision else None
+        return self.latest_revision.action
 
-    @property
+    @latest_revision_property
     def extra_filter_expression(self):
-        return self.latest_revision.extra_filter_expression if self.latest_revision else None
+        return self.latest_revision.extra_filter_expression
 
-    @property
+    @latest_revision_property
     def arguments_json(self):
-        return self.latest_revision.arguments_json if self.latest_revision else None
+        return self.latest_revision.arguments_json
 
-    @property
+    @latest_revision_property
     def arguments(self):
-        return self.latest_revision.arguments if self.latest_revision else None
+        return self.latest_revision.arguments
 
-    @property
+    @latest_revision_property
     def revision_id(self):
-        return self.latest_revision.id if self.latest_revision else None
+        return self.latest_revision.id
 
-    @property
+    @latest_revision_property
     def last_updated(self):
-        return self.latest_revision.updated if self.latest_revision else None
+        return self.latest_revision.updated
 
-    @property
+    @latest_revision_property
     def filter_expression(self):
-        return self.latest_revision.filter_expression if self.latest_revision else None
+        return self.latest_revision.filter_expression
 
-    @property
+    @latest_revision_property
     def channels(self):
-        return self.latest_revision.channels if self.latest_revision else None
+        return self.latest_revision.channels
 
-    @property
+    @latest_revision_property
     def countries(self):
-        return self.latest_revision.countries if self.latest_revision else None
+        return self.latest_revision.countries
 
-    @property
+    @latest_revision_property
     def locales(self):
-        return self.latest_revision.locales if self.latest_revision else None
+        return self.latest_revision.locales
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -196,8 +197,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
             is_clean = False
 
         if not is_clean or force:
-            self.latest_revision = RecipeRevision.objects.create(recipe=self, parent=revision,
-                                                                 **data)
+            self.latest_revision = RecipeRevision.objects.create(
+                recipe=self, parent=revision, **data)
 
             for channel in channels:
                 self.latest_revision.channels.add(channel)
