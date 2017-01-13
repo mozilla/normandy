@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255)),
                 ('arguments_json', models.TextField(default='{}', validators=[normandy.recipes.validators.validate_json])),
                 ('filter_expression', models.TextField()),
-                ('action', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='recipes.Action')),
+                ('action', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipe_revisions', to='recipes.Action')),
                 ('parent', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child', to='recipes.RecipeRevision')),
             ],
         ),
@@ -87,5 +87,15 @@ class Migration(migrations.Migration):
             model_name='recipe',
             name='latest_revision',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='latest_for_recipe', to='recipes.RecipeRevision'),
+        ),
+        migrations.AlterField(
+            model_name='recipe',
+            name='action',
+            field=models.ForeignKey(to='recipes.Action', null=True),
+        ),
+        migrations.AlterField(
+            model_name='recipe',
+            name='name',
+            field=models.CharField(max_length=255, unique=False, null=True),
         ),
     ]
