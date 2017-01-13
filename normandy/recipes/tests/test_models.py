@@ -63,6 +63,10 @@ class TestRecipe(object):
         )
         # Yes, this is really ugly, but we really do need to compare an exact
         # byte sequence, since this is used for hashing and signing
+        filter_expression = (
+            "normandy.locale in ['en-US'] && normandy.country in ['CA']"
+            " && normandy.channel in ['beta'] && (2 + 2 == 4)"
+        )
         expected = (
             '{'
             '"action":"action",'
@@ -71,7 +75,7 @@ class TestRecipe(object):
             '"countries":["CA"],'
             '"enabled":false,'
             '"extra_filter_expression":"2 + 2 == 4",'
-            '"filter_expression":"2 + 2 == 4",'
+            '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
             '"last_updated":"%(last_updated)s",'
             '"locales":["en-US"],'
@@ -81,7 +85,8 @@ class TestRecipe(object):
         ) % {
             'id': recipe.id,
             'revision_id': recipe.revision_id,
-            'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'filter_expression': filter_expression
         }
         expected = expected.encode()
         assert recipe.canonical_json() == expected

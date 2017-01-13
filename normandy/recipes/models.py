@@ -267,7 +267,34 @@ class RecipeRevision(models.Model):
 
     @property
     def filter_expression(self):
-        return self.extra_filter_expression
+        exp = ''
+
+        if self.locales.count():
+            locales = ', '.join(["'{}'".format(l.code) for l in self.locales.all()])
+            exp = 'normandy.locale in [{}]'.format(locales)
+
+        if self.countries.count():
+            countries = ', '.join(["'{}'".format(c.code) for c in self.countries.all()])
+
+            if len(exp):
+                exp += ' && '
+
+            exp += 'normandy.country in [{}]'.format(countries)
+
+        if self.channels.count():
+            channels = ', '.join(["'{}'".format(c.slug) for c in self.channels.all()])
+
+            if len(exp):
+                exp += ' && '
+
+            exp += 'normandy.channel in [{}]'.format(channels)
+
+        if self.extra_filter_expression:
+            prefix = ' && (' if len(exp) else ''
+            suffix = ')' if len(exp) else ''
+            exp += '{}{}{}'.format(prefix, self.extra_filter_expression, suffix)
+
+        return exp
 
     @property
     def arguments(self):
