@@ -28,6 +28,7 @@ XPCOMUtils.defineLazyGetter(this, "jexl", () => {
   jexl.addTransforms({
     date: dateString => new Date(dateString),
     stableSample: Sampling.stableSample,
+    bucketSample: Sampling.bucketSample,
   });
   return jexl;
 });
