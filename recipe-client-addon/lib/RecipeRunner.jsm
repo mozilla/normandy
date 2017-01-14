@@ -8,7 +8,7 @@ const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
 Cu.import("resource://gre/modules/Task.jsm");
-Cu.import("resource://gre/modules/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/EnvExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
@@ -17,7 +17,7 @@ Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
-const log = Log.repository.getLogger("extensions.shield-recipe-client");
+const log = LogManager.getLogger("recipe-runner");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
 this.RecipeRunner = {
@@ -72,7 +72,7 @@ this.RecipeRunner = {
     try {
       extraContext = yield this.getExtraContext();
     } catch (e) {
-      log.warning(`Couldn't get extra filter context: ${e}`);
+      log.warn(`Couldn't get extra filter context: ${e}`);
       extraContext = {};
     }
 

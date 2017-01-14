@@ -12,7 +12,7 @@ Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource:///modules/ShellService.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeout */
-Cu.import("resource://gre/modules/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 
@@ -20,8 +20,8 @@ const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUID
 
 this.EXPORTED_SYMBOLS = ["NormandyDriver"];
 
-const log = Log.repository.getLogger("extensions.shield-recipe-client");
-const actionLog = Log.repository.getLogger("extensions.shield-recipe-client.actions");
+const log = LogManager.getLogger("normandy-driver");
+const actionLog = LogManager.getLogger("normandy-driver.actions");
 
 this.NormandyDriver = function(sandboxManager, extraContext = {}) {
   if (!sandboxManager) {

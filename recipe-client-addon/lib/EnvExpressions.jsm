@@ -9,7 +9,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/TelemetryArchive.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
-Cu.import("resource://gre/modules/Log.jsm");
 
 this.EXPORTED_SYMBOLS = ["EnvExpressions"];
 
