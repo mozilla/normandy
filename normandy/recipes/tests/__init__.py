@@ -2,13 +2,11 @@ import hashlib
 
 import factory
 
-from normandy.base.tests import FuzzyUnicode, UserFactory
+from normandy.base.tests import FuzzyUnicode
 from normandy.recipes.models import (
     Action,
-    Approval,
-    ApprovalRequest,
-    ApprovalRequestComment,
     Recipe,
+    RecipeRevision,
     Signature,
 )
 
@@ -25,21 +23,22 @@ class ActionFactory(factory.DjangoModelFactory):
         return hashlib.sha1(action.implementation.encode()).hexdigest()
 
 
-class ApprovalFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Approval
-
-    creator = factory.SubFactory(UserFactory)
-
-
 class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
-    name = FuzzyUnicode()
-    action = factory.SubFactory(ActionFactory)
     enabled = True
-    approval = factory.SubFactory(ApprovalFactory)
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        obj = model_class(enabled=kwargs.pop('enabled'))
+        obj.save()
+
+        revision = RecipeRevisionFactory(**kwargs)
+        revision.action.save()
+        obj.update(**revision.data)
+
+        return obj
 
     # It is important that the signature be based on the actual data, and not
     # some static value so that tests can make assertions against what data was
@@ -54,48 +53,15 @@ class RecipeFactory(factory.DjangoModelFactory):
         else:
             return None
 
-    @factory.post_generation
-    def countries(self, create, extracted, **kwargs):
-        if not create:
-            return
 
-        if extracted:
-            for country in extracted:
-                self.countries.add(country)
-
-    @factory.post_generation
-    def locales(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for locale in extracted:
-                self.locales.add(locale)
-
-    @factory.post_generation
-    def release_channels(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for channel in extracted:
-                self.release_channels.add(channel)
-
-
-class ApprovalRequestFactory(factory.DjangoModelFactory):
+@factory.use_strategy(factory.BUILD_STRATEGY)
+class RecipeRevisionFactory(factory.DjangoModelFactory):
     class Meta:
-        model = ApprovalRequest
+        model = RecipeRevision
 
+    name = FuzzyUnicode()
+    action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
-    creator = factory.SubFactory(UserFactory)
-
-
-class ApprovalRequestCommentFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = ApprovalRequestComment
-
-    approval_request = factory.SubFactory(ApprovalRequestFactory)
-    creator = factory.SubFactory(UserFactory)
 
 
 class SignatureFactory(factory.DjangoModelFactory):

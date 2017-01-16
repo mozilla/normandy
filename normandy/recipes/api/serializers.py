@@ -1,12 +1,8 @@
-from django.contrib.auth.models import User
-
 from rest_framework import serializers
 from reversion.models import Version
 
-from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import (
-    Action, Approval, ApprovalRequest, ApprovalRequestComment, Recipe, Signature)
+from normandy.recipes.models import Action, Recipe, RecipeRevision, Signature
 from normandy.recipes.validators import JSONSchemaValidator
 
 
@@ -23,69 +19,14 @@ class ActionSerializer(serializers.ModelSerializer):
         ]
 
 
-class ApprovalSerializer(serializers.ModelSerializer):
-    creator = UserSerializer(read_only=True)
-    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
-                                                    write_only=True)
-
-    class Meta:
-        model = Approval
-        fields = [
-            'id',
-            'created',
-            'creator',
-            'creator_id',
-        ]
-
-
-class ApprovalRequestSerializer(serializers.ModelSerializer):
-    creator = UserSerializer(read_only=True)
-    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
-                                                    write_only=True)
-    is_approved = serializers.BooleanField(read_only=True)
-    recipe_id = serializers.PrimaryKeyRelatedField(source='recipe', queryset=Recipe.objects.all(),
-                                                   write_only=True)
-
-    class Meta:
-        model = ApprovalRequest
-        fields = [
-            'id',
-            'created',
-            'creator',
-            'creator_id',
-            'active',
-            'approval',
-            'is_approved',
-            'recipe_id',
-        ]
-
-
-class ApprovalRequestCommentSerializer(serializers.ModelSerializer):
-    creator = UserSerializer(read_only=True)
-    creator_id = serializers.PrimaryKeyRelatedField(source='creator', queryset=User.objects.all(),
-                                                    write_only=True)
-    approval_request_id = serializers.PrimaryKeyRelatedField(
-        source='approval_request', queryset=ApprovalRequest.objects.all(), write_only=True)
-
-    class Meta:
-        model = ApprovalRequestComment
-        fields = [
-            'id',
-            'created',
-            'creator',
-            'creator_id',
-            'text',
-            'approval_request_id',
-        ]
-
-
 class RecipeSerializer(serializers.ModelSerializer):
+    enabled = serializers.BooleanField(required=False)
+    last_updated = serializers.DateTimeField(read_only=True)
+    revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
-    current_approval_request = ApprovalRequestSerializer(read_only=True)
-    approval = ApprovalSerializer(read_only=True)
-    is_approved = serializers.BooleanField(read_only=True)
-    enabled = serializers.BooleanField(required=False)
+    filter_expression = serializers.CharField()
 
     class Meta:
         model = Recipe
@@ -98,10 +39,28 @@ class RecipeSerializer(serializers.ModelSerializer):
             'action',
             'arguments',
             'filter_expression',
-            'current_approval_request',
-            'approval',
-            'is_approved',
         ]
+
+    def update(self, instance, validated_data):
+        if 'enabled' in validated_data:
+            instance.enabled = validated_data.pop('enabled')
+
+        instance.save()
+
+        if 'action' in validated_data:
+            validated_data.update({
+                'action': Action.objects.get(name=validated_data['action'])
+            })
+
+        instance.update(**validated_data)
+
+        return instance
+
+    def create(self, validated_data):
+        recipe = Recipe.objects.create(enabled=validated_data.pop('enabled'))
+        recipe.save()
+
+        return self.update(recipe, validated_data)
 
     def validate_arguments(self, value):
         # Get the schema associated with the selected action
@@ -148,6 +107,21 @@ class RecipeSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.Serializer):
     country = serializers.CharField()
     request_time = serializers.DateTimeField()
+
+
+class RecipeRevisionSerializer(serializers.ModelSerializer):
+    date_created = serializers.DateTimeField(source='created', read_only=True)
+    comment = serializers.CharField(read_only=True)
+    recipe = RecipeSerializer(source='restored_recipe', read_only=True)
+
+    class Meta:
+        model = RecipeRevision
+        fields = [
+            'id',
+            'date_created',
+            'recipe',
+            'comment',
+        ]
 
 
 class RecipeVersionSerializer(serializers.ModelSerializer):

@@ -1,23 +1,18 @@
 import hashlib
 from unittest.mock import patch
 
-from django.contrib.contenttypes.models import ContentType
-from django.db import connection, transaction
+from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
-from reversion import revisions as reversion
-from reversion.models import Version
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
-from normandy.base.tests import Whatever, UserFactory
+from normandy.base.tests import Whatever
 from normandy.base.utils import aware_datetime
-from normandy.recipes.models import Recipe, ApprovalRequest, ApprovalRequestComment
+from normandy.recipes.models import Recipe
 from normandy.recipes.tests import (
     ActionFactory,
-    ApprovalRequestFactory,
-    ApprovalRequestCommentFactory,
     RecipeFactory,
 )
 
@@ -193,7 +188,7 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.name == 'changed'
         assert recipe.filter_expression == 'false'
-        assert recipe.revision_id == old_revision_id + 1
+        assert recipe.revision_id != old_revision_id
 
     def test_creation_when_action_does_not_exist(self, api_client):
         res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
@@ -259,16 +254,9 @@ class TestRecipeAPI(object):
         assert res.data['detail'] == AdminEnabledOrReadOnly.message
 
     def test_history(self, api_client):
-        with reversion.create_revision():
-            recipe = RecipeFactory(name='version 1')
-
-        with reversion.create_revision():
-            recipe.name = 'version 2'
-            recipe.save()
-
-        with reversion.create_revision():
-            recipe.name = 'version 3'
-            recipe.save()
+        recipe = RecipeFactory(name='version 1')
+        recipe.update(name='version 2')
+        recipe.update(name='version 3')
 
         res = api_client.get('/api/v1/recipe/%s/history/' % recipe.id)
 
@@ -278,8 +266,6 @@ class TestRecipeAPI(object):
 
     def test_it_can_enable_recipes(self, api_client):
         recipe = RecipeFactory(enabled=False)
-        approval_request = ApprovalRequestFactory(recipe=recipe)
-        approval_request.approve(UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 204
@@ -289,25 +275,12 @@ class TestRecipeAPI(object):
 
     def test_it_can_disable_recipes(self, api_client):
         recipe = RecipeFactory(enabled=True)
-        approval_request = ApprovalRequestFactory(recipe=recipe)
-        approval_request.approve(UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
         assert res.status_code == 204
 
         recipe = Recipe.objects.all()[0]
-        assert recipe.approval is None
         assert not recipe.enabled
-
-    def test_approval_request_list(self, api_client):
-        recipe = RecipeFactory()
-        ar1 = ApprovalRequestFactory(recipe=recipe, active=False)
-        ar2 = ApprovalRequestFactory(recipe=recipe)
-
-        res = api_client.get('/api/v1/recipe/%s/approval_requests/' % recipe.id)
-        assert res.status_code == 200
-        assert res.data[0]['id'] == ar2.id
-        assert res.data[1]['id'] == ar1.id
 
     def test_filtering_by_enabled_lowercase(self, api_client):
         r1 = RecipeFactory(enabled=True)
@@ -368,224 +341,17 @@ class TestRecipeAPI(object):
 
 
 @pytest.mark.django_db
-class TestRecipeVersionAPI(object):
+class TestRecipeRevisionAPI(object):
     def test_it_works(self, api_client):
-        res = api_client.get('/api/v1/recipe_version/')
+        res = api_client.get('/api/v1/recipe_revision/')
         assert res.status_code == 200
         assert res.data == []
 
-    def test_it_serves_recipes(self, api_client):
-        with transaction.atomic(), reversion.create_revision():
-            recipe = RecipeFactory()
-
-        content_type = ContentType.objects.get_for_model(recipe)
-        version = Version.objects.filter(content_type=content_type, object_id=recipe.pk).first()
-
-        res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
-        assert res.status_code == 200
-        assert res.data['id'] == version.id
-
-    def test_it_filters_only_recipe_versions(self, api_client):
-        with transaction.atomic(), reversion.create_revision():
-            recipe = RecipeFactory()
-
-        action = recipe.action
-        content_type = ContentType.objects.get_for_model(action)
-        version = Version.objects.filter(content_type=content_type, object_id=action.pk).first()
-
-        res = api_client.get('/api/v1/recipe_version/%s/' % version.id)
-        assert res.status_code == 404
-
-
-@pytest.mark.django_db
-class TestApprovalRequestAPI(object):
-    def test_it_works(self, api_client):
-        res = api_client.get('/api/v1/approval_request/')
-        assert res.status_code == 200
-        assert res.data == []
-
-    def test_it_serves_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory()
-
-        res = api_client.get('/api/v1/approval_request/')
-        assert res.status_code == 200
-        assert res.data[0]['id'] == approval_request.id
-
-    def test_it_can_create_approval_requests(self, api_client):
+    def test_it_serves_revisions(self, api_client):
         recipe = RecipeFactory()
-        user = UserFactory()
-
-        res = api_client.post('/api/v1/approval_request/', {
-            'creator_id': user.id, 'active': True, 'recipe_id': recipe.id})
-        assert res.status_code == 201
-
-        approval_requests = ApprovalRequest.objects.all()
-        assert approval_requests.count() == 1
-
-    def test_it_cannot_create_multiple_open_approval_requests(self, api_client):
-        recipe = RecipeFactory()
-        user = UserFactory()
-        ApprovalRequestFactory(recipe=recipe, active=True)
-
-        res = api_client.post('/api/v1/approval_request/', {
-            'creator_id': user.id, 'active': True, 'recipe_id': recipe.id})
-        assert res.status_code == 400
-
-    def test_it_can_edit_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory(active=True)
-
-        res = api_client.patch('/api/v1/approval_request/%s/' % approval_request.id,
-                               {'active': False})
+        res = api_client.get('/api/v1/recipe_revision/%s/' % recipe.latest_revision.id)
         assert res.status_code == 200
-
-        approval_request.refresh_from_db()
-        assert not approval_request.active
-
-    def test_it_can_delete_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory()
-
-        res = api_client.delete('/api/v1/approval_request/%s/' % approval_request.id)
-        assert res.status_code == 204
-
-        approval_requests = ApprovalRequest.objects.all()
-        assert approval_requests.count() == 0
-
-    def test_available_if_admin_enabled(self, api_client, settings):
-        settings.ADMIN_ENABLED = True
-        res = api_client.get('/api/v1/approval_request/')
-        assert res.status_code == 200
-        assert res.data == []
-
-    def test_readonly_if_admin_disabled(self, api_client, settings):
-        settings.ADMIN_ENABLED = False
-        res = api_client.get('/api/v1/approval_request/')
-        assert res.status_code == 200
-
-        approval_request = ApprovalRequestFactory(active=True)
-        res = api_client.patch('/api/v1/approval_request/%s/' % approval_request.id,
-                               {'active': False})
-        assert res.status_code == 403
-        assert res.data['detail'] == AdminEnabledOrReadOnly.message
-
-    def test_it_can_approve_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory(active=True)
-
-        res = api_client.post('/api/v1/approval_request/%s/approve/' % approval_request.id)
-        assert res.status_code == 204
-
-        approval_request = ApprovalRequest.objects.first()
-        assert approval_request.approval is not None
-        assert approval_request.is_approved
-        assert not approval_request.active
-
-    def test_it_cannot_approve_closed_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory(active=False)
-
-        res = api_client.post('/api/v1/approval_request/%s/approve/' % approval_request.id)
-        assert res.status_code == 400
-
-    def test_it_can_reject_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory(active=True)
-
-        res = api_client.post('/api/v1/approval_request/%s/reject/' % approval_request.id)
-        assert res.status_code == 204
-
-        approval_request = ApprovalRequest.objects.first()
-        assert approval_request.approval is None
-        assert not approval_request.is_approved
-        assert not approval_request.active
-
-    def test_it_cannot_reject_closed_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory(active=False)
-
-        res = api_client.post('/api/v1/approval_request/%s/reject/' % approval_request.id)
-        assert res.status_code == 400
-
-    def test_it_can_comment_on_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory()
-
-        res = api_client.post('/api/v1/approval_request/%s/comment/' % approval_request.id,
-                              {'text': 'a test comment.'})
-        assert res.status_code == 200
-        assert res.data['text'] == 'a test comment.'
-        assert approval_request.comments.count() == 1
-
-    def test_blank_comments_fail_on_approval_requests(self, api_client):
-        approval_request = ApprovalRequestFactory()
-
-        res = api_client.post('/api/v1/approval_request/%s/comment/' % approval_request.id,
-                              {'text': ''})
-        assert res.status_code == 400
-
-    def test_it_can_list_comments_on_approval_requests(self, api_client):
-        comment = ApprovalRequestCommentFactory()
-
-        res = api_client.get('/api/v1/approval_request/%s/comments/' % comment.approval_request.id)
-        assert res.status_code == 200
-        assert res.data[0]['id'] == comment.id
-        assert ApprovalRequestComment.objects.count() == 1
-
-
-@pytest.mark.django_db
-class TestApprovalRequestCommentAPI(object):
-    def test_it_works(self, api_client):
-        res = api_client.get('/api/v1/approval_request_comment/')
-        assert res.status_code == 200
-        assert res.data == []
-
-    def test_it_serves_comments(self, api_client):
-        approval_request = ApprovalRequestCommentFactory()
-
-        res = api_client.get('/api/v1/approval_request_comment/')
-        assert res.status_code == 200
-        assert res.data[0]['id'] == approval_request.id
-
-    def test_it_can_create_comments(self, api_client):
-        approval_request = ApprovalRequestFactory()
-        user = UserFactory()
-
-        res = api_client.post('/api/v1/approval_request_comment/', {
-            'creator_id': user.id, 'text': 'testing', 'approval_request_id': approval_request.id})
-        assert res.status_code == 201
-
-        comments = ApprovalRequestComment.objects.all()
-        assert comments.count() == 1
-
-    def test_it_can_edit_comments(self, api_client):
-        comment = ApprovalRequestCommentFactory(text='unchanged')
-
-        res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,
-                               {'text': 'changed'})
-        assert res.status_code == 200
-
-        comment.refresh_from_db()
-        assert comment.text == 'changed'
-
-    def test_it_can_delete_comments(self, api_client):
-        comment = ApprovalRequestCommentFactory()
-
-        res = api_client.delete('/api/v1/approval_request_comment/%s/' % comment.id)
-        assert res.status_code == 204
-
-        comments = ApprovalRequestComment.objects.all()
-        assert comments.count() == 0
-
-    def test_available_if_admin_enabled(self, api_client, settings):
-        settings.ADMIN_ENABLED = True
-        res = api_client.get('/api/v1/approval_request_comment/')
-        assert res.status_code == 200
-        assert res.data == []
-
-    def test_readonly_if_admin_disabled(self, api_client, settings):
-        settings.ADMIN_ENABLED = False
-        res = api_client.get('/api/v1/approval_request_comment/')
-        assert res.status_code == 200
-
-        comment = ApprovalRequestCommentFactory(text='unchanged')
-        res = api_client.patch('/api/v1/approval_request_comment/%s/' % comment.id,
-                               {'text': 'changed'})
-        assert res.status_code == 403
-        assert res.data['detail'] == AdminEnabledOrReadOnly.message
+        assert res.data['id'] == recipe.latest_revision.id
 
 
 @pytest.mark.django_db

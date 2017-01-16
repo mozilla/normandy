@@ -22,11 +22,6 @@ from normandy.recipes.validators import validate_json
 logger = logging.getLogger(__name__)
 
 
-class Approval(models.Model):
-    created = models.DateTimeField(default=timezone.now)
-    creator = models.ForeignKey(User)
-
-
 class Signature(models.Model):
     signature = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
@@ -59,58 +54,19 @@ class RecipeQuerySet(models.QuerySet):
             recipe.save()
 
 
-@reversion.register()
 class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
     objects = RecipeQuerySet.as_manager()
 
-    name = models.CharField(max_length=255, unique=True)
-    revision_id = models.IntegerField(default=0, editable=False)
-    last_updated = models.DateTimeField(default=timezone.now)
+    latest_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
+                                        related_name='latest_for_recipe')
 
-    action = models.ForeignKey('Action')
-    arguments_json = models.TextField(default='{}', validators=[validate_json])
-
-    # Fields that determine who this recipe is sent to.
     enabled = models.BooleanField(default=False)
-    filter_expression = models.TextField(blank=False)
-    approval = models.OneToOneField(Approval, related_name='recipe', null=True, blank=True)
-
-    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
+    signature = models.OneToOneField(Signature, related_name='recipe_revision', null=True,
+                                     blank=True)
 
     class Meta:
-        ordering = ['-enabled', '-last_updated']
-
-    class IsNotApproved(Exception):
-        pass
-
-    @property
-    def is_approved(self):
-        return self.approval is not None
-
-    @property
-    def arguments(self):
-        return json.loads(self.arguments_json)
-
-    @arguments.setter
-    def arguments(self, value):
-        self.arguments_json = json.dumps(value)
-
-    @property
-    def current_approval_request(self):
-        try:
-            return self.approval_requests.get(active=True)
-        except ApprovalRequest.DoesNotExist:
-            return None
-
-    def enable(self):
-        self.enabled = True
-
-    def disable(self):
-        self.enabled = False
-        self.approval = None
-
-    _registered_matchers = []
+        ordering = ['-enabled', '-latest_revision__updated']
 
     def __repr__(self):
         return '<Recipe "{name}">'.format(name=self.name)
@@ -118,53 +74,33 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def __str__(self):
         return self.name
 
-    @transaction.atomic
-    def save(self, *args, skip_last_updated=False, **kwargs):
-        if self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields(check_relationship=True)
+    @property
+    def name(self):
+        return self.latest_revision.name if self.latest_revision else None
 
-            # If only the signature changed, skip the rest of the updates here,
-            # to avoid invalidating that signature. If the signature changed
-            # along with something else, raise an error, since the signature
-            # will probably be invalid. Otherwise, try and generate a new
-            # signature for the object. If that fails, remove the signature,
-            # because it is invalid now.
+    @property
+    def action(self):
+        return self.latest_revision.action if self.latest_revision else None
 
-            dirty_field_names = list(dirty_fields.keys())
-            should_sign = False
+    @property
+    def filter_expression(self):
+        return self.latest_revision.filter_expression if self.latest_revision else None
 
-            if dirty_field_names == ['signature']:
-                super().save(*args, **kwargs)
-                return
-            elif 'signature' in dirty_field_names and self.signature is not None:
-                # Setting the signature while also changing something else is probably
-                # going to make the signature immediately invalid. Don't allow it.
-                raise ValidationError('Signatures must change alone')
-            else:
-                should_sign = True
+    @property
+    def arguments_json(self):
+        return self.latest_revision.arguments_json if self.latest_revision else None
 
-            # Increment the revision ID, unless someone else tried to change it.
-            if 'revision_id' not in dirty_field_names:
-                self.revision_id += 1
+    @property
+    def arguments(self):
+        return self.latest_revision.arguments if self.latest_revision else None
 
-            if reversion.is_active():
-                reversion.add_to_revision(self)
+    @property
+    def revision_id(self):
+        return self.latest_revision.id if self.latest_revision else None
 
-            if not skip_last_updated:
-                self.last_updated = timezone.now()
-
-            if should_sign:
-                try:
-                    if self.id is None:
-                        # Save now, to get an ID for the signature.
-                        super().save(*args, **kwargs)
-                        # Change from insert to update, so the save() call at the end doesn't fail
-                        kwargs['force_insert'] = False
-                    self.update_signature()
-                except ImproperlyConfigured:
-                    self.signature = None
-
-        super().save(*args, **kwargs)
+    @property
+    def last_updated(self):
+        return self.latest_revision.updated if self.latest_revision else None
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -183,6 +119,97 @@ class Recipe(DirtyFieldsMixin, models.Model):
         signature = Signature(**signature_data)
         signature.save()
         self.signature = signature
+
+    @transaction.atomic
+    def update(self, force=False, **data):
+        if self.latest_revision:
+            is_clean = RecipeRevision.objects.filter(id=self.latest_revision.id, **data).exists()
+
+            revision_data = self.latest_revision.data
+            revision_data.update(data)
+            data = revision_data
+        else:
+            is_clean = False
+
+        if not is_clean or force:
+            self.latest_revision = RecipeRevision.objects.create(
+                recipe=self, parent=self.latest_revision, **data)
+            self.save()
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+            dirty_field_names = list(dirty_fields.keys())
+
+            if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
+                    and self.signature is not None):
+                # Setting the signature while also changing something else is probably
+                # going to make the signature immediately invalid. Don't allow it.
+                raise ValidationError('Signatures must change alone')
+
+            if dirty_field_names != ['signature']:
+                super().save(*args, **kwargs)
+                kwargs['force_insert'] = False
+
+                try:
+                    self.update_signature()
+                except ImproperlyConfigured:
+                    self.signature = None
+
+        super().save(*args, **kwargs)
+
+
+class RecipeRevision(models.Model):
+    id = models.CharField(max_length=64, primary_key=True)
+    parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
+                                  related_name='child')
+    recipe = models.ForeignKey(Recipe, related_name='revisions')
+    created = models.DateTimeField(default=timezone.now)
+    updated = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='recipe_revisions',
+                             null=True)
+    comment = models.TextField()
+
+    name = models.CharField(max_length=255)
+    action = models.ForeignKey('Action', related_name='recipe_revisions')
+    arguments_json = models.TextField(default='{}', validators=[validate_json])
+    filter_expression = models.TextField(blank=False)
+
+    @property
+    def data(self):
+        return {
+            'name': self.name,
+            'action': self.action,
+            'arguments_json': self.arguments_json,
+            'filter_expression': self.filter_expression,
+        }
+
+    @property
+    def arguments(self):
+        return json.loads(self.arguments_json)
+
+    @arguments.setter
+    def arguments(self, value):
+        self.arguments_json = json.dumps(value)
+
+    @property
+    def restored_recipe(self):
+        recipe = self.recipe
+        recipe.latest_revision = self
+        return recipe
+
+    def save(self, *args, **kwargs):
+        if not self.created:
+            self.created = timezone.now()
+
+        data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
+                                     self.arguments_json, self.filter_expression)
+        self.id = hashlib.sha256(data.encode()).hexdigest()
+
+        self.updated = timezone.now()
+
+        super().save(*args, **kwargs)
 
 
 @reversion.register()
@@ -206,7 +233,9 @@ class Action(models.Model):
     @property
     def recipes_used_by(self):
         """Set of enabled recipes that are using this action."""
-        return self.recipe_set.filter(enabled=True)
+        return Recipe.objects.filter(
+            latest_revision_id__in=self.recipe_revisions.values_list('id', flat=True),
+            enabled=True)
 
     def __str__(self):
         return self.name
@@ -243,65 +272,3 @@ class Client(object):
     @cached_property
     def request_time(self):
         return self.request.received_at
-
-
-class ApprovalRequest(models.Model):
-    recipe = models.ForeignKey(Recipe, related_name='approval_requests')
-    created = models.DateTimeField(default=timezone.now)
-    creator = models.ForeignKey(User)
-    active = models.BooleanField(default=True)
-    approval = models.OneToOneField(Approval, null=True, related_name='approval_request')
-
-    class Meta:
-        ordering = ('-created',)
-
-    class IsNotActive(Exception):
-        pass
-
-    class ActiveRequestAlreadyExists(Exception):
-        pass
-
-    @property
-    def is_approved(self):
-        return self.approval is not None
-
-    @transaction.atomic
-    def approve(self, user):
-        if self.active:
-            approval = Approval(creator=user)
-            approval.save()
-
-            self.approval = approval
-            self.active = False
-            self.save()
-
-            self.recipe.approval = approval
-            self.recipe.save()
-        else:
-            raise self.IsNotActive('Approval request has already been closed.')
-
-    def reject(self):
-        if self.active:
-            self.active = False
-            self.save()
-        else:
-            raise self.IsNotActive('Approval request has already been closed.')
-
-    def save(self, *args, **kwargs):
-        open_approval_requests = self.recipe.approval_requests.filter(active=True)
-
-        if self.pk:
-            open_approval_requests = open_approval_requests.exclude(pk=self.pk)
-
-        if self.active and open_approval_requests.exists():
-            raise self.ActiveRequestAlreadyExists('A recipe can only have one active approval '
-                                                  'request.')
-
-        super().save(*args, **kwargs)
-
-
-class ApprovalRequestComment(models.Model):
-    approval_request = models.ForeignKey(ApprovalRequest, related_name='comments')
-    created = models.DateTimeField(default=timezone.now)
-    creator = models.ForeignKey(User)
-    text = models.TextField()
