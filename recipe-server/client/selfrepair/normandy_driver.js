@@ -60,7 +60,7 @@ export class HeartbeatEmitter {
     'Voted',
     'TelemetrySent',
     'Engaged',
-  ]
+  ];
 
   constructor() {
     this.callbacks = {};

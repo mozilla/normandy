@@ -1,8 +1,9 @@
 import { Action, registerAction } from '../utils';
 
-const VERSION = 55; // Increase when changed.
+const VERSION = 56; // Increase when changed.
 
-const ONE_DAY = 1000 * 60 * 60 * 24; // 24 hours
+// 24 hours in milliseconds
+const ONE_DAY = (1000 * 3600 * 24);
 
 // how much time should elapse between heartbeats?
 const HEARTBEAT_THROTTLE = ONE_DAY;
@@ -19,6 +20,7 @@ export default class ShowHeartbeatAction extends Action {
     // (constant namespace - all heartbeats can access)
     this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
 
+    // context bindings
     this.updateLastInteraction = ::this.updateLastInteraction;
     this.updateLastShown = ::this.updateLastShown;
   }
@@ -69,12 +71,16 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   /**
+   * Looks up the time the prompt was last displayed to the user,
+   * and converts it to a Number (if found).
+   *
    * @async
-   * @return {number}
+   * @return {number}   Timestamp of last prompt showing
    */
   async getLastShown() {
     const lastShown = await this.storage.getItem('lastShown');
-    return lastShown ? parseFloat(lastShown) : null;
+    return typeof lastShown !== 'undefined' ?
+      parseFloat(lastShown) : null;
   }
 
   /**
@@ -91,31 +97,52 @@ export default class ShowHeartbeatAction extends Action {
     return !!lastShown;
   }
 
-  async shownWithinPastDays(days) {
+  /**
+   * Determines if this heartbeat was shown
+   * at least x days ago.
+   *
+   * @param  {Number}  days Days ago to check
+   * @return {boolean}      Has prompt been shown by that date?
+   */
+  async shownAtleastDaysAgo(days) {
     const hasShown = await this.hasShownBefore();
 
     if (!hasShown) {
       return false;
     }
 
+    // get timestamp of last shown
     const timeLastShown = await this.getLastShown();
 
-    const lastShown = new Date(timeLastShown);
-    const today = new Date();
+    // get the difference between now and then
+    const timeElapsed = Date.now() - timeLastShown;
 
-    const timeDiff = today.getTime() - lastShown.getTime();
-    const diffDays = Math.floor(timeDiff / ONE_DAY);
+    // time limit is the number of days passed in
+    // converted into milliseconds
+    const timeLimit = ONE_DAY * days;
 
-    return diffDays < days;
-  }
-
-  async getLastInteraction() {
-    const lastInteraction = await this.storage.getItem('lastInteraction');
-
-    return lastInteraction;
+    // if the diff is smaller than the limit,
+    // that means that the last time the user saw the prompt
+    // was less than the `days` passed in
+    return timeElapsed < timeLimit;
   }
 
   /**
+   * Simple function to read the lastInteraction
+   * timestamp (if any) from local storage.
+   * @return {number}   Timestamp of last prompt interaction (if any)
+   */
+  async getLastInteraction() {
+    const lastInteraction = await this.storage.getItem('lastInteraction');
+
+    return typeof lastInteraction !== 'undefined' ?
+      parseFloat(lastInteraction) : null;
+  }
+
+  /**
+   * Gets the timestamp of the last prompt interaction,
+   * and returns the time (in ms) since then.
+   *
    * @async
    * @return {number}
    */
@@ -123,7 +150,7 @@ export default class ShowHeartbeatAction extends Action {
     const lastInteraction = await this.getLastInteraction();
 
     return typeof lastInteraction !== 'undefined' ?
-      Date.now() - parseFloat(lastInteraction) : null;
+      Date.now() - lastInteraction : null;
   }
 
   /**
@@ -169,11 +196,29 @@ export default class ShowHeartbeatAction extends Action {
 
       // `xdays` waits for `repeatEvery` days to show again
       case 'xdays':
-        hasShown = await this.shownWithinPastDays(repeatEvery);
+        hasShown = await this.shownAtleastDaysAgo(repeatEvery);
         break;
     }
 
     return hasShown;
+  }
+
+  /**
+   * Returns a boolean if the heartbeat should
+   * fall out of `execute` or not. Checks
+   * `testing` mode, and if heartbeats have
+   * been shown lately.
+   *
+   * @return {boolean}  Should the recipe execution halt?
+   */
+  async shouldNotExecute() {
+    return !this.normandy.testing &&
+      (
+        // if a heartbeat has been shown in the past 24 hours
+        await this.heartbeatShownRecently() ||
+        // or this specific heartbeat has already ran
+        await this.heartbeatHasRan()
+      );
   }
 
   /**
@@ -194,17 +239,15 @@ export default class ShowHeartbeatAction extends Action {
       learnMoreUrl,
     } = this.recipe.arguments;
 
-    // Test mode skips the 'last shown' checks
-    if (!this.normandy.testing && (
-      await this.heartbeatShownRecently() ||
-      await this.heartbeatHasRan()
-    )) {
+    // determine if this should even run
+    if (await this.shouldNotExecute()) {
       return;
     }
 
     this.location = await this.normandy.location();
     this.client = await this.normandy.client();
 
+    // pull some data to attach to the telemetry business
     const { userId } = this.normandy;
     const surveyId = this.generateSurveyId();
 
@@ -228,11 +271,17 @@ export default class ShowHeartbeatAction extends Action {
       heartbeatData.testing = 1;
     }
 
+    // show the prompt!
     const heartBeat = await this.normandy.showHeartbeat(heartbeatData);
 
+    // list of events that the heartBeat will trigger
+    // based on the user's interaction with the browser chrome
+    const interactionEvents = ['Voted', 'Engaged'];
+
     // Upon heartbeat interaction, we want to update the stored time
-    heartBeat.on('Voted', this.updateLastInteraction);
-    heartBeat.on('Engaged', this.updateLastInteraction);
+    interactionEvents.forEach(event => {
+      heartBeat.on(event, this.updateLastInteraction);
+    });
 
     // Let the record show that a heartbeat has been displayed
     this.updateLastShown();
@@ -250,6 +299,10 @@ export default class ShowHeartbeatAction extends Action {
     this.heartbeatStorage.setItem('lastShown', Date.now());
   }
 
+  /**
+   * Updates the local storage value of when this heartbeat
+   * received an interaction event from
+   */
   updateLastInteraction() {
     this.storage.setItem('lastInteraction', Date.now());
   }

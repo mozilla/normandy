@@ -57,18 +57,6 @@ describe('ShowHeartbeatAction', () => {
   });
 
   describe('Repeat Options', () => {
-    // should not show if another hbeat played within the last 24 hours
-
-    /*
-       .d88888b.  888b    888  .d8888b.  8888888888
-      d88P" "Y88b 8888b   888 d88P  Y88b 888
-      888     888 88888b  888 888    888 888
-      888     888 888Y88b 888 888        8888888
-      888     888 888 Y88b888 888        888
-      888     888 888  Y88888 888    888 888
-      Y88b. .d88P 888   Y8888 Y88b  d88P 888
-       "Y88888P"  888    Y888  "Y8888P"  8888888888
-     */
     describe('`once`', () => {
       afterEach(() => {
         normandy.showHeartbeat.calls.reset();
@@ -128,16 +116,6 @@ describe('ShowHeartbeatAction', () => {
     });
 
 
-    /*
-      888b    888        d8888  .d8888b.
-      8888b   888       d88888 d88P  Y88b
-      88888b  888      d88P888 888    888
-      888Y88b 888     d88P 888 888
-      888 Y88b888    d88P  888 888  88888
-      888  Y88888   d88P   888 888    888
-      888   Y8888  d8888888888 Y88b  d88P
-      888    Y888 d88P     888  "Y8888P88
-     */
     describe('`nag`', () => {
       afterEach(() => {
         normandy.showHeartbeat.calls.reset();
@@ -199,16 +177,6 @@ describe('ShowHeartbeatAction', () => {
     });
 
 
-    /*
-      Y88b   d88P 8888888b.        d8888 Y88b   d88P  .d8888b.
-       Y88b d88P  888  "Y88b      d88888  Y88b d88P  d88P  Y88b
-        Y88o88P   888    888     d88P888   Y88o88P   Y88b.
-         Y888P    888    888    d88P 888    Y888P     "Y888b.
-         d888b    888    888   d88P  888     888         "Y88b.
-        d88888b   888    888  d88P   888     888           "888
-       d88P Y88b  888  .d88P d8888888888     888     Y88b  d88P
-      d88P   Y88b 8888888P" d88P     888     888      "Y8888P"
-     */
     describe('`xdays`', () => {
       afterEach(() => {
         normandy.showHeartbeat.calls.reset();
@@ -231,7 +199,7 @@ describe('ShowHeartbeatAction', () => {
         const max = repeatEvery - 1;
         for (idx; idx <= max; idx++) {
           normandy.showHeartbeat.calls.reset();
-          // set last shown to be exactly [idx] days ago
+          // set last shown to be exactly `idx` days ago
           normandy.mock.storage.data.lastShown =
             Date.now() - (idx * ONE_DAY);
 
@@ -271,16 +239,7 @@ describe('ShowHeartbeatAction', () => {
     });
   });
 
-/*
-8888888b.   .d88888b.   .d8888b. 88888888888      888     888 8888888b.  888
-888   Y88b d88P" "Y88b d88P  Y88b    888          888     888 888   Y88b 888
-888    888 888     888 Y88b.         888          888     888 888    888 888
-888   d88P 888     888  "Y888b.      888          888     888 888   d88P 888
-8888888P"  888     888     "Y88b.    888          888     888 8888888P"  888
-888        888     888       "888    888   888888 888     888 888 T88b   888
-888        Y88b. .d88P Y88b  d88P    888          Y88b. .d88P 888  T88b  888
-888         "Y88888P"   "Y8888P"     888           "Y88888P"  888   T88b 88888888
- */
+
   describe('Post-answer URL annotation', () => {
     it('should not bother to annotate an empty post-answer URL', async () => {
       const recipe = recipeFactory({
@@ -314,7 +273,7 @@ describe('ShowHeartbeatAction', () => {
       const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
       const params = new URL(postAnswerUrl).searchParams;
       expect(params.get('source')).toEqual('heartbeat');
-      expect(params.get('surveyversion')).toEqual('55');
+      expect(params.get('surveyversion')).toEqual('56');
       expect(params.get('updateChannel')).toEqual('nightly');
       expect(params.get('fxVersion')).toEqual('42.0.1');
       expect(params.get('isDefaultBrowser')).toEqual('1');
