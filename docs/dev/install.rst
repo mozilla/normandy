@@ -113,6 +113,18 @@ Installation
 
       python manage.py update_actions
 
+11. Update product details:
+
+   .. code-block:: bash
+
+      python manage.py update_product_details
+
+12. Load in initial data:
+
+   .. code-block:: bash
+
+      python manage.py initial_data
+
 Once you've finished these steps, you should be able to start the site by
 running:
 
