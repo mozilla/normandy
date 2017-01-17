@@ -61,7 +61,7 @@ export default function HeartbeatFields({ fields }) {
         component="select"
       >
         <option value="once" default>{`
-          Do not show this prompt to specific users more than once
+          Do not show this prompt to users more than once.
         `}</option>
         <option value="nag">{`
           Show this prompt until the user interacts with it in any way,
@@ -69,7 +69,7 @@ export default function HeartbeatFields({ fields }) {
         `}</option>
         <option value="xdays">{`
           Allow re-prompting users who have already seen this prompt
-          after ${fields.repeatEvery || 'X'} days since they last saw it
+          after ${fields.repeatEvery || 'X'} days since they last saw it.
         `}</option>
       </ControlField>
 

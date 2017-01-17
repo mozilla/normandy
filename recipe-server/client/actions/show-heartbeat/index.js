@@ -20,6 +20,7 @@ export default class ShowHeartbeatAction extends Action {
     this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
 
     this.updateLastInteraction = ::this.updateLastInteraction;
+    this.updateLastShown = ::this.updateLastShown;
   }
 
   /**
@@ -59,7 +60,8 @@ export default class ShowHeartbeatAction extends Action {
    */
   async heartbeatShownRecently() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    const timeSince = lastShown ? new Date() - lastShown : Infinity;
+    const timeSince = !!lastShown ? // eslint-disable-line no-extra-boolean-cast
+      new Date() - parseFloat(lastShown) : Infinity;
 
     // Return a boolean indicating if a heartbeat
     // has shown within the last HEARTBEAT_THROTTLE ms
@@ -70,9 +72,9 @@ export default class ShowHeartbeatAction extends Action {
    * @async
    * @return {number}
    */
-  async sinceLastShown() {
+  async getLastShown() {
     const lastShown = await this.storage.getItem('lastShown');
-    return lastShown ? Date.now() - lastShown : null;
+    return lastShown ? parseFloat(lastShown) : null;
   }
 
   /**
@@ -84,16 +86,33 @@ export default class ShowHeartbeatAction extends Action {
    * @return {Boolean}  Has the survey ever been shown?
    */
   async hasShownBefore() {
-    const lastShown = await this.sinceLastShown();
+    const lastShown = await this.getLastShown();
     // If no survey has been shown, lastShown will be falsey.
     return !!lastShown;
   }
 
-  async shownWithinLastDays(days) {
-    const sinceLastShown = await this.sinceLastShown();
-    const daysAgo = ONE_DAY * days;
+  async shownWithinPastDays(days) {
+    const hasShown = await this.hasShownBefore();
 
-    return sinceLastShown && sinceLastShown <= daysAgo;
+    if (!hasShown) {
+      return false;
+    }
+
+    const timeLastShown = await this.getLastShown();
+
+    const lastShown = new Date(timeLastShown);
+    const today = new Date();
+
+    const timeDiff = today.getTime() - lastShown.getTime();
+    const diffDays = Math.floor(timeDiff / ONE_DAY);
+
+    return diffDays < days;
+  }
+
+  async getLastInteraction() {
+    const lastInteraction = await this.storage.getItem('lastInteraction');
+
+    return lastInteraction;
   }
 
   /**
@@ -101,8 +120,10 @@ export default class ShowHeartbeatAction extends Action {
    * @return {number}
    */
   async sinceLastInteraction() {
-    const lastInteraction = await this.storage.getItem('lastInteraction');
-    return lastInteraction ? Date.now() - lastInteraction : null;
+    const lastInteraction = await this.getLastInteraction();
+
+    return typeof lastInteraction !== 'undefined' ?
+      Date.now() - parseFloat(lastInteraction) : null;
   }
 
   /**
@@ -115,10 +136,8 @@ export default class ShowHeartbeatAction extends Action {
    * @return {Boolean}  Has the survey ever had interaction?
    */
   async hasHadInteraction() {
-    const hadInteraction = await this.sinceLastInteraction();
-    // If the user has not interacted with the heartbeat yet,
-    // hadInteraction will be falsey.
-    return !!hadInteraction;
+    const lastInteraction = await this.getLastInteraction();
+    return !!lastInteraction;
   }
 
   /**
@@ -138,6 +157,7 @@ export default class ShowHeartbeatAction extends Action {
 
     switch (repeatOption) {
       // `once` is one and done
+      default:
       case 'once':
         hasShown = await this.hasShownBefore();
         break;
@@ -149,10 +169,7 @@ export default class ShowHeartbeatAction extends Action {
 
       // `xdays` waits for `repeatEvery` days to show again
       case 'xdays':
-        hasShown = await this.shownWithinLastDays(repeatEvery);
-        break;
-
-      default:
+        hasShown = await this.shownWithinPastDays(repeatEvery);
         break;
     }
 
@@ -179,7 +196,7 @@ export default class ShowHeartbeatAction extends Action {
 
     // Test mode skips the 'last shown' checks
     if (!this.normandy.testing && (
-      await this.heartbeatShownRecently() &&
+      await this.heartbeatShownRecently() ||
       await this.heartbeatHasRan()
     )) {
       return;
@@ -218,7 +235,7 @@ export default class ShowHeartbeatAction extends Action {
     heartBeat.on('Engaged', this.updateLastInteraction);
 
     // Let the record show that a heartbeat has been displayed
-    heartBeat.on('NotificationOffered', () => this.updateLastShown());
+    this.updateLastShown();
   }
 
   /**
