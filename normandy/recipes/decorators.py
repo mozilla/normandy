@@ -1,4 +1,8 @@
 class LatestRevisionProperty(object):
+    """
+    A class to help create class properties that return None if an instance of the parent class
+    has no `latest_revision`.
+    """
     def __init__(self, method):
         self.method = method
         self.__doc__ = method.__doc__
@@ -16,4 +20,7 @@ class LatestRevisionProperty(object):
 
 
 def latest_revision_property(method):
+    """
+    A decorator that will return None if the instance has no `latest_revision`
+    """
     return LatestRevisionProperty(method)
