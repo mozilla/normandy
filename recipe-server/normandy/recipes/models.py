@@ -14,7 +14,7 @@ from reversion import revisions as reversion
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip
-from normandy.recipes.decorators import latest_revision_property
+from normandy.recipes.decorators import approved_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
@@ -94,6 +94,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     latest_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
                                         related_name='latest_for_recipe')
+    approved_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
+                                          related_name='approved_for_recipe')
 
     enabled = models.BooleanField(default=False)
     signature = models.OneToOneField(Signature, related_name='recipe_revision', null=True,
@@ -108,49 +110,53 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def __str__(self):
         return self.name
 
-    @latest_revision_property
-    def name(self):
+    @property
+    def is_approved(self):
+        return self.approved_revision is not None
+
+    @approved_revision_property
+    def name(self, revision):
         return self.latest_revision.name
 
-    @latest_revision_property
-    def action(self):
-        return self.latest_revision.action
+    @approved_revision_property
+    def action(self, revision):
+        return revision.action
 
-    @latest_revision_property
-    def extra_filter_expression(self):
-        return self.latest_revision.extra_filter_expression
+    @approved_revision_property
+    def extra_filter_expression(self, revision):
+        return revision.extra_filter_expression
 
-    @latest_revision_property
-    def arguments_json(self):
-        return self.latest_revision.arguments_json
+    @approved_revision_property
+    def arguments_json(self, revision):
+        return revision.arguments_json
 
-    @latest_revision_property
-    def arguments(self):
-        return self.latest_revision.arguments
+    @approved_revision_property
+    def arguments(self, revision):
+        return revision.arguments
 
-    @latest_revision_property
-    def revision_id(self):
-        return self.latest_revision.id
+    @approved_revision_property
+    def revision_id(self, revision):
+        return revision.id
 
-    @latest_revision_property
-    def last_updated(self):
-        return self.latest_revision.updated
+    @approved_revision_property
+    def last_updated(self, revision):
+        return revision.updated
 
-    @latest_revision_property
-    def filter_expression(self):
-        return self.latest_revision.filter_expression
+    @approved_revision_property
+    def filter_expression(self, revision):
+        return revision.filter_expression
 
-    @latest_revision_property
-    def channels(self):
-        return self.latest_revision.channels
+    @approved_revision_property
+    def channels(self, revision):
+        return revision.channels
 
-    @latest_revision_property
-    def countries(self):
-        return self.latest_revision.countries
+    @approved_revision_property
+    def countries(self, revision):
+        return revision.countries
 
-    @latest_revision_property
-    def locales(self):
-        return self.latest_revision.locales
+    @approved_revision_property
+    def locales(self, revision):
+        return revision.locales
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -200,6 +206,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
             is_clean = False
 
         if not is_clean or force:
+            if revision and revision.is_pending_approval:
+                revision.approval_request.delete()
+
             self.latest_revision = RecipeRevision.objects.create(
                 recipe=self, parent=revision, **data)
 
@@ -301,10 +310,33 @@ class RecipeRevision(models.Model):
         self.arguments_json = json.dumps(value)
 
     @property
-    def restored_recipe(self):
+    def serializable_recipe(self):
+        """Returns an unsaved recipe object with this revisions data to be serialized."""
         recipe = self.recipe
+        recipe.approved_revision = self if self.is_approved else None
         recipe.latest_revision = self
         return recipe
+
+    @property
+    def is_approved(self):
+        try:
+            return self.approval_request.approved is True
+        except ApprovalRequest.DoesNotExist:
+            return False
+
+    @property
+    def is_rejected(self):
+        try:
+            self.approval_request.approved is False
+        except ApprovalRequest.DoesNotExist:
+            return False
+
+    @property
+    def is_pending_approval(self):
+        try:
+            return self.approval_request and not self.is_approved and not self.is_rejected
+        except ApprovalRequest.DoesNotExist:
+            return False
 
     def hash(self):
         data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
@@ -317,6 +349,23 @@ class RecipeRevision(models.Model):
         self.id = self.hash()
         self.updated = timezone.now()
         super().save(*args, **kwargs)
+
+
+class ApprovalRequest(models.Model):
+    revision = models.OneToOneField(RecipeRevision, related_name='approval_request')
+    created = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approval_requests',
+                             null=True)
+    approved = models.NullBooleanField(null=True)
+
+    def approve(self):
+        self.approved = True
+        self.revision.recipe.approved_revision = self.revision
+        self.save()
+
+    def reject(self):
+        self.approved = False
+        self.save()
 
 
 @reversion.register()

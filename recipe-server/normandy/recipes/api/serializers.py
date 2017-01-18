@@ -146,7 +146,7 @@ class ClientSerializer(serializers.Serializer):
 class RecipeRevisionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='created', read_only=True)
     comment = serializers.CharField(read_only=True)
-    recipe = RecipeSerializer(source='restored_recipe', read_only=True)
+    recipe = RecipeSerializer(source='serializable_recipe', read_only=True)
 
     class Meta:
         model = RecipeRevision
