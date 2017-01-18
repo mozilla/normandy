@@ -4,9 +4,7 @@ class LatestRevisionProperty(object):
         self.__doc__ = method.__doc__
 
     def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        elif not instance.latest_revision:
+        if not instance.latest_revision:
             return None
         return self.method(instance)
 

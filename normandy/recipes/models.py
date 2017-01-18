@@ -30,6 +30,9 @@ class Channel(models.Model):
     class Meta:
         ordering = ('slug',)
 
+    def __repr__(self):
+        return '<Channel {}>'.format(self.slug)
+
 
 class Country(models.Model):
     code = models.CharField(max_length=255, unique=True)
@@ -38,6 +41,9 @@ class Country(models.Model):
     class Meta:
         ordering = ('name',)
 
+    def __repr__(self):
+        return '<Country {}>'.format(self.code)
+
 
 class Locale(models.Model):
     code = models.CharField(max_length=255, unique=True)
@@ -45,6 +51,9 @@ class Locale(models.Model):
 
     class Meta:
         ordering = ('name',)
+
+    def __repr__(self):
+        return '<Locale {}>'.format(self.code)
 
 
 class Signature(models.Model):
@@ -165,35 +174,29 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def update(self, force=False, **data):
         revision = self.latest_revision
 
-        channels = data.pop('channels', [])
-        countries = data.pop('countries', [])
-        locales = data.pop('locales', [])
-
         if revision:
+            revisions = RecipeRevision.objects.filter(id=revision.id)
+
             revision_data = revision.data
             revision_data.update(data)
 
-            revisions = RecipeRevision.objects.filter(id=self.latest_revision.id, **data)
+            channels = revision_data.pop('channels')
+            revisions = filter_m2m(revisions, 'channels', channels)
 
-            if channels:
-                revisions = filter_m2m(revisions, 'channels', list(channels))
-            else:
-                channels = revision_data.pop('channels')
+            countries = revision_data.pop('countries')
+            revisions = filter_m2m(revisions, 'countries', countries)
 
-            if countries:
-                revisions = filter_m2m(revisions, 'countries', list(countries))
-            else:
-                countries = revision_data.pop('countries')
-
-            if locales:
-                revisions = filter_m2m(revisions, 'locales', list(locales))
-            else:
-                locales = revision_data.pop('locales')
-
-            is_clean = revisions.exists()
+            locales = revision_data.pop('locales')
+            revisions = filter_m2m(revisions, 'locales', locales)
 
             data = revision_data
+            revisions = revisions.filter(**data)
+
+            is_clean = revisions.exists()
         else:
+            channels = data.pop('channels', [])
+            countries = data.pop('countries', [])
+            locales = data.pop('locales', [])
             is_clean = False
 
         if not is_clean or force:
@@ -268,34 +271,24 @@ class RecipeRevision(models.Model):
 
     @property
     def filter_expression(self):
-        exp = ''
+        parts = []
 
         if self.locales.count():
             locales = ', '.join(["'{}'".format(l.code) for l in self.locales.all()])
-            exp = 'normandy.locale in [{}]'.format(locales)
+            parts.append('normandy.locale in [{}]'.format(locales))
 
         if self.countries.count():
             countries = ', '.join(["'{}'".format(c.code) for c in self.countries.all()])
-
-            if len(exp):
-                exp += ' && '
-
-            exp += 'normandy.country in [{}]'.format(countries)
+            parts.append('normandy.country in [{}]'.format(countries))
 
         if self.channels.count():
             channels = ', '.join(["'{}'".format(c.slug) for c in self.channels.all()])
-
-            if len(exp):
-                exp += ' && '
-
-            exp += 'normandy.channel in [{}]'.format(channels)
+            parts.append('normandy.channel in [{}]'.format(channels))
 
         if self.extra_filter_expression:
-            prefix = ' && (' if len(exp) else ''
-            suffix = ')' if len(exp) else ''
-            exp += '{}{}{}'.format(prefix, self.extra_filter_expression, suffix)
+            parts.append(self.extra_filter_expression)
 
-        return exp
+        return ' && '.join(parts)
 
     @property
     def arguments(self):
@@ -311,16 +304,16 @@ class RecipeRevision(models.Model):
         recipe.latest_revision = self
         return recipe
 
+    def hash(self):
+        data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
+                                     self.arguments_json, self.filter_expression)
+        return hashlib.sha256(data.encode()).hexdigest()
+
     def save(self, *args, **kwargs):
         if not self.created:
             self.created = timezone.now()
-
-        data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
-                                     self.arguments_json, self.filter_expression)
-        self.id = hashlib.sha256(data.encode()).hexdigest()
-
+        self.id = self.hash()
         self.updated = timezone.now()
-
         super().save(*args, **kwargs)
 
 
