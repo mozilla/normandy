@@ -5,12 +5,12 @@
 "use strict";
 
 const {utils: Cu} = Components;
-Cu.import("resource://gre/modules/Log.jsm");
+Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.importGlobalProperties(["crypto", "TextEncoder"]);
 
 this.EXPORTED_SYMBOLS = ["Sampling"];
 
-const log = Log.repository.getLogger("extensions.shield-recipe-client");
+const log = LogManager.getLogger("sampling");
 
 /**
  * Map from the range [0, 1] to [0, max(sha256)].
