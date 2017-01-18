@@ -13,27 +13,29 @@ machine:
 dependencies:
   pre:
     - docker info
+    # Install latest pip and other CI requirements first
+    - pip install -r ./ci/requirements.txt
   override:
-    - ./bin/ci/runner.sh dependencies
+    - ./ci/bin/runner.sh dependencies
 
 compile:
   override:
-    - ./bin/ci/runner.sh compile
+    - ./ci/bin/runner.sh compile
 
 test:
   override:
-    - ./bin/ci/runner.sh test
+    - ./ci/bin/runner.sh test
   post:
-    - ./bin/ci/runner.sh test-post
+    - ./ci/bin/runner.sh test-post
 
 deployment:
   latest:
     branch: master
     commands:
-      - ./bin/ci/runner.sh deploy latest
+      - ./ci/bin/runner.sh deploy latest
 
   tags:
     # push all tags
     tag: /.*/
     commands:
-      - ./bin/ci/runner.sh deploy "$CIRCLE_TAG"
+      - ./ci/bin/runner.sh deploy "$CIRCLE_TAG"
