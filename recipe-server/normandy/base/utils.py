@@ -55,7 +55,14 @@ def canonical_json_dumps(data):
 
 
 def filter_m2m(qs, field, values):
-    qs.annotate(_count=Count(field)).filter(_count=len(values))
+    """
+    Filters a queryset by an exact list of many to many relations.
+    """
+    values = list(values)
 
-    for value in values:
-        qs.filter(**{field: value})
+    qs = qs.annotate(_count=Count(field)).filter(_count=len(values))
+
+    if len(values):
+        qs = qs.filter(**{'{}__in'.format(field): values})
+
+    return qs
