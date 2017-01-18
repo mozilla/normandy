@@ -21,10 +21,10 @@ LANGUAGES_JSON = (
 
 @pytest.mark.django_db
 class TestProductDetailsRelationalStorage(object):
-    def test_update_locales(self):
+    def test_update_locales(self, tmpdir):
         assert Locale.objects.count() == 0
 
-        storage = ProductDetailsRelationalStorage()
+        storage = ProductDetailsRelationalStorage(json_dir=tmpdir.strpath)
         storage.update('languages.json', LANGUAGES_JSON, '1999-01-01')
 
         assert Locale.objects.count() == 12
