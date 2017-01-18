@@ -82,21 +82,21 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         queryset = self.queryset
 
         if self.request.GET.get('status') == 'enabled':
-            queryset.filter(enabled=True)
+            queryset = queryset.filter(enabled=True)
         elif self.request.GET.get('status') == 'disabled':
-            queryset.filter(enabled=False)
+            queryset = queryset.filter(enabled=False)
 
         if 'channel' in self.request.GET:
             channels = self.request.GET.get('channel').split(',')
-            queryset.filter(latest_revision__channels__slug__in=channels)
+            queryset = queryset.filter(latest_revision__channels__slug__in=channels)
 
         if 'country' in self.request.GET:
             countries = self.request.GET.get('country').split(',')
-            queryset.filter(latest_revision__countries__code__in=countries)
+            queryset = queryset.filter(latest_revision__countries__code__in=countries)
 
         if 'locale' in self.request.GET:
             locales = self.request.GET.get('locale').split(',')
-            queryset.filter(latest_revision__locales__code__in=locales)
+            queryset = queryset.filter(latest_revision__locales__code__in=locales)
 
         return queryset
 

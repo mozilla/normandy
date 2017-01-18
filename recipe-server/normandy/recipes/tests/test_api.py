@@ -13,6 +13,9 @@ from normandy.base.utils import aware_datetime
 from normandy.recipes.models import Recipe
 from normandy.recipes.tests import (
     ActionFactory,
+    ChannelFactory,
+    CountryFactory,
+    LocaleFactory,
     RecipeFactory,
 )
 
@@ -338,6 +341,65 @@ class TestRecipeAPI(object):
         res = api_client.get('/api/v1/recipe/{id}/'.format(id=recipe.id))
         assert res.status_code == 200
         assert res.client.cookies == {}
+
+    def test_list_filter_status(self, api_client):
+        r1 = RecipeFactory(enabled=False)
+        r2 = RecipeFactory(enabled=True)
+
+        res = api_client.get('/api/v1/recipe/?status=enabled')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r2.id
+
+        res = api_client.get('/api/v1/recipe/?status=disabled')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r1.id
+
+    def test_list_filter_channel(self, api_client):
+        r1 = RecipeFactory(channels=[ChannelFactory(slug='beta')])
+        r2 = RecipeFactory(channels=[ChannelFactory(slug='release')])
+
+        res = api_client.get('/api/v1/recipe/?channel=beta')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r1.id
+
+        res = api_client.get('/api/v1/recipe/?channel=beta,release')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+        for recipe in res.data:
+            assert recipe['id'] in [r1.id, r2.id]
+
+    def test_list_filter_country(self, api_client):
+        r1 = RecipeFactory(countries=[CountryFactory(code='US')])
+        r2 = RecipeFactory(countries=[CountryFactory(code='CA')])
+
+        res = api_client.get('/api/v1/recipe/?country=US')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r1.id
+
+        res = api_client.get('/api/v1/recipe/?country=US,CA')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+        for recipe in res.data:
+            assert recipe['id'] in [r1.id, r2.id]
+
+    def test_list_filter_locale(self, api_client):
+        r1 = RecipeFactory(locales=[LocaleFactory(code='en-US')])
+        r2 = RecipeFactory(locales=[LocaleFactory(code='fr-CA')])
+
+        res = api_client.get('/api/v1/recipe/?locale=en-US')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r1.id
+
+        res = api_client.get('/api/v1/recipe/?locale=en-US,fr-CA')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+        for recipe in res.data:
+            assert recipe['id'] in [r1.id, r2.id]
 
 
 @pytest.mark.django_db
