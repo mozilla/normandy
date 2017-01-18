@@ -39,8 +39,8 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: fixtureRecipes,
-        selectedRecipe: null,
         recipeListNeedsFetch: false,
       },
     });
@@ -53,6 +53,7 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: [fixtureRecipes[0]],
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
@@ -67,6 +68,7 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: [],
         selectedRecipe: 2,
         recipeListNeedsFetch: true,
@@ -145,13 +147,12 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
+        ...initialState.recipes,
         list: [{
           id: 4,
           name: 'Villis stebulum',
           enabled: false,
         }],
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
       },
     });
   });
@@ -187,8 +188,6 @@ describe('controlApp reducer', () => {
           name: 'Updated recipe name',
           enabled: true,
         }],
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
       },
     });
   });
@@ -216,8 +215,6 @@ describe('controlApp reducer', () => {
           name: 'Dolor set amet',
           enabled: true,
         }],
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
       },
     });
   });

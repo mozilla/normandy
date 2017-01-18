@@ -189,7 +189,7 @@ class DisconnectedRecipeList extends React.Component {
       searchText,
     } = this.state;
 
-    const filteredRecipes = (this.state.filteredRecipes || recipes)
+    const filteredRecipes = [].concat(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
 
     return (
