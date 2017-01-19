@@ -92,7 +92,11 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
 
       const pluginsPromise = new Promise(resolve => {
         AddonManager.getAddonsByTypes(["plugin"], plugins => {
-          plugins.forEach(plugin => appinfo.plugins[plugin.name] = plugin);
+          plugins.forEach(plugin => appinfo.plugins[plugin.name] = {
+            name: plugin.name,
+            description: plugin.description,
+            version: plugin.version,
+          });
           resolve();
         });
       });
