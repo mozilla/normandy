@@ -10,6 +10,10 @@ Cu.importGlobalProperties(["crypto", "TextEncoder"]);
 
 this.EXPORTED_SYMBOLS = ["Sampling"];
 
+const hashBits = 48;
+const hashLength = hashBits / 4;  // each hexadecimal digit represents 4 bits
+const hashMultiplier = Math.pow(2, hashBits) - 1;
+
 this.Sampling = {
   /**
    * Map from the range [0, 1] to [0, 2^48].
@@ -17,31 +21,17 @@ this.Sampling = {
    * @return {string} A 48 bit number represented in hex, padded to 12 characters.
    */
   fractionToKey(frac) {
-    const hashBits = 48;
-    const hashLength = hashBits / 4;  // each hexadecimal digit represents 4 bits
-
     if (frac < 0 || frac > 1) {
       throw new Error(`frac must be between 0 and 1 inclusive (got ${frac})`);
     }
 
-    const mult = Math.pow(2, hashBits) - 1;
-    const inDecimal = Math.floor(frac * mult);
-    let hexDigits = inDecimal.toString(16);
-    if (hexDigits.length < hashLength) {
-      // Left pad with zeroes
-      // If N zeroes are needed, generate an array of nulls N+1 elements long,
-      // and inserts zeroes between each null.
-      hexDigits = Array(hashLength - hexDigits.length + 1).join("0") + hexDigits;
-    }
-
-    // Saturate at 2**48 - 1
-    if (hexDigits.length > hashLength) {
-      hexDigits = Array(hashLength + 1).join("f");
-    }
-
-    return hexDigits;
+    return Math.floor(frac * hashMultiplier).toString(16).padStart(hashLength, "0");
   },
 
+  /**
+   * @param {ArrayBuffer} buffer Data to convert
+   * @returns {String}    `buffer`'s content, converted to a hexadecimal string.
+   */
   bufferToHex(buffer) {
     const hexCodes = [];
     const view = new DataView(buffer);
@@ -56,7 +46,25 @@ this.Sampling = {
     return hexCodes.join("");
   },
 
-  rangeBucketSample(inputHash, minBucket, maxBucket, bucketCount) {
+  /**
+   * Check if an input hash is contained in a bucket range.
+   *
+   * isHashInBucket(fractionToKey(0.5), 3, 6, 10) -> returns true
+   *
+   *              minBucket
+   *              |     hash
+   *              v     v
+   *    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+   *                       ^
+   *                       maxBucket
+   *
+   * @param inputHash {String}
+   * @param minBucket {int} The lower boundary, inclusive, of the range to check.
+   * @param maxBucket {int} The upper boundary, exclusive, of the range to check.
+   * @param bucketCount {int} The total number of buckets. Should be greater than
+   *                          or equal to maxBucket.
+   */
+  isHashInBucket(inputHash, minBucket, maxBucket, bucketCount) {
     const minHash = Sampling.fractionToKey(minBucket / bucketCount);
     const maxHash = Sampling.fractionToKey(maxBucket / bucketCount);
     return (minHash <= inputHash) && (inputHash < maxHash);
@@ -97,7 +105,7 @@ this.Sampling = {
    *
    * The range to check is defined by a start point and length, and can wrap
    * around the input space. For example, if there are 100 buckets, and we ask to
-   * check 50 buckets starting from bucket 70, then buckets 70-100 and 0-19 will
+   * check 50 buckets starting from bucket 70, then buckets 70-99 and 0-19 will
    * be checked.
    *
    * @param {object}     input Input to hash to determine the matching bucket.
@@ -115,11 +123,11 @@ this.Sampling = {
     // to max, and from min to end.
     if (end > total) {
       return (
-        Sampling.rangeBucketSample(inputHash, 0, end % total, total)
-        || Sampling.rangeBucketSample(inputHash, wrappedStart, total, total)
+        Sampling.isHashInBucket(inputHash, 0, end % total, total)
+        || Sampling.isHashInBucket(inputHash, wrappedStart, total, total)
       );
     }
 
-    return Sampling.rangeBucketSample(inputHash, wrappedStart, wrappedStart + count, total);
+    return Sampling.isHashInBucket(inputHash, wrappedStart, end, total);
   }),
 };

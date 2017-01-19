@@ -1,10 +1,11 @@
 "use strict";
 // Cu is defined in xpc_head.js
+/* globals Cu, equal */
 
 Cu.import("resource://gre/modules/Task.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm", this);
 
-add_task(function* testStableSample () {
+add_task(function* testStableSample() {
   // Absolute samples
   equal(yield Sampling.stableSample("test", 1), true, "stableSample returns true for 100% sample");
   equal(yield Sampling.stableSample("test", 0), false, "stableSample returns false for 0% sample");
@@ -14,7 +15,7 @@ add_task(function* testStableSample () {
   equal(yield Sampling.stableSample("test-1", 0.5), false, "stableSample returns false for known non-matching sample");
 });
 
-add_task(function* testBucketSample () {
+add_task(function* testBucketSample() {
   // Absolute samples
   equal(yield Sampling.bucketSample("test", 0, 10, 10), true, "bucketSample returns true for 100% sample");
   equal(yield Sampling.bucketSample("test", 0, 0, 10), false, "bucketSample returns false for 0% sample");
@@ -24,7 +25,7 @@ add_task(function* testBucketSample () {
   equal(yield Sampling.bucketSample("test-1", 0, 5, 10), false, "bucketSample returns false for known non-matching sample");
 });
 
-add_test(function testFractionToKey() {
+add_task(function* testFractionToKey() {
   // Test that results are always 12 character hexadecimal strings.
   const expected_regex = /[0-9a-f]{12}/;
   const count = 100;
@@ -36,7 +37,6 @@ add_test(function testFractionToKey() {
     }
   }
   equal(successes, count, "fractionToKey makes keys the right length");
-  run_next_test();
 });
 
 add_task(function* testTruncatedHash() {
@@ -52,7 +52,7 @@ add_task(function* testTruncatedHash() {
   equal(successes, count, "truncatedHash makes hashes the right length");
 });
 
-add_test(function testBufferToHex() {
+add_task(function* testBufferToHex() {
   const data = new ArrayBuffer(4);
   const view = new DataView(data);
   view.setUint8(0, 0xff);
@@ -60,5 +60,4 @@ add_test(function testBufferToHex() {
   view.setUint8(2, 0x3f);
   view.setUint8(3, 0x1f);
   equal(Sampling.bufferToHex(data), "ff7f3f1f");
-  run_next_test();
-})
+});
