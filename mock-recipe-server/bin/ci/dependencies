@@ -2,7 +2,7 @@
 set -eu
 
 # Install docker-compose
-sudo pip install docker-compose
+pip install -r requirements/default.txt -c requirements/constraints.txt
 
 # Setup normandy-compose used in build
 ./bin/setup.sh
