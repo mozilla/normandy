@@ -288,7 +288,9 @@ class RecipeRevision(models.Model):
         if self.extra_filter_expression:
             parts.append(self.extra_filter_expression)
 
-        return ' && '.join(parts)
+        expression = ') && ('.join(parts)
+
+        return '({})'.format(expression) if len(parts) > 1 else expression
 
     @property
     def arguments(self):
