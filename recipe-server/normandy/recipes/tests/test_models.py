@@ -83,10 +83,10 @@ class TestRecipe(object):
         assert r.filter_expression == '2 + 2 == 4'
 
         r.update(channels=[channel1], countries=[country1], locales=[locale1])
-        assert r.filter_expression == ("normandy.locale in ['en-US'] && "
-                                       "normandy.country in ['US'] && "
-                                       "normandy.channel in ['beta'] && "
-                                       "2 + 2 == 4")
+        assert r.filter_expression == ("(normandy.locale in ['en-US']) && "
+                                       "(normandy.country in ['US']) && "
+                                       "(normandy.channel in ['beta']) && "
+                                       "(2 + 2 == 4)")
 
     def test_canonical_json(self):
         recipe = RecipeFactory(
@@ -102,8 +102,8 @@ class TestRecipe(object):
         # Yes, this is really ugly, but we really do need to compare an exact
         # byte sequence, since this is used for hashing and signing
         filter_expression = (
-            "normandy.locale in ['en-US'] && normandy.country in ['CA']"
-            " && normandy.channel in ['beta'] && 2 + 2 == 4"
+            "(normandy.locale in ['en-US']) && (normandy.country in ['CA']) && "
+            "(normandy.channel in ['beta']) && (2 + 2 == 4)"
         )
         expected = (
             '{'
@@ -215,8 +215,8 @@ class TestRecipe(object):
         assert recipe.action == a2
         assert recipe.name == 'changed'
         assert recipe.arguments == {'message': 'something'}
-        assert recipe.filter_expression == ("normandy.channel in ['beta'] && "
-                                            "something !== undefined")
+        assert recipe.filter_expression == ("(normandy.channel in ['beta']) && "
+                                            "(something !== undefined)")
 
     def test_recipe_doesnt_update_when_clean(self):
         channel = ChannelFactory()
