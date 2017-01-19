@@ -13,6 +13,9 @@ machine:
 dependencies:
   pre:
     - docker info
+    # Use pipstrap to bootstrap ourselves to a trusted pip 8 for hash
+    # checking.
+    - ./ci/bin/pipstrap.py
     # Install latest pip and other CI requirements first
     - pip install -r ./ci/requirements.txt
   override:
