@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>SHIELD Test Service</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #F6F4EF;
+        color: #585755;
+        font-family: sans-serif;
+        font-size: 15px;
+        line-height: 1.4em;
+        margin: 0 auto;
+        width: 720px;
+        word-wrap: break-word;
+      }
+
+      a {
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      li {
+        margin-bottom: .5em;
+      }
+
+      pre, code {
+        background: #EEE;
+        border: 1px solid #CCC;
+      }
+
+      pre {
+        margin: 0 0 1.5em;
+        padding: 5px;
+      }
+
+      code {
+        box-decoration-break: clone;
+        padding: 2px 4px;
+        position: relative;
+        top: -1px;
+      }
+
+      .testcase {
+        background: #FFF;
+        margin: 0 0 20px;
+      }
+
+      .testcase h3 {
+        background: #585755;
+        color: #FFF;
+        margin: 0;
+        padding: 15px
+      }
+
+      .testcase-content {
+        padding: 15px;
+      }
+
+      .testcase-content p {
+        margin: 0 0 1.5em;
+      }
+
+      textarea {
+        border: 1px solid #ece7db;
+        border-radius: 3px;
+        display: block;
+        height: 6em;
+        overflow: auto;
+        padding: 5px;
+        white-space: pre;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SHIELD Test Service</h1>
+    <p>
+      This service hosts the data needed for running manual tests of the
+      <a href="https://wiki.mozilla.org/Firefox/SHIELD">SHIELD</a> recipe
+      client. The scripts that generate this page and the data are
+      <a href="https://github.com/mozilla/normandy/tree/master/mock-recipe-server">
+      hosted on Github</a>.
+    </p>
+    <h2>Setting up for Testing</h2>
+    <ol>
+      <li>
+        Obtain a copy of Firefox with the SHIELD recipe client system add-on
+        installed. You can check <code>about:support</code> to ensure that you
+        have it.
+      </li>
+      <li>
+        Set the <code>extensions.shield-recipe-client.dev_mode</code> preference
+        to <code>true</code> to run recipes immediately on startup.
+      </li>
+      <li>
+        Set the <code>extensions.shield-recipe-client.logging.level</code>
+        preference to <code>0</code> to enable more logging.
+      </li>
+      <li>
+        Set the <code>security.content.signature.root_hash</code> preference to
+        <code>4C:35:B1:C3:E3:12:D9:55:E7:78:ED:D0:A7:E7:8A:38:83:04:EF:01:BF:FA:03:29:B2:46:9F:3C:C5:EC:36:04</code>.
+        This is the public hash used for verifying content signatures of the
+        test data.
+      </li>
+    </ol>
+    <h2>Verifying a Test Case</h2>
+    <p>
+      You have two options for verifying a test case depending on how thoroughly
+      you want to test the client:
+    </p>
+    <ul>
+      <li>
+        Find the test in the list below, set the
+        <code>extensions.shield-recipe-client.api_url</code> preference to the
+        given URL, and restart your browser. Upon restart, the client will
+        download recipes and execute them. This tests the recipe client from
+        startup to recipe execution.
+      </li>
+      <li>
+        If you have enabled the browser chrome debugging toolbox in the DevTools
+        settings, you can copy and paste the code from the textbox into the
+        Browser Console to immediately set the right preferences and fetch the
+        recipes. This skips testing a small amount of initialization, but is
+        otherwise a quick and reliable way of testing.
+      </li>
+    </ul>
+    <h2>Test Cases</h2>
+    {% for fixture in fixtures %}
+      <div class="testcase" data-name="{{ fixture.name }}">
+        <h3>{{ fixture.name }}</h3>
+        <div class="testcase-content">
+          {{ fixture.description|safe }}
+          <p><strong>URL:</strong> <code class="url"></code></p>
+          <textarea class="browser-code"></textarea>
+        </div>
+      </div>
+    {% endfor %}
+    <script>
+      // Caluclate URLs relative to the current domain and populate each
+      // testcase with them.
+      let testcases = Array.from(document.querySelectorAll('.testcase'));
+      for (let testcase of testcases) {
+        let url = new URL(`/${testcase.dataset.name}/api/v1`, window.location);
+        testcase.querySelector('.url').textContent = url.href;
+        testcase.querySelector('.browser-code').value = (
+          `Cu.import('resource://shield-recipe-client/lib/Storage.jsm');\n` +
+          `Storage.clearAllStorage();\n` +
+          `Services.prefs.setCharPref("extensions.shield-recipe-client.api_url", "${url.href}");\n` +
+          `Cu.import('resource://shield-recipe-client/lib/RecipeRunner.jsm');\n` +
+          `RecipeRunner.start();`
+        );
+      }
+
+      // Select entire textbox when it gets focus to make things quicker.
+      document.addEventListener('focusin', ({ target }) => {
+        if (target.tagName && target.tagName.toLowerCase() === 'textarea') {
+          target.select();
+        }
+      });
+    </script>
+  </body>
+</html>

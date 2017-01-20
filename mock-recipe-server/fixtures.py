@@ -2,13 +2,20 @@ from normandy.recipes.models import Action, Recipe
 from normandy.recipes.tests import ClientFactory, RecipeFactory
 
 
-def console_log_action():
-    return Action.objects.get(name='console-log')
+def console_log(message, **kwargs):
+    return RecipeFactory(
+        action=Action.objects.get(name='console-log'),
+        arguments={'message': message},
+        **kwargs
+    )
 
 
 def get_fixtures():
     """Return all defined fixtures."""
-    return [FixtureClass() for FixtureClass in Fixture.__subclasses__()]
+    return sorted(
+        [FixtureClass() for FixtureClass in Fixture.__subclasses__()],
+        key=lambda f: f.name
+    )
 
 
 class Fixture(object):
@@ -20,6 +27,10 @@ class Fixture(object):
     @property
     def name(self):
         return self.__class__.__name__
+
+    @property
+    def description(self):
+        return '<p class="description">{}</p>'.format(self.__doc__)
 
     def load(self):
         """
@@ -45,10 +56,8 @@ class Fixture(object):
 
 
 class ConsoleLogBasic(Fixture):
-    """A single console-log action."""
+    """Matches all clients. Logs a message to the console."""
     def load_data(self):
-        RecipeFactory(
-            action=console_log_action(),
-            arguments={'message': 'Test Message'},
+        console_log('ConsoleLogBasic executed', filter_expression='true')
             filter_expression='true',
         )

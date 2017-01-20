@@ -22,6 +22,8 @@ configurations.setup()
 
 
 # Now that Django is set up we can import Django things.
+from django.template import Context, Template  # noqa
+
 from normandy.base.utils import canonical_json_dumps  # noqa
 from normandy.recipes.api.serializers import ClientSerializer  # noqa
 from normandy.recipes.models import Action  # noqa
@@ -77,10 +79,21 @@ def main():
     """
     build_path = Path(sys.argv[1])
     domain = sys.argv[2]
-    for fixture in get_fixtures():
+    fixtures = get_fixtures()
+    for fixture in fixtures:
         fixture.load()
         fixture_api_path = APIPath(build_path / fixture.name, 'https://proxy:8443')
         serialize_api(fixture, fixture_api_path, domain)
+
+    # Write the root index page.
+    index_template_path = Path(__file__).parent / 'api_index.html'
+    with index_template_path.open() as f:
+        index_template = Template(f.read())
+
+    context = Context({'fixtures': fixtures})
+    index_path = build_path / 'index.html'
+    with index_path.open(mode='w') as f:
+        f.write(index_template.render(context))
 
 
 def serialize_api(fixture, api_path, domain):
