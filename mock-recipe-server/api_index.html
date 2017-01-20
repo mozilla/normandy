@@ -129,11 +129,11 @@
       </li>
     </ul>
     <h2>Test Cases</h2>
-    {% for fixture in fixtures %}
-      <div class="testcase" data-name="{{ fixture.name }}">
-        <h3>{{ fixture.name }}</h3>
+    {% for testcase in testcases %}
+      <div class="testcase" data-name="{{ testcase.name }}">
+        <h3>{{ testcase.name }}</h3>
         <div class="testcase-content">
-          {{ fixture.description|safe }}
+          {{ testcase.description|safe }}
           <p><strong>URL:</strong> <code class="url"></code></p>
           <textarea class="browser-code"></textarea>
         </div>

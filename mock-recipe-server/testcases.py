@@ -10,19 +10,19 @@ def console_log(message, **kwargs):
     )
 
 
-def get_fixtures():
-    """Return all defined fixtures."""
+def get_testcases():
+    """Return all defined testcases."""
     return sorted(
-        [FixtureClass() for FixtureClass in Fixture.__subclasses__()],
+        [TestCaseClass() for TestCaseClass in TestCase.__subclasses__()],
         key=lambda f: f.name
     )
 
 
-class Fixture(object):
+class TestCase(object):
     """
-    Collection of data for a specific manual test case. Includes both
-    data to be loaded in the database, and data needed to represent
-    API responses that don't use the database.
+    Configuration for a specific manual test case. Subclasses can
+    override methods on this class to customize the state of the server
+    that will be serialized, or, if necessary, the serialization itself.
     """
     @property
     def name(self):
@@ -34,7 +34,7 @@ class Fixture(object):
 
     def load(self):
         """
-        Clear out all existing recipes and load this fixture's data in
+        Clear out all existing recipes and load this test's data in
         its place.
         """
         Recipe.objects.all().delete()
@@ -42,22 +42,20 @@ class Fixture(object):
 
     def load_data(self):
         """
-        Create data specific to this fixture. Individual fixtures must
-        override this.
+        Create data specific to this test. Override to populate the
+        database with recipes and other data the test case needs.
         """
-        raise NotImplementedError()
+        pass
 
     def client(self):
         """
         Return a Client object that the client classification endpoint
-        should render for this fixture.
+        should render for this test.
         """
         return ClientFactory()
 
 
-class ConsoleLogBasic(Fixture):
+class ConsoleLogBasic(TestCase):
     """Matches all clients. Logs a message to the console."""
     def load_data(self):
         console_log('ConsoleLogBasic executed', filter_expression='true')
-            filter_expression='true',
-        )
