@@ -57,12 +57,12 @@ describe('ShowHeartbeatAction', () => {
   });
 
   describe('Repeat Options', () => {
-    describe('`once`', () => {
-      afterEach(() => {
-        normandy.showHeartbeat.calls.reset();
-        delete normandy.mock.storage.data.lastShown;
-      });
+    afterEach(() => {
+      normandy.showHeartbeat.calls.reset();
+      delete normandy.mock.storage.data.lastShown;
+    });
 
+    describe('`once`', () => {
       it('should NOT show if another heartbeat has ran already', async() => {
         const firstAction = new ShowHeartbeatAction(normandy, recipeFactory());
         await firstAction.execute();
@@ -99,29 +99,31 @@ describe('ShowHeartbeatAction', () => {
       });
 
       it('should NOT show if it has been shown already', async() => {
+        jasmine.clock().install();
+
         const onceRecipe = recipeFactory();
 
         const action = new ShowHeartbeatAction(normandy, onceRecipe);
+        // runs correctly first time
+        await action.execute();
+        expect(normandy.showHeartbeat).toHaveBeenCalled();
 
-        // set the lastShown value in storage,
-        // so heartbeat thinks it's run already before
-        normandy.mock.storage.data.lastShown = '1337';
+        // wait
+        jasmine.clock().tick(1000);
 
+        normandy.showHeartbeat.calls.reset();
         // attempt to run it again
         await action.execute();
 
-        // it should NOT run since it's already 'run' once before
+        // it should NOT run since it's already run once before
         expect(normandy.showHeartbeat).not.toHaveBeenCalled();
+
+        jasmine.clock().uninstall();
       });
     });
 
 
     describe('`nag`', () => {
-      afterEach(() => {
-        normandy.showHeartbeat.calls.reset();
-        delete normandy.mock.storage.data.lastShown;
-      });
-
       const nagConfig = {
         arguments: {
           repeatOption: 'nag',
@@ -178,11 +180,6 @@ describe('ShowHeartbeatAction', () => {
 
 
     describe('`xdays`', () => {
-      afterEach(() => {
-        normandy.showHeartbeat.calls.reset();
-        delete normandy.mock.storage.data.lastShown;
-      });
-
       const ONE_DAY = (1000 * 3600 * 24); // in milliseconds
       const repeatEvery = 7; // days
       const xdaysConfig = {
@@ -195,9 +192,9 @@ describe('ShowHeartbeatAction', () => {
       it('should not show if less than `repeatEvery` days has elapsed', async () => {
         const action = new ShowHeartbeatAction(normandy, recipeFactory({ ...xdaysConfig }));
 
-        let idx = 0;
         const max = repeatEvery - 1;
-        for (idx; idx <= max; idx++) {
+
+        for (let idx = 0; idx <= max; idx++) {
           normandy.showHeartbeat.calls.reset();
           // set last shown to be exactly `idx` days ago
           normandy.mock.storage.data.lastShown =

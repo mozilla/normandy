@@ -62,7 +62,7 @@ export default class ShowHeartbeatAction extends Action {
    */
   async heartbeatShownRecently() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    const timeSince = !!lastShown ? // eslint-disable-line no-extra-boolean-cast
+    const timeSince = lastShown ?
       new Date() - parseFloat(lastShown) : Infinity;
 
     // Return a boolean indicating if a heartbeat

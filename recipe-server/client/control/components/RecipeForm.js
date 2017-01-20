@@ -61,20 +61,14 @@ export class RecipeForm extends React.Component {
       return null;
     }
 
-    this.cloneCache = this.cloneCache || {};
-    const cache = this.cloneCache;
-
-    if (!cache[displayedRecipe.id]) {
-      cache[displayedRecipe.id] = (
-        <span className="cloning-message callout">
-          {'You are cloning '}
-          <Link to={`/control/recipe/${displayedRecipe.id}/`}>
-            {displayedRecipe.name} ({displayedRecipe.action})
-          </Link>.
-        </span>
-      );
-    }
-    return cache[displayedRecipe.id];
+    return (
+      <span className="cloning-message callout">
+        {'You are cloning '}
+        <Link to={`/control/recipe/${displayedRecipe.id}/`}>
+          {displayedRecipe.name} ({displayedRecipe.action})
+        </Link>.
+      </span>
+    );
   }
 
   render() {
