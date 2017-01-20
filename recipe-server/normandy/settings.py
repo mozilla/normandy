@@ -259,6 +259,8 @@ class Base(Core):
     AUTOGRAPH_HAWK_SECRET_KEY = values.Value()
     AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
 
+    PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, 'product_details'))
+
 
 class Development(Base):
     """Settings for local development."""
