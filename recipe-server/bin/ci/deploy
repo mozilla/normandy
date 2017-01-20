@@ -23,9 +23,13 @@ retry 3 docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWO
 
 # docker tag and push git branch to dockerhub
 if [ -n "$1" ]; then
-    [ "$1" == master ] && TAG=latest || TAG="$1"
-    docker tag normandy:build "mozilla/normandy:$TAG" ||
-        (echo "Couldn't tag normandy:build as mozilla/normandy:$TAG" && false)
+    if [ "$1" == master ]; then
+        TAG=latest
+    else
+        TAG="$1"
+        docker tag mozilla/normandy:latest "mozilla/normandy:$TAG" ||
+            (echo "Couldn't re-tag mozilla/normandy:latest as mozilla/normandy:$TAG" && false)
+    fi
     retry 3 docker push "mozilla/normandy:$TAG" ||
         (echo "Couldn't push mozilla/normandy:$TAG" && false)
     echo "Pushed mozilla/normandy:$TAG"
