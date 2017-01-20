@@ -122,7 +122,6 @@ describe('controlApp Actions', () => {
     });
   });
 
-
   describe('showNotification', () => {
     it('automatically dismisses notifications after 10 seconds', async () => {
       jasmine.clock().install();

@@ -4,12 +4,17 @@ export const fixtureRecipes = [
   { id: 3, name: 'Consequitar adipscing', enabled: false },
 ];
 
+export const fixtureRecipeDict = {};
+fixtureRecipes.forEach(recipe => {
+  fixtureRecipeDict[recipe.id] = { ...recipe };
+});
+
 export const initialState = {
   controlApp: {
     isFetching: false,
   },
   recipes: {
-    list: [],
+    list: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },

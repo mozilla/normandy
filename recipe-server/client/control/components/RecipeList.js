@@ -13,6 +13,10 @@ import {
   getActiveColumns,
 } from 'control/selectors/ColumnSelector';
 
+import {
+  getRecipesList,
+} from 'control/selectors/RecipesSelector';
+
 import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
@@ -107,7 +111,7 @@ class DisconnectedRecipeList extends React.Component {
 
     if (recipeListNeedsFetch && !isFetching) {
       dispatch(makeApiRequest('fetchAllRecipes', {}))
-      .then(recipes => dispatch(recipesReceived(recipes)));
+        .then(recipes => dispatch(recipesReceived(recipes)));
     }
   }
 
@@ -240,7 +244,7 @@ class DisconnectedRecipeList extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   dispatch: ownProps.dispatch,
   isFetching: state.controlApp.isFetching,
-  recipes: state.recipes.list || [],
+  recipes: getRecipesList(state.recipes),
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   displayedColumns: getActiveColumns(state.columns),
 });

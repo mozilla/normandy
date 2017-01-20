@@ -2,6 +2,7 @@ import appReducer from 'control/reducers';
 import * as actions from 'control/actions/ControlActions';
 import {
   fixtureRecipes,
+  fixtureRecipeDict,
   initialState,
 } from 'control/tests/fixtures';
 
@@ -40,7 +41,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipes,
+        list: fixtureRecipeDict,
         recipeListNeedsFetch: false,
       },
     });
@@ -54,7 +55,9 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [fixtureRecipes[0]],
+        list: {
+          [fixtureRecipes[0].id]: fixtureRecipes[0],
+        },
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
       },
@@ -69,9 +72,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [],
         selectedRecipe: 2,
-        recipeListNeedsFetch: true,
       },
     });
   });
@@ -137,22 +138,22 @@ describe('controlApp reducer', () => {
   });
 
   it('should handle RECIPE_ADDED', () => {
+    const fakeRecipe = {
+      id: 4,
+      name: 'Villis stebulum',
+      enabled: false,
+    };
+
     expect(appReducer(initialState, {
       type: actions.RECIPE_ADDED,
-      recipe: {
-        id: 4,
-        name: 'Villis stebulum',
-        enabled: false,
-      },
+      recipe: fakeRecipe,
     })).toEqual({
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 4,
-          name: 'Villis stebulum',
-          enabled: false,
-        }],
+        list: {
+          [fakeRecipe.id]: fakeRecipe,
+        },
       },
     });
   });
@@ -162,7 +163,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipes,
+        list: fixtureRecipeDict,
       },
     }, {
       type: actions.RECIPE_UPDATED,
@@ -175,19 +176,23 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 1,
-          name: 'Lorem Ipsum',
-          enabled: true,
-        }, {
-          id: 2,
-          name: 'Dolor set amet',
-          enabled: true,
-        }, {
-          id: 3,
-          name: 'Updated recipe name',
-          enabled: true,
-        }],
+        list: {
+          1: {
+            id: 1,
+            name: 'Lorem Ipsum',
+            enabled: true,
+          },
+          2: {
+            id: 2,
+            name: 'Dolor set amet',
+            enabled: true,
+          },
+          3: {
+            id: 3,
+            name: 'Updated recipe name',
+            enabled: true,
+          },
+        },
       },
     });
   });
@@ -197,7 +202,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipes,
+        list: fixtureRecipeDict,
       },
     }, {
       type: actions.RECIPE_DELETED,
@@ -206,16 +211,53 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 1,
-          name: 'Lorem Ipsum',
-          enabled: true,
-        }, {
-          id: 2,
-          name: 'Dolor set amet',
-          enabled: true,
-        }],
+        list: {
+          1: {
+            id: 1,
+            name: 'Lorem Ipsum',
+            enabled: true,
+          },
+          2: {
+            id: 2,
+            name: 'Dolor set amet',
+            enabled: true,
+          },
+        },
       },
+    });
+  });
+
+  describe('Recipe Creation and Updating', () => {
+    it('only has one recipe in the `list` after creating and updating a new recipe', async () => {
+      // create
+      const fakeRecipe = {
+        id: 3,
+        name: 'Villis stebulum',
+        enabled: false,
+      };
+
+      let store = appReducer(initialState, {
+        type: actions.RECIPE_ADDED,
+        recipe: fakeRecipe,
+      });
+
+      // update
+      store = appReducer(store, {
+        type: actions.RECIPE_UPDATED,
+        recipe: {
+          id: 3,
+          name: 'Updated recipe name',
+          enabled: true,
+        },
+      });
+
+      expect(store.recipes.list).toEqual({
+        3: {
+          id: 3,
+          name: 'Updated recipe name',
+          enabled: true,
+        },
+      });
     });
   });
 });
