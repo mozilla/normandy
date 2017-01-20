@@ -59,11 +59,10 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
         return sandbox.Promise.reject(new sandbox.Error("No window to show heartbeat in"));
       }
 
-      const sandboxedDriver = Cu.cloneInto(this, sandbox, {cloneFunctions: true});
-      const ee = new sandbox.EventEmitter(sandboxedDriver).wrappedJSObject;
       const internalOptions = Object.assign({}, options, {testing: this.testing});
-      new Heartbeat(aWindow, ee, sandboxManager, internalOptions);
-      return sandbox.Promise.resolve(ee);
+      const heartbeat = new Heartbeat(aWindow, sandboxManager, internalOptions);
+      const eventEmitter = Cu.cloneInto(heartbeat.eventEmitter, sandbox, {cloneFunctions: true});
+      return sandbox.Promise.resolve(eventEmitter);
     },
 
     saveHeartbeatFlow() {

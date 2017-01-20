@@ -56,8 +56,5 @@ function makeSandbox() {
     wantGlobalProperties: ["URL", "URLSearchParams"],
   });
 
-  const url = "resource://shield-recipe-client/data/EventEmitter.js";
-  Services.scriptloader.loadSubScript(url, sandbox);
-
   return sandbox;
 }

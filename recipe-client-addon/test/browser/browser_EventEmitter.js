@@ -1,17 +1,9 @@
 "use strict";
 
 const {utils: Cu} = Components;
-Cu.import("resource://gre/modules/Log.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/EventEmitter.jsm", this);
 
-const sandboxManager = new SandboxManager();
-sandboxManager.addHold("test running");
-const driver = new NormandyDriver(sandboxManager);
-const sandboxedDriver = Cu.cloneInto(driver, sandboxManager.sandbox, {cloneFunctions: true});
-const eventEmitter = new sandboxManager.sandbox.EventEmitter(sandboxedDriver).wrappedJSObject;
-
-
+const eventEmitter = new EventEmitter();
 const evidence = {
   a: 0,
   b: 0,
@@ -83,10 +75,4 @@ add_task(function* () {
     c: 1,
     log: "abcaba",  // events are in order
   }, "events fired as expected");
-
-  sandboxManager.removeHold("test running");
-
-  yield sandboxManager.isNuked()
-    .then(() => ok(true, "sandbox is nuked"))
-    .catch(e => ok(false, "sandbox is nuked", e));
 });
