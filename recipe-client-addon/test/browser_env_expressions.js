@@ -53,4 +53,16 @@ add_task(function* () {
   // Test stable sample returns true for matching samples
   val = yield EnvExpressions.eval('["test"]|stableSample(0)');
   is(val, false, "Stable sample returns false for 0% sample");
+
+  // Test stable sample for known samples
+  val = yield EnvExpressions.eval('["test-1"]|stableSample(0.5)');
+  is(val, true, "Stable sample returns true for a known sample");
+  val = yield EnvExpressions.eval('["test-4"]|stableSample(0.5)');
+  is(val, false, "Stable sample returns false for a known sample");
+
+  // Test bucket sample for known samples
+  val = yield EnvExpressions.eval('["test-1"]|bucketSample(0, 5, 10)');
+  is(val, true, "Bucket sample returns true for a known sample");
+  val = yield EnvExpressions.eval('["test-4"]|bucketSample(0, 5, 10)');
+  is(val, false, "Bucket sample returns false for a known sample");
 });
