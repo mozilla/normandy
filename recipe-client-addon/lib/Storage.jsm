@@ -131,4 +131,18 @@ this.Storage = {
       cloneFunctions: true,
     });
   },
+
+  /**
+   * Clear ALL storage data and save to the disk.
+   */
+  clearAllStorage() {
+    return loadStorage()
+      .then(store => {
+        store.data = {};
+        store.saveSoon();
+      })
+      .catch(err => {
+        log.error(err);
+      });
+  },
 };
