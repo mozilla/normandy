@@ -1,17 +1,17 @@
 import hashlib
-from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils import timezone
 
 import pytest
 
 from normandy.base.tests import Whatever
-from normandy.recipes.models import ApprovalRequest, Client, Recipe
+from normandy.recipes.models import Client, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
-    ApprovalRequestFactory,
+    ChannelFactory,
+    CountryFactory,
+    LocaleFactory,
     RecipeFactory,
     SignatureFactory,
 )
@@ -37,18 +37,7 @@ class TestAction(object):
 
 @pytest.mark.django_db
 class TestRecipe(object):
-    def test_revision_id_increments(self):
-        """Ensure that the revision id is incremented on each save"""
-        recipe = RecipeFactory()
-
-        # The factory saves a couple times so revision id is not 0
-        revision_id = recipe.revision_id
-
-        recipe.action = ActionFactory()
-        recipe.save()
-        assert recipe.revision_id == revision_id + 1
-
-    def test_revision_id_doesnt_increment_if_no_changes(self):
+    def test_revision_id_doesnt_change_if_no_changes(self):
         """
         revision_id should not increment if a recipe is saved with no
         changes.
@@ -61,52 +50,81 @@ class TestRecipe(object):
         recipe.save()
         assert recipe.revision_id == revision_id
 
-    def test_skip_last_updated(self):
-        # set last_updated to avoid timestamp precision problems
-        recipe = RecipeFactory(name='one', last_updated=datetime.now() - timedelta(30))
-        last_updated_1 = recipe.last_updated
+    def test_filter_expression(self):
+        channel1 = ChannelFactory(slug='beta', name='Beta')
+        channel2 = ChannelFactory(slug='release', name='Release')
+        country1 = CountryFactory(code='US', name='USA')
+        country2 = CountryFactory(code='CA', name='Canada')
+        locale1 = LocaleFactory(code='en-US', name='English (US)')
+        locale2 = LocaleFactory(code='fr-CA', name='French (CA)')
 
-        recipe.name = 'two'
-        recipe.save()
-        last_updated_2 = recipe.last_updated
+        r = RecipeFactory()
+        assert r.filter_expression == ''
 
-        recipe.name = 'three'
-        recipe.save(skip_last_updated=True)
-        last_updated_3 = recipe.last_updated
+        r = RecipeFactory(channels=[channel1])
+        assert r.filter_expression == "normandy.channel in ['beta']"
 
-        assert last_updated_1 != last_updated_2
-        assert last_updated_2 == last_updated_3
+        r.update(channels=[channel1, channel2])
+        assert r.filter_expression == "normandy.channel in ['beta', 'release']"
+
+        r = RecipeFactory(countries=[country1])
+        assert r.filter_expression == "normandy.country in ['US']"
+
+        r.update(countries=[country1, country2])
+        assert r.filter_expression == "normandy.country in ['CA', 'US']"
+
+        r = RecipeFactory(locales=[locale1])
+        assert r.filter_expression == "normandy.locale in ['en-US']"
+
+        r.update(locales=[locale1, locale2])
+        assert r.filter_expression == "normandy.locale in ['en-US', 'fr-CA']"
+
+        r = RecipeFactory(extra_filter_expression='2 + 2 == 4')
+        assert r.filter_expression == '2 + 2 == 4'
+
+        r.update(channels=[channel1], countries=[country1], locales=[locale1])
+        assert r.filter_expression == ("(normandy.locale in ['en-US']) && "
+                                       "(normandy.country in ['US']) && "
+                                       "(normandy.channel in ['beta']) && "
+                                       "(2 + 2 == 4)")
 
     def test_canonical_json(self):
-        recipe = RecipeFactory.build(
+        recipe = RecipeFactory(
             action=ActionFactory(name='action'),
-            approval=None,
-            arguments={'foo': 1, 'bar': 2},
+            arguments_json='{"foo": 1, "bar": 2}',
+            channels=[ChannelFactory(slug='beta')],
+            countries=[CountryFactory(code='CA')],
             enabled=False,
-            filter_expression='2 + 2 == 4',
+            extra_filter_expression='2 + 2 == 4',
+            locales=[LocaleFactory(code='en-US')],
             name='canonical',
-            last_updated=datetime(2016, 6, 27, 13, 54, 51, 1234, tzinfo=timezone.utc),
         )
-        recipe.save(skip_last_updated=True)
         # Yes, this is really ugly, but we really do need to compare an exact
         # byte sequence, since this is used for hashing and signing
+        filter_expression = (
+            "(normandy.locale in ['en-US']) && (normandy.country in ['CA']) && "
+            "(normandy.channel in ['beta']) && (2 + 2 == 4)"
+        )
         expected = (
             '{'
             '"action":"action",'
-            '"approval":null,'
             '"arguments":{"bar":2,"foo":1},'
-            '"current_approval_request":null,'
+            '"channels":["beta"],'
+            '"countries":["CA"],'
             '"enabled":false,'
-            '"filter_expression":"2 + 2 == 4",'
+            '"extra_filter_expression":"2 + 2 == 4",'
+            '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
-            '"is_approved":false,'
-            '"last_updated":"2016-06-27T13:54:51.001234Z",'
+            '"last_updated":"%(last_updated)s",'
+            '"locales":["en-US"],'
             '"name":"canonical",'
-            '"revision_id":%(revision_id)s'
+            '"revision_id":"%(revision_id)s"'
             '}'
         ) % {
             'id': recipe.id,
             'revision_id': recipe.revision_id,
+            'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'filter_expression': filter_expression
         }
         expected = expected.encode()
         assert recipe.canonical_json() == expected
@@ -121,8 +139,7 @@ class TestRecipe(object):
         original_signature = recipe.signature
         assert original_signature is not None
 
-        recipe.name = 'changed'
-        recipe.save()
+        recipe.update(name='changed')
 
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
@@ -136,8 +153,7 @@ class TestRecipe(object):
 
         recipe = RecipeFactory(name='unchanged', signed=True)
         original_signature = recipe.signature
-        recipe.name = 'changed'
-        recipe.save()
+        recipe.update(name='changed')
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
         assert recipe.signature is None
@@ -153,9 +169,8 @@ class TestRecipe(object):
     def test_cant_change_signature_and_other_fields(self):
         recipe = RecipeFactory(name='unchanged', signed=False)
         recipe.signature = SignatureFactory()
-        recipe.name = 'changed'
         with pytest.raises(ValidationError) as exc_info:
-            recipe.save()
+            recipe.update(name='changed')
         assert exc_info.value.message == 'Signatures must change alone'
 
     def test_update_signature(self, mocker):
@@ -190,10 +205,100 @@ class TestRecipe(object):
         assert recipe.signature is not None
         assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
 
+    def test_recipe_update_partial(self):
+        a1 = ActionFactory()
+        recipe = RecipeFactory(name='unchanged', action=a1, arguments={'message': 'something'},
+                               extra_filter_expression='something !== undefined')
+        a2 = ActionFactory()
+        c = ChannelFactory(slug='beta')
+        recipe.update(name='changed', action=a2, channels=[c])
+        assert recipe.action == a2
+        assert recipe.name == 'changed'
+        assert recipe.arguments == {'message': 'something'}
+        assert recipe.filter_expression == ("(normandy.channel in ['beta']) && "
+                                            "(something !== undefined)")
+
+    def test_recipe_doesnt_update_when_clean(self):
+        channel = ChannelFactory()
+        recipe = RecipeFactory(name='my name', channels=[channel])
+
+        revision_id = recipe.revision_id
+        last_updated = recipe.last_updated
+
+        recipe.update(name='my name', channels=[channel])
+        assert revision_id == recipe.revision_id
+        assert last_updated == recipe.last_updated
+
+    def test_recipe_update_channels(self):
+        c1 = ChannelFactory(slug='beta')
+        recipe = RecipeFactory(channels=[c1])
+
+        c2 = ChannelFactory(slug='release')
+        recipe.update(channels=[c2])
+        assert recipe.channels.count() == 1
+        assert list(recipe.channels.all()) == [c2]
+
+        recipe.update(channels=[c1, c2])
+        channels = list(recipe.channels.all())
+        assert recipe.channels.count() == 2
+        assert c1 in channels
+        assert c2 in channels
+
+        recipe.update(channels=[])
+        assert recipe.channels.count() == 0
+
+    def test_recipe_update_countries(self):
+        c1 = CountryFactory(code='CA')
+        recipe = RecipeFactory(countries=[c1])
+
+        c2 = CountryFactory(code='US')
+        recipe.update(countries=[c2])
+        assert recipe.countries.count() == 1
+        assert list(recipe.countries.all()) == [c2]
+
+        recipe.update(countries=[c1, c2])
+        countries = list(recipe.countries.all())
+        assert recipe.countries.count() == 2
+        assert c1 in countries
+        assert c2 in countries
+
+        recipe.update(countries=[])
+        assert recipe.countries.count() == 0
+
+    def test_recipe_update_locales(self):
+        l1 = LocaleFactory(code='en-US')
+        recipe = RecipeFactory(locales=[l1])
+
+        l2 = LocaleFactory(code='fr-CA')
+        recipe.update(locales=[l2])
+        assert recipe.locales.count() == 1
+        assert list(recipe.locales.all()) == [l2]
+
+        recipe.update(locales=[l1, l2])
+        locales = list(recipe.locales.all())
+        assert recipe.locales.count() == 2
+        assert l1 in locales
+        assert l2 in locales
+
+        recipe.update(locales=[])
+        assert recipe.locales.count() == 0
+
+    def test_recipe_force_update(self):
+        recipe = RecipeFactory(name='my name')
+        revision_id = recipe.revision_id
+        recipe.update(name='my name', force=True)
+        assert revision_id != recipe.revision_id
+
+    def test_revision_id_changes(self):
+        """Ensure that the revision id is incremented on each save"""
+        recipe = RecipeFactory()
+        revision_id = recipe.revision_id
+        recipe.update(action=ActionFactory())
+        assert recipe.revision_id != revision_id
+
 
 @pytest.mark.django_db
 class TestRecipeQueryset(object):
-
     def test_update_signatures(self, mocker):
         # Make sure the test environment is clean. This test is invalid otherwise.
         assert Recipe.objects.all().count() == 0
@@ -211,26 +316,6 @@ class TestRecipeQueryset(object):
         assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
         signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
         assert signatures == ['fake signature 1', 'fake signature 2']
-
-
-@pytest.mark.django_db
-class TestApprovalRequest(object):
-    def test_only_one_open_request_for_recipe(self):
-        recipe = RecipeFactory()
-        ApprovalRequestFactory(recipe=recipe, active=False)
-
-        # Should be able to create a new request because last one was not active
-        ApprovalRequestFactory(recipe=recipe, active=True)
-
-        # Should not be able to create a new request because an open request exists
-        with pytest.raises(ApprovalRequest.ActiveRequestAlreadyExists):
-            ApprovalRequestFactory(recipe=recipe, active=True)
-
-    def test_can_save_open_request(self):
-        request = ApprovalRequestFactory(active=True)
-
-        # Should be able to call save without an integrity error
-        request.save()
 
 
 class TestClient(object):
