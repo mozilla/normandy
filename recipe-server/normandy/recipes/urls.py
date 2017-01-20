@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 from normandy.recipes.api.views import (
     ActionImplementationView,
     ActionViewSet,
+    ApprovalRequestViewSet,
     ClassifyClient,
     Filters,
     RecipeViewSet,
@@ -16,6 +17,7 @@ router = DefaultRouter()
 router.register(r'action', ActionViewSet)
 router.register(r'recipe', RecipeViewSet)
 router.register(r'recipe_revision', RecipeRevisionViewSet)
+router.register(r'approval_request', ApprovalRequestViewSet)
 
 
 app_name = 'recipes'

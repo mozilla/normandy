@@ -115,6 +115,7 @@ class TestRecipe(object):
             '"extra_filter_expression":"2 + 2 == 4",'
             '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
+            '"is_approved":false,'
             '"last_updated":"%(last_updated)s",'
             '"locales":["en-US"],'
             '"name":"canonical",'

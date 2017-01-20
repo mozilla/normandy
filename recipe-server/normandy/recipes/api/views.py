@@ -15,6 +15,7 @@ from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import reversion_transaction
 from normandy.recipes.models import (
     Action,
+    ApprovalRequest,
     Channel,
     Client,
     Country,
@@ -24,6 +25,7 @@ from normandy.recipes.models import (
 )
 from normandy.recipes.api.serializers import (
     ActionSerializer,
+    ApprovalRequestSerializer,
     ClientSerializer,
     RecipeSerializer,
     RecipeRevisionSerializer,
@@ -129,6 +131,26 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         recipe.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @detail_route(methods=['POST'])
+    def request_approval(self, request, pk=None):
+        recipe = self.get_object()
+
+        if recipe.is_approved:
+            return Response({'error': 'Recipe is already approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        elif not recipe.latest_revision:
+            return Response({'error': 'Recipe has no revisions to be approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        elif recipe.latest_revision.is_rejected:
+            return Response({'error': 'The latest revision has already been rejected. Please make '
+                                      'changes before requesting approval.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        revision = recipe.latest_revision
+        revision.approval_request = ApprovalRequest(revision=revision, user=request.user)
+        revision.save()
+        return Response(ApprovalRequestSerializer(revision.approval_request).data)
+
 
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = RecipeRevision.objects.all()
@@ -136,6 +158,32 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [
         AdminEnabledOrReadOnly,
     ]
+
+
+class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = ApprovalRequest.objects.all()
+    serializer_class = ApprovalRequestSerializer
+    permission_classes = [
+        AdminEnabledOrReadOnly,
+    ]
+
+    @detail_route(methods=['POST'])
+    def approve(self, request, pk=None):
+        approval_request = self.get_object()
+        approval_request.approve()
+        return Response(ApprovalRequestSerializer(approval_request).data)
+
+    @detail_route(methods=['POST'])
+    def reject(self, request, pk=None):
+        approval_request = self.get_object()
+        approval_request.reject()
+        return Response(ApprovalRequestSerializer(approval_request).data)
+
+    @detail_route(methods=['POST'])
+    def close(self, request, pk=None):
+        approval_request = self.get_object()
+        approval_request.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ClassifyClient(views.APIView):
