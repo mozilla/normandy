@@ -61,8 +61,8 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
 
       const internalOptions = Object.assign({}, options, {testing: this.testing});
       const heartbeat = new Heartbeat(aWindow, sandboxManager, internalOptions);
-      const eventEmitter = Cu.cloneInto(heartbeat.eventEmitter, sandbox, {cloneFunctions: true});
-      return sandbox.Promise.resolve(eventEmitter);
+      // Emitter is already cloned into the sandbox.
+      return sandbox.Promise.resolve(heartbeat.eventEmitter);
     },
 
     saveHeartbeatFlow() {

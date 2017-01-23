@@ -22,10 +22,12 @@ this.EventEmitter = function() {
             log.info(`EventEmitter: Event fired with no listeners: ${eventName}`);
             return;
           }
+          // freeze event to prevent handlers from modifying it
+          const frozenEvent = Object.freeze(event);
           // Clone callbacks array to avoid problems with mutation while iterating
           const callbacks = Array.from(listeners[eventName]);
           for (const cb of callbacks) {
-            cb(event);
+            cb(frozenEvent);
           }
         });
     },

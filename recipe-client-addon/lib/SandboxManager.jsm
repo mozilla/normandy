@@ -29,6 +29,10 @@ this.SandboxManager = class {
     this.tryCleanup();
   }
 
+  cloneInto(value, options = {}) {
+    return Cu.cloneInto(value, this._sandbox, options);
+  }
+
   tryCleanup() {
     if (this.holds.length === 0) {
       const sandbox = this._sandbox;
