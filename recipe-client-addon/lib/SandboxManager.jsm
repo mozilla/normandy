@@ -30,7 +30,7 @@ this.SandboxManager = class {
   }
 
   cloneInto(value, options = {}) {
-    return Cu.cloneInto(value, this._sandbox, options);
+    return Cu.cloneInto(value, this.sandbox, options);
   }
 
   tryCleanup() {

@@ -90,13 +90,8 @@ this.Heartbeat = class {
       }
     }
 
-    // Run the emitter in the sandbox, but waive Xrays so we can call
-    // emit on it. As long as the only arguments passed to it are
-    // strings and cloned event data, this should be safe.
-    const sandboxedEmitter = sandboxManager.cloneInto(new EventEmitter(), {cloneFunctions: true});
-    this.eventEmitter = Cu.waiveXrays(sandboxedEmitter);
-
     this.chromeWindow = chromeWindow;
+    this.eventEmitter = new EventEmitter(sandboxManager);
     this.sandboxManager = sandboxManager;
     this.options = options;
     this.surveyResults = {};
@@ -265,7 +260,7 @@ this.Heartbeat = class {
 
     data.timestamp = timestamp;
     data.flowId = this.options.flowId;
-    this.eventEmitter.emit(name, this.sandboxManager.cloneInto(data));
+    this.eventEmitter.emit(name, data);
 
     if (sendPing) {
       // Send the ping to Telemetry
@@ -283,7 +278,7 @@ this.Heartbeat = class {
       });
 
       // only for testing
-      this.eventEmitter.emit("TelemetrySent", this.sandboxManager.cloneInto(payload));
+      this.eventEmitter.emit("TelemetrySent", payload);
 
       // Survey is complete, clear out the expiry timer & survey configuration
       this.endTimerIfPresent("surveyEndTimer");

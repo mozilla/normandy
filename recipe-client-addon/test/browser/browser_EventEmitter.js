@@ -2,8 +2,9 @@
 
 const {utils: Cu} = Components;
 Cu.import("resource://shield-recipe-client/lib/EventEmitter.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 
-const eventEmitter = new EventEmitter();
+let eventEmitter = null;
 const evidence = {
   a: 0,
   b: 0,
@@ -25,6 +26,18 @@ function listenerC(x = 1) {
   evidence.c += x;
   evidence.log += "c";
 }
+
+add_task(function* () {
+  const sandboxManager = new SandboxManager();
+  sandboxManager.addHold("test running");
+  eventEmitter = new EventEmitter(sandboxManager);
+  registerCleanupFunction(() => {
+    sandboxManager.removeHold("test running");
+    return sandboxManager.isNuked()
+      .then(() => ok(true, "sandbox is nuked"))
+      .catch(e => ok(false, "sandbox is nuked", e));
+  });
+});
 
 add_task(function* () {
   // Fire an unrelated event, to make sure nothing goes wrong
@@ -75,4 +88,10 @@ add_task(function* () {
     c: 1,
     log: "abcaba",  // events are in order
   }, "events fired as expected");
+
+  eventEmitter.on("mutationTest", data => {
+    ok(Object.isFrozen(data), "Event data passed to listeners is frozen.");
+  });
+  eventEmitter.emit("mutationTest");
+  yield Promise.resolve();
 });

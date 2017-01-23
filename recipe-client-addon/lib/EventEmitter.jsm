@@ -4,16 +4,25 @@
 "use strict";
 
 const {utils: Cu} = Components;
+const {jsonCopy} = Cu.import("resource://shield-recipe-client/lib/Utils.jsm", {});
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 
 this.EXPORTED_SYMBOLS = ["EventEmitter"];
 
 const log = LogManager.getLogger("event-emitter");
 
-this.EventEmitter = function() {
+this.EventEmitter = function(sandboxManager) {
   const listeners = {};
 
   return {
+    createSandboxedEmitter() {
+      return sandboxManager.cloneInto({
+        on: this.on.bind(this),
+        off: this.off.bind(this),
+        once: this.once.bind(this),
+      });
+    },
+
     emit(eventName, event) {
       // Fire events async
       Promise.resolve()
@@ -22,12 +31,12 @@ this.EventEmitter = function() {
             log.info(`EventEmitter: Event fired with no listeners: ${eventName}`);
             return;
           }
-          // freeze event to prevent handlers from modifying it
-          const frozenEvent = Object.freeze(event);
           // Clone callbacks array to avoid problems with mutation while iterating
           const callbacks = Array.from(listeners[eventName]);
           for (const cb of callbacks) {
-            cb(frozenEvent);
+            // Copy event to prevent modifcations leaking between callbacks.
+            const copiedEvent = jsonCopy(event);
+            cb(sandboxManager.cloneInto(copiedEvent));
           }
         });
     },

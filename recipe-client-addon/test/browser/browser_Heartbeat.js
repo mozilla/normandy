@@ -53,7 +53,7 @@ function closeAllNotifications(targetWindow, notificationBox) {
   });
 }
 
-/* Check that the correct telmetry was sent */
+/* Check that the correct telemetry was sent */
 function assertTelemetrySent(hb, eventNames) {
   return new Promise(resolve => {
     hb.eventEmitter.once("TelemetrySent", payload => {
