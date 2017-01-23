@@ -170,13 +170,13 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.approve()
+        approval_request.approve(approver=request.user)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])
     def reject(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.reject()
+        approval_request.reject(approver=request.user)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])

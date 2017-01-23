@@ -354,17 +354,24 @@ class RecipeRevision(models.Model):
 class ApprovalRequest(models.Model):
     revision = models.OneToOneField(RecipeRevision, related_name='approval_request')
     created = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approval_requests',
-                             null=True)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approval_requests',
+                                null=True)
     approved = models.NullBooleanField(null=True)
+    approver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approved_requests',
+                                 null=True)
 
-    def approve(self):
+    def approve(self, approver):
         self.approved = True
-        self.revision.recipe.approved_revision = self.revision
+        self.approver = approver
         self.save()
 
-    def reject(self):
+        recipe = self.revision.recipe
+        recipe.approved_revision = self.revision
+        recipe.save()
+
+    def reject(self, approver):
         self.approved = False
+        self.approver = approver
         self.save()
 
 
