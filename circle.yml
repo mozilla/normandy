@@ -21,10 +21,6 @@ dependencies:
   override:
     - ./ci/bin/runner.sh dependencies
 
-compile:
-  override:
-    - ./ci/bin/runner.sh compile
-
 test:
   override:
     - ./ci/bin/runner.sh test
