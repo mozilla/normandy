@@ -2,10 +2,10 @@ import json
 
 from django.db import transaction
 
-from product_details.storage import PDFileStorage
+from product_details.storage import PDDatabaseStorage
 
 
-class ProductDetailsRelationalStorage(PDFileStorage):
+class ProductDetailsRelationalStorage(PDDatabaseStorage):
     """
     Extends the in-database storage for product_details to provide a
     database table of locales for other models to have foreign keys to.

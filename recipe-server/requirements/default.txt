@@ -24,6 +24,8 @@ django-dirtyfields==0.8.2 \
 django-filter==0.13.0 \
     --hash=sha256:b4c1614576fe696d1a91d08f100caeffcbc084d93181b3df26f5d4fc0131f0fc \
     --hash=sha256:f5e10bea3b30e43a9b0b7efdca8e91cb0c1d5bf4d316e8fb6c0c22300d30c7dd
+django-mozilla-product-details==0.11.1 \
+    --hash=sha256:6a9bf2898deae722876bd19eb874bfdcbe884f99c8096c2ddd6cdea8b95d4fa0
 django-npm==0.1.4 \
     --hash=sha256:4ace771ef76bf6a9430278d0f23a23d1a7083ec2b00240c4400d3c5a5cd7cea6
 django-reversion==2.0.4 \
@@ -120,6 +122,3 @@ statsd==3.2.1 \
 whitenoise==2.0.6 \
     --hash=sha256:826ffe5d608c9dc8daebef1b0b43d01f7958f17c2fce36e75c80e26160172c4f \
     --hash=sha256:5aea935dfc09ef2beeb76960b4a808b0bbe65e85fb0b0312434b9c365ca02a41
-django-mozilla-product-details==0.12.1 \
-    --hash=sha256:a31a51102e8c2f047f8aa62b8bdc552f7a31d9c69f2cb16393225c3ee0db72b5 \
-    --hash=sha256:25ac11bd4544fef3236f32439f6b1de3bcf931f8b34c7786ab40f0ec85626eeb
