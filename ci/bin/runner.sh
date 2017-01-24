@@ -28,7 +28,7 @@ for project in "${PROJECTS[@]}"; do
         echo "============================================================"
 
         pushd ${BASE_DIR}/${project}
-        "${step_script}" "$@"
+        "${step_script}" "$@" | cat
         popd
     fi
 done
