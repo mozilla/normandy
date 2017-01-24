@@ -10,7 +10,6 @@ BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../.. && pwd)"
 PROJECTS=(
     recipe-client-addon
     recipe-server
-    mock-recipe-server
     lints
     compose
     eslint-config-normandy
