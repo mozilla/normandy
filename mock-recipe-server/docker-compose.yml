@@ -3,7 +3,7 @@ version: '2'
 services:
   testgen:
     extends:
-      file: normandy-base.yml
+      file: ../compose/normandy-base.yml
       service: normandy-base
     links:
       - database
