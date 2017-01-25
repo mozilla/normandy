@@ -14,3 +14,4 @@ _build
 /__version__/
 /tmp
 /node_modules
+/product_details/

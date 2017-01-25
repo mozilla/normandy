@@ -2,7 +2,7 @@ version: '2'
 
 services:
   normandy-base:
-    image: mozilla/normandy:latest
+    build: ../recipe-server
     environment:
       DATABASE_URL: "postgres://postgres@database/postgres"
       DJANGO_CONFIGURATION: ProductionInsecure
