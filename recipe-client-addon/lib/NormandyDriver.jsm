@@ -15,6 +15,7 @@ Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeo
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
+Cu.import("resource://shield-recipe-client/lib/EnvExpressions.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -36,6 +37,10 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
       return Cc["@mozilla.org/chrome/chrome-registry;1"]
         .getService(Ci.nsIXULChromeRegistry)
         .getSelectedLocale("browser");
+    },
+
+    get userId() {
+      return EnvExpressions.getUserId();
     },
 
     log(message, level = "debug") {
