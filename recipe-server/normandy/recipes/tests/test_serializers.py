@@ -2,7 +2,14 @@ import pytest
 from rest_framework import serializers
 
 from normandy.base.tests import Whatever
-from normandy.recipes.tests import RecipeFactory, ActionFactory, ARGUMENTS_SCHEMA
+from normandy.recipes.tests import (
+    ARGUMENTS_SCHEMA,
+    ActionFactory,
+    ChannelFactory,
+    CountryFactory,
+    LocaleFactory,
+    RecipeFactory,
+)
 from normandy.recipes.api.serializers import (
     ActionSerializer, RecipeSerializer, SignedRecipeSerializer)
 
@@ -10,7 +17,11 @@ from normandy.recipes.api.serializers import (
 @pytest.mark.django_db()
 class TestRecipeSerializer:
     def test_it_works(self, rf):
-        recipe = RecipeFactory(arguments={'foo': 'bar'})
+        channel = ChannelFactory()
+        country = CountryFactory()
+        locale = LocaleFactory()
+        recipe = RecipeFactory(arguments={'foo': 'bar'}, channels=[channel], countries=[country],
+                               locales=[locale])
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
 
@@ -19,15 +30,16 @@ class TestRecipeSerializer:
             'id': recipe.id,
             'last_updated': Whatever(),
             'enabled': recipe.enabled,
+            'extra_filter_expression': recipe.extra_filter_expression,
             'filter_expression': recipe.filter_expression,
             'revision_id': recipe.revision_id,
             'action': action.name,
             'arguments': {
                 'foo': 'bar',
             },
-            'current_approval_request': Whatever(),
-            'approval': Whatever(),
-            'is_approved': recipe.is_approved
+            'channels': [channel.slug],
+            'countries': [country.code],
+            'locales': [locale.code]
         }
 
     # If the action specified cannot be found, raise validation
@@ -81,9 +93,16 @@ class TestRecipeSerializer:
             arguments_schema=ARGUMENTS_SCHEMA
         )
 
+        channel = ChannelFactory(slug='release')
+        country = CountryFactory(code='CA')
+        locale = LocaleFactory(code='en-US')
+
         serializer = RecipeSerializer(data={
-            'name': 'bar', 'enabled': True, 'filter_expression': '[]',
+            'name': 'bar', 'enabled': True, 'extra_filter_expression': '[]',
             'action': 'show-heartbeat',
+            'channels': ['release'],
+            'countries': ['CA'],
+            'locales': ['en-US'],
             'arguments': {
                 'surveyId': 'lorem-ipsum-dolor',
                 'surveys': [
@@ -97,7 +116,7 @@ class TestRecipeSerializer:
         assert serializer.validated_data == {
             'name': 'bar',
             'enabled': True,
-            'filter_expression': '[]',
+            'extra_filter_expression': '[]',
             'action': mockAction,
             'arguments': {
                 'surveyId': 'lorem-ipsum-dolor',
@@ -105,7 +124,10 @@ class TestRecipeSerializer:
                     {'title': 'adipscing', 'weight': 1},
                     {'title': 'consequetar', 'weight': 1}
                 ]
-            }
+            },
+            'channels': [channel],
+            'countries': [country],
+            'locales': [locale],
         }
         assert serializer.errors == {}
 
@@ -149,13 +171,14 @@ class TestSignedRecipeSerializer:
                 'name': recipe.name,
                 'id': recipe.id,
                 'enabled': recipe.enabled,
+                'extra_filter_expression': recipe.extra_filter_expression,
                 'filter_expression': recipe.filter_expression,
                 'revision_id': recipe.revision_id,
                 'action': action.name,
                 'arguments': recipe.arguments,
-                'current_approval_request': Whatever(),
-                'approval': Whatever(),
-                'is_approved': recipe.is_approved,
                 'last_updated': Whatever(),
+                'channels': [],
+                'countries': [],
+                'locales': [],
             }
         }
