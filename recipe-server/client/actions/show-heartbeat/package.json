@@ -17,6 +17,16 @@
         "thanksMessage"
       ],
       "properties": {
+        "repeatOption": {
+          "type": "string",
+          "description": "Determines how often an action executes. (once|nag|xdays)",
+          "default": "once"
+        },
+        "repeatEvery": {
+          "type": "number",
+          "description": "How often (in days) the action is displayed.",
+          "default": null
+        },
         "includeTelemetryUUID": {
           "type": "boolean",
           "description": "Include unique user ID in post-answer-url and Telemetry",

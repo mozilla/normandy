@@ -16,7 +16,7 @@ export function urlPathMatcher(path) {
  */
 export function recipeFactory(props = {}) {
   // If we leave arguments, it will overwrite itself below.
-  const args = props.arguments;
+  const args = { ...props.arguments };
   delete props.arguments;
 
   return {
@@ -34,6 +34,7 @@ export function recipeFactory(props = {}) {
       postAnswerUrl: 'http://example.com',
       learnMoreMessage: 'Learn More',
       learnMoreUrl: 'http://example.com',
+      repeatOption: 'once',
       ...args,
     },
     ...props,

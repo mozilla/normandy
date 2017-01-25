@@ -43,6 +43,7 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
+    recipeFields: pt.object,
     // route prop passed from router
     route: pt.object,
   };
@@ -54,15 +55,20 @@ export class RecipeForm extends React.Component {
 
   renderCloningMessage() {
     const isCloning = this.props.route && this.props.route.isCloning;
-    const displayedRecipe = this.props.recipe || {};
+    const displayedRecipe = this.props.recipe;
 
-    return isCloning &&
-      (<span className="cloning-message callout">
+    if (!isCloning || !displayedRecipe) {
+      return null;
+    }
+
+    return (
+      <span className="cloning-message callout">
         {'You are cloning '}
         <Link to={`/control/recipe/${displayedRecipe.id}/`}>
           {displayedRecipe.name} ({displayedRecipe.action})
         </Link>.
-      </span>);
+      </span>
+    );
   }
 
   render() {
@@ -73,8 +79,10 @@ export class RecipeForm extends React.Component {
       recipe,
       recipeId,
       route,
+      recipeFields,
     } = this.props;
-    const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || null;
+    const noop = () => null;
+    const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
 
     // Show a loading indicator if we haven't yet loaded the recipe.
     if (recipeId && !recipe) {
@@ -112,7 +120,7 @@ export class RecipeForm extends React.Component {
           <option value="console-log">Log to Console</option>
           <option value="show-heartbeat">Heartbeat Prompt</option>
         </ControlField>
-        {ArgumentsFields && <ArgumentsFields />}
+        <ArgumentsFields fields={recipeFields} />
         <div className="form-actions">
           {recipeId && !isCloning &&
             <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
@@ -217,6 +225,7 @@ const connector = connect(
   // Pull selected action from the form state.
   state => ({
     selectedAction: selector(state, 'action'),
+    recipeFields: selector(state, 'arguments'),
   }),
 
   // Bound functions for writing to the server.
