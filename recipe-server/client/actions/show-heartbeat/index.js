@@ -168,14 +168,17 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   /**
-   * Checks the repeat argument for this recipe,
-   * then determines if the recipe can be qualified as 'ran'.
-   * This ultimately decides if the prompt is shown at all
-   * to the end user.
+   * Checks the repeatOption argument for this recipe
+   * and determines if the recipe has fully executed.
    *
-   * @return {boolean}        Has the heartbeat been shown?
+   * Each `repeatOption` setting has different requirements
+   * to consider the heartbeat as executed; `once` will appear to the
+   * user once and never again, while `nag` may appear to the user multiple times
+   * before it is interacted with and considers itself 'executed'.
+   *
+   * @return {boolean}   Has this recipe fulfilled its execution criteria?
    */
-  async heartbeatHasRan() {
+  async heartbeatHasExecuted() {
     let hasShown = false;
     const {
       repeatOption,
@@ -217,7 +220,7 @@ export default class ShowHeartbeatAction extends Action {
         // if a heartbeat has been shown in the past 24 hours
         await this.heartbeatShownRecently() ||
         // or this specific heartbeat has already ran
-        await this.heartbeatHasRan()
+        await this.heartbeatHasExecuted()
       );
   }
 
