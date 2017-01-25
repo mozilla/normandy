@@ -5,7 +5,10 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../.. && pwd)"
 WAIT_FOR_DB="./bin/wait-for-it.sh database:5432 --"
 
 compose () {
-    docker-compose -p mockrecipeserver $@
+    docker-compose \
+        -p mockrecipeserver \
+        -f "$REPO_DIR/compose/docker-compose.yml" \
+        $@
 }
 
 # Shut down docker even if we error out.
