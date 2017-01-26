@@ -3,6 +3,7 @@ from datetime import datetime
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from django.conf import settings
+from django.db.models import Count
 from django.utils import timezone
 
 
@@ -51,3 +52,17 @@ def get_client_ip(request):
 
 def canonical_json_dumps(data):
     return json.dumps(data, ensure_ascii=True, separators=(',', ':'), sort_keys=True)
+
+
+def filter_m2m(qs, field, values):
+    """
+    Filters a queryset by an exact list of many to many relations.
+    """
+    values = list(values)
+
+    qs = qs.annotate(_count=Count(field)).filter(_count=len(values))
+
+    if len(values):
+        qs = qs.filter(**{'{}__in'.format(field): values})
+
+    return qs

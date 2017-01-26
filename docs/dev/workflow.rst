@@ -43,6 +43,12 @@ steps, as they don't affect your setup if nothing has changed:
    # Add any new action data (does not duplicate data).
    python manage.py update_actions
 
+   # Update product details (does not duplicate data).
+   python manage.py update_product_details
+
+   # Update any new basic data (does not duplicate data).
+   python manage.py initial_data
+
    # Build frontend files
    ./node_modules/.bin/webpack --config ./webpack.config.js --update-actions
 

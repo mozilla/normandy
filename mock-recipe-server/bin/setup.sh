@@ -9,4 +9,6 @@ pushd "$REPO_DIR/compose"
 ./bin/genkeys.sh
 docker-compose -p mockrecipeserver run normandy ./manage.py migrate
 docker-compose -p mockrecipeserver run normandy ./manage.py update_actions
+docker-compose -p mockrecipeserver run normandy ./manage.py update_product_details
+docker-compose -p mockrecipeserver run normandy ./manage.py initial_data
 popd
