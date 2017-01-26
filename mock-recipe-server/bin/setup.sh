@@ -13,7 +13,7 @@ compose () {
 
 # Shut down docker even if we error out.
 function finish {
-    compose down
+    compose stop
 }
 trap finish EXIT
 
