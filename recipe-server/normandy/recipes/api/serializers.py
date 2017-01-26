@@ -189,9 +189,7 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
             'comment',
-            'is_approved',
-            'is_rejected',
-            'is_pending_approval',
+            'approval_status'
         ]
 
 

@@ -206,7 +206,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
             is_clean = False
 
         if not is_clean or force:
-            if revision and revision.is_pending_approval:
+            if revision and revision.approval_status == RecipeRevision.PENDING:
                 revision.approval_request.delete()
 
             self.latest_revision = RecipeRevision.objects.create(
@@ -248,6 +248,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
 
 class RecipeRevision(models.Model):
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+    PENDING = 'pending'
+
     id = models.CharField(max_length=64, primary_key=True)
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
@@ -313,30 +317,21 @@ class RecipeRevision(models.Model):
     def serializable_recipe(self):
         """Returns an unsaved recipe object with this revisions data to be serialized."""
         recipe = self.recipe
-        recipe.approved_revision = self if self.is_approved else None
+        recipe.approved_revision = self if self.approval_status == self.APPROVED else None
         recipe.latest_revision = self
         return recipe
 
     @property
-    def is_approved(self):
+    def approval_status(self):
         try:
-            return self.approval_request.approved is True
+            if self.approval_request.approved is True:
+                return self.APPROVED
+            elif self.approval_request.approved is False:
+                return self.REJECTED
+            else:
+                return self.PENDING
         except ApprovalRequest.DoesNotExist:
-            return False
-
-    @property
-    def is_rejected(self):
-        try:
-            self.approval_request.approved is False
-        except ApprovalRequest.DoesNotExist:
-            return False
-
-    @property
-    def is_pending_approval(self):
-        try:
-            return self.approval_request and not self.is_approved and not self.is_rejected
-        except ApprovalRequest.DoesNotExist:
-            return False
+            return None
 
     def hash(self):
         data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
@@ -360,7 +355,13 @@ class ApprovalRequest(models.Model):
     approver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approved_requests',
                                  null=True)
 
+    class AlreadyApproved(Exception):
+        pass
+
     def approve(self, approver):
+        if self.approved is not None:
+            raise self.AlreadyApproved()
+
         self.approved = True
         self.approver = approver
         self.save()
@@ -370,6 +371,9 @@ class ApprovalRequest(models.Model):
         recipe.save()
 
     def reject(self, approver):
+        if self.approved is not None:
+            raise self.AlreadyApproved()
+
         self.approved = False
         self.approver = approver
         self.save()

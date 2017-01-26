@@ -131,26 +131,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         recipe.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @detail_route(methods=['POST'])
-    def request_approval(self, request, pk=None):
-        recipe = self.get_object()
-
-        if recipe.is_approved:
-            return Response({'error': 'Recipe is already approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        elif not recipe.latest_revision:
-            return Response({'error': 'Recipe has no revisions to be approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        elif recipe.latest_revision.is_rejected:
-            return Response({'error': 'The latest revision has already been rejected. Please make '
-                                      'changes before requesting approval.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        revision = recipe.latest_revision
-        revision.approval_request = ApprovalRequest(revision=revision, user=request.user)
-        revision.save()
-        return Response(ApprovalRequestSerializer(revision.approval_request).data)
-
 
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = RecipeRevision.objects.all()
@@ -158,6 +138,19 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [
         AdminEnabledOrReadOnly,
     ]
+
+    @detail_route(methods=['POST'])
+    def request_approval(self, request, pk=None):
+        revision = self.get_object()
+
+        if revision.approval_status is not None:
+            return Response({'error': 'This revision already has an approval request.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        approval_request = ApprovalRequest(revision=revision, user=request.user)
+        approval_request.save()
+
+        return Response(ApprovalRequestSerializer(approval_request).data)
 
 
 class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
