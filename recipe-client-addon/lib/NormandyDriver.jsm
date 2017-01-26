@@ -75,6 +75,9 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
         isDefaultBrowser: ShellService.isDefaultBrowser() || null,
         searchEngine: null,
         syncSetup: Preferences.isSet("services.sync.username"),
+        syncDesktopDevices: Preferences.get("services.sync.clients.devices.desktop", 0),
+        syncMobileDevices: Preferences.get("services.sync.clients.devices.mobile", 0),
+        syncTotalDevices: Preferences.get("services.sync.numClients", 0),
         plugins: {},
         doNotTrack: Preferences.get("privacy.donottrackheader.enabled", false),
       };
