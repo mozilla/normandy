@@ -4,7 +4,6 @@
 "use strict";
 
 const {utils: Cu} = Components;
-const {jsonCopy} = Cu.import("resource://shield-recipe-client/lib/Utils.jsm", {});
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 
 this.EXPORTED_SYMBOLS = ["EventEmitter"];
@@ -20,7 +19,7 @@ this.EventEmitter = function(sandboxManager) {
         on: this.on.bind(this),
         off: this.off.bind(this),
         once: this.once.bind(this),
-      });
+      }, {cloneFunctions: true});
     },
 
     emit(eventName, event) {
@@ -34,9 +33,7 @@ this.EventEmitter = function(sandboxManager) {
           // Clone callbacks array to avoid problems with mutation while iterating
           const callbacks = Array.from(listeners[eventName]);
           for (const cb of callbacks) {
-            // Copy event to prevent modifcations leaking between callbacks.
-            const copiedEvent = jsonCopy(event);
-            cb(sandboxManager.cloneInto(copiedEvent));
+            cb(sandboxManager.cloneInto(event));
           }
         });
     },
