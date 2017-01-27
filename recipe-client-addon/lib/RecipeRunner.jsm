@@ -142,7 +142,7 @@ this.RecipeRunner = {
    * @param  {String} actionScript The JavaScript for the action to execute.
    * @promise Resolves or rejects when the action has executed or failed.
    */
-  executeAction: function(recipe, extraContext, actionScript) {
+  executeAction(recipe, extraContext, actionScript) {
     return new Promise((resolve, reject) => {
       const sandboxManager = new SandboxManager();
       const prepScript = `

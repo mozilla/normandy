@@ -14,6 +14,7 @@ module.exports = {
     "mozilla/import-globals": 2,
     "spaced-comment": 2,
     "space-before-function-paren": [2, "never"],
+    "object-shorthand": [2],
     "prefer-const": 1,
     "indent": [1, 2, {SwitchCase: 1}],
     "mozilla/no-aArgs": 1,
