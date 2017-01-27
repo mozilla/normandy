@@ -101,8 +101,9 @@ export class HeartbeatEmitter {
  * Implementation of the Normandy driver.
  */
 export default class NormandyDriver {
-  constructor(uitour = Mozilla.UITour) {
+  constructor(uitour = Mozilla.UITour, navigator = window.navigator) {
     this._uitour = uitour;
+    this._navigator = navigator;
     this.setDurability();
   }
 
@@ -129,7 +130,9 @@ export default class NormandyDriver {
     });
   }
 
-  locale = document.documentElement.dataset.locale || navigator.language;
+  get locale() {
+    return document.documentElement.dataset.locale || this._navigator.language;
+  }
 
   _testingOverride = false;
   get testing() {
@@ -186,10 +189,9 @@ export default class NormandyDriver {
       };
 
       // Populate plugin info.
-      for (const plugin of navigator.plugins) {
+      for (const plugin of this._navigator.plugins) {
         client.plugins[plugin.name] = {
           name: plugin.name,
-          filename: plugin.filename,
           description: plugin.description,
           version: plugin.version,
         };

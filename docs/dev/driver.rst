@@ -190,10 +190,6 @@ Plugins
 
       A human-readable description of the plugin.
 
-   .. js:data:: filename
-
-      The filename of the plugin file.
-
    .. js:data:: version
 
       The plugin's version number string.

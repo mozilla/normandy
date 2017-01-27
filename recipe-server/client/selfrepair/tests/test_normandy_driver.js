@@ -67,31 +67,32 @@ describe('Normandy Driver', () => {
   });
 
   describe('client', () => {
+    const uitour = {
+      getConfiguration(config, cb) {
+        switch (config) {
+          case 'sync':
+            return cb({
+              setup: true,
+              desktopDevices: 1,
+              mobileDevices: 2,
+              totalDevices: 3,
+            });
+          case 'appinfo':
+            return cb({
+              version: '50.0.2',
+              defaultUpdateChannel: 'aurora',
+              defaultBrowser: true,
+              distribution: 'funnelcake85',
+            });
+          case 'selectedSearchEngine':
+            return cb({ searchEngineIdentifier: 'Yahoo' });
+          default:
+            return cb({});
+        }
+      },
+    };
+
     it("should fetch the user's config from UITour", async () => {
-      const uitour = {
-        getConfiguration(config, cb) {
-          switch (config) {
-            case 'sync':
-              return cb({
-                setup: true,
-                desktopDevices: 1,
-                mobileDevices: 2,
-                totalDevices: 3,
-              });
-            case 'appinfo':
-              return cb({
-                version: '50.0.2',
-                defaultUpdateChannel: 'aurora',
-                defaultBrowser: true,
-                distribution: 'funnelcake85',
-              });
-            case 'selectedSearchEngine':
-              return cb({ searchEngineIdentifier: 'Yahoo' });
-            default:
-              return cb({});
-          }
-        },
-      };
       const driver = new NormandyDriver(uitour);
       const client = await driver.client();
 
@@ -102,6 +103,31 @@ describe('Normandy Driver', () => {
       expect(client.distribution).toEqual('funnelcake85');
       expect(client.isDefaultBrowser).toEqual(true);
       expect(client.searchEngine).toEqual('Yahoo');
+    });
+
+    it('should pull plugin data from navigator.plugins', async () => {
+      const flashPlugin = {
+        name: 'Shockwave Flash',
+        description: 'Literally the worst',
+        version: 'v0.1.2',
+        filename: 'foo.xpi',
+      };
+      const navigator = {
+        plugins: [flashPlugin],
+      };
+      const driver = new NormandyDriver(uitour, navigator);
+      const client = await driver.client();
+
+      expect(Object.keys(client.plugins).length).toEqual(1);
+
+      const clientPlugin = client.plugins['Shockwave Flash'];
+      expect(clientPlugin.name).toEqual(flashPlugin.name);
+      expect(clientPlugin.description).toEqual(flashPlugin.description);
+      expect(clientPlugin.version).toEqual(flashPlugin.version);
+
+      // Ensure we don't pick up properties that are available but not
+      // in the spec.
+      expect(client.plugins['Shockwave Flash'].filename).toBeUndefined();
     });
   });
 

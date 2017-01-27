@@ -1,5 +1,4 @@
 bootstrap.js
-data
 install.rdf.in
 jar.mn
 lib
