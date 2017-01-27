@@ -151,24 +151,34 @@ this.RecipeRunner = {
           let a = new Action(sandboxedDriver, sandboxedRecipe);
           a.execute()
             .then(actionFinished)
-            .catch(err => sandboxedDriver.log(err, 'error'));
+            .catch(actionFailed);
         };
 
-        window.registerAction = registerAction;
-        window.setTimeout = sandboxedDriver.setTimeout;
-        window.clearTimeout = sandboxedDriver.clearTimeout;
+        this.window = this;
+        this.registerAction = registerAction;
+        this.setTimeout = sandboxedDriver.setTimeout;
+        this.clearTimeout = sandboxedDriver.clearTimeout;
       `;
 
       const driver = new NormandyDriver(sandboxManager, extraContext);
       sandbox.sandboxedDriver = Cu.cloneInto(driver, sandbox, {cloneFunctions: true});
       sandbox.sandboxedRecipe = Cu.cloneInto(recipe, sandbox);
+
+      // Results are cloned so that they don't become inaccessible when
+      // the sandbox they came from is nuked when the hold is removed.
       sandbox.actionFinished = result => {
+        const clonedResult = Cu.cloneInto(result, {});
         sandboxManager.removeHold("recipeExecution");
-        resolve(result);
+        resolve(clonedResult);
       };
       sandbox.actionFailed = err => {
+        Cu.reportError(err);
+
+        // Error objects can't be cloned, so we just copy the message
+        // (which doesn't need to be cloned) to be somewhat useful.
+        const message = err.message;
         sandboxManager.removeHold("recipeExecution");
-        reject(err);
+        reject(new Error(message));
       };
 
       sandboxManager.addHold("recipeExecution");
