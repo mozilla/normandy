@@ -41,10 +41,13 @@ describe('Filter Actions', () => {
 
       fetchMock.get('/api/v1/filters/', {
         body: {
-          status: [
-            'enabled',
-            'disabled',
-          ],
+          status: [{
+            key: 'enabled',
+            value: 'Enabled',
+          }, {
+            key: 'disabled',
+            value: 'Disabled',
+          }],
         },
       });
 

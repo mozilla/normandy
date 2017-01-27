@@ -1,6 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import cloneArrayValues from 'client/utils/clone-array';
-import removeProps from 'client/utils/remove-props';
+import { omit } from 'underscore';
 
 import DropdownMenu from 'control/components/DropdownMenu';
 import GroupMenu from 'control/components/GroupMenu';
@@ -46,12 +46,12 @@ export default class RecipeCombobox extends React.Component {
     return cloneArrayValues(groups).filter(group => {
       // remove 'meta' properties the user doesn't actually
       // want to search over
-      const groupProperties = removeProps(group,
+      const groupProperties = omit(group,
         ['value', 'selected', 'multiple']);
 
       // remove properties user doesnt care to search over
       groupProperties.options = groupProperties.options.map(option =>
-        removeProps(option, [
+        omit(option, [
           // if an option has a label,
           // remove the hidden value
           option.label ? 'value' : 'label',

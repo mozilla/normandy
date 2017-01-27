@@ -16,7 +16,6 @@ import {
 } from 'control/actions/FilterActions';
 
 import cloneArrayValues from 'client/utils/clone-array';
-import { capFirstLetter } from 'client/utils/string-man';
 
 /**
  * Utility to remove `selected` props from
@@ -133,7 +132,7 @@ function filtersReducer(state = initialState, action) {
 
         // various display options
         newGroup.value = 'text';
-        newGroup.label = capFirstLetter('Text Search');
+        newGroup.label = 'Text Search';
         newGroup.options = textOptions;
         newGroup.selected = action.isEnabled || false;
 

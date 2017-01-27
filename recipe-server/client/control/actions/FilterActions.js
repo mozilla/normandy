@@ -24,8 +24,7 @@ function formatFilterOption(option) {
   // string type = we were given just an option
   // (no keyed value/label)
   if (typeof option === 'string') {
-    value = option;
-    label = capFirstLetter(option);
+    value = label = option;
   // else if we get an object, then we
   // can extract the key/value props
   } else if (typeof option === 'object') {
