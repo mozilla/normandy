@@ -4,18 +4,14 @@
 
 /**
  * Given the `recipes` state, returns an array
- * of all the recipes stored in `recipes.list`.
+ * of all the recipes stored in `recipes.entries`.
  *
  * @param  {Object} recipes `recipes` store state tree
  * @return {Array}         Array of all loaded recipes
  */
 export function getRecipesList(recipes) {
-  const listArray = [];
-  Object.keys(recipes.list).forEach(recipeId => {
-    listArray.push(recipes.list[recipeId]);
-  });
-
-  return listArray;
+  return [].concat(Object.keys(recipes.entries))
+    .map(recipeId => recipes.entries[recipeId]);
 }
 
 /**
@@ -26,5 +22,5 @@ export function getRecipesList(recipes) {
  * @return {Object}         Selected recipe object
  */
 export function getSelectedRecipe(recipes) {
-  return recipes.list[recipes.selectedRecipe] || null;
+  return recipes.entries[recipes.selectedRecipe] || null;
 }

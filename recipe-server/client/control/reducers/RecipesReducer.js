@@ -4,7 +4,7 @@ import {
 } from 'control/actions/ControlActions';
 
 const initialState = {
-  list: {},
+  entries: {},
   selectedRecipe: null,
   recipeListNeedsFetch: true,
 };
@@ -21,8 +21,8 @@ function recipesReducer(state = initialState, action) {
 
       return {
         ...state,
-        list: {
-          ...state.list,
+        entries: {
+          ...state.entries,
           ...recipesObj,
         },
         recipeListNeedsFetch: false,
@@ -32,8 +32,8 @@ function recipesReducer(state = initialState, action) {
     case SINGLE_RECIPE_RECEIVED: {
       return {
         ...state,
-        list: {
-          ...state.list,
+        entries: {
+          ...state.entries,
           [action.recipe.id]: action.recipe,
         },
         recipeListNeedsFetch: true,
@@ -51,30 +51,30 @@ function recipesReducer(state = initialState, action) {
     case RECIPE_ADDED: {
       return {
         ...state,
-        list: {
-          ...state.list,
+        entries: {
+          ...state.entries,
           [action.recipe.id]: action.recipe,
         },
       };
     }
 
     case RECIPE_UPDATED: {
-      const newList = { ...state.list };
-      newList[action.recipe.id] = { ...action.recipe };
+      const newEntries = { ...state.entries };
+      newEntries[action.recipe.id] = { ...action.recipe };
 
       return {
         ...state,
-        list: newList,
+        entries: newEntries,
       };
     }
 
     case RECIPE_DELETED: {
-      const newList = { ...state.list };
-      delete newList[action.recipeId];
+      const newEntries = { ...state.entries };
+      delete newEntries[action.recipeId];
 
       return {
         ...state,
-        list: newList,
+        entries: newEntries,
       };
     }
 

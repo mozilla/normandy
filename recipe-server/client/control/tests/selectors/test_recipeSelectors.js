@@ -4,7 +4,7 @@ describe('Recipe Selectors', () => {
   describe('getRecipesList', () => {
     it('should return an array of loaded recipes', () => {
       const testState = {
-        list: {
+        entries: {
           1: { id: 1 },
           2: { id: 2 },
           3: { id: 3 },
@@ -19,7 +19,7 @@ describe('Recipe Selectors', () => {
   describe('getSelectedRecipe', () => {
     it('should return the selected recipe object', () => {
       const testState = {
-        list: {
+        entries: {
           1: { id: 1 },
           2: { id: 2 },
           3: { id: 3 },

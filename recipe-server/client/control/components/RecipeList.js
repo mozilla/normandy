@@ -27,7 +27,7 @@ BooleanIcon.propTypes = {
   value: pt.bool.isRequired,
 };
 
-class DisconnectedRecipeList extends React.Component {
+export class DisconnectedRecipeList extends React.Component {
   static propTypes = {
     // connected
     dispatch: pt.func.isRequired,

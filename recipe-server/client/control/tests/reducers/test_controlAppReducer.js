@@ -6,6 +6,12 @@ import {
   initialState,
 } from 'control/tests/fixtures';
 
+const fakeRecipe = {
+  id: 4,
+  name: 'Villis stebulum',
+  enabled: false,
+};
+
 describe('controlApp reducer', () => {
   it('should return initial state by default', () => {
     expect(appReducer(undefined, {})).toEqual(initialState);
@@ -41,7 +47,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipeDict,
+        entries: fixtureRecipeDict,
         recipeListNeedsFetch: false,
       },
     });
@@ -55,7 +61,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: {
+        entries: {
           [fixtureRecipes[0].id]: fixtureRecipes[0],
         },
         selectedRecipe: 1,
@@ -138,12 +144,6 @@ describe('controlApp reducer', () => {
   });
 
   it('should handle RECIPE_ADDED', () => {
-    const fakeRecipe = {
-      id: 4,
-      name: 'Villis stebulum',
-      enabled: false,
-    };
-
     expect(appReducer(initialState, {
       type: actions.RECIPE_ADDED,
       recipe: fakeRecipe,
@@ -151,7 +151,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: {
+        entries: {
           [fakeRecipe.id]: fakeRecipe,
         },
       },
@@ -163,7 +163,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipeDict,
+        entries: fixtureRecipeDict,
       },
     }, {
       type: actions.RECIPE_UPDATED,
@@ -176,7 +176,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: {
+        entries: {
           1: {
             id: 1,
             name: 'Lorem Ipsum',
@@ -202,7 +202,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipeDict,
+        entries: fixtureRecipeDict,
       },
     }, {
       type: actions.RECIPE_DELETED,
@@ -211,7 +211,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: {
+        entries: {
           1: {
             id: 1,
             name: 'Lorem Ipsum',
@@ -227,37 +227,19 @@ describe('controlApp reducer', () => {
     });
   });
 
-  describe('Recipe Creation and Updating', () => {
-    it('only has one recipe in the `list` after creating and updating a new recipe', async () => {
-      // create
-      const fakeRecipe = {
-        id: 3,
-        name: 'Villis stebulum',
-        enabled: false,
-      };
-
+  describe('Recipe Creation and Loading', () => {
+    it('should prevent duplicate recipes from loading into memory', () => {
       let store = appReducer(initialState, {
         type: actions.RECIPE_ADDED,
         recipe: fakeRecipe,
       });
 
-      // update
       store = appReducer(store, {
-        type: actions.RECIPE_UPDATED,
-        recipe: {
-          id: 3,
-          name: 'Updated recipe name',
-          enabled: true,
-        },
+        type: actions.RECIPES_RECEIVED,
+        recipes: [fakeRecipe],
       });
 
-      expect(store.recipes.list).toEqual({
-        3: {
-          id: 3,
-          name: 'Updated recipe name',
-          enabled: true,
-        },
-      });
+      expect(Object.keys(store.recipes.entries).length).toBe(1);
     });
   });
 });

@@ -14,7 +14,7 @@ export const initialState = {
     isFetching: false,
   },
   recipes: {
-    list: {},
+    entries: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },
