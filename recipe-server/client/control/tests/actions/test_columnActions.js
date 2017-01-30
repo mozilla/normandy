@@ -5,8 +5,6 @@ import * as localForage from 'localforage';
 import { initialState } from 'control/tests/fixtures';
 import * as columnActions from 'control/actions/ColumnActions';
 
-import cloneArrayValues from 'client/utils/clone-array';
-
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 const store = mockStore({ ...initialState });
@@ -61,9 +59,12 @@ describe('Column Actions', () => {
       } = columnActions;
 
       // fake some 'loaded' columns
-      const expectedColumns = cloneArrayValues(initialState.columns);
+      const expectedColumns = [].concat(initialState.columns);
       // add some 'custom' data to check for later
-      expectedColumns[0].testProperty = 'should exist';
+      expectedColumns[0] = {
+        ...expectedColumns[0],
+        testProperty: 'should exist',
+      };
 
       // set the fake columns in memory
       await localForage.setItem(localStorageID, expectedColumns);

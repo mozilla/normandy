@@ -15,8 +15,6 @@ import {
   SET_TEXT_FILTER,
 } from 'control/actions/FilterActions';
 
-import cloneArrayValues from 'client/utils/clone-array';
-
 /**
  * Utility to remove `selected` props from
  * filter groups and their options.
@@ -25,13 +23,16 @@ import cloneArrayValues from 'client/utils/clone-array';
  * @return {Array}          Array with de`select`ed groups + options
  */
 const deleteSelects = filters =>
-  cloneArrayValues(filters || [])
+  [].concat(filters || [])
     .map(filter => {
-      delete filter.selected;
-      (filter.options || []).forEach(option => {
-        delete option.selected;
+      const newFilter = { ...filter };
+      delete newFilter.selected;
+      (newFilter.options || []).forEach(option => {
+        const newOption = { ...option };
+        delete newOption.selected;
+        return newOption;
       });
-      return filter;
+      return newFilter;
     });
 
 // Filters start out empty, as we need to load them from the API
@@ -71,7 +72,7 @@ function filtersReducer(state = initialState, action) {
           let hasSelected = false;
 
           // loop through each option..
-          newGroup.options = cloneArrayValues(newGroup.options).map(option => {
+          newGroup.options = [].concat(newGroup.options).map(option => {
             const newOption = { ...option };
 
             // ..find the option that this action is targeting..
@@ -108,7 +109,7 @@ function filtersReducer(state = initialState, action) {
 
     case SET_TEXT_FILTER: {
       newState = { ...state };
-      newState.active = cloneArrayValues(state.active);
+      newState.active = [].concat(state.active);
 
       // function which modifies an existing text group
       // or creates an entirely new one, and appends the
@@ -117,7 +118,7 @@ function filtersReducer(state = initialState, action) {
         const newGroup = { ...group };
 
         // get existing options
-        textOptions = cloneArrayValues(newGroup.options || []);
+        textOptions = [].concat(newGroup.options || []);
 
         textOptions = [];
 
@@ -144,15 +145,16 @@ function filtersReducer(state = initialState, action) {
 
       // look through existing groups
       newState.active = newState.active.map(group => {
+        const newGroup = { ...group };
         // if a text group is found
-        if (group.value === 'text') {
+        if (newGroup.value === 'text') {
           wasFound = true;
 
           // update it
-          return formatGroup(group);
+          return formatGroup(newGroup);
         }
 
-        return group;
+        return newGroup;
       });
 
       // if we do NOT have an existing text group,

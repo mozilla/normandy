@@ -1,5 +1,5 @@
 import React, { PropTypes as pt } from 'react';
-import cloneArrayValues from 'client/utils/clone-array';
+
 import { omit } from 'underscore';
 
 import DropdownMenu from 'control/components/DropdownMenu';
@@ -43,7 +43,7 @@ export default class RecipeCombobox extends React.Component {
    * @return {Array<Object>} Array of filter groups containing search value
    */
   filterGroups(groups, search) {
-    return cloneArrayValues(groups).filter(group => {
+    return [].concat(groups).filter(group => {
       // remove 'meta' properties the user doesn't actually
       // want to search over
       const groupProperties = omit(group,

@@ -9,7 +9,6 @@ import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
-import cloneArrayValues from 'client/utils/clone-array';
 import { capFirstLetter } from 'client/utils/string-man';
 
 const SET_FILTER = 'SET_FILTER';
@@ -61,7 +60,7 @@ function loadFilters() {
             value: group,
             label: capFirstLetter(group),
             multiple: filters[group].length > 2,
-            options: cloneArrayValues(filters[group]).map(formatFilterOption),
+            options: [].concat(filters[group]).map(formatFilterOption),
           };
 
           newFilters.push(newGroup);

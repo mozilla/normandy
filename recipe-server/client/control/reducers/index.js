@@ -12,11 +12,11 @@ import recipesReducer from 'control/reducers/RecipesReducer';
 import notificationReducer from 'control/reducers/NotificationReducer';
 
 export default combineReducers({
-  controlApp: controlAppReducer,
-  recipes: recipesReducer,
-  filters: filtersReducer,
   columns: columnReducer,
-  notifications: notificationReducer,
+  controlApp: controlAppReducer,
+  filters: filtersReducer,
   form: formReducer,
+  notifications: notificationReducer,
+  recipes: recipesReducer,
   routing: routerReducer,
 });

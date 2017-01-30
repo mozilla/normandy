@@ -10,15 +10,6 @@ fixtureRecipes.forEach(recipe => {
 });
 
 export const initialState = {
-  controlApp: {
-    isFetching: false,
-  },
-  recipes: {
-    entries: {},
-    cache: {},
-    selectedRecipe: null,
-    recipeListNeedsFetch: true,
-  },
   columns: [{
     label: 'Name',
     slug: 'name',
@@ -58,12 +49,21 @@ export const initialState = {
     slug: 'metadata',
     enabled: true,
   }],
+  controlApp: {
+    isFetching: false,
+  },
   filters: {
     list: [],
     active: [],
   },
-  notifications: [],
   form: {},
+  notifications: [],
+  recipes: {
+    entries: {},
+    cache: {},
+    selectedRecipe: null,
+    recipeListNeedsFetch: true,
+  },
   routing: {
     locationBeforeTransitions: null,
   },

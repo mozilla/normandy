@@ -5,8 +5,6 @@
  * This simplifies in-view logic - no more .maps or .filters in mapStateToProps!
  */
 
-import cloneArrayValues from 'client/utils/clone-array';
-
 /**
  * Given a group, determines if any option has been selected
  * somewhere within it.
@@ -46,16 +44,16 @@ export const getSelectedFilterGroups = state => state.active.filter(isGroupSelec
  * @return {Array<Object>}        Active filter groups and their selected options
  */
 export const getActiveFilters = state =>
-  cloneArrayValues(state.active)
+  [].concat(state.active)
     .map(group => {
       // group has no selection = remove it
-      if (!group.selected) {
+      if (!group || !group.selected) {
         return null;
       }
 
       const newGroup = { ...group };
       // remove non-selected filters
-      const activeOptions = cloneArrayValues(group.options).filter(option => option.selected);
+      const activeOptions = [].concat(group.options).filter(option => option.selected);
       newGroup.options = activeOptions;
 
       return newGroup;
@@ -96,13 +94,13 @@ export const getFilterParamString = state =>
  * @return {Array<Object>}        Array of non-selected options/groups
  */
 export const getAvailableFilters = state =>
-  cloneArrayValues(state.active)
+  [].concat(state.active)
     .map(group => {
       const newGroup = { ...group };
 
       // get the non/selected options
-      let availableOptions = cloneArrayValues(group.options).filter(option => !option.selected);
-      const activeOptions = cloneArrayValues(group.options).filter(option => option.selected);
+      let availableOptions = [].concat(group.options).filter(option => !option.selected);
+      const activeOptions = [].concat(group.options).filter(option => option.selected);
 
       // if there is at least one option selected,
       // and this group DOES NOT allow multiples,

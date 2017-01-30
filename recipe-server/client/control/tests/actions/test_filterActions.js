@@ -131,16 +131,27 @@ describe('Filter Actions', () => {
       // build a fake store with filters 'already loaded'
       const filterStore = mockStore({
         ...initialState,
-        filters: [{
-          value: 'status',
-          label: 'Status',
-          multiple: false,
-          options: [{
-            key: 'enabled',
-            value: 'Enabled',
-            selected: true,
+        filters: {
+          list: [{
+            value: 'status',
+            label: 'Status',
+            multiple: false,
+            options: [{
+              key: 'enabled',
+              value: 'Enabled',
+            }],
           }],
-        }],
+          active: [{
+            value: 'status',
+            label: 'Status',
+            multiple: false,
+            options: [{
+              key: 'enabled',
+              value: 'Enabled',
+              selected: true,
+            }],
+          }],
+        },
       });
 
       // use a selector to get the param string

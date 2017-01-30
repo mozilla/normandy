@@ -25,18 +25,17 @@ export default class GroupMenu extends React.Component {
     this.clickItemCache = this.clickItemCache || {};
     // reference variable for brevity
     const cache = this.clickItemCache;
+    const cacheKey = group.value + option.value + option.label;
 
     // if the cache misses,
-    if (!cache[group] || !cache[group][option]) {
-      // build the group cache (if necessary)
-      cache[group] = cache[group] || {};
-      // and then generate the actual handler
-      cache[group][option] = () =>
+    if (!cache[cacheKey]) {
+      // generate the handler
+      cache[cacheKey] = () =>
         this.props.onItemSelect(group, option);
     }
 
     // return the (now cached) handler function
-    return cache[group][option];
+    return cache[cacheKey];
   }
 
   /**
