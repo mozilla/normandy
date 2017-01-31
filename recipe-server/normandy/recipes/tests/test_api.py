@@ -231,6 +231,26 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.get(pk=recipe.id)
         assert recipe.action == action
 
+    def test_it_can_change_arguments_for_recipes(self, api_client):
+        recipe = RecipeFactory(arguments_json='')
+        action = ActionFactory(
+            name='foobarbaz',
+            arguments_schema={
+                'type': 'object',
+                'properties': {'message': {'type': 'string'}},
+                'required': ['message']
+            }
+        )
+
+        arguments = {'message': 'test message'}
+
+        res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {
+            'action': action.name, 'arguments': arguments})
+        assert res.status_code == 200
+
+        recipe = Recipe.objects.get(pk=recipe.id)
+        assert recipe.arguments == arguments
+
     def test_it_can_delete_recipes(self, api_client):
         recipe = RecipeFactory()
 

@@ -283,6 +283,11 @@ class TestRecipe(object):
         recipe.update(locales=[])
         assert recipe.locales.count() == 0
 
+    def test_recipe_update_arguments(self):
+        recipe = RecipeFactory(arguments_json='')
+        recipe.update(arguments={'something': 'value'})
+        assert recipe.arguments_json == '{"something": "value"}'
+
     def test_recipe_force_update(self):
         recipe = RecipeFactory(name='my name')
         revision_id = recipe.revision_id
