@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -eu
 
+# store version info in app directory, for Docker to pick up
+mkdir -p __version__
+git rev-parse HEAD > __version__/commit
+git describe --tags --exact-match > __version__/tag || true # may fail if not on a tag
 # build image
 docker build -t mozilla/normandy:latest .
 # pull other docker images used below
