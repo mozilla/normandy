@@ -43,28 +43,46 @@ export default class RecipeCombobox extends React.Component {
    * @return {Array<Object>} Array of filter groups containing search value
    */
   filterGroups(groups, search) {
-    return [].concat(groups).filter(group => {
-      // remove 'meta' properties the user doesn't actually
-      // want to search over
-      const groupProperties = omit(group,
-        ['value', 'selected', 'multiple']);
+    const searchText = (search || '').toLowerCase();
 
-      // remove properties user doesnt care to search over
-      groupProperties.options = groupProperties.options.map(option =>
-        omit(option, [
-          // if an option has a label,
-          // remove the hidden value
-          option.label ? 'value' : 'label',
-          'selected',
-          'multiple',
-        ]));
+    this.filterCache = this.filterCache || {};
+    const cacheKey = `${Object.keys(groups).join(',')}::${searchText}`;
+    if (this.filterCache[cacheKey]) {
+      return this.filterCache[cacheKey];
+    }
 
-      // quick and dirty 'deep object search'
-      const groupString = JSON.stringify(groupProperties).toLowerCase();
-      const groupSearch = (search || '').toLowerCase();
+    const searchRegex = new RegExp(searchText, 'ig');
 
-      return groupString.indexOf(groupSearch) > -1;
-    });
+    const containsSearch = obj =>
+      !!Object.keys(obj)
+        .find(key => searchRegex.test(obj[key]));
+
+    const filteredGroups = []
+      .concat(groups)
+      .map(group => {
+        const newGroup = { ...group };
+
+        // remove properties user doesnt care to search over
+        newGroup.options = newGroup.options.filter(option => {
+          const newOption = omit({ ...option }, [
+            // if an option has a label,
+            // remove the hidden value
+            option.label ? 'value' : 'label',
+            'selected',
+            'multiple',
+          ]);
+
+          return containsSearch(newOption);
+        });
+
+
+        return newGroup.options.length ? newGroup : null;
+      })
+      .filter(x => x);
+
+    this.filterCache[cacheKey] = filteredGroups;
+
+    return filteredGroups;
   }
 
   /**

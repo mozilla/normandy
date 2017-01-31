@@ -11,6 +11,15 @@ export default class GroupMenu extends React.Component {
     searchText: pt.string,
   };
 
+  static INTIAL_DISPLAY_COUNT = 5;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      expanded: {},
+    };
+  }
+
   /**
    * Creates a click handler based on the
    * group/option passed into it, basically
@@ -36,6 +45,25 @@ export default class GroupMenu extends React.Component {
 
     // return the (now cached) handler function
     return cache[cacheKey];
+  }
+
+  makeViewMoreHandler(group) {
+    this.viewMoreHandler = this.viewMoreHandler || {};
+    const cache = this.viewMoreHandler;
+    const groupKey = group.value;
+
+    if (!cache[groupKey]) {
+      cache[groupKey] = () => {
+        this.setState({
+          expanded: {
+            ...this.state.expanded,
+            [groupKey]: !this.state.expanded[groupKey],
+          },
+        });
+      };
+    }
+
+    return cache[groupKey];
   }
 
   /**
@@ -76,6 +104,7 @@ export default class GroupMenu extends React.Component {
     } = this.props;
 
     const textSearchMessage = this.buildTextSearchMessage(searchText);
+    const maxCount = GroupMenu.INTIAL_DISPLAY_COUNT;
 
     return (
       <div
@@ -83,25 +112,54 @@ export default class GroupMenu extends React.Component {
       >
         { textSearchMessage }
         {
-          data.map(group =>
-            <div
-              key={group.value}
-              className={group.value}
-            >
-              <h3 className="group-label">{group.label}</h3>
-              {
-                group.options.map((option, index) =>
-                  <div
-                    className={"menu-item"}
-                    key={index}
-                    onClick={this.makeClickItemHandler(group, option)}
-                  >
-                    { option.label || option.value }
-                  </div>
-                )
-              }
-            </div>
-          )
+          data.map(group => {
+            const {
+              value,
+              options,
+              label,
+            } = group;
+            // the group is expanded if there's search text,
+            // or if the user has already manually expanded the group
+            const groupIsExpanded = !!searchText || this.state.expanded[value];
+
+            // if expanded, display options are the default options
+            // if not expanded, truncate list to INITIAL_DISPLAY_COUNT items
+            const displayedOptions = groupIsExpanded ?
+              options : options.slice(0, maxCount);
+
+            // determine if there are some hidden to the user or not
+            const hasSomeHidden = !groupIsExpanded &&
+              options.length > maxCount;
+
+            return (
+              <div
+                key={value}
+                className={value}
+              >
+                <h3 className="group-label">{label}</h3>
+                {
+                  displayedOptions.map((option, index) =>
+                    <div
+                      className={"menu-item"}
+                      key={index}
+                      onClick={this.makeClickItemHandler(group, option)}
+                    >
+                      { option.label || option.value }
+                    </div>
+                  )
+                }
+                {
+                  hasSomeHidden &&
+                    <span
+                      className="view-more"
+                      onClick={this.makeViewMoreHandler(group)}
+                    >
+                      View more...
+                    </span>
+                }
+              </div>
+            );
+          })
         }
       </div>
     );

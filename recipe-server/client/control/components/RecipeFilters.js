@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import ColumnMenu from 'control/components/ColumnMenu';
 import ActiveFilters from 'control/components/ActiveFilters';
 import RecipeCombobox from 'control/components/RecipeCombobox';
-import RecipeCount from 'control/components/RecipeCount';
 
 import { isEqual } from 'underscore';
 
@@ -31,8 +30,6 @@ import {
  */
 class RecipeFilters extends React.Component {
   static propTypes = {
-    displayCount: pt.number,
-    totalCount: pt.number,
     // connected
     filters: pt.array.isRequired,
     selectedFilters: pt.array.isRequired,
@@ -125,8 +122,6 @@ class RecipeFilters extends React.Component {
 
   render() {
     const {
-      displayCount,
-      totalCount,
       availableFilters,
       columns,
     } = this.props;
@@ -142,14 +137,6 @@ class RecipeFilters extends React.Component {
           </div>
 
           <div id="filters-container" className="fluid-6">
-            {
-              !!(displayCount && totalCount) &&
-                <RecipeCount
-                  displayCount={displayCount}
-                  totalCount={totalCount}
-                  isFiltering={this.props.selectedFilters.length > 0}
-                />
-            }
             <ColumnMenu
               columns={columns}
               onColumnChange={this.handleColumnInput}
