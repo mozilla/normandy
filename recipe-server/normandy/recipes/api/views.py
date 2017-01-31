@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Q
 from django.views.decorators.cache import cache_control
 
 import django_filters
@@ -97,6 +98,11 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         if 'locale' in self.request.GET:
             locales = self.request.GET.get('locale').split(',')
             queryset = queryset.filter(latest_revision__locales__code__in=locales)
+
+        if 'text' in self.request.GET:
+            text = self.request.GET.get('text')
+            queryset = queryset.filter(Q(latest_revision__name__contains=text) |
+                                       Q(latest_revision__extra_filter_expression__contains=text))
 
         return queryset
 
