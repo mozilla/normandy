@@ -401,6 +401,26 @@ class TestRecipeAPI(object):
         for recipe in res.data:
             assert recipe['id'] in [r1.id, r2.id]
 
+    def test_list_filter_text(self, api_client):
+        r1 = RecipeFactory(name='first', extra_filter_expression='1 + 1 == 2')
+        r2 = RecipeFactory(name='second', extra_filter_expression='one + one == two')
+
+        res = api_client.get('/api/v1/recipe/?text=first')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r1.id
+
+        res = api_client.get('/api/v1/recipe/?text=one')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['id'] == r2.id
+
+        res = api_client.get('/api/v1/recipe/?text=t')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+        for recipe in res.data:
+            assert recipe['id'] in [r1.id, r2.id]
+
 
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):
