@@ -2,7 +2,7 @@ FROM python:3.5.2-slim
 WORKDIR /app
 RUN groupadd --gid 1001 app && useradd -g app --uid 1001 --shell /usr/sbin/nologin app
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc libpq-dev curl apt-transport-https libffi-dev git
+    gcc libpq-dev curl apt-transport-https libffi-dev
 
 # Install node from NodeSource
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
@@ -23,9 +23,7 @@ RUN NODE_ENV=production ./node_modules/.bin/webpack && \
     mkdir -p media && chown app:app media && \
     mkdir -p __version__ && \
     mkdir -p /test_artifacts && \
-    chmod 777 /test_artifacts && \
-    git rev-parse HEAD > __version__/commit && \
-    git describe --tags --exact-match > __version__/tag || true # may fail if not on a tag
+    chmod 777 /test_artifacts
 
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
