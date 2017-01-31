@@ -286,7 +286,6 @@ class TestRecipe(object):
     def test_recipe_update_arguments(self):
         recipe = RecipeFactory(arguments_json='')
         recipe.update(arguments={'something': 'value'})
-        assert recipe.arguments == {'something': 'value'}
         assert recipe.arguments_json == '{"something": "value"}'
 
     def test_recipe_force_update(self):
