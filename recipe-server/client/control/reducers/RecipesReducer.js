@@ -4,56 +4,79 @@ import {
 } from 'control/actions/ControlActions';
 
 const initialState = {
-  list: [],
+  entries: {},
   selectedRecipe: null,
   recipeListNeedsFetch: true,
 };
 
 function recipesReducer(state = initialState, action) {
   switch (action.type) {
-    case RECIPES_RECEIVED:
+    case RECIPES_RECEIVED: {
+      // convert array of recipes into an obj
+      // keyed on the recipe id
+      const recipesObj = {};
+      (action.recipes || []).forEach(recipe => {
+        recipesObj[recipe.id] = { ...recipe };
+      });
+
       return {
         ...state,
-        list: [].concat(state.list).concat(action.recipes),
+        entries: {
+          ...state.entries,
+          ...recipesObj,
+        },
         recipeListNeedsFetch: false,
       };
-    case SINGLE_RECIPE_RECEIVED:
+    }
+
+    case SINGLE_RECIPE_RECEIVED: {
       return {
         ...state,
-        list: [].concat(state.list).concat([action.recipe]),
+        entries: {
+          ...state.entries,
+          [action.recipe.id]: action.recipe,
+        },
         recipeListNeedsFetch: true,
         selectedRecipe: action.recipe.id,
       };
+    }
 
-    case SET_SELECTED_RECIPE:
+    case SET_SELECTED_RECIPE: {
       return {
         ...state,
         selectedRecipe: action.recipeId,
       };
+    }
 
-    case RECIPE_ADDED:
+    case RECIPE_ADDED: {
       return {
         ...state,
-        list: [].concat(state.list).concat([
-          ...state.list || [],
-          action.recipe,
-        ]),
+        entries: {
+          ...state.entries,
+          [action.recipe.id]: action.recipe,
+        },
       };
-    case RECIPE_UPDATED:
+    }
+
+    case RECIPE_UPDATED: {
+      const newEntries = { ...state.entries };
+      newEntries[action.recipe.id] = { ...action.recipe };
+
       return {
         ...state,
-        list: [].concat(state.list).map(recipe => {
-          if (recipe.id === action.recipe.id) {
-            return { ...recipe, ...action.recipe };
-          }
-          return recipe;
-        }),
+        entries: newEntries,
       };
-    case RECIPE_DELETED:
+    }
+
+    case RECIPE_DELETED: {
+      const newEntries = { ...state.entries };
+      delete newEntries[action.recipeId];
+
       return {
         ...state,
-        list: [].concat(state.list).filter(recipe => recipe.id !== action.recipeId),
+        entries: newEntries,
       };
+    }
 
     default:
       return state;

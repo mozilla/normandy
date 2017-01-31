@@ -2,8 +2,15 @@ import appReducer from 'control/reducers';
 import * as actions from 'control/actions/ControlActions';
 import {
   fixtureRecipes,
+  fixtureRecipeDict,
   initialState,
 } from 'control/tests/fixtures';
+
+const fakeRecipe = {
+  id: 4,
+  name: 'Villis stebulum',
+  enabled: false,
+};
 
 describe('controlApp reducer', () => {
   it('should return initial state by default', () => {
@@ -39,8 +46,8 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
-        list: fixtureRecipes,
-        selectedRecipe: null,
+        ...initialState.recipes,
+        entries: fixtureRecipeDict,
         recipeListNeedsFetch: false,
       },
     });
@@ -53,7 +60,10 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
-        list: [fixtureRecipes[0]],
+        ...initialState.recipes,
+        entries: {
+          [fixtureRecipes[0].id]: fixtureRecipes[0],
+        },
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
       },
@@ -67,9 +77,8 @@ describe('controlApp reducer', () => {
     })).toEqual({
       ...initialState,
       recipes: {
-        list: [],
+        ...initialState.recipes,
         selectedRecipe: 2,
-        recipeListNeedsFetch: true,
       },
     });
   });
@@ -137,21 +146,14 @@ describe('controlApp reducer', () => {
   it('should handle RECIPE_ADDED', () => {
     expect(appReducer(initialState, {
       type: actions.RECIPE_ADDED,
-      recipe: {
-        id: 4,
-        name: 'Villis stebulum',
-        enabled: false,
-      },
+      recipe: fakeRecipe,
     })).toEqual({
       ...initialState,
       recipes: {
-        list: [{
-          id: 4,
-          name: 'Villis stebulum',
-          enabled: false,
-        }],
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
+        ...initialState.recipes,
+        entries: {
+          [fakeRecipe.id]: fakeRecipe,
+        },
       },
     });
   });
@@ -161,7 +163,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipes,
+        entries: fixtureRecipeDict,
       },
     }, {
       type: actions.RECIPE_UPDATED,
@@ -174,21 +176,23 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 1,
-          name: 'Lorem Ipsum',
-          enabled: true,
-        }, {
-          id: 2,
-          name: 'Dolor set amet',
-          enabled: true,
-        }, {
-          id: 3,
-          name: 'Updated recipe name',
-          enabled: true,
-        }],
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
+        entries: {
+          1: {
+            id: 1,
+            name: 'Lorem Ipsum',
+            enabled: true,
+          },
+          2: {
+            id: 2,
+            name: 'Dolor set amet',
+            enabled: true,
+          },
+          3: {
+            id: 3,
+            name: 'Updated recipe name',
+            enabled: true,
+          },
+        },
       },
     });
   });
@@ -198,7 +202,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: fixtureRecipes,
+        entries: fixtureRecipeDict,
       },
     }, {
       type: actions.RECIPE_DELETED,
@@ -207,18 +211,35 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 1,
-          name: 'Lorem Ipsum',
-          enabled: true,
-        }, {
-          id: 2,
-          name: 'Dolor set amet',
-          enabled: true,
-        }],
-        selectedRecipe: null,
-        recipeListNeedsFetch: true,
+        entries: {
+          1: {
+            id: 1,
+            name: 'Lorem Ipsum',
+            enabled: true,
+          },
+          2: {
+            id: 2,
+            name: 'Dolor set amet',
+            enabled: true,
+          },
+        },
       },
+    });
+  });
+
+  describe('Recipe Creation and Loading', () => {
+    it('should prevent duplicate recipes from loading into memory', () => {
+      let store = appReducer(initialState, {
+        type: actions.RECIPE_ADDED,
+        recipe: fakeRecipe,
+      });
+
+      store = appReducer(store, {
+        type: actions.RECIPES_RECEIVED,
+        recipes: [fakeRecipe],
+      });
+
+      expect(Object.keys(store.recipes.entries).length).toBe(1);
     });
   });
 });

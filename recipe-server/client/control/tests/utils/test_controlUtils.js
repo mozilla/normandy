@@ -1,4 +1,4 @@
-import absolutePath from '../../../utils/absolute-path';
+import absolutePath from 'client/utils/absolute-path';
 
 describe('controlApp Utils', () => {
   describe('absolute-path', () => {

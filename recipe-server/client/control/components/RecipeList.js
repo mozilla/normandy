@@ -13,6 +13,10 @@ import {
   getActiveColumns,
 } from 'control/selectors/ColumnSelector';
 
+import {
+  getRecipesList,
+} from 'control/selectors/RecipesSelector';
+
 import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
@@ -23,7 +27,7 @@ BooleanIcon.propTypes = {
   value: pt.bool.isRequired,
 };
 
-class DisconnectedRecipeList extends React.Component {
+export class DisconnectedRecipeList extends React.Component {
   static propTypes = {
     // connected
     dispatch: pt.func.isRequired,
@@ -107,7 +111,7 @@ class DisconnectedRecipeList extends React.Component {
 
     if (recipeListNeedsFetch && !isFetching) {
       dispatch(makeApiRequest('fetchAllRecipes', {}))
-      .then(recipes => dispatch(recipesReceived(recipes)));
+        .then(recipes => dispatch(recipesReceived(recipes)));
     }
   }
 
@@ -189,7 +193,7 @@ class DisconnectedRecipeList extends React.Component {
       searchText,
     } = this.state;
 
-    const filteredRecipes = (this.state.filteredRecipes || recipes)
+    const filteredRecipes = [].concat(recipes)
       .map(DisconnectedRecipeList.applyRecipeMetadata);
 
     return (
@@ -240,7 +244,7 @@ class DisconnectedRecipeList extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   dispatch: ownProps.dispatch,
   isFetching: state.controlApp.isFetching,
-  recipes: state.recipes.list || [],
+  recipes: getRecipesList(state.recipes),
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   displayedColumns: getActiveColumns(state.columns),
 });

@@ -3,6 +3,10 @@ import { connect } from 'react-redux';
 import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
   from 'control/actions/ControlActions';
 
+import {
+  getSelectedRecipe,
+} from 'control/selectors/RecipesSelector';
+
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
     static propTypes = {
@@ -47,19 +51,11 @@ export default function composeRecipeContainer(Component) {
     }
   }
 
-  const mapStateToProps = (state, props) => {
-    let recipeData = null;
-    if (state.recipes && state.recipes.list.length) {
-      recipeData = state.recipes.list
-        .find(recipe => recipe.id === state.recipes.selectedRecipe);
-    }
-
-    return {
-      recipeId: state.recipes.selectedRecipe || parseInt(props.params.id, 10) || null,
-      recipe: recipeData,
-      dispatch: props.dispatch,
-    };
-  };
+  const mapStateToProps = (state, props) => ({
+    recipeId: state.recipes.selectedRecipe || parseInt(props.params.id, 10) || null,
+    recipe: getSelectedRecipe(state.recipes),
+    dispatch: props.dispatch,
+  });
 
   RecipeContainer.propTypes = {
     recipeId: React.PropTypes.number,
