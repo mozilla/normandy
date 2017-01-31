@@ -2,7 +2,7 @@
 set -eu
 
 # build image
-docker build -t normandy:build .
+docker build -t mozilla/normandy:latest .
 # pull other docker images used below
 docker pull giorgos/takis
 # get MaxMind GeoIP database for tests
