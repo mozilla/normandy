@@ -174,6 +174,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def update(self, force=False, **data):
         revision = self.latest_revision
 
+        if 'arguments' in data:
+            data['arguments_json'] = json.dumps(data.pop('arguments'))
+
         if revision:
             revisions = RecipeRevision.objects.filter(id=revision.id)
 
