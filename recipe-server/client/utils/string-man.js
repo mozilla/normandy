@@ -6,6 +6,6 @@
  * @param  {String} value String to capitalize.
  * @return {String}       String with capitalized first letter.
  */
-export function capFirstLetter(value) {
+export function capitalizeFirst(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }

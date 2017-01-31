@@ -43,7 +43,9 @@ function recipesReducer(state = initialState, action) {
             ...newState.cache,
             // update the 'cache' object entry for this
             // particular cache key
-            [action.key]: action.recipes,
+            [action.key]: {
+              ...recipesObj,
+            },
           },
         };
       }
@@ -95,7 +97,7 @@ function recipesReducer(state = initialState, action) {
       const newEntries = { ...state.entries };
       newEntries[action.recipe.id] = { ...action.recipe };
 
-      newState =  {
+      newState = {
         ...state,
         entries: newEntries,
       };

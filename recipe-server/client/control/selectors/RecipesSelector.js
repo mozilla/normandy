@@ -3,7 +3,7 @@
  */
 
 import {
-  getFilterParams,
+  getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
 /**
@@ -41,9 +41,9 @@ export function getSelectedRecipe(recipes) {
  * @param  {Array<Object>}  filters Filters array from the redux store
  * @return {Array<Object>}  List of recipes that match the provided 'filters' config
  */
-export default function getCachedRecipes(recipes, filters) {
-  const filterCacheKey = getFilterParams(filters);
+export function getCachedRecipes(recipes, filters) {
+  const filterCacheKey = getFilterParamString(filters);
   const foundList = filterCacheKey ? recipes.cache[filterCacheKey] : recipes.entries;
 
-  return [].concat(Object.keys(foundList)).map(recipeId => foundList[recipeId]);
+  return [].concat(Object.keys(foundList || {})).map(recipeId => foundList[recipeId]);
 }

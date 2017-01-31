@@ -9,7 +9,7 @@ import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
-import { capFirstLetter } from 'client/utils/string-man';
+import { capitalizeFirst } from 'client/utils/string-man';
 
 const SET_FILTER = 'SET_FILTER';
 const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
@@ -58,7 +58,7 @@ function loadFilters() {
           }
           const newGroup = {
             value: group,
-            label: capFirstLetter(group),
+            label: capitalizeFirst(group),
             multiple: filters[group].length > 2,
             options: [].concat(filters[group]).map(formatFilterOption),
           };
