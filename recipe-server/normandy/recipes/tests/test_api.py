@@ -356,46 +356,46 @@ class TestRecipeAPI(object):
         assert len(res.data) == 1
         assert res.data[0]['id'] == r1.id
 
-    def test_list_filter_channel(self, api_client):
+    def test_list_filter_channels(self, api_client):
         r1 = RecipeFactory(channels=[ChannelFactory(slug='beta')])
         r2 = RecipeFactory(channels=[ChannelFactory(slug='release')])
 
-        res = api_client.get('/api/v1/recipe/?channel=beta')
+        res = api_client.get('/api/v1/recipe/?channels=beta')
         assert res.status_code == 200
         assert len(res.data) == 1
         assert res.data[0]['id'] == r1.id
 
-        res = api_client.get('/api/v1/recipe/?channel=beta,release')
+        res = api_client.get('/api/v1/recipe/?channels=beta,release')
         assert res.status_code == 200
         assert len(res.data) == 2
         for recipe in res.data:
             assert recipe['id'] in [r1.id, r2.id]
 
-    def test_list_filter_country(self, api_client):
+    def test_list_filter_countries(self, api_client):
         r1 = RecipeFactory(countries=[CountryFactory(code='US')])
         r2 = RecipeFactory(countries=[CountryFactory(code='CA')])
 
-        res = api_client.get('/api/v1/recipe/?country=US')
+        res = api_client.get('/api/v1/recipe/?countries=US')
         assert res.status_code == 200
         assert len(res.data) == 1
         assert res.data[0]['id'] == r1.id
 
-        res = api_client.get('/api/v1/recipe/?country=US,CA')
+        res = api_client.get('/api/v1/recipe/?countries=US,CA')
         assert res.status_code == 200
         assert len(res.data) == 2
         for recipe in res.data:
             assert recipe['id'] in [r1.id, r2.id]
 
-    def test_list_filter_locale(self, api_client):
+    def test_list_filter_locales(self, api_client):
         r1 = RecipeFactory(locales=[LocaleFactory(code='en-US')])
         r2 = RecipeFactory(locales=[LocaleFactory(code='fr-CA')])
 
-        res = api_client.get('/api/v1/recipe/?locale=en-US')
+        res = api_client.get('/api/v1/recipe/?locales=en-US')
         assert res.status_code == 200
         assert len(res.data) == 1
         assert res.data[0]['id'] == r1.id
 
-        res = api_client.get('/api/v1/recipe/?locale=en-US,fr-CA')
+        res = api_client.get('/api/v1/recipe/?locales=en-US,fr-CA')
         assert res.status_code == 200
         assert len(res.data) == 2
         for recipe in res.data:
