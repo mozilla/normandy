@@ -127,8 +127,14 @@ in other Django projects.
 
     :default: ``None``
 
-    The DSN for Raven to report errors to Sentry. Defaults to ``None``. Not
-    required.
+    Optional. The DSN for Raven to report errors to Sentry.
+
+.. envvar:: DJANGO_RAVEN_CONFIG_RELEASE
+
+    :default: ``None``
+
+    Optional. The release for Raven to report to Sentry. Automatically set by
+    production Docker images.
 
 .. envvar:: DJANGO_AUTOGRAPH_URL
 

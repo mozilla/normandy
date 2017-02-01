@@ -195,9 +195,20 @@ class Base(Core):
     EMAIL_USE_TLS = values.BooleanValue(True)
     EMAIL_HOST_PASSWORD = values.Value()
     EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
-    RAVEN_CONFIG = {
-        'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
-    }
+
+    def RAVEN_CONFIG(self):
+        version_path = os.path.join(Core.BASE_DIR, '__version__', 'tag')
+        try:
+            with open(version_path) as f:
+                version = f.read().strip()
+        except IOError:
+            version = None
+
+        return {
+            'dsn': values.URLValue(None, environ_name='RAVEN_CONFIG_DSN'),
+            'release': values.Value(version, environ_name='RAVEN_CONFIG_RELEASE'),
+        }
+
     # statsd
     STATSD_HOST = values.Value('localhost')
     STATSD_PORT = values.IntegerValue(8125)
