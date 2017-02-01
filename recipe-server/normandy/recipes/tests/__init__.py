@@ -7,6 +7,7 @@ import factory
 from normandy.base.tests import FuzzyUnicode
 from normandy.recipes.models import (
     Action,
+    ApprovalRequest,
     Client,
     Channel,
     Country,
@@ -116,6 +117,13 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
+
+
+class ApprovalRequestFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = ApprovalRequest
+
+    revision = factory.SubFactory(RecipeRevisionFactory)
 
 
 class SignatureFactory(factory.DjangoModelFactory):
