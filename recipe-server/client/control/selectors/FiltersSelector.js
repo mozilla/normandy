@@ -43,7 +43,7 @@ export const getSelectedFilterGroups = state => state.active.filter(isGroupSelec
  * @param  {Array<Object>} groups All possible filter groups
  * @return {Array<Object>}        Active filter groups and their selected options
  */
-export const getActiveFilters = state =>
+export const getActiveFilterOptions = state =>
   [].concat(state.active)
     .map(group => {
       // group has no selection = remove it
@@ -53,7 +53,9 @@ export const getActiveFilters = state =>
 
       const newGroup = { ...group };
       // remove non-selected filters
-      const activeOptions = [].concat(group.options).filter(option => option.selected);
+      const activeOptions = [].concat(group.options)
+        .filter(option => option.selected);
+
       newGroup.options = activeOptions;
 
       return newGroup;
@@ -70,7 +72,7 @@ export const getActiveFilters = state =>
  * @return {string}        URL-safe query param string
  */
 export const getFilterParamString = state =>
-  getActiveFilters(state)
+  getActiveFilterOptions(state)
     .map(group => {
       const param = group.value;
       const selected = [];
@@ -125,4 +127,4 @@ export const getAvailableFilters = state =>
  * @return {boolean}              Does user have at least one filter active?
  */
 export const isFilteringActive = state =>
-  getActiveFilters(state).length > 0;
+  getActiveFilterOptions(state).length > 0;

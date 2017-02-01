@@ -113,7 +113,7 @@ export default class RecipeCombobox extends React.Component {
    */
   updateSearch({ target, keyCode }) {
     // Enter key
-    if (keyCode === 13) {
+    if (typeof keyCode !== 'undefined' && keyCode === 13) {
       this.props.onFilterSelect('text', target.value);
 
       this.clearInput();
@@ -164,6 +164,7 @@ export default class RecipeCombobox extends React.Component {
               placeholder="Search"
               initialValue={searchText}
               onKeyUp={this.updateSearch}
+              onChange={this.updateSearch}
               ref={input => { this.inputRef = input; }}
             />
           }

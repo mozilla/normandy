@@ -28,10 +28,9 @@ import {
  * Contains the big filter combobox, the 'active filters' section,
  * and the column menu.
  */
-class RecipeFilters extends React.Component {
+export class RecipeFilters extends React.Component {
   static propTypes = {
     // connected
-    filters: pt.array.isRequired,
     selectedFilters: pt.array.isRequired,
     availableFilters: pt.array.isRequired,
     columns: pt.array.isRequired,

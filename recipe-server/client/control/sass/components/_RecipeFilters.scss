@@ -2,8 +2,8 @@
   display: flex;
   overflow: auto;
 
-  .enabled-filter,
-  .enabled-filter-button {
+  .filter-group,
+  .filter-button {
     background: $darkCream;
     display: inline-block;
     margin-right: 1em;
@@ -38,7 +38,7 @@
     }
   }
 
-  .enabled-filter-button {
+  .filter-button {
     cursor: pointer;
     display: flex;
     flex-direction: column;

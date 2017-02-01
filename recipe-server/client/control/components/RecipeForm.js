@@ -170,10 +170,6 @@ export const formConfig = {
     ]);
     const isCloning = route && route.isCloning;
 
-    // API expects `arguments_json`
-    recipe.arguments_json = JSON.stringify(recipe.arguments);
-    delete recipe.arguments;
-
     let result;
     if (recipeId && !isCloning) {
       result = updateRecipe(recipeId, recipe);

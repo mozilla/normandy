@@ -57,7 +57,7 @@ export default class ActiveFilters extends React.Component {
         { selectedFilters.map(filter =>
           <div
             key={filter.value}
-            className="enabled-filter"
+            className="filter-group"
           >
             <span className="filter-label">
               { filter.label }
@@ -76,7 +76,7 @@ export default class ActiveFilters extends React.Component {
         }
         { selectedFilters.length &&
           <div
-            className="enabled-filter-button"
+            className="filter-button reset"
             onClick={onResetFilters}
             children={'Reset Filters'}
           />
