@@ -98,9 +98,9 @@ pytest-mock==0.11.0 \
     --hash=sha256:5d109071ac1c6a5a883aece92c507b4562efce86054ab39c83a9f3554688289d
 pytest-testrail==0.0.9 \
     --hash=sha256:74a46e3f61eecccb43b55e44a7c99ae22bdf75f85ecf10caf88f03e2a95d0eb3
-raven==5.10.2 \
-    --hash=sha256:f17269486e9f64ccd5a38a859e8191a8d8f5609e8f0efee6f1881e8a0fb20ed8 \
-    --hash=sha256:58d52e16c834f70046f07d53795cafbf2709aef87afa9ca2a9d21be28a6ed92c
+raven==5.32.0 \
+    --hash=sha256:a06517e9b7858ac41963f9741cc8358005d37511475aaa4c8b692d29ae0a7d94 \
+    --hash=sha256:13e68bbf21d4d6f0cae4458da5be2d0d538733beabc5f93cb185048b28a77457
 requests==2.11.1 \
     --hash=sha256:545c4855cd9d7c12671444326337013766f4eea6068c3f0307fb2dc2696d580e
 requests-hawk==1.0.0 \
