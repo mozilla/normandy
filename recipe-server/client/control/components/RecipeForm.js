@@ -39,7 +39,7 @@ export class RecipeForm extends React.Component {
     recipe: pt.shape({
       name: pt.string.isRequired,
       enabled: pt.bool.isRequired,
-      filter_expression: pt.string.isRequired,
+      extra_filter_expression: pt.string.isRequired,
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
@@ -112,7 +112,7 @@ export class RecipeForm extends React.Component {
         />
         <ControlField
           label="Filter Expression"
-          name="filter_expression"
+          name="extra_filter_expression"
           component="textarea"
         />
         <ControlField label="Action" name="action" component="select">
@@ -141,19 +141,19 @@ export class RecipeForm extends React.Component {
  */
 export const formConfig = {
   form: 'recipe',
-  asyncBlurFields: ['filter_expression'],
+  asyncBlurFields: ['extra_filter_expression'],
 
   async asyncValidate(values) {
     const errors = {};
     // Validate that filter expression is valid JEXL
-    if (!values.filter_expression) {
-      errors.filter_expression = 'Filter expression cannot be empty.';
+    if (!values.extra_filter_expression) {
+      errors.extra_filter_expression = 'Filter expression cannot be empty.';
     } else {
       const jexlEnvironment = new JexlEnvironment({});
       try {
-        await jexlEnvironment.eval(values.filter_expression);
+        await jexlEnvironment.eval(values.extra_filter_expression);
       } catch (err) {
-        errors.filter_expression = err.toString();
+        errors.extra_filter_expression = err.toString();
       }
     }
 
@@ -166,7 +166,7 @@ export const formConfig = {
   onSubmit(values, dispatch, { route, recipeId, updateRecipe, addRecipe }) {
     // Filter out unwanted keys for submission.
     const recipe = pick(values, [
-      'name', 'enabled', 'filter_expression', 'action', 'arguments',
+      'name', 'enabled', 'extra_filter_expression', 'action', 'arguments',
     ]);
     const isCloning = route && route.isCloning;
 
