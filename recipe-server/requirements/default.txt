@@ -122,3 +122,5 @@ statsd==3.2.1 \
 whitenoise==2.0.6 \
     --hash=sha256:826ffe5d608c9dc8daebef1b0b43d01f7958f17c2fce36e75c80e26160172c4f \
     --hash=sha256:5aea935dfc09ef2beeb76960b4a808b0bbe65e85fb0b0312434b9c365ca02a41
+newrelic==2.78.0.57 \
+    --hash=sha256:2191b7699e14a07efa5d9221270eb29bdf6cce643aa56cff08546ecb3f729be6
