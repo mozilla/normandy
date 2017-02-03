@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
 
+import makeApiRequest from 'control/api';
+
 import {
-  makeApiRequest,
   recipesReceived,
   setSelectedRecipe,
-} from 'control/actions/ControlActions';
+} from 'control/actions/RecipeActions';
 
 import {
   getActiveColumns,

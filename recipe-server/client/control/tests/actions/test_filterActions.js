@@ -7,7 +7,7 @@ import {
   stubbedFilters,
 } from 'control/tests/fixtures';
 
-import { API_REQUEST_SETTINGS } from 'control/actions/ControlActions';
+import { API_REQUEST_SETTINGS } from 'control/api';
 import * as filterActions from 'control/actions/FilterActions';
 import { getFilterParamString } from 'control/selectors/FiltersSelector';
 

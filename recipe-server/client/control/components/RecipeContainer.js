@@ -1,7 +1,10 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
-import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
-  from 'control/actions/ControlActions';
+import makeApiRequest from 'control/api';
+import {
+  singleRecipeReceived,
+  setSelectedRecipe,
+} from 'control/actions/RecipeActions';
 
 import {
   getSelectedRecipe,

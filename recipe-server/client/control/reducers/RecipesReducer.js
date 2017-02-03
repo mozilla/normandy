@@ -6,7 +6,7 @@ import {
   RECIPE_DELETED,
   SET_SELECTED_RECIPE,
   RECIPES_NEED_FETCH,
-} from 'control/actions/ControlActions';
+} from 'control/actions/RecipeActions';
 
 const initialState = {
   entries: {},

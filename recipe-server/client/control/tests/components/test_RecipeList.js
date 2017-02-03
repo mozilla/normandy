@@ -2,7 +2,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import appReducer from 'control/reducers';
-import * as actions from 'control/actions/ControlActions';
+import * as actions from 'control/actions/RecipeActions';
 import { initialState } from 'control/tests/fixtures';
 
 import { Tr } from 'reactable';
