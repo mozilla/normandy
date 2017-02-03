@@ -100,9 +100,9 @@ describe('<ActiveFilters>', () => {
       expect(wrapper.hasClass('active-filters')).toBe(true);
 
       wrapper.setProps({ className: 'test' });
-      // only one element should exist
+      // default class should still be on the element
       expect(wrapper.hasClass('active-filters')).toBe(true);
-      // and it should have the `test` class on it
+      // and it should also have the `test` class on it
       expect(wrapper.hasClass('test')).toBe(true);
 
       // update the prop again
