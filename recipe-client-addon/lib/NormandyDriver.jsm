@@ -80,6 +80,7 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
         syncTotalDevices: Preferences.get("services.sync.numClients", 0),
         plugins: {},
         doNotTrack: Preferences.get("privacy.donottrackheader.enabled", false),
+        distribution: Preferences.get("distribution.id", "default"),
       };
 
       const searchEnginePromise = new Promise(resolve => {

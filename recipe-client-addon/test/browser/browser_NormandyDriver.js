@@ -38,3 +38,12 @@ add_task(Utils.withDriver(Assert, function* syncDeviceCounts(driver) {
   is(client.syncDesktopDevices, 4, "syncDesktopDevices is read when set");
   is(client.syncTotalDevices, 9, "syncTotalDevices is read when set");
 }));
+
+add_task(Utils.withDriver(Assert, function* distribution(driver) {
+  let client = yield driver.client();
+  is(client.distribution, "default", "distribution has a default value");
+
+  yield SpecialPowers.pushPrefEnv({set: [["distribution.id", "funnelcake"]]});
+  client = yield driver.client();
+  is(client.distribution, "funnelcake", "distribution is read from preferences");
+}));
