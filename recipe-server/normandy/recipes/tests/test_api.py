@@ -8,11 +8,12 @@ import pytest
 from rest_framework.reverse import reverse
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
-from normandy.base.tests import Whatever
+from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import aware_datetime
-from normandy.recipes.models import Recipe
+from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
+    ApprovalRequestFactory,
     ChannelFactory,
     CountryFactory,
     LocaleFactory,
@@ -414,6 +415,71 @@ class TestRecipeRevisionAPI(object):
         res = api_client.get('/api/v1/recipe_revision/%s/' % recipe.latest_revision.id)
         assert res.status_code == 200
         assert res.data['id'] == recipe.latest_revision.id
+
+    def test_request_approval(self, api_client):
+        recipe = RecipeFactory()
+        res = api_client.post(
+            '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
+        assert res.status_code == 200
+        assert res.data['id'] == recipe.latest_revision.approval_request.id
+
+    def test_cannot_open_second_approval_request(self, api_client):
+        recipe = RecipeFactory()
+        ApprovalRequestFactory(revision=recipe.latest_revision)
+        res = api_client.post(
+            '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
+        assert res.status_code == 400
+
+
+@pytest.mark.django_db
+class TestApprovalRequestAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/approval_request/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_approve(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
+        assert res.status_code == 200
+
+        r = Recipe.objects.get(pk=r.pk)
+        assert r.is_approved
+
+    def test_approve_already_approved(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        a.approve(UserFactory())
+
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
+        assert res.status_code == 400
+
+    def test_reject(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
+        assert res.status_code == 200
+
+        r = Recipe.objects.get(pk=r.pk)
+        assert r.latest_revision.approval_status == r.latest_revision.REJECTED
+
+    def test_reject_already_approved(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        a.approve(UserFactory())
+
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
+        assert res.status_code == 400
+
+    def test_close(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/close/'.format(a.id))
+        assert res.status_code == 204
+
+        with pytest.raises(ApprovalRequest.DoesNotExist):
+            ApprovalRequest.objects.get(pk=a.pk)
 
 
 @pytest.mark.django_db

@@ -147,7 +147,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'This revision already has an approval request.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        approval_request = ApprovalRequest(revision=revision, user=request.user)
+        approval_request = ApprovalRequest(revision=revision, creator=request.user)
         approval_request.save()
 
         return Response(ApprovalRequestSerializer(approval_request).data)
@@ -163,13 +163,21 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.approve(approver=request.user)
+        try:
+            approval_request.approve(approver=request.user)
+        except ApprovalRequest.AlreadyApproved:
+            return Response({'error': 'This approval request has already been approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])
     def reject(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.reject(approver=request.user)
+        try:
+            approval_request.reject(approver=request.user)
+        except ApprovalRequest.AlreadyApproved:
+            return Response({'error': 'This approval request has already been approved.'},
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])

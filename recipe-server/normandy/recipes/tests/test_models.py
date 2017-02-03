@@ -5,10 +5,11 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 
 import pytest
 
-from normandy.base.tests import Whatever
-from normandy.recipes.models import Client, Recipe
+from normandy.base.tests import UserFactory, Whatever
+from normandy.recipes.models import ApprovalRequest, Client, Recipe, RecipeRevision
 from normandy.recipes.tests import (
     ActionFactory,
+    ApprovalRequestFactory,
     ChannelFactory,
     CountryFactory,
     LocaleFactory,
@@ -296,6 +297,103 @@ class TestRecipe(object):
         revision_id = recipe.revision_id
         recipe.update(action=ActionFactory())
         assert recipe.revision_id != revision_id
+
+    def test_approved_revision_property(self):
+        """Ensure approved revision properties work as expected."""
+        recipe = RecipeFactory(name='first')
+        assert recipe.name == 'first'
+
+        recipe.update(name='second')
+        assert recipe.name == 'second'
+
+        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
+        approval.approve(UserFactory())
+        assert recipe.name == 'second'
+
+        recipe.update(name='third')
+        assert recipe.name == 'second'
+
+    def test_recipe_is_approved(self):
+        recipe = RecipeFactory(name='old')
+        assert not recipe.is_approved
+
+        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
+        approval.approve(UserFactory())
+        assert recipe.is_approved
+        assert recipe.approved_revision == recipe.latest_revision
+
+        recipe.update(name='new')
+        assert recipe.is_approved
+        assert recipe.approved_revision != recipe.latest_revision
+
+    def test_delete_pending_approval_request_on_update(self):
+        recipe = RecipeFactory(name='old')
+        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
+        recipe.update(name='new')
+
+        with pytest.raises(ApprovalRequest.DoesNotExist):
+            ApprovalRequest.objects.get(pk=approval.pk)
+
+
+@pytest.mark.django_db
+class TestRecipeRevision(object):
+    def test_approval_status(self):
+        recipe = RecipeFactory()
+        revision = recipe.latest_revision
+        assert revision.approval_status is None
+
+        approval = ApprovalRequestFactory(revision=revision)
+        revision = RecipeRevision.objects.get(pk=revision.pk)
+        assert revision.approval_status == revision.PENDING
+
+        approval.approve(UserFactory())
+        revision = RecipeRevision.objects.get(pk=revision.pk)
+        assert revision.approval_status == revision.APPROVED
+
+        approval.delete()
+        approval = ApprovalRequestFactory(revision=revision)
+        approval.reject(UserFactory())
+        revision = RecipeRevision.objects.get(pk=revision.pk)
+        assert revision.approval_status == revision.REJECTED
+
+
+@pytest.mark.django_db
+class TestApprovalRequest(object):
+    def test_approve(self):
+        u = UserFactory()
+        req = ApprovalRequestFactory()
+        req.approve(u)
+        assert req.approved
+        assert req.approver == u
+
+        recipe = req.revision.recipe
+        assert recipe.is_approved
+
+    def test_cannot_approve_already_approved(self):
+        u = UserFactory()
+        req = ApprovalRequestFactory()
+        req.approve(u)
+
+        with pytest.raises(req.AlreadyApproved):
+            req.approve(u)
+
+    def test_reject(self):
+        u = UserFactory()
+        req = ApprovalRequestFactory()
+        req.reject(u)
+        assert not req.approved
+        assert req.approver == u
+
+        recipe = req.revision.recipe
+        assert not recipe.is_approved
+
+    def test_cannot_reject_already_rejected(self):
+        u = UserFactory()
+        req = ApprovalRequestFactory()
+        req.reject(u)
+
+        with pytest.raises(req.AlreadyApproved):
+            req.reject(u)
 
 
 @pytest.mark.django_db

@@ -116,7 +116,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     @approved_revision_property
     def name(self, revision):
-        return self.latest_revision.name
+        return revision.name
 
     @approved_revision_property
     def action(self, revision):

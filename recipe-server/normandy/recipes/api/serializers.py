@@ -148,15 +148,17 @@ class ClientSerializer(serializers.Serializer):
 
 class ApprovalRequestSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(read_only=True)
-    user = UserSerializer()
+    creator = UserSerializer()
+    approver = UserSerializer()
 
     class Meta:
         model = ApprovalRequest
         fields = [
             'id',
             'created',
-            'user',
+            'creator',
             'approved',
+            'approver',
         ]
 
 
