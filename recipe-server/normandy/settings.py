@@ -165,45 +165,21 @@ class Base(Core):
                     'class': 'logging.StreamHandler',
                     'formatter': 'json' if self.LOGGING_USE_JSON else 'development',
                 },
-                'sentry': {
-                    'level': 'ERROR',
-                    'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-                }
             },
             'root': {
-                'handlers': ['console', 'sentry'],
+                'handlers': ['console'],
                 'level': 'WARNING',
             },
             'loggers': {
-                # Log DEBUG messages for normandy
                 'normandy': {
                     'propagate': False,
-                    'handlers': ['console', 'sentry'],
+                    'handlers': ['console'],
                     'level': 'DEBUG',
                 },
-                # Log DEBUG messages for request.summary
                 'request.summary': {
                     'propagate': False,
-                    'handlers': ['console', 'sentry'],
-                    'level': 'DEBUG',
-                },
-                # Don't send logging about DB queries (since they are too noisy)
-                'django.db.backends': {
-                    'level': 'ERROR',
                     'handlers': ['console'],
-                    'propagate': False,
-                },
-                # Don't send Raven errors to Sentry (since Raven is the Sentry reporter)
-                'raven': {
                     'level': 'DEBUG',
-                    'handlers': ['console'],
-                    'propagate': False,
-                },
-                # Don't send Sentry errors to Sentry
-                'sentry.errors': {
-                    'level': 'DEBUG',
-                    'handlers': ['console'],
-                    'propagate': False,
                 },
             },
         }
