@@ -1,0 +1,7 @@
+py==1.4.31 \
+    --hash=sha256:4a3e4f3000c123835ac39cab5ccc510642153bc47bc1f13e2bbb53039540ae69 \
+    --hash=sha256:a6501963c725fc2554dabfece8ae9a8fb5e149c0ac0a42fd2b02c5c1c57fc114
+setuptools==19.6 \
+    --hash=sha256:57c63a363b37ffa2d64db4ffee26844e3ab81441fc02da4cd5e8cafcff9acb3a \
+    --hash=sha256:ecd48d753c1a8ecc6a2826b863a6defaafbfd4ceafc0c1d62e5362f5a86912e9 \
+    --hash=sha256:ada6bc13059b504c939a77baa06d71cbe5028babc12b7e4b41816d0130be456f
