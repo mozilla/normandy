@@ -4,3 +4,6 @@ selenium==3.0.2 \
 pytest==3.0.2 \
     --hash=sha256:4b0872d00159dd8d7a27c4a45a2be77aac8a6e70c3af9a7c76c040c3e3715b9d \
     --hash=sha256:64d8937626dd2a4bc15ef0edd307d26636a72a3f3f9664c424d78e40efb1e339
+pytest-selenium==1.8.0 \
+    --hash=sha256:6cb6fd2f3cca04ecbe30a88d36e7c3f38562d1c2de948ac00e3a941bbea043cc \
+    --hash=sha256:64ee80556502248d7cc4c827cae4b784a92843f1a2a39622d8205ab832365474
