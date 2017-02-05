@@ -7,6 +7,8 @@ services:
       - normandy
       - selenium
     volumes: # Relative to /compose/docker-compose.yml
-      - ../functional-tests:/functional-tests
+      - ../functional_tests:/functional_tests
+      - "${TEST_REPORTS}:/test_reports"
+      - "${TEST_ARTIFACTS}:/test_artifacts"
   selenium:
     image: selenium/standalone-firefox:3.0.1-fermium

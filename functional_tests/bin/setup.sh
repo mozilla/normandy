@@ -21,8 +21,10 @@ trap finish EXIT
 echo "Initializing functional testing containers"
 pushd "$REPO_DIR/compose"
 ./bin/genkeys.sh
-compose run normandy $WAIT_FOR_DB ./manage.py migrate
+compose run normandy $WAIT_FOR_DB ./manage.py flush --no-input
+compose run normandy ./manage.py migrate --no-input
 compose run normandy ./manage.py update_actions
 compose run normandy ./manage.py update_product_details
 compose run normandy ./manage.py initial_data
+compose run normandy ./bin/create_test_admin.py
 popd

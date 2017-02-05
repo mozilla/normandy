@@ -1,0 +1,7 @@
+.cache
+.env*
+.floo*
+node_modules
+pip-cache
+venv
+__pycache__
