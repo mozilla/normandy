@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -eu
-
-echo "Generating SSL cert for compose servers."
-./bin/genkeys.sh

@@ -16,8 +16,10 @@ dependencies:
     # Use pipstrap to bootstrap ourselves to a trusted pip 8 for hash
     # checking.
     - ./ci/bin/pipstrap.py
-    # Install latest pip and other CI requirements first
-    - pip install -r ./ci/requirements.txt
+    # Install latest pip (for constraint support), then the rest of the
+    # CI requirements.
+    - pip install -r ./ci/pip.txt
+    - pip install -r ./ci/requirements/default.txt -c ./ci/requirements/constraints.txt
   override:
     - ./ci/bin/runner.sh dependencies
 
