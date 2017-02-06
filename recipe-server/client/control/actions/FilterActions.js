@@ -9,7 +9,7 @@ import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
-import { capitalizeFirst } from 'client/utils/string-man';
+import titleize from 'underscore.string/titleize';
 
 const SET_FILTER = 'SET_FILTER';
 const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
@@ -58,7 +58,7 @@ function loadFilters() {
           }
           const newGroup = {
             value: group,
-            label: capitalizeFirst(group),
+            label: titleize(group),
             multiple: filters[group].length > 2,
             options: [].concat(filters[group]).map(formatFilterOption),
           };
