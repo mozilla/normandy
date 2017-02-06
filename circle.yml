@@ -18,7 +18,7 @@ dependencies:
     - ./ci/bin/pipstrap.py
     # Install latest pip (for constraint support), then the rest of the
     # CI requirements.
-    - pip install -r ./ci/pip.txt
+    - pip install -r ./ci/requirements/pip.txt
     - pip install -r ./ci/requirements/default.txt -c ./ci/requirements/constraints.txt
   override:
     - ./ci/bin/runner.sh dependencies
