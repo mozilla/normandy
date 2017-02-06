@@ -13,4 +13,5 @@ development environment for it.
    driver
    troubleshooting
    api-tests
+   functional-tests
    code-style
