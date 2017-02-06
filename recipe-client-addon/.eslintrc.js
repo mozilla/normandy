@@ -15,6 +15,7 @@ module.exports = {
     "spaced-comment": 2,
     "space-before-function-paren": [2, "never"],
     "object-shorthand": [2],
+    "no-shadow": [2],
     "prefer-const": 1,
     "indent": [1, 2, {SwitchCase: 1}],
     "mozilla/no-aArgs": 1,
