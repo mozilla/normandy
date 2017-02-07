@@ -1,4 +1,4 @@
-FROM python:3.5.2-slim
+FROM python:3.6.0-slim
 WORKDIR /functional_tests
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl apt-transport-https
