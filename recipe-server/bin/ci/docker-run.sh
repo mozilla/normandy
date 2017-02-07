@@ -40,5 +40,5 @@ docker run \
   --env DJANGO_CONFIGURATION=Test \
   --net host \
   "${DOCKER_ARGS[@]}" \
-  normandy:build \
+  mozilla/normandy:latest \
   "$@"
