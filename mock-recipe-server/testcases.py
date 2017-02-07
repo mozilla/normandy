@@ -152,7 +152,7 @@ class FilterVersion(TestCase):
     Matches Firefox version 50.0.0. Logs to the console.
     """
     def load_data(self):
-        console_log('FilterVersion executed', filter_expression='normandy.version=="50.0.0"')
+        console_log('FilterVersion executed', extra_filter_expression='normandy.version=="50.0.0"')
 
 
 class FilterChannel(TestCase):
@@ -160,7 +160,7 @@ class FilterChannel(TestCase):
     Matches Firefox channel Aurora. Logs to the console.
     """
     def load_data(self):
-        console_log('FilterChannel executed', filter_expression='normandy.channel=="aurora"')
+        console_log('FilterChannel executed', extra_filter_expression='normandy.channel=="aurora"')
 
 
 class FilterDefaultBrowser(TestCase):
@@ -170,7 +170,7 @@ class FilterDefaultBrowser(TestCase):
     def load_data(self):
         console_log(
             'FilterDefaultBrowser executed',
-            filter_expression='normandy.isDefaultBrowser==true'
+            extra_filter_expression='normandy.isDefaultBrowser==true'
         )
 
 
@@ -185,7 +185,7 @@ class FilterGeolocationMatch(TestCase):
     def load_data(self):
         console_log(
             'FilterGeolocationMatch executed',
-            filter_expression='normandy.country=="US"'
+            extra_filter_expression='normandy.country=="US"'
         )
 
 
@@ -200,7 +200,7 @@ class FilterGeolocationNoMatch(TestCase):
     def load_data(self):
         console_log(
             'FilterGeolocationNoMatch executed',
-            filter_expression='normandy.country=="US"'
+            extra_filter_expression='normandy.country=="US"'
         )
 
 
@@ -210,7 +210,10 @@ class FilterSample0(TestCase):
     run). Logs to the console.
     """
     def load_data(self):
-        console_log('FilterSample0 executed', filter_expression='normandy.userId|stableSample(0)')
+        console_log(
+            'FilterSample0 executed',
+            extra_filter_expression='normandy.userId|stableSample(0)'
+        )
 
 
 class FilterSample100(TestCase):
@@ -221,7 +224,7 @@ class FilterSample100(TestCase):
     def load_data(self):
         console_log(
             'FilterSample100 executed',
-            filter_expression='normandy.userId|stableSample(1)'
+            extra_filter_expression='normandy.userId|stableSample(1)'
         )
 
 
@@ -244,7 +247,7 @@ class FilterTelemetry(TestCase):
     def load_data(self):
         console_log(
             'FilterTelemetry executed',
-            filter_expression='''
+            extra_filter_expression='''
                 telemetry.testping.payload.foo=="bar"
             '''
         )
@@ -253,7 +256,7 @@ class FilterTelemetry(TestCase):
 class ConsoleLogBasic(TestCase):
     """Matches all clients. Logs a message to the console."""
     def load_data(self):
-        console_log('ConsoleLogBasic executed', filter_expression='true')
+        console_log('ConsoleLogBasic executed', extra_filter_expression='true')
 
 
 class ShowHeartbeatStars(TestCase):
@@ -263,7 +266,7 @@ class ShowHeartbeatStars(TestCase):
     """
     def load_data(self):
         show_heartbeat(
-            filter_expression='true',
+            extra_filter_expression='true',
             arguments={
                 'includeTelemetryUUID': False,
                 'surveyId': 'test-survey',
@@ -284,7 +287,7 @@ class ShowHeartbeatButton(TestCase):
     """
     def load_data(self):
         show_heartbeat(
-            filter_expression='true',
+            extra_filter_expression='true',
             arguments={
                 'includeTelemetryUUID': False,
                 'surveyId': 'test-survey',
@@ -316,7 +319,7 @@ class FilterLongExpression(TestCase):
         ]
         truthy_expressions = [random.choice(truthy_choices) for _ in range(1000)]
         filter_expression = '&&'.join(['({})'.format(expr) for expr in truthy_expressions])
-        console_log('FilterLongExpression executed', filter_expression=filter_expression)
+        console_log('FilterLongExpression executed', extra_filter_expression=filter_expression)
 
 
 class ConsoleLogLongMessage(TestCase):
@@ -326,7 +329,7 @@ class ConsoleLogLongMessage(TestCase):
     """
     def load_data(self):
         message = generate_long_message()
-        console_log('ConsoleLogLongMessage executed: ' + message, filter_expression='true')
+        console_log('ConsoleLogLongMessage executed: ' + message, extra_filter_expression='true')
 
 
 class HeartbeatLongMessages(TestCase):
@@ -337,7 +340,7 @@ class HeartbeatLongMessages(TestCase):
     def load_data(self):
         message = generate_long_message()
         show_heartbeat(
-            filter_expression='true',
+            extra_filter_expression='true',
             arguments={
                 'includeTelemetryUUID': False,
                 'surveyId': 'test-survey',
@@ -370,6 +373,6 @@ class ErrorInvalidSignature(TestCase):
     executed. If it does anyway, it will log to the console.
     """
     def load_data(self):
-        recipe = console_log('ErrorInvalidSignature executed', filter_expression='true')
+        recipe = console_log('ErrorInvalidSignature executed', extra_filter_expression='true')
         recipe.signature = SignatureFactory.create(data='blockbuster night part 1'.encode())
         recipe.save()
