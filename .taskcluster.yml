@@ -20,12 +20,12 @@ tasks:
       command:
         - "/bin/bash"
         - "-c"
-        - |
-          apt-get update
-          apt-get install git
-          git clone $GITHUB_HEAD_REPO_URL normandy
-          cd normandy
-          git checkout $GITHUB_HEAD_BRANCH
+        - >
+          apt-get update &&
+          apt-get install git &&
+          git clone $GITHUB_HEAD_REPO_URL normandy &&
+          cd normandy &&
+          git checkout $GITHUB_HEAD_BRANCH &&
           bash ci/taskcluster/decision.sh
       features:
         dind: true
