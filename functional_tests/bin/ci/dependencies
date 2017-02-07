@@ -3,6 +3,3 @@ set -eu
 
 # build image
 docker build -t mozilla/normandy-functional-tests:latest .
-
-# Setup normandy-compose used in build
-./bin/setup.sh
