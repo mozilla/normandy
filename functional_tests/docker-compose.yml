@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  functionaltestrunner:
+    image: mozilla/normandy-functional-tests:latest
+    links:
+      - normandy
+      - selenium
+    volumes: # Relative to /compose/docker-compose.yml
+      - ../functional_tests:/functional_tests
+      - "${TEST_REPORTS}:/test_reports"
+      - "${TEST_ARTIFACTS}:/test_artifacts"
+  selenium:
+    image: selenium/standalone-firefox:3.0.1-fermium
+  takis:
+    image: giorgos/takis
+    links:
+      - database
+      - normandy

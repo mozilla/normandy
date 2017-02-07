@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -eu
+
+# Run functional tests
+TEST_REPORTS="${CIRCLE_TEST_REPORTS}/selenium"
+TEST_ARTIFACTS="${CIRCLE_ARTIFACTS}/selenium"
+mkdir -p $TEST_REPORTS
+mkdir -p $TEST_ARTIFACTS
+
+./bin/runtests.sh $TEST_REPORTS $TEST_ARTIFACTS
