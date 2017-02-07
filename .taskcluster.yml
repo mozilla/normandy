@@ -1,0 +1,37 @@
+version: 0
+
+metadata:
+  name: Normandy
+  description: Normandy CI Tasks
+  owner: "{{ event.head.user.email }}"
+  source: "{{ event.head.repo.url }}"
+
+tasks:
+  - metadata:
+      name: Normandy decision task
+      description: Normandy decision task
+      owner: "{{ event.head.user.email }}"
+      source: "{{ event.head.repo.url }}"
+    provisionerId: "{{ taskcluster.docker.provisionerId }}"
+    workerType: "{{ taskcluster.docker.workerType }}"
+    payload:
+      maxRunTime: 3600
+      image: "ubuntu:zesty"
+      command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          git clone $GITHUB_HEAD_REPO_URL normandy
+          cd normandy
+          git checkout $GITHUB_HEAD_BRANCH
+          bash ci/taskcluster/decision.sh
+      features:
+        dind: true
+    extra:
+      github:
+        env: true
+        events:
+          - pull_request.opened
+          - pull_request.synchronized
+          - push
+          - release
