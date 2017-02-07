@@ -21,6 +21,7 @@ tasks:
         - "/bin/bash"
         - "-c"
         - |
+          apt-get update
           apt-get install git
           git clone $GITHUB_HEAD_REPO_URL normandy
           cd normandy
