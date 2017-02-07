@@ -22,7 +22,7 @@ tasks:
         - "-c"
         - >-
           apt-get update &&
-          apt-get install -y --no-install-recommends git &&
+          apt-get install -y git &&
           git clone $GITHUB_HEAD_REPO_URL normandy &&
           cd normandy &&
           git checkout $GITHUB_HEAD_BRANCH &&
