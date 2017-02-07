@@ -24,5 +24,5 @@ export TEST_ARTIFACTS=$2
 
 # Run tests
 echo "Running functional tests"
-compose run functionaltestrunner ./bin/wait-for-it.sh normandy:8000
+compose run -e CHECK_PORT=8000 -e CHECK_HOST=normandy takis # Wait for server
 compose run functionaltestrunner py.test --html=/test_artifacts/report.html --junitxml=/test_reports/pytest.xml
