@@ -151,7 +151,8 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         approval_request = ApprovalRequest(revision=revision, creator=request.user)
         approval_request.save()
 
-        return Response(ApprovalRequestSerializer(approval_request).data)
+        return Response(ApprovalRequestSerializer(approval_request).data,
+                        status=status.HTTP_201_CREATED)
 
 
 class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
@@ -171,6 +172,10 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(
                 {'error': 'This approval request has already been approved or rejected.'},
                 status=status.HTTP_400_BAD_REQUEST)
+        except ApprovalRequest.CannotActOnOwnRequest:
+            return Response(
+                {'error': 'You cannot approve your own approval request.'},
+                status=status.HTTP_403_FORBIDDEN)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])
@@ -182,6 +187,10 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(
                 {'error': 'This approval request has already been approved or rejected.'},
                 status=status.HTTP_400_BAD_REQUEST)
+        except ApprovalRequest.CannotActOnOwnRequest:
+            return Response(
+                {'error': 'You cannot reject your own approval request.'},
+                status=status.HTTP_403_FORBIDDEN)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])

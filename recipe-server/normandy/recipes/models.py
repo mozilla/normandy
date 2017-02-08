@@ -362,9 +362,15 @@ class ApprovalRequest(models.Model):
     class NotActionable(Exception):
         pass
 
+    class CannotActOnOwnRequest(Exception):
+        pass
+
     def approve(self, approver):
         if self.approved is not None:
             raise self.NotActionable()
+
+        if approver == self.creator:
+            raise self.CannotActOnOwnRequest()
 
         self.approved = True
         self.approver = approver
@@ -377,6 +383,9 @@ class ApprovalRequest(models.Model):
     def reject(self, approver):
         if self.approved is not None:
             raise self.NotActionable()
+
+        if approver == self.creator:
+            raise self.CannotActOnOwnRequest()
 
         self.approved = False
         self.approver = approver

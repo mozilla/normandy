@@ -420,7 +420,7 @@ class TestRecipeRevisionAPI(object):
         recipe = RecipeFactory()
         res = api_client.post(
             '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
-        assert res.status_code == 200
+        assert res.status_code == 201
         assert res.data['id'] == recipe.latest_revision.approval_request.id
 
     def test_cannot_open_second_approval_request(self, api_client):
@@ -462,7 +462,7 @@ class TestApprovalRequestAPI(object):
         res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
         assert res.status_code == 200
 
-        r.refresh_from_db()
+        r.latest_revision.approval_request.refresh_from_db()
         assert r.latest_revision.approval_status == r.latest_revision.REJECTED
 
     def test_reject_not_actionable(self, api_client):
