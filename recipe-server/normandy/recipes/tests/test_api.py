@@ -444,7 +444,7 @@ class TestApprovalRequestAPI(object):
         res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
         assert res.status_code == 200
 
-        r = Recipe.objects.get(pk=r.pk)
+        r.refresh_from_db()
         assert r.is_approved
 
     def test_approve_not_actionable(self, api_client):
@@ -462,7 +462,7 @@ class TestApprovalRequestAPI(object):
         res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
         assert res.status_code == 200
 
-        r = Recipe.objects.get(pk=r.pk)
+        r.refresh_from_db()
         assert r.latest_revision.approval_status == r.latest_revision.REJECTED
 
     def test_reject_not_actionable(self, api_client):
