@@ -14,7 +14,7 @@ from reversion import revisions as reversion
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip
-from normandy.recipes.decorators import approved_revision_property
+from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
@@ -111,52 +111,56 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.name
 
     @property
+    def current_revision(self):
+        return self.approved_revision or self.latest_revision
+
+    @property
     def is_approved(self):
         return self.approved_revision is not None
 
-    @approved_revision_property
-    def name(self, revision):
-        return revision.name
+    @current_revision_property
+    def name(self):
+        return self.current_revision.name
 
-    @approved_revision_property
-    def action(self, revision):
-        return revision.action
+    @current_revision_property
+    def action(self):
+        return self.current_revision.action
 
-    @approved_revision_property
-    def extra_filter_expression(self, revision):
-        return revision.extra_filter_expression
+    @current_revision_property
+    def extra_filter_expression(self):
+        return self.current_revision.extra_filter_expression
 
-    @approved_revision_property
-    def arguments_json(self, revision):
-        return revision.arguments_json
+    @current_revision_property
+    def arguments_json(self):
+        return self.current_revision.arguments_json
 
-    @approved_revision_property
-    def arguments(self, revision):
-        return revision.arguments
+    @current_revision_property
+    def arguments(self):
+        return self.current_revision.arguments
 
-    @approved_revision_property
-    def revision_id(self, revision):
-        return revision.id
+    @current_revision_property
+    def revision_id(self):
+        return self.current_revision.id
 
-    @approved_revision_property
-    def last_updated(self, revision):
-        return revision.updated
+    @current_revision_property
+    def last_updated(self):
+        return self.current_revision.updated
 
-    @approved_revision_property
-    def filter_expression(self, revision):
-        return revision.filter_expression
+    @current_revision_property
+    def filter_expression(self):
+        return self.current_revision.filter_expression
 
-    @approved_revision_property
-    def channels(self, revision):
-        return revision.channels
+    @current_revision_property
+    def channels(self):
+        return self.current_revision.channels
 
-    @approved_revision_property
-    def countries(self, revision):
-        return revision.countries
+    @current_revision_property
+    def countries(self):
+        return self.current_revision.countries
 
-    @approved_revision_property
-    def locales(self, revision):
-        return revision.locales
+    @current_revision_property
+    def locales(self):
+        return self.current_revision.locales
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -315,7 +319,7 @@ class RecipeRevision(models.Model):
 
     @property
     def serializable_recipe(self):
-        """Returns an unsaved recipe object with this revisions data to be serialized."""
+        """Returns an unsaved recipe object with this revision's data to be serialized."""
         recipe = self.recipe
         recipe.approved_revision = self if self.approval_status == self.APPROVED else None
         recipe.latest_revision = self
@@ -355,12 +359,12 @@ class ApprovalRequest(models.Model):
     approver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approved_requests',
                                  null=True)
 
-    class AlreadyApproved(Exception):
+    class NotActionable(Exception):
         pass
 
     def approve(self, approver):
         if self.approved is not None:
-            raise self.AlreadyApproved()
+            raise self.NotActionable()
 
         self.approved = True
         self.approver = approver
@@ -372,7 +376,7 @@ class ApprovalRequest(models.Model):
 
     def reject(self, approver):
         if self.approved is not None:
-            raise self.AlreadyApproved()
+            raise self.NotActionable()
 
         self.approved = False
         self.approver = approver

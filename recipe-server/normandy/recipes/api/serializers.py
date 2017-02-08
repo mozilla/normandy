@@ -32,7 +32,7 @@ class ActionSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     enabled = serializers.BooleanField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
-    revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    revision_id = serializers.CharField(read_only=True)
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
@@ -44,6 +44,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                                            many=True, required=False)
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
+    latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
 
     class Meta:
         model = Recipe
@@ -61,6 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'locales',
             'extra_filter_expression',
             'filter_expression',
+            'latest_revision_id',
         ]
 
     def update(self, instance, validated_data):

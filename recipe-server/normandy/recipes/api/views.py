@@ -137,6 +137,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecipeRevisionSerializer
     permission_classes = [
         AdminEnabledOrReadOnly,
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
 
     @detail_route(methods=['POST'])
@@ -158,6 +159,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ApprovalRequestSerializer
     permission_classes = [
         AdminEnabledOrReadOnly,
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
 
     @detail_route(methods=['POST'])
@@ -165,9 +167,10 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         approval_request = self.get_object()
         try:
             approval_request.approve(approver=request.user)
-        except ApprovalRequest.AlreadyApproved:
-            return Response({'error': 'This approval request has already been approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        except ApprovalRequest.NotActionable:
+            return Response(
+                {'error': 'This approval request has already been approved or rejected.'},
+                status=status.HTTP_400_BAD_REQUEST)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])
@@ -175,9 +178,10 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         approval_request = self.get_object()
         try:
             approval_request.reject(approver=request.user)
-        except ApprovalRequest.AlreadyApproved:
-            return Response({'error': 'This approval request has already been approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        except ApprovalRequest.NotActionable:
+            return Response(
+                {'error': 'This approval request has already been approved or rejected.'},
+                status=status.HTTP_400_BAD_REQUEST)
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])

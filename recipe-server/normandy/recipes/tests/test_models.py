@@ -118,6 +118,7 @@ class TestRecipe(object):
             '"id":%(id)s,'
             '"is_approved":false,'
             '"last_updated":"%(last_updated)s",'
+            '"latest_revision_id":"%(latest_revision_id)s",'
             '"locales":["en-US"],'
             '"name":"canonical",'
             '"revision_id":"%(revision_id)s"'
@@ -126,6 +127,7 @@ class TestRecipe(object):
             'id': recipe.id,
             'revision_id': recipe.revision_id,
             'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'latest_revision_id': recipe.latest_revision.id,
             'filter_expression': filter_expression
         }
         expected = expected.encode()
@@ -374,7 +376,7 @@ class TestApprovalRequest(object):
         req = ApprovalRequestFactory()
         req.approve(u)
 
-        with pytest.raises(req.AlreadyApproved):
+        with pytest.raises(req.NotActionable):
             req.approve(u)
 
     def test_reject(self):
@@ -392,7 +394,7 @@ class TestApprovalRequest(object):
         req = ApprovalRequestFactory()
         req.reject(u)
 
-        with pytest.raises(req.AlreadyApproved):
+        with pytest.raises(req.NotActionable):
             req.reject(u)
 
 

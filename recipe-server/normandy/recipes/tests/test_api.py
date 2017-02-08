@@ -447,13 +447,14 @@ class TestApprovalRequestAPI(object):
         r = Recipe.objects.get(pk=r.pk)
         assert r.is_approved
 
-    def test_approve_already_approved(self, api_client):
+    def test_approve_not_actionable(self, api_client):
         r = RecipeFactory()
         a = ApprovalRequestFactory(revision=r.latest_revision)
         a.approve(UserFactory())
 
         res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
         assert res.status_code == 400
+        assert res.data['error'] == 'This approval request has already been approved or rejected.'
 
     def test_reject(self, api_client):
         r = RecipeFactory()
@@ -464,13 +465,14 @@ class TestApprovalRequestAPI(object):
         r = Recipe.objects.get(pk=r.pk)
         assert r.latest_revision.approval_status == r.latest_revision.REJECTED
 
-    def test_reject_already_approved(self, api_client):
+    def test_reject_not_actionable(self, api_client):
         r = RecipeFactory()
         a = ApprovalRequestFactory(revision=r.latest_revision)
         a.approve(UserFactory())
 
         res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
         assert res.status_code == 400
+        assert res.data['error'] == 'This approval request has already been approved or rejected.'
 
     def test_close(self, api_client):
         r = RecipeFactory()
