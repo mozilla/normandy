@@ -294,7 +294,7 @@ class Production(Base):
     USE_X_FORWARDED_HOST = values.BooleanValue(True)
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
     LOGGING_USE_JSON = values.Value(True)
-    SECURE_HSTS_SECONDS = values.IntegerValue(15768000)  # Six months
+    SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
 
 
 class ProductionReadOnly(Production):
