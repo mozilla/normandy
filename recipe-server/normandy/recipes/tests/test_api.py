@@ -512,3 +512,97 @@ class TestClassifyClient(object):
         res = api_client.get('/api/v1/classify_client/')
         assert res.status_code == 200
         assert res.client.cookies == {}
+
+
+@pytest.mark.django_db
+def test_full_approval_flow(api_client):
+    action = ActionFactory()
+    user1 = UserFactory(is_superuser=True)
+    user2 = UserFactory(is_superuser=True)
+    api_client.force_authenticate(user1)
+
+    # Create a recipe
+    res = api_client.post('/api/v1/recipe/', {
+        'action': action.name,
+        'arguments': {},
+        'name': 'test recipe',
+        'extra_filter_expression': 'counter == 0',
+        'enabled': 'false',
+    })
+    assert res.status_code == 201
+    recipe_data_1 = res.json()
+
+    # Request approval for it
+    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                          .format(recipe_data_1['revision_id']))
+    approval_data = res.json()
+    assert res.status_code == 201
+
+    # The requester isn't allowed to approve a recipe
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']))
+    assert res.status_code == 403  # Forbidden
+
+    # Approve the recipe
+    api_client.force_authenticate(user2)
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']))
+    assert res.status_code == 200
+
+    # Make another change
+    api_client.force_authenticate(user1)
+    res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
+        'extra_filter_expression': 'counter == 1',
+    })
+    assert res.status_code == 200
+
+    # The change should not be visible yet, since it isn't approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    recipe_data_2 = res.json()
+    assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
+
+    # Request approval for the change
+    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                          .format(recipe_data_2['latest_revision_id']))
+    approval_data = res.json()
+    assert res.status_code == 201
+
+    # The change should not be visible yet, since it isn't approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    assert res.json() == recipe_data_2
+
+    # Reject the change
+    api_client.force_authenticate(user2)
+    res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']))
+    assert res.status_code == 200
+
+    # The change should not be visible yet, since it isn't approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    assert res.json() == recipe_data_2
+
+    # Make a third version of the recipe
+    api_client.force_authenticate(user1)
+    res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
+        'extra_filter_expression': 'counter == 2',
+    })
+    recipe_data_3 = res.json()
+    assert res.status_code == 200
+
+    # Request approval
+    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                          .format(recipe_data_3['latest_revision_id']))
+    approval_data = res.json()
+    assert res.status_code == 201
+
+    # Approve the change
+    api_client.force_authenticate(user2)
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']))
+    assert res.status_code == 200
+
+    # The change should be visible now, since it is approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    recipe_data_4 = res.json()
+    assert recipe_data_4['extra_filter_expression'] == 'counter == 2'
+    assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']
