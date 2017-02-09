@@ -447,6 +447,7 @@ class TestApprovalRequestAPI(object):
 
         r.refresh_from_db()
         assert r.is_approved
+        assert r.approved_revision.approval_request.comment == 'r+'
 
     def test_approve_no_comment(self, api_client):
         r = RecipeFactory()
@@ -474,6 +475,7 @@ class TestApprovalRequestAPI(object):
 
         r.latest_revision.approval_request.refresh_from_db()
         assert r.latest_revision.approval_status == r.latest_revision.REJECTED
+        assert r.latest_revision.approval_request.comment == 'r-'
 
     def test_reject_no_comment(self, api_client):
         r = RecipeFactory()
