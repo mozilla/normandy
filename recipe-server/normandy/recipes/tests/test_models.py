@@ -312,6 +312,9 @@ class TestRecipe(object):
         approval.approve(UserFactory())
         assert recipe.name == 'second'
 
+        # When `update` is called on a recipe with at least one approved revision, the new revision
+        # is treated as a draft and as such the `name` property of the recipe should return the
+        # `name` from the `approved_revision` not the `latest_revision`.
         recipe.update(name='third')
         assert recipe.latest_revision.name == 'third'  # The latest revision ("draft") is updated
         assert recipe.name == 'second'  # The current revision is unchanged
