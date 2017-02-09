@@ -5,7 +5,7 @@ import { ControlField } from 'control/components/Fields';
 /**
  * Form fields for the show-heartbeat action.
  */
-export default function HeartbeatFields({ fields }) {
+export default function HeartbeatFields({ fields = {} }) {
   return (
     <div className="arguments-fields">
       <p className="info">
@@ -74,8 +74,6 @@ export default function HeartbeatFields({ fields }) {
       </ControlField>
 
       {
-        fields &&
-        fields.repeatOption &&
         fields.repeatOption === 'xdays' &&
           <ControlField
             label="Days before user is re-prompted"
