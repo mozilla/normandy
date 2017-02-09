@@ -166,8 +166,13 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
+
+        if 'comment' not in request.data:
+            return Response({'comment': 'This field is required.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            approval_request.approve(approver=request.user)
+            approval_request.approve(approver=request.user, comment=request.data.get('comment'))
         except ApprovalRequest.NotActionable:
             return Response(
                 {'error': 'This approval request has already been approved or rejected.'},
@@ -176,13 +181,19 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(
                 {'error': 'You cannot approve your own approval request.'},
                 status=status.HTTP_403_FORBIDDEN)
+
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])
     def reject(self, request, pk=None):
         approval_request = self.get_object()
+
+        if 'comment' not in request.data:
+            return Response({'comment': 'This field is required.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            approval_request.reject(approver=request.user)
+            approval_request.reject(approver=request.user, comment=request.data.get('comment'))
         except ApprovalRequest.NotActionable:
             return Response(
                 {'error': 'This approval request has already been approved or rejected.'},
@@ -191,6 +202,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(
                 {'error': 'You cannot reject your own approval request.'},
                 status=status.HTTP_403_FORBIDDEN)
+
         return Response(ApprovalRequestSerializer(approval_request).data)
 
     @detail_route(methods=['POST'])

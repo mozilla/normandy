@@ -358,6 +358,7 @@ class ApprovalRequest(models.Model):
     approved = models.NullBooleanField(null=True)
     approver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approved_requests',
                                  null=True)
+    comment = models.TextField(null=True)
 
     class NotActionable(Exception):
         pass
@@ -365,7 +366,7 @@ class ApprovalRequest(models.Model):
     class CannotActOnOwnRequest(Exception):
         pass
 
-    def approve(self, approver):
+    def approve(self, approver, comment):
         if self.approved is not None:
             raise self.NotActionable()
 
@@ -374,13 +375,14 @@ class ApprovalRequest(models.Model):
 
         self.approved = True
         self.approver = approver
+        self.comment = comment
         self.save()
 
         recipe = self.revision.recipe
         recipe.approved_revision = self.revision
         recipe.save()
 
-    def reject(self, approver):
+    def reject(self, approver, comment):
         if self.approved is not None:
             raise self.NotActionable()
 
@@ -389,6 +391,7 @@ class ApprovalRequest(models.Model):
 
         self.approved = False
         self.approver = approver
+        self.comment = comment
         self.save()
 
 
