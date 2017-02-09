@@ -300,8 +300,8 @@ class TestRecipe(object):
         recipe.update(action=ActionFactory())
         assert recipe.revision_id != revision_id
 
-    def test_approved_revision_property(self):
-        """Ensure approved revision properties work as expected."""
+    def test_current_revision_property(self):
+        """Ensure current revision properties work as expected."""
         recipe = RecipeFactory(name='first')
         assert recipe.name == 'first'
 
@@ -313,7 +313,8 @@ class TestRecipe(object):
         assert recipe.name == 'second'
 
         recipe.update(name='third')
-        assert recipe.name == 'second'
+        assert recipe.latest_revision.name == 'third'  # The latest revision ("draft") is updated
+        assert recipe.name == 'second'  # The current revision is unchanged
 
     def test_recipe_is_approved(self):
         recipe = RecipeFactory(name='old')
