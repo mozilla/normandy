@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from reversion.models import Version
 
+from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import (
     Action,
+    ApprovalRequest,
     Channel,
     Country,
     Locale,
@@ -30,7 +32,7 @@ class ActionSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     enabled = serializers.BooleanField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
-    revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    revision_id = serializers.CharField(read_only=True)
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
@@ -42,6 +44,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                                            many=True, required=False)
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
+    latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
 
     class Meta:
         model = Recipe
@@ -50,6 +53,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'last_updated',
             'name',
             'enabled',
+            'is_approved',
             'revision_id',
             'action',
             'arguments',
@@ -58,6 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'locales',
             'extra_filter_expression',
             'filter_expression',
+            'latest_revision_id',
         ]
 
     def update(self, instance, validated_data):
@@ -143,10 +148,27 @@ class ClientSerializer(serializers.Serializer):
     request_time = serializers.DateTimeField()
 
 
+class ApprovalRequestSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(read_only=True)
+    creator = UserSerializer()
+    approver = UserSerializer()
+
+    class Meta:
+        model = ApprovalRequest
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'approved',
+            'approver',
+        ]
+
+
 class RecipeRevisionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='created', read_only=True)
     comment = serializers.CharField(read_only=True)
-    recipe = RecipeSerializer(source='restored_recipe', read_only=True)
+    recipe = RecipeSerializer(source='serializable_recipe', read_only=True)
+    approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
         model = RecipeRevision
@@ -155,6 +177,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
             'comment',
+            'approval_request',
         ]
 
 
@@ -170,6 +193,7 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
             'comment',
+            'approval_status'
         ]
 
 

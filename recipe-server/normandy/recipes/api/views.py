@@ -15,6 +15,7 @@ from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import reversion_transaction
 from normandy.recipes.models import (
     Action,
+    ApprovalRequest,
     Channel,
     Client,
     Country,
@@ -24,6 +25,7 @@ from normandy.recipes.models import (
 )
 from normandy.recipes.api.serializers import (
     ActionSerializer,
+    ApprovalRequestSerializer,
     ClientSerializer,
     RecipeSerializer,
     RecipeRevisionSerializer,
@@ -135,7 +137,67 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecipeRevisionSerializer
     permission_classes = [
         AdminEnabledOrReadOnly,
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+
+    @detail_route(methods=['POST'])
+    def request_approval(self, request, pk=None):
+        revision = self.get_object()
+
+        if revision.approval_status is not None:
+            return Response({'error': 'This revision already has an approval request.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        approval_request = ApprovalRequest(revision=revision, creator=request.user)
+        approval_request.save()
+
+        return Response(ApprovalRequestSerializer(approval_request).data,
+                        status=status.HTTP_201_CREATED)
+
+
+class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = ApprovalRequest.objects.all()
+    serializer_class = ApprovalRequestSerializer
+    permission_classes = [
+        AdminEnabledOrReadOnly,
+        permissions.DjangoModelPermissionsOrAnonReadOnly,
+    ]
+
+    @detail_route(methods=['POST'])
+    def approve(self, request, pk=None):
+        approval_request = self.get_object()
+        try:
+            approval_request.approve(approver=request.user)
+        except ApprovalRequest.NotActionable:
+            return Response(
+                {'error': 'This approval request has already been approved or rejected.'},
+                status=status.HTTP_400_BAD_REQUEST)
+        except ApprovalRequest.CannotActOnOwnRequest:
+            return Response(
+                {'error': 'You cannot approve your own approval request.'},
+                status=status.HTTP_403_FORBIDDEN)
+        return Response(ApprovalRequestSerializer(approval_request).data)
+
+    @detail_route(methods=['POST'])
+    def reject(self, request, pk=None):
+        approval_request = self.get_object()
+        try:
+            approval_request.reject(approver=request.user)
+        except ApprovalRequest.NotActionable:
+            return Response(
+                {'error': 'This approval request has already been approved or rejected.'},
+                status=status.HTTP_400_BAD_REQUEST)
+        except ApprovalRequest.CannotActOnOwnRequest:
+            return Response(
+                {'error': 'You cannot reject your own approval request.'},
+                status=status.HTTP_403_FORBIDDEN)
+        return Response(ApprovalRequestSerializer(approval_request).data)
+
+    @detail_route(methods=['POST'])
+    def close(self, request, pk=None):
+        approval_request = self.get_object()
+        approval_request.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ClassifyClient(views.APIView):

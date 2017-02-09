@@ -39,7 +39,9 @@ class TestRecipeSerializer:
             },
             'channels': [channel.slug],
             'countries': [country.code],
-            'locales': [locale.code]
+            'locales': [locale.code],
+            'is_approved': False,
+            'latest_revision_id': recipe.latest_revision.id,
         }
 
     # If the action specified cannot be found, raise validation
@@ -180,5 +182,7 @@ class TestSignedRecipeSerializer:
                 'channels': [],
                 'countries': [],
                 'locales': [],
+                'is_approved': False,
+                'latest_revision_id': recipe.latest_revision.id,
             }
         }
