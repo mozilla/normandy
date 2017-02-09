@@ -309,7 +309,7 @@ class TestRecipe(object):
         assert recipe.name == 'second'
 
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        approval.approve(UserFactory())
+        approval.approve(UserFactory(), 'r+')
         assert recipe.name == 'second'
 
         # When `update` is called on a recipe with at least one approved revision, the new revision
@@ -324,7 +324,7 @@ class TestRecipe(object):
         assert not recipe.is_approved
 
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        approval.approve(UserFactory())
+        approval.approve(UserFactory(), 'r+')
         assert recipe.is_approved
         assert recipe.approved_revision == recipe.latest_revision
 
@@ -352,13 +352,13 @@ class TestRecipeRevision(object):
         revision = RecipeRevision.objects.get(pk=revision.pk)
         assert revision.approval_status == revision.PENDING
 
-        approval.approve(UserFactory())
+        approval.approve(UserFactory(), 'r+')
         revision = RecipeRevision.objects.get(pk=revision.pk)
         assert revision.approval_status == revision.APPROVED
 
         approval.delete()
         approval = ApprovalRequestFactory(revision=revision)
-        approval.reject(UserFactory())
+        approval.reject(UserFactory(), 'r-')
         revision = RecipeRevision.objects.get(pk=revision.pk)
         assert revision.approval_status == revision.REJECTED
 
@@ -368,9 +368,10 @@ class TestApprovalRequest(object):
     def test_approve(self):
         u = UserFactory()
         req = ApprovalRequestFactory()
-        req.approve(u)
+        req.approve(u, 'r+')
         assert req.approved
         assert req.approver == u
+        assert req.comment == 'r+'
 
         recipe = req.revision.recipe
         assert recipe.is_approved
@@ -378,17 +379,18 @@ class TestApprovalRequest(object):
     def test_cannot_approve_already_approved(self):
         u = UserFactory()
         req = ApprovalRequestFactory()
-        req.approve(u)
+        req.approve(u, 'r+')
 
         with pytest.raises(req.NotActionable):
-            req.approve(u)
+            req.approve(u, 'r+')
 
     def test_reject(self):
         u = UserFactory()
         req = ApprovalRequestFactory()
-        req.reject(u)
+        req.reject(u, 'r-')
         assert not req.approved
         assert req.approver == u
+        assert req.comment == 'r-'
 
         recipe = req.revision.recipe
         assert not recipe.is_approved
@@ -396,10 +398,10 @@ class TestApprovalRequest(object):
     def test_cannot_reject_already_rejected(self):
         u = UserFactory()
         req = ApprovalRequestFactory()
-        req.reject(u)
+        req.reject(u, 'r-')
 
         with pytest.raises(req.NotActionable):
-            req.reject(u)
+            req.reject(u, 'r-')
 
 
 @pytest.mark.django_db

@@ -161,6 +161,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
             'creator',
             'approved',
             'approver',
+            'comment',
         ]
 
 

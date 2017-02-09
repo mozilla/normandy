@@ -441,36 +441,56 @@ class TestApprovalRequestAPI(object):
     def test_approve(self, api_client):
         r = RecipeFactory()
         a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id),
+                              {'comment': 'r+'})
         assert res.status_code == 200
 
         r.refresh_from_db()
         assert r.is_approved
+        assert r.approved_revision.approval_request.comment == 'r+'
+
+    def test_approve_no_comment(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
+        assert res.status_code == 400
+        assert res.data['comment'] == 'This field is required.'
 
     def test_approve_not_actionable(self, api_client):
         r = RecipeFactory()
         a = ApprovalRequestFactory(revision=r.latest_revision)
-        a.approve(UserFactory())
+        a.approve(UserFactory(), 'r+')
 
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id),
+                              {'comment': 'r+'})
         assert res.status_code == 400
         assert res.data['error'] == 'This approval request has already been approved or rejected.'
 
     def test_reject(self, api_client):
         r = RecipeFactory()
         a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id),
+                              {'comment': 'r-'})
         assert res.status_code == 200
 
         r.latest_revision.approval_request.refresh_from_db()
         assert r.latest_revision.approval_status == r.latest_revision.REJECTED
+        assert r.latest_revision.approval_request.comment == 'r-'
+
+    def test_reject_no_comment(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
+        assert res.status_code == 400
+        assert res.data['comment'] == 'This field is required.'
 
     def test_reject_not_actionable(self, api_client):
         r = RecipeFactory()
         a = ApprovalRequestFactory(revision=r.latest_revision)
-        a.approve(UserFactory())
+        a.approve(UserFactory(), 'r+')
 
-        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id),
+                              {'comment': '-r'})
         assert res.status_code == 400
         assert res.data['error'] == 'This approval request has already been approved or rejected.'
 
@@ -539,12 +559,14 @@ def test_full_approval_flow(api_client):
     assert res.status_code == 201
 
     # The requester isn't allowed to approve a recipe
-    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']))
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                          {'comment': 'r+'})
     assert res.status_code == 403  # Forbidden
 
     # Approve the recipe
     api_client.force_authenticate(user2)
-    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']))
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                          {'comment': 'r+'})
     assert res.status_code == 200
 
     # Make another change
@@ -573,7 +595,8 @@ def test_full_approval_flow(api_client):
 
     # Reject the change
     api_client.force_authenticate(user2)
-    res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']))
+    res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
+                          {'comment': 'r-'})
     assert res.status_code == 200
 
     # The change should not be visible yet, since it isn't approved
@@ -597,7 +620,8 @@ def test_full_approval_flow(api_client):
 
     # Approve the change
     api_client.force_authenticate(user2)
-    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']))
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                          {'comment': 'r+'})
     assert res.status_code == 200
 
     # The change should be visible now, since it is approved
