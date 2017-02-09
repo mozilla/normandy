@@ -92,7 +92,7 @@ class Core(Configuration):
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.SessionAuthentication'
         ),
-        'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.DjangoFilterBackend'],
+        'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
         'DEFAULT_RENDERER_CLASSES': (
             'normandy.base.api.renderers.CanonicalJSONRenderer',
