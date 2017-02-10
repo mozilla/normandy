@@ -26,7 +26,8 @@ class RecipeDeletePage(Page):
     confirm_button = Element('.delete[type="submit"]')
 
 
-def test_login_create_recipe(selenium):
+def test_create_recipe_console_log(selenium):
+    """Test creating and deleting a console-log recipe."""
     # Load control interface, expect login redirect.
     selenium.get('http://normandy:8000/control/')
     assert '/control/login' in selenium.current_url
