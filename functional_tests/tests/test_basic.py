@@ -1,6 +1,23 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from utils import Element, ElementGroup, FormField, Page, SelectField, wait_for
+
+
+class LoginPage(Page):
+    username = FormField('#id_username')
+    password = FormField('#id_password')
+
+
+class RecipeListPage(Page):
+    recipe_list = Element('.recipe-list')
+    recipe_rows = ElementGroup('.recipe-list tbody tr')
+    new_recipe_button = Element('.button[href*="/control/recipe/new"]')
+
+
+class RecipeFormPage(Page):
+    form = Element('.recipe-form')
+    name = FormField('[name="name"]')
+    enabled = FormField('[name="enabled"]')
+    extra_filter_expression = FormField('[name="extra_filter_expression"]')
+    action = SelectField('select[name="action"]')
 
 
 def test_login_create_recipe(selenium):
@@ -9,43 +26,34 @@ def test_login_create_recipe(selenium):
     assert '/control/login' in selenium.current_url
 
     # Login
-    username = selenium.find_element_by_id('id_username')
-    username.send_keys('admin')
-    password = selenium.find_element_by_id('id_password')
-    password.send_keys('asdfqwer')
-    password.submit()
+    login_page = LoginPage(selenium)
+    login_page.username = 'admin'
+    login_page.password = 'asdfqwer'
+    login_page.password.submit()
 
-    # Wait for empty recipe listing
-    recipe_list = WebDriverWait(selenium, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'recipe-list'))
-    )
-    assert len(recipe_list.find_elements_by_css_selector('.recipe-list tbody tr')) == 0
+    # Check for empty recipe listing
+    recipe_list_page = RecipeListPage(selenium)
+    wait_for(selenium, lambda driver: recipe_list_page.recipe_list is not None)
+    assert len(recipe_list_page.recipe_rows) == 0
 
-    # Click new recipe button
-    selenium.find_element_by_css_selector('.button[href*="/control/recipe/new"]').click()
-    recipe_form = WebDriverWait(selenium, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'recipe-form'))
-    )
+    # Load new recipe page
+    recipe_list_page.new_recipe_button.click()
+    recipe_form_page = RecipeFormPage(selenium)
+    wait_for(selenium, lambda driver: recipe_form_page.form is not None)
 
     # Fill out form
-    recipe_form.find_element_by_name('name').send_keys('Test Recipe')
-    recipe_form.find_element_by_name('enabled').click()
-    recipe_form.find_element_by_name('extra_filter_expression').send_keys('true')
-    recipe_form.find_element_by_css_selector(
-        'select[name="action"] > option[value="console-log"]'
-    ).click()
-    recipe_form.find_element_by_name('arguments.message').send_keys('Test Message')
-    recipe_form.submit()
+    recipe_form_page.name = 'Test Recipe'
+    recipe_form_page.enabled.click()
+    recipe_form_page.extra_filter_expression = 'true'
+    recipe_form_page.action.select_by_value('console-log')
+    recipe_form_page.select('[name="arguments.message"]').send_keys('Test Message')
+    recipe_form_page.form.submit()
 
     # Wait until we navigate away from the new recipe page
-    WebDriverWait(selenium, 10).until(
-        lambda selenium: '/control/recipe/new' not in selenium.current_url
-    )
+    wait_for(selenium, lambda driver: '/control/recipe/new' not in driver.current_url)
 
     # Check that the recipe list is updated
     selenium.get('http://normandy:8000/control/')
-    recipe_list = selenium.find_element_by_class_name('recipe-list')
-    rows = recipe_list.find_elements_by_css_selector('.recipe-list tbody tr')
-    assert len(rows) == 1
-    columns = rows[0].find_elements_by_tag_name('td')
+    assert len(recipe_list_page.recipe_rows) == 1
+    columns = recipe_list_page.recipe_rows[0].find_elements_by_tag_name('td')
     assert columns[0].text == 'Test Recipe'
