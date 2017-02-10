@@ -181,7 +181,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         self.signature = signature
 
     @transaction.atomic
-    def update(self, force=False, **data):
+    def revise(self, force=False, **data):
         revision = self.latest_revision
 
         if revision:

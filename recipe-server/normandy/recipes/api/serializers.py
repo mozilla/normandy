@@ -91,7 +91,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 'locales': Locale.objects.filter(code__in=validated_data['locales'])
             })
 
-        instance.update(**validated_data)
+        instance.revise(**validated_data)
 
         return instance
 
