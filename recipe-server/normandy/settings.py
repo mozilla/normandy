@@ -276,6 +276,8 @@ class Base(Core):
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
     CDN_URL = values.URLValue(None)
+    # URL that bypasses any CDNs
+    APP_SERVER_URL = values.URLValue(None)
 
     # URL for the CSP report-uri directive.
     CSP_REPORT_URI = values.Value(None)

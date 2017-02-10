@@ -190,6 +190,22 @@ in other Django projects.
 
    .. _report-uri: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri
 
+.. envvar:: DJANGO_CDN_URL
+
+  :default: ``None``
+
+  The URL of a CDN that is backed by Normandy, if one is in use. This is used to
+  enforce that immutable content is routed through the CDN. Must end with a
+  slash (``/``).
+
+.. envvar:: DJANGO_APP_SERVER_URL
+
+  :default: ``None``
+
+  The URL that allows direct access to Normandy, bypassing any CDNs. This
+  is used for content that cannot be cached. If not specified, Normandy will
+  assume direct access. Must end with a slash (``/``).
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the

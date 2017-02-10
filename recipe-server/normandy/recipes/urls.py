@@ -1,7 +1,6 @@
 from django.conf.urls import url, include
 
-from rest_framework.routers import DefaultRouter
-
+from normandy.base.api.routers import RouterWithDetachedViews
 from normandy.recipes.api.views import (
     ActionImplementationView,
     ActionViewSet,
@@ -11,12 +10,15 @@ from normandy.recipes.api.views import (
     RecipeRevisionViewSet,
 )
 
-# API Router
-router = DefaultRouter()
-router.register(r'action', ActionViewSet)
-router.register(r'recipe', RecipeViewSet)
-router.register(r'recipe_revision', RecipeRevisionViewSet)
 
+# API Router
+router = RouterWithDetachedViews()
+router.register('action', ActionViewSet)
+router.register('recipe', RecipeViewSet)
+router.register('recipe_revision', RecipeRevisionViewSet)
+
+router.register_view('classify_client', ClassifyClient, name='classify-client')
+router.register_view('filters', Filters)
 
 app_name = 'recipes'
 
@@ -27,6 +29,4 @@ urlpatterns = [
         ActionImplementationView.as_view(),
         name='action-implementation'
     ),
-    url(r'^api/v1/classify_client/$', ClassifyClient.as_view(), name='classify-client'),
-    url(r'^api/v1/filters/$', Filters.as_view(), name='filters'),
 ]
