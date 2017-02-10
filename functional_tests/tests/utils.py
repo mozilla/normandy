@@ -13,6 +13,9 @@ class Page(object):
         """Shorthand for finding elements by a CSS selector."""
         return self.driver.find_elements_by_css_selector(selector)
 
+    def wait_for_element(self, name, timeout=10):
+        return wait_for(self.driver, lambda driver: getattr(self, name) is not None, timeout)
+
 
 class Element(object):
     def __init__(self, selector):
