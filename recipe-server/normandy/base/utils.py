@@ -1,5 +1,7 @@
 import json
+from base64 import b64encode
 from datetime import datetime
+from hashlib import sha384
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from django.conf import settings
@@ -66,3 +68,19 @@ def filter_m2m(qs, field, values):
         qs = qs.filter(**{'{}__in'.format(field): values})
 
     return qs
+
+
+def sri_hash(data):
+    """
+    Return a subresource integrity attribute string for a file
+    containing the given data.
+
+    SRI attributes are a string of the form "{algorithm}-{hash}", where
+    {algorithm} is the hash algorithm, and {hash} is a base64-encoded
+    hash of the data using the specified algorithm.
+
+    :param data:
+        Bytes-like object containing the data to hash.
+    """
+    data_hash = b64encode(sha384(data).digest())
+    return 'sha384-' + data_hash.decode()
