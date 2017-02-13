@@ -64,7 +64,7 @@ class RecipeFactory(factory.DjangoModelFactory):
 
         revision = RecipeRevisionFactory(**kwargs)
         revision.action.save()
-        obj.update(**revision.data)
+        obj.revise(**revision.data)
 
         return obj
 

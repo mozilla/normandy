@@ -259,8 +259,8 @@ class TestRecipeAPI(object):
 
     def test_history(self, api_client):
         recipe = RecipeFactory(name='version 1')
-        recipe.update(name='version 2')
-        recipe.update(name='version 3')
+        recipe.revise(name='version 2')
+        recipe.revise(name='version 3')
 
         res = api_client.get('/api/v1/recipe/%s/history/' % recipe.id)
 

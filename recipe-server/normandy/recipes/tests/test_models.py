@@ -65,25 +65,25 @@ class TestRecipe(object):
         r = RecipeFactory(channels=[channel1])
         assert r.filter_expression == "normandy.channel in ['beta']"
 
-        r.update(channels=[channel1, channel2])
+        r.revise(channels=[channel1, channel2])
         assert r.filter_expression == "normandy.channel in ['beta', 'release']"
 
         r = RecipeFactory(countries=[country1])
         assert r.filter_expression == "normandy.country in ['US']"
 
-        r.update(countries=[country1, country2])
+        r.revise(countries=[country1, country2])
         assert r.filter_expression == "normandy.country in ['CA', 'US']"
 
         r = RecipeFactory(locales=[locale1])
         assert r.filter_expression == "normandy.locale in ['en-US']"
 
-        r.update(locales=[locale1, locale2])
+        r.revise(locales=[locale1, locale2])
         assert r.filter_expression == "normandy.locale in ['en-US', 'fr-CA']"
 
         r = RecipeFactory(extra_filter_expression='2 + 2 == 4')
         assert r.filter_expression == '2 + 2 == 4'
 
-        r.update(channels=[channel1], countries=[country1], locales=[locale1])
+        r.revise(channels=[channel1], countries=[country1], locales=[locale1])
         assert r.filter_expression == ("(normandy.locale in ['en-US']) && "
                                        "(normandy.country in ['US']) && "
                                        "(normandy.channel in ['beta']) && "
@@ -143,7 +143,7 @@ class TestRecipe(object):
         original_signature = recipe.signature
         assert original_signature is not None
 
-        recipe.update(name='changed')
+        recipe.revise(name='changed')
 
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
@@ -157,7 +157,7 @@ class TestRecipe(object):
 
         recipe = RecipeFactory(name='unchanged', signed=True)
         original_signature = recipe.signature
-        recipe.update(name='changed')
+        recipe.revise(name='changed')
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
         assert recipe.signature is None
@@ -174,7 +174,7 @@ class TestRecipe(object):
         recipe = RecipeFactory(name='unchanged', signed=False)
         recipe.signature = SignatureFactory()
         with pytest.raises(ValidationError) as exc_info:
-            recipe.update(name='changed')
+            recipe.revise(name='changed')
         assert exc_info.value.message == 'Signatures must change alone'
 
     def test_update_signature(self, mocker):
@@ -209,95 +209,95 @@ class TestRecipe(object):
         assert recipe.signature is not None
         assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
 
-    def test_recipe_update_partial(self):
+    def test_recipe_revise_partial(self):
         a1 = ActionFactory()
         recipe = RecipeFactory(name='unchanged', action=a1, arguments={'message': 'something'},
                                extra_filter_expression='something !== undefined')
         a2 = ActionFactory()
         c = ChannelFactory(slug='beta')
-        recipe.update(name='changed', action=a2, channels=[c])
+        recipe.revise(name='changed', action=a2, channels=[c])
         assert recipe.action == a2
         assert recipe.name == 'changed'
         assert recipe.arguments == {'message': 'something'}
         assert recipe.filter_expression == ("(normandy.channel in ['beta']) && "
                                             "(something !== undefined)")
 
-    def test_recipe_doesnt_update_when_clean(self):
+    def test_recipe_doesnt_revise_when_clean(self):
         channel = ChannelFactory()
         recipe = RecipeFactory(name='my name', channels=[channel])
 
         revision_id = recipe.revision_id
         last_updated = recipe.last_updated
 
-        recipe.update(name='my name', channels=[channel])
+        recipe.revise(name='my name', channels=[channel])
         assert revision_id == recipe.revision_id
         assert last_updated == recipe.last_updated
 
-    def test_recipe_update_channels(self):
+    def test_recipe_revise_channels(self):
         c1 = ChannelFactory(slug='beta')
         recipe = RecipeFactory(channels=[c1])
 
         c2 = ChannelFactory(slug='release')
-        recipe.update(channels=[c2])
+        recipe.revise(channels=[c2])
         assert recipe.channels.count() == 1
         assert list(recipe.channels.all()) == [c2]
 
-        recipe.update(channels=[c1, c2])
+        recipe.revise(channels=[c1, c2])
         channels = list(recipe.channels.all())
         assert recipe.channels.count() == 2
         assert c1 in channels
         assert c2 in channels
 
-        recipe.update(channels=[])
+        recipe.revise(channels=[])
         assert recipe.channels.count() == 0
 
-    def test_recipe_update_countries(self):
+    def test_recipe_revise_countries(self):
         c1 = CountryFactory(code='CA')
         recipe = RecipeFactory(countries=[c1])
 
         c2 = CountryFactory(code='US')
-        recipe.update(countries=[c2])
+        recipe.revise(countries=[c2])
         assert recipe.countries.count() == 1
         assert list(recipe.countries.all()) == [c2]
 
-        recipe.update(countries=[c1, c2])
+        recipe.revise(countries=[c1, c2])
         countries = list(recipe.countries.all())
         assert recipe.countries.count() == 2
         assert c1 in countries
         assert c2 in countries
 
-        recipe.update(countries=[])
+        recipe.revise(countries=[])
         assert recipe.countries.count() == 0
 
-    def test_recipe_update_locales(self):
+    def test_recipe_revise_locales(self):
         l1 = LocaleFactory(code='en-US')
         recipe = RecipeFactory(locales=[l1])
 
         l2 = LocaleFactory(code='fr-CA')
-        recipe.update(locales=[l2])
+        recipe.revise(locales=[l2])
         assert recipe.locales.count() == 1
         assert list(recipe.locales.all()) == [l2]
 
-        recipe.update(locales=[l1, l2])
+        recipe.revise(locales=[l1, l2])
         locales = list(recipe.locales.all())
         assert recipe.locales.count() == 2
         assert l1 in locales
         assert l2 in locales
 
-        recipe.update(locales=[])
+        recipe.revise(locales=[])
         assert recipe.locales.count() == 0
 
-    def test_recipe_force_update(self):
+    def test_recipe_force_revise(self):
         recipe = RecipeFactory(name='my name')
         revision_id = recipe.revision_id
-        recipe.update(name='my name', force=True)
+        recipe.revise(name='my name', force=True)
         assert revision_id != recipe.revision_id
 
     def test_revision_id_changes(self):
         """Ensure that the revision id is incremented on each save"""
         recipe = RecipeFactory()
         revision_id = recipe.revision_id
-        recipe.update(action=ActionFactory())
+        recipe.revise(action=ActionFactory())
         assert recipe.revision_id != revision_id
 
     def test_current_revision_property(self):
@@ -305,17 +305,17 @@ class TestRecipe(object):
         recipe = RecipeFactory(name='first')
         assert recipe.name == 'first'
 
-        recipe.update(name='second')
+        recipe.revise(name='second')
         assert recipe.name == 'second'
 
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         approval.approve(UserFactory(), 'r+')
         assert recipe.name == 'second'
 
-        # When `update` is called on a recipe with at least one approved revision, the new revision
+        # When `revise` is called on a recipe with at least one approved revision, the new revision
         # is treated as a draft and as such the `name` property of the recipe should return the
         # `name` from the `approved_revision` not the `latest_revision`.
-        recipe.update(name='third')
+        recipe.revise(name='third')
         assert recipe.latest_revision.name == 'third'  # The latest revision ("draft") is updated
         assert recipe.name == 'second'  # The current revision is unchanged
 
@@ -328,14 +328,14 @@ class TestRecipe(object):
         assert recipe.is_approved
         assert recipe.approved_revision == recipe.latest_revision
 
-        recipe.update(name='new')
+        recipe.revise(name='new')
         assert recipe.is_approved
         assert recipe.approved_revision != recipe.latest_revision
 
-    def test_delete_pending_approval_request_on_update(self):
+    def test_delete_pending_approval_request_on_revise(self):
         recipe = RecipeFactory(name='old')
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        recipe.update(name='new')
+        recipe.revise(name='new')
 
         with pytest.raises(ApprovalRequest.DoesNotExist):
             ApprovalRequest.objects.get(pk=approval.pk)
