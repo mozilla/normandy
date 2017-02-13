@@ -1,0 +1,59 @@
+.active-filters {
+  display: flex;
+  overflow: auto;
+
+  .filter-group,
+  .filter-button {
+    background: $darkCream;
+    display: inline-block;
+    margin-right: 1em;
+    min-width: 100px;
+    padding: 0.5em 1em;
+
+    &:hover,
+    &:focus {
+      background: $cream;
+    }
+
+    & > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .filter-label {
+      font-weight: bold;
+    }
+
+    .filter-option {
+      cursor: pointer;
+      margin: 0.25em 0;
+      transition: 0.1s all ease;
+
+      &:hover,
+      &:focus {
+        background: $darkestCream;
+        text-decoration: line-through;
+      }
+    }
+  }
+
+  .filter-button {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    justify-content: center;
+
+    &:hover,
+    &:focus {
+      background: #EEE;
+    }
+  }
+}
+
+.show-count {
+  display: inline-block;
+  // lazy centering
+  margin-top: 1em;
+}

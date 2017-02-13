@@ -1,5 +1,6 @@
 .group-menu {
-  .menu-item {
+  .menu-item,
+  .view-more {
     background-color: transparent;
     cursor: pointer;
     transition: 0.15s background-color ease;
@@ -8,9 +9,20 @@
     &:focus {
       background-color: rgba(0, 0, 0, 0.1);
     }
+  }
+
+  .menu-item {
+    margin: 0.25em 0;
 
     &:last-child {
-      margin-bottom: 0.5em;
+      margin-bottom: 1em;
     }
+  }
+
+  .view-more {
+    background: rgba(0, 0, 0, 0.02);
+    display: block;
+    margin: 0.75em 0 1em;
+    width: 100%;
   }
 }

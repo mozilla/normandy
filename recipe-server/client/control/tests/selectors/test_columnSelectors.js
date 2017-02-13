@@ -1,22 +1,19 @@
 import { initialState } from 'control/tests/fixtures';
 import * as columnSelectors from 'control/selectors/ColumnSelector';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
-
-
 describe('Column Selectors', () => {
   describe('getActiveColumns', () => {
     it('returns only columns that are enabled', () => {
       const enabled = ['name', 'action', 'channels', 'endTime'];
 
       // enable the selected columns
-      const testColumns = cloneArrayValues(initialState.columns)
+      const testColumns = [].concat(initialState.columns)
         .map(col => {
           col.enabled = enabled.indexOf(col.slug) > -1;
           return col;
         });
 
-      // compare the values that are returned
+      // compare the slugs that are returned
       const active = columnSelectors
         .getActiveColumns(testColumns)
         .map(col => col.slug);
@@ -30,7 +27,7 @@ describe('Column Selectors', () => {
       const disabled = ['name', 'action', 'channels', 'endTime'];
 
       // disable the chosen columns
-      const testColumns = cloneArrayValues(initialState.columns)
+      const testColumns = [].concat(initialState.columns)
         .map(col => {
           col.enabled = disabled.indexOf(col.slug) === -1;
           return col;

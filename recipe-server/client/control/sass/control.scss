@@ -2,6 +2,7 @@
 @import 'components/CheckboxList';
 @import 'components/DropdownMenu';
 @import 'components/GroupMenu';
+@import 'components/RecipeFilters';
 
 /* Layout */
 #container { margin: 0 auto; }
@@ -280,8 +281,12 @@
       font-weight: 800;
     }
   }
+}
 
-  & + .callout {
-    margin: 2em 0 1em;
-  }
+.callout.loading {
+  bottom: 2em;
+  left: 2em;
+  position: fixed;
+  right: 2em;
+  width: auto;
 }

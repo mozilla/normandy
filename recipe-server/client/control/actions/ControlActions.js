@@ -4,6 +4,8 @@ export const REQUEST_COMPLETE = 'REQUEST_COMPLETE';
 export const RECIPES_RECEIVED = 'RECIPES_RECEIVED';
 export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
 
+export const RECIPES_NEED_FETCH = 'RECIPES_NEED_FETCH';
+
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
 export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
@@ -11,6 +13,8 @@ export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
 export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
+
+export const LOAD_FILTERS = 'LOAD_FILTERS';
 
 
 const BASE_API_URL = '/api/v1/';
@@ -32,6 +36,26 @@ const apiRequestMap = {
         method: 'GET',
       },
       errorNotification: 'Error fetching recipes.',
+    };
+  },
+
+  fetchFilters() {
+    return {
+      url: `${BASE_API_URL}filters/`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error fetching filter options.',
+    };
+  },
+
+  fetchFilteredRecipes(filterParams) {
+    return {
+      url: `${BASE_API_URL}recipe/?${filterParams}`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error fetching filtered recipes.',
     };
   },
 
@@ -114,10 +138,24 @@ function requestComplete(result) {
   };
 }
 
-function recipesReceived(recipes) {
+function recipesReceived(recipes, cacheKey) {
   return {
     type: RECIPES_RECEIVED,
     recipes,
+    key: cacheKey,
+  };
+}
+
+function filtersReceived(filters) {
+  return {
+    type: LOAD_FILTERS,
+    filters,
+  };
+}
+
+function recipesNeedFetch() {
+  return {
+    type: RECIPES_NEED_FETCH,
   };
 }
 
@@ -207,8 +245,10 @@ function makeApiRequest(requestType, requestData) {
 
 
 export {
+  API_REQUEST_SETTINGS,
   makeApiRequest,
   recipesReceived,
+  recipesNeedFetch,
   singleRecipeReceived,
   setSelectedRecipe,
   showNotification,
@@ -216,4 +256,5 @@ export {
   recipeAdded,
   recipeUpdated,
   recipeDeleted,
+  filtersReceived,
 };

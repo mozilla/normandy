@@ -10,14 +10,6 @@ fixtureRecipes.forEach(recipe => {
 });
 
 export const initialState = {
-  controlApp: {
-    isFetching: false,
-  },
-  recipes: {
-    entries: {},
-    selectedRecipe: null,
-    recipeListNeedsFetch: true,
-  },
   columns: [{
     label: 'Name',
     slug: 'name',
@@ -57,8 +49,21 @@ export const initialState = {
     slug: 'metadata',
     enabled: true,
   }],
-  notifications: [],
+  controlApp: {
+    isFetching: false,
+  },
+  filters: {
+    list: [],
+    active: [],
+  },
   form: {},
+  notifications: [],
+  recipes: {
+    entries: {},
+    cache: {},
+    selectedRecipe: null,
+    recipeListNeedsFetch: true,
+  },
   routing: {
     locationBeforeTransitions: null,
   },
@@ -83,3 +88,43 @@ export const fixtureRevisions = [
     },
   },
 ];
+
+export const stubbedFilters = [{
+  value: 'status',
+  label: 'Status',
+  multiple: false,
+  options: [{
+    label: 'Enabled',
+    value: 'enabled',
+  }, {
+    label: 'Disabled',
+    value: 'disabled',
+  }],
+}];
+
+export const multiStubbedFilters = [{
+  value: 'status',
+  label: 'Status',
+  multiple: false,
+  options: [{
+    label: 'Enabled',
+    value: 'enabled',
+  }, {
+    label: 'Disabled',
+    value: 'disabled',
+  }],
+}, {
+  value: 'countries',
+  label: 'Countries',
+  multiple: true,
+  options: [{
+    label: 'United States',
+    value: 'US',
+  }, {
+    label: 'Canada',
+    value: 'CA',
+  }, {
+    label: 'Russia',
+    value: 'RU',
+  }],
+}];

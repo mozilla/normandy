@@ -5,26 +5,13 @@ import {
   initialState,
 } from 'control/tests/fixtures';
 
-import cloneArrayValues from 'client/utils/clone-array-values';
-
-/**
- * Utility function to clone the initialState column array and its values
- * (This prevents nested objects from being cloned by reference)
- *
- * @return {Array} New array with cloned initialState values
- */
-function cloneInitialArray() {
-  return cloneArrayValues(initialState.columns);
-}
-
-
 /**
  * Utility function to get the index of a column
  * which is NOT shown by default.
  *
  * @return {Number} Index of non-default column to test against.
  */
-const getNondefaultColumn = () => {
+const getNondefaultColumnIndex = () => {
   let foundIndex;
   initialState.columns
     .find((col, index) => {
@@ -38,7 +25,7 @@ const getNondefaultColumn = () => {
   return foundIndex;
 };
 
-const getDefaultColumn = () => {
+const getDefaultColumnIndex = () => {
   let foundIndex;
   initialState.columns
     .find((col, index) => {
@@ -62,13 +49,16 @@ describe('Column reducer', () => {
 
   describe('handling UPDATE_COLUMN', () => {
     it('should enable columns appropriately', () => {
-      const expectedColumns = cloneInitialArray();
+      const expectedColumns = [].concat(initialState.columns);
 
       // grab a non-default'd column
-      const colId = getNondefaultColumn();
-      expectedColumns[colId].enabled = true;
+      const colIdx = getNondefaultColumnIndex();
+      expectedColumns[colIdx] = {
+        ...expectedColumns[colIdx],
+        enabled: true,
+      };
 
-      const colSlug = expectedColumns[colId].slug;
+      const colSlug = expectedColumns[colIdx].slug;
 
       expect(appReducer(undefined, {
         type: actions.UPDATE_COLUMN,
@@ -81,12 +71,16 @@ describe('Column reducer', () => {
     });
 
     it('should disable columns appropriately', () => {
-      const expectedColumns = cloneInitialArray();
-      const colId = getDefaultColumn();
+      const colIdx = getDefaultColumnIndex();
+      const colSlug = initialState.columns[colIdx].slug;
 
-      expectedColumns[colId].enabled = false;
-      const colSlug = expectedColumns[colId].slug;
+      const expectedColumns = [].concat(initialState.columns);
+      // clone the thing we're editing
+      expectedColumns[colIdx] = { ...expectedColumns[colIdx] };
+      // the `enabled` prop should be gone
+      delete expectedColumns[colIdx].enabled;
 
+      // de-activate (the actual test)
       expect(appReducer(undefined, {
         type: actions.UPDATE_COLUMN,
         slug: colSlug,
@@ -100,12 +94,12 @@ describe('Column reducer', () => {
 
 
   describe('handling LOAD_SAVED_COLUMNS', () => {
-    // when loading, the values/labels are compared against what's
+    // when loading, the slugs/labels are compared against what's
     // inside initial state - this prevents the user loading outdated columns
     it('should ignore an action with unrecognized columns', () => {
       const newColumns = [{
         label: 'This column doesnt exist',
-        value: 'so it should fail',
+        slug: 'so it should fail',
       }];
 
       // expect the columns to remain the default
@@ -115,13 +109,14 @@ describe('Column reducer', () => {
       })).toEqual(initialState);
     });
 
-    it('should set the column state if column labels/values match', () => {
+    it('should set the column state if column labels/slugs match', () => {
       // after checking values/labels, the column state should be updated
       // with whatever column set is passed in
-      const expectedState = cloneInitialArray()
+      const expectedState = [].concat(initialState.columns)
         .map(col => {
-          col.enabled = true;
-          return col;
+          const newCol = { ...col };
+          newCol.enabled = true;
+          return newCol;
         });
 
       expect(appReducer(undefined, {

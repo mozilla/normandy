@@ -2,7 +2,6 @@
  * RecipeList column selectors
  */
 
-
 /**
  * Given a set of columns, returns an array of
  * enabled-only/displayed columns

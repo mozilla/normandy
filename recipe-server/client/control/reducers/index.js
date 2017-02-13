@@ -6,15 +6,17 @@ import { routerReducer } from 'react-router-redux';
 
 // app reducer imports
 import controlAppReducer from 'control/reducers/ControlAppReducer';
+import filtersReducer from 'control/reducers/FiltersReducer';
 import columnReducer from 'control/reducers/ColumnReducer';
 import recipesReducer from 'control/reducers/RecipesReducer';
 import notificationReducer from 'control/reducers/NotificationReducer';
 
 export default combineReducers({
-  controlApp: controlAppReducer,
-  recipes: recipesReducer,
   columns: columnReducer,
-  notifications: notificationReducer,
+  controlApp: controlAppReducer,
+  filters: filtersReducer,
   form: formReducer,
+  notifications: notificationReducer,
+  recipes: recipesReducer,
   routing: routerReducer,
 });

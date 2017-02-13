@@ -177,7 +177,6 @@ export const formConfig = {
       result = addRecipe(recipe);
     }
 
-
     // Wrap error responses with a SubmissionError for redux-form.
     return result.catch(errors => {
       throw new SubmissionError(errors);
