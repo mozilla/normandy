@@ -91,7 +91,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
-        recipe = Recipe.objects.create(enabled=validated_data.pop('enabled'))
+        recipe = Recipe.objects.create(enabled=validated_data.pop('enabled', False))
         recipe.save()
 
         return self.update(recipe, validated_data)
