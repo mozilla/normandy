@@ -101,6 +101,7 @@ class TestCase(object):
             API.
         """
         root_path = api_path.add('api', 'v1')
+        root_path.save()
         self.serialize_recipe_api(root_path)
         self.serialize_client_api(root_path)
         self.serialize_action_api(root_path, domain)
