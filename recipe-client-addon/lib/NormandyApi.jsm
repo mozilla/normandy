@@ -17,10 +17,10 @@ this.EXPORTED_SYMBOLS = ["NormandyApi"];
 const log = LogManager.getLogger("normandy-api");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
+let indexPromise;
+
 this.NormandyApi = {
-  apiCall(method, endpoint, data = {}) {
-    const api_url = prefs.getCharPref("api_url");
-    let url = `${api_url}/${endpoint}`;
+  apiCall(method, url, data = {}) {
     method = method.toLowerCase();
 
     if (method === "get") {
@@ -49,8 +49,29 @@ this.NormandyApi = {
     return this.apiCall("post", endpoint, data);
   },
 
+  apiIndex() {
+    if (!indexPromise) {
+      indexPromise = this.get(prefs.getCharPref("api_url")).then(res => res.json);
+    }
+    return indexPromise;
+  },
+
+  makeApiUrl(endpoint) {
+    let base = prefs.getCharPref("api_url");
+    // Remove trailing slash if present
+    if (base.slice(-1) === "/") {
+      base = base.slice(0, -1);
+    }
+    // Remove leading slash, if present
+    if (endpoint[0] === "/") {
+      endpoint = endpoint.slice(1);
+    }
+    return `${base}/${endpoint}`;
+  },
+
   fetchRecipes: Task.async(function* (filters = {}) {
-    const recipeResponse = yield this.get("recipe/signed/", filters);
+    const signedRecipeUrls = (yield this.apiIndex())["recipes-signed"];
+    const recipeResponse = yield this.get(signedRecipeUrls, filters, {enabled: true});
     const rawText = yield recipeResponse.text();
     const recipesWithSigs = JSON.parse(rawText);
 
@@ -70,13 +91,22 @@ this.NormandyApi = {
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
         .createInstance(Ci.nsIContentSignatureVerifier);
 
-      if (!verifier.verifyContentSignature(serialized, builtSignature, certChain, "normandy.content-signature.mozilla.org")) {
+      const valid =  verifier.verifyContentSignature(
+        serialized,
+        builtSignature,
+        certChain,
+        "normandy.content-signature.mozilla.org"
+      );
+      if (!valid) {
         throw new Error("Recipe signature is not valid");
       }
       verifiedRecipes.push(recipe);
     }
 
-    log.debug(`Fetched ${verifiedRecipes.length} recipes from the server:`, verifiedRecipes.map(r => r.name).join(", "));
+    log.debug(
+      `Fetched ${verifiedRecipes.length} recipes from the server:`,
+      verifiedRecipes.map(r => r.name).join(", ")
+    );
 
     return verifiedRecipes;
   }),
@@ -85,16 +115,20 @@ this.NormandyApi = {
    * Fetch metadata about this client determined by the server.
    * @return {object} Metadata specified by the server
    */
-  classifyClient() {
-    return this.get("classify_client/")
-      .then(response => response.json())
-      .then(clientData => {
-        clientData.request_time = new Date(clientData.request_time);
-        return clientData;
-      });
-  },
+  classifyClient: Task.async(function* () {
+    const classifyClientUrl = (yield this.apiIndex())["classify-client"];
+    const response = yield this.get(classifyClientUrl);
+    const clientData = yield response.json();
+    clientData.request_time = new Date(clientData.request_time);
+    return clientData;
+  }),
 
-  fetchAction(name) {
-    return this.get(`action/${name}/`).then(req => req.json());
-  },
+  fetchAction: Task.async(function* (name) {
+    let actionApiUrl = (yield this.apiIndex())["action-list"];
+    if (actionApiUrl.slice(-1) !== "/") {
+      actionApiUrl += "/";
+    }
+    const res = yield this.get(this.makeApiUrl(actionApiUrl + name));
+    return yield res.json();
+  }),
 };
