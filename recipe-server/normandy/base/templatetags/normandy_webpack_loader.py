@@ -20,11 +20,11 @@ def render_bundle(bundle_name, extension=None, config='DEFAULT', attrs=''):
     for chunk in chunks:
         with open(chunk['path'], 'rb') as f:
             chunk_hash = sri_hash(f.read())
-        if chunk['name'].endswith(('.js', '.js.gz')):
+        if chunk['name'].endswith('.js'):
             tags.append((
                 '<script type="text/javascript" src="{0}" integrity="{1}" {2}></script>'
             ).format(chunk['url'], chunk_hash, attrs))
-        elif chunk['name'].endswith(('.css', '.css.gz')):
+        elif chunk['name'].endswith('.css'):
             tags.append((
                 '<link type="text/css" href="{0}" rel="stylesheet" integrity="{1}" {2}/>'
             ).format(chunk['url'], chunk_hash, attrs))

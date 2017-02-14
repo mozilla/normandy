@@ -73,7 +73,7 @@ def filter_m2m(qs, field, values):
 def sri_hash(data):
     """
     Return a subresource integrity attribute string for a file
-    containing the given data.
+    containing the given binary data.
 
     SRI attributes are a string of the form "{algorithm}-{hash}", where
     {algorithm} is the hash algorithm, and {hash} is a base64-encoded
