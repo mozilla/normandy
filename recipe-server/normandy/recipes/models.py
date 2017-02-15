@@ -162,6 +162,13 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def locales(self):
         return self.current_revision.locales
 
+    @property
+    def approval_request(self):
+        try:
+            return self.latest_revision.approval_request if self.latest_revision else None
+        except ApprovalRequest.DoesNotExist:
+            return None
+
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
         data = RecipeSerializer(self).data

@@ -586,6 +586,7 @@ def test_full_approval_flow(api_client):
     res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
                           .format(recipe_data_2['latest_revision_id']))
     approval_data = res.json()
+    recipe_data_2['approval_request'] = approval_data
     assert res.status_code == 201
 
     # The change should not be visible yet, since it isn't approved
@@ -597,6 +598,7 @@ def test_full_approval_flow(api_client):
     api_client.force_authenticate(user2)
     res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
                           {'comment': 'r-'})
+    recipe_data_2['approval_request'] = res.json()
     assert res.status_code == 200
 
     # The change should not be visible yet, since it isn't approved
