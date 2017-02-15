@@ -18,6 +18,7 @@ class Core(Configuration):
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
+        'rest_framework_swagger',
         'reversion',
         'storages',
         'raven.contrib.django.raven_compat',
@@ -117,6 +118,10 @@ class Core(Configuration):
     }
 
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
+
+    SWAGGER_SETTINGS = {
+        'DOC_EXPANSION': 'list',
+    }
 
 
 class Base(Core):
@@ -276,6 +281,9 @@ class Development(Base):
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
 
     API_CACHE_TIME = values.IntegerValue(0)
+
+    SWAGGER_SETTINGS = Base.SWAGGER_SETTINGS
+    SWAGGER_SETTINGS['VALIDATOR_URL'] = None
 
 
 class Production(Base):
