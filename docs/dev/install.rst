@@ -8,7 +8,7 @@ Prerequisites
 This guide assumes you have already installed and set up the following:
 
 1. Git_
-2. `Python 3.5`_, `pip 8`_ or higher, and virtualenv_
+2. `Python 3.6`_, `pip 8`_ or higher, and virtualenv_
 3. `Node.js`_ and npm.
 4. `Postgres 9.4`_
 5. ``openssl``
@@ -18,7 +18,7 @@ theory, run on Windows as well. All the example commands given below are
 intended to be run in a terminal.
 
 .. _Git: https://git-scm.com/
-.. _Python 3.5: https://www.python.org/
+.. _Python 3.6: https://www.python.org/
 .. _pip 8: https://pip.pypa.io/en/stable/
 .. _Node.js: https://nodejs.org/en/
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/

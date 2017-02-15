@@ -29,8 +29,8 @@ Jinja2==2.8 \
     --hash=sha256:bc1ff2ff88dbfacefde4ddde471d1417d3b304e8df103a7a9437d47269201bf4
 MarkupSafe==0.23 \
     --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
-mohawk==0.3.2.1 \
-    --hash=sha256:46e98d8349f927b40227f1a9f0021509fedcf0398e1feb22dac954010f625f1d
+mohawk==0.3.4 \
+    --hash=sha256:e98b331d9fa9ece7b8be26094cbe2d57613ae882133cc755167268a984bc0ab3
 maxminddb==1.2.0 \
     --hash=sha256:00bf6c469a11316b052f732ab326363acadb6b3bd610eabfb479f4621baffab8
 mccabe==0.4.0 \
