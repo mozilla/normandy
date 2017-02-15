@@ -1,9 +1,9 @@
+import makeApiRequest from 'control/api';
+
 import {
-  makeApiRequest,
   recipesNeedFetch,
   recipesReceived,
-  filtersReceived,
-} from 'control/actions/ControlActions';
+} from 'control/actions/RecipeActions';
 
 import {
   getFilterParamString,
@@ -11,10 +11,11 @@ import {
 
 import titleize from 'underscore.string/titleize';
 
-const SET_FILTER = 'SET_FILTER';
-const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
-const LOAD_FILTERS = 'LOAD_FILTERS';
-const RESET_FILTERS = 'RESET_FILTERS';
+export const SET_FILTER = 'SET_FILTER';
+export const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
+export const LOAD_FILTERS = 'LOAD_FILTERS';
+export const RESET_FILTERS = 'RESET_FILTERS';
+
 
 function formatFilterOption(option) {
   let label;
@@ -43,7 +44,7 @@ function formatFilterOption(option) {
  * This is stored in the `filters` reducer, and
  * later used to populate relevant RecipeFilters components.
  */
-function loadFilters() {
+export function loadFilters() {
   return dispatch =>
     dispatch(makeApiRequest('fetchFilters'))
       .then(filters => {
@@ -78,7 +79,7 @@ function loadFilters() {
  * @param  {Object}  option    Option that was affected
  * @param  {Boolean} isEnabled Is the option selected?
  */
-function selectFilter({ group, option, isEnabled }) {
+export function selectFilter({ group, option, isEnabled }) {
   return {
     type: group.value === 'text' ? SET_TEXT_FILTER : SET_FILTER,
     group,
@@ -92,7 +93,7 @@ function selectFilter({ group, option, isEnabled }) {
  * Detects activated filters, creates the URL param string,
  * and queries API for a filtered list based on params.
  */
-function loadFilteredRecipes() {
+export function loadFilteredRecipes() {
   return (dispatch, getState) => {
     dispatch(recipesNeedFetch());
 
@@ -107,22 +108,15 @@ function loadFilteredRecipes() {
  * Dispatches a RESET_FILTERS event, which resets
  * the 'active' filters to what was loaded earlier.
  */
-function resetFilters() {
+export function resetFilters() {
   return {
     type: RESET_FILTERS,
   };
 }
 
-// Exports
-export {
-  // action constants
-  SET_FILTER,
-  RESET_FILTERS,
-  SET_TEXT_FILTER,
-  LOAD_FILTERS,
-  // action functions
-  loadFilters,
-  selectFilter,
-  resetFilters,
-  loadFilteredRecipes,
-};
+export function filtersReceived(filters) {
+  return {
+    type: LOAD_FILTERS,
+    filters,
+  };
+}
