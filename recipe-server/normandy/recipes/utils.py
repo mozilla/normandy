@@ -66,7 +66,7 @@ def deterministic_sample(rate, inputs):
     return input_hash < sample_point
 
 
-class Autographer:
+class Autographer(object):
     """
     Interacts with an Autograph service.
 

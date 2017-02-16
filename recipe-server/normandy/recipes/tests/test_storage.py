@@ -1,7 +1,8 @@
 import pytest
 
+from normandy.base.tests import Whatever
 from normandy.recipes.models import Locale
-from normandy.recipes.storage import ProductDetailsRelationalStorage
+from normandy.recipes.storage import ProductDetailsRelationalStorage, INFO_UPDATE_PRODUCT_DETAILS
 
 
 LANGUAGES_JSON = (
@@ -21,11 +22,16 @@ LANGUAGES_JSON = (
 
 @pytest.mark.django_db
 class TestProductDetailsRelationalStorage(object):
-    def test_update_locales(self, tmpdir):
+    @pytest.fixture
+    def mock_logger(self, mocker):
+        return mocker.patch('normandy.recipes.storage.logger')
+
+    def test_update_locales(self, tmpdir, mock_logger):
         assert Locale.objects.count() == 0
 
         storage = ProductDetailsRelationalStorage(json_dir=tmpdir.strpath)
         storage.update('languages.json', LANGUAGES_JSON, '1999-01-01')
 
+        mock_logger.info.assert_called_with(Whatever(), extra={'code': INFO_UPDATE_PRODUCT_DETAILS})
         assert Locale.objects.count() == 12
         assert Locale.objects.filter(code='en-US', name='English (US)').exists()

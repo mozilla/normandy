@@ -8,7 +8,17 @@ from django.core.exceptions import ImproperlyConfigured
 import pytest
 
 from normandy.base.tests import Whatever
-from normandy.recipes.utils import Autographer, fraction_to_key, verify_signature
+from normandy.recipes.utils import (
+    Autographer,
+    fraction_to_key,
+    INFO_RECEIVED_SIGNATURES,
+    verify_signature,
+)
+
+
+@pytest.fixture
+def mock_logger(mocker):
+    return mocker.patch('normandy.recipes.utils.logger')
 
 
 class TestFractionToKey(object):
@@ -84,7 +94,7 @@ class TestAutographer(object):
         # assert doesn't raise
         Autographer()
 
-    def test_it_interacts_with_autograph_correctly(self, settings):
+    def test_it_interacts_with_autograph_correctly(self, settings, mock_logger):
         settings.AUTOGRAPH_URL = 'https://autograph.example.com'
         settings.AUTOGRAPH_HAWK_ID = 'hawk id'
         settings.AUTOGRAPH_HAWK_SECRET_KEY = 'hawk secret key'
@@ -134,6 +144,12 @@ class TestAutographer(object):
                 'public_key': 'fake_pubkey_2',
             }
         ]
+
+        # Assert that logging happened
+        mock_logger.info.assert_called_with(
+            Whatever.contains('2'),
+            extra={'code': INFO_RECEIVED_SIGNATURES}
+        )
 
         # Assert the correct request was made
         assert autographer.session.post.called_once_with(
