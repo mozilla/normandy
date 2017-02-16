@@ -13,6 +13,9 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 
+INFO_RECEIVED_SIGNATURES = 'normandy.autograph.I001'
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -112,7 +115,10 @@ class Autographer:
         res.raise_for_status()
         signing_responses = res.json()
 
-        logger.info('Got %s signatures from Autograph', len(signing_responses))
+        logger.info(
+            f'Got {len(signing_responses)} signatures from Autograph',
+            extra={'code': INFO_RECEIVED_SIGNATURES}
+        )
 
         signatures = []
         for res in signing_responses:
