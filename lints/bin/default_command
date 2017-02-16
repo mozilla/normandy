@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
 
+num_errors=0
+
 cd /app/code
 therapist run --use-tracked-files
+if [[ $? -ne 0 ]]; then
+    num_errors=$((num_errors + 1))
+fi
+
+for directory in *; do
+    if [[ -f $directory/package.json ]]; then
+        echo "Checking $directory for known NPM security issues..."
+        pushd $directory
+        nsp check
+        if [[ $? -ne 0 ]]; then
+            num_errors=$((num_errors + 1))
+        fi
+        popd
+    fi
+done
+
+exit $num_errors
