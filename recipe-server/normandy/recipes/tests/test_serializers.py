@@ -5,6 +5,7 @@ from normandy.base.tests import Whatever
 from normandy.recipes.tests import (
     ARGUMENTS_SCHEMA,
     ActionFactory,
+    ApprovalRequestFactory,
     ChannelFactory,
     CountryFactory,
     LocaleFactory,
@@ -22,6 +23,7 @@ class TestRecipeSerializer:
         locale = LocaleFactory()
         recipe = RecipeFactory(arguments={'foo': 'bar'}, channels=[channel], countries=[country],
                                locales=[locale])
+        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
 
@@ -42,6 +44,14 @@ class TestRecipeSerializer:
             'locales': [locale.code],
             'is_approved': False,
             'latest_revision_id': recipe.latest_revision.id,
+            'approval_request': {
+                'id': approval.id,
+                'created': Whatever(),
+                'creator': Whatever(),
+                'approved': None,
+                'approver': None,
+                'comment': None,
+            },
         }
 
     # If the action specified cannot be found, raise validation
@@ -184,5 +194,6 @@ class TestSignedRecipeSerializer:
                 'locales': [],
                 'is_approved': False,
                 'latest_revision_id': recipe.latest_revision.id,
+                'approval_request': None,
             }
         }

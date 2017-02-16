@@ -29,6 +29,23 @@ class ActionSerializer(serializers.ModelSerializer):
         ]
 
 
+class ApprovalRequestSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(read_only=True)
+    creator = UserSerializer()
+    approver = UserSerializer()
+
+    class Meta:
+        model = ApprovalRequest
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'approved',
+            'approver',
+            'comment',
+        ]
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     enabled = serializers.BooleanField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
@@ -45,6 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
     latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
         model = Recipe
@@ -63,6 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'extra_filter_expression',
             'filter_expression',
             'latest_revision_id',
+            'approval_request',
         ]
 
     def update(self, instance, validated_data):
@@ -146,23 +165,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.Serializer):
     country = serializers.CharField()
     request_time = serializers.DateTimeField()
-
-
-class ApprovalRequestSerializer(serializers.ModelSerializer):
-    created = serializers.DateTimeField(read_only=True)
-    creator = UserSerializer()
-    approver = UserSerializer()
-
-    class Meta:
-        model = ApprovalRequest
-        fields = [
-            'id',
-            'created',
-            'creator',
-            'approved',
-            'approver',
-            'comment',
-        ]
 
 
 class RecipeRevisionSerializer(serializers.ModelSerializer):

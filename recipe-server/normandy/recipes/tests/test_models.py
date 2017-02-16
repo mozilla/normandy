@@ -109,6 +109,7 @@ class TestRecipe(object):
         expected = (
             '{'
             '"action":"action",'
+            '"approval_request":null,'
             '"arguments":{"bar":2,"foo":1},'
             '"channels":["beta"],'
             '"countries":["CA"],'
@@ -339,6 +340,20 @@ class TestRecipe(object):
 
         with pytest.raises(ApprovalRequest.DoesNotExist):
             ApprovalRequest.objects.get(pk=approval.pk)
+
+    def test_approval_request_property(self):
+        # Make sure it works when there is no approval request
+        recipe = RecipeFactory(name='old')
+        assert recipe.approval_request is None
+
+        # Make sure it returns an approval request if it exists
+        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
+        assert recipe.approval_request == approval
+
+        # Check the edge case where there is no latest_revision
+        recipe.latest_revision.delete()
+        recipe.refresh_from_db()
+        assert recipe.approval_request is None
 
 
 @pytest.mark.django_db
