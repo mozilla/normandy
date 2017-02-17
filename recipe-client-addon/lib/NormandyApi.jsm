@@ -49,30 +49,21 @@ this.NormandyApi = {
     return this.apiCall("post", endpoint, data);
   },
 
-  apiIndex() {
+  getApiUrl: Task.async(function * (name) {
     if (!indexPromise) {
       indexPromise = this.get(prefs.getCharPref("api_url")).then(res => res.json);
     }
-    return indexPromise;
-  },
-
-  makeApiUrl(endpoint) {
-    let base = prefs.getCharPref("api_url");
-    // Remove trailing slash if present
-    if (base.slice(-1) === "/") {
-      base = base.slice(0, -1);
+    const index = yield indexPromise;
+    if (!(name in index)) {
+      throw new Error(`API endpoint with name "${name}" not found.`);
     }
-    // Remove leading slash, if present
-    if (endpoint[0] === "/") {
-      endpoint = endpoint.slice(1);
-    }
-    return `${base}/${endpoint}`;
-  },
+    return index[name];
+  }),
 
   fetchRecipes: Task.async(function* (filters = {}) {
-    const signedRecipeUrls = (yield this.apiIndex())["recipes-signed"];
-    const recipeResponse = yield this.get(signedRecipeUrls, filters, {enabled: true});
-    const rawText = yield recipeResponse.text();
+    const signedRecipesUrls = yield this.getApiUrl("recipe-signed");
+    const recipesResponse = yield this.get(signedRecipesUrls, filters, {enabled: true});
+    const rawText = yield recipesResponse.text();
     const recipesWithSigs = JSON.parse(rawText);
 
     const verifiedRecipes = [];
@@ -91,7 +82,7 @@ this.NormandyApi = {
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
         .createInstance(Ci.nsIContentSignatureVerifier);
 
-      const valid =  verifier.verifyContentSignature(
+      const valid = verifier.verifyContentSignature(
         serialized,
         builtSignature,
         certChain,
@@ -116,7 +107,7 @@ this.NormandyApi = {
    * @return {object} Metadata specified by the server
    */
   classifyClient: Task.async(function* () {
-    const classifyClientUrl = (yield this.apiIndex())["classify-client"];
+    const classifyClientUrl = yield this.getApiUrl("classify-client");
     const response = yield this.get(classifyClientUrl);
     const clientData = yield response.json();
     clientData.request_time = new Date(clientData.request_time);
@@ -124,11 +115,11 @@ this.NormandyApi = {
   }),
 
   fetchAction: Task.async(function* (name) {
-    let actionApiUrl = (yield this.apiIndex())["action-list"];
-    if (actionApiUrl.slice(-1) !== "/") {
+    let actionApiUrl = yield this.getApiUrl("action-list");
+    if (!actionApiUrl.endswith("/")) {
       actionApiUrl += "/";
     }
-    const res = yield this.get(this.makeApiUrl(actionApiUrl + name));
+    const res = yield this.get(actionApiUrl + name);
     return yield res.json();
   }),
 };
