@@ -14,4 +14,5 @@ development environment for it.
    troubleshooting
    api-tests
    functional-tests
+   mock-recipe-server
    code-style
