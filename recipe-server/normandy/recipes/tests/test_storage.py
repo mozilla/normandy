@@ -32,6 +32,9 @@ class TestProductDetailsRelationalStorage(object):
         storage = ProductDetailsRelationalStorage(json_dir=tmpdir.strpath)
         storage.update('languages.json', LANGUAGES_JSON, '1999-01-01')
 
-        mock_logger.info.assert_called_with(Whatever(), extra={'code': INFO_UPDATE_PRODUCT_DETAILS})
+        mock_logger.info.assert_called_with(
+            Whatever(),
+            extra={'code': INFO_UPDATE_PRODUCT_DETAILS}
+        )
         assert Locale.objects.count() == 12
         assert Locale.objects.filter(code='en-US', name='English (US)').exists()
