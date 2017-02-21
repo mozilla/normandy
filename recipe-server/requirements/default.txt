@@ -116,3 +116,6 @@ whitenoise==2.0.6 \
     --hash=sha256:5aea935dfc09ef2beeb76960b4a808b0bbe65e85fb0b0312434b9c365ca02a41
 newrelic==2.78.0.57 \
     --hash=sha256:2191b7699e14a07efa5d9221270eb29bdf6cce643aa56cff08546ecb3f729be6
+django-csp==3.2 \
+    --hash=sha256:7cec78ba7c426deba6d4bea188dcfc1a8b2609ad98dd539c365605c9ec2996b2 \
+    --hash=sha256:fb56c0126b4e69f854fd1581a4bef25fa7cac1f10235e95f697e297ceef88132

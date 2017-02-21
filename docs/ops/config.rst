@@ -179,6 +179,17 @@ in other Django projects.
 
     .. _mozlog: https://github.com/mozilla-services/Dockerflow/blob/master/docs/mozlog.md
 
+.. envvar:: DJANGO_CSP_REPORT_URI
+
+   :default: ``None``
+
+   Controls the ``report-uri`` directive in the Content Security Policy header.
+   Attempts to violate the Content Security Policy are sent by the browser to
+   this URL. See the `MDN documentation on report-uri <report-uri>`_ for more
+   info.
+
+   .. _report-uri: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the

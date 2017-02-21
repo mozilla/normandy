@@ -38,6 +38,7 @@ class Core(Configuration):
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'csp.middleware.CSPMiddleware',
     ]
 
     ROOT_URLCONF = 'normandy.urls'
@@ -109,6 +110,23 @@ class Core(Configuration):
             'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-actions.json')
         }
     }
+
+    # Content Security Policy
+    def CSP_DEFAULT_SRC(self):
+        srcs = ["'self'"]
+        if self.CDN_URL:
+            srcs.append(self.CDN_URL)
+        return srcs
+
+    CSP_OBJECT_SRC = "'none'"  # not using <object>, <embed>, and <applet> elements
+    CSP_WORKER_SRC = "'none'"  # not using JS Worker, SharedWorker, or ServiceWorkers
+    CSP_FRAME_SRC = "'none'"  # not using frames or iframes
+    CSP_BLOCK_ALL_MIXED_CONTENT = True
+
+    # these don't fallback to default-src
+    CSP_BASE_URI = "'none'"  # not using <base>
+    CSP_FRAME_ANCESTORS = "'none'"  # this page isn't iframed elsewhere
+    CSP_FORM_ACTION = "'self'"  # we only submit forms to ourselves
 
     # Action names and the path they are located at.
     ACTIONS = {
@@ -258,6 +276,9 @@ class Base(Core):
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
     CDN_URL = values.URLValue(None)
+
+    # URL for the CSP report-uri directive.
+    CSP_REPORT_URI = values.URLValue(None)
 
     # Normandy settings
     ADMIN_ENABLED = values.BooleanValue(True)
