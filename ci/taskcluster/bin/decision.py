@@ -30,6 +30,8 @@ def main():
         return _idMaker(name).decode()
 
     decisionTaskId = os.environ['TASK_ID']
+    owner = os.environ['GITHUB_HEAD_USER_EMAIL']
+    source = os.environ['GITHUB_HEAD_REPO_URL']
 
     with requests.Session() as session:
         for task in tasks:
@@ -46,8 +48,8 @@ def main():
                 'metadata': {
                     'name': task['name'],
                     'description': task['description'],
-                    'owner': "mcooper@mozilla.com",
-                    'source': "https://github.com/mozilla/normandy",
+                    'owner': owner,
+                    'source': source,
                 },
                 'provisionerId': 'aws-provisioner-v1',
                 'workerType': 'github-worker',

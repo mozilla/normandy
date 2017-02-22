@@ -21,6 +21,8 @@ done < "${BASE_DIR}/build-includes.txt"
 
 rm "${DEST}/install.rdf.in"
 cp "${BASE_DIR}/install.rdf" "${DEST}"
+rm "${DEST}/jar.mn"
+cp "${BASE_DIR}/chrome.manifest" "${DEST}"
 
 pushd $DEST
 zip -r shield-recipe-client.xpi *
