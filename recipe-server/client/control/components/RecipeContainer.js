@@ -9,6 +9,7 @@ export default function composeRecipeContainer(Component) {
       dispatch: pt.func.isRequired,
       location: pt.object.isRequired,
       recipe: pt.object.isRequired,
+      routeParams: pt.object,
     }
 
     componentWillMount() {
@@ -17,33 +18,51 @@ export default function composeRecipeContainer(Component) {
       }
     }
 
-    componentWillReceiveProps({ recipeId }) {
-      if (recipeId && recipeId !== this.props.recipeId) {
-        this.getRecipeData(recipeId);
+    componentWillReceiveProps({ recipeId, routeParams: { revisionId } }) {
+      const gettingNewRecipe = recipeId && recipeId !== this.props.recipeId;
+      const gettingNewRevision = revisionId && revisionId !== this.props.routeParams.revisionId;
+
+      if (gettingNewRecipe || gettingNewRevision) {
+        this.getRecipeData(recipeId, revisionId);
       }
     }
 
-    getRecipeData(recipeId) {
-      const { dispatch, location, recipe } = this.props;
+    getRecipeData(recipeId, requestedRevision) {
+      const { dispatch, routeParams, recipe } = this.props;
       if (!recipe) {
         dispatch(setSelectedRecipe(recipeId));
 
-        if (location.query.revisionId) {
-          dispatch(makeApiRequest('fetchSingleRevision', { revisionId: location.query.revisionId }))
+        const revisionId = requestedRevision || routeParams.revisionId;
+
+        if (revisionId) {
+          // request the data for the selected revision
+          dispatch(makeApiRequest('fetchSingleRevision', { revisionId }))
           .then(revision => {
-            dispatch(singleRecipeReceived(revision.recipe));
+            // once we have the revision, we have the recipe id, and we need to
+            // load the single recipe data in order to determine the latest revision id
+            dispatch(makeApiRequest('fetchSingleRecipe', { recipeId: revision.recipe.id }))
+            .then(({ latest_revision_id }) => {
+              // once we get the 'latest' revision id,
+              // pass through the selected revision with the patched value
+              dispatch(singleRecipeReceived({
+                ...revision.recipe,
+                latest_revision_id,
+              }));
+            });
           });
         } else {
           dispatch(makeApiRequest('fetchSingleRecipe', { recipeId }))
           .then(newRecipe => {
-            dispatch(singleRecipeReceived(newRecipe));
+            dispatch(singleRecipeReceived({
+              ...newRecipe,
+            }));
           });
         }
       }
     }
 
     render() {
-      return <Component {...this.props} {...this.state} />;
+      return <Component {...this.props} {...this.state} isRecipeContainer />;
     }
   }
 

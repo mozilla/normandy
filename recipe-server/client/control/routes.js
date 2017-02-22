@@ -3,7 +3,7 @@ import { IndexRedirect, IndexRoute, Route } from 'react-router';
 import ControlApp from 'control/components/ControlApp';
 import RecipeList from 'control/components/RecipeList';
 import RecipeForm from 'control/components/RecipeForm';
-import RecipeHistory from 'control/components/RecipeHistory';
+import { RecipeHistoryPage as RecipeHistory } from 'control/components/RecipeHistory';
 import RecipePreview from 'control/components/RecipePreview';
 import DeleteRecipe from 'control/components/DeleteRecipe';
 import NoMatch from 'control/components/NoMatch';
@@ -29,7 +29,7 @@ export default (
           ctaButtons={[
             { text: 'Clone', icon: 'files-o', link: 'clone/' },
             { text: 'Preview', icon: 'eye', link: 'preview/' },
-            { text: 'History', icon: 'history', link: 'history/' },
+            { text: 'Change Log', icon: 'history', link: 'history/' },
           ]}
         />
         <Route
@@ -55,6 +55,13 @@ export default (
           path="delete/"
           component={DeleteRecipe}
           name="Delete"
+        />
+        <Route
+          path=":revisionId/"
+          component={RecipeForm}
+          ctaButtons={[
+            { text: 'Change Log', icon: 'history', link: 'history/' },
+          ]}
         />
       </Route>
     </Route>

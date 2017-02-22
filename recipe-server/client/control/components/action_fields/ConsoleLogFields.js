@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 
 import { ControlField } from 'control/components/Fields';
 
 /**
  * Form fields for the console-log action.
  */
-export default function ConsoleLogFields() {
+export default function ConsoleLogFields({ disabled }) {
   return (
     <div className="arguments-fields">
       <p className="info">Log a message to the console.</p>
@@ -14,7 +14,12 @@ export default function ConsoleLogFields() {
         name="arguments.message"
         component="input"
         type="text"
+        disabled={disabled}
       />
     </div>
   );
 }
+
+ConsoleLogFields.propTypes = {
+  disabled: pt.bool,
+};
