@@ -278,7 +278,7 @@ class Base(Core):
     CDN_URL = values.URLValue(None)
 
     # URL for the CSP report-uri directive.
-    CSP_REPORT_URI = values.URLValue(None)
+    CSP_REPORT_URI = values.Value(None)
 
     # Normandy settings
     ADMIN_ENABLED = values.BooleanValue(True)
