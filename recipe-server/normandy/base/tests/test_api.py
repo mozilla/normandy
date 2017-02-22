@@ -93,8 +93,8 @@ class TestMixedViewRouter(object):
         router.register_view('view-1', View, name='view-1', allow_cdn=True)
         router.register_view('view-2', View, name='view-2', allow_cdn=False)
         assert [v.name for v in router.registered_view_urls] == ['view-1', 'view-2']
-        assert router.registered_view_urls[0].allow_cdn == True
-        assert router.registered_view_urls[1].allow_cdn == False
+        assert router.registered_view_urls[0].allow_cdn
+        assert not router.registered_view_urls[1].allow_cdn
 
     def test_register_view_requires_name(self):
         router = MixedViewRouter()
@@ -119,5 +119,5 @@ class TestMixedViewRouter(object):
         mock_api_view = mocker.Mock()
         router = MixedViewRouter(view=mock_api_view)
         router.register_view('view', View, name='standalone-view')
-        urls = router.get_urls()
+        router.get_urls()
         assert mock_api_view.called_once_with([Whatever(lambda v: v.name == 'standalone-view')])
