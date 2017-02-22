@@ -63,7 +63,7 @@ class ActionImplementationView(generics.RetrieveAPIView):
 
 
 class RecipeFilters(django_filters.FilterSet):
-    enabled = CaseInsensitiveBooleanFilter(name='enabled', lookup_type='eq')
+    enabled = CaseInsensitiveBooleanFilter(name='enabled', lookup_expr='eq')
 
     class Meta:
         model = Recipe
