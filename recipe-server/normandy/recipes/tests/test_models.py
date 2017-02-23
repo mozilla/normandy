@@ -202,7 +202,7 @@ class TestRecipe(object):
 
         mock_autograph.return_value.sign_data.side_effect = fake_sign
 
-        recipe = RecipeFactory(enabled=False, signed=False)
+        recipe = RecipeFactory(enabled=False, signed=False, approved=True)
         recipe.enabled = True
         recipe.save()
         recipe.refresh_from_db()

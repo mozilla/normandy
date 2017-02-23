@@ -4,7 +4,7 @@ from django.utils import timezone
 
 import factory
 
-from normandy.base.tests import FuzzyUnicode
+from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
@@ -55,11 +55,11 @@ class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
-    enabled = True
+    enabled = False
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        obj = model_class(enabled=kwargs.pop('enabled'))
+        obj = model_class()
         obj.save()
 
         revision = RecipeRevisionFactory(**kwargs)
@@ -107,6 +107,21 @@ class RecipeFactory(factory.DjangoModelFactory):
         if extracted:
             for locale in extracted:
                 self.locales.add(locale)
+
+    @factory.post_generation
+    def enabled(self, create, extracted, **kwargs):
+        if extracted:
+            approval = ApprovalRequestFactory(revision=self.latest_revision)
+            approval.approve(UserFactory(), 'r+')
+
+            self.enabled = True
+            self.save()
+
+    @factory.post_generation
+    def approved(self, create, extracted, **kwargs):
+        if extracted:
+            approval = ApprovalRequestFactory(revision=self.latest_revision)
+            approval.approve(UserFactory(), 'r+')
 
 
 @factory.use_strategy(factory.BUILD_STRATEGY)

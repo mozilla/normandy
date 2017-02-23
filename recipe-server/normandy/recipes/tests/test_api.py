@@ -269,7 +269,7 @@ class TestRecipeAPI(object):
         assert res.data[2]['recipe']['name'] == 'version 1'
 
     def test_it_can_enable_recipes(self, api_client):
-        recipe = RecipeFactory(enabled=False)
+        recipe = RecipeFactory(enabled=False, approved=True)
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 204
@@ -284,6 +284,7 @@ class TestRecipeAPI(object):
         assert res.status_code == 204
 
         recipe = Recipe.objects.all()[0]
+        assert not recipe.is_approved
         assert not recipe.enabled
 
     def test_filtering_by_enabled_lowercase(self, api_client):

@@ -114,7 +114,7 @@ class TestUpdateActions(object):
 
 
 @pytest.mark.django_db
-class TestUpdateRecipeSignantures(object):
+class TestUpdateRecipeSignatures(object):
     def test_it_works(self):
         """
         Verify that the update_recipe_signatures command doesn't throw an error.
