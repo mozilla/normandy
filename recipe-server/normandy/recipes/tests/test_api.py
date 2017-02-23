@@ -351,6 +351,20 @@ class TestRecipeAPI(object):
         assert res.data[1]['recipe']['id'] == r2.id
         assert res.data[1]['signature']['signature'] == r2.signature.signature
 
+    def test_signed_listing_filters_by_enabled(Self, api_client):
+        enabled_recipe = RecipeFactory(signed=True, enabled=True)
+        disabled_recipe = RecipeFactory(signed=True, enabled=False)
+
+        res = api_client.get('/api/v1/recipe/signed/?enabled=1')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['recipe']['id'] == enabled_recipe.id
+
+        res = api_client.get('/api/v1/recipe/signed/?enabled=0')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['recipe']['id'] == disabled_recipe.id
+
     def test_list_sets_no_cookies(self, api_client):
         res = api_client.get('/api/v1/recipe/')
         assert res.status_code == 200
