@@ -148,7 +148,6 @@ class ClassifyClient(views.APIView):
     authentication_classes = []
     permission_classes = []
     serializer_class = ClientSerializer
-    always_dynamic = True
 
     def get(self, request, format=None):
         client = Client(request)
