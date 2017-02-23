@@ -15,32 +15,30 @@ dependencies:
     - docker info
     # Use pipstrap to bootstrap ourselves to a trusted pip 8 for hash
     # checking.
-    - ./ci/bin/pipstrap.py
+    - ./ci/circleci/bin/pipstrap.py
     # Install latest pip (for constraint support), then the rest of the
     # CI requirements.
-    - pip install -r ./ci/requirements/pip.txt
-    - pip install -r ./ci/requirements/default.txt -c ./ci/requirements/constraints.txt
+    - pip install -r ./ci/circleci/requirements/pip.txt
+    - pip install -r ./ci/circleci/requirements/default.txt -c ./ci/circleci/requirements/constraints.txt
   override:
-    - ./ci/bin/runner.sh dependencies
+    - ./ci/circleci/bin/runner.sh dependencies
 
 compile:
   override:
-    - ./ci/bin/runner.sh compile
+    - ./ci/circleci/bin/runner.sh compile
 
 test:
   override:
-    - ./ci/bin/runner.sh test
-  post:
-    - ./ci/bin/runner.sh test-post
+    - ./ci/circleci/bin/runner.sh test
 
 deployment:
   latest:
     branch: master
     commands:
-      - ./ci/bin/runner.sh deploy latest
+      - ./ci/circleci/bin/runner.sh deploy latest
 
   tags:
     # push all tags
     tag: /.*/
     commands:
-      - ./ci/bin/runner.sh deploy "$CIRCLE_TAG"
+      - ./ci/circleci/bin/runner.sh deploy "$CIRCLE_TAG"

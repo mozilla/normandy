@@ -1,38 +1,21 @@
 {
   "title": "Shield Recipe Client",
-  "name": "shield-recipe-client",
-  "id": "shield-recipe-client@mozilla.org",
   "version": "0.1.3",
   "description": "Client to download and run recipes for SHIELD, Heartbeat, etc.",
   "main": "index.js",
   "author": "Mike Cooper <mcooper@mozilla.com>",
   "repository": "https://github.com/mozilla/normandy-addon",
   "scripts": {
-    "test": "jpm test",
-    "build": "jpm xpi"
-  },
-  "engines": {
-    "firefox": ">=51.0a1"
   },
   "license": "MPL-2.0",
-  "keywords": [
-    "jetpack"
-  ],
   "devDependencies": {
     "babel-eslint": "6.1.2",
     "eslint": "^3.8.1",
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-babel": "3.3.0",
-    "eslint-plugin-mozilla": "0.2.5",
-    "get-firefox": "^1.5.0",
-    "jpm": "1.2.2",
-    "woodchipper": "0.9.1"
+    "eslint-plugin-mozilla": "0.2.5"
   },
   "dependencies": {
-    "jexl": "1.1.4",
-    "sha.js": "2.4.5"
-  },
-  "permissions": {
-    "multiprocess": true
+    "jexl": "1.1.4"
   }
 }

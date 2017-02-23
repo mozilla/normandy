@@ -6,7 +6,7 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
-BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../.. && pwd)"
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../.. && pwd)"
 PROJECTS=(
     recipe-client-addon
     recipe-server
