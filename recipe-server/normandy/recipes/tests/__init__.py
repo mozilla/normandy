@@ -55,11 +55,9 @@ class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
-    enabled = True
-
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        obj = model_class(enabled=kwargs.pop('enabled'))
+        obj = model_class()
         obj.save()
 
         revision = RecipeRevisionFactory(**kwargs)
@@ -107,6 +105,20 @@ class RecipeFactory(factory.DjangoModelFactory):
         if extracted:
             for locale in extracted:
                 self.locales.add(locale)
+
+    # This should always be before `enabled`
+    @factory.post_generation
+    def approver(self, create, extracted, **kwargs):
+        if extracted:
+            approval = ApprovalRequestFactory(revision=self.latest_revision)
+            approval.approve(extracted, 'r+')
+
+    # This should always be after `approver` as we require approval to enable a recipe
+    @factory.post_generation
+    def enabled(self, create, extracted, **kwargs):
+        if extracted:
+            self.enabled = True
+            self.save()
 
 
 @factory.use_strategy(factory.BUILD_STRATEGY)

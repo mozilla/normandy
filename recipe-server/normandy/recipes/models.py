@@ -104,6 +104,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
     class Meta:
         ordering = ['-enabled', '-latest_revision__updated']
 
+    class NotApproved(Exception):
+        pass
+
     def __repr__(self):
         return '<Recipe "{name}">'.format(name=self.name)
 
@@ -239,6 +242,14 @@ class Recipe(DirtyFieldsMixin, models.Model):
         if self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             dirty_field_names = list(dirty_fields.keys())
+
+            if 'enabled' in dirty_field_names:
+                if self.enabled and not self.is_approved:
+                    raise self.NotApproved('Cannot enable a recipe that is not approved.')
+
+                if not self.enabled:
+                    # If we are disabling the recipe we should invalidate the approval
+                    self.approved_revision = None
 
             if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
                     and self.signature is not None):

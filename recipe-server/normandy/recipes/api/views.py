@@ -120,7 +120,12 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     def enable(self, request, pk=None):
         recipe = self.get_object()
         recipe.enabled = True
-        recipe.save()
+
+        try:
+            recipe.save()
+        except Recipe.NotApproved as e:
+            return Response({'enabled': str(e)}, status=status.HTTP_409_CONFLICT)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @reversion_transaction

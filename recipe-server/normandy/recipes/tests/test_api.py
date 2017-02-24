@@ -269,7 +269,7 @@ class TestRecipeAPI(object):
         assert res.data[2]['recipe']['name'] == 'version 1'
 
     def test_it_can_enable_recipes(self, api_client):
-        recipe = RecipeFactory(enabled=False)
+        recipe = RecipeFactory(enabled=False, approver=UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 204
@@ -277,17 +277,25 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
 
+    def test_cannot_enable_unapproved_recipes(self, api_client):
+        recipe = RecipeFactory(enabled=False)
+
+        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
+        assert res.status_code == 409
+        assert res.data['enabled'] == 'Cannot enable a recipe that is not approved.'
+
     def test_it_can_disable_recipes(self, api_client):
-        recipe = RecipeFactory(enabled=True)
+        recipe = RecipeFactory(approver=UserFactory(), enabled=True)
 
         res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
         assert res.status_code == 204
 
         recipe = Recipe.objects.all()[0]
+        assert not recipe.is_approved
         assert not recipe.enabled
 
     def test_filtering_by_enabled_lowercase(self, api_client):
-        r1 = RecipeFactory(enabled=True)
+        r1 = RecipeFactory(approver=UserFactory(), enabled=True)
         RecipeFactory(enabled=False)
 
         res = api_client.get('/api/v1/recipe/?enabled=true')
@@ -345,7 +353,7 @@ class TestRecipeAPI(object):
 
     def test_list_filter_status(self, api_client):
         r1 = RecipeFactory(enabled=False)
-        r2 = RecipeFactory(enabled=True)
+        r2 = RecipeFactory(approver=UserFactory(), enabled=True)
 
         res = api_client.get('/api/v1/recipe/?status=enabled')
         assert res.status_code == 200
