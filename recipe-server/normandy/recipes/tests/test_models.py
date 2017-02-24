@@ -355,6 +355,22 @@ class TestRecipe(object):
         recipe.refresh_from_db()
         assert recipe.approval_request is None
 
+    def test_cannot_enable_unapproved_recipe(self):
+        recipe = RecipeFactory(enabled=False)
+
+        with pytest.raises(Recipe.NotApproved):
+            recipe.enabled = True
+            recipe.save()
+
+    def test_disabling_recipe_removes_approval(self):
+        recipe = RecipeFactory(enabled=True)
+        assert recipe.is_approved
+
+        recipe.enabled = False
+        recipe.save()
+        recipe.refresh_from_db()
+        assert not recipe.is_approved
+
 
 @pytest.mark.django_db
 class TestRecipeRevision(object):

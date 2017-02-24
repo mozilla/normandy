@@ -55,8 +55,6 @@ class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
-    enabled = False
-
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         obj = model_class()

@@ -277,6 +277,13 @@ class TestRecipeAPI(object):
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
 
+    def test_cannot_enable_unapproved_recipes(self, api_client):
+        recipe = RecipeFactory(enabled=False, approved=False)
+
+        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
+        assert res.status_code == 400
+        assert res.data['enabled'] == 'Cannot enable a recipe that has not been approved.'
+
     def test_it_can_disable_recipes(self, api_client):
         recipe = RecipeFactory(enabled=True)
 
