@@ -33,8 +33,9 @@ class Core(Configuration):
 
     # Middleware that ALL environments must have. See the Base class for
     # details.
-    MIDDLEWARE_CLASSES = [
-        'normandy.base.middleware.RequestReceivedAtMiddleware',
+    MIDDLEWARE = [
+        'normandy.base.middleware.request_received_at_middleware',
+        'normandy.base.middleware.RequestSummaryLogger',
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -54,7 +55,7 @@ class Core(Configuration):
                     'django.template.context_processors.request',
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
-                    'django.core.context_processors.static',
+                    'django.template.context_processors.static',
                 ],
             },
         },
@@ -151,21 +152,20 @@ class Base(Core):
 
     # Middleware that _most_ environments will need. Subclasses can
     # override this list.
-    EXTRA_MIDDLEWARE_CLASSES = [
+    EXTRA_MIDDLEWARE = [
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        'mozilla_cloud_services_logger.django.middleware.RequestSummaryLogger',
     ]
 
-    def MIDDLEWARE_CLASSES(self):
+    def MIDDLEWARE(self):
         """
         Determine middleware by combining the core set and
         per-environment set.
         """
-        return Core.MIDDLEWARE_CLASSES + self.EXTRA_MIDDLEWARE_CLASSES
+        return Core.MIDDLEWARE + self.EXTRA_MIDDLEWARE
 
     LOGGING_USE_JSON = values.BooleanValue(False)
 
@@ -330,9 +330,8 @@ class ProductionReadOnly(Production):
     Settings for a production environment that is read-only. This is
     used on public-facing webheads.
     """
-    EXTRA_MIDDLEWARE_CLASSES = [
+    EXTRA_MIDDLEWARE = [
         # No need for sessions, so removing those middlewares helps us go fast
-        'mozilla_cloud_services_logger.django.middleware.RequestSummaryLogger',
     ]
     ADMIN_ENABLED = values.BooleanValue(False)
     SILENCED_SYSTEM_CHECKS = values.ListValue(['security.W003'])  # CSRF check
