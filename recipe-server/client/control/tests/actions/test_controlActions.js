@@ -83,11 +83,11 @@ describe('controlApp Actions', () => {
   });
 
   it('makes a proper API request for fetchSingleRevision', () => {
-    fetchMock.get('/api/v1/recipe_version/169/', fixtureRecipes[0]);
+    fetchMock.get('/api/v1/recipe_revision/169/', fixtureRecipes[0]);
 
     return store.dispatch(actionTypes.makeApiRequest('fetchSingleRevision', { revisionId: 169 }))
     .then(() => {
-      expect(fetchMock.calls('/api/v1/recipe_version/169/').length).toEqual(1);
+      expect(fetchMock.calls('/api/v1/recipe_revision/169/').length).toEqual(1);
     });
   });
 

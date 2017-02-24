@@ -56,6 +56,13 @@ export default (
           component={DeleteRecipe}
           name="Delete"
         />
+        <Route
+          path=":revisionId/"
+          component={RecipeForm}
+          ctaButtons={[
+            { text: 'History', icon: 'history', link: '../history/' },
+          ]}
+        />
       </Route>
     </Route>
     <Route path="*" component={NoMatch} />

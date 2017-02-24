@@ -47,7 +47,7 @@ const apiRequestMap = {
 
   fetchSingleRevision(recipeInfo) {
     return {
-      url: `${BASE_API_URL}recipe_version/${recipeInfo.revisionId}/`,
+      url: `${BASE_API_URL}recipe_revision/${recipeInfo.revisionId}/`,
       settings: {
         method: 'GET',
       },
@@ -55,9 +55,72 @@ const apiRequestMap = {
     };
   },
 
-  fetchRecipeHistory(recipeInfo) {
+  getApprovalRequests() {
     return {
-      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/history/`,
+      url: `${BASE_API_URL}approval_request/`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error fetching approval requests.',
+    };
+  },
+
+  getApprovalRequestInfo({ requestId }) {
+    return {
+      url: `${BASE_API_URL}approval_request/${requestId}/`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error fetching approval request info.',
+    };
+  },
+
+  openApprovalRequest({ revisionId }) {
+    return {
+      url: `${BASE_API_URL}recipe_revision/${revisionId}/request_approval/`,
+      settings: {
+        method: 'POST',
+        body: JSON.stringify({ revisionId }),
+      },
+      errorNotification: 'Error creating new approval request.',
+    };
+  },
+
+  acceptApprovalRequest({ requestId, comment = '' }) {
+    return {
+      url: `${BASE_API_URL}approval_request/${requestId}/approve/`,
+      settings: {
+        method: 'POST',
+        body: JSON.stringify({ comment }),
+      },
+      errorNotification: 'Error accepting recipe approval.',
+    };
+  },
+
+  rejectApprovalRequest({ requestId, comment = '' }) {
+    return {
+      url: `${BASE_API_URL}approval_request/${requestId}/reject/`,
+      settings: {
+        method: 'POST',
+        body: JSON.stringify({ comment }),
+      },
+      errorNotification: 'Error rejecting recipe approval.',
+    };
+  },
+
+  closeApprovalRequest({ requestId }) {
+    return {
+      url: `${BASE_API_URL}approval_request/${requestId}/close/`,
+      settings: {
+        method: 'POST',
+      },
+      errorNotification: 'Error closing recipe approval request.',
+    };
+  },
+
+  fetchRecipeHistory({ recipeId }) {
+    return {
+      url: `${BASE_API_URL}recipe/${recipeId}/history/`,
       settings: {
         method: 'GET',
       },
@@ -65,11 +128,11 @@ const apiRequestMap = {
     };
   },
 
-  addRecipe(recipeInfo) {
+  addRecipe({ recipe }) {
     return {
       url: `${BASE_API_URL}recipe/`,
       settings: {
-        body: JSON.stringify(recipeInfo.recipe),
+        body: JSON.stringify(recipe),
         method: 'POST',
       },
     };

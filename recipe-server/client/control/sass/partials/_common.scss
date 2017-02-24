@@ -116,6 +116,7 @@ a.button {
   border: 0;
   border-radius: 0;
   color: #FFF;
+  display: inline-block;
   font: normal normal 600 13px/30px $OpenSans;
   padding: 10px 40px;
   text-align: center;
@@ -124,7 +125,6 @@ a.button {
 
   &.delete {
     background-color: $red;
-    display: inline-block;
 
     &:hover {
       background-color: $redHover;

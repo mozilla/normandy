@@ -7,8 +7,8 @@ export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
     static propTypes = {
       dispatch: pt.func.isRequired,
-      location: pt.object.isRequired,
       recipe: pt.object.isRequired,
+      routeParams: pt.object.isRequired,
     }
 
     componentWillMount() {
@@ -24,12 +24,12 @@ export default function composeRecipeContainer(Component) {
     }
 
     getRecipeData(recipeId) {
-      const { dispatch, location, recipe } = this.props;
+      const { dispatch, recipe, routeParams } = this.props;
       if (!recipe) {
         dispatch(setSelectedRecipe(recipeId));
 
-        if (location.query.revisionId) {
-          dispatch(makeApiRequest('fetchSingleRevision', { revisionId: location.query.revisionId }))
+        if (routeParams.revisionId) {
+          dispatch(makeApiRequest('fetchSingleRevision', { revisionId: routeParams.revisionId }))
           .then(revision => {
             dispatch(singleRecipeReceived(revision.recipe));
           });

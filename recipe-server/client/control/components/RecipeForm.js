@@ -17,9 +17,11 @@ import {
   recipeAdded,
   showNotification,
   setSelectedRecipe,
+  singleRecipeReceived,
 } from 'control/actions/ControlActions';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
+import RecipeFormActions from 'control/components/RecipeFormActions';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
@@ -44,8 +46,12 @@ export class RecipeForm extends React.Component {
       arguments: pt.object.isRequired,
     }),
     recipeFields: pt.object,
-    // route prop passed from router
+    dispatch: pt.func.isRequired,
+    // route props passed from router
     route: pt.object,
+    routeParams: pt.object.isRequired,
+    // from redux-form
+    pristine: pt.bool,
   };
 
   static argumentsFields = {
@@ -53,32 +59,151 @@ export class RecipeForm extends React.Component {
     'show-heartbeat': HeartbeatFields,
   };
 
-  renderCloningMessage() {
-    const isCloning = this.props.route && this.props.route.isCloning;
-    const displayedRecipe = this.props.recipe;
+  static LoadingSpinner = (
+    <div className="recipe-form loading">
+      <i className="fa fa-spinner fa-spin fa-3x fa-fw" />
+      <p>Loading recipe...</p>
+    </div>
+  );
 
-    if (!isCloning || !displayedRecipe) {
+  static renderCloningMessage({ route, recipe }) {
+    const isCloning = route && route.isCloning;
+    if (!isCloning || !recipe) {
       return null;
     }
 
     return (
       <span className="cloning-message callout">
         {'You are cloning '}
-        <Link to={`/control/recipe/${displayedRecipe.id}/`}>
-          {displayedRecipe.name} ({displayedRecipe.action})
+        <Link to={`/control/recipe/${recipe.id}/`}>
+          {recipe.name} ({recipe.action})
         </Link>.
       </span>
     );
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.handleFormAction = ::this.handleFormAction;
+  }
+
+  /**
+   * Generates an object relevant to the user/draft state. All values returned
+   * are cast as booleans.
+   *
+   * @return {Object} Hash of user/draft state data, formatted as booleans
+   */
+  getRenderVariables() {
+    const {
+      route,
+      routeParams,
+      recipe,
+      pristine,
+      submitting,
+      recipeId,
+    } = this.props;
+    const requestDetails = recipe && recipe.approval_request;
+    // #TODO: get actual user id
+    const currentUserID = requestDetails && requestDetails.creator.id;
+
+    const requestAuthorID = requestDetails && requestDetails.creator.id;
+
+    const isCloning = !!(route && route.isCloning);
+    const isUserViewingOutdated = !!(routeParams && routeParams.revisionId);
+    const isPendingApproval = !!(requestDetails && !requestDetails.approved);
+    const isUserRequestor = requestAuthorID === currentUserID;
+    const isAlreadySaved = !!recipeId;
+    const isFormPristine = pristine;
+
+    const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated);
+
+    return {
+      isCloning,
+      isUserViewingOutdated,
+      isPendingApproval,
+      isUserRequestor,
+      isAlreadySaved,
+      isFormPristine,
+      isFormDisabled,
+    };
+  }
+
+  /**
+   * Event handler for form action buttons.
+   * Form action buttons remotely fire this handler with a (string) action type,
+   * which then triggers the appropriate API requests/etc.
+   *
+   * @param  {string} action Action type to trigger. ex: 'close', 'approve', 'reject'
+   */
+  handleFormAction(action) {
+    const {
+      recipe,
+      dispatch,
+    } = this.props;
+
+    switch (action) {
+      case 'close': {
+        dispatch(makeApiRequest('closeApprovalRequest', {
+          requestId: recipe.approval_request.id,
+        })).then(() => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Approval review closed.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: null,
+          }));
+        });
+        break;
+      }
+      case 'approve': {
+        dispatch(makeApiRequest('acceptApprovalRequest', {
+          requestId: recipe.approval_request.id,
+        }));
+        break;
+      }
+      case 'reject': {
+        dispatch(makeApiRequest('rejectApprovalRequest', {
+          requestId: recipe.approval_request.id,
+        }));
+        break;
+      }
+      case 'request': {
+        dispatch(makeApiRequest('openApprovalRequest', {
+          revisionId: recipe.revision_id,
+        }))
+        .then(response => {
+          // show success message
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Approval review requested!',
+          }));
+          // patch existing recipe with new approval_request
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: {
+              ...response,
+            },
+          }));
+        });
+        break;
+      }
+      default: {
+        throw new Error(`Unrecognized form action "${action}"`);
+      }
+    }
   }
 
   render() {
     const {
       handleSubmit,
       selectedAction,
-      submitting,
       recipe,
       recipeId,
-      route,
       recipeFields,
     } = this.props;
     const noop = () => null;
@@ -86,24 +211,25 @@ export class RecipeForm extends React.Component {
 
     // Show a loading indicator if we haven't yet loaded the recipe.
     if (recipeId && !recipe) {
-      return (
-        <div className="recipe-form loading">
-          <i className="fa fa-spinner fa-spin fa-3x fa-fw" />
-          <p>Loading recipe...</p>
-        </div>
-      );
+      return RecipeForm.LoadingSpinner;
     }
 
-    const isCloning = route && route.isCloning;
-
-    const submitButtonCaption = recipeId && !isCloning ? 'Update Recipe' : 'Add New Recipe';
+    const renderVars = this.getRenderVariables();
+    const { isFormDisabled } = renderVars;
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
-        { this.renderCloningMessage() }
+        { RecipeForm.renderCloningMessage(this.props) }
 
-        <ControlField label="Name" name="name" component="input" type="text" />
         <ControlField
+          disabled={isFormDisabled}
+          label="Name"
+          name="name"
+          component="input"
+          type="text"
+        />
+        <ControlField
+          disabled={isFormDisabled}
           label="Enabled"
           name="enabled"
           className="checkbox-field"
@@ -111,26 +237,29 @@ export class RecipeForm extends React.Component {
           type="checkbox"
         />
         <ControlField
+          disabled={isFormDisabled}
           label="Filter Expression"
           name="filter_expression"
           component="textarea"
         />
-        <ControlField label="Action" name="action" component="select">
+        <ControlField
+          disabled={isFormDisabled}
+          label="Action"
+          name="action"
+          component="select"
+        >
           <option value="">Choose an action...</option>
           <option value="console-log">Log to Console</option>
           <option value="show-heartbeat">Heartbeat Prompt</option>
         </ControlField>
-        <ArgumentsFields fields={recipeFields} />
-        <div className="form-actions">
-          {recipeId && !isCloning &&
-            <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
-              Delete
-            </Link>
-          }
-          <button className="button submit" type="submit" disabled={submitting}>
-            {submitButtonCaption}
-          </button>
-        </div>
+
+        <ArgumentsFields disabled={isFormDisabled} fields={recipeFields} />
+
+        <RecipeFormActions
+          onAction={this.handleFormAction}
+          recipeId={recipeId}
+          {...renderVars}
+        />
       </form>
     );
   }
@@ -141,6 +270,7 @@ export class RecipeForm extends React.Component {
  */
 export const formConfig = {
   form: 'recipe',
+  enableReinitialize: true,
   asyncBlurFields: ['filter_expression'],
 
   async asyncValidate(values) {
@@ -176,7 +306,6 @@ export const formConfig = {
     } else {
       result = addRecipe(recipe);
     }
-
 
     // Wrap error responses with a SubmissionError for redux-form.
     return result.catch(errors => {
