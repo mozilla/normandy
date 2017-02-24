@@ -123,9 +123,8 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         try:
             recipe.save()
-        except Recipe.NotApproved:
-            return Response({'enabled': 'Cannot enable a recipe that has not been approved.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        except Recipe.NotApproved as e:
+            return Response({'enabled': str(e)}, status=status.HTTP_409_CONFLICT)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

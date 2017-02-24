@@ -21,11 +21,12 @@ from normandy.recipes.tests import (
 @pytest.mark.django_db
 class TestAction(object):
     def test_recipes_used_by(self):
-        recipe = RecipeFactory(enabled=True)
+        approver = UserFactory()
+        recipe = RecipeFactory(approver=approver, enabled=True)
         assert [recipe] == list(recipe.action.recipes_used_by)
 
         action = ActionFactory()
-        recipes = RecipeFactory.create_batch(2, action=action, enabled=True)
+        recipes = RecipeFactory.create_batch(2, action=action, approver=approver, enabled=True)
         assert set(action.recipes_used_by) == set(recipes)
 
     def test_recipes_used_by_empty(self):
@@ -202,7 +203,7 @@ class TestRecipe(object):
 
         mock_autograph.return_value.sign_data.side_effect = fake_sign
 
-        recipe = RecipeFactory(enabled=False, signed=False, approved=True)
+        recipe = RecipeFactory(enabled=False, signed=False, approver=UserFactory())
         recipe.enabled = True
         recipe.save()
         recipe.refresh_from_db()
@@ -363,7 +364,7 @@ class TestRecipe(object):
             recipe.save()
 
     def test_disabling_recipe_removes_approval(self):
-        recipe = RecipeFactory(enabled=True)
+        recipe = RecipeFactory(approver=UserFactory(), enabled=True)
         assert recipe.is_approved
 
         recipe.enabled = False
