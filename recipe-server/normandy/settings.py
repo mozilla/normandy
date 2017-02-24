@@ -62,6 +62,11 @@ class Core(Configuration):
 
     WSGI_APPLICATION = 'normandy.wsgi.application'
 
+    # Authentication
+    AUTHENTICATION_BACKENDS = [
+        'normandy.base.auth_backends.LoggingModelBackend',
+    ]
+
     # Internationalization
     LANGUAGE_CODE = 'en-us'
     TIME_ZONE = 'UTC'

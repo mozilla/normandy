@@ -14,6 +14,10 @@ class Whatever(object):
     def endswith(cls, suffix):
         return cls(lambda s: s.endswith(suffix))
 
+    @classmethod
+    def contains(cls, *values):
+        return cls(lambda s: all(value in s for value in values))
+
     def __eq__(self, other):
         return self.test(other)
 

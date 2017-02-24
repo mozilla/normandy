@@ -6,7 +6,11 @@ from geoip2.database import Reader
 from geoip2.errors import GeoIP2Error, AddressNotFoundError
 
 
-log = logging.getLogger('normandy.geolocation')
+WARNING_CANNOT_LOAD_DATABASE = 'normandy.geolocation.W001'
+WARNING_UNKNOWN_GEOIP_ERROR = 'normandy.geolocation.W002'
+
+
+logger = logging.getLogger(__name__)
 
 
 #: Shared instance of the GeoIP2 database reader.
@@ -19,7 +23,10 @@ def load_geoip_database():
     try:
         geoip_reader = Reader(settings.GEOIP2_DATABASE)
     except IOError:
-        log.warning('Geolocation is disabled: Cannot load database.')
+        logger.warning(
+            'Geolocation is disabled: Cannot load database.',
+            extra={'code': WARNING_CANNOT_LOAD_DATABASE}
+        )
 
 
 def get_country_code(ip_address):
@@ -29,7 +36,7 @@ def get_country_code(ip_address):
         except AddressNotFoundError:
             pass
         except GeoIP2Error as exc:
-            log.warning(exc)
+            logger.warning(exc, extra={'code': WARNING_UNKNOWN_GEOIP_ERROR})
             pass
 
     return None

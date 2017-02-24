@@ -6,7 +6,12 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 import pytest
 
 from normandy.base.tests import Whatever
-from normandy.recipes.models import Client, Recipe
+from normandy.recipes.models import (
+    Client,
+    INFO_CREATE_REVISION,
+    INFO_REQUESTING_RECIPE_SIGNATURES,
+    Recipe,
+)
 from normandy.recipes.tests import (
     ActionFactory,
     ChannelFactory,
@@ -15,6 +20,11 @@ from normandy.recipes.tests import (
     RecipeFactory,
     SignatureFactory,
 )
+
+
+@pytest.fixture
+def mock_logger(mocker):
+    return mocker.patch('normandy.recipes.models.logger')
 
 
 @pytest.mark.django_db
@@ -173,7 +183,7 @@ class TestRecipe(object):
             recipe.update(name='changed')
         assert exc_info.value.message == 'Signatures must change alone'
 
-    def test_update_signature(self, mocker):
+    def test_update_signature(self, mocker, mock_logger):
         # Mock the Autographer
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
         mock_autograph.return_value.sign_data.return_value = [
@@ -182,6 +192,11 @@ class TestRecipe(object):
 
         recipe = RecipeFactory(signed=False)
         recipe.update_signature()
+        mock_logger.info.assert_called_with(
+            Whatever.contains(str(recipe.id)),
+            extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': [recipe.id]}
+        )
+
         recipe.save()
         assert recipe.signature is not None
         assert recipe.signature.signature == 'fake signature'
@@ -294,6 +309,14 @@ class TestRecipe(object):
         recipe.update(name='my name', force=True)
         assert revision_id != recipe.revision_id
 
+    def test_update_logging(self, mock_logger):
+        recipe = RecipeFactory(name='my name')
+        recipe.update(name='my name', force=True)
+        mock_logger.info.assert_called_with(
+            Whatever.contains(str(recipe.id)),
+            extra={'code': INFO_CREATE_REVISION}
+        )
+
     def test_revision_id_changes(self):
         """Ensure that the revision id is incremented on each save"""
         recipe = RecipeFactory()
@@ -304,18 +327,30 @@ class TestRecipe(object):
 
 @pytest.mark.django_db
 class TestRecipeQueryset(object):
-    def test_update_signatures(self, mocker):
+    def test_update_signatures(self, mocker, mock_logger):
         # Make sure the test environment is clean. This test is invalid otherwise.
         assert Recipe.objects.all().count() == 0
+
         # Mock the Autographer
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
         mock_autograph.return_value.sign_data.return_value = [
             {'signature': 'fake signature 1'},
             {'signature': 'fake signature 2'},
         ]
+
         # Make and sign two recipes
-        RecipeFactory.create_batch(2)
+        (recipe1, recipe2) = RecipeFactory.create_batch(2)
         Recipe.objects.all().update_signatures()
+
+        # Assert that the signature update is logged.
+        mock_logger.info.assert_called_with(
+            Whatever.contains(str(recipe1.id), str(recipe2.id)),
+            extra={
+                'code': INFO_REQUESTING_RECIPE_SIGNATURES,
+                'recipe_ids': Whatever.contains(recipe1.id, recipe2.id)
+            }
+        )
+
         # Assert the autographer was used as expected
         assert mock_autograph.called
         assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])

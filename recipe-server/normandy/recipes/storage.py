@@ -1,8 +1,15 @@
 import json
+import logging
 
 from django.db import transaction
 
 from product_details.storage import PDDatabaseStorage
+
+
+INFO_UPDATE_PRODUCT_DETAILS = 'normandy.product_details.I001'
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProductDetailsRelationalStorage(PDDatabaseStorage):
@@ -12,6 +19,8 @@ class ProductDetailsRelationalStorage(PDDatabaseStorage):
     """
     @transaction.atomic
     def update(self, name, content, last_modified):
+        logger.info('Updating product_details.', extra={'code': INFO_UPDATE_PRODUCT_DETAILS})
+
         # Don't import models when module loads due to app startup.
         from normandy.recipes.models import Locale
 

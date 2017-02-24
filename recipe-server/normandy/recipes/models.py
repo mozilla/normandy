@@ -20,6 +20,10 @@ from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
 
 
+INFO_REQUESTING_RECIPE_SIGNATURES = 'normandy.recipes.I001'
+INFO_CREATE_REVISION = 'normandy.recipes.I002'
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -74,9 +78,9 @@ class RecipeQuerySet(models.QuerySet):
 
         recipe_ids = [r.id for r in recipes]
         logger.info(
-            'Requesting signatures for recipes with ids [%s] from Autograph',
-            (recipe_ids, ),
-            extra={'recipe_ids': recipe_ids})
+            f'Requesting signatures for recipes with ids [{recipe_ids}] from Autograph',
+            extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': recipe_ids}
+        )
 
         canonical_jsons = [r.canonical_json() for r in recipes]
         signatures_data = autographer.sign_data(canonical_jsons)
@@ -161,9 +165,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
         autographer = Autographer()
 
         logger.info(
-            'Requesting signatures for recipes with ids [%s] from Autograph',
-            self.id,
-            extra={'recipe_ids': [self.id]})
+            f'Requesting signatures for recipes with ids [{self.id}] from Autograph',
+            extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': [self.id]}
+        )
 
         signature_data = autographer.sign_data([self.canonical_json()])[0]
         signature = Signature(**signature_data)
@@ -203,6 +207,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
             is_clean = False
 
         if not is_clean or force:
+            logger.info(
+                f'Creating new revision for recipe ID [{self.id}]',
+                extra={'code': INFO_CREATE_REVISION}
+            )
+
             self.latest_revision = RecipeRevision.objects.create(
                 recipe=self, parent=revision, **data)
 
