@@ -14,7 +14,7 @@ Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
-this.EXPORTED_SYMBOLS = ["EnvExpressions"];
+this.EXPORTED_SYMBOLS = ["FilterExpressions"];
 
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
@@ -39,7 +39,7 @@ XPCOMUtils.defineLazyGetter(this, "jexl", () => {
   return jexl;
 });
 
-this.EnvExpressions = {
+this.FilterExpressions = {
   getLatestTelemetry: Task.async(function *() {
     const pings = yield TelemetryArchive.promiseArchivedPingList();
 
@@ -77,10 +77,10 @@ this.EnvExpressions = {
     // First clone the extra context
     const context = Object.assign({normandy: {}}, extraContext);
     // jexl handles promises, so it is fine to include them in this data.
-    context.telemetry = EnvExpressions.getLatestTelemetry();
+    context.telemetry = FilterExpressions.getLatestTelemetry();
 
     context.normandy = Object.assign(context.normandy, {
-      userId: EnvExpressions.getUserId(),
+      userId: FilterExpressions.getUserId(),
       distribution: Preferences.get("distribution.id", "default"),
     });
 

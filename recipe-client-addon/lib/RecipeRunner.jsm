@@ -10,7 +10,7 @@ Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
-Cu.import("resource://shield-recipe-client/lib/EnvExpressions.jsm");
+Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
@@ -111,7 +111,7 @@ this.RecipeRunner = {
    * @return {boolean} The result of evaluating the filter, cast to a bool.
    */
   checkFilter(recipe, extraContext) {
-    return EnvExpressions.eval(recipe.filter_expression, extraContext)
+    return FilterExpressions.eval(recipe.filter_expression, extraContext)
       .then(result => {
         return !!result;
       })

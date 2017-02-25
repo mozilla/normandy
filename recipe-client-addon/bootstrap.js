@@ -78,7 +78,7 @@ this.shutdown = function(data, reason) {
 
   const modules = [
     "lib/CleanupManager.jsm",
-    "lib/EnvExpressions.jsm",
+    "lib/FilterExpressions.jsm",
     "lib/EventEmitter.jsm",
     "lib/Heartbeat.jsm",
     "lib/LogManager.jsm",
