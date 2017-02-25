@@ -112,3 +112,37 @@ add_task(withServer(function* test_fetchAction() {
   const action = yield NormandyApi.fetchAction("show-heartbeat");
   equal(action.name, "show-heartbeat");
 }));
+
+add_task(function* () {
+  // Point the add-on to the test server.
+  const prefManager = new PrefManager();
+  prefManager.setCharPref(
+    "extensions.shield-recipe-client.api_url",
+    "http://test/browser/browser/extensions/shield-recipe-client/test"
+  );
+
+  try {
+    // Test that NormandyApi can fetch from the test server.
+    let response = yield NormandyApi.get("unit/test_server.sjs");
+    let data = yield response.json();
+    Assert.deepEqual(data, {queryString: {}, body: {}}, "NormandyApi returned incorrect server data.");
+
+    // Test that NormandyApi can send query string parameters to the test server.
+    response = yield NormandyApi.get("unit/test_server.sjs", {foo: "bar", baz: "biff"});
+    data = yield response.json();
+    Assert.deepEqual(
+      data, {queryString: {foo: "bar", baz: "biff"}, body: {}},
+      "NormandyApi sent an incorrect query string."
+    );
+
+    // Test that NormandyApi can POST JSON-formatted data to the test server.
+    response = yield NormandyApi.post("unit/test_server.sjs", {foo: "bar", baz: "biff"});
+    data = yield response.json();
+    Assert.deepEqual(
+      data, {queryString: {}, body: {foo: "bar", baz: "biff"}},
+      "NormandyApi sent an incorrect query string."
+    );
+  } finally {
+    prefManager.cleanup();
+  }
+});
