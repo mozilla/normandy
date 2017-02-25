@@ -221,10 +221,12 @@
 
   .revision-number {
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     /* Force table cell to smallest width */
-    white-space: nowrap;
-    width: 1px;
+    width: 91px;
   }
 
   .status-indicator {

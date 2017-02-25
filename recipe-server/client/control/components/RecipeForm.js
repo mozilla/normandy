@@ -96,7 +96,7 @@ export class RecipeForm extends React.Component {
       dispatch,
     } = this.props;
 
-    if (!user.id) {
+    if (!user || !user.id) {
       dispatch(makeApiRequest('getCurrentUser'))
         .then(receivedUser => dispatch(userInfoReceived(receivedUser)));
     }
@@ -144,7 +144,7 @@ export class RecipeForm extends React.Component {
    * Form action buttons remotely fire this handler with a (string) action type,
    * which then triggers the appropriate API requests/etc.
    *
-   * @param  {string} action Action type to trigger. ex: 'close', 'approve', 'reject'
+   * @param  {string} action Action type to trigger. ex: 'cancel', 'approve', 'reject'
    */
   handleFormAction(action) {
     const {
@@ -153,7 +153,7 @@ export class RecipeForm extends React.Component {
     } = this.props;
 
     switch (action) {
-      case 'close': {
+      case 'cancel': {
         dispatch(makeApiRequest('closeApprovalRequest', {
           requestId: recipe.approval_request.id,
         })).then(() => {

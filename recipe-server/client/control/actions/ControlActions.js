@@ -29,7 +29,7 @@ const API_REQUEST_SETTINGS = {
 const apiRequestMap = {
   getCurrentUser() {
     return {
-      url: `${BASE_API_URL}user/me`,
+      url: `${BASE_API_URL}user/me/`,
       settings: {
         method: 'GET',
       },
@@ -63,26 +63,6 @@ const apiRequestMap = {
         method: 'GET',
       },
       errorNotification: 'Error fetching recipe revision.',
-    };
-  },
-
-  getApprovalRequests() {
-    return {
-      url: `${BASE_API_URL}approval_request/`,
-      settings: {
-        method: 'GET',
-      },
-      errorNotification: 'Error fetching approval requests.',
-    };
-  },
-
-  getApprovalRequestInfo({ requestId }) {
-    return {
-      url: `${BASE_API_URL}approval_request/${requestId}/`,
-      settings: {
-        method: 'GET',
-      },
-      errorNotification: 'Error fetching approval request info.',
     };
   },
 
