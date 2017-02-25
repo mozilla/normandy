@@ -18,6 +18,7 @@ import {
   showNotification,
   setSelectedRecipe,
   singleRecipeReceived,
+  userInfoReceived,
 } from 'control/actions/ControlActions';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
@@ -46,6 +47,7 @@ export class RecipeForm extends React.Component {
       arguments: pt.object.isRequired,
     }),
     recipeFields: pt.object,
+    user: pt.object,
     dispatch: pt.func.isRequired,
     // route props passed from router
     route: pt.object,
@@ -88,6 +90,18 @@ export class RecipeForm extends React.Component {
     this.handleFormAction = ::this.handleFormAction;
   }
 
+  componentWillMount() {
+    const {
+      user,
+      dispatch,
+    } = this.props;
+
+    if (!user.id) {
+      dispatch(makeApiRequest('getCurrentUser'))
+        .then(receivedUser => dispatch(userInfoReceived(receivedUser)));
+    }
+  }
+
   /**
    * Generates an object relevant to the user/draft state. All values returned
    * are cast as booleans.
@@ -102,29 +116,25 @@ export class RecipeForm extends React.Component {
       pristine,
       submitting,
       recipeId,
+      user: {
+        id: userId,
+      },
     } = this.props;
     const requestDetails = recipe && recipe.approval_request;
-    // #TODO: get actual user id
-    const currentUserID = requestDetails && requestDetails.creator.id;
-
+    const currentUserID = userId;
     const requestAuthorID = requestDetails && requestDetails.creator.id;
 
-    const isCloning = !!(route && route.isCloning);
     const isUserViewingOutdated = !!(routeParams && routeParams.revisionId);
     const isPendingApproval = !!(requestDetails && !requestDetails.approved);
-    const isUserRequestor = requestAuthorID === currentUserID;
-    const isAlreadySaved = !!recipeId;
-    const isFormPristine = pristine;
-
     const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated);
 
     return {
-      isCloning,
+      isCloning: !!(route && route.isCloning),
+      isUserRequestor: requestAuthorID === currentUserID,
+      isAlreadySaved: !!recipeId,
+      isFormPristine: pristine,
       isUserViewingOutdated,
       isPendingApproval,
-      isUserRequestor,
-      isAlreadySaved,
-      isFormPristine,
       isFormDisabled,
     };
   }
@@ -355,6 +365,7 @@ const connector = connect(
   state => ({
     selectedAction: selector(state, 'action'),
     recipeFields: selector(state, 'arguments'),
+    user: state.user,
   }),
 
   // Bound functions for writing to the server.

@@ -12,6 +12,8 @@ export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
 
+export const RECEIVED_USER_INFO = 'RECEIVED_USER_INFO';
+
 
 const BASE_API_URL = '/api/v1/';
 
@@ -25,6 +27,15 @@ const API_REQUEST_SETTINGS = {
 };
 
 const apiRequestMap = {
+  getCurrentUser() {
+    return {
+      url: `${BASE_API_URL}user/me`,
+      settings: {
+        method: 'GET',
+      },
+      errorNotification: 'Error retrieving user info.',
+    };
+  },
   fetchAllRecipes() {
     return {
       url: `${BASE_API_URL}recipe/`,
@@ -160,6 +171,12 @@ const apiRequestMap = {
   },
 };
 
+function userInfoReceived(user) {
+  return {
+    type: RECEIVED_USER_INFO,
+    user,
+  };
+}
 
 function requestInProgress() {
   return {
@@ -268,9 +285,9 @@ function makeApiRequest(requestType, requestData) {
   };
 }
 
-
 export {
   makeApiRequest,
+  userInfoReceived,
   recipesReceived,
   singleRecipeReceived,
   setSelectedRecipe,
