@@ -247,7 +247,6 @@ export default class ShowHeartbeatAction extends Action {
       return;
     }
 
-    this.location = await this.normandy.location();
     this.client = await this.normandy.client();
 
     // pull some data to attach to the telemetry business

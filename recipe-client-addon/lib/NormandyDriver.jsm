@@ -127,11 +127,6 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
       return storage;
     },
 
-    location() {
-      const location = Cu.cloneInto({countryCode: extraContext.country}, sandbox);
-      return sandbox.Promise.resolve(location);
-    },
-
     setTimeout(cb, time) {
       if (typeof cb !== "function") {
         throw new sandbox.Error(`setTimeout must be called with a function, got "${typeof cb}"`);

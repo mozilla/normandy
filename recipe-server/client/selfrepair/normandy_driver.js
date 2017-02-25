@@ -142,11 +142,6 @@ export default class NormandyDriver {
     this._testingOverride = value;
   }
 
-  _location = { countryCode: null };
-  location() {
-    return Promise.resolve(this._location);
-  }
-
   log(message, level = 'debug') {
     if (level === 'debug' && !this.testing) {
       return;
