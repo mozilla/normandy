@@ -21,6 +21,7 @@
     "babel-runtime": "6.11.6",
     "classnames": "2.2.5",
     "cssmin": "0.4.3",
+    "deep-diff": "0.3.4",
     "font-awesome": "4.6.3",
     "jexl": "1.1.4",
     "jquery": "3.1.0",
@@ -43,7 +44,8 @@
     "redux-thunk": "2.1.0",
     "sha.js": "2.4.5",
     "uglifyjs": "2.4.10",
-    "underscore": "1.8.3"
+    "underscore": "1.8.3",
+    "underscore.string": "3.3.4"
   },
   "devDependencies": {
     "babel-core": "6.14.0",

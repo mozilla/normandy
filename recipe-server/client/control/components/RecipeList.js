@@ -16,7 +16,7 @@ import {
 import RecipeFilters from 'control/components/RecipeFilters';
 
 const BooleanIcon = props => {
-  const iconClass = props.value ? 'fa-check green' : 'fa-times red';
+  const iconClass = props.value ? 'fa-check color-green' : 'fa-times color-red';
   return <i className={`fa fa-lg ${iconClass}`}>&nbsp;</i>;
 };
 BooleanIcon.propTypes = {
@@ -170,6 +170,7 @@ class DisconnectedRecipeList extends React.Component {
 
       return (
         <Td
+          key={slug + displayValue}
           column={slug}
           data={displayValue}
         >

@@ -206,7 +206,7 @@ thead {
 }
 
 tr:nth-child(even) {
-  background: rgba($cream, 0.5);
+  background: rgba($cream, 0.25);
 }
 
 td {
@@ -331,3 +331,113 @@ i {
   display: block;
   padding: 1em;
 }
+
+
+.history-item {
+  cursor: pointer;
+  display: block;
+  height: auto;
+  list-style: none;
+  list-style-type: none;
+  padding: 0.5em 0.5em 1.5em;
+  position: relative;
+
+  &:nth-child(2n) {
+    background: rgba($cream, 0.5);
+  }
+
+  &:last-child {
+    i.fa-long-arrow-up {
+      display: none;
+    }
+  }
+
+  i.fa-long-arrow-up {
+    font-size: 1.5em !important;
+    left: 0.45em;
+    opacity: 0.5;
+    position: absolute;
+    top: 100%;
+    transform: translateY(-50%);
+    z-index: 555;
+  }
+
+  .currently-viewing {
+    position: absolute;
+    right: 0.5em;
+    top: calc(50% - 0.5em);
+  }
+
+  .history-content {
+    display: block;
+    margin: 1em 1em 1em 2em;
+    position: relative;
+  }
+
+  .history-id {
+    display: block;
+    margin: 0 0 1em;
+
+    small {
+      display: block;
+    }
+  }
+
+  .draft-status-icon {
+    margin-left: -1.85em;
+    padding-right: 0.5em;
+    position: relative;
+    top: 0.65em;
+  }
+
+  .show-changes {
+    opacity: 0.5;
+  }
+
+  .change-list {
+    box-sizing: content-box;
+    list-style: none;
+    padding: 1em 2em;
+
+    li {
+      display: inline-block;
+      min-width: 230px;
+    }
+  }
+
+  .change-from,
+  .change-to {
+    background: #EEE;
+    border: 1px solid #DDD;
+    display: inline-block;
+    margin: 0.5em 0 1.5em 1em;
+    padding: 0.55em 1em;
+  }
+
+  .change-to {
+    margin-left: 0;
+  }
+
+  .change-label {
+    position: relative;
+
+    .fa {
+      left: -0.3em;
+      position: relative;
+    }
+  }
+}
+
+
+.draft-history {
+  float: right;
+  max-width: 48%;
+  width: 265px;
+
+  .recipe-history {
+    margin-top: 10px;
+    max-height: 280px;
+    overflow: auto;
+  }
+}
+

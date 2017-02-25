@@ -16,5 +16,18 @@ $yellow: #F8F8C3;
 $grey: #777;
 
 
-.red { color: $red; }
-.green { color: $green; }
+/**
+ * Automatically generate a list of color classes
+ */
+$colors: (green, $green),
+  (red, $red),
+  (yellow, $yellow),
+  (grey, $grey),
+  (blue, $cta),
+  (cta, $cta);
+
+@each $colorClass, $colorVal in $colors {
+  .color-#{$colorClass} {
+    color: $colorVal;
+  }
+}
