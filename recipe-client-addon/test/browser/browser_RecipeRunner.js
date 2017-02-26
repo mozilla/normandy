@@ -25,7 +25,7 @@ add_task(function* execute() {
     registerAction('test-action', TestAction);
   `;
 
-  const result = yield RecipeRunner.executeAction(recipe, {}, actionScript);
+  const result = yield RecipeRunner.executeAction(recipe, actionScript);
   is(result.foo, "bar", "Recipe executed correctly");
 });
 
@@ -46,7 +46,7 @@ add_task(function* error() {
 
   let gotException = false;
   try {
-    yield RecipeRunner.executeAction({}, {}, actionScript);
+    yield RecipeRunner.executeAction({}, actionScript);
   } catch (err) {
     gotException = true;
     is(err.message, "ERROR MESSAGE", "RecipeRunner throws errors from the sandbox correctly.");
@@ -77,11 +77,37 @@ add_task(function* globalObject() {
     registerAction('test-action', TestAction);
   `;
 
-  const result = yield RecipeRunner.executeAction({}, {}, actionScript);
+  const result = yield RecipeRunner.executeAction({}, actionScript);
   Assert.deepEqual(result, {
     setOnWindow: "set",
     setOnGlobal: "set",
     setTimeoutExists: true,
     clearTimeoutExists: true,
   }, "sandbox.window is the global object and has expected functions.");
+});
+
+add_task(function* getFilterContext() {
+  const context = RecipeRunner.getFilterContext();
+
+  // Test for expected properties in the filter expression context.
+  const expectedNormandyKeys = [
+    "country",
+    "distribution",
+    "request_time",
+    "telemetry",
+    "userId",
+  ];
+  for (const key of expectedNormandyKeys) {
+    ok(key in context.normandy, `normandy.${key} is available`);
+  }
+});
+
+add_task(function* checkFilter() {
+  const check = filter => RecipeRunner.checkFilter({filter_expression: filter});
+
+  // Errors must result in a false return value.
+  ok(!(yield check("invalid ( + 5yntax")), "Invalid filter expressions return false");
+
+  // Non-boolean filter results result in a true return value.
+  ok(yield check("[1, 2, 3]"), "Non-boolean filter expressions return true");
 });

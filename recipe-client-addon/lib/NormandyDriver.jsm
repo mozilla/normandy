@@ -16,6 +16,7 @@ Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
+Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -24,7 +25,7 @@ this.EXPORTED_SYMBOLS = ["NormandyDriver"];
 const log = LogManager.getLogger("normandy-driver");
 const actionLog = LogManager.getLogger("normandy-driver.actions");
 
-this.NormandyDriver = function(sandboxManager, extraContext = {}) {
+this.NormandyDriver = function(sandboxManager) {
   if (!sandboxManager) {
     throw new Error("sandboxManager is required");
   }
@@ -40,7 +41,7 @@ this.NormandyDriver = function(sandboxManager, extraContext = {}) {
     },
 
     get userId() {
-      return FilterExpressions.getUserId();
+      return ClientEnvironment.getEnvironment().userId;
     },
 
     log(message, level = "debug") {

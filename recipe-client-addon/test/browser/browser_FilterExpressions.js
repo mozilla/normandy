@@ -1,18 +1,9 @@
 "use strict";
 
 const {utils: Cu} = Components;
-Cu.import("resource://gre/modules/Preferences.jsm");
-Cu.import("resource://gre/modules/TelemetryController.jsm", this);
-Cu.import("resource://gre/modules/Task.jsm", this);
-
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm", this);
-Cu.import("resource://shield-recipe-client/test/browser/Utils.jsm", this);
 
 add_task(function* () {
-  // setup
-  yield TelemetryController.submitExternalPing("testfoo", {foo: 1});
-  yield TelemetryController.submitExternalPing("testbar", {bar: 2});
-
   let val;
   // Test that basic expressions work
   val = yield FilterExpressions.eval("2+2");
@@ -25,15 +16,6 @@ add_task(function* () {
     2
   `);
   is(val, 4, "multiline expression works");
-
-  // Test it can access telemetry
-  val = yield FilterExpressions.eval("telemetry");
-  is(typeof val, "object", "Telemetry is accesible");
-
-  // Test it reads different types of telemetry
-  val = yield FilterExpressions.eval("telemetry");
-  is(val.testfoo.payload.foo, 1, "value 'foo' is in mock telemetry");
-  is(val.testbar.payload.bar, 2, "value 'bar' is in mock telemetry");
 
   // Test has a date transform
   val = yield FilterExpressions.eval('"2016-04-22"|date');
@@ -67,28 +49,7 @@ add_task(function* () {
   val = yield FilterExpressions.eval('["test-4"]|bucketSample(0, 5, 10)');
   is(val, false, "Bucket sample returns false for a known sample");
 
-  // Test that userId is available
-  val = yield FilterExpressions.eval("normandy.userId");
-  ok(Utils.UUID_REGEX.test(val), "userId available");
-
-  // test that it pulls from the right preference
-  yield SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.user_id", "fake id"]]});
-  val = yield FilterExpressions.eval("normandy.userId");
-  Assert.equal(val, "fake id", "userId is pulled from preferences");
-
-  // test that it merges context correctly, `userId` comes from the default context, and
-  // `injectedValue` comes from us. Expect both to be on the final `normandy` object.
-  val = yield FilterExpressions.eval(
-    "[normandy.userId, normandy.injectedValue]",
-    {normandy: {injectedValue: "injected"}});
-  Assert.deepEqual(val, ["fake id", "injected"], "context is correctly merged");
-
-  // distribution id defaults to "default"
-  val = yield FilterExpressions.eval("normandy.distribution");
-  Assert.equal(val, "default", "distribution has a default value");
-
-  // distribution id is in the context
-  yield SpecialPowers.pushPrefEnv({set: [["distribution.id", "funnelcake"]]});
-  val = yield FilterExpressions.eval("normandy.distribution");
-  Assert.equal(val, "funnelcake", "distribution is read from preferences");
+  // Test that it reads from the context correctly.
+  val = yield FilterExpressions.eval("first + second + 3", {first: 1, second: 2});
+  is(val, 6, "context is available to filter expressions");
 });
