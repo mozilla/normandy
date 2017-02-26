@@ -58,3 +58,33 @@ add_task(ClientEnvironment.withMockClassify(mockClassify, function* testCountryR
     "request_time is read from the server API"
   );
 }));
+
+add_task(function* testSync() {
+  let environment = ClientEnvironment.getEnvironment();
+  is(environment.syncMobileDevices, 0, "syncMobileDevices defaults to zero");
+  is(environment.syncDesktopDevices, 0, "syncDesktopDevices defaults to zero");
+  is(environment.syncTotalDevices, 0, "syncTotalDevices defaults to zero");
+  yield SpecialPowers.pushPrefEnv({
+    set: [
+      ["services.sync.numClients", 9],
+      ["services.sync.clients.devices.mobile", 5],
+      ["services.sync.clients.devices.desktop", 4],
+    ],
+  });
+  environment = ClientEnvironment.getEnvironment();
+  is(environment.syncMobileDevices, 5, "syncMobileDevices is read when set");
+  is(environment.syncDesktopDevices, 4, "syncDesktopDevices is read when set");
+  is(environment.syncTotalDevices, 9, "syncTotalDevices is read when set");
+});
+
+add_task(function* testDoNotTrack() {
+  let environment = ClientEnvironment.getEnvironment();
+
+  // doNotTrack defaults to false
+  ok(!environment.doNotTrack, "doNotTrack has a default value");
+
+  // doNotTrack is read from a preference
+  yield SpecialPowers.pushPrefEnv({set: [["privacy.donottrackheader.enabled", true]]});
+  environment = ClientEnvironment.getEnvironment();
+  ok(environment.doNotTrack, "doNotTrack is read from preferences");
+});

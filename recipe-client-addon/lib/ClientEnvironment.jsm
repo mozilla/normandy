@@ -5,6 +5,8 @@
 "use strict";
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+Cu.import("resource:///modules/ShellService.jsm");
+Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
@@ -102,6 +104,68 @@ this.ClientEnvironment = {
         }
         return telemetry;
       });
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "version", () => {
+      return Services.appinfo.version;
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "channel", () => {
+      return Services.appinfo.defaultUpdateChannel;
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "isDefaultBrowser", () => {
+      return ShellService.isDefaultBrowser();
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "searchEngine", () => {
+      return Task.spawn(function* () {
+        const init = yield new Promise(resolve => Services.search.init(resolve));
+        if (Components.isSuccessCode(init)) {
+          return Services.search.defaultEngine.identifier;
+        }
+        return null;
+      });
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "syncSetup", () => {
+      return Preferences.isSet("services.sync.username");
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "syncDesktopDevices", () => {
+      return Preferences.get("services.sync.clients.devices.desktop", 0);
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "syncMobileDevices", () => {
+      return Preferences.get("services.sync.clients.devices.mobile", 0);
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "syncTotalDevices", () => {
+      return Preferences.get("services.sync.numClients", 0);
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "plugins", () => {
+      return Task.spawn(function* () {
+        const plugins = yield AddonManager.getAddonsByTypes(["plugin"]);
+        return plugins.reduce((pluginMap, plugin) => {
+          pluginMap[plugin.name] = {
+            name: plugin.name,
+            description: plugin.description,
+            version: plugin.version,
+          };
+          return pluginMap;
+        }, {});
+      });
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "locale", () => {
+      return Cc["@mozilla.org/chrome/chrome-registry;1"]
+        .getService(Ci.nsIXULChromeRegistry)
+        .getSelectedLocale("browser");
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "doNotTrack", () => {
+      return Preferences.get("privacy.donottrackheader.enabled", false);
     });
 
     return environment;

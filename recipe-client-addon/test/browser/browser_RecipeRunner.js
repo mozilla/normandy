@@ -91,11 +91,22 @@ add_task(function* getFilterContext() {
 
   // Test for expected properties in the filter expression context.
   const expectedNormandyKeys = [
+    "channel",
     "country",
     "distribution",
+    "doNotTrack",
+    "isDefaultBrowser",
+    "locale",
+    "plugins",
     "request_time",
+    "searchEngine",
+    "syncDesktopDevices",
+    "syncMobileDevices",
+    "syncSetup",
+    "syncTotalDevices",
     "telemetry",
     "userId",
+    "version",
   ];
   for (const key of expectedNormandyKeys) {
     ok(key in context.normandy, `normandy.${key} is available`);

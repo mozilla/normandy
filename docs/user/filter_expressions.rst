@@ -206,6 +206,10 @@ filter expressions.
    .. _Telemetry: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/index.html
    .. _Telemetry data documentation: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/index.html
 
+.. js:attribute:: normandy.doNotTrack
+
+   Boolean specifying whether the user has enabled Do Not Track.
+
 Transforms
 ----------
 This section describes the transforms available to filter expressions, and what
