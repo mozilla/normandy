@@ -42,6 +42,10 @@ this.NormandyApi = {
     return this.apiCall("get", endpoint, data);
   },
 
+  post(endpoint, data) {
+    return this.apiCall("post", endpoint, data);
+  },
+
   absolutify(url) {
     const apiBase = prefs.getCharPref("api_url");
     const server = new URL(apiBase).origin;
