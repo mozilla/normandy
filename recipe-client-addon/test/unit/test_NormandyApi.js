@@ -21,8 +21,8 @@ class PrefManager {
   }
 
   cleanup() {
-    for (const name of this.oldValues) {
-      Services.setCharPref(name, this.oldValues[name]);
+    for (const name of Object.keys(this.oldValues)) {
+      Services.prefs.setCharPref(name, this.oldValues[name]);
     }
   }
 }
