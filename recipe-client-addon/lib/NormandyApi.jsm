@@ -24,7 +24,7 @@ this.NormandyApi = {
     method = method.toLowerCase();
 
     let body = undefined;
-    if (data !== undefined) {
+    if (data) {
       if (method === "get") {
         for (const key of Object.keys(data)) {
           url.searchParams.set(key, data[key]);

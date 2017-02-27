@@ -12,10 +12,10 @@ function handleRequest(request, response) {
 
   // Read request body
   const inputStream = new BinaryInputStream(request.bodyInputStream);
-  const bytes = [];
+  let bytes = [];
   let available;
   while ((available = inputStream.available()) > 0) {
-    Array.prototype.push.apply(bytes, inputStream.readByteArray(available));
+    bytes = bytes.concat(inputStream.readByteArray(available));
   }
   const body = String.fromCharCode.apply(null, bytes);
 
