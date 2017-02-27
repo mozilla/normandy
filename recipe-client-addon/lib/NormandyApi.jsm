@@ -10,17 +10,17 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/CanonicalJSON.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
-Cu.importGlobalProperties(["fetch"]); /* globals fetch */
+Cu.importGlobalProperties(["fetch", "URL"]); /* globals fetch, URL */
 
 this.EXPORTED_SYMBOLS = ["NormandyApi"];
 
 const log = LogManager.getLogger("normandy-api");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
+let indexPromise;
+
 this.NormandyApi = {
-  apiCall(method, endpoint, data = {}) {
-    const api_url = prefs.getCharPref("api_url");
-    let url = `${api_url}/${endpoint}`;
+  apiCall(method, url, data = {}) {
     method = method.toLowerCase();
 
     if (method === "get") {
@@ -45,13 +45,34 @@ this.NormandyApi = {
     return this.apiCall("get", endpoint, data);
   },
 
-  post(endpoint, data) {
-    return this.apiCall("post", endpoint, data);
+  absolutify(url) {
+    const apiBase = prefs.getCharPref("api_url");
+    const server = new URL(apiBase).origin;
+    if (url.startsWith("http")) {
+      return url;
+    } else if (url.startsWith("/")) {
+      return server + url;
+    }
+    throw new Error("Can't use relative urls");
   },
 
-  fetchRecipes: Task.async(function* (filters = {}) {
-    const recipeResponse = yield this.get("recipe/signed/", filters);
-    const rawText = yield recipeResponse.text();
+  getApiUrl: Task.async(function * (name) {
+    const apiBase = prefs.getCharPref("api_url");
+    if (!indexPromise) {
+      indexPromise = this.get(apiBase).then(res => res.json());
+    }
+    const index = yield indexPromise;
+    if (!(name in index)) {
+      throw new Error(`API endpoint with name "${name}" not found.`);
+    }
+    const url = index[name];
+    return this.absolutify(url);
+  }),
+
+  fetchRecipes: Task.async(function* (filters = {enabled: true}) {
+    const signedRecipesUrl = yield this.getApiUrl("recipe-signed");
+    const recipesResponse = yield this.get(signedRecipesUrl, filters);
+    const rawText = yield recipesResponse.text();
     const recipesWithSigs = JSON.parse(rawText);
 
     const verifiedRecipes = [];
@@ -63,20 +84,29 @@ this.NormandyApi = {
         throw new Error("Canonical recipe serialization does not match!");
       }
 
-      const certChainResponse = yield fetch(x5u);
+      const certChainResponse = yield fetch(this.absolutify(x5u));
       const certChain = yield certChainResponse.text();
       const builtSignature = `p384ecdsa=${signature}`;
 
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
         .createInstance(Ci.nsIContentSignatureVerifier);
 
-      if (!verifier.verifyContentSignature(serialized, builtSignature, certChain, "normandy.content-signature.mozilla.org")) {
+      const valid = verifier.verifyContentSignature(
+        serialized,
+        builtSignature,
+        certChain,
+        "normandy.content-signature.mozilla.org"
+      );
+      if (!valid) {
         throw new Error("Recipe signature is not valid");
       }
       verifiedRecipes.push(recipe);
     }
 
-    log.debug(`Fetched ${verifiedRecipes.length} recipes from the server:`, verifiedRecipes.map(r => r.name).join(", "));
+    log.debug(
+      `Fetched ${verifiedRecipes.length} recipes from the server:`,
+      verifiedRecipes.map(r => r.name).join(", ")
+    );
 
     return verifiedRecipes;
   }),
@@ -85,16 +115,20 @@ this.NormandyApi = {
    * Fetch metadata about this client determined by the server.
    * @return {object} Metadata specified by the server
    */
-  classifyClient() {
-    return this.get("classify_client/")
-      .then(response => response.json())
-      .then(clientData => {
-        clientData.request_time = new Date(clientData.request_time);
-        return clientData;
-      });
-  },
+  classifyClient: Task.async(function* () {
+    const classifyClientUrl = yield this.getApiUrl("classify-client");
+    const response = yield this.get(classifyClientUrl);
+    const clientData = yield response.json();
+    clientData.request_time = new Date(clientData.request_time);
+    return clientData;
+  }),
 
-  fetchAction(name) {
-    return this.get(`action/${name}/`).then(req => req.json());
-  },
+  fetchAction: Task.async(function* (name) {
+    let actionApiUrl = yield this.getApiUrl("action-list");
+    if (!actionApiUrl.endsWith("/")) {
+      actionApiUrl += "/";
+    }
+    const res = yield this.get(actionApiUrl + name);
+    return yield res.json();
+  }),
 };

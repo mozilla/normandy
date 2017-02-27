@@ -97,7 +97,7 @@ class Core(Configuration):
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.SessionAuthentication'
         ),
-        'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.DjangoFilterBackend'],
+        'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
         'DEFAULT_RENDERER_CLASSES': (
             'normandy.base.api.renderers.CanonicalJSONRenderer',
@@ -281,6 +281,8 @@ class Base(Core):
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
     CDN_URL = values.URLValue(None)
+    # URL that bypasses any CDNs
+    APP_SERVER_URL = values.URLValue(None)
 
     # URL for the CSP report-uri directive.
     CSP_REPORT_URI = values.Value(None)
