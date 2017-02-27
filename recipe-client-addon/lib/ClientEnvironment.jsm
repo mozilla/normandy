@@ -5,20 +5,19 @@
 "use strict";
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-Cu.import("resource:///modules/ShellService.jsm");
-Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Task.jsm");
-Cu.import("resource://gre/modules/TelemetryArchive.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "Services", "resource:///modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ShellService", "resource:///modules/ShellService.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AddonManager", "resource://gre/modules/AddonManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "TelemetryArchive", "resource://gre/modules/TelemetryArchive.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "NormandyApi", "resource://shield-recipe-client/lib/NormandyApi.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
 this.EXPORTED_SYMBOLS = ["ClientEnvironment"];
-
-const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
 // Cached API request for client attributes that are determined by the Normandy
 // service.
@@ -60,11 +59,11 @@ this.ClientEnvironment = {
     const environment = {};
 
     XPCOMUtils.defineLazyGetter(environment, "userId", () => {
-      let id = prefs.getCharPref("user_id");
-      if (id === "") {
+      let id = Preferences.get("extensions.shield-recipe-client.user_id", "");
+      if (!id) {
         // generateUUID adds leading and trailing "{" and "}". strip them off.
         id = generateUUID().toString().slice(1, -1);
-        prefs.setCharPref("user_id", id);
+        Preferences.set("extensions.shield-recipe-client.user_id", id);
       }
       return id;
     });
@@ -81,30 +80,28 @@ this.ClientEnvironment = {
       return Preferences.get("distribution.id", "default");
     });
 
-    XPCOMUtils.defineLazyGetter(environment, "telemetry", () => {
-      return Task.spawn(function *() {
-        const pings = yield TelemetryArchive.promiseArchivedPingList();
+    XPCOMUtils.defineLazyGetter(environment, "telemetry", Task.async(function *() {
+      const pings = yield TelemetryArchive.promiseArchivedPingList();
 
-        // get most recent ping per type
-        const mostRecentPings = {};
-        for (const ping of pings) {
-          if (ping.type in mostRecentPings) {
-            if (mostRecentPings[ping.type].timeStampCreated < ping.timeStampCreated) {
-              mostRecentPings[ping.type] = ping;
-            }
-          } else {
+      // get most recent ping per type
+      const mostRecentPings = {};
+      for (const ping of pings) {
+        if (ping.type in mostRecentPings) {
+          if (mostRecentPings[ping.type].timeStampCreated < ping.timeStampCreated) {
             mostRecentPings[ping.type] = ping;
           }
+        } else {
+          mostRecentPings[ping.type] = ping;
         }
+      }
 
-        const telemetry = {};
-        for (const key in mostRecentPings) {
-          const ping = mostRecentPings[key];
-          telemetry[ping.type] = yield TelemetryArchive.promiseArchivedPingById(ping.id);
-        }
-        return telemetry;
-      });
-    });
+      const telemetry = {};
+      for (const key in mostRecentPings) {
+        const ping = mostRecentPings[key];
+        telemetry[ping.type] = yield TelemetryArchive.promiseArchivedPingById(ping.id);
+      }
+      return telemetry;
+    }));
 
     XPCOMUtils.defineLazyGetter(environment, "version", () => {
       return Services.appinfo.version;
@@ -118,15 +115,13 @@ this.ClientEnvironment = {
       return ShellService.isDefaultBrowser();
     });
 
-    XPCOMUtils.defineLazyGetter(environment, "searchEngine", () => {
-      return Task.spawn(function* () {
-        const init = yield new Promise(resolve => Services.search.init(resolve));
-        if (Components.isSuccessCode(init)) {
-          return Services.search.defaultEngine.identifier;
-        }
-        return null;
-      });
-    });
+    XPCOMUtils.defineLazyGetter(environment, "searchEngine", Task.async(function* () {
+      const searchInitialized = yield new Promise(resolve => Services.search.init(resolve));
+      if (Components.isSuccessCode(searchInitialized)) {
+        return Services.search.defaultEngine.identifier;
+      }
+      return null;
+    }));
 
     XPCOMUtils.defineLazyGetter(environment, "syncSetup", () => {
       return Preferences.isSet("services.sync.username");
@@ -144,19 +139,17 @@ this.ClientEnvironment = {
       return Preferences.get("services.sync.numClients", 0);
     });
 
-    XPCOMUtils.defineLazyGetter(environment, "plugins", () => {
-      return Task.spawn(function* () {
-        const plugins = yield AddonManager.getAddonsByTypes(["plugin"]);
-        return plugins.reduce((pluginMap, plugin) => {
-          pluginMap[plugin.name] = {
-            name: plugin.name,
-            description: plugin.description,
-            version: plugin.version,
-          };
-          return pluginMap;
-        }, {});
-      });
-    });
+    XPCOMUtils.defineLazyGetter(environment, "plugins", Task.async(function* () {
+      const plugins = yield AddonManager.getAddonsByTypes(["plugin"]);
+      return plugins.reduce((pluginMap, plugin) => {
+        pluginMap[plugin.name] = {
+          name: plugin.name,
+          description: plugin.description,
+          version: plugin.version,
+        };
+        return pluginMap;
+      }, {});
+    }));
 
     XPCOMUtils.defineLazyGetter(environment, "locale", () => {
       return Cc["@mozilla.org/chrome/chrome-registry;1"]
