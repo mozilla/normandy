@@ -186,6 +186,26 @@ filter expressions.
 
    On Firefox versions prior to 48.0, this value is set to ``undefined``.
 
+.. js:attribute:: normandy.telemetry
+
+   Object containing data for the most recent Telemetry_ packet of each type.
+   This allows you to target recipes at users based on their Telemetry data.
+
+   The object is keyed off the ping type, as documented in the
+   `Telemetry data documentation`_ (see the ``type`` field in the packet
+   example). The value is the contents of the ping.
+
+   .. code-block:: javascript
+
+      // Target clients that are running Firefox on a tablet
+      normandy.telemetry.main.environment.system.device.isTablet
+
+      // Target clients whose last crash had a BuildID of "201403021422"
+      normandy.telemetry.crash.payload.metadata.BuildID == '201403021422'
+
+   .. _Telemetry: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/index.html
+   .. _Telemetry data documentation: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/index.html
+
 Transforms
 ----------
 This section describes the transforms available to filter expressions, and what
