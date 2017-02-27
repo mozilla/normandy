@@ -1,0 +1,55 @@
+import React, { PropTypes as pt } from 'react';
+import { push } from 'react-router-redux';
+import { makeApiRequest, recipeDisabled } from 'control/actions/ControlActions';
+import composeRecipeContainer from 'control/components/RecipeContainer';
+
+class DisableRecipe extends React.Component {
+  static propTypes = {
+    dispatch: pt.func.isRequired,
+    recipeId: pt.number.isRequired,
+    recipe: pt.object,
+  }
+
+  constructor(props) {
+    super(props);
+    this.disableRecipe = ::this.disableRecipe;
+  }
+
+  disableRecipe(event) {
+    const { dispatch, recipeId } = this.props;
+
+    event.preventDefault();
+    dispatch(makeApiRequest('disableRecipe', { recipeId }))
+    .then(() => {
+      dispatch(recipeDisabled(recipeId));
+      dispatch(push(`/control/recipe/${recipeId}/`));
+    });
+  }
+
+  render() {
+    const { recipe } = this.props;
+    if (recipe) {
+      return (
+        <div className="fluid-8">
+          <form action="" className="crud-form">
+            <p>Are you sure you want to disable "{recipe.name}"?</p>
+            <div className="form-action-buttons">
+              <div className="fluid-2 float-right">
+                <input
+                  type="submit"
+                  value="Confirm"
+                  className="delete"
+                  onClick={this.disableRecipe}
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+      );
+    }
+
+    return null;
+  }
+}
+
+export default composeRecipeContainer(DisableRecipe);
