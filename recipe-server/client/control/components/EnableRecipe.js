@@ -28,27 +28,26 @@ class EnableRecipe extends React.Component {
 
   render() {
     const { recipe } = this.props;
-    if (recipe) {
-      return (
-        <div className="fluid-8">
-          <form action="" className="crud-form">
-            <p>Are you sure you want to enable "{recipe.name}"?</p>
-            <div className="form-action-buttons">
-              <div className="fluid-2 float-right">
-                <input
-                  type="submit"
-                  value="Confirm"
-                  className="submit"
-                  onClick={this.enableRecipe}
-                />
-              </div>
-            </div>
-          </form>
-        </div>
-      );
-    }
 
-    return null;
+    if (!recipe) { return null; }
+
+    return (
+      <div className="fluid-8">
+        <form action="" className="crud-form">
+          <p>Are you sure you want to enable "{recipe.name}"?</p>
+          <div className="form-action-buttons">
+            <div className="fluid-2 float-right">
+              <input
+                type="submit"
+                value="Confirm"
+                className="submit"
+                onClick={this.enableRecipe}
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    );
   }
 }
 

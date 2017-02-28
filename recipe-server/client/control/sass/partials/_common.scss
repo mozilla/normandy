@@ -127,23 +127,18 @@ a.button {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
   text-transform: uppercase;
 
-  &:disabled,
-  &:disabled:hover {
-    background-color: #7F9497;
-    color: $cream;
-  }
-
   &.delete {
     background-color: $red;
 
     &:hover {
       background-color: $redHover;
     }
+  }
 
-    &:disabled,
-    &:disabled:hover {
-      background-color: #B58F8F;
-    }
+  &:disabled,
+  &:disabled:hover {
+    background-color: #7F9497;
+    color: $cream;
   }
 }
 

@@ -28,27 +28,26 @@ class DisableRecipe extends React.Component {
 
   render() {
     const { recipe } = this.props;
-    if (recipe) {
-      return (
-        <div className="fluid-8">
-          <form action="" className="crud-form">
-            <p>Are you sure you want to disable "{recipe.name}"?</p>
-            <div className="form-action-buttons">
-              <div className="fluid-2 float-right">
-                <input
-                  type="submit"
-                  value="Confirm"
-                  className="delete"
-                  onClick={this.disableRecipe}
-                />
-              </div>
-            </div>
-          </form>
-        </div>
-      );
-    }
 
-    return null;
+    if (!recipe) { return null; }
+
+    return (
+      <div className="fluid-8">
+        <form action="" className="crud-form">
+          <p>Are you sure you want to disable "{recipe.name}"?</p>
+          <div className="form-action-buttons">
+            <div className="fluid-2 float-right">
+              <input
+                type="submit"
+                value="Confirm"
+                className="delete"
+                onClick={this.disableRecipe}
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    );
   }
 }
 
