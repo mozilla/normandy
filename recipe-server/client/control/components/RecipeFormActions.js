@@ -73,23 +73,6 @@ export default class RecipeFormActions extends React.Component {
     recipeId,
   }) {
     return [
-      // enable
-      <FormButton
-        display={!isUserViewingOutdated && !isEnabled}
-        disabled={!isApproved}
-        className="action-enable submit"
-        label="Enable"
-        element={isApproved ? Link : 'button'}
-        to={`/control/recipe/${recipeId}/enable/`}
-      />,
-      // disable
-      <FormButton
-        display={!isUserViewingOutdated && isEnabled}
-        className="action-disable submit delete"
-        label="Disable"
-        element={Link}
-        to={`/control/recipe/${recipeId}/disable/`}
-      />,
       // delete
       <FormButton
         display={isAlreadySaved && !isCloning}
@@ -114,6 +97,23 @@ export default class RecipeFormActions extends React.Component {
         className="action-new submit"
         type="submit"
         label="Save New Recipe"
+      />,
+      // enable
+      <FormButton
+        display={!isUserViewingOutdated && !isEnabled}
+        disabled={!isApproved}
+        className="action-enable submit"
+        label="Enable"
+        element={isApproved ? Link : 'button'}
+        to={`/control/recipe/${recipeId}/enable/`}
+      />,
+      // disable
+      <FormButton
+        display={!isUserViewingOutdated && isEnabled}
+        className="action-disable submit delete"
+        label="Disable"
+        element={Link}
+        to={`/control/recipe/${recipeId}/disable/`}
       />,
       // cancel
       <FormButton
