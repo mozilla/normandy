@@ -12,7 +12,6 @@ const propFactory = props => ({
   isAlreadySaved: false,
   isFormPristine: false,
   isCloning: false,
-  isFormDisabled: false,
   recipeId: 12345,
   ...props,
 });
@@ -23,46 +22,10 @@ describe('<RecipeFormActions>', () => {
     expect(wrapper).not.toThrow();
   });
 
-
-  describe('Revert button', () => {
-    const displayCriteria = {
-      isUserViewingOutdated: true,
-      isFormPristine: true,
-    };
-
-    it('should NOT display when user is viewing a current revision', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserViewingOutdated: false,
-        })}
-      />);
-      expect(wrapper.find('.action-revert').length).toBe(0);
-    });
-
-    it('should NOT display when user is viewing an outdated revision with changes', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserViewingOutdated: true,
-          isFormPristine: false,
-        })}
-      />);
-      expect(wrapper.find('.action-revert').length).toBe(0);
-    });
-
-    it('should display when user is viewing an outdated, pristine revision', () => {
-      const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
-      expect(wrapper.find('.action-revert').length).toBe(1);
-    });
-  });
-
-
   describe('Cancel button', () => {
     const displayCriteria = {
       isUserViewingOutdated: false,
       isPendingApproval: true,
-      isUserRequestor: true,
     };
 
     it('should fire a `cancel` action', () => {
@@ -97,82 +60,17 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-cancel').length).toBe(0);
     });
 
-    it('should NOT display if user is not the approval requestor', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserRequestor: false,
-        })}
-      />);
-      expect(wrapper.find('.action-cancel').length).toBe(0);
-    });
-
     it('should display with proper criteria', () => {
       const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
       expect(wrapper.find('.action-cancel').length).toBe(1);
     });
   });
 
-
-  describe('Back to Latest/Review button', () => {
-    const displayCriteria = {
-      isUserViewingOutdated: true,
-      isCloning: false,
-    };
-
-    it('should NOT display when viewing the current revision', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserViewingOutdated: false,
-        })}
-      />);
-      expect(wrapper.find('.action-back').length).toBe(0);
-    });
-
-    it('should NOT display when user is cloning a recipe', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isCloning: true,
-        })}
-      />);
-      expect(wrapper.find('.action-back').length).toBe(0);
-    });
-
-    it('should display when viewing an outdated revision and NOT cloning', () => {
-      const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
-      expect(wrapper.find('.action-back').length).toBe(1);
-    });
-
-    it('should read `Back to Latest` if no approval request is open', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isPendingApproval: false,
-        })}
-      />);
-      expect(wrapper.find('.action-back').text()).toBe('Back to Latest');
-    });
-
-    it('should read `Back to Review` if an approval request is open', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isPendingApproval: true,
-        })}
-      />);
-      expect(wrapper.find('.action-back').text()).toBe('Back to Review');
-    });
-  });
-
-
   describe('Approve + Reject Buttons', () => {
     const displayCriteria = {
       isUserViewingOutdated: false,
       isPendingApproval: true,
       isCloning: false,
-      isUserRequestor: false,
     };
 
     it('should fire an `approve` action', () => {
@@ -232,15 +130,15 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-reject').length).toBe(0);
     });
 
-    it('should NOT display when user is the approval requestor', () => {
+    it('should NOT be enabled when user is the approval requestor', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
           ...displayCriteria,
           isUserRequestor: true,
         })}
       />);
-      expect(wrapper.find('.action-approve').length).toBe(0);
-      expect(wrapper.find('.action-reject').length).toBe(0);
+      expect(wrapper.find('.action-approve').prop('disabled')).toBe(true);
+      expect(wrapper.find('.action-reject').prop('disabled')).toBe(true);
     });
 
     it('should display with proper criteria', () => {
@@ -253,31 +151,9 @@ describe('<RecipeFormActions>', () => {
 
   describe('Delete button', () => {
     const displayCriteria = {
-      isUserViewingOutdated: false,
-      isPendingApproval: false,
       isAlreadySaved: true,
       isCloning: false,
     };
-
-    it('should NOT display when viewing an outdated revision', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserViewingOutdated: true,
-        })}
-      />);
-      expect(wrapper.find('.action-delete').length).toBe(0);
-    });
-
-    it('should NOT display when there is an approval request open', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isPendingApproval: true,
-        })}
-      />);
-      expect(wrapper.find('.action-delete').length).toBe(0);
-    });
 
     it('should NOT display if the recipe is brand new and has not been saved yet', () => {
       const wrapper = mount(<RecipeFormActions
@@ -336,11 +212,11 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-request').length).toBe(0);
     });
 
-    it('should NOT display when there is an approval request open', () => {
+    it('should NOT display when there is an approval request, at all', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
           ...displayCriteria,
-          isPendingApproval: true,
+          hasApprovalRequest: true,
         })}
       />);
       expect(wrapper.find('.action-request').length).toBe(0);
@@ -366,14 +242,14 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-request').length).toBe(0);
     });
 
-    it('should NOT display if user has edited the recipe form', () => {
+    it('should NOT be enabled if user has edited the recipe form', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
           ...displayCriteria,
           isFormPristine: false,
         })}
       />);
-      expect(wrapper.find('.action-request').length).toBe(0);
+      expect(wrapper.find('.action-request').props().disabled).toBe(true);
     });
 
     it('should display with proper criteria', () => {
@@ -384,32 +260,9 @@ describe('<RecipeFormActions>', () => {
 
   describe('Save Draft button', () => {
     const displayCriteria = {
-      isUserViewingOutdated: false,
-      isPendingApproval: false,
       isAlreadySaved: true,
       isCloning: false,
-      isFormPristine: false,
     };
-
-    it('should NOT display when viewing an outdated revision', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserViewingOutdated: true,
-        })}
-      />);
-      expect(wrapper.find('.action-save').length).toBe(0);
-    });
-
-    it('should NOT display when there is an approval request open', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isPendingApproval: true,
-        })}
-      />);
-      expect(wrapper.find('.action-save').length).toBe(0);
-    });
 
     it('should NOT display if the recipe is brand new and has not been saved yet', () => {
       const wrapper = mount(<RecipeFormActions
@@ -421,7 +274,7 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-save').length).toBe(0);
     });
 
-    it('should NOT display when user is cloning a recipe', () => {
+    it('should not display when user is cloning a recipe', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
           ...displayCriteria,
@@ -431,14 +284,22 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-save').length).toBe(0);
     });
 
-    it('should NOT display if user has NOT edited the recipe form', () => {
-      const wrapper = mount(<RecipeFormActions
+    it('should NOT be enabled if user has NOT edited the recipe form', () => {
+      let wrapper = mount(<RecipeFormActions
         {...propFactory({
           ...displayCriteria,
           isFormPristine: true,
         })}
       />);
-      expect(wrapper.find('.action-save').length).toBe(0);
+      expect(wrapper.find('.action-save').props().disabled).toBe(true);
+
+      wrapper = mount(<RecipeFormActions
+        {...propFactory({
+          ...displayCriteria,
+          isFormPristine: false,
+        })}
+      />);
+      expect(wrapper.find('.action-save').props().disabled).toBe(false);
     });
 
     it('should display with proper criteria', () => {
@@ -449,38 +310,15 @@ describe('<RecipeFormActions>', () => {
 
   describe('New Recipe button', () => {
     const displayCriteria = {
-      isCloning: false,
-      isPendingApproval: false,
       isAlreadySaved: false,
-      // include the negation of the second criteria to prevent accidental passes
-      isUserViewingOutdated: false,
-      isFormPristine: true,
-    };
-    // - or -
-    const otherDisplayCriteria = {
-      isUserViewingOutdated: true,
-      isFormPristine: false,
-      // include the negation of the first criteria to prevent accidental passes
       isCloning: true,
-      isPendingApproval: true,
-      isAlreadySaved: true,
     };
 
-    it('should NOT display when user is cloning a recipe', () => {
+    it('should NOT display when user is NOT cloning a recipe', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
-          ...displayCriteria,
-          isCloning: true,
-        })}
-      />);
-      expect(wrapper.find('.action-new').length).toBe(0);
-    });
-
-    it('should NOT display when there is an approval request open', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isPendingApproval: true,
+          isAlreadySaved: true,
+          isCloning: false,
         })}
       />);
       expect(wrapper.find('.action-new').length).toBe(0);
@@ -489,39 +327,15 @@ describe('<RecipeFormActions>', () => {
     it('should NOT display if the recipe already exists in the DB', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
-          ...displayCriteria,
           isAlreadySaved: true,
+          isCloning: false,
         })}
       />);
       expect(wrapper.find('.action-new').length).toBe(0);
     });
 
-    // other criteria
-    it('should NOT display when user is viewing a current revision', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...otherDisplayCriteria,
-          isUserViewingOutdated: false,
-        })}
-      />);
-      expect(wrapper.find('.action-new').length).toBe(0);
-    });
-
-    it('should NOT display when user has not edited the form', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...otherDisplayCriteria,
-          isFormPristine: true,
-        })}
-      />);
-      expect(wrapper.find('.action-new').length).toBe(0);
-    });
-
-    it('should display if either display criteria is met', () => {
-      let wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
-      expect(wrapper.find('.action-new').length).toBe(1);
-
-      wrapper = mount(<RecipeFormActions {...propFactory(otherDisplayCriteria)} />);
+    it('should display if display criteria is met', () => {
+      const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
       expect(wrapper.find('.action-new').length).toBe(1);
     });
   });

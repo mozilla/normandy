@@ -49,6 +49,9 @@ export default class RecipeFormActions extends React.Component {
     isFormPristine: pt.bool,
     isCloning: pt.bool,
     isFormDisabled: pt.bool,
+    isAccepted: pt.bool,
+    isRejected: pt.bool,
+    hasApprovalRequest: pt.bool,
     recipeId: pt.number,
   };
 
@@ -60,77 +63,66 @@ export default class RecipeFormActions extends React.Component {
     isFormPristine,
     isCloning,
     isFormDisabled,
+    hasApprovalRequest,
     recipeId,
   }) {
     return [
-      // revert
-      <FormButton
-        display={isUserViewingOutdated && isFormPristine}
-        disabled={isFormDisabled}
-        className={'action-revert submit'}
-        type={'submit'}
-        label={'Revert to this Revision'}
-      />,
-      // cancel
-      <FormButton
-        display={!isUserViewingOutdated && isPendingApproval && isUserRequestor}
-        className={'action-cancel submit delete'}
-        onClick={this.createActionEmitter('cancel')}
-        label={'Cancel Review Request'}
-      />,
-      // back to latest
-      <FormButton
-        display={isUserViewingOutdated && !isCloning}
-        element={Link}
-        className={'action-back'}
-        to={`/control/recipe/${recipeId}/`}
-        label={`Back to ${isPendingApproval ? 'Review' : 'Latest'}`}
-      />,
-      // approve
-      <FormButton
-        display={!isUserViewingOutdated && isPendingApproval && !isCloning && !isUserRequestor}
-        className={'action-approve submit'}
-        onClick={this.createActionEmitter('approve')}
-        label={'Approve'}
-      />,
-      // reject
-      <FormButton
-        display={!isUserViewingOutdated && isPendingApproval && !isCloning && !isUserRequestor}
-        className={'action-reject submit delete'}
-        onClick={this.createActionEmitter('reject')}
-        label={'Reject'}
-      />,
       // delete
       <FormButton
-        display={!isUserViewingOutdated && !isPendingApproval && isAlreadySaved && !isCloning}
-        className={'action-delete delete'}
-        label={'Delete'}
+        display={isAlreadySaved && !isCloning}
+        disabled={isFormDisabled}
+        className="action-delete delete"
+        label="Delete"
         element={Link}
         to={`/control/recipe/${recipeId}/delete/`}
       />,
-      // request
-      <FormButton
-        display={!isUserViewingOutdated && !isPendingApproval && isAlreadySaved
-          && !isCloning && isFormPristine}
-        className={'action-request submit'}
-        onClick={this.createActionEmitter('request')}
-        label={'Request Approval'}
-      />,
       // save
       <FormButton
-        display={!isPendingApproval && isAlreadySaved && !isCloning && !isFormPristine
-          && !isUserViewingOutdated}
-        className={'action-save submit'}
-        type={'submit'}
-        label={'Save Draft'}
+        disabled={isFormPristine}
+        display={isAlreadySaved && !isCloning}
+        className="action-save submit"
+        type="submit"
+        label="Save Draft"
       />,
       // new
       <FormButton
-        display={(!isCloning && !isPendingApproval && !isAlreadySaved)
-          || (isUserViewingOutdated && !isFormPristine)}
-        className={'action-new submit'}
-        type={'submit'}
-        label={'Save New Recipe'}
+        disabled={isFormPristine}
+        display={!isAlreadySaved || isCloning}
+        className="action-new submit"
+        type="submit"
+        label="Save New Recipe"
+      />,
+      // cancel
+      <FormButton
+        display={!isUserViewingOutdated && isPendingApproval}
+        className="action-cancel submit delete"
+        onClick={this.createActionEmitter('cancel')}
+        label="Cancel Review Request"
+      />,
+      // approve
+      <FormButton
+        display={!isUserViewingOutdated && isPendingApproval && !isCloning}
+        disabled={isUserRequestor}
+        className="action-approve submit"
+        onClick={this.createActionEmitter('approve')}
+        label="Approve"
+      />,
+      // reject
+      <FormButton
+        display={!isUserViewingOutdated && isPendingApproval && !isCloning}
+        disabled={isUserRequestor}
+        className="action-reject submit delete"
+        onClick={this.createActionEmitter('reject')}
+        label="Reject"
+      />,
+      // request
+      <FormButton
+        display={!isUserViewingOutdated && !hasApprovalRequest
+          && !isPendingApproval && isAlreadySaved && !isCloning}
+        disabled={!isFormPristine}
+        className="action-request submit"
+        onClick={this.createActionEmitter('request')}
+        label="Request Approval"
       />,
     ];
   }

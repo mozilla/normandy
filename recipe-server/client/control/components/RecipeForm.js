@@ -125,8 +125,12 @@ export class RecipeForm extends React.Component {
     const requestAuthorID = requestDetails && requestDetails.creator.id;
 
     const isUserViewingOutdated = !!(routeParams && routeParams.revisionId);
-    const isPendingApproval = !!(requestDetails && !requestDetails.approved);
+    const hasApprovalRequest = !!requestDetails;
+    const isPendingApproval = hasApprovalRequest && requestDetails.approved === null;
     const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated);
+
+    const isAccepted = hasApprovalRequest && requestDetails.approved === true;
+    const isRejected = hasApprovalRequest && requestDetails.approved === false;
 
     return {
       isCloning: !!(route && route.isCloning),
@@ -136,6 +140,9 @@ export class RecipeForm extends React.Component {
       isUserViewingOutdated,
       isPendingApproval,
       isFormDisabled,
+      isAccepted,
+      isRejected,
+      hasApprovalRequest,
     };
   }
 
@@ -173,13 +180,35 @@ export class RecipeForm extends React.Component {
       case 'approve': {
         dispatch(makeApiRequest('acceptApprovalRequest', {
           requestId: recipe.approval_request.id,
-        }));
+        })).then(updatedRequest => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Recipe review successfully approved!.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: updatedRequest,
+          }));
+        });
         break;
       }
       case 'reject': {
         dispatch(makeApiRequest('rejectApprovalRequest', {
           requestId: recipe.approval_request.id,
-        }));
+        })).then(updatedRequest => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Recipe review successfully rejected.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: updatedRequest,
+          }));
+        });
         break;
       }
       case 'request': {
@@ -230,6 +259,18 @@ export class RecipeForm extends React.Component {
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
         { RecipeForm.renderCloningMessage(this.props) }
+
+        { renderVars.isAccepted &&
+          <div>
+            This recipe has been approved.
+          </div>
+        }
+        { renderVars.isRejected &&
+          <div>
+            This recipe has been rejected. Create another draft and submit another
+            request.
+          </div>
+        }
 
         <ControlField
           disabled={isFormDisabled}

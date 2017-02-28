@@ -174,13 +174,8 @@
     padding: 30px 15px 15px;
 
     .delete {
-      background-color: $red;
       display: inline-block;
       float: left;
-
-      &:hover {
-        background-color: $redHover;
-      }
     }
 
     .submit {
