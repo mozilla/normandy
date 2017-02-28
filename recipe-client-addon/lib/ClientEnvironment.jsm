@@ -22,14 +22,22 @@ this.EXPORTED_SYMBOLS = ["ClientEnvironment"];
 // Cached API request for client attributes that are determined by the Normandy
 // service.
 let _classifyRequest = null;
-const getClientClassification = Task.async(function *() {
-  if (!_classifyRequest) {
-    _classifyRequest = NormandyApi.classifyClient();
-  }
-  return yield _classifyRequest;
-});
 
 this.ClientEnvironment = {
+  /**
+   * Fetches information about the client that is calculated on the server,
+   * like geolocation and the current time.
+   *
+   * The server request is made lazily and is cached for the entire browser
+   * session.
+   */
+  getClientClassification: Task.async(function *() {
+    if (!_classifyRequest) {
+      _classifyRequest = NormandyApi.classifyClient();
+    }
+    return yield _classifyRequest;
+  }),
+
   /**
    * Test wrapper that mocks the server request for classifying the client.
    * @param  {Object}   data          Fake server data to use
@@ -69,11 +77,13 @@ this.ClientEnvironment = {
     });
 
     XPCOMUtils.defineLazyGetter(environment, "country", () => {
-      return getClientClassification().then(classification => classification.country);
+      return ClientEnvironment.getClientClassification()
+        .then(classification => classification.country);
     });
 
     XPCOMUtils.defineLazyGetter(environment, "request_time", () => {
-      return getClientClassification().then(classification => classification.request_time);
+      return ClientEnvironment.getClientClassification()
+        .then(classification => classification.request_time);
     });
 
     XPCOMUtils.defineLazyGetter(environment, "distribution", () => {

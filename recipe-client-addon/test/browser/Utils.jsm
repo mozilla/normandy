@@ -27,4 +27,48 @@ this.Utils = {
       yield testGenerator(driver);
     });
   },
+
+  /**
+   * Test wrapper that replaces a property on an object with another value for
+   * the duration of the test. The test generator is passed the replaced value.
+   */
+  withPatch(object, propertyName, patchValue, testGenerator) {
+    return function* inner() {
+      const original = object[propertyName];
+      object[propertyName] = patchValue;
+      yield testGenerator(patchValue);
+      object[propertyName] = original;
+    };
+  },
+
+  /**
+   * Creates a wrapper function that tracks whether it has been called.
+   */
+  createMock(wrapped) {
+    const mock = function(...args) {
+      mock.called = true;
+      if ("returnValue" in mock) {
+        return mock.returnValue;
+      }
+      return wrapped(...args);
+    };
+    mock.called = false;
+    mock.reset = function() {
+      mock.called = false;
+    };
+
+    return mock;
+  },
+
+  /**
+   * Test wrapper that wraps a function on an object with a mock value.
+   */
+  withMock(object, propertyName, testGenerator) {
+    return this.withPatch(
+      object,
+      propertyName,
+      this.createMock(object[propertyName]),
+      testGenerator
+    );
+  },
 };

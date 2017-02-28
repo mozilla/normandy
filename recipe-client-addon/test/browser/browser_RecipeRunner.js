@@ -1,7 +1,9 @@
 "use strict";
 
 const {utils: Cu} = Components;
+Cu.import("resource://shield-recipe-client/test/browser/Utils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 
 add_task(function* execute() {
   // Test that RecipeRunner can execute a basic recipe/action and return
@@ -122,3 +124,28 @@ add_task(function* checkFilter() {
   // Non-boolean filter results result in a true return value.
   ok(yield check("[1, 2, 3]"), "Non-boolean filter expressions return true");
 });
+
+add_task(
+  Utils.withMock(ClientEnvironment, "getClientClassification",
+    function* testStart(mockGet) {
+      mockGet.returnValue = Promise.resolve(false);
+
+      // When the experiment pref is false, eagerly call getClientClassification.
+      yield SpecialPowers.pushPrefEnv({set: [
+        ["extensions.shield-recipe-client.experiments.lazy_classify", false],
+      ]});
+      ok(!mockGet.called, "getClientClassification hasn't been called");
+      yield RecipeRunner.start();
+      ok(mockGet.called, "getClientClassfication was called eagerly");
+
+      // When the experiment pref is true, do not eagerly call getClientClassification.
+      yield SpecialPowers.pushPrefEnv({set: [
+        ["extensions.shield-recipe-client.experiments.lazy_classify", true],
+      ]});
+      mockGet.reset();
+      ok(!mockGet.called, "getClientClassification hasn't been called");
+      yield RecipeRunner.start();
+      ok(!mockGet.called, "getClientClassfication was not called eagerly");
+    }
+  )
+);

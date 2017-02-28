@@ -14,7 +14,10 @@ Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
+
+XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
@@ -60,6 +63,11 @@ this.RecipeRunner = {
   },
 
   start: Task.async(function* () {
+    // Unless lazy classification is enabled, prep the classify cache.
+    if (!Preferences.get("extensions.shield-recipe-client.experiments.lazy_classify", false)) {
+      yield ClientEnvironment.getClientClassification();
+    }
+
     let recipes;
     try {
       recipes = yield NormandyApi.fetchRecipes({enabled: true});
