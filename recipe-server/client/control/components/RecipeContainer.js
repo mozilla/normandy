@@ -56,10 +56,7 @@ export default function composeRecipeContainer(Component) {
 
       return dispatch(makeApiRequest('fetchSingleRevision', { revisionId }))
         .then(revision => {
-          dispatch(singleRevisionReceived({
-            revision,
-            recipeId: revision.recipe.id,
-          }));
+          dispatch(singleRevisionReceived({ revision }));
         });
     }
 
@@ -69,40 +66,40 @@ export default function composeRecipeContainer(Component) {
   }
 
   const mapStateToProps = (state, props) => {
-    let recipeData = null;
-    let revisionData = null;
+    let recipe = null;
+    let revision = null;
     const selectedRecipeId = state.recipes && state.recipes.selectedRecipe;
     let selectedRevisionId = props.routeParams && props.routeParams.revisionId;
 
-    const revReference = state.recipes.revisions[selectedRecipeId] || {};
+    const recipeRevisions = state.recipes.revisions[selectedRecipeId] || {};
 
     if (selectedRecipeId) {
-      recipeData = state.recipes.list
-        .find(recipe => recipe.id === selectedRecipeId);
+      recipe = state.recipes.list
+        .find(rec => rec.id === selectedRecipeId);
 
       // If there is a selected revision, attempt to pull that info.
       if (!selectedRevisionId) {
         // If there is _not_ a selected revision, default to the latest
         let latestId = -1;
 
-        for (const revisionId in revReference) {
-          if (revReference[revisionId].id > latestId) {
-            latestId = revReference[revisionId].revision_id;
+        for (const revisionId in recipeRevisions) {
+          if (recipeRevisions[revisionId].id > latestId) {
+            latestId = recipeRevisions[revisionId].revision_id;
           }
         }
-        selectedRevisionId = revReference[latestId] && revReference[latestId].revision_id;
+        selectedRevisionId = recipeRevisions[latestId] && recipeRevisions[latestId].revision_id;
       }
 
-      revisionData = revReference[selectedRevisionId];
+      revision = recipeRevisions[selectedRevisionId];
 
-      if (!revisionData) {
-        recipeData = null;
+      if (!revision) {
+        recipe = null;
       }
     }
     return {
       recipeId: state.recipes.selectedRecipe || parseInt(props.params.id, 10) || null,
-      recipe: recipeData,
-      revision: revisionData,
+      recipe,
+      revision,
       dispatch: props.dispatch,
     };
   };

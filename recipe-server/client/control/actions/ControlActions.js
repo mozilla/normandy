@@ -189,10 +189,9 @@ function singleRecipeReceived(recipe) {
   };
 }
 
-function singleRevisionReceived({ revision, recipeId }) {
+function singleRevisionReceived({ revision }) {
   return {
     type: SINGLE_REVISION_RECEIVED,
-    recipeId,
     revision,
   };
 }

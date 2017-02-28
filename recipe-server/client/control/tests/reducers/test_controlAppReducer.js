@@ -2,6 +2,8 @@ import appReducer from 'control/reducers';
 import * as actions from 'control/actions/ControlActions';
 import {
   fixtureRecipes,
+  fixtureStoredRevisions,
+  fixtureStoredSingleRevision,
   initialState,
 } from 'control/tests/fixtures';
 
@@ -40,7 +42,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         list: fixtureRecipes,
-        revisions: {},
+        revisions: fixtureStoredRevisions,
         selectedRecipe: null,
         recipeListNeedsFetch: false,
       },
@@ -55,7 +57,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         list: [fixtureRecipes[0]],
-        revisions: {},
+        revisions: fixtureStoredSingleRevision,
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
       },
@@ -140,19 +142,12 @@ describe('controlApp reducer', () => {
   it('should handle RECIPE_ADDED', () => {
     expect(appReducer(initialState, {
       type: actions.RECIPE_ADDED,
-      recipe: {
-        id: 4,
-        name: 'Villis stebulum',
-        enabled: false,
-      },
+      recipe: fixtureRecipes[0],
     })).toEqual({
       ...initialState,
       recipes: {
-        list: [{
-          id: 4,
-          name: 'Villis stebulum',
-          enabled: false,
-        }],
+        list: [fixtureRecipes[0]],
+        revisions: fixtureStoredSingleRevision,
         selectedRecipe: null,
         recipeListNeedsFetch: true,
       },
@@ -160,36 +155,39 @@ describe('controlApp reducer', () => {
   });
 
   it('should handle RECIPE_UPDATED', () => {
+    const updatedRecipe = {
+      id: 3,
+      name: 'Updated recipe name',
+      enabled: true,
+      revision_id: 'ghi',
+    };
+
     expect(appReducer({
       ...initialState,
       recipes: {
         ...initialState.recipes,
         list: fixtureRecipes,
+        revisions: fixtureStoredRevisions,
       },
     }, {
       type: actions.RECIPE_UPDATED,
-      recipe: {
-        id: 3,
-        name: 'Updated recipe name',
-        enabled: true,
-      },
+      recipe: updatedRecipe,
     })).toEqual({
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 1,
-          name: 'Lorem Ipsum',
-          enabled: true,
-        }, {
-          id: 2,
-          name: 'Dolor set amet',
-          enabled: true,
-        }, {
-          id: 3,
-          name: 'Updated recipe name',
-          enabled: true,
-        }],
+        list: [
+          { id: 1, name: 'Lorem Ipsum', enabled: true, revision_id: 'abc' },
+          { id: 2, name: 'Dolor set amet', enabled: true, revision_id: 'def' },
+          updatedRecipe,
+        ],
+        revisions: {
+          ...fixtureStoredRevisions,
+          3: {
+            ...fixtureStoredRevisions[3],
+            ghi: updatedRecipe,
+          },
+        },
         selectedRecipe: null,
         recipeListNeedsFetch: true,
       },
@@ -197,28 +195,23 @@ describe('controlApp reducer', () => {
   });
 
   it('should handle RECIPE_DELETED', () => {
+    const testId = 3;
     expect(appReducer({
       ...initialState,
       recipes: {
         ...initialState.recipes,
         list: fixtureRecipes,
+        revisions: fixtureStoredRevisions,
       },
     }, {
       type: actions.RECIPE_DELETED,
-      recipeId: 3,
+      recipeId: testId,
     })).toEqual({
       ...initialState,
       recipes: {
         ...initialState.recipes,
-        list: [{
-          id: 1,
-          name: 'Lorem Ipsum',
-          enabled: true,
-        }, {
-          id: 2,
-          name: 'Dolor set amet',
-          enabled: true,
-        }],
+        list: fixtureRecipes.filter(rec => rec.id !== testId),
+        revisions: fixtureStoredRevisions,
         selectedRecipe: null,
         recipeListNeedsFetch: true,
       },
