@@ -1,10 +1,12 @@
 import {
-  RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED, RECIPE_ADDED,
-  RECIPE_UPDATED, RECIPE_DELETED, SET_SELECTED_RECIPE,
+  RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED,
+  SINGLE_REVISION_RECEIVED, RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
+  SET_SELECTED_RECIPE,
 } from 'control/actions/ControlActions';
 
 const initialState = {
   list: [],
+  revisions: {},
   selectedRecipe: null,
   recipeListNeedsFetch: true,
 };
@@ -20,20 +22,45 @@ const dedupe = arr => {
 };
 
 function recipesReducer(state = initialState, action) {
+  let newRevisions = {};
+
   switch (action.type) {
-    case RECIPES_RECEIVED:
+    case RECIPES_RECEIVED: {
+      [].concat(action.recipes).forEach(recipe => {
+        newRevisions[recipe.id] = {};
+        newRevisions[recipe.id][recipe.revision_id] = { ...recipe };
+      });
       return {
         ...state,
-        list: dedupe(action.recipes.concat(state.list)),
+        list: [].concat(action.recipes),
+        revisions: newRevisions,
         recipeListNeedsFetch: false,
       };
-    case SINGLE_RECIPE_RECEIVED:
+    }
+    case SINGLE_RECIPE_RECEIVED: {
+      newRevisions = { ...state.revisions };
+      newRevisions[action.recipe.id] = newRevisions[action.recipe.id] || {};
+      newRevisions[action.recipe.id][action.recipe.revision_id] = { ...action.recipe };
+
       return {
         ...state,
         list: dedupe([action.recipe].concat(state.list)),
+        revisions: newRevisions,
         recipeListNeedsFetch: true,
         selectedRecipe: action.recipe.id,
       };
+    }
+
+    case SINGLE_REVISION_RECEIVED: {
+      newRevisions = { ...state.revisions };
+      newRevisions[action.recipeId] = newRevisions[action.recipeId] || {};
+      newRevisions[action.recipeId][action.revision.id] = { ...action.revision.recipe };
+
+      return {
+        ...state,
+        revisions: newRevisions,
+      };
+    }
 
     case SET_SELECTED_RECIPE:
       return {

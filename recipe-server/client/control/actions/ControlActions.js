@@ -3,6 +3,7 @@ export const REQUEST_COMPLETE = 'REQUEST_COMPLETE';
 
 export const RECIPES_RECEIVED = 'RECIPES_RECEIVED';
 export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
+export const SINGLE_REVISION_RECEIVED = 'SINGLE_REVISION_RECEIVED';
 
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
@@ -188,6 +189,14 @@ function singleRecipeReceived(recipe) {
   };
 }
 
+function singleRevisionReceived({ revision, recipeId }) {
+  return {
+    type: SINGLE_REVISION_RECEIVED,
+    recipeId,
+    revision,
+  };
+}
+
 function recipeAdded(recipe) {
   return {
     type: RECIPE_ADDED,
@@ -270,6 +279,7 @@ export {
   userInfoReceived,
   recipesReceived,
   singleRecipeReceived,
+  singleRevisionReceived,
   setSelectedRecipe,
   showNotification,
   dismissNotification,

@@ -163,7 +163,7 @@ describe('<RecipeForm>', () => {
       const Component = ({ initialValues }) => <div>{initialValues}</div>;
       const WrappedComponent = initialValuesWrapper(Component);
       const wrapper = shallow(
-        <WrappedComponent recipe="fakerecipe" location={{}} />
+        <WrappedComponent recipe={'fakerecipe'} location={{}} />
       );
 
       expect(wrapper.find(Component).prop('initialValues')).toBe('fakerecipe');
@@ -172,9 +172,8 @@ describe('<RecipeForm>', () => {
     it('should pass the selected revision as initialValues when available', () => {
       const Component = ({ initialValues }) => <div>{initialValues}</div>;
       const WrappedComponent = initialValuesWrapper(Component);
-      const location = { state: { selectedRevision: 'fakerevision' } };
       const wrapper = shallow(
-        <WrappedComponent recipe="fakerecipe" location={location} />
+        <WrappedComponent recipe={'fakerecipe'} revision={'fakerevision'} />
       );
 
       expect(wrapper.find(Component).prop('initialValues')).toBe('fakerevision');

@@ -11,6 +11,7 @@ export const initialState = {
   },
   recipes: {
     list: [],
+    revisions: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },

@@ -33,6 +33,16 @@ export default (
           ]}
         />
         <Route
+          path="revision/:revisionId"
+          component={RecipeForm}
+          name="Revision"
+          ctaButtons={[
+            { text: 'Clone', icon: 'files-o', link: '../../clone/' },
+            { text: 'Preview', icon: 'eye', link: '../../preview/' },
+            { text: 'History', icon: 'history', link: '../../history/' },
+          ]}
+        />
+        <Route
           path="clone/"
           component={RecipeForm}
           name="Clone"

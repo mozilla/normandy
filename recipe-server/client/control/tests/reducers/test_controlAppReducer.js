@@ -40,6 +40,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         list: fixtureRecipes,
+        revisions: {},
         selectedRecipe: null,
         recipeListNeedsFetch: false,
       },
@@ -54,6 +55,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         list: [fixtureRecipes[0]],
+        revisions: {},
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
       },
@@ -68,6 +70,7 @@ describe('controlApp reducer', () => {
       ...initialState,
       recipes: {
         list: [],
+        revisions: {},
         selectedRecipe: 2,
         recipeListNeedsFetch: true,
       },
