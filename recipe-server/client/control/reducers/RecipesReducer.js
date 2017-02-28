@@ -9,18 +9,28 @@ const initialState = {
   recipeListNeedsFetch: true,
 };
 
+// This is unnecessary once landed in master
+const dedupe = arr => {
+  const seen = {};
+  return arr.filter(({ id }) => {
+    const hasSeen = seen[id];
+    seen[id] = true;
+    return !hasSeen;
+  });
+};
+
 function recipesReducer(state = initialState, action) {
   switch (action.type) {
     case RECIPES_RECEIVED:
       return {
         ...state,
-        list: [].concat(state.list).concat(action.recipes),
+        list: dedupe(action.recipes.concat(state.list)),
         recipeListNeedsFetch: false,
       };
     case SINGLE_RECIPE_RECEIVED:
       return {
         ...state,
-        list: [].concat(state.list).concat([action.recipe]),
+        list: dedupe([action.recipe].concat(state.list)),
         recipeListNeedsFetch: true,
         selectedRecipe: action.recipe.id,
       };
@@ -34,10 +44,7 @@ function recipesReducer(state = initialState, action) {
     case RECIPE_ADDED:
       return {
         ...state,
-        list: [].concat(state.list).concat([
-          ...state.list || [],
-          action.recipe,
-        ]),
+        list: dedupe([action.recipe].concat(state.list)),
       };
     case RECIPE_UPDATED:
       return {

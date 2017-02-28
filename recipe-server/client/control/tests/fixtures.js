@@ -5,6 +5,7 @@ export const fixtureRecipes = [
 ];
 
 export const initialState = {
+  user: {},
   controlApp: {
     isFetching: false,
   },

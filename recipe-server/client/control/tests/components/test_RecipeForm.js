@@ -13,7 +13,9 @@ import { recipeFactory } from '../../../tests/utils.js';
 function propFactory(props = {}) {
   return {
     handleSubmit: () => undefined,
+    dispatch: () => Promise.resolve(),
     submitting: false,
+    user: {},
     ...props,
   };
 }
@@ -31,21 +33,6 @@ describe('<RecipeForm>', () => {
     expect(wrapper.find(ConsoleLogFields).length).toBe(1);
   });
 
-  it('should render a delete button if editing an existing recipe', () => {
-    const recipe = recipeFactory();
-    const wrapper = shallow(
-      <RecipeForm recipeId={recipe.id} recipe={recipe} {...propFactory()} />
-    );
-    expect(wrapper.find('.delete').length).toBe(1);
-  });
-
-  it('should not render a delete button if creating a new recipe', () => {
-    const wrapper = shallow(
-      <RecipeForm {...propFactory()} />
-    );
-    expect(wrapper.find('.delete').length).toBe(0);
-  });
-
   it('should render a clone message if user is cloning', () => {
     const recipe = recipeFactory();
     const wrapper = shallow(
@@ -58,20 +45,6 @@ describe('<RecipeForm>', () => {
     );
     // message should exist
     expect(wrapper.find('.cloning-message').length).toBe(1);
-  });
-
-  it('should disable the submit button if currently submitting the form', () => {
-    const wrapper = shallow(
-      <RecipeForm {...propFactory({ submitting: true })} />
-    );
-    expect(wrapper.find('.submit').prop('disabled')).toBe(true);
-  });
-
-  it('should enable the submit button if not currently submitting the form', () => {
-    const wrapper = shallow(
-      <RecipeForm {...propFactory({ submitting: false })} />
-    );
-    expect(wrapper.find('.submit').prop('disabled')).toBe(false);
   });
 
   describe('asyncValidate', () => {
