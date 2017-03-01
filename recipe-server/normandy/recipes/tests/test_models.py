@@ -372,6 +372,11 @@ class TestRecipe(object):
         recipe.refresh_from_db()
         assert not recipe.is_approved
 
+    def test_revise_arguments(self):
+        recipe = RecipeFactory(arguments_json='[]')
+        recipe.revise(arguments=[{'id': 1}])
+        assert recipe.arguments_json == '[{"id": 1}]'
+
 
 @pytest.mark.django_db
 class TestRecipeRevision(object):
