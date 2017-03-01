@@ -128,7 +128,7 @@ export class RecipeForm extends React.Component {
         id: userId,
       },
     } = this.props;
-    const requestDetails = recipe.approval_request;
+    const requestDetails = recipe && recipe.approval_request;
     const currentUserID = userId;
     const hasApprovalRequest = !!requestDetails;
     const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
@@ -140,7 +140,7 @@ export class RecipeForm extends React.Component {
     const isAccepted = hasApprovalRequest && requestDetails.approved === true;
     const isRejected = hasApprovalRequest && requestDetails.approved === false;
 
-    const recipeRevisions = allRevisions[recipe.id] || {};
+    const recipeRevisions = allRevisions[recipe && recipe.id] || {};
     const lastApprovedRevisionId = getLastApprovedRevision(recipeRevisions).revision_id;
 
     return {
