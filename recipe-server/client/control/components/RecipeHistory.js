@@ -99,10 +99,7 @@ export class HistoryItem extends React.Component {
     if (revision.recipe.revision_id === recipe.revision_id) {
       dispatch(push(`/control/recipe/${recipe.id}/`));
     } else {
-      dispatch(push({
-        pathname: `/control/recipe/${recipe.id}/${revision.id}/`,
-        state: { selectedRevision: revision.recipe },
-      }));
+      dispatch(push(`/control/recipe/${recipe.id}/revision/${revision.id}/`));
     }
   }
 

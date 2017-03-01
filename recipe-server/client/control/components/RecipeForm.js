@@ -386,15 +386,14 @@ export const formConfig = {
  */
 export function initialValuesWrapper(Component) {
   function Wrapped(props) {
-    const { recipe, location } = props;
-    let initialValues = recipe;
-    if (location.state && location.state.selectedRevision) {
-      initialValues = location.state.selectedRevision;
-    }
+    const { recipe, revision } = props;
+
+    const initialValues = revision || recipe;
     return <Component initialValues={initialValues} {...props} />;
   }
   Wrapped.propTypes = {
     recipe: pt.object,
+    revision: pt.object,
     location: locationShape,
   };
 

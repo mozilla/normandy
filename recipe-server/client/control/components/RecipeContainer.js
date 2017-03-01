@@ -1,7 +1,11 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
-import { makeApiRequest, singleRecipeReceived, setSelectedRecipe }
-  from 'control/actions/ControlActions';
+import {
+  makeApiRequest,
+  singleRecipeReceived,
+  singleRevisionReceived,
+  setSelectedRecipe,
+} from 'control/actions/ControlActions';
 
 export default function composeRecipeContainer(Component) {
   class RecipeContainer extends React.Component {
@@ -17,29 +21,43 @@ export default function composeRecipeContainer(Component) {
       }
     }
 
-    componentWillReceiveProps({ recipeId }) {
-      if (recipeId && recipeId !== this.props.recipeId) {
-        this.getRecipeData(recipeId);
+    componentWillReceiveProps({ recipeId, routeParams = {} }) {
+      const isRecipeChanging = recipeId !== this.props.recipeId;
+      const isRouteRevisionChanging =
+        routeParams.revisionId !== this.props.routeParams.revisionId;
+
+      if (recipeId && isRecipeChanging) {
+        this.getRecipeData(recipeId, routeParams && routeParams.revisionId);
+      }
+      if (routeParams.revisionId && isRouteRevisionChanging) {
+        this.getRecipeRevision(routeParams.revisionId);
       }
     }
 
-    getRecipeData(recipeId) {
-      const { dispatch, recipe, routeParams } = this.props;
+    getRecipeData(recipeId, revisionId) {
+      const { dispatch, routeParams, recipe } = this.props;
       if (!recipe) {
         dispatch(setSelectedRecipe(recipeId));
 
-        if (routeParams.revisionId) {
-          dispatch(makeApiRequest('fetchSingleRevision', { revisionId: routeParams.revisionId }))
-          .then(revision => {
-            dispatch(singleRecipeReceived(revision.recipe));
-          });
-        } else {
-          dispatch(makeApiRequest('fetchSingleRecipe', { recipeId }))
-          .then(newRecipe => {
-            dispatch(singleRecipeReceived(newRecipe));
-          });
-        }
+        // always get the latest
+        dispatch(makeApiRequest('fetchSingleRecipe', { recipeId }))
+        .then(newRecipe => {
+          dispatch(singleRecipeReceived(newRecipe));
+          // get a specific revision, if specified
+          if (revisionId || routeParams.revisionId) {
+            this.getRecipeRevision(revisionId || routeParams.revisionId);
+          }
+        });
       }
+    }
+
+    getRecipeRevision(revisionId) {
+      const { dispatch } = this.props;
+
+      return dispatch(makeApiRequest('fetchSingleRevision', { revisionId }))
+        .then(revision => {
+          dispatch(singleRevisionReceived({ revision }));
+        });
     }
 
     render() {
@@ -48,15 +66,40 @@ export default function composeRecipeContainer(Component) {
   }
 
   const mapStateToProps = (state, props) => {
-    let recipeData = null;
-    if (state.recipes && state.recipes.list.length) {
-      recipeData = state.recipes.list
-        .find(recipe => recipe.id === state.recipes.selectedRecipe);
-    }
+    let recipe = null;
+    let revision = null;
+    const selectedRecipeId = state.recipes && state.recipes.selectedRecipe;
+    let selectedRevisionId = props.routeParams && props.routeParams.revisionId;
 
+    const recipeRevisions = state.recipes.revisions[selectedRecipeId] || {};
+
+    if (selectedRecipeId) {
+      recipe = state.recipes.list
+        .find(rec => rec.id === selectedRecipeId);
+
+      // If there is a selected revision, attempt to pull that info.
+      if (!selectedRevisionId) {
+        // If there is _not_ a selected revision, default to the latest
+        let latestId = -1;
+
+        for (const revisionId in recipeRevisions) {
+          if (recipeRevisions[revisionId].id > latestId) {
+            latestId = recipeRevisions[revisionId].revision_id;
+          }
+        }
+        selectedRevisionId = recipeRevisions[latestId] && recipeRevisions[latestId].revision_id;
+      }
+
+      revision = recipeRevisions[selectedRevisionId];
+
+      if (!revision) {
+        recipe = null;
+      }
+    }
     return {
       recipeId: state.recipes.selectedRecipe || parseInt(props.params.id, 10) || null,
-      recipe: recipeData,
+      recipe,
+      revision,
       dispatch: props.dispatch,
     };
   };
