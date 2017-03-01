@@ -334,6 +334,12 @@ i {
     text-align: left;
     width: 45%;
   }
+
+  .status-indicator {
+    float: right;
+    min-width: 150px;
+    width: auto;
+  }
 }
 
 .col-trigger {

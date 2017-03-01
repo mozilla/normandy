@@ -37,9 +37,12 @@
 
   h2 {
     color: $cream;
+    display: block;
     flex: 1;
     font: normal normal 300 20px/30px $SourceSansPro;
+    overflow: hidden;
     padding: 15px 30px;
+    width: 100%;
 
     a:link,
     a:visited { color: $cream; }
@@ -52,6 +55,13 @@
     span:last-child .fa {
       display: none;
     }
+  }
+
+  .breadcrumbs {
+    max-width: 75%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .button {
@@ -141,6 +151,7 @@
   }
 
   & > .form-field {
+    clear: both;
     margin: 0 0 1em;
     position: relative;
     width: 100%;
@@ -248,11 +259,84 @@
 .status-indicator {
   border: 1px solid;
   border-radius: 3px;
+  display: flex;
   font-size: 12px;
-  line-height: 30px;
+  height: 100%;
+  line-height: 1em;
   margin-top: 10px;
-  padding: 5px 15px;
+  max-width: 150px;
+  min-width: 130px;
+  padding: 1em 0 1em 0.5em;
+  position: relative;
   text-transform: uppercase;
+  width: 100%;
+
+  &.draft {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+
+    .draft-status-icon {
+      opacity: 0.8;
+    }
+  }
+
+  &.pending {
+    background: #E8F8FA;
+    border-color: $cta;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  &.approved {
+    background: #DCEFDC;
+    border-color: $green;
+    box-shadow: 0 2px 2px rgba($green, 0.3);
+
+    .fa {
+      color: #50A950;
+    }
+  }
+
+  &.rejected {
+    background: #FBDDDD;
+    border-color: $red;
+    box-shadow: 0 2px 2px rgba($red, 0.2);
+
+    .fa {
+      color: $red;
+    }
+  }
+
+  &.approved,
+  &.rejected {
+    .status-text .flavor-text {
+      color: inherit;
+      opacity: 0.7;
+    }
+  }
+
+  .draft-status-icon {
+    font-size: 1.9em;
+    margin-left: 0.125em;
+  }
+
+  .status-text {
+    left: 3em;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    span {
+      display: block;
+
+      // apply when the last child is not the only child
+      &:last-child:not(:first-child) {
+        margin-top: 0.5em;
+      }
+    }
+
+    .flavor-text {
+      color: $lightGrey;
+    }
+  }
 
   p {
     line-height: 15px;

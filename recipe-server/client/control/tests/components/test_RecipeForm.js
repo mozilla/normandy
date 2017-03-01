@@ -50,25 +50,25 @@ describe('<RecipeForm>', () => {
   describe('asyncValidate', () => {
     it('should throw if the filter expression is blank', async () => {
       try {
-        await formConfig.asyncValidate({ filter_expression: '' });
+        await formConfig.asyncValidate({ extra_filter_expression: '' });
         expect(false).toBe(true); // Fail if we don't throw.
       } catch (err) {
-        expect('filter_expression' in err).toBe(true);
+        expect('extra_filter_expression' in err).toBe(true);
       }
     });
 
     it('should throw if the filter expression is invalid JEXL', async () => {
       try {
-        await formConfig.asyncValidate({ filter_expression: '2-- + 4 (' });
+        await formConfig.asyncValidate({ extra_filter_expression: '2-- + 4 (' });
         expect(false).toBe(true); // Fail if we don't throw.
       } catch (err) {
-        expect('filter_expression' in err).toBe(true);
+        expect('extra_filter_expression' in err).toBe(true);
       }
     });
 
     it('should pass if the filter expression is valid JEXL', async () => {
       // Should not throw.
-      await formConfig.asyncValidate({ filter_expression: '1+1' });
+      await formConfig.asyncValidate({ extra_filter_expression: '1+1' });
     });
   });
 
@@ -92,8 +92,7 @@ describe('<RecipeForm>', () => {
 
       expect(updateRecipe).toHaveBeenCalledWith(recipe.id, {
         name: recipe.name,
-        enabled: recipe.enabled,
-        filter_expression: recipe.filter_expression,
+        extra_filter_expression: recipe.extra_filter_expression,
         action: recipe.action,
         arguments: recipe.arguments,
       });
@@ -112,8 +111,7 @@ describe('<RecipeForm>', () => {
 
       expect(addRecipe).toHaveBeenCalledWith({
         name: recipe.name,
-        enabled: recipe.enabled,
-        filter_expression: recipe.filter_expression,
+        extra_filter_expression: recipe.extra_filter_expression,
         action: recipe.action,
         arguments: recipe.arguments,
       });
@@ -133,8 +131,7 @@ describe('<RecipeForm>', () => {
 
       expect(addRecipe).toHaveBeenCalledWith({
         name: recipe.name,
-        enabled: recipe.enabled,
-        filter_expression: recipe.filter_expression,
+        extra_filter_expression: recipe.extra_filter_expression,
         action: recipe.action,
         arguments: recipe.arguments,
       });
