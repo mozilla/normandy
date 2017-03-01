@@ -24,7 +24,7 @@ export function recipeFactory(props = {}) {
     revision_id: 1,
     name: 'Test Recipe',
     enabled: false,
-    filter_expression: 'true',
+    extra_filter_expression: 'true',
     action: 'console-log',
     arguments: {
       surveyId: 'mysurvey',

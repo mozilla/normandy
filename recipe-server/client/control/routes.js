@@ -27,6 +27,7 @@ export default (
       />
       <Route path=":id/" name="Recipe">
         <IndexRoute
+          name="Latest"
           component={RecipeForm}
           ctaButtons={[
             { text: 'Clone', icon: 'files-o', link: 'clone/' },

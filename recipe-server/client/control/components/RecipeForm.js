@@ -20,6 +20,9 @@ import {
   singleRecipeReceived,
   userInfoReceived,
 } from 'control/actions/ControlActions';
+import {
+  getLastApprovedRevision,
+} from 'control/selectors/RecipesSelector';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
@@ -48,6 +51,8 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
+    revision: pt.object,
+    allRevisions: pt.object,
     recipeFields: pt.object,
     user: pt.object,
     dispatch: pt.func.isRequired,
@@ -113,8 +118,9 @@ export class RecipeForm extends React.Component {
   getRenderVariables() {
     const {
       route,
-      routeParams,
-      recipe,
+      routeParams = {},
+      recipe = {},
+      allRevisions = {},
       pristine,
       submitting,
       recipeId,
@@ -122,17 +128,20 @@ export class RecipeForm extends React.Component {
         id: userId,
       },
     } = this.props;
-    const requestDetails = recipe && recipe.approval_request;
+    const requestDetails = recipe.approval_request;
     const currentUserID = userId;
-    const requestAuthorID = requestDetails && requestDetails.creator.id;
-
-    const isUserViewingOutdated = !!(routeParams && routeParams.revisionId);
     const hasApprovalRequest = !!requestDetails;
+    const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
+
+    const isUserViewingOutdated = !!routeParams.revisionId;
     const isPendingApproval = hasApprovalRequest && requestDetails.approved === null;
     const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated);
 
     const isAccepted = hasApprovalRequest && requestDetails.approved === true;
     const isRejected = hasApprovalRequest && requestDetails.approved === false;
+
+    const recipeRevisions = allRevisions[recipe.id] || {};
+    const lastApprovedRevisionId = getLastApprovedRevision(recipeRevisions).revision_id;
 
     return {
       isCloning: !!(route && route.isCloning),
@@ -147,6 +156,7 @@ export class RecipeForm extends React.Component {
       isAccepted,
       isRejected,
       hasApprovalRequest,
+      lastApprovedRevisionId,
     };
   }
 
@@ -246,6 +256,7 @@ export class RecipeForm extends React.Component {
       handleSubmit,
       selectedAction,
       recipe,
+      revision,
       recipeId,
       recipeFields,
     } = this.props;
@@ -258,12 +269,22 @@ export class RecipeForm extends React.Component {
     }
 
     const renderVars = this.getRenderVariables();
-    const { isFormDisabled } = renderVars;
+    const {
+      isFormDisabled,
+      lastApprovedRevisionId,
+    } = renderVars;
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
         { RecipeForm.renderCloningMessage(this.props) }
-        <DraftStatus recipe={recipe} key={recipe} />
+        {
+          revision &&
+            <DraftStatus
+              latestRevisionId={recipe.revision_id}
+              lastApprovedRevisionId={lastApprovedRevisionId}
+              recipe={revision}
+            />
+        }
 
         { renderVars.isAccepted &&
           <div>
@@ -403,6 +424,7 @@ const connector = connect(
     selectedAction: selector(state, 'action'),
     recipeFields: selector(state, 'arguments'),
     user: state.user,
+    allRevisions: state.recipes.revisions,
   }),
 
   // Bound functions for writing to the server.

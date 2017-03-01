@@ -35,7 +35,7 @@ export default function composeRecipeContainer(Component) {
     }
 
     getRecipeData(recipeId, revisionId) {
-      const { dispatch, routeParams, recipe } = this.props;
+      const { dispatch, recipe, routeParams } = this.props;
       if (!recipe) {
         dispatch(setSelectedRecipe(recipeId));
 

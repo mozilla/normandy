@@ -336,9 +336,8 @@ i {
   }
 
   .status-indicator {
-    display: inline-block;
     float: right;
-    padding: 2%;
+    min-width: 150px;
     width: auto;
   }
 }
