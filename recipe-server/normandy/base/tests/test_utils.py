@@ -1,6 +1,6 @@
 import json
 
-from normandy.base.utils import canonical_json_dumps, get_client_ip
+from normandy.base.utils import canonical_json_dumps, get_client_ip, sri_hash
 
 
 class TestGetClientIp(object):
@@ -51,3 +51,9 @@ class TestCanonicalJsonDumps(object):
         dumped = canonical_json_dumps(data)
         assert dumped == r'{"message":"It \"works\", I think"}'
         json.loads(dumped)
+
+
+def test_sri_hash():
+    # Pre-generated base64 hash of the string "foobar"
+    expected = 'sha384-PJww2fZl501RXIQpYNSkUcg6ASX9Pec5LXs3IxrxDHLqWK7fzfiaV2W/kCr5Ps8G'
+    assert sri_hash(b'foobar') == expected
