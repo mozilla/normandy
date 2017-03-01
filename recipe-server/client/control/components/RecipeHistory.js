@@ -3,6 +3,8 @@ import { push } from 'react-router-redux';
 import moment from 'moment';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
+import DraftStatus from 'control/components/DraftStatus';
+
 import { makeApiRequest } from 'control/actions/ControlActions';
 
 export class DisconnectedRecipeHistory extends React.Component {
@@ -104,8 +106,7 @@ export class HistoryItem extends React.Component {
   }
 
   render() {
-    const { revision, recipe } = this.props;
-    const isCurrent = revision.recipe.revision_id === recipe.revision_id;
+    const { revision } = this.props;
 
     return (
       <tr className="history-item" onClick={this.handleClick}>
@@ -115,16 +116,16 @@ export class HistoryItem extends React.Component {
           {moment(revision.date_created).format('MMM Do YYYY - h:mmA')}
         </td>
         <td className="revision-comment">
-          <span className="label">Comment:</span>
-          {revision.comment || '--'}
+        {
+          !!revision.comment &&
+            <span>
+              <span className="label">Comment:</span>
+              {revision.comment || '--'}
+            </span>
+        }
         </td>
         <td>
-          {isCurrent && (
-            <div className="status-indicator green">
-              <i className="fa fa-circle pre" />
-              Current Revision
-            </div>
-          )}
+          <DraftStatus recipe={revision.recipe} />
         </td>
       </tr>
     );

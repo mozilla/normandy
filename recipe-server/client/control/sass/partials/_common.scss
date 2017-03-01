@@ -334,6 +334,13 @@ i {
     text-align: left;
     width: 45%;
   }
+
+  .status-indicator {
+    display: inline-block;
+    float: right;
+    padding: 2%;
+    width: auto;
+  }
 }
 
 .col-trigger {

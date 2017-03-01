@@ -25,6 +25,8 @@ import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+import DraftStatus from 'control/components/DraftStatus';
+
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 
@@ -261,6 +263,7 @@ export class RecipeForm extends React.Component {
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
         { RecipeForm.renderCloningMessage(this.props) }
+        <DraftStatus recipe={recipe} key={recipe} />
 
         { renderVars.isAccepted &&
           <div>
