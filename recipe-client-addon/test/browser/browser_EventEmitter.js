@@ -1,6 +1,5 @@
 "use strict";
 
-const {utils: Cu} = Components;
 Cu.import("resource://shield-recipe-client/test/browser/Utils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/EventEmitter.jsm", this);
 

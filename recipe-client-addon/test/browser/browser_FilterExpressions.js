@@ -1,6 +1,5 @@
 "use strict";
 
-const {utils: Cu} = Components;
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm", this);
 
 add_task(function* () {
