@@ -6,7 +6,7 @@
 import moment from 'moment';
 
 export function getLastApprovedRevision(revisions) {
-  return [].concat(Object.keys(revisions))
+  return [].concat(Object.keys(revisions || {}))
     // Array of revision objects
     .map(id => revisions[id])
     // Which have approval requests

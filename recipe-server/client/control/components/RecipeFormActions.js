@@ -4,6 +4,8 @@ import React, {
 import { Link } from 'react-router';
 import cx from 'classnames';
 
+import DropdownMenu from 'control/components/DropdownMenu';
+
 export const FormButton = ({
   className,
   label,
@@ -13,7 +15,7 @@ export const FormButton = ({
   display,
   ...props,
 }) => {
-  if (!display) {
+  if (display === false) {
     return null;
   }
 
@@ -48,7 +50,7 @@ export default class RecipeFormActions extends React.Component {
     isEnabled: pt.bool,
     isUserViewingOutdated: pt.bool,
     isPendingApproval: pt.bool,
-    isUserRequestor: pt.bool,
+    isUserRequester: pt.bool,
     isAlreadySaved: pt.bool,
     isFormPristine: pt.bool,
     isCloning: pt.bool,
@@ -59,12 +61,30 @@ export default class RecipeFormActions extends React.Component {
     recipeId: pt.number,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      comment: {},
+    };
+  }
+
+  onCommentChange(type) {
+    return evt => {
+      this.setState({
+        comment: {
+          ...this.state.comment,
+          [type]: evt.target.value,
+        },
+      });
+    };
+  }
+
   getActions({
     isApproved,
     isEnabled,
     isUserViewingOutdated,
     isPendingApproval,
-    isUserRequestor,
+    isUserRequester,
     isAlreadySaved,
     isFormPristine,
     isCloning,
@@ -120,24 +140,76 @@ export default class RecipeFormActions extends React.Component {
         display={!isUserViewingOutdated && isPendingApproval}
         className="action-cancel submit delete"
         onClick={this.createActionEmitter('cancel')}
-        label="Cancel Review Request"
+        label="Cancel Review"
       />,
       // approve
-      <FormButton
+      <DropdownMenu
         display={!isUserViewingOutdated && isPendingApproval && !isCloning}
-        disabled={isUserRequestor}
-        className="action-approve submit"
-        onClick={this.createActionEmitter('approve')}
-        label="Approve"
-      />,
+        pinTop
+        pinRight
+        useClick
+        trigger={
+          <FormButton
+            disabled={isUserRequester}
+            className="action-approve submit"
+            label="Approve"
+          />
+        }
+      >
+        <div>
+          Approval comment section
+          <textarea
+            defaultValue={this.state.comment.approve}
+            onChange={this.onCommentChange('approve')}
+          />
+          <FormButton
+            className="mini-button"
+            type="button"
+            onClick={() => {
+              this.props.onAction('approve', {
+                comment: this.state.comment.approve,
+              });
+            }}
+            disabled={!this.state.comment.approve}
+          >
+            Approve
+          </FormButton>
+        </div>
+      </DropdownMenu>,
       // reject
-      <FormButton
+      <DropdownMenu
         display={!isUserViewingOutdated && isPendingApproval && !isCloning}
-        disabled={isUserRequestor}
-        className="action-reject submit delete"
-        onClick={this.createActionEmitter('reject')}
-        label="Reject"
-      />,
+        pinTop
+        pinRight
+        useClick
+        trigger={
+          <FormButton
+            disabled={isUserRequester}
+            className="action-reject submit delete"
+            label="Reject"
+          />
+        }
+      >
+        <div>
+          Rejection comment section
+          <textarea
+            defaultValue={this.state.comment.reject}
+            onChange={this.onCommentChange('reject')}
+          />
+          <FormButton
+            className="mini-button"
+            type="button"
+            onClick={() => {
+              this.props.onAction('reject', {
+                comment: this.state.comment.reject,
+              });
+            }}
+            disabled={!this.state.comment.reject}
+          >
+            Reject
+          </FormButton>
+        </div>
+      </DropdownMenu>,
       // request
       <FormButton
         display={!isUserViewingOutdated && !hasApprovalRequest

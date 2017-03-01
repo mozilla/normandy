@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import uuid from 'node-uuid';
+import cx from 'classnames';
 
 import closest from 'client/utils/closest';
 
@@ -27,6 +28,8 @@ export default class DropdownMenu extends React.Component {
     useClick: pt.bool,
     useFocus: pt.bool,
     pinRight: pt.bool,
+    pinTop: pt.bool,
+    display: pt.bool,
   };
 
   constructor(props) {
@@ -125,24 +128,42 @@ export default class DropdownMenu extends React.Component {
    * Render
    */
   render() {
-    const pinClass = this.props.pinRight && 'pin-right';
+    const {
+      pinRight,
+      pinTop,
+      useClick,
+      useFocus,
+      trigger,
+      display,
+      children,
+    } = this.props;
+    const menuClass = cx('dropdown-menu', this.id);
+    const pinClass = cx('dropdown-content',
+      pinRight && 'pin-right',
+      pinTop && 'pin-top'
+    );
+
+    if (display === false) {
+      return null;
+    }
+
     return (
       <div
-        className={`dropdown-menu ${this.id}`}
+        className={menuClass}
       >
         <div
           className="dropdown-trigger"
-          onClick={this.props.useClick && this.toggleVisibility}
-          onFocus={this.props.useFocus && this.toggleVisibility}
+          onClick={useClick && this.toggleVisibility}
+          onFocus={useFocus && this.toggleVisibility}
         >
-          { this.props.trigger }
+          { trigger }
         </div>
         {
           this.state.isVisible &&
             <div
-              className={`dropdown-content ${pinClass || ''}`}
+              className={pinClass}
             >
-              { this.props.children }
+              { children }
             </div>
         }
       </div>

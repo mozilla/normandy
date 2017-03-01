@@ -40,6 +40,13 @@
       right: 0;
     }
 
+    &.pin-top {
+      bottom: 100%;
+      min-width: 200px;
+      top: auto;
+      width: 30vw;
+    }
+
     ul,
     li {
       list-style: none;

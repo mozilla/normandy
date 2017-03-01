@@ -8,7 +8,7 @@ const propFactory = props => ({
   onAction: () => {},
   isUserViewingOutdated: false,
   isPendingApproval: false,
-  isUserRequestor: false,
+  isUserRequester: false,
   isAlreadySaved: false,
   isFormPristine: false,
   isCloning: false,
@@ -73,30 +73,6 @@ describe('<RecipeFormActions>', () => {
       isCloning: false,
     };
 
-    it('should fire an `approve` action', () => {
-      let firedType;
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          onAction: type => { firedType = type; },
-        })}
-      />);
-      wrapper.find('.action-approve').simulate('click');
-      expect(firedType).toBe('approve');
-    });
-
-    it('should fire a `reject` action', () => {
-      let firedType;
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          onAction: type => { firedType = type; },
-        })}
-      />);
-      wrapper.find('.action-reject').simulate('click');
-      expect(firedType).toBe('reject');
-    });
-
     it('should NOT display when viewing an outdated revision', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
@@ -130,11 +106,11 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-reject').length).toBe(0);
     });
 
-    it('should NOT be enabled when user is the approval requestor', () => {
+    it('should NOT be enabled when user is the approval requester', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
           ...displayCriteria,
-          isUserRequestor: true,
+          isUserRequester: true,
         })}
       />);
       expect(wrapper.find('.action-approve').prop('disabled')).toBe(true);

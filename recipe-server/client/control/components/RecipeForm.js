@@ -140,12 +140,12 @@ export class RecipeForm extends React.Component {
     const isAccepted = hasApprovalRequest && requestDetails.approved === true;
     const isRejected = hasApprovalRequest && requestDetails.approved === false;
 
-    const recipeRevisions = allRevisions[recipe && recipe.id] || {};
+    const recipeRevisions = recipe ? allRevisions[recipe.id] : {};
     const lastApprovedRevisionId = getLastApprovedRevision(recipeRevisions).revision_id;
 
     return {
       isCloning: !!(route && route.isCloning),
-      isUserRequestor: requestAuthorID === currentUserID,
+      isUserRequester: requestAuthorID === currentUserID,
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
       isApproved: !!recipeId && recipe.is_approved,
@@ -167,7 +167,7 @@ export class RecipeForm extends React.Component {
    *
    * @param  {string} action Action type to trigger. ex: 'cancel', 'approve', 'reject'
    */
-  handleFormAction(action) {
+  handleFormAction(action, data) {
     const {
       recipe,
       dispatch,
@@ -194,6 +194,7 @@ export class RecipeForm extends React.Component {
       case 'approve': {
         dispatch(makeApiRequest('acceptApprovalRequest', {
           requestId: recipe.approval_request.id,
+          ...data,
         })).then(updatedRequest => {
           // show success
           dispatch(showNotification({
@@ -211,13 +212,14 @@ export class RecipeForm extends React.Component {
       case 'reject': {
         dispatch(makeApiRequest('rejectApprovalRequest', {
           requestId: recipe.approval_request.id,
+          ...data,
         })).then(updatedRequest => {
           // show success
           dispatch(showNotification({
             messageType: 'success',
             message: 'Recipe review successfully rejected.',
           }));
-          // remove approval request from recipe in memory
+          // update approval request from recipe in memory
           dispatch(singleRecipeReceived({
             ...recipe,
             approval_request: updatedRequest,
@@ -274,28 +276,34 @@ export class RecipeForm extends React.Component {
       lastApprovedRevisionId,
     } = renderVars;
 
+    const thisRevisionRequest = revision && revision.approval_request;
+
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
         { RecipeForm.renderCloningMessage(this.props) }
         {
           revision &&
             <DraftStatus
-              latestRevisionId={recipe.revision_id}
+              latestRevisionId={recipe.latest_revision_id}
               lastApprovedRevisionId={lastApprovedRevisionId}
               recipe={revision}
             />
         }
 
-        { renderVars.isAccepted &&
-          <div>
-            This recipe has been approved.
-          </div>
-        }
-        { renderVars.isRejected &&
-          <div>
-            This recipe has been rejected. Create another draft and submit another
-            request.
-          </div>
+        {
+          thisRevisionRequest
+          && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
+          && (
+            <div className="approval-status">
+              This recipe has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
+              <pre className="approval-comment">
+                {recipe.approval_request.comment}
+                <span className="comment-author">
+                  &ndash; {recipe.approval_request.approver.email}
+                </span>
+              </pre>
+            </div>
+          )
         }
 
         <ControlField
