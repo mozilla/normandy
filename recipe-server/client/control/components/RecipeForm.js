@@ -137,6 +137,8 @@ export class RecipeForm extends React.Component {
       isUserRequestor: requestAuthorID === currentUserID,
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
+      isApproved: !!recipeId && recipe.is_approved,
+      isEnabled: !!recipeId && recipe.enabled,
       isUserViewingOutdated,
       isPendingApproval,
       isFormDisabled,
@@ -281,16 +283,8 @@ export class RecipeForm extends React.Component {
         />
         <ControlField
           disabled={isFormDisabled}
-          label="Enabled"
-          name="enabled"
-          className="checkbox-field"
-          component="input"
-          type="checkbox"
-        />
-        <ControlField
-          disabled={isFormDisabled}
           label="Filter Expression"
-          name="filter_expression"
+          name="extra_filter_expression"
           component="textarea"
         />
         <ControlField
@@ -322,19 +316,19 @@ export class RecipeForm extends React.Component {
 export const formConfig = {
   form: 'recipe',
   enableReinitialize: true,
-  asyncBlurFields: ['filter_expression'],
+  asyncBlurFields: ['extra_filter_expression'],
 
   async asyncValidate(values) {
     const errors = {};
     // Validate that filter expression is valid JEXL
-    if (!values.filter_expression) {
-      errors.filter_expression = 'Filter expression cannot be empty.';
+    if (!values.extra_filter_expression) {
+      errors.extra_filter_expression = 'Filter expression cannot be empty.';
     } else {
       const jexlEnvironment = new JexlEnvironment({});
       try {
-        await jexlEnvironment.eval(values.filter_expression);
+        await jexlEnvironment.eval(values.extra_filter_expression);
       } catch (err) {
-        errors.filter_expression = err.toString();
+        errors.extra_filter_expression = err.toString();
       }
     }
 
@@ -347,7 +341,7 @@ export const formConfig = {
   onSubmit(values, dispatch, { route, recipeId, updateRecipe, addRecipe }) {
     // Filter out unwanted keys for submission.
     const recipe = pick(values, [
-      'name', 'enabled', 'filter_expression', 'action', 'arguments',
+      'name', 'extra_filter_expression', 'action', 'arguments',
     ]);
     const isCloning = route && route.isCloning;
 

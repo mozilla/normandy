@@ -5,14 +5,14 @@ import { Link } from 'react-router';
 import cx from 'classnames';
 
 export const FormButton = ({
-    className,
-    label,
-    element = 'button',
-    type = 'button',
-    onClick,
-    display,
-    ...props,
-  }) => {
+  className,
+  label,
+  element = 'button',
+  type = 'button',
+  onClick,
+  display,
+  ...props,
+}) => {
   if (!display) {
     return null;
   }
@@ -30,6 +30,7 @@ export const FormButton = ({
     />
   );
 };
+
 FormButton.propTypes = {
   display: pt.bool.isRequired,
   className: pt.string,
@@ -39,9 +40,12 @@ FormButton.propTypes = {
   onClick: pt.func,
 };
 
+
 export default class RecipeFormActions extends React.Component {
   static propTypes = {
     onAction: pt.func.isRequired,
+    isApproved: pt.bool,
+    isEnabled: pt.bool,
     isUserViewingOutdated: pt.bool,
     isPendingApproval: pt.bool,
     isUserRequestor: pt.bool,
@@ -56,6 +60,8 @@ export default class RecipeFormActions extends React.Component {
   };
 
   getActions({
+    isApproved,
+    isEnabled,
     isUserViewingOutdated,
     isPendingApproval,
     isUserRequestor,
@@ -91,6 +97,23 @@ export default class RecipeFormActions extends React.Component {
         className="action-new submit"
         type="submit"
         label="Save New Recipe"
+      />,
+      // enable
+      <FormButton
+        display={!isUserViewingOutdated && !isEnabled}
+        disabled={!isApproved}
+        className="action-enable submit"
+        label="Enable"
+        element={isApproved ? Link : 'button'}
+        to={`/control/recipe/${recipeId}/enable/`}
+      />,
+      // disable
+      <FormButton
+        display={!isUserViewingOutdated && isEnabled}
+        className="action-disable submit delete"
+        label="Disable"
+        element={Link}
+        to={`/control/recipe/${recipeId}/disable/`}
       />,
       // cancel
       <FormButton

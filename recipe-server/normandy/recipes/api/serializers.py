@@ -47,7 +47,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    enabled = serializers.BooleanField(required=False)
+    enabled = serializers.BooleanField(read_only=True)
     last_updated = serializers.DateTimeField(read_only=True)
     revision_id = serializers.CharField(read_only=True)
     name = serializers.CharField()
@@ -115,7 +115,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
-        recipe = Recipe.objects.create(enabled=validated_data.pop('enabled'))
+        recipe = Recipe.objects.create()
         recipe.save()
 
         return self.update(recipe, validated_data)

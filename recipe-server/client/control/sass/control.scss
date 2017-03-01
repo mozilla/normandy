@@ -143,7 +143,7 @@
   & > .form-field {
     margin: 0 0 1em;
     position: relative;
-    width: 50%;
+    width: 100%;
   }
 
   .error {
@@ -173,14 +173,15 @@
     margin-top: 30px;
     padding: 30px 15px 15px;
 
-    .delete {
-      display: inline-block;
-      float: left;
+    .button {
+      float: right;
+      margin-left: 5px;
     }
 
-    .submit {
-      display: inline-block;
-      float: right;
+    .action-delete {
+      float: left;
+      margin-left: 0;
+      margin-right: 5px;
     }
   }
 }

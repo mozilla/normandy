@@ -1,7 +1,13 @@
 import {
-  RECIPES_RECEIVED, SINGLE_RECIPE_RECEIVED,
-  SINGLE_REVISION_RECEIVED, RECIPE_ADDED, RECIPE_UPDATED, RECIPE_DELETED,
+  RECIPE_ADDED,
+  RECIPE_DELETED,
+  RECIPE_DISABLED,
+  RECIPE_ENABLED,
+  RECIPE_UPDATED,
+  RECIPES_RECEIVED,
   SET_SELECTED_RECIPE,
+  SINGLE_RECIPE_RECEIVED,
+  SINGLE_REVISION_RECEIVED,
 } from 'control/actions/ControlActions';
 
 const initialState = {
@@ -119,6 +125,34 @@ function recipesReducer(state = initialState, action) {
       return {
         ...state,
         list: [].concat(state.list).filter(recipe => recipe.id !== action.recipeId),
+      };
+
+    case RECIPE_ENABLED:
+      return {
+        ...state,
+        list: [].concat(state.list).map(recipe => {
+          if (recipe.id === action.recipeId) {
+            return {
+              ...recipe,
+              enabled: true,
+            };
+          }
+          return recipe;
+        }),
+      };
+
+    case RECIPE_DISABLED:
+      return {
+        ...state,
+        list: [].concat(state.list).map(recipe => {
+          if (recipe.id === action.recipeId) {
+            return {
+              ...recipe,
+              enabled: false,
+            };
+          }
+          return recipe;
+        }),
       };
 
     default:

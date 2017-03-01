@@ -6,6 +6,8 @@ import RecipeForm from 'control/components/RecipeForm';
 import RecipeHistory from 'control/components/RecipeHistory';
 import RecipePreview from 'control/components/RecipePreview';
 import DeleteRecipe from 'control/components/DeleteRecipe';
+import EnableRecipe from 'control/components/EnableRecipe';
+import DisableRecipe from 'control/components/DisableRecipe';
 import NoMatch from 'control/components/NoMatch';
 
 export default (
@@ -65,6 +67,16 @@ export default (
           path="delete/"
           component={DeleteRecipe}
           name="Delete"
+        />
+        <Route
+          path="enable/"
+          component={EnableRecipe}
+          name="Enable"
+        />
+        <Route
+          path="disable/"
+          component={DisableRecipe}
+          name="Disable"
         />
         <Route
           path=":revisionId/"

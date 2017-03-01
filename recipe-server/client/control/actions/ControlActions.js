@@ -12,6 +12,8 @@ export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
 export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
+export const RECIPE_ENABLED = 'RECIPE_ENABLED';
+export const RECIPE_DISABLED = 'RECIPE_DISABLED';
 
 export const RECEIVED_USER_INFO = 'RECEIVED_USER_INFO';
 
@@ -150,6 +152,28 @@ const apiRequestMap = {
       errorNotification: 'Error deleting recipe.',
     };
   },
+
+  enableRecipe(recipeInfo) {
+    return {
+      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/enable/`,
+      settings: {
+        method: 'POST',
+      },
+      successNotification: 'Recipe enabled.',
+      errorNotification: 'Error enabling recipe.',
+    };
+  },
+
+  disableRecipe(recipeInfo) {
+    return {
+      url: `${BASE_API_URL}recipe/${recipeInfo.recipeId}/disable/`,
+      settings: {
+        method: 'POST',
+      },
+      successNotification: 'Recipe disabled.',
+      errorNotification: 'Error disabling recipe.',
+    };
+  },
 };
 
 function userInfoReceived(user) {
@@ -213,6 +237,20 @@ function recipeUpdated(recipe) {
 function recipeDeleted(recipeId) {
   return {
     type: RECIPE_DELETED,
+    recipeId,
+  };
+}
+
+function recipeEnabled(recipeId) {
+  return {
+    type: RECIPE_ENABLED,
+    recipeId,
+  };
+}
+
+function recipeDisabled(recipeId) {
+  return {
+    type: RECIPE_DISABLED,
     recipeId,
   };
 }
@@ -285,4 +323,6 @@ export {
   recipeAdded,
   recipeUpdated,
   recipeDeleted,
+  recipeEnabled,
+  recipeDisabled,
 };
