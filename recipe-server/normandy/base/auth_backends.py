@@ -1,6 +1,6 @@
 import logging
 
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
 
 
 INFO_LOGIN_SUCCESS = 'normandy.auth.I001'
@@ -10,13 +10,19 @@ WARNING_LOGIN_FAILURE = 'normandy.auth.W001'
 logger = logging.getLogger(__name__)
 
 
-class LoggingModelBackend(ModelBackend):
+class LoggingAuthBackendMixin(object):
     """
-    Model-backed authentication backend that logs the results of login
-    attempts.
+    Authentication backend mixin that logs the results of login attempts.
     """
-    def authenticate(self, username=None, **kwargs):
-        result = super().authenticate(username=username, **kwargs)
+    def authenticate(self, **kwargs):
+        result = super().authenticate(**kwargs)
+
+        username = None
+        if 'username' in kwargs:
+            username = kwargs['username']
+        elif 'remote_user' in kwargs:
+            username = kwargs['remote_user']
+
         if result is None:
             if username is not None:
                 logger.warning(
@@ -34,3 +40,15 @@ class LoggingModelBackend(ModelBackend):
                 extra={'code': INFO_LOGIN_SUCCESS}
             )
         return result
+
+
+class LoggingModelBackend(LoggingAuthBackendMixin, ModelBackend):
+    """
+    Model-backed authentication backend that logs the results of login attempts.
+    """
+
+
+class LoggingRemoteUserBackend(LoggingAuthBackendMixin, RemoteUserBackend):
+    """
+    Remote-user backend that logs the results of login attempts.
+    """

@@ -63,11 +63,6 @@ class Core(Configuration):
 
     WSGI_APPLICATION = 'normandy.wsgi.application'
 
-    # Authentication
-    AUTHENTICATION_BACKENDS = [
-        'normandy.base.auth_backends.LoggingModelBackend',
-    ]
-
     # Internationalization
     LANGUAGE_CODE = 'en-us'
     TIME_ZONE = 'UTC'
@@ -94,10 +89,7 @@ class Core(Configuration):
     }
 
     REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.TokenAuthentication',
-            'rest_framework.authentication.SessionAuthentication'
-        ),
+        'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
         'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
         'DEFAULT_RENDERER_CLASSES': (
@@ -145,13 +137,27 @@ class Core(Configuration):
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
+
+    # Flags that affect other settings, via setting methods below
+    LOGGING_USE_JSON = values.BooleanValue(False)
+    USE_OIDC = values.BooleanValue(False)
+
     # General settings
     DEBUG = values.BooleanValue(False)
     ADMINS = values.SingleNestedListValue([])
     SILENCED_SYSTEM_CHECKS = values.ListValue([])
 
-    # Middleware that _most_ environments will need. Subclasses can
-    # override this list.
+    # Authentication
+    def AUTHENTICATION_BACKENDS(self):
+        if self.USE_OIDC:
+            return ['normandy.base.auth_backends.LoggingRemoteUserBackend']
+        else:
+            return ['normandy.base.auth_backends.LoggingModelBackend']
+
+    OIDC_REMOTE_AUTH_HEADER = values.Value('HTTP_REMOTE_USER')
+    OIDC_LOGOUT_IF_NO_HEADER = values.BooleanValue(True)
+
+    # Middleware that _most_ environments will need. Subclasses can override this list.
     EXTRA_MIDDLEWARE = [
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -165,9 +171,10 @@ class Base(Core):
         Determine middleware by combining the core set and
         per-environment set.
         """
-        return Core.MIDDLEWARE + self.EXTRA_MIDDLEWARE
-
-    LOGGING_USE_JSON = values.BooleanValue(False)
+        middleware = Core.MIDDLEWARE + self.EXTRA_MIDDLEWARE
+        if self.USE_OIDC:
+            middleware.append('normandy.base.middleware.ConfigurableRemoteUserMiddleware')
+        return middleware
 
     def LOGGING(self):
         return {

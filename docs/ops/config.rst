@@ -192,19 +192,63 @@ in other Django projects.
 
 .. envvar:: DJANGO_CDN_URL
 
-  :default: ``None``
+   :default: ``None``
 
-  The URL of a CDN that is backed by Normandy, if one is in use. This is used to
-  enforce that immutable content is routed through the CDN. Must end with a
-  slash (``/``).
+   The URL of a CDN that is backed by Normandy, if one is in use. This is used to
+   enforce that immutable content is routed through the CDN. Must end with a
+   slash (``/``).
 
 .. envvar:: DJANGO_APP_SERVER_URL
 
-  :default: ``None``
+   :default: ``None``
 
-  The URL that allows direct access to Normandy, bypassing any CDNs. This
-  is used for content that cannot be cached. If not specified, Normandy will
-  assume direct access. Must end with a slash (``/``).
+   The URL that allows direct access to Normandy, bypassing any CDNs. This
+   is used for content that cannot be cached. If not specified, Normandy will
+   assume direct access. Must end with a slash (``/``).
+
+.. envvar:: DJANGO_USE_OIDC
+
+   :default: ``False``
+
+   If enabled, Normandy will authenticate users by reading a header in requests.
+   The expectation is that a proxy server, such as Nginx, will perform
+   authentication using Open ID Connect, and then pass the unique ID of the user
+   in a header.
+
+   .. seealso::
+
+      :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` for which header Normandy
+      reads this value from.
+
+   .. warning::
+
+      If this feature is enabled, the proxy server providing authentcation
+      *must* sanitize the headers passed along to Normandy. Specifcially, the
+      header defined in :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` must not be
+      passed on from the user.
+
+      Failing to do this will result from any client being able to authenticate
+      as any user, with no checks.
+
+.. envvar:: DJANGO_OIDC_REMOTE_AUTH_HEADER
+
+   :default: ``HTTP_REMOTE_USER``
+
+   If :envvar:`DJANGO_USE_OIDC` is ``True``, this is the source of the user to
+   authenticate. This is subject to the Django header normalization, i.e.
+   the header will be capitalized, dashes replaced with underscores, and it will
+   be prefixed with ``HTTP_``.
+
+.. envvar:: DJANGO_OIDC_LOGOUT_IF_NO_HEADER
+
+   :default: ``True``
+
+   If set to ``False``, users will stayed logged in as long as their session
+   remains live. This is useful if only some URLs pass the
+   :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` (for example, authentication pages).
+
+   If set to ``True``, users will be logged out in Django's session when they
+   send a request without the appropriate headers.
 
 Gunicorn settings
 -----------------
