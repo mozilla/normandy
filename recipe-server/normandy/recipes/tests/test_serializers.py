@@ -127,7 +127,6 @@ class TestRecipeSerializer:
         assert serializer.is_valid()
         assert serializer.validated_data == {
             'name': 'bar',
-            'enabled': True,
             'extra_filter_expression': '[]',
             'action': mockAction,
             'arguments': {
