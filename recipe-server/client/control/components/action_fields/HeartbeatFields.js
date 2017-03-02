@@ -64,7 +64,7 @@ export default function HeartbeatFields({ fields = {} }) {
           Do not show this prompt to users more than once.
         `}</option>
         <option value="nag">{`
-          Show this prompt until the user interacts with it in any way,
+          Show this prompt until the user clicks the button/stars,
           and then never again.
         `}</option>
         <option value="xdays">{`
@@ -97,4 +97,3 @@ export default function HeartbeatFields({ fields = {} }) {
 HeartbeatFields.propTypes = {
   fields: pt.object,
 };
-
