@@ -1,7 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-/* globals URLSearchParams */
 
 "use strict";
 
@@ -20,29 +19,31 @@ const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 let indexPromise;
 
 this.NormandyApi = {
-  apiCall(method, url, data = {}) {
+  apiCall(method, endpoint, data = {}) {
+    const url = new URL(endpoint);
     method = method.toLowerCase();
 
-    if (method === "get") {
-      if (data === {}) {
-        const paramObj = new URLSearchParams();
-        for (const key in data) {
-          paramObj.append(key, data[key]);
+    let body = undefined;
+    if (data) {
+      if (method === "get") {
+        for (const key of Object.keys(data)) {
+          url.searchParams.set(key, data[key]);
         }
-        url += "?" + paramObj.toString();
+      } else if (method === "post") {
+        body = JSON.stringify(data);
       }
-      data = undefined;
     }
 
     const headers = {"Accept": "application/json"};
-    return fetch(url, {
-      body: JSON.stringify(data),
-      headers,
-    });
+    return fetch(url.href, {method, body, headers});
   },
 
   get(endpoint, data) {
     return this.apiCall("get", endpoint, data);
+  },
+
+  post(endpoint, data) {
+    return this.apiCall("post", endpoint, data);
   },
 
   absolutify(url) {

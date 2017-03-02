@@ -21,15 +21,14 @@ class PrefManager {
   }
 
   cleanup() {
-    for (const name of this.oldValues) {
-      Services.setCharPref(name, this.oldValues[name]);
+    for (const name of Object.keys(this.oldValues)) {
+      Services.prefs.setCharPref(name, this.oldValues[name]);
     }
   }
 }
 
-function withServer(task) {
+function withServer(server, task) {
   return function* inner() {
-    const server = makeMockApiServer();
     const serverUrl = `http://localhost:${server.identity.primaryPort}`;
     const prefManager = new PrefManager();
     prefManager.setCharPref("extensions.shield-recipe-client.api_url", `${serverUrl}/api/v1`);
@@ -46,6 +45,18 @@ function withServer(task) {
       yield new Promise(resolve => server.stop(resolve));
     }
   };
+}
+
+function makeScriptServer(scriptPath) {
+  const server = new HttpServer();
+  server.registerContentType("sjs", "sjs");
+  server.registerFile("/", do_get_file(scriptPath));
+  server.start(-1);
+  return server;
+}
+
+function withScriptServer(scriptPath, task) {
+  return withServer(makeScriptServer(scriptPath), task);
 }
 
 function makeMockApiServer() {
@@ -80,27 +91,31 @@ function makeMockApiServer() {
   return server;
 }
 
-add_task(withServer(function* test_get(serverUrl) {
+function withMockApiServer(task) {
+  return withServer(makeMockApiServer(), task);
+}
+
+add_task(withMockApiServer(function* test_get(serverUrl) {
   // Test that NormandyApi can fetch from the test server.
   const response = yield NormandyApi.get(`${serverUrl}/api/v1`);
   const data = yield response.json();
   equal(data["recipe-list"], "/api/v1/recipe/", "Expected data in response");
 }));
 
-add_task(withServer(function* test_getApiUrl(serverUrl) {
+add_task(withMockApiServer(function* test_getApiUrl(serverUrl) {
   const apiBase = `${serverUrl}/api/v1`;
   // Test that NormandyApi can use the self-describing API's index
   const recipeListUrl = yield NormandyApi.getApiUrl("action-list");
   equal(recipeListUrl, `${apiBase}/action/`, "Can retrieve action-list URL from API");
 }));
 
-add_task(withServer(function* test_fetchRecipes() {
+add_task(withMockApiServer(function* test_fetchRecipes() {
   const recipes = yield NormandyApi.fetchRecipes();
   equal(recipes.length, 1);
   equal(recipes[0].name, "system-addon-test");
 }));
 
-add_task(withServer(function* test_classifyClient() {
+add_task(withMockApiServer(function* test_classifyClient() {
   const classification = yield NormandyApi.classifyClient();
   Assert.deepEqual(classification, {
     country: "US",
@@ -108,7 +123,34 @@ add_task(withServer(function* test_classifyClient() {
   });
 }));
 
-add_task(withServer(function* test_fetchAction() {
+add_task(withMockApiServer(function* test_fetchAction() {
   const action = yield NormandyApi.fetchAction("show-heartbeat");
   equal(action.name, "show-heartbeat");
+}));
+
+add_task(withScriptServer("test_server.sjs", function* test_getTestServer(serverUrl) {
+  // Test that NormandyApi can fetch from the test server.
+  const response = yield NormandyApi.get(serverUrl);
+  const data = yield response.json();
+  Assert.deepEqual(data, {queryString: {}, body: {}}, "NormandyApi returned incorrect server data.");
+}));
+
+add_task(withScriptServer("test_server.sjs", function* test_getQueryString(serverUrl) {
+  // Test that NormandyApi can send query string parameters to the test server.
+  const response = yield NormandyApi.get(serverUrl, {foo: "bar", baz: "biff"});
+  const data = yield response.json();
+  Assert.deepEqual(
+    data, {queryString: {foo: "bar", baz: "biff"}, body: {}},
+    "NormandyApi sent an incorrect query string."
+  );
+}));
+
+add_task(withScriptServer("test_server.sjs", function* test_postData(serverUrl) {
+  // Test that NormandyApi can POST JSON-formatted data to the test server.
+  const response = yield NormandyApi.post(serverUrl,  {foo: "bar", baz: "biff"});
+  const data = yield response.json();
+  Assert.deepEqual(
+    data, {queryString: {}, body: {foo: "bar", baz: "biff"}},
+    "NormandyApi sent an incorrect query string."
+  );
 }));
