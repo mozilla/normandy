@@ -126,7 +126,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         except Recipe.NotApproved as e:
             return Response({'enabled': str(e)}, status=status.HTTP_409_CONFLICT)
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(RecipeSerializer(recipe).data)
 
     @reversion_transaction
     @detail_route(methods=['POST'])
@@ -134,7 +134,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         recipe = self.get_object()
         recipe.enabled = False
         recipe.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(RecipeSerializer(recipe).data)
 
 
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):

@@ -12,8 +12,6 @@ export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
 export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
-export const RECIPE_ENABLED = 'RECIPE_ENABLED';
-export const RECIPE_DISABLED = 'RECIPE_DISABLED';
 
 export const RECEIVED_USER_INFO = 'RECEIVED_USER_INFO';
 
@@ -80,14 +78,14 @@ const apiRequestMap = {
     };
   },
 
-  acceptApprovalRequest({ requestId, comment = '' }) {
+  approveApprovalRequest({ requestId, comment = '' }) {
     return {
       url: `${BASE_API_URL}approval_request/${requestId}/approve/`,
       settings: {
         method: 'POST',
         body: JSON.stringify({ comment }),
       },
-      errorNotification: 'Error accepting recipe approval.',
+      errorNotification: 'Error approving recipe approval.',
     };
   },
 
@@ -241,20 +239,6 @@ function recipeDeleted(recipeId) {
   };
 }
 
-function recipeEnabled(recipeId) {
-  return {
-    type: RECIPE_ENABLED,
-    recipeId,
-  };
-}
-
-function recipeDisabled(recipeId) {
-  return {
-    type: RECIPE_DISABLED,
-    recipeId,
-  };
-}
-
 function setSelectedRecipe(recipeId) {
   return {
     type: SET_SELECTED_RECIPE,
@@ -323,6 +307,4 @@ export {
   recipeAdded,
   recipeUpdated,
   recipeDeleted,
-  recipeEnabled,
-  recipeDisabled,
 };

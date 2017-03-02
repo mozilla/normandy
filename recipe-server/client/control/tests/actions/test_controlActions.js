@@ -83,10 +83,10 @@ describe('controlApp Actions', () => {
       });
   });
 
-  it('makes a proper API request for acceptApprovalRequest', () => {
+  it('makes a proper API request for approveApprovalRequest', () => {
     fetchMock.post('/api/v1/approval_request/123/approve/', {});
 
-    return store.dispatch(actionTypes.makeApiRequest('acceptApprovalRequest', {
+    return store.dispatch(actionTypes.makeApiRequest('approveApprovalRequest', {
       requestId: 123,
     }))
       .then(() => {

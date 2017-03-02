@@ -192,7 +192,7 @@ export class RecipeForm extends React.Component {
         break;
       }
       case 'approve': {
-        dispatch(makeApiRequest('acceptApprovalRequest', {
+        dispatch(makeApiRequest('approveApprovalRequest', {
           requestId: recipe.approval_request.id,
           ...data,
         })).then(updatedRequest => {
@@ -204,6 +204,7 @@ export class RecipeForm extends React.Component {
           // remove approval request from recipe in memory
           dispatch(singleRecipeReceived({
             ...recipe,
+            is_approved: true,
             approval_request: updatedRequest,
           }));
         });
@@ -222,6 +223,7 @@ export class RecipeForm extends React.Component {
           // update approval request from recipe in memory
           dispatch(singleRecipeReceived({
             ...recipe,
+            is_approved: false,
             approval_request: updatedRequest,
           }));
         });
