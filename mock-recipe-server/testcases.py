@@ -2,6 +2,8 @@ import json
 import random
 from urllib.parse import urlparse, urlunparse
 
+from product_details import product_details
+
 from normandy.base.utils import canonical_json_dumps
 from normandy.recipes.api.serializers import ClientSerializer
 from normandy.recipes.models import Action, Recipe
@@ -149,19 +151,45 @@ class TestCase(object):
 
 
 class FilterVersion(TestCase):
-    """
-    Matches Firefox version 50.0.0. Logs to the console.
-    """
+    """Matches recent Firefox versions."""
+    @property
+    def versions(self):
+        return [
+            product_details.firefox_versions['FIREFOX_NIGHTLY'],
+            product_details.firefox_versions['FIREFOX_AURORA'],
+            product_details.firefox_versions['LATEST_FIREFOX_DEVEL_VERSION'],
+            product_details.firefox_versions['LATEST_FIREFOX_VERSION'],
+        ]
+
+    def description(self):
+        version_html = ', '.join(f'<code>{version}</code>' for version in self.versions)
+        return f'''
+            <p class="description">
+            Several recipes that match recent Firefox versions, specifically: {version_html}.
+            All log to the console with the version they matched.
+            </p>
+        '''
+
     def load_data(self):
-        console_log('FilterVersion executed', extra_filter_expression='normandy.version=="50.0.0"')
+        for version in self.versions:
+            console_log(
+                f'FilterVersion executed: Matching version "{version}"',
+                extra_filter_expression=f'normandy.version=="{version}"'
+            )
 
 
 class FilterChannel(TestCase):
     """
-    Matches Firefox channel Aurora. Logs to the console.
+    Five recipes that match the Default (custom build), Nightly, Aurora,
+    Beta, and Release channels respectively. All log to the console with
+    the channel they match.
     """
     def load_data(self):
-        console_log('FilterChannel executed', extra_filter_expression='normandy.channel=="aurora"')
+        for channel in ['default', 'nightly', 'aurora', 'beta', 'release']:
+            console_log(
+                f'FilterChannel executed: Matching channel "{channel}"',
+                extra_filter_expression=f'normandy.channel=="{channel}"'
+            )
 
 
 class FilterDefaultBrowser(TestCase):
@@ -252,6 +280,108 @@ class FilterTelemetry(TestCase):
                 telemetry.testping.payload.foo=="bar"
             '''
         )
+
+
+class FilterDistribution(TestCase):
+    """
+    Matches the distribution "testdist", which is read from the
+    <code>distribution.id</code> preference. Logs to the console.
+    """
+    def load_data(self):
+        console_log(
+            'FilterDistribution executed',
+            extra_filter_expression='normandy.distribution=="testdist"'
+        )
+
+
+class FilterSearchEngines(TestCase):
+    """Matches search engines."""
+    @property
+    def engines(self):
+        return [
+            'yahoo',
+            'google-nocodes',
+            'bing',
+            'amazondotcom',
+            'ddg',
+            'twitter',
+            'wikipedia',
+        ]
+
+    def description(self):
+        engine_html = ', '.join(f'<code>{engine}</code>' for engine in self.engines)
+        return f'''
+            <p class="description">
+            Several recipes that match default search engines, specifically: {engine_html}.
+            All log to the console with the search engine they matched.
+            </p>
+        '''
+
+    def load_data(self):
+        for engine in self.engines:
+            console_log(
+                f'FilterSearchEngine executed: Matching search engine "{engine}"',
+                extra_filter_expression=f'normandy.searchEngine=="{engine}"'
+            )
+
+
+class FilterSync(TestCase):
+    """Matches Firefox sync status."""
+    def description(self):
+        return f'''
+        <p class="description">Several recipes that match Firefox Sync status:</p>
+        <ul>
+            <li>FilterSyncDisabled matches when sync is disabled.</li>
+            <li>FilterSyncEnabled matches when sync is enabled.</li>
+            <li>FilterSyncDesktop matches when at least 1 desktop client is linked to sync.</li>
+            <li>FilterSyncMobile matches when at least 1 mobile client is linked to sync.</li>
+            <li>FilterSyncMany matches when at least 2 clients are linked to sync.</li>
+        </ul>
+        '''
+
+    def load_data(self):
+        console_log(
+            'FilterSyncDisabled executed',
+            extra_filter_expression='!normandy.syncSetup'
+        )
+        console_log(
+            'FilterSyncEnabled executed',
+            extra_filter_expression='normandy.syncSetup'
+        )
+        console_log(
+            'FilterSyncDesktop executed',
+            extra_filter_expression='normandy.syncDesktopDevices > 0'
+        )
+        console_log(
+            'FilterSyncMobile executed',
+            extra_filter_expression='normandy.syncMobileDevices > 0'
+        )
+        console_log(
+            'FilterSyncMany executed',
+            extra_filter_expression='normandy.syncTotalDevices > 1'
+        )
+
+
+class FilterPluginsFlash(TestCase):
+    """Matches if the Flash plugin is installed. Logs to the console."""
+    def load_data(self):
+        console_log(
+            'FilterPluginsFlash executed',
+            extra_filter_expression='normandy.plugins["Shockwave Flash"]'
+        )
+
+
+class FilterLocales(TestCase):
+    """
+    Several recipes that match the locales that Firefox is available in.
+    All log to the console with the locale they matched.
+    """
+    def load_data(self):
+        for locale in product_details.languages.keys():
+            console_log(
+                f'FilterLocales executed: Matching locale "{locale}"',
+                extra_filter_expression=f'normandy.locale=="{locale}"'
+            )
 
 
 class ConsoleLogBasic(TestCase):
