@@ -6,6 +6,10 @@ export const SINGLE_RECIPE_RECEIVED = 'SINGLE_RECIPE_RECEIVED';
 export const SINGLE_REVISION_RECEIVED = 'SINGLE_REVISION_RECEIVED';
 
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
+export const SET_SELECTED_REVISION = 'SET_SELECTED_REVISION';
+
+export const REVISIONS_RECEIVED = 'REVISIONS_RECEIVED';
+
 export const SHOW_NOTIFICATION = 'SHOW_NOTIFICATION';
 export const DISMISS_NOTIFICATION = 'DISMISS_NOTIFICATION';
 
@@ -246,6 +250,21 @@ function setSelectedRecipe(recipeId) {
   };
 }
 
+function setSelectedRevision(revisionId) {
+  return {
+    type: SET_SELECTED_REVISION,
+    revisionId,
+  };
+}
+
+function revisionsReceived({ recipeId, revisions }) {
+  return {
+    type: REVISIONS_RECEIVED,
+    recipeId,
+    revisions,
+  };
+}
+
 function showNotification(notification) {
   return dispatch => {
     // Use time-based id and dismiss automatically after 10 seconds.
@@ -302,6 +321,8 @@ export {
   singleRecipeReceived,
   singleRevisionReceived,
   setSelectedRecipe,
+  setSelectedRevision,
+  revisionsReceived,
   showNotification,
   dismissNotification,
   recipeAdded,

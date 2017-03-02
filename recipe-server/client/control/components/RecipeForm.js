@@ -17,8 +17,8 @@ import {
   recipeAdded,
   showNotification,
   setSelectedRecipe,
-  singleRecipeReceived,
   userInfoReceived,
+  revisionsReceived,
 } from 'control/actions/ControlActions';
 import {
   getLastApprovedRevision,
@@ -121,6 +121,7 @@ export class RecipeForm extends React.Component {
       route,
       routeParams = {},
       recipe = {},
+      revision = {},
       allRevisions = {},
       pristine,
       submitting,
@@ -130,7 +131,7 @@ export class RecipeForm extends React.Component {
         id: userId,
       },
     } = this.props;
-    const requestDetails = recipe && recipe.approval_request;
+    const requestDetails = revision && revision.approval_request;
     const currentUserID = userId;
     const isViewingLatestApproved = recipe && revision
       && revision.revision_id === recipe.approved_revision_id;
@@ -139,7 +140,7 @@ export class RecipeForm extends React.Component {
 
     const isUserViewingOutdated = !!routeParams.revisionId;
     const isPendingApproval = hasApprovalRequest && requestDetails.approved === null;
-    const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated);
+    const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated) || !userId;
 
     const isAccepted = hasApprovalRequest && requestDetails.approved === true;
     const isRejected = hasApprovalRequest && requestDetails.approved === false;
@@ -165,6 +166,20 @@ export class RecipeForm extends React.Component {
     };
   }
 
+  updateRecipeHistory(recipeId) {
+    const {
+      dispatch,
+    } = this.props;
+
+    return dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
+      .then(revisions => {
+        dispatch(revisionsReceived({
+          recipeId,
+          revisions,
+        }));
+      });
+  }
+
   /**
    * Event handler for form action buttons.
    * Form action buttons remotely fire this handler with a (string) action type,
@@ -174,6 +189,7 @@ export class RecipeForm extends React.Component {
    */
   handleFormAction(action, data) {
     const {
+      revision,
       recipe,
       revision,
       dispatch,
@@ -182,77 +198,60 @@ export class RecipeForm extends React.Component {
     switch (action) {
       case 'cancel': {
         dispatch(makeApiRequest('closeApprovalRequest', {
-          requestId: recipe.approval_request.id,
+          requestId: revision.approval_request.id,
         })).then(() => {
           // show success
           dispatch(showNotification({
             messageType: 'success',
             message: 'Approval review closed.',
           }));
-          // remove approval request from recipe in memory
-          dispatch(singleRecipeReceived({
-            ...recipe,
-            approval_request: null,
-          }));
+
+          this.updateRecipeHistory(recipe.id);
         });
         break;
       }
       case 'approve': {
-        dispatch(makeApiRequest('approveApprovalRequest', {
-          requestId: recipe.approval_request.id,
+        dispatch(makeApiRequest('acceptApprovalRequest', {
+          requestId: revision.approval_request.id,
           ...data,
-        })).then(updatedRequest => {
+        })).then(() => {
           // show success
           dispatch(showNotification({
             messageType: 'success',
             message: 'Recipe review successfully approved!.',
           }));
-          // remove approval request from recipe in memory
-          dispatch(singleRecipeReceived({
-            ...recipe,
-            is_approved: true,
-            approved_revision_id: revision.revision_id,
-            approval_request: updatedRequest,
-          }));
+
+          this.updateRecipeHistory(recipe.id);
         });
         break;
       }
       case 'reject': {
         dispatch(makeApiRequest('rejectApprovalRequest', {
-          requestId: recipe.approval_request.id,
+          requestId: revision.approval_request.id,
           ...data,
-        })).then(updatedRequest => {
+        })).then(() => {
           // show success
           dispatch(showNotification({
             messageType: 'success',
             message: 'Recipe review successfully rejected.',
           }));
-          // update approval request from recipe in memory
-          dispatch(singleRecipeReceived({
-            ...recipe,
-            is_approved: false,
-            approval_request: updatedRequest,
-          }));
+
+          this.updateRecipeHistory(recipe.id);
         });
         break;
       }
       case 'request': {
         dispatch(makeApiRequest('openApprovalRequest', {
-          revisionId: recipe.revision_id,
+          revisionId: revision.revision_id,
         }))
-        .then(response => {
+        .then(() => {
           // show success message
           dispatch(showNotification({
             messageType: 'success',
             message: 'Approval review requested!',
           }));
-          // patch existing recipe with new approval_request
-          dispatch(singleRecipeReceived({
-            ...recipe,
-            approval_request: {
-              ...response,
-            },
-          }));
+
+          this.updateRecipeHistory(recipe.id);
         });
         break;
       }
@@ -275,7 +274,7 @@ export class RecipeForm extends React.Component {
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
 
     // Show a loading indicator if we haven't yet loaded the recipe.
-    if (recipeId && !recipe) {
+    if (recipeId && (!recipe && !revision)) {
       return RecipeForm.LoadingSpinner;
     }
 
