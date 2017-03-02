@@ -120,19 +120,6 @@ The driver object contains the following attributes:
       collision with other actions using the storage.
    :returns: :js:class:`Storage`
 
-.. js:function:: location()
-
-   Retrieves information about where the user is located.
-
-   :returns: A Promise that resolves with a location object.
-
-   The location object has the following fields:
-
-   countryCode
-      ISO 3166-1 country code for the country the user has been geolocated to.
-
-.. _Input Documentation: http://fjord.readthedocs.org/en/latest/hb_api.html
-
 .. js:function:: client()
 
    Retrieves information about the user's browser.

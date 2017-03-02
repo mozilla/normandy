@@ -16,3 +16,4 @@ development environment for it.
    functional-tests
    mock-recipe-server
    code-style
+   feature-experiments
