@@ -157,7 +157,7 @@ export default class RecipeFormActions extends React.Component {
         }
       >
         <div>
-          Approval comment section
+          Add a review comment
           <textarea
             defaultValue={this.state.comment.approve}
             onChange={this.onCommentChange('approve')}
@@ -191,7 +191,7 @@ export default class RecipeFormActions extends React.Component {
         }
       >
         <div>
-          Rejection comment section
+          Add a review comment
           <textarea
             defaultValue={this.state.comment.reject}
             onChange={this.onCommentChange('reject')}

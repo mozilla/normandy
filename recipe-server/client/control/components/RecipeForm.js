@@ -295,11 +295,11 @@ export class RecipeForm extends React.Component {
           && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
           && (
             <div className="approval-status">
-              This recipe has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
+              This revision has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
               <pre className="approval-comment">
-                {recipe.approval_request.comment}
+                {revision.approval_request.comment}
                 <span className="comment-author">
-                  &ndash; {recipe.approval_request.approver.email}
+                  &ndash; {revision.approval_request.approver.email}
                 </span>
               </pre>
             </div>
