@@ -62,6 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
     latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    approved_revision_id = serializers.CharField(source='approved_revision.id', read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
@@ -81,6 +82,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'extra_filter_expression',
             'filter_expression',
             'latest_revision_id',
+            'approved_revision_id',
             'approval_request',
         ]
 

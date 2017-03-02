@@ -124,12 +124,15 @@ export class RecipeForm extends React.Component {
       pristine,
       submitting,
       recipeId,
+      revision,
       user: {
         id: userId,
       },
     } = this.props;
     const requestDetails = recipe && recipe.approval_request;
     const currentUserID = userId;
+    const isViewingLatestApproved = recipe && revision
+      && revision.revision_id === recipe.approved_revision_id;
     const hasApprovalRequest = !!requestDetails;
     const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
 
@@ -151,6 +154,7 @@ export class RecipeForm extends React.Component {
       isApproved: !!recipeId && recipe.is_approved,
       isEnabled: !!recipeId && recipe.enabled,
       isUserViewingOutdated,
+      isViewingLatestApproved,
       isPendingApproval,
       isFormDisabled,
       isAccepted,
@@ -170,6 +174,7 @@ export class RecipeForm extends React.Component {
   handleFormAction(action, data) {
     const {
       recipe,
+      revision,
       dispatch,
     } = this.props;
 
@@ -205,6 +210,7 @@ export class RecipeForm extends React.Component {
           dispatch(singleRecipeReceived({
             ...recipe,
             is_approved: true,
+            approved_revision_id: revision.revision_id,
             approval_request: updatedRequest,
           }));
         });
