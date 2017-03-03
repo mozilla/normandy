@@ -103,10 +103,16 @@ class TestCase(object):
             API.
         """
         root_path = api_path.add('api', 'v1')
-        root_path.save()
+        self.serialize_api_root(root_path, domain)
         self.serialize_recipe_api(root_path)
         self.serialize_client_api(root_path)
         self.serialize_action_api(root_path, domain)
+
+    def serialize_api_root(self, root_path, domain):
+        root_data = json.loads(root_path.fetch())
+        for name, url in root_data.items():
+            root_data[name] = self.update_url(url, domain)
+        root_path.save(json.dumps(root_data))
 
     def serialize_recipe_api(self, root_path):
         root_path.add('recipe').save()
