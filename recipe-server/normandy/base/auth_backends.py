@@ -14,14 +14,12 @@ class LoggingAuthBackendMixin(object):
     """
     Authentication backend mixin that logs the results of login attempts.
     """
+    def get_username(self, **kwargs):
+        raise NotImplemented()
+
     def authenticate(self, **kwargs):
         result = super().authenticate(**kwargs)
-
-        username = None
-        if 'username' in kwargs:
-            username = kwargs['username']
-        elif 'remote_user' in kwargs:
-            username = kwargs['remote_user']
+        username = self.get_username(**kwargs)
 
         if result is None:
             if username is not None:
@@ -46,9 +44,13 @@ class LoggingModelBackend(LoggingAuthBackendMixin, ModelBackend):
     """
     Model-backed authentication backend that logs the results of login attempts.
     """
+    def get_username(self, username=None, **kwargs):
+        return username
 
 
 class LoggingRemoteUserBackend(LoggingAuthBackendMixin, RemoteUserBackend):
     """
     Remote-user backend that logs the results of login attempts.
     """
+    def get_username(self, remote_user=None, **kwargs):
+        return remote_user

@@ -8,6 +8,7 @@ ERROR_MISCONFIGURED_CDN_URL_SLASH = 'normandy.base.E001'
 ERROR_MISCONFIGURED_CDN_URL_HTTPS = 'normandy.base.E002'
 ERROR_MISCONFIGURED_APP_SERVER_URL_SLASH = 'normandy.base.E003'
 ERROR_MISCONFIGURED_APP_SERVER_URL_HTTPS = 'normandy.base.E004'
+ERROR_MISCONFIGURED_OIDC_LOGOUT_URL = 'normandy.base.E005'
 
 
 def setting_cdn_url(app_configs, **kwargs):
@@ -50,7 +51,18 @@ def setting_oidc_remote_auth_header(app_configs, **kwargs):
     return errors
 
 
+def setting_oidc_logout_url(app_configs, **kwargs):
+    errors = []
+
+    if settings.USE_OIDC and settings.OIDC_LOGOUT_URL is None:
+        msg = 'The setting OIDC_LOGOUT_URL must be set when USE_OIDC=True'
+        errors.append(Error(msg, id=ERROR_MISCONFIGURED_OIDC_LOGOUT_URL))
+
+    return errors
+
+
 def register():
     register_check(setting_cdn_url)
     register_check(setting_app_server_url)
     register_check(setting_oidc_remote_auth_header)
+    register_check(setting_oidc_logout_url)

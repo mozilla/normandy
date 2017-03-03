@@ -43,14 +43,3 @@ class ConfigurableRemoteUserMiddleware(RemoteUserMiddleware):
         prefixed with "HTTP_".
         """
         return settings.OIDC_REMOTE_AUTH_HEADER
-
-    @property
-    def force_logout_if_no_header(self):
-        """
-        If True, don't log the user out when the remote user header is not found.
-
-        Useful for setups when the external authentication is only
-        expected to happen on some "logon" URL and the rest of the
-        application wants to use Django's authentication mechanism.
-        """
-        return settings.OIDC_LOGOUT_IF_NO_HEADER

@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load render_bundle from normandy_webpack_loader %}
+{% load logout_button from normandy_logout_button %}
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 
@@ -20,7 +21,7 @@
         {% if user.is_authenticated %}
           <span>
             {% firstof user.get_short_name user.get_username %} //
-            <a href="{% url 'control:logout' %}">Log Out <i class="fa fa-sign-out post"></i></a>
+            {% logout_button %}
           </span>
         {% endif %}
       </div>

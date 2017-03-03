@@ -222,12 +222,12 @@ in other Django projects.
 
    .. warning::
 
-      If this feature is enabled, the proxy server providing authentcation
-      *must* sanitize the headers passed along to Normandy. Specifcially, the
+      If this feature is enabled, the proxy server providing authentication
+      *must* sanitize the headers passed along to Normandy. Specifically, the
       header defined in :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` must not be
       passed on from the user.
 
-      Failing to do this will result from any client being able to authenticate
+      Failing to do this will result in any client being able to authenticate
       as any user, with no checks.
 
 .. envvar:: DJANGO_OIDC_REMOTE_AUTH_HEADER
@@ -235,20 +235,16 @@ in other Django projects.
    :default: ``HTTP_REMOTE_USER``
 
    If :envvar:`DJANGO_USE_OIDC` is ``True``, this is the source of the user to
-   authenticate. This is subject to the Django header normalization, i.e.
-   the header will be capitalized, dashes replaced with underscores, and it will
-   be prefixed with ``HTTP_``.
+   authenticate. This must match Django header normalization, i.e. it must be
+   capitalized, dashes replaced with underscores, and be prefixed with ``HTTP_``.
 
-.. envvar:: DJANGO_OIDC_LOGOUT_IF_NO_HEADER
+   For example, the header ``OIDC-Claim-User-Profile-Email`` becomes
+   ``HTTP_OIDC_CLAIM_USER_PROFILE_EMAIL``.
 
-   :default: ``True``
+.. envvar:: DJANGO_OIDC_LOGOUT_URL
 
-   If set to ``False``, users will stayed logged in as long as their session
-   remains live. This is useful if only some URLs pass the
-   :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` (for example, authentication pages).
-
-   If set to ``True``, users will be logged out in Django's session when they
-   send a request without the appropriate headers.
+   If :envvar:`DJANGO_USE_OIDC` is set to ``True``, this settings must be set to
+   the URL that a user can visit to logout. It may be a relative URL.
 
 Gunicorn settings
 -----------------

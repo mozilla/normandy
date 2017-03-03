@@ -155,7 +155,7 @@ class Base(Core):
             return ['normandy.base.auth_backends.LoggingModelBackend']
 
     OIDC_REMOTE_AUTH_HEADER = values.Value('HTTP_REMOTE_USER')
-    OIDC_LOGOUT_IF_NO_HEADER = values.BooleanValue(True)
+    OIDC_LOGOUT_URL = values.Value(None)
 
     # Middleware that _most_ environments will need. Subclasses can override this list.
     EXTRA_MIDDLEWARE = [
