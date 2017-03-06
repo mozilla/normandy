@@ -284,8 +284,6 @@ class Base(Core):
         os.path.join(Core.BASE_DIR, 'assets'),
     )
 
-    # Overwrite old files when uploading media.
-    DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
     CDN_URL = values.URLValue(None)
     # URL that bypasses any CDNs
@@ -369,7 +367,7 @@ class ProductionInsecure(Production):
     ])
 
 
-class ProductionReadOnlyInsecure(ProductionReadOnly, ProductionInsecure):
+class ProductionReadOnlyInsecure(ProductionInsecure, ProductionReadOnly):
     pass
 
 

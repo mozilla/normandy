@@ -107,12 +107,14 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         return queryset
 
     @list_route(methods=['GET'])
+    @cache_control(public=True, max_age=settings.API_CACHE_TIME)
     def signed(self, request, pk=None):
         recipes = self.filter_queryset(self.get_queryset()).exclude(signature=None)
         serializer = SignedRecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 
     @detail_route(methods=['GET'])
+    @cache_control(public=True, max_age=settings.API_CACHE_TIME)
     def history(self, request, pk=None):
         recipe = self.get_object()
         serializer = RecipeRevisionSerializer(recipe.revisions.all(), many=True,

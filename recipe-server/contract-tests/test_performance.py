@@ -7,6 +7,7 @@ HOT_PATHS = [
     '/en-US/repair',
     '/en-US/repair/',
     '/api/v1/recipe/',
+    '/api/v1/recipe/signed/',
     '/api/v1/action/',
 ]
 
@@ -32,3 +33,16 @@ class TestHotPaths(object):
         r = requests_session.get(conf.getoption('server') + path)
         r.raise_for_status()
         assert 'cookie' not in r.headers.get('vary', '').lower()
+
+    def test_cache_headers(self, conf, requests_session, path):
+        r = requests_session.get(conf.getoption('server') + path)
+        r.raise_for_status()
+        cache_control = r.headers.get('cache-control')
+        assert cache_control is not None
+
+        # parse cache-control header.
+        parts = [part.strip() for part in cache_control.split(',')]
+        max_age = [part for part in parts if part.startswith('max-age=')][0]
+        max_age_seconds = int(max_age.split('=')[1])
+        assert 'public' in parts
+        assert max_age_seconds > 0
