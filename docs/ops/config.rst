@@ -192,19 +192,59 @@ in other Django projects.
 
 .. envvar:: DJANGO_CDN_URL
 
-  :default: ``None``
+   :default: ``None``
 
-  The URL of a CDN that is backed by Normandy, if one is in use. This is used to
-  enforce that immutable content is routed through the CDN. Must end with a
-  slash (``/``).
+   The URL of a CDN that is backed by Normandy, if one is in use. This is used to
+   enforce that immutable content is routed through the CDN. Must end with a
+   slash (``/``).
 
 .. envvar:: DJANGO_APP_SERVER_URL
 
-  :default: ``None``
+   :default: ``None``
 
-  The URL that allows direct access to Normandy, bypassing any CDNs. This
-  is used for content that cannot be cached. If not specified, Normandy will
-  assume direct access. Must end with a slash (``/``).
+   The URL that allows direct access to Normandy, bypassing any CDNs. This
+   is used for content that cannot be cached. If not specified, Normandy will
+   assume direct access. Must end with a slash (``/``).
+
+.. envvar:: DJANGO_USE_OIDC
+
+   :default: ``False``
+
+   If enabled, Normandy will authenticate users by reading a header in requests.
+   The expectation is that a proxy server, such as Nginx, will perform
+   authentication using Open ID Connect, and then pass the unique ID of the user
+   in a header.
+
+   .. seealso::
+
+      :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` for which header Normandy
+      reads this value from.
+
+   .. warning::
+
+      If this feature is enabled, the proxy server providing authentication
+      *must* sanitize the headers passed along to Normandy. Specifically, the
+      header defined in :envvar:`DJANGO_OIDC_REMOTE_AUTH_HEADER` must not be
+      passed on from the user.
+
+      Failing to do this will result in any client being able to authenticate
+      as any user, with no checks.
+
+.. envvar:: DJANGO_OIDC_REMOTE_AUTH_HEADER
+
+   :default: ``HTTP_REMOTE_USER``
+
+   If :envvar:`DJANGO_USE_OIDC` is ``True``, this is the source of the user to
+   authenticate. This must match Django header normalization, i.e. it must be
+   capitalized, dashes replaced with underscores, and be prefixed with ``HTTP_``.
+
+   For example, the header ``OIDC-Claim-User-Profile-Email`` becomes
+   ``HTTP_OIDC_CLAIM_USER_PROFILE_EMAIL``.
+
+.. envvar:: DJANGO_OIDC_LOGOUT_URL
+
+   If :envvar:`DJANGO_USE_OIDC` is set to ``True``, this settings must be set to
+   the URL that a user can visit to logout. It may be a relative URL.
 
 Gunicorn settings
 -----------------
