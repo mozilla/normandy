@@ -16,9 +16,13 @@ this.EXPORTED_SYMBOLS = ["NormandyApi"];
 const log = LogManager.getLogger("normandy-api");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 
-let indexPromise;
+let indexPromise = null;
 
 this.NormandyApi = {
+  clearIndexCache() {
+    indexPromise = null;
+  },
+
   apiCall(method, endpoint, data = {}) {
     const url = new URL(endpoint);
     method = method.toLowerCase();
