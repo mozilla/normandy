@@ -29,7 +29,7 @@ const REASONS = {
 
 const PREF_BRANCH = "extensions.shield-recipe-client.";
 const DEFAULT_PREFS = {
-  api_url: "https://self-repair.mozilla.org/api/v1",
+  api_url: "https://normandy.cdn.mozilla.net/api/v1",
   dev_mode: false,
   enabled: true,
   startup_delay_seconds: 300,

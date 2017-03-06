@@ -9,7 +9,8 @@ Production
 Production is the live, user-facing instance of Normandy that is hit by every
 active user of Firefox.
 
-- **Server URL:** https://self-repair.mozilla.org/
+- **Server URL:** https://normandy.cdn.mozilla.net/
+- **Alternate URL (deprecated):** https://self-repair.mozilla.org/
 - **Control Interface:** https://normandy-admin.prod.mozaws.net/control/
 
 Preferences
@@ -19,7 +20,7 @@ production server:
 
 .. describe:: extensions.shield-recipe-client.api_url
 
-   ``https://self-repair.mozilla.org/api/v1``
+   ``https://normandy.cdn.mozilla.net/api/v1``
 
 .. describe:: security.content.signature.root_hash
 

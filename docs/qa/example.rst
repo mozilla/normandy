@@ -125,7 +125,7 @@ our new recipe:
 
       {
          "name": "show-heartbeat",
-         "implementation_url": "https://self-repair.mozilla.org/api/v1/action/notification/implementation/4574dbc126af07cd031a0da29d625a11365403ea/",
+         "implementation_url": "https://normandy.cdn.mozilla.net/v1/action/notification/implementation/4574dbc126af07cd031a0da29d625a11365403ea/",
          "arguments_schema": {
                "$schema": "http://json-schema.org/draft-04/schema#",
                "title": "Display a pop-up notification",
