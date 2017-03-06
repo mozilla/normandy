@@ -126,14 +126,14 @@ export class RecipeForm extends React.Component {
       pristine,
       submitting,
       recipeId,
-      revision,
       user: {
         id: userId,
       },
     } = this.props;
-    const requestDetails = revision && revision.approval_request;
+
+    const requestDetails = revision.approval_request;
     const currentUserID = userId;
-    const isViewingLatestApproved = recipe && revision
+    const isViewingLatestApproved = recipe.approved_revision_id
       && revision.revision_id === recipe.approved_revision_id;
     const hasApprovalRequest = !!requestDetails;
     const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
@@ -166,7 +166,7 @@ export class RecipeForm extends React.Component {
     };
   }
 
-  updateRecipeHistory(recipeId) {
+  getRecipeHistory(recipeId) {
     const {
       dispatch,
     } = this.props;
@@ -189,75 +189,61 @@ export class RecipeForm extends React.Component {
    */
   handleFormAction(action, data) {
     const {
-      revision,
       recipe,
       revision,
       dispatch,
     } = this.props;
 
-    switch (action) {
-      case 'cancel': {
-        dispatch(makeApiRequest('closeApprovalRequest', {
-          requestId: revision.approval_request.id,
-        })).then(() => {
-          // show success
-          dispatch(showNotification({
-            messageType: 'success',
-            message: 'Approval review closed.',
-          }));
-
-          this.updateRecipeHistory(recipe.id);
-        });
-        break;
-      }
-      case 'approve': {
-        dispatch(makeApiRequest('acceptApprovalRequest', {
-          requestId: revision.approval_request.id,
-          ...data,
-        })).then(() => {
-          // show success
-          dispatch(showNotification({
-            messageType: 'success',
-            message: 'Recipe review successfully approved!.',
-          }));
-
-          this.updateRecipeHistory(recipe.id);
-        });
-        break;
-      }
-      case 'reject': {
-        dispatch(makeApiRequest('rejectApprovalRequest', {
-          requestId: revision.approval_request.id,
-          ...data,
-        })).then(() => {
-          // show success
-          dispatch(showNotification({
-            messageType: 'success',
-            message: 'Recipe review successfully rejected.',
-          }));
-
-          this.updateRecipeHistory(recipe.id);
-        });
-        break;
-      }
-      case 'request': {
-        dispatch(makeApiRequest('openApprovalRequest', {
-          revisionId: revision.revision_id,
-        }))
+    // Form actions follow the same pattern: call api, show success message, update
+    // history. This is just an abstracted handler to keep things DRY.
+    const handleAction = ({ apiEndpoint, successMessage, ...apiData }) =>
+      dispatch(makeApiRequest(apiEndpoint), apiData || {})
         .then(() => {
-          // show success message
           dispatch(showNotification({
             messageType: 'success',
-            message: 'Approval review requested!',
+            message: successMessage,
           }));
 
-          this.updateRecipeHistory(recipe.id);
+          this.getRecipeHistory(recipe.id);
         });
-        break;
-      }
-      default: {
+
+    switch (action) {
+      case 'cancel':
+        return handleAction({
+          apiEndpoint: 'closeApprovalRequest',
+          successMessage: 'Approval review closed.',
+          // Request data
+          requestId: revision.approval_request.id,
+        });
+
+      case 'approve':
+        return handleAction({
+          apiEndpoint: 'acceptApprovalRequest',
+          successMessage: 'Recipe review successfully approved!',
+          // Request data
+          requestId: revision.approval_request.id,
+          ...data,
+        });
+
+      case 'reject':
+        return handleAction({
+          apiEndpoint: 'rejectApprovalRequest',
+          successMessage: 'Recipe review successfully rejected.',
+          // Request data
+          requestId: revision.approval_request.id,
+          ...data,
+        });
+
+      case 'request':
+        return handleAction({
+          apiEndpoint: 'openApprovalRequest',
+          successMessage: 'Approval review requested!',
+          // Request data
+          revisionId: revision.revision_id,
+        });
+
+      default:
         throw new Error(`Unrecognized form action "${action}"`);
-      }
     }
   }
 
