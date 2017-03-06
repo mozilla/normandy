@@ -194,15 +194,17 @@ this.RecipeRunner = {
    * API url. This is used mainly by the mock-recipe-server JS that is
    * executed in the browser console.
    */
-  testRun(baseApiUrl) {
+  testRun: Task.async(function* (baseApiUrl) {
     const oldApiUrl = prefs.getCharPref("api_url");
     prefs.setCharPref("api_url", baseApiUrl);
 
-    Storage.clearAllStorage();
-    NormandyApi.clearIndexCache();
-    this.start();
-
-    prefs.setCharPref("api_url", oldApiUrl);
-    NormandyApi.clearIndexCache();
-  },
+    try {
+      Storage.clearAllStorage();
+      NormandyApi.clearIndexCache();
+      yield this.start();
+    } finally {
+      prefs.setCharPref("api_url", oldApiUrl);
+      NormandyApi.clearIndexCache();
+    }
+  }),
 };
