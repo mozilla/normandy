@@ -13,15 +13,8 @@ import {
   getActiveColumns,
 } from 'control/selectors/ColumnSelector';
 
+import BooleanIcon from 'control/components/BooleanIcon';
 import RecipeFilters from 'control/components/RecipeFilters';
-
-const BooleanIcon = props => {
-  const iconClass = props.value ? 'fa-check green' : 'fa-times red';
-  return <i className={`fa fa-lg ${iconClass}`}>&nbsp;</i>;
-};
-BooleanIcon.propTypes = {
-  value: pt.bool.isRequired,
-};
 
 class DisconnectedRecipeList extends React.Component {
   static propTypes = {

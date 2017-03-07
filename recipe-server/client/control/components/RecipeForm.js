@@ -23,6 +23,7 @@ import {
 import {
   getLastApprovedRevision,
 } from 'control/selectors/RecipesSelector';
+import BooleanIcon from 'control/components/BooleanIcon';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
@@ -313,6 +314,11 @@ export class RecipeForm extends React.Component {
             </div>
           )
         }
+
+        <div className="status-indicator">
+          <BooleanIcon value={renderVars.isEnabled} />
+          { renderVars.isEnabled ? 'Enabled' : 'Disabled' }
+        </div>
 
         <ControlField
           disabled={isFormDisabled}
