@@ -137,6 +137,7 @@ class Core(Configuration):
     ACTIONS = {
         'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
         'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
+        'preference-experiment': os.path.join(BASE_DIR, 'client/actions/preference-experiment'),
     }
 
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')

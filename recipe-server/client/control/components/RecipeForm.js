@@ -27,6 +27,7 @@ import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+import PreferenceExperimentFields from 'control/components/action_fields/PreferenceExperimentFields';
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 
@@ -56,6 +57,7 @@ export class RecipeForm extends React.Component {
   static argumentsFields = {
     'console-log': ConsoleLogFields,
     'show-heartbeat': HeartbeatFields,
+    'preference-experiment': PreferenceExperimentFields,
   };
 
   renderCloningMessage() {
@@ -124,6 +126,7 @@ export class RecipeForm extends React.Component {
           <option value="">Choose an action...</option>
           <option value="console-log">Log to Console</option>
           <option value="show-heartbeat">Heartbeat Prompt</option>
+          <option value="preference-experiment">Preference Experiment</option>
         </ControlField>
         <ArgumentsFields fields={recipeFields} />
         <div className="form-actions">
