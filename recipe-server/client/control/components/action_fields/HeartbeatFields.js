@@ -1,11 +1,13 @@
 import React, { PropTypes as pt } from 'react';
+import { connect } from 'react-redux';
 
 import { ControlField } from 'control/components/Fields';
+import { selector } from 'control/components/RecipeForm';
 
 /**
  * Form fields for the show-heartbeat action.
  */
-export default function HeartbeatFields({ fields = {} }) {
+export function HeartbeatFields({ recipeArguments }) {
   return (
     <div className="arguments-fields">
       <p className="info">
@@ -69,12 +71,13 @@ export default function HeartbeatFields({ fields = {} }) {
         `}</option>
         <option value="xdays">{`
           Allow re-prompting users who have already seen this prompt
-          after ${(fields && fields.repeatEvery) || 'X'} days since they last saw it.
+          after ${(recipeArguments && recipeArguments.repeatEvery) || 'X'}
+          days since they last saw it.
         `}</option>
       </ControlField>
 
       {
-        fields.repeatOption === 'xdays' &&
+        recipeArguments.repeatOption === 'xdays' &&
           <ControlField
             label="Days before user is re-prompted"
             name="arguments.repeatEvery"
@@ -95,5 +98,11 @@ export default function HeartbeatFields({ fields = {} }) {
 }
 
 HeartbeatFields.propTypes = {
-  fields: pt.object,
+  recipeArguments: pt.object,
 };
+
+export default connect(
+  state => ({
+    recipeArguments: selector(state, 'arguments'),
+  })
+)(HeartbeatFields);

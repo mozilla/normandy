@@ -232,7 +232,6 @@ const connector = connect(
   // Pull selected action from the form state.
   state => ({
     selectedAction: selector(state, 'action'),
-    recipeFields: selector(state, 'arguments'),
   }),
 
   // Bound functions for writing to the server.
