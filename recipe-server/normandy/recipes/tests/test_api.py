@@ -320,9 +320,16 @@ class TestRecipeAPI(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
+    def test_signed_view_includes_cache_headers(self, api_client):
+        res = api_client.get('/api/v1/recipe/signed/')
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max-age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
+
     def test_detail_view_includes_cache_headers(self, api_client):
         recipe = RecipeFactory()
-        res = api_client.get('/api/v1/recipe/{id}/'.format(id=recipe.id))
+        res = api_client.get(f'/api/v1/recipe/{recipe.id}/')
         assert res.status_code == 200
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
