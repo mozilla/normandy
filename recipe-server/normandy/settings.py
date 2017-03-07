@@ -71,6 +71,7 @@ class Core(Configuration):
     USE_TZ = True
 
     # Static files (CSS, JavaScript, Images)
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -283,7 +284,6 @@ class Base(Core):
         os.path.join(Core.BASE_DIR, 'assets'),
     )
 
-    STATICFILES_STORAGE = values.Value('whitenoise.django.GzipManifestStaticFilesStorage')
     # Overwrite old files when uploading media.
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.overwrite.OverwriteStorage')
     # URL that the CDN exists at to front cached parts of the site, if any.
@@ -384,4 +384,3 @@ class Test(Base):
     SECRET_KEY = 'not a secret'
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
     SECURE_SSL_REDIRECT = False
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
