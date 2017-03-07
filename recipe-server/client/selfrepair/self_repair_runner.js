@@ -48,7 +48,8 @@ export function fetchAction(recipe) {
 
   if (!(recipe.action in cache)) {
     const headers = { Accept: 'application/json' };
-    cache[recipe.action] = fetch(`/api/v1/action/${recipe.action}/`, { headers })
+    const credentials = 'same-origin';
+    cache[recipe.action] = fetch(`/api/v1/action/${recipe.action}/`, { headers, credentials })
       .then(response => response.json());
   }
 
@@ -64,7 +65,7 @@ export function fetchRecipes() {
   const { recipeUrl } = document.documentElement.dataset;
   const headers = { Accept: 'application/json' };
 
-  return fetch(`${recipeUrl}?enabled=true`, { headers })
+  return fetch(`${recipeUrl}?enabled=true`, { headers, credentials: 'same-origin' })
   .then(response => response.json());
 }
 
@@ -79,7 +80,7 @@ export function classifyClient() {
 
   classifyUrl = new URL(classifyUrl, window.location.href);
 
-  return fetch(classifyUrl.href, { headers })
+  return fetch(classifyUrl.href, { headers, credentials: 'same-origin' })
   .then(response => response.json())
   .then(classification => {
     // Parse request time
