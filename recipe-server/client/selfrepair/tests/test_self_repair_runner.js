@@ -50,6 +50,7 @@ describe('Self-Repair Runner', () => {
       await fetchRecipes();
 
       expect(fetchMock.lastOptions()).toEqual({
+        credentials: 'same-origin',
         headers: {
           Accept: 'application/json',
         },
@@ -96,6 +97,7 @@ describe('Self-Repair Runner', () => {
       await fetchAction(recipe);
 
       expect(fetchMock.lastOptions()).toEqual({
+        credentials: 'same-origin',
         headers: {
           Accept: 'application/json',
         },
