@@ -79,7 +79,7 @@ JSON format as returned by Normandy:
       "revision_id": 12,
       "action": {
          "name": "console-log",
-         "implementation_url": "https://self-repair.mozilla.org/api/v1/action/console-log/implementation/8ee8e7621fc08574f854972ee77be2a5280fb546/",
+         "implementation_url": "https://normandy.cdn.mozilla.net/api/v1/action/console-log/implementation/8ee8e7621fc08574f854972ee77be2a5280fb546/",
          "arguments_schema": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "description": "Log a message to the console",
