@@ -19,7 +19,7 @@ const BASE_API_URL = '/api/v1/';
 
 // Default API request settings
 export const API_REQUEST_SETTINGS = {
-  credentials: 'include',
+  credentials: 'same-origin',
   headers: {
     'X-CSRFToken': document.getElementsByTagName('html')[0].dataset.csrf,
     Accept: 'application/json',
