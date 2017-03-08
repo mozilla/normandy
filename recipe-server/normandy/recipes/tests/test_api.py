@@ -273,6 +273,7 @@ class TestRecipeAPI(object):
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
         assert res.status_code == 200
+        assert res.data['enabled'] is True
 
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
@@ -289,6 +290,7 @@ class TestRecipeAPI(object):
 
         res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
         assert res.status_code == 200
+        assert res.data['enabled'] is False
 
         recipe = Recipe.objects.all()[0]
         assert not recipe.is_approved

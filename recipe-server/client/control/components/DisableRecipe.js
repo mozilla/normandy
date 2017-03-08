@@ -16,12 +16,12 @@ class DisableRecipe extends React.Component {
   }
 
   disableRecipe(event) {
-    const { dispatch, recipeId } = this.props;
+    const { dispatch, recipe, recipeId } = this.props;
 
     event.preventDefault();
     dispatch(makeApiRequest('disableRecipe', { recipeId }))
     .then(() => {
-      dispatch(singleRecipeReceived(recipeId));
+      dispatch(singleRecipeReceived(recipe));
       dispatch(push(`/control/recipe/${recipeId}/`));
     });
   }

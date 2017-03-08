@@ -44,6 +44,7 @@ class TestRecipeSerializer:
             'locales': [locale.code],
             'is_approved': False,
             'latest_revision_id': recipe.latest_revision.id,
+            'approved_revision_id': recipe.approved_revision_id,
             'approval_request': {
                 'id': approval.id,
                 'created': Whatever(),
@@ -193,6 +194,7 @@ class TestSignedRecipeSerializer:
                 'locales': [],
                 'is_approved': False,
                 'latest_revision_id': recipe.latest_revision.id,
+                'approved_revision_id': recipe.approved_revision_id,
                 'approval_request': None,
             }
         }

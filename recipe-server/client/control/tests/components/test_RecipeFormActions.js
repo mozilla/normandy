@@ -7,6 +7,7 @@ import RecipeFormActions from 'control/components/RecipeFormActions';
 const propFactory = props => ({
   onAction: () => {},
   isUserViewingOutdated: false,
+  isViewingLatestApproved: false,
   isPendingApproval: false,
   isUserRequester: false,
   isAlreadySaved: false,
@@ -313,6 +314,26 @@ describe('<RecipeFormActions>', () => {
     it('should display if display criteria is met', () => {
       const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
       expect(wrapper.find('.action-new').length).toBe(1);
+    });
+  });
+
+  describe('Enable button', () => {
+    const displayCriteria = {
+      isViewingLatestApproved: true,
+    };
+
+    it('should NOT display when user is NOT viewing the latest approved revision', () => {
+      const wrapper = mount(<RecipeFormActions
+        {...propFactory({
+          isViewingLatestApproved: false,
+        })}
+      />);
+      expect(wrapper.find('.action-enable').length).toBe(0);
+    });
+
+    it('should display if display criteria is met', () => {
+      const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);
+      expect(wrapper.find('.action-enable').length).toBe(1);
     });
   });
 });
