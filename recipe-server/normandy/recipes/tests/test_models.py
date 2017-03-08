@@ -111,6 +111,7 @@ class TestRecipe(object):
             '{'
             '"action":"action",'
             '"approval_request":null,'
+            '"approved_revision_id":null,'
             '"arguments":{"bar":2,"foo":1},'
             '"channels":["beta"],'
             '"countries":["CA"],'

@@ -1,6 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import { push } from 'react-router-redux';
-import { makeApiRequest, recipeDisabled } from 'control/actions/ControlActions';
+import { makeApiRequest, singleRecipeReceived } from 'control/actions/ControlActions';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 
 class DisableRecipe extends React.Component {
@@ -16,12 +16,12 @@ class DisableRecipe extends React.Component {
   }
 
   disableRecipe(event) {
-    const { dispatch, recipeId } = this.props;
+    const { dispatch, recipe, recipeId } = this.props;
 
     event.preventDefault();
     dispatch(makeApiRequest('disableRecipe', { recipeId }))
     .then(() => {
-      dispatch(recipeDisabled(recipeId));
+      dispatch(singleRecipeReceived(recipe));
       dispatch(push(`/control/recipe/${recipeId}/`));
     });
   }

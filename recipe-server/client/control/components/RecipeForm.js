@@ -23,6 +23,7 @@ import {
 import {
   getLastApprovedRevision,
 } from 'control/selectors/RecipesSelector';
+import BooleanIcon from 'control/components/BooleanIcon';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
@@ -124,12 +125,15 @@ export class RecipeForm extends React.Component {
       pristine,
       submitting,
       recipeId,
+      revision,
       user: {
         id: userId,
       },
     } = this.props;
     const requestDetails = recipe && recipe.approval_request;
     const currentUserID = userId;
+    const isViewingLatestApproved = recipe && revision
+      && revision.revision_id === recipe.approved_revision_id;
     const hasApprovalRequest = !!requestDetails;
     const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
 
@@ -151,6 +155,7 @@ export class RecipeForm extends React.Component {
       isApproved: !!recipeId && recipe.is_approved,
       isEnabled: !!recipeId && recipe.enabled,
       isUserViewingOutdated,
+      isViewingLatestApproved,
       isPendingApproval,
       isFormDisabled,
       isAccepted,
@@ -170,6 +175,7 @@ export class RecipeForm extends React.Component {
   handleFormAction(action, data) {
     const {
       recipe,
+      revision,
       dispatch,
     } = this.props;
 
@@ -192,7 +198,7 @@ export class RecipeForm extends React.Component {
         break;
       }
       case 'approve': {
-        dispatch(makeApiRequest('acceptApprovalRequest', {
+        dispatch(makeApiRequest('approveApprovalRequest', {
           requestId: recipe.approval_request.id,
           ...data,
         })).then(updatedRequest => {
@@ -204,6 +210,8 @@ export class RecipeForm extends React.Component {
           // remove approval request from recipe in memory
           dispatch(singleRecipeReceived({
             ...recipe,
+            is_approved: true,
+            approved_revision_id: revision.revision_id,
             approval_request: updatedRequest,
           }));
         });
@@ -222,6 +230,7 @@ export class RecipeForm extends React.Component {
           // update approval request from recipe in memory
           dispatch(singleRecipeReceived({
             ...recipe,
+            is_approved: false,
             approval_request: updatedRequest,
           }));
         });
@@ -305,6 +314,11 @@ export class RecipeForm extends React.Component {
             </div>
           )
         }
+
+        <div className="status-indicator">
+          <BooleanIcon value={renderVars.isEnabled} />
+          { renderVars.isEnabled ? 'Enabled' : 'Disabled' }
+        </div>
 
         <ControlField
           disabled={isFormDisabled}

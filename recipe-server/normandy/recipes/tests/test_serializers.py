@@ -44,6 +44,7 @@ class TestRecipeSerializer:
             'locales': [locale.code],
             'is_approved': False,
             'latest_revision_id': recipe.latest_revision.id,
+            'approved_revision_id': recipe.approved_revision_id,
             'approval_request': {
                 'id': approval.id,
                 'created': Whatever(),
@@ -127,7 +128,6 @@ class TestRecipeSerializer:
         assert serializer.is_valid()
         assert serializer.validated_data == {
             'name': 'bar',
-            'enabled': True,
             'extra_filter_expression': '[]',
             'action': mockAction,
             'arguments': {
@@ -194,6 +194,7 @@ class TestSignedRecipeSerializer:
                 'locales': [],
                 'is_approved': False,
                 'latest_revision_id': recipe.latest_revision.id,
+                'approved_revision_id': recipe.approved_revision_id,
                 'approval_request': None,
             }
         }
