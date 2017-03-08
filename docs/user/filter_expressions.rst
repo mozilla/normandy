@@ -127,7 +127,19 @@ filter expressions.
 
    **Example:** ``'google'``
 
-   String containing the user's default search engine identifier.
+   String containing the user's default search engine identifier. Identifiers
+   are lowercase, and may by locale-specific (Wikipedia, for examnple, often has
+   locale-specific codes like ``'wikipedia-es'``).
+
+   The default identifiers included in Firefox are:
+
+   * ``'google'``
+   * ``'yahoo'``
+   * ``'amazondotcom'``
+   * ``'bing'``
+   * ``'ddg'``
+   * ``'twitter'``
+   * ``'wikipedia'``
 
 .. js:attribute:: normandy.syncSetup
 
