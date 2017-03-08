@@ -22,10 +22,12 @@ def render_bundle(bundle_name, extension=None, config='DEFAULT', attrs=''):
             chunk_hash = sri_hash(f.read())
         if chunk['name'].endswith('.js'):
             tags.append((
-                '<script type="text/javascript" src="{0}" integrity="{1}" {2}></script>'
+                '<script type="text/javascript" src="{0}" integrity="{1}" crossorigin="anonymous" '
+                '{2}></script>'
             ).format(chunk['url'], chunk_hash, attrs))
         elif chunk['name'].endswith('.css'):
             tags.append((
-                '<link type="text/css" href="{0}" rel="stylesheet" integrity="{1}" {2}/>'
+                '<link type="text/css" href="{0}" rel="stylesheet" integrity="{1}" '
+                'crossorigin="anonymous" {2}/>'
             ).format(chunk['url'], chunk_hash, attrs))
     return mark_safe('\n'.join(tags))

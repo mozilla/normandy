@@ -40,13 +40,13 @@ class TestRenderBundle(object):
         mock_get_files.assert_called_with('fakebundle', extension='all', config='fake')
 
         script_tag = (
-            '<script type="text/javascript" src="file.js" integrity="hash({})" foo="bar">'
-            '</script>'
+            '<script type="text/javascript" src="file.js" integrity="hash({})" '
+            'crossorigin="anonymous" foo="bar"></script>'
         ).format(js_file.read())
         assert script_tag in html
 
         link_tag = (
             '<link type="text/css" href="file.css" rel="stylesheet" integrity="hash({})" '
-            'foo="bar"/>'
+            'crossorigin="anonymous" foo="bar"/>'
         ).format(css_file.read())
         assert link_tag in html
