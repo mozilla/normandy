@@ -1,11 +1,11 @@
 "use strict";
 
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm", this);
 Cu.import("resource://gre/modules/Task.jsm", this);
-
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
-Cu.import("resource://shield-recipe-client/test/browser/Utils.jsm", this);
+
 
 add_task(function* testTelemetry() {
   // setup
@@ -26,7 +26,7 @@ add_task(function* testUserId() {
   let environment = ClientEnvironment.getEnvironment();
 
   // Test that userId is available
-  ok(Utils.UUID_REGEX.test(environment.userId), "userId available");
+  ok(UUID_REGEX.test(environment.userId), "userId available");
 
   // test that it pulls from the right preference
   yield SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.user_id", "fake id"]]});

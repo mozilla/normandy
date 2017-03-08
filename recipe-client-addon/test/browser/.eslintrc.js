@@ -14,5 +14,8 @@ module.exports = {
     Cu: false,
     Ci: false,
     Cc: false,
+    UUID_REGEX: false,
+    withSandboxManager: false,
+    withDriver: false,
   },
 };
