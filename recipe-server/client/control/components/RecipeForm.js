@@ -32,6 +32,11 @@ import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 
 export const selector = formValueSelector('recipe');
+const DEFAULT_FORM_VALUES = {
+  name: '',
+  extra_filter_expression: '',
+  action: '',
+};
 
 /**
  * Form for creating new recipes or editing existing recipes.
@@ -150,6 +155,8 @@ export class RecipeForm extends React.Component {
 export const formConfig = {
   form: 'recipe',
   asyncBlurFields: ['extra_filter_expression'],
+  enableReinitialize: true,
+  keepDirtyOnReinitialize: true,
 
   async asyncValidate(values) {
     const errors = {};
@@ -218,6 +225,18 @@ export function initialValuesWrapper(Component) {
     if (location.state && location.state.selectedRevision) {
       initialValues = location.state.selectedRevision;
     }
+
+    // If we still don't have initial values, roll with the defaults.
+    if (!initialValues) {
+      initialValues = Object.assign({}, DEFAULT_FORM_VALUES);
+
+      // ActionField subclasses define their own initial values.
+      if (props.selectedAction) {
+        const ActionFields = RecipeForm.argumentsFields[props.selectedAction];
+        initialValues.arguments = Object.assign({}, ActionFields.initialValues);
+      }
+    }
+
     return <Component initialValues={initialValues} {...props} />;
   }
   Wrapped.propTypes = {
@@ -254,7 +273,7 @@ const connector = connect(
 // Use reduce to call several wrapper functions in a row.
 export default [
   reduxForm(formConfig),
-  connector,
   initialValuesWrapper,
+  connector,
   composeRecipeContainer,
 ].reduce((prev, func) => func(prev), RecipeForm);

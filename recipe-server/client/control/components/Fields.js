@@ -23,13 +23,14 @@ export function buildControlField({
   label,
   className = '',
   InputComponent,
+  hideErrors = false,
   children,
   ...args // eslint-disable-line comma-dangle
 }) {
   return (
     <label className={`${className} form-field`}>
       <span className="label">{label}</span>
-      {error && <span className="error">{error}</span>}
+      {!hideErrors && error && <span className="error">{error}</span>}
       <InputComponent {...input} {...args}>
         {children}
       </InputComponent>
@@ -39,10 +40,65 @@ export function buildControlField({
 buildControlField.propTypes = {
   input: pt.object.isRequired,
   meta: pt.shape({
-    error: pt.string,
+    error: pt.oneOfType([pt.string, pt.array]),
   }).isRequired,
   label: pt.string.isRequired,
   className: pt.string,
   InputComponent: pt.oneOfType([pt.func, pt.string]),
+  hideErrors: pt.bool,
   children: pt.node,
+};
+
+export function IntegerControlField(props) {
+  return (
+    <ControlField
+      component="input"
+      type="number"
+      step="1"
+      parse={value => {
+        try {
+          return Number.parseInt(value, 10);
+        } catch (err) {
+          return 0;
+        }
+      }}
+      {...props}
+    />
+  );
+}
+
+export function BooleanRadioControlField(props) {
+  return (
+    <ControlField
+      component="input"
+      type="radio"
+      className="radio-field"
+      parse={value => value === 'true'}
+      format={value => {
+        if (value) {
+          return 'true';
+        } else if (value !== undefined) {
+          return 'false';
+        }
+        return undefined;
+      }}
+      {...props}
+    />
+  );
+}
+
+export function ErrorMessageField(props) {
+  return <Field component={buildErrorMessageField} {...props} />;
+}
+
+export function buildErrorMessageField({ meta: { error } }) {
+  if (error) {
+    return <span className="error">{error}</span>;
+  }
+  return null;
+}
+buildErrorMessageField.propTypes = {
+  meta: pt.shape({
+    error: pt.oneOfType([pt.string, pt.array]),
+  }).isRequired,
 };

@@ -10,13 +10,62 @@
             "title": "Run a feature experiment activated by a preference.",
             "type": "object",
             "required": [
-                "message"
+                "slug",
+                "preferenceName",
+                "preferenceType",
+                "branches"
             ],
             "properties": {
-                "message": {
-                    "description": "Message to log to the console",
+                "slug": {
+                    "description": "Unique identifier for this experiment",
                     "type": "string",
                     "default": ""
+                },
+                "experimentDocumentUrl": {
+                    "description": "URL of a document describing the experiment",
+                    "type": "string",
+                    "format": "uri",
+                    "default": ""
+                },
+                "preferenceName": {
+                    "description": "Full dotted-path of the preference that controls this experiment",
+                    "type": "string",
+                    "default": ""
+                },
+                "preferenceType": {
+                    "description": "Data type of the preference that controls this experiment",
+                    "type": "string",
+                    "enum": ["string", "integer", "boolean"],
+                    "default": "boolean"
+                },
+                "branches": {
+                    "description": "List of experimental branches",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "slug",
+                            "value",
+                            "bucketCount"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "description": "Unique identifier for this branch of the experiment",
+                                "type": "string",
+                                "default": ""
+                            },
+                            "value": {
+                                "description": "Value to set the preference to for this branch",
+                                "type": ["string", "number", "boolean"]
+                            },
+                            "bucketCount": {
+                                "description": "Number of sample buckets to assign to this branch",
+                                "type": "number",
+                                "default": 10
+                            }
+                        }
+                    }
                 }
             }
         }
