@@ -28,9 +28,13 @@ RUN NODE_ENV=production ./node_modules/.bin/webpack && \
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
-    PORT=8000
+    PORT=8000 \
+    CMD_PREFIX=""
 EXPOSE $PORT
-CMD gunicorn normandy.wsgi:application \
+
+CMD $CMD_PREFIX \
+    gunicorn  \
     --log-file - \
     --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
-    --max-requests ${GUNICORN_MAX_REQUESTS:-0}
+    --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
+    normandy.wsgi:application
