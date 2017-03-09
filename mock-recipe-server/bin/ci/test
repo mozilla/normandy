@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -eu
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../.. && pwd)"
+
+compose () {
+    docker-compose \
+        -p mockrecipeserver \
+        -f "$REPO_DIR/compose/docker-compose.yml" \
+        -f "$REPO_DIR/mock-recipe-server/docker-compose.yml" \
+        $@
+}
+
+# Shut down docker even if we error out.
+function finish {
+    compose stop
+}
+trap finish EXIT
+
+# MOCK_SERVER_ARTIFACTS is exported so the docker-compose config can
+# use it to mount the artifact volume.
+export MOCK_SERVER_ARTIFACTS
+
+# Generate mock server files
+echo "Verifying mock server files"
+compose run testgen /mock-server/test.py /build
