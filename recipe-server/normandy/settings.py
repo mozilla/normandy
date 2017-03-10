@@ -290,7 +290,7 @@ class Base(Core):
     APP_SERVER_URL = values.URLValue(None)
 
     # URL for the CSP report-uri directive.
-    CSP_REPORT_URI = values.Value(None)
+    CSP_REPORT_URI = values.Value('/__cspreport__')
 
     # Normandy settings
     ADMIN_ENABLED = values.BooleanValue(True)
