@@ -34,7 +34,7 @@ class TestHotPaths(object):
         r.raise_for_status()
         assert 'cookie' not in r.headers.get('vary', '').lower()
 
-    def test_cache_headers(self, conf, requests_session, path):
+    def test_cache_headers(self, conf, requests_session, path, only_readonly):
         r = requests_session.get(conf.getoption('server') + path)
         r.raise_for_status()
         cache_control = r.headers.get('cache-control')
