@@ -110,7 +110,7 @@ def test_recipe_signatures(conf, requests_session):
 
 
 def test_recipe_api_is_json(conf, requests_session):
-    r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/')
+    r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/?enabled=1')
     r.raise_for_status()
     data = r.json()
     assert isinstance(data, list)

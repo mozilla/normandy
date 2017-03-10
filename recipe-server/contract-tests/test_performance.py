@@ -6,8 +6,8 @@ from pytest_testrail.plugin import testrail
 HOT_PATHS = [
     '/en-US/repair',
     '/en-US/repair/',
-    '/api/v1/recipe/',
-    '/api/v1/recipe/signed/',
+    '/api/v1/recipe/?enabled=1',
+    '/api/v1/recipe/signed/?enabled=1',
     '/api/v1/action/',
 ]
 
