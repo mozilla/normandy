@@ -19,7 +19,12 @@ class APIPath(object):
     @property
     def path(self):
         """Generate a Path object for the current URL."""
-        return Path(self.base_path, *self.segments, 'index.html')
+        return Path(self.base_path, *self.segments)
+
+    @property
+    def index_path(self):
+        """Generate a Path object for the current URL's index file."""
+        return self.path / 'index.html'
 
     def add(self, *paths):
         """Add segments to the current URL."""
@@ -33,7 +38,7 @@ class APIPath(object):
 
     def read(self):
         """Read data on the filesystem for the current URL."""
-        with self.path.open() as f:
+        with self.index_path.open() as f:
             return f.read()
 
     def save(self, data=None):
@@ -45,6 +50,6 @@ class APIPath(object):
             be remotely fetched and saved.
         """
         data = data or self.fetch()
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open(mode='w') as f:
+        self.path.mkdir(parents=True, exist_ok=True)
+        with self.index_path.open(mode='w') as f:
             f.write(data)

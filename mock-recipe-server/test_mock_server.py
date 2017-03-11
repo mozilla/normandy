@@ -1,10 +1,27 @@
 """
 Tests for the mock-server itself.
 """
+from utils import APIPath
 
 
 def test_testcase_difference(root_path):
     """Ensure that different testcases output different data."""
-    console_log_recipes = root_path.add('ConsoleLogBasic', 'api', 'v1', 'recipe', 'signed').read()
-    filter_channel_recipes = root_path.add('FilterChannel', 'api', 'v1', 'recipe', 'signed').read()
-    assert console_log_recipes != filter_channel_recipes
+    recipes = set()
+
+    testcase_paths = (
+        APIPath(path, 'http://example.com')
+        for path in root_path.path.iterdir() if path.is_dir()
+    )
+    for testcase_path in testcase_paths:
+        recipe_path = testcase_path.add('api', 'v1', 'recipe')
+
+        recipe_data = recipe_path.read()
+        assert recipe_data not in recipes
+        recipes.add(recipe_data)
+
+        # This asserts both that testcases have differing signed data
+        # and that a single testcase does not have the same data for
+        # signed and unsigned endpoints.
+        signed_recipe_data = recipe_path.add('signed').read()
+        assert signed_recipe_data not in recipes
+        recipes.add(signed_recipe_data)
