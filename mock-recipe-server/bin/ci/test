@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -eu
+
+# Run mock-server tests
+./bin/runtests.sh $MOCK_SERVER_ARTIFACTS
