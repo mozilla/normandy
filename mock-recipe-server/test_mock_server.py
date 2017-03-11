@@ -15,13 +15,19 @@ def test_testcase_difference(root_path):
     for testcase_path in testcase_paths:
         recipe_path = testcase_path.add('api', 'v1', 'recipe')
 
-        recipe_data = recipe_path.read()
+        try:
+            recipe_data = recipe_path.read()
+            signed_recipe_data = recipe_path.add('signed').read()
+        except FileNotFoundError:
+            # Some error testcases are purposefully missing files,
+            # so we just skip checking those.
+            continue
+
         assert recipe_data not in recipes
         recipes.add(recipe_data)
 
         # This asserts both that testcases have differing signed data
         # and that a single testcase does not have the same data for
         # signed and unsigned endpoints.
-        signed_recipe_data = recipe_path.add('signed').read()
         assert signed_recipe_data not in recipes
         recipes.add(signed_recipe_data)
