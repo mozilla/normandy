@@ -12,4 +12,6 @@ services:
       DJANGO_AUTOGRAPH_HAWK_ID: normandev
       DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: 3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
       DJANGO_CAN_EDIT_ACTIONS_IN_USE: "true"
+      # Pulled from the local environment
+      DJANGO_API_CACHE_ENABLED:
     stop_signal: SIGKILL
