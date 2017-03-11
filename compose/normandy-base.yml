@@ -4,6 +4,7 @@ services:
   normandy-base:
     image: mozilla/normandy:latest
     environment:
+      PYTHONDONTWRITEBYTECODE: 1
       DATABASE_URL: "postgres://postgres@database/postgres"
       DJANGO_CONFIGURATION: ProductionInsecure
       DJANGO_AUTOGRAPH_URL: http://autograph:8000/
