@@ -3,7 +3,9 @@ import {
   RECIPE_DELETED,
   RECIPE_UPDATED,
   RECIPES_RECEIVED,
+  REVISIONS_RECEIVED,
   SET_SELECTED_RECIPE,
+  SET_SELECTED_REVISION,
   SINGLE_RECIPE_RECEIVED,
   SINGLE_REVISION_RECEIVED,
 } from 'control/actions/ControlActions';
@@ -80,10 +82,34 @@ function recipesReducer(state = initialState, action) {
       };
     }
 
+    case REVISIONS_RECEIVED: {
+      const newRevisions = {};
+      [].concat(action.revisions).forEach(rev => {
+        newRevisions[rev.id] = rev;
+      });
+
+      return {
+        ...state,
+        revisions: {
+          ...state.revisions,
+          [action.recipeId]: {
+            ...state.revisions[action.recipeId],
+            ...newRevisions,
+          },
+        },
+      };
+    }
+
     case SET_SELECTED_RECIPE:
       return {
         ...state,
         selectedRecipe: action.recipeId,
+      };
+
+    case SET_SELECTED_REVISION:
+      return {
+        ...state,
+        selectedRevision: action.revisionId,
       };
 
     case RECIPE_ADDED:

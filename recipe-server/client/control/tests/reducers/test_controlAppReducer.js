@@ -3,6 +3,7 @@ import * as actions from 'control/actions/ControlActions';
 import {
   fixtureRecipes,
   fixtureStoredRevisions,
+  fixtureSingleRevision,
   fixtureStoredSingleRevision,
   initialState,
 } from 'control/tests/fixtures';
@@ -75,6 +76,37 @@ describe('controlApp reducer', () => {
         revisions: {},
         selectedRecipe: 2,
         recipeListNeedsFetch: true,
+      },
+    });
+  });
+
+  it('should handle SET_SELECTED_REVISION', () => {
+    expect(appReducer(undefined, {
+      type: actions.SET_SELECTED_REVISION,
+      revisionId: 2,
+    })).toEqual({
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        selectedRevision: 2,
+      },
+    });
+  });
+
+  it('should handle REVISIONS_RECEIVED', () => {
+    expect(appReducer(undefined, {
+      type: actions.REVISIONS_RECEIVED,
+      revisions: [fixtureSingleRevision],
+      recipeId: 'test-id',
+    })).toEqual({
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        revisions: {
+          'test-id': {
+            [fixtureSingleRevision.id]: fixtureSingleRevision,
+          },
+        },
       },
     });
   });

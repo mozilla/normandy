@@ -105,7 +105,7 @@ export class HistoryItem extends React.Component {
 
     // Do not include form state changes if the current revision was
     // clicked.
-    if (revision.recipe.revision_id === recipe.revision_id) {
+    if (revision.recipe.revision_id === recipe.latest_revision_id) {
       dispatch(push(`/control/recipe/${recipe.id}/`));
     } else {
       dispatch(push(`/control/recipe/${recipe.id}/revision/${revision.id}/`));

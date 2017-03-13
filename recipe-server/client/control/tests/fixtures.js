@@ -15,6 +15,13 @@ export const fixtureStoredSingleRevision = {
   },
 };
 
+export const fixtureSingleRevision = {
+  id: 1,
+  name: 'Lorem Ipsum',
+  enabled: true,
+  revision_id: 'abc',
+};
+
 export const fixtureStoredRevisions = {
   1: {
     abc: {
@@ -43,7 +50,6 @@ export const fixtureStoredRevisions = {
 };
 
 export const initialState = {
-  user: {},
   controlApp: {
     isFetching: false,
   },
@@ -93,6 +99,7 @@ export const initialState = {
     enabled: true,
   }],
   notifications: [],
+  user: {},
   form: {},
   routing: {
     locationBeforeTransitions: null,
