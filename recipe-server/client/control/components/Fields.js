@@ -31,7 +31,7 @@ export function buildControlField({
     <WrappingElement className={`${className} form-field`}>
       <span className="label">{label}</span>
       {error && <span className="error">{error}</span>}
-      <InputComponent {...input} {...args}>
+      <InputComponent {...input} {...args} input={input}>
         {children}
       </InputComponent>
     </WrappingElement>

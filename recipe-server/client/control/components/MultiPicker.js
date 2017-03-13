@@ -10,19 +10,19 @@ export default class MultiPicker extends React.Component {
     onChange: pt.func,
   };
 
-  static selectToArray({ options }) {
-    const result = [];
-    const selectOptions = options || [];
-    let opt;
+  static getActiveSelectOptions({ options }) {
+    if (!options) {
+      return [];
+    }
 
-    for (let i = 0, iLen = selectOptions.length; i < iLen; i++) {
-      opt = selectOptions[i];
-
-      if (opt.selected) {
-        result.push(opt.value || opt.text);
+    const selected = [];
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].selected) {
+        selected.push(options[i].value);
       }
     }
-    return result;
+
+    return selected.filter(x => x);
   }
 
   constructor(props) {
@@ -54,16 +54,11 @@ export default class MultiPicker extends React.Component {
     const selectedOptions = options.filter(option =>
       value.indexOf(option.value) === -1);
 
-    let displayedOptions = [].concat(selectedOptions.map(option => option.value))
-      .map(val => {
-        if (!val) {
-          return null;
-        }
-
-        const foundOption = this.convertValueToObj(val);
-
-        return { ...foundOption } || null;
-      }).filter(x => x);
+    let displayedOptions = [].concat(selectedOptions)
+      .map(option => option.value)
+      .map(val =>
+        (!val ? null : { ...this.convertValueToObj(val) }))
+      .filter(x => x);
 
     const {
       filterText,
@@ -89,7 +84,7 @@ export default class MultiPicker extends React.Component {
       onChange,
     } = this.props;
 
-    let selectedFilters = MultiPicker.selectToArray(this.availableRef);
+    let selectedFilters = MultiPicker.getActiveSelectOptions(this.availableRef);
 
     if (!selectedFilters || selectedFilters.length === 0) {
       selectedFilters = this.getDisplayedOptions();
@@ -117,7 +112,7 @@ export default class MultiPicker extends React.Component {
       onChange,
     } = this.props;
 
-    const selectedFilters = MultiPicker.selectToArray(this.selectedRef);
+    const selectedFilters = MultiPicker.getActiveSelectOptions(this.selectedRef);
     let newOptions = []
       .concat(value || [])
       .filter(val => selectedFilters.indexOf(val) === -1);
