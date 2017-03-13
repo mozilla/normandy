@@ -13,6 +13,11 @@ import { pick } from 'underscore';
 
 import makeApiRequest from 'control/api';
 
+
+import {
+  getFilterObject,
+} from 'control/selectors/FiltersSelector';
+
 import {
   recipeUpdated,
   recipeAdded,
@@ -21,6 +26,10 @@ import {
   revisionsReceived,
   revisionRecipeUpdated,
 } from 'control/actions/RecipeActions';
+
+import {
+  loadFilters,
+} from 'control/actions/FilterActions';
 
 import {
   showNotification,
@@ -35,8 +44,10 @@ import {
 } from 'control/selectors/RecipesSelector';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
-import { ControlField } from 'control/components/Fields';
+import { ControlField, CheckboxGroup } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
+import MultiPicker from 'control/components/MultiPicker';
+
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import PreferenceExperimentFields from
@@ -45,7 +56,7 @@ import RecipeStatus from 'control/components/RecipeStatus';
 import DraftStatus from 'control/components/DraftStatus';
 import BooleanIcon from 'control/components/BooleanIcon';
 
-export const selector = formValueSelector('recipe');
+export const formSelector = formValueSelector('recipe');
 
 // The arguments field is handled in initialValuesWrapper.
 const DEFAULT_FORM_VALUES = {
@@ -79,6 +90,9 @@ export class RecipeForm extends React.Component {
     routeParams: pt.object.isRequired,
     // from redux-form
     pristine: pt.bool,
+    recipeArguments: pt.object,
+    filters: pt.object.isRequired,
+    loadFilters: pt.func.isRequired,
   };
 
   static argumentsFields = {
@@ -121,6 +135,8 @@ export class RecipeForm extends React.Component {
       user,
       dispatch,
     } = this.props;
+
+    dispatch(loadFilters());
 
     if (!user || !user.id) {
       dispatch(makeApiRequest('getCurrentUser'))
@@ -326,6 +342,8 @@ export class RecipeForm extends React.Component {
       recipe,
       revision,
       recipeId,
+      route,
+      recipeArguments,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -343,6 +361,7 @@ export class RecipeForm extends React.Component {
 
     const thisRevisionRequest = revision && revision.approval_request;
     const statusText = renderVars.isEnabled ? 'Enabled' : 'Disabled';
+    const filters = getFilterObject(this.props.filters.list);
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
@@ -395,23 +414,53 @@ export class RecipeForm extends React.Component {
           component="input"
           type="text"
         />
+
         <ControlField
           disabled={isFormDisabled}
           label="Filter Expression"
           name="extra_filter_expression"
           component="textarea"
         />
+
         <ControlField
           disabled={isFormDisabled}
           label="Action"
           name="action"
           component="select"
-        >
-          <option value="">Choose an action...</option>
-          <option value="console-log">Log to Console</option>
-          <option value="show-heartbeat">Heartbeat Prompt</option>
-          <option value="preference-experiment">Preference Experiment</option>
-        </ControlField>
+        />
+
+        <div className="form-frame">
+          <span className="frame-title">
+            Filters
+          </span>
+          <ControlField
+            component={MultiPicker}
+            name="locales"
+            unit={'Locale'}
+            plural={'Locales'}
+            options={filters.locales || []}
+          />
+          <ControlField
+            component={MultiPicker}
+            name="countries"
+            unit={'Country'}
+            plural={'Countries'}
+            options={filters.countries || []}
+          />
+
+          <ControlField
+            component={CheckboxGroup}
+            name="channels"
+            label="Release Channels"
+            options={filters.channels || []}
+          />
+
+          <ControlField
+            label="Additional Filter Expressions"
+            name="extra_filter_expression"
+            component="textarea"
+          />
+        </div>
 
         <ArgumentsFields disabled={isFormDisabled} />
 
@@ -451,8 +500,17 @@ export const formConfig = {
     // Filter out unwanted keys for submission.
     const recipe = pick(values, [
       'name', 'enabled', 'extra_filter_expression', 'action', 'arguments',
+      'locales', 'countries', 'channels',
     ]);
     const isCloning = route && route.isCloning;
+
+    // Some values may be strings but the API requires arrays
+    ['locales', 'countries', 'channels'].forEach(key => {
+      if (typeof recipe[key] === 'string') {
+        recipe[key] = recipe[key].split(',');
+      }
+    });
+
 
     let result;
     if (recipeId && !isCloning) {
@@ -518,13 +576,16 @@ export function initialValuesWrapper(Component) {
 const connector = connect(
   // Pull selected action from the form state.
   state => ({
-    selectedAction: selector(state, 'action'),
     user: state.user,
     allRevisions: state.recipes.revisions,
+    selectedAction: formSelector(state, 'action'),
+    recipeArguments: formSelector(state, 'arguments'),
+    filters: state.filters || {},
   }),
 
   // Bound functions for writing to the server.
   dispatch => ({
+    loadFilters,
     addRecipe(recipe) {
       return dispatch(makeApiRequest('addRecipe', { recipe }))
       .then(response => {
