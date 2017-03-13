@@ -1,8 +1,5 @@
 "use strict";
 
-Cu.import("resource://gre/modules/Services.jsm", this);
-Cu.import("resource://gre/modules/Console.jsm", this);
-
 add_task(withDriver(Assert, function* uuids(driver) {
   // Test that it is a UUID
   const uuid1 = driver.uuid();
