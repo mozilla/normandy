@@ -170,6 +170,15 @@ in other Django projects.
     set to 0 in non-production environments to ease testing. In production
     environments, setting this value too low can be a denial-of-service risk.
 
+.. envvar:: DJANGO_API_CACHE_ENABLED
+
+    :default: ``True``
+
+    Controls cache headers for cacheable APIs. If true, API views will send
+    headers indicating that they can be cached according to
+    :envvar:`DJANGO_API_CACHE_TIME`. If false, API views will send headers
+    indicating that they should never be cached.
+
 .. envvar:: DJANGO_LOGGING_USE_JSON
 
     :default: ``True``

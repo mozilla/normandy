@@ -22,6 +22,9 @@ trap finish EXIT
 export MOCK_SERVER_ARTIFACTS=$1
 MOCK_SERVER_DOMAIN=$2
 
+# Disable cache headers
+export DJANGO_API_CACHE_ENABLED=false
+
 # Generate mock server files
 echo "Generating mock server files"
 compose run normandy ./bin/wait-for-it.sh database:5432

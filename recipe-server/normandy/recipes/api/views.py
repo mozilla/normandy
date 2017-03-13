@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db.models import Q
-from django.views.decorators.cache import cache_control
 
 import django_filters
 from rest_framework import generics, permissions, status, views, viewsets
@@ -13,7 +12,7 @@ from normandy.base.api.filters import CaseInsensitiveBooleanFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.base.decorators import reversion_transaction
+from normandy.base.decorators import api_cache_control, reversion_transaction
 from normandy.recipes.models import (
     Action,
     Channel,
@@ -52,7 +51,7 @@ class ActionImplementationView(generics.RetrieveAPIView):
     permission_classes = []
     renderer_classes = [JavaScriptRenderer]
 
-    @cache_control(public=True, max_age=settings.ACTION_IMPLEMENTATION_CACHE_TIME)
+    @api_cache_control(max_age=settings.ACTION_IMPLEMENTATION_CACHE_TIME)
     def retrieve(self, request, name, impl_hash):
         action = self.get_object()
         if impl_hash != action.implementation_hash:
@@ -107,14 +106,14 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         return queryset
 
     @list_route(methods=['GET'])
-    @cache_control(public=True, max_age=settings.API_CACHE_TIME)
+    @api_cache_control()
     def signed(self, request, pk=None):
         recipes = self.filter_queryset(self.get_queryset()).exclude(signature=None)
         serializer = SignedRecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 
     @detail_route(methods=['GET'])
-    @cache_control(public=True, max_age=settings.API_CACHE_TIME)
+    @api_cache_control()
     def history(self, request, pk=None):
         recipe = self.get_object()
         serializer = RecipeRevisionSerializer(recipe.revisions.all(), many=True,

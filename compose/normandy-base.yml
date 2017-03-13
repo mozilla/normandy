@@ -4,6 +4,7 @@ services:
   normandy-base:
     image: mozilla/normandy:latest
     environment:
+      PYTHONDONTWRITEBYTECODE: 1
       DATABASE_URL: "postgres://postgres@database/postgres"
       DJANGO_CONFIGURATION: ProductionInsecure
       DJANGO_AUTOGRAPH_URL: http://autograph:8000/
@@ -11,4 +12,6 @@ services:
       DJANGO_AUTOGRAPH_HAWK_ID: normandev
       DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: 3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
       DJANGO_CAN_EDIT_ACTIONS_IN_USE: "true"
+      # Pulled from the local environment
+      DJANGO_API_CACHE_ENABLED:
     stop_signal: SIGKILL
