@@ -4,7 +4,14 @@ set -eu
 # mach wants this
 export SHELL=$(which bash)
 
-apt-get install -y npm curl python2.7 xvfb
+apt-get install -y apt-transport-https curl
+curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+echo 'deb https://deb.nodesource.com/node_6.x yakkety main' > /etc/apt/sources.list.d/nodesource.list
+echo 'deb-src https://deb.nodesource.com/node_6.x yakkety main' >> /etc/apt/sources.list.d/nodesource.list
+apt-get update
+
+apt-get install -y curl python2.7 xvfb nodejs
+exit 0
 
 # Creates gecko-dev-master
 echo 'Downloading gecko-dev...'
@@ -18,6 +25,7 @@ popd
 pushd gecko-dev-master
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
 source /root/.cargo/env
+./mach lint browser/extensions/shield-recipe-client/
 ./mach build
 xvfb-run ./mach test browser/extensions/shield-recipe-client/
 popd
