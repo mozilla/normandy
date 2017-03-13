@@ -148,9 +148,8 @@
         let url = new URL(`/${testcase.dataset.name}/api/v1`, window.location);
         testcase.querySelector('.url').textContent = url.href;
         testcase.querySelector('.browser-code').value = (
-          `Cu.unload('resource://shield-recipe-client/lib/RecipeRunner.jsm');\n` +
-          `Cu.import('resource://shield-recipe-client/lib/RecipeRunner.jsm');\n` +
-          `RecipeRunner.testRun("${url.href}");\n`
+          `Cu.import('resource://shield-recipe-client/lib/RecipeRunner.jsm', {})` +
+          `.RecipeRunner.testRun("${url.href}");`
         );
       }
 
