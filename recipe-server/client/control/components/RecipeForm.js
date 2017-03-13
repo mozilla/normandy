@@ -13,6 +13,11 @@ import { pick } from 'underscore';
 
 import makeApiRequest from 'control/api';
 
+
+import {
+  getFilterObject,
+} from 'control/selectors/FiltersSelector';
+
 import {
   recipeUpdated,
   recipeAdded,
@@ -20,17 +25,23 @@ import {
 } from 'control/actions/RecipeActions';
 
 import {
+  loadFilters,
+} from 'control/actions/FilterActions';
+
+import {
   showNotification,
 } from 'control/actions/NotificationActions';
 
+import MultiPicker from 'control/components/MultiPicker';
+
 import composeRecipeContainer from 'control/components/RecipeContainer';
-import { ControlField } from 'control/components/Fields';
+import { ControlField, CheckboxGroup } from 'control/components/Fields';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 
-export const selector = formValueSelector('recipe');
+export const formSelector = formValueSelector('recipe');
 
 /**
  * Form for creating new recipes or editing existing recipes.
@@ -48,15 +59,22 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
-    recipeFields: pt.object,
+    recipeArguments: pt.object,
     // route prop passed from router
     route: pt.object,
+    filters: pt.object.isRequired,
+    dispatch: pt.func.isRequired,
+    loadFilters: pt.func.isRequired,
   };
 
   static argumentsFields = {
     'console-log': ConsoleLogFields,
     'show-heartbeat': HeartbeatFields,
   };
+
+  componentWillMount() {
+    this.props.dispatch(loadFilters());
+  }
 
   renderCloningMessage() {
     const isCloning = this.props.route && this.props.route.isCloning;
@@ -84,7 +102,7 @@ export class RecipeForm extends React.Component {
       recipe,
       recipeId,
       route,
-      recipeFields,
+      recipeArguments,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -100,8 +118,10 @@ export class RecipeForm extends React.Component {
     }
 
     const isCloning = route && route.isCloning;
-
     const submitButtonCaption = recipeId && !isCloning ? 'Update Recipe' : 'Add New Recipe';
+
+    const filters = getFilterObject(this.props.filters.list);
+
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
@@ -115,17 +135,53 @@ export class RecipeForm extends React.Component {
           component="input"
           type="checkbox"
         />
+
         <ControlField
           label="Filter Expression"
           name="extra_filter_expression"
           component="textarea"
         />
+
+        <div className="form-frame">
+          <span className="frame-title">
+            Filters
+          </span>
+          <ControlField
+            component={MultiPicker}
+            name="locales"
+            unit={'Locale'}
+            plural={'Locales'}
+            options={filters.locales || []}
+          />
+          <ControlField
+            component={MultiPicker}
+            name="countries"
+            unit={'Country'}
+            plural={'Countries'}
+            options={filters.countries || []}
+          />
+
+          <ControlField
+            component={CheckboxGroup}
+            name="channels"
+            label="Release Channels"
+            options={filters.channels || []}
+          />
+
+          <ControlField
+            label="Additional Filter Expressions"
+            name="extra_filter_expression"
+            component="textarea"
+          />
+        </div>
+
         <ControlField label="Action" name="action" component="select">
           <option value="">Choose an action...</option>
           <option value="console-log">Log to Console</option>
           <option value="show-heartbeat">Heartbeat Prompt</option>
         </ControlField>
-        <ArgumentsFields fields={recipeFields} />
+
+        <ArgumentsFields fields={recipeArguments} />
         <div className="form-actions">
           {recipeId && !isCloning &&
             <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
@@ -172,8 +228,17 @@ export const formConfig = {
     // Filter out unwanted keys for submission.
     const recipe = pick(values, [
       'name', 'enabled', 'extra_filter_expression', 'action', 'arguments',
+      'locales', 'countries', 'channels',
     ]);
     const isCloning = route && route.isCloning;
+
+    // Some values may be strings but the API requires arrays
+    ['locales', 'countries', 'channels'].forEach(key => {
+      if (typeof recipe[key] === 'string') {
+        recipe[key] = recipe[key].split(',');
+      }
+    });
+
 
     let result;
     if (recipeId && !isCloning) {
@@ -228,12 +293,14 @@ export function initialValuesWrapper(Component) {
 const connector = connect(
   // Pull selected action from the form state.
   state => ({
-    selectedAction: selector(state, 'action'),
-    recipeFields: selector(state, 'arguments'),
+    selectedAction: formSelector(state, 'action'),
+    recipeArguments: formSelector(state, 'arguments'),
+    filters: state.filters || {},
   }),
 
   // Bound functions for writing to the server.
   dispatch => ({
+    loadFilters,
     addRecipe(recipe) {
       return dispatch(makeApiRequest('addRecipe', { recipe }))
       .then(response => {

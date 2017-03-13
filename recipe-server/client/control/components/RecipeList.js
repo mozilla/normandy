@@ -188,10 +188,7 @@ export class DisconnectedRecipeList extends React.Component {
 
     return (
       <div>
-        <RecipeFilters
-          displayCount={filteredRecipes.length}
-          totalCount={recipes.length}
-        />
+        <RecipeFilters />
         <div className="fluid-8">
           {
             !noResults && recipeListNeedsFetch &&

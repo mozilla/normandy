@@ -331,3 +331,62 @@ i {
   display: block;
   padding: 1em;
 }
+
+
+.form-frame {
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  padding: 0 1em;
+
+  .frame-title {
+    background: $white;
+    display: inline-block;
+    padding: 0 0.5em;
+    position: relative;
+    top: -0.65em;
+  }
+}
+
+.multipicker {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2em;
+
+  .mp-frame {
+    width: 50%;
+
+    label,
+    .label,
+    select,
+    button {
+      text-transform: none;
+    }
+  }
+
+  .mp-button-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  option {
+    &::after {
+      content: " (" attr(title) ")";
+      font-size: 0.75em;
+      margin-left: 0.5em;
+    }
+  }
+}
+
+.form-field .checkbox-list {
+  label {
+    text-transform: none;
+  }
+
+  input {
+    float: none;
+  }
+}
+
+pre {
+  overflow: auto;
+}

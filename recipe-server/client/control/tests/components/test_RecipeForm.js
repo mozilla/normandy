@@ -14,6 +14,9 @@ import { recipeFactory } from '../../../tests/utils.js';
 function propFactory(props = {}) {
   return {
     handleSubmit: () => undefined,
+    loadFilters: () => Promise.resolve(),
+    dispatch: () => Promise.resolve(),
+    filters: {},
     submitting: false,
     ...props,
   };
