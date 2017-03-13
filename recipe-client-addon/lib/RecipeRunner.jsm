@@ -18,6 +18,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Storage", "resource://shield-recipe-client/lib/Storage.jsm");
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
@@ -187,4 +188,23 @@ this.RecipeRunner = {
       sandboxManager.evalInSandbox(actionScript);
     });
   },
+
+  /**
+   * Clear out cached state and fetch/execute recipes from the given
+   * API url. This is used mainly by the mock-recipe-server JS that is
+   * executed in the browser console.
+   */
+  testRun: Task.async(function* (baseApiUrl) {
+    const oldApiUrl = prefs.getCharPref("api_url");
+    prefs.setCharPref("api_url", baseApiUrl);
+
+    try {
+      Storage.clearAllStorage();
+      NormandyApi.clearIndexCache();
+      yield this.start();
+    } finally {
+      prefs.setCharPref("api_url", oldApiUrl);
+      NormandyApi.clearIndexCache();
+    }
+  }),
 };

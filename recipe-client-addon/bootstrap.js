@@ -41,6 +41,7 @@ const PREF_SELF_SUPPORT_ENABLED = "browser.selfsupport.enabled";
 const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
 
 let shouldRun = true;
+let log = null;
 
 this.install = function() {
   // Self Repair only checks its pref on start, so if we disable it, wait until
@@ -62,6 +63,7 @@ this.startup = function() {
 
   // Setup logging and listen for changes to logging prefs
   LogManager.configure(Services.prefs.getIntPref(PREF_LOGGING_LEVEL));
+  log = LogManager.getLogger("bootstrap");
   Preferences.observe(PREF_LOGGING_LEVEL, LogManager.configure);
   CleanupManager.addCleanupHandler(
     () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure));
@@ -90,9 +92,13 @@ this.shutdown = function(data, reason) {
     "lib/SandboxManager.jsm",
     "lib/Storage.jsm",
   ];
-  for (const module in modules) {
+  for (const module of modules) {
+    log.debug(`Unloading ${module}`);
     Cu.unload(`resource://shield-recipe-client/${module}`);
   }
+
+  // Don't forget the logger!
+  log = null;
 };
 
 this.uninstall = function() {

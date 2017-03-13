@@ -148,11 +148,8 @@
         let url = new URL(`/${testcase.dataset.name}/api/v1`, window.location);
         testcase.querySelector('.url').textContent = url.href;
         testcase.querySelector('.browser-code').value = (
-          `Cu.import('resource://shield-recipe-client/lib/Storage.jsm');\n` +
-          `Storage.clearAllStorage();\n` +
-          `Services.prefs.setCharPref("extensions.shield-recipe-client.api_url", "${url.href}");\n` +
-          `Cu.import('resource://shield-recipe-client/lib/RecipeRunner.jsm');\n` +
-          `RecipeRunner.start();`
+          `Cu.import('resource://shield-recipe-client/lib/RecipeRunner.jsm', {})` +
+          `.RecipeRunner.testRun("${url.href}");`
         );
       }
 
