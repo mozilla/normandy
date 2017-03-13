@@ -79,7 +79,7 @@ function makeMockApiServer() {
     try {
       const contents = yield OS.File.read(index.path, {encoding: "utf-8"});
       response.write(contents);
-    } catch(e) {
+    } catch (e) {
       response.setStatusLine("1.1", 500, "Server error");
       response.write(e.toString());
     } finally {
@@ -147,7 +147,7 @@ add_task(withScriptServer("test_server.sjs", function* test_getQueryString(serve
 
 add_task(withScriptServer("test_server.sjs", function* test_postData(serverUrl) {
   // Test that NormandyApi can POST JSON-formatted data to the test server.
-  const response = yield NormandyApi.post(serverUrl,  {foo: "bar", baz: "biff"});
+  const response = yield NormandyApi.post(serverUrl, {foo: "bar", baz: "biff"});
   const data = yield response.json();
   Assert.deepEqual(
     data, {queryString: {}, body: {foo: "bar", baz: "biff"}},
