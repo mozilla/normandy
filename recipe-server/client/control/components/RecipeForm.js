@@ -131,9 +131,9 @@ export class RecipeForm extends React.Component {
       },
     } = this.props;
 
-    const requestDetails = revision.approval_request;
+    const requestDetails = revision && revision.approval_request;
     const currentUserID = userId;
-    const isViewingLatestApproved = recipe.approved_revision_id
+    const isViewingLatestApproved = recipe && recipe.approved_revision_id
       && revision.revision_id === recipe.approved_revision_id;
     const hasApprovalRequest = !!requestDetails;
     const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
