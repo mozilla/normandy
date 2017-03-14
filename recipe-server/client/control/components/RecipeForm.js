@@ -344,6 +344,7 @@ export class RecipeForm extends React.Component {
       recipeId,
       route,
       recipeArguments,
+      filters = {},
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -429,22 +430,22 @@ export class RecipeForm extends React.Component {
           component="select"
         />
 
-        <div className="form-frame">
-          <span className="frame-title">
+        <fieldset className="form-frame">
+          <legend className="frame-title">
             Filters
-          </span>
+          </legend>
           <ControlField
             component={MultiPicker}
+            wrapper="div"
             name="locales"
-            unit={'Locale'}
-            plural={'Locales'}
+            unit="Locales"
             options={filters.locales || []}
           />
           <ControlField
             component={MultiPicker}
+            wrapper="div"
             name="countries"
-            unit={'Country'}
-            plural={'Countries'}
+            unit="Countries"
             options={filters.countries || []}
           />
 
@@ -460,7 +461,7 @@ export class RecipeForm extends React.Component {
             name="extra_filter_expression"
             component="textarea"
           />
-        </div>
+        </fieldset>
 
         <ArgumentsFields disabled={isFormDisabled} />
 
@@ -580,7 +581,7 @@ const connector = connect(
     allRevisions: state.recipes.revisions,
     selectedAction: formSelector(state, 'action'),
     recipeArguments: formSelector(state, 'arguments'),
-    filters: state.filters || {},
+    filters: getFilterObject(state.filters.list),
   }),
 
   // Bound functions for writing to the server.

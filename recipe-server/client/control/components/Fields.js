@@ -25,9 +25,10 @@ export function buildControlField({
   InputComponent,
   hideErrors = false,
   children,
+  wrapper = 'label',
   ...args // eslint-disable-line comma-dangle
 }) {
-  const WrappingElement = label ? 'label' : 'div';
+  const WrappingElement = wrapper;
   return (
     <WrappingElement className={`${className} form-field`}>
       <span className="label">{label}</span>
@@ -44,6 +45,7 @@ buildControlField.propTypes = {
     error: pt.oneOfType([pt.string, pt.array]),
   }).isRequired,
   label: pt.string,
+  wrapper: pt.oneOfType([pt.func, pt.string]),
   className: pt.string,
   InputComponent: pt.oneOfType([pt.func, pt.string]),
   hideErrors: pt.bool,
@@ -113,34 +115,42 @@ buildErrorMessageField.propTypes = {
 };
 
 
-export const CheckboxGroup = ({ name, options = [], input }) =>
-  <div>
-    {
-      options.map((option, index) =>
-        <div className="checkbox" key={index}>
-          <input
-            type="checkbox"
-            name={`${name}[${index}]`}
-            value={option.value}
-            checked={input.value.indexOf(option.value) !== -1}
-            onChange={event => {
-              const newValue = [...input.value];
-              if (event.target.checked) {
-                newValue.push(option.value);
-              } else {
-                newValue.splice(newValue.indexOf(option.value), 1);
-              }
+export const CheckboxGroup = ({ name, options = [], value, onChange }) => {
+  const handleChange = option =>
+    event => {
+      const newValue = [...value];
+      if (event.target.checked) {
+        newValue.push(option.value);
+      } else {
+        newValue.splice(newValue.indexOf(option.value), 1);
+      }
 
-              return input.onChange(newValue);
-            }}
-          />
-          {option.value}
-        </div>)
-    }
-  </div>;
+      return onChange(newValue);
+    };
+
+  return (
+    <div>
+      {
+        options.map((option, index) =>
+          <label className="checkbox" key={index}>
+            <input
+              type="checkbox"
+              name={`${name}[${index}]`}
+              value={option.value}
+              checked={value.includes(option.value)}
+              onChange={handleChange(option)}
+            />
+            {option.label}
+          </label>)
+      }
+    </div>
+  );
+};
 
 CheckboxGroup.propTypes = {
   name: pt.string.isRequired,
   input: pt.object.isRequired,
+  value: pt.oneOfType([pt.string, pt.array]),
+  onChange: pt.func.isRequired,
   options: pt.array,
 };
