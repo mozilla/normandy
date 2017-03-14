@@ -129,36 +129,14 @@ export const isFilteringActive = state =>
   getActiveFilterOptions(state).length > 0;
 
 /**
- * Given a specific filter slug, returns only that
- * filter group.
- *
- * @param  {Array<Object>} groups All filter groups
- * @param  {String}        slug   Slug of specific group to pull
- * @return {Object}               Found group object (or `undefined`)
- */
-export const getFilterGroup = (groups, slug) =>
-  [].concat(groups)
-    .map(group => ({ ...group }))
-    .filter(group => group.value === slug).pop();
-
-/**
  * Get all filters as an object keyed on their slug
  *
  * @param  {Array<Object>} groups All filter groups
  * @return {Object}               Object of filters keyed by their slug
  */
-export const getFilterObject = groups => {
-  let compiled = {};
-
-  [].concat(groups)
-    .map(group => ({ ...group }))
-    .forEach(group => {
-      compiled = {
-        ...compiled,
-        [group.value]: [].concat(group.options).map(option => ({ ...option })),
-      };
-    });
-
-  return compiled;
-};
+export const getFilterObject = groups =>
+  groups.reduce((optionsMap, group) => {
+    optionsMap[group.value] = group.options;
+    return optionsMap;
+  }, {});
 

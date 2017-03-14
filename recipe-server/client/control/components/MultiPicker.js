@@ -1,29 +1,16 @@
 import React, { PropTypes as pt } from 'react';
+import { propTypes as reduxFormPropTypes } from 'redux-form';
 
 export default class MultiPicker extends React.Component {
   static propTypes = {
     unit: pt.string.isRequired,
-    plural: pt.string.isRequired,
     options: pt.array,
-    // from redux-form
-    value: pt.oneOfType([pt.array, pt.string]),
-    onChange: pt.func,
+    value: reduxFormPropTypes.value,
+    onChange: reduxFormPropTypes.onChange,
   };
 
-  static getActiveSelectOptions({ options }) {
-    if (!options) {
-      return [];
-    }
-
-    const selected = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selected.push(options[i].value);
-      }
-    }
-
-    return selected.filter(x => x);
-  }
+  static getActiveSelectOptions = selectElement =>
+    Array.from(selectElement.selectedOptions).map(option => option.value).filter(x => x);
 
   constructor(props) {
     super(props);
@@ -31,18 +18,24 @@ export default class MultiPicker extends React.Component {
       filterText: null,
     };
 
-    this.handleApplyOption = ::this.handleApplyOption;
-    this.handleRemoveOption = ::this.handleRemoveOption;
-    this.onTextChange = ::this.onTextChange;
-    this.convertValueToObj = ::this.convertValueToObj;
+    this.handleChangeOption = ::this.handleChangeOption;
+    this.handleTextChange = ::this.handleTextChange;
+    this.getOptionFromValue = ::this.getOptionFromValue;
   }
 
-  onTextChange(event) {
-    const { value } = event.target;
+  /**
+   * Given an option's value, finds the specified option from the given
+   * props.options list, and returns it.
+   *
+   * @param  {string} value Option's value
+   * @return {object}       Option object (has label, value)
+   */
+  getOptionFromValue(value) {
+    const {
+      options = [],
+    } = this.props;
 
-    this.setState({
-      filterText: value,
-    });
+    return options.find(option => option.value === value);
   }
 
   getDisplayedOptions() {
@@ -51,88 +44,61 @@ export default class MultiPicker extends React.Component {
       value,
     } = this.props;
 
-    const selectedOptions = options.filter(option =>
-      value.indexOf(option.value) === -1);
-
-    let displayedOptions = [].concat(selectedOptions)
-      .map(option => option.value)
-      .map(val =>
-        (!val ? null : { ...this.convertValueToObj(val) }))
-      .filter(x => x);
-
     const {
       filterText,
     } = this.state;
 
+    let selectedOptions = options.filter(option => value.indexOf(option.value) === -1);
+
     if (filterText) {
-      displayedOptions = displayedOptions.filter(option =>
-        JSON.stringify(option).indexOf(filterText) > -1);
+      const searchText = filterText.toLowerCase();
+
+      selectedOptions = selectedOptions.filter(option => {
+        const searchValues = Object.values(option).join(' ').toLowerCase();
+        return searchValues.indexOf(searchText) > -1;
+      });
     }
 
-    return displayedOptions;
+    return selectedOptions;
   }
 
-  handleApplyOption(event) {
-    event.persist();
-
-    if (!this.availableRef) {
-      return;
-    }
-
-    const {
-      value,
-      onChange,
-    } = this.props;
-
-    let selectedFilters = MultiPicker.getActiveSelectOptions(this.availableRef);
-
-    if (!selectedFilters || selectedFilters.length === 0) {
-      selectedFilters = this.getDisplayedOptions();
-      selectedFilters = selectedFilters.map(option => option.value);
-    }
-
-    const newOptions = []
-      .concat(value || [])
-      .concat(selectedFilters);
-
-    // clear user input
-    this.availableRef.value = null;
-
-    onChange(newOptions.join(','));
+  handleTextChange(event) {
+    this.setState({
+      filterText: event.target.value,
+    });
   }
 
-  handleRemoveOption(event) {
-    event.persist();
-    if (!this.selectedRef) {
-      return;
-    }
+  handleChangeOption(type) {
+    return () => {
+      const ref = type === 'apply' ? this.availableRef : this.selectedRef;
+      if (!type || !ref) {
+        return;
+      }
 
-    const {
-      value,
-      onChange,
-    } = this.props;
+      const {
+        value = [],
+        onChange = () => {},
+      } = this.props;
 
-    const selectedFilters = MultiPicker.getActiveSelectOptions(this.selectedRef);
-    let newOptions = []
-      .concat(value || [])
-      .filter(val => selectedFilters.indexOf(val) === -1);
+      // Get a list of all selected values.
+      let selection = [].concat(value);
+      // Pick up list of selected options from the dom ref
+      const refSelected = MultiPicker.getActiveSelectOptions(ref);
 
-    if (!selectedFilters || selectedFilters.length === 0) {
-      newOptions = [];
-    }
+      // Apply = take from the 'available' section and put in 'selected'
+      if (type === 'apply') {
+        selection = selection.concat(refSelected);
+      // Remove = take from 'selected' and put back in 'available'
+      } else if (type === 'remove') {
+        selection = selection.filter(val => refSelected.indexOf(val) === -1);
+      }
 
-    // clear the user selection
-    this.selectedRef.value = null;
+      // Clear user input.
+      ref.value = null;
 
-    onChange(newOptions.join(','));
-  }
-
-  convertValueToObj(value) {
-    const {
-      options = [],
-    } = this.props;
-
-    return options.find(option => option.value === value);
+      // Report the updated selected filters to the parent.
+      onChange(selection.join(','));
+    };
   }
 
   /**
@@ -141,41 +107,35 @@ export default class MultiPicker extends React.Component {
   render() {
     const {
       unit,
-      plural,
       value,
     } = this.props;
 
     let pickerValue = value || [];
 
+    // Value can be a string or an array, but we want an array.
     if (value && typeof value === 'string') {
       pickerValue = pickerValue.split(',');
     }
 
-    pickerValue = pickerValue.map(this.convertValueToObj);
+    // We're given a comma-separated list of strings as values,
+    // so we'll convert those values into their respective `option`s here
+    pickerValue = pickerValue.map(this.getOptionFromValue);
 
     const displayedOptions = this.getDisplayedOptions();
-
-    const availableLabel = displayedOptions
-      && (displayedOptions.length === 0 || displayedOptions.length > 1)
-      ? plural : unit;
-
-    const selectedLabel = pickerValue
-      && (pickerValue.length === 0 || pickerValue.length > 1)
-      ? plural : unit;
 
     return (
       <div className="multipicker">
 
         <div className="mp-frame mp-from">
-          {`Available ${availableLabel}`}
+          {`Available ${unit}`}
 
           <input
-            type="text"
-            placeholder={`Search ${plural}`}
-            onChange={this.onTextChange}
+            type="search"
+            placeholder={`Search ${unit}`}
+            onChange={this.handleTextChange}
           />
 
-          <select ref={ref => { this.availableRef = ref || this.availableRef; }} multiple>
+          <select ref={ref => { this.availableRef = ref; }} multiple>
             {
               (displayedOptions).map((option, idx) =>
                 <option
@@ -188,20 +148,19 @@ export default class MultiPicker extends React.Component {
               )
             }
           </select>
-          <button type="button" onClick={this.handleApplyOption}>Add {unit}</button>
         </div>
 
         {
-          !!pickerValue &&
+          pickerValue &&
             <div className="mp-button-group">
               <button
-                onClick={this.handleRemoveOption}
+                onClick={this.handleChangeOption('remove')}
                 type="button"
               >
                 ⇜
               </button>
               <button
-                onClick={this.handleApplyOption}
+                onClick={this.handleChangeOption('apply')}
                 type="button"
               >
                 ⇝
@@ -210,8 +169,8 @@ export default class MultiPicker extends React.Component {
         }
 
         <div className="mp-frame mp-to">
-          {`Selected ${selectedLabel}`}
-          <select ref={ref => { this.selectedRef = ref || this.selectedRef; }} multiple>
+          {`Selected ${unit}`}
+          <select ref={ref => { this.selectedRef = ref; }} multiple>
             {
               pickerValue.map((option, idx) =>
                 <option
@@ -224,9 +183,6 @@ export default class MultiPicker extends React.Component {
               )
             }
           </select>
-          { !!pickerValue && !!pickerValue.length &&
-            <button type="button" onClick={this.handleRemoveOption}>Remove {unit}</button>
-          }
         </div>
       </div>
     );
