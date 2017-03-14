@@ -1,13 +1,58 @@
 export const fixtureRecipes = [
-  { id: 1, name: 'Lorem Ipsum', enabled: true },
-  { id: 2, name: 'Dolor set amet', enabled: true },
-  { id: 3, name: 'Consequitar adipscing', enabled: false },
+  { id: 1, name: 'Lorem Ipsum', enabled: true, revision_id: 'abc' },
+  { id: 2, name: 'Dolor set amet', enabled: true, revision_id: 'def' },
+  { id: 3, name: 'Consequitar adipscing', enabled: false, revision_id: 'ghi' },
 ];
 
 export const fixtureRecipeDict = {};
 fixtureRecipes.forEach(recipe => {
   fixtureRecipeDict[recipe.id] = { ...recipe };
 });
+
+export const fixtureStoredSingleRevision = {
+  1: {
+    abc: {
+      id: 1,
+      name: 'Lorem Ipsum',
+      enabled: true,
+      revision_id: 'abc',
+    },
+  },
+};
+
+export const fixtureSingleRevision = {
+  id: 1,
+  name: 'Lorem Ipsum',
+  enabled: true,
+  revision_id: 'abc',
+};
+
+export const fixtureStoredRevisions = {
+  1: {
+    abc: {
+      id: 1,
+      name: 'Lorem Ipsum',
+      enabled: true,
+      revision_id: 'abc',
+    },
+  },
+  2: {
+    def: {
+      id: 2,
+      name: 'Dolor set amet',
+      enabled: true,
+      revision_id: 'def',
+    },
+  },
+  3: {
+    ghi: {
+      id: 3,
+      name: 'Consequitar adipscing',
+      enabled: false,
+      revision_id: 'ghi',
+    },
+  },
+};
 
 export const initialState = {
   columns: [{
@@ -58,9 +103,10 @@ export const initialState = {
   },
   form: {},
   notifications: [],
+  user: {},
   recipes: {
     entries: {},
-    cache: {},
+    revisions: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,
   },

@@ -74,4 +74,47 @@ describe('Recipe Actions', () => {
       expect(fetchMock.calls('/api/v1/recipe/1/').length).toEqual(1);
     });
   });
+
+  it('makes a proper API request for openApprovalRequest', () => {
+    fetchMock.post('/api/v1/recipe_revision/123/request_approval/', {});
+    return store.dispatch(makeApiRequest('openApprovalRequest', {
+      revisionId: 123,
+    }))
+      .then(() => {
+        expect(fetchMock.calls('/api/v1/recipe_revision/123/request_approval/').length).toEqual(1);
+      });
+  });
+
+  it('makes a proper API request for approveApprovalRequest', () => {
+    fetchMock.post('/api/v1/approval_request/123/approve/', {});
+
+    return store.dispatch(makeApiRequest('approveApprovalRequest', {
+      requestId: 123,
+    }))
+      .then(() => {
+        expect(fetchMock.calls('/api/v1/approval_request/123/approve/').length).toEqual(1);
+      });
+  });
+
+  it('makes a proper API request for rejectApprovalRequest', () => {
+    fetchMock.post('/api/v1/approval_request/123/reject/', {});
+
+    return store.dispatch(makeApiRequest('rejectApprovalRequest', {
+      requestId: 123,
+    }))
+      .then(() => {
+        expect(fetchMock.calls('/api/v1/approval_request/123/reject/').length).toEqual(1);
+      });
+  });
+
+  it('makes a proper API request for closeApprovalRequest', () => {
+    fetchMock.post('/api/v1/approval_request/123/close/', {});
+
+    return store.dispatch(makeApiRequest('closeApprovalRequest', {
+      requestId: 123,
+    }))
+      .then(() => {
+        expect(fetchMock.calls('/api/v1/approval_request/123/close/').length).toEqual(1);
+      });
+  });
 });

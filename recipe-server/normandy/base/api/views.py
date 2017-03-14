@@ -2,10 +2,13 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 
+from rest_framework import status
 from rest_framework.compat import NoReverseMatch
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+
+from normandy.base.api.serializers import UserSerializer
 
 
 class APIRootView(APIView):
@@ -40,3 +43,11 @@ class APIRootView(APIView):
                 pass
 
         return Response(ret)
+
+
+class CurrentUserView(APIView):
+    def get(self, request):
+        if not request.user.is_authenticated():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(UserSerializer(request.user).data)

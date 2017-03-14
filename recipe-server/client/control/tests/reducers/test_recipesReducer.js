@@ -3,14 +3,13 @@ import * as actions from 'control/actions/RecipeActions';
 import {
   fixtureRecipes,
   fixtureRecipeDict,
+  fixtureStoredRevisions,
+  fixtureSingleRevision,
+  fixtureStoredSingleRevision,
   initialState,
 } from 'control/tests/fixtures';
 
-const fakeRecipe = {
-  id: 4,
-  name: 'Villis stebulum',
-  enabled: false,
-};
+const fakeRecipe = fixtureRecipeDict[1];
 
 describe('Notification reducer', () => {
   it('should return initial state by default', () => {
@@ -25,6 +24,7 @@ describe('Notification reducer', () => {
       ...initialState,
       recipes: {
         ...initialState.recipes,
+        revisions: fixtureStoredRevisions,
         entries: fixtureRecipeDict,
         selectedRecipe: null,
         recipeListNeedsFetch: false,
@@ -43,6 +43,7 @@ describe('Notification reducer', () => {
         entries: {
           [fixtureRecipes[0].id]: fixtureRecipes[0],
         },
+        revisions: fixtureStoredSingleRevision,
         selectedRecipe: 1,
         recipeListNeedsFetch: true,
       },
@@ -62,6 +63,37 @@ describe('Notification reducer', () => {
     });
   });
 
+  it('should handle SET_SELECTED_REVISION', () => {
+    expect(appReducer(undefined, {
+      type: actions.SET_SELECTED_REVISION,
+      revisionId: 2,
+    })).toEqual({
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        selectedRevision: 2,
+      },
+    });
+  });
+
+  it('should handle REVISIONS_RECEIVED', () => {
+    expect(appReducer(undefined, {
+      type: actions.REVISIONS_RECEIVED,
+      revisions: [fixtureSingleRevision],
+      recipeId: 'test-id',
+    })).toEqual({
+      ...initialState,
+      recipes: {
+        ...initialState.recipes,
+        revisions: {
+          'test-id': {
+            [fixtureSingleRevision.id]: fixtureSingleRevision,
+          },
+        },
+      },
+    });
+  });
+
   it('should handle RECIPE_ADDED', () => {
     expect(appReducer(initialState, {
       type: actions.RECIPE_ADDED,
@@ -73,43 +105,42 @@ describe('Notification reducer', () => {
         entries: {
           [fakeRecipe.id]: fakeRecipe,
         },
+        revisions: fixtureStoredSingleRevision,
       },
     });
   });
 
   it('should handle RECIPE_UPDATED', () => {
+    const updatedRecipe = {
+      id: 3,
+      name: 'Updated recipe name',
+      enabled: true,
+      revision_id: 'ghi',
+    };
+
     expect(appReducer({
       ...initialState,
       recipes: {
         ...initialState.recipes,
         entries: fixtureRecipeDict,
+        revisions: fixtureStoredRevisions,
       },
     }, {
       type: actions.RECIPE_UPDATED,
-      recipe: {
-        id: 3,
-        name: 'Updated recipe name',
-        enabled: true,
-      },
+      recipe: updatedRecipe,
     })).toEqual({
       ...initialState,
       recipes: {
         ...initialState.recipes,
         entries: {
-          1: {
-            id: 1,
-            name: 'Lorem Ipsum',
-            enabled: true,
-          },
-          2: {
-            id: 2,
-            name: 'Dolor set amet',
-            enabled: true,
-          },
+          ...fixtureRecipeDict,
+          3: updatedRecipe,
+        },
+        revisions: {
+          ...fixtureStoredRevisions,
           3: {
-            id: 3,
-            name: 'Updated recipe name',
-            enabled: true,
+            ...fixtureStoredRevisions[3],
+            ghi: updatedRecipe,
           },
         },
       },
@@ -117,30 +148,26 @@ describe('Notification reducer', () => {
   });
 
   it('should handle RECIPE_DELETED', () => {
+    const testId = 3;
+
     expect(appReducer({
       ...initialState,
       recipes: {
         ...initialState.recipes,
         entries: fixtureRecipeDict,
+        revisions: fixtureStoredRevisions,
       },
     }, {
       type: actions.RECIPE_DELETED,
-      recipeId: 3,
+      recipeId: testId,
     })).toEqual({
       ...initialState,
       recipes: {
         ...initialState.recipes,
+        revisions: fixtureStoredRevisions,
         entries: {
-          1: {
-            id: 1,
-            name: 'Lorem Ipsum',
-            enabled: true,
-          },
-          2: {
-            id: 2,
-            name: 'Dolor set amet',
-            enabled: true,
-          },
+          1: fixtureRecipeDict[1],
+          2: fixtureRecipeDict[2],
         },
       },
     });

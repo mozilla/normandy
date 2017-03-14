@@ -11,22 +11,15 @@ import {
 } from 'control/actions/RecipeActions';
 
 import {
+  getRecipesList,
+} from 'control/selectors/RecipesSelector';
+
+import {
   getActiveColumns,
 } from 'control/selectors/ColumnSelector';
 
-import {
-  getCachedRecipes,
-} from 'control/selectors/RecipesSelector';
-
+import BooleanIcon from 'control/components/BooleanIcon';
 import RecipeFilters from 'control/components/RecipeFilters';
-
-const BooleanIcon = props => {
-  const iconClass = props.value ? 'fa-check green' : 'fa-times red';
-  return <i className={`fa fa-lg ${iconClass}`}>&nbsp;</i>;
-};
-BooleanIcon.propTypes = {
-  value: pt.bool.isRequired,
-};
 
 export class DisconnectedRecipeList extends React.Component {
   static propTypes = {
@@ -237,7 +230,7 @@ export class DisconnectedRecipeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  recipes: getCachedRecipes(state.recipes, state.filters),
+  recipes: getRecipesList(state.recipes),
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,

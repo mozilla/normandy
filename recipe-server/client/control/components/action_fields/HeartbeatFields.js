@@ -5,37 +5,42 @@ import { ControlField } from 'control/components/Fields';
 /**
  * Form fields for the show-heartbeat action.
  */
-export default function HeartbeatFields({ fields = {} }) {
+export default function HeartbeatFields({ disabled, fields = {} }) {
   return (
     <div className="arguments-fields">
       <p className="info">
         Shows a single message or survey prompt to the user.
       </p>
       <ControlField
+        disabled={disabled}
         label="Survey ID"
         name="arguments.surveyId"
         component="input"
         type="text"
       />
       <ControlField
+        disabled={disabled}
         label="Message"
         name="arguments.message"
         component="input"
         type="text"
       />
       <ControlField
+        disabled={disabled}
         label="Engagement Button Label"
         name="arguments.engagementButtonLabel"
         component="input"
         type="text"
       />
       <ControlField
+        disabled={disabled}
         label="Thanks Message"
         name="arguments.thanksMessage"
         component="input"
         type="text"
       />
       <ControlField
+        disabled={disabled}
         label="Post-Answer URL"
         name="arguments.postAnswerUrl"
         component="input"
@@ -43,12 +48,14 @@ export default function HeartbeatFields({ fields = {} }) {
       />
 
       <ControlField
+        disabled={disabled}
         label="Learn More Message"
         name="arguments.learnMoreMessage"
         component="input"
         type="text"
       />
       <ControlField
+        disabled={disabled}
         label="Learn More URL"
         name="arguments.learnMoreUrl"
         component="input"
@@ -56,6 +63,7 @@ export default function HeartbeatFields({ fields = {} }) {
       />
 
       <ControlField
+        disabled={disabled}
         label="How often should the prompt be shown?"
         name="arguments.repeatOption"
         component="select"
@@ -76,6 +84,7 @@ export default function HeartbeatFields({ fields = {} }) {
       {
         fields.repeatOption === 'xdays' &&
           <ControlField
+            disabled={disabled}
             label="Days before user is re-prompted"
             name="arguments.repeatEvery"
             component="input"
@@ -84,6 +93,7 @@ export default function HeartbeatFields({ fields = {} }) {
       }
 
       <ControlField
+        disabled={disabled}
         label="Include unique user ID in Post-Answer URL (and Telemetry)"
         name="arguments.includeTelemetryUUID"
         component="input"
@@ -95,5 +105,6 @@ export default function HeartbeatFields({ fields = {} }) {
 }
 
 HeartbeatFields.propTypes = {
+  disabled: pt.bool,
   fields: pt.object,
 };

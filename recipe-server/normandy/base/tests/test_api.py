@@ -3,6 +3,7 @@ import json
 import pytest
 
 from django.conf.urls import url
+from django.contrib.auth.models import User
 from django.views.generic import View
 
 from normandy.base.api.views import APIRootView
@@ -21,6 +22,7 @@ class TestApiRoot(object):
             'action-list': 'http://testserver/api/v1/action/',
             'reciperevision-list': 'http://testserver/api/v1/recipe_revision/',
             'classify-client': 'http://testserver/api/v1/classify_client/',
+            'approvalrequest-list': 'http://testserver/api/v1/approval_request/',
             'filters': 'http://testserver/api/v1/filters/',
         }
 
@@ -121,3 +123,22 @@ class TestMixedViewRouter(object):
         router.register_view('view', View, name='standalone-view')
         router.get_urls()
         assert mock_api_view.called_once_with([Whatever(lambda v: v.name == 'standalone-view')])
+
+
+@pytest.mark.django_db
+class TestCurrentUserView(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/user/me/')
+        user = User.objects.first()  # Get the default user
+        assert res.status_code == 200
+        assert res.data == {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
+        }
+
+    def test_unauthorized(self, api_client):
+        res = api_client.logout()
+        res = api_client.get('/api/v1/user/me/')
+        assert res.status_code == 401

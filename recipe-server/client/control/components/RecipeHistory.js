@@ -4,6 +4,11 @@ import moment from 'moment';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import makeApiRequest from 'control/api';
+import DraftStatus from 'control/components/DraftStatus';
+
+import {
+  getLastApprovedRevision,
+} from 'control/selectors/RecipesSelector';
 
 export class DisconnectedRecipeHistory extends React.Component {
   static propTypes = {
@@ -43,6 +48,8 @@ export class DisconnectedRecipeHistory extends React.Component {
 }
 
 export function HistoryList({ recipe, revisions, dispatch }) {
+  const lastApprovedId = getLastApprovedRevision(revisions).id;
+
   return (
     <div className="fluid-8 recipe-history">
       <h3>Viewing revision log for: <b>{recipe ? recipe.name : ''}</b></h3>
@@ -54,6 +61,7 @@ export function HistoryList({ recipe, revisions, dispatch }) {
               revision={revision}
               recipe={recipe}
               dispatch={dispatch}
+              approvedId={lastApprovedId}
             />
           )}
         </tbody>
@@ -80,6 +88,7 @@ export class HistoryItem extends React.Component {
     recipe: pt.shape({
       revision_id: pt.number.isRequired,
     }).isRequired,
+    approvedId: pt.string,
   }
 
   constructor(props) {
@@ -96,39 +105,38 @@ export class HistoryItem extends React.Component {
 
     // Do not include form state changes if the current revision was
     // clicked.
-    if (revision.recipe.revision_id === recipe.revision_id) {
+    if (revision.recipe.revision_id === recipe.latest_revision_id) {
       dispatch(push(`/control/recipe/${recipe.id}/`));
     } else {
-      dispatch(push({
-        pathname: `/control/recipe/${recipe.id}/`,
-        query: { revisionId: `${revision.id}` },
-        state: { selectedRevision: revision.recipe },
-      }));
+      dispatch(push(`/control/recipe/${recipe.id}/revision/${revision.id}/`));
     }
   }
 
   render() {
-    const { revision, recipe } = this.props;
-    const isCurrent = revision.recipe.revision_id === recipe.revision_id;
+    const { revision, recipe, approvedId } = this.props;
 
     return (
       <tr className="history-item" onClick={this.handleClick}>
-        <td className="revision-number">#{revision.recipe.revision_id}</td>
+        <td className="revision-number">{revision.recipe.revision_id}</td>
         <td className="revision-created">
           <span className="label">Created On:</span>
           {moment(revision.date_created).format('MMM Do YYYY - h:mmA')}
         </td>
         <td className="revision-comment">
-          <span className="label">Comment:</span>
-          {revision.comment || '--'}
+        {
+          !!revision.comment &&
+            <span>
+              <span className="label">Comment:</span>
+              <span className="comment-text">{revision.comment || '--'}</span>
+            </span>
+        }
         </td>
         <td>
-          {isCurrent && (
-            <div className="status-indicator green">
-              <i className="fa fa-circle pre" />
-              Current Revision
-            </div>
-          )}
+          <DraftStatus
+            latestRevisionId={recipe.latest_revision_id}
+            lastApprovedRevisionId={approvedId}
+            recipe={revision.recipe}
+          />
         </td>
       </tr>
     );
