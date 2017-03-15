@@ -391,3 +391,6 @@ class Test(Base):
     SECRET_KEY = 'not a secret'
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
     SECURE_SSL_REDIRECT = False
+    AUTOGRAPH_URL = None
+    AUTOGRAPH_HAWK_ID = None
+    AUTOGRAPH_HAWK_SECRET_KEY = None
