@@ -283,7 +283,7 @@ class FilterTelemetry(TestCase):
         console_log(
             'FilterTelemetry executed',
             extra_filter_expression='''
-                telemetry.testping.payload.foo=="bar"
+                normandy.telemetry.testping.payload.foo=="bar"
             '''
         )
 
