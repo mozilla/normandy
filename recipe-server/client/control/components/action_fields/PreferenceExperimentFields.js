@@ -1,5 +1,5 @@
-import React from 'react';
-import { FieldArray } from 'redux-form';
+import React, { PropTypes as pt } from 'react';
+import { FieldArray, propTypes as reduxFormPropTypes } from 'redux-form';
 import { connect } from 'react-redux';
 
 import {
@@ -95,6 +95,9 @@ export function renderBranches({ fields }) {
     </div>
   );
 }
+renderBranches.propTypes = {
+  fields: reduxFormPropTypes.array,
+};
 
 export function BranchFields({ branch, onClickDelete, preferenceType = 'boolean' }) {
   const ValueField = VALUE_FIELDS[preferenceType];
@@ -120,6 +123,11 @@ export function BranchFields({ branch, onClickDelete, preferenceType = 'boolean'
     </div>
   );
 }
+BranchFields.propTypes = {
+  branch: pt.string.required,
+  onClickDelete: pt.func.required,
+  preferenceType: pt.string.required,
+};
 
 export const ConnectedBranchFields = connect(
   state => ({

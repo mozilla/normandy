@@ -49,42 +49,50 @@ buildControlField.propTypes = {
   children: pt.node,
 };
 
-export function IntegerControlField(props) {
-  return (
-    <ControlField
-      component="input"
-      type="number"
-      step="1"
-      parse={value => {
-        try {
-          return Number.parseInt(value, 10);
-        } catch (err) {
-          return 0;
-        }
-      }}
-      {...props}
-    />
-  );
+export class IntegerControlField extends React.Component {
+  parse(value) {
+    return Number.parseInt(value, 10);
+  }
+
+  render() {
+    return (
+      <ControlField
+        component="input"
+        type="number"
+        step="1"
+        parse={this.parse}
+        {...this.props}
+      />
+    );
+  }
 }
 
-export function BooleanRadioControlField(props) {
-  return (
-    <ControlField
-      component="input"
-      type="radio"
-      className="radio-field"
-      parse={value => value === 'true'}
-      format={value => {
-        if (value) {
-          return 'true';
-        } else if (value !== undefined) {
-          return 'false';
-        }
-        return undefined;
-      }}
-      {...props}
-    />
-  );
+export class BooleanRadioControlField extends React.Component {
+  parse(value) {
+    return value === 'true';
+  }
+
+  format(value) {
+    if (value) {
+      return 'true';
+    } else if (value !== undefined) {
+      return 'false';
+    }
+    return undefined;
+  }
+
+  render() {
+    return (
+      <ControlField
+        component="input"
+        type="radio"
+        className="radio-field"
+        parse={this.parse}
+        format={this.format}
+        {...this.props}
+      />
+    );
+  }
 }
 
 export function ErrorMessageField(props) {

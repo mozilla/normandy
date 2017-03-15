@@ -161,6 +161,7 @@
   /* A group of related fields, generally for things like radio buttons. */
   .fieldset {
     @extend .form-field;
+
     border: none;
 
     .fieldset-label {
@@ -168,19 +169,22 @@
     }
 
     /* Checkbox/radio fields within fieldsets should be inline in a row. */
-    .checkbox-field, .radio-field {
+    .checkbox-field,
+    .radio-field {
       display: inline-flex;
       margin-right: 1.5em;
     }
   }
 
   /* Checkbox/radio inputs should appear to the left of the label. */
-  .checkbox-field, .radio-field {
+  .checkbox-field,
+  .radio-field {
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
 
-    input[type="checkbox"], input[type="radio"] {
+    input[type="checkbox"],
+    input[type="radio"] {
       flex: 0;
       margin: 6px 6px 6px 0;
     }
@@ -245,8 +249,8 @@
 
   .branch {
     background: $darkCream;
-    padding: 15px;
     margin: 0 0 15px;
+    padding: 15px;
   }
 
   .branch-fields {

@@ -101,7 +101,7 @@ export class HeartbeatFields extends ActionFields {
 }
 
 HeartbeatFields.propTypes = {
-  recipeArguments: pt.object,
+  recipeArguments: pt.object.required,
 };
 
 export default connect(

@@ -27,11 +27,14 @@ import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
-import PreferenceExperimentFields from 'control/components/action_fields/PreferenceExperimentFields';
+import PreferenceExperimentFields from
+  'control/components/action_fields/PreferenceExperimentFields';
 import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 
 export const selector = formValueSelector('recipe');
+
+// The arguments field is handled in initialValuesWrapper.
 const DEFAULT_FORM_VALUES = {
   name: '',
   extra_filter_expression: '',
@@ -54,7 +57,6 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
-    recipeFields: pt.object,
     // route prop passed from router
     route: pt.object,
   };
@@ -91,7 +93,6 @@ export class RecipeForm extends React.Component {
       recipe,
       recipeId,
       route,
-      recipeFields,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -133,7 +134,7 @@ export class RecipeForm extends React.Component {
           <option value="show-heartbeat">Heartbeat Prompt</option>
           <option value="preference-experiment">Preference Experiment</option>
         </ControlField>
-        <ArgumentsFields fields={recipeFields} />
+        <ArgumentsFields />
         <div className="form-actions">
           {recipeId && !isCloning &&
             <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
@@ -220,7 +221,7 @@ export const formConfig = {
  */
 export function initialValuesWrapper(Component) {
   function Wrapped(props) {
-    const { recipe, location } = props;
+    const { recipe, location, selectedAction } = props;
     let initialValues = recipe;
     if (location.state && location.state.selectedRevision) {
       initialValues = location.state.selectedRevision;
@@ -228,12 +229,15 @@ export function initialValuesWrapper(Component) {
 
     // If we still don't have initial values, roll with the defaults.
     if (!initialValues) {
-      initialValues = Object.assign({}, DEFAULT_FORM_VALUES);
+      initialValues = { ...DEFAULT_FORM_VALUES };
 
       // ActionField subclasses define their own initial values.
-      if (props.selectedAction) {
-        const ActionFields = RecipeForm.argumentsFields[props.selectedAction];
-        initialValues.arguments = Object.assign({}, ActionFields.initialValues);
+      if (selectedAction) {
+        const ActionFields = RecipeForm.argumentsFields[selectedAction];
+        initialValues.arguments = { ...ActionFields.initialValues };
+      } else {
+        // DEFAULT_FORM_VALUES wouldn't copy this, so we add it here instead.
+        initialValues.arguments = {};
       }
     }
 
@@ -242,6 +246,7 @@ export function initialValuesWrapper(Component) {
   Wrapped.propTypes = {
     recipe: pt.object,
     location: locationShape,
+    selectedAction: pt.string,
   };
 
   return Wrapped;
