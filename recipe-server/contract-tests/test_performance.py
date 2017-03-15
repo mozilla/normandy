@@ -6,8 +6,8 @@ from pytest_testrail.plugin import testrail
 HOT_PATHS = [
     '/en-US/repair',
     '/en-US/repair/',
-    '/api/v1/recipe/',
-    '/api/v1/recipe/signed/',
+    '/api/v1/recipe/?enabled=1',
+    '/api/v1/recipe/signed/?enabled=1',
     '/api/v1/action/',
 ]
 
@@ -34,7 +34,7 @@ class TestHotPaths(object):
         r.raise_for_status()
         assert 'cookie' not in r.headers.get('vary', '').lower()
 
-    def test_cache_headers(self, conf, requests_session, path):
+    def test_cache_headers(self, conf, requests_session, path, only_readonly):
         r = requests_session.get(conf.getoption('server') + path)
         r.raise_for_status()
         cache_control = r.headers.get('cache-control')

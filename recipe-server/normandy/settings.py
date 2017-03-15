@@ -124,8 +124,13 @@ class Core(Configuration):
 
     # these don't fallback to default-src
     CSP_BASE_URI = "'none'"  # not using <base>
-    CSP_FRAME_ANCESTORS = "'none'"  # this page isn't iframed elsewhere
     CSP_FORM_ACTION = "'self'"  # we only submit forms to ourselves
+
+    # TODO(mythmon) Re-add this once either:
+    #   1) We know the domain we can use for Firefox's framing of the self-repair frame
+    #   2) We've deprecated the self-repair frame entirely
+    #   3) django-csp allows removing directives on an individual view (mozilla/django-csp#85)
+    # CSP_FRAME_ANCESTORS = "'none'"  # Block framing by default
 
     # Action names and the path they are located at.
     ACTIONS = {
@@ -290,7 +295,7 @@ class Base(Core):
     APP_SERVER_URL = values.URLValue(None)
 
     # URL for the CSP report-uri directive.
-    CSP_REPORT_URI = values.Value(None)
+    CSP_REPORT_URI = values.Value('/__cspreport__')
 
     # Normandy settings
     ADMIN_ENABLED = values.BooleanValue(True)

@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 
 from django.conf import settings
@@ -12,6 +14,7 @@ from statsd.defaults.django import statsd
 from normandy.base.decorators import short_circuit_middlewares
 
 
+logger = logging.getLogger(__name__)
 _commit = None
 _tag = None
 
@@ -113,3 +116,15 @@ def heartbeat_check_detail(check):
         'level': level,
         'messages': {e.id: e.msg for e in errors},
     }
+
+
+@api_view(['POST'])
+def cspreport(request):
+    try:
+        data = json.loads(request.body.decode())
+        detail = data['csp-report']['violated-directive']
+        logger.error(f'csp error: {detail}', extra=data)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+    except (ValueError, KeyError):
+        logger.warn(f'unparsable csp error', extra={'body': request.body.decode()})
+        return Response({'error': 'unparsable csp report'}, status=status.HTTP_400_BAD_REQUEST)
