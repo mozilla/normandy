@@ -18,7 +18,7 @@ const VALUE_FIELDS = {
 };
 const DEFAULT_BRANCH_VALUES = {
   slug: '',
-  bucketCount: 10,
+  ratio: 1,
 };
 
 /**
@@ -30,6 +30,7 @@ export default class PreferenceExperimentFields extends ActionFields {
     experimentDocumentUrl: '',
     preferenceName: '',
     preferenceType: 'boolean',
+    bucketCount: 10,
   }
 
   render() {
@@ -63,6 +64,10 @@ export default class PreferenceExperimentFields extends ActionFields {
           <option value="integer">Integer</option>
           <option value="string">String</option>
         </ControlField>
+        <IntegerControlField
+          label="Sample of Total Population (out of 100,000 buckets)"
+          name="arguments.bucketCount"
+        />
         <FieldArray name="arguments.branches" component={renderBranches} />
       </div>
     );
@@ -104,15 +109,15 @@ export function BranchFields({ branch, onClickDelete, preferenceType = 'boolean'
   return (
     <div className="branch-fields">
       <ControlField
-        label="Slug"
+        label="Branch Slug"
         name={`${branch}.slug`}
         component="input"
         type="text"
       />
       <ValueField name={`${branch}.value`} />
       <IntegerControlField
-        label="Sample Buckets"
-        name={`${branch}.bucketCount`}
+        label="Ratio"
+        name={`${branch}.ratio`}
       />
       <div className="remove-branch">
         <a className="button delete" onClick={onClickDelete}>

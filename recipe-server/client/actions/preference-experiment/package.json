@@ -13,6 +13,7 @@
                 "slug",
                 "preferenceName",
                 "preferenceType",
+                "bucketCount",
                 "branches"
             ],
             "properties": {
@@ -38,6 +39,13 @@
                     "enum": ["string", "integer", "boolean"],
                     "default": "boolean"
                 },
+                "bucketCount": {
+                    "description": "Number of sample buckets to assign to this experiment",
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 0,
+                    "maximum": 100000
+                },
                 "branches": {
                     "description": "List of experimental branches",
                     "type": "array",
@@ -47,7 +55,7 @@
                         "required": [
                             "slug",
                             "value",
-                            "bucketCount"
+                            "ratio"
                         ],
                         "properties": {
                             "slug": {
@@ -59,10 +67,11 @@
                                 "description": "Value to set the preference to for this branch",
                                 "type": ["string", "number", "boolean"]
                             },
-                            "bucketCount": {
-                                "description": "Number of sample buckets to assign to this branch",
-                                "type": "number",
-                                "default": 10
+                            "ratio": {
+                                "description": "Ratio of users who should be grouped into this branch",
+                                "type": "integer",
+                                "default": 1,
+                                "minimum": 1
                             }
                         }
                     }
