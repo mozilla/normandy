@@ -11,7 +11,6 @@ echo 'deb-src https://deb.nodesource.com/node_6.x yakkety main' >> /etc/apt/sour
 apt-get update
 
 apt-get install -y curl python2.7 xvfb nodejs
-exit 0
 
 # Creates gecko-dev-master
 echo 'Downloading gecko-dev...'
