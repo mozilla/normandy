@@ -200,6 +200,7 @@ this.RecipeRunner = {
 
     try {
       Storage.clearAllStorage();
+      ClientEnvironment.clearClassifyCache();
       NormandyApi.clearIndexCache();
       yield this.start();
     } finally {
