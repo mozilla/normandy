@@ -22,7 +22,6 @@ class RecipeListPage(Page):
 class RecipeFormPage(Page):
     form = Element('.recipe-form')
     name = FormField('[name="name"]')
-    enabled = FormField('[name="enabled"]')
     extra_filter_expression = FormField('[name="extra_filter_expression"]')
     action = SelectField('select[name="action"]')
     delete_button = Element('a.delete')
@@ -62,7 +61,6 @@ def test_create_recipe_console_log(selenium):
 
     # Fill out form
     form_page.name = 'Console-Log-Test'
-    form_page.enabled.click()
     form_page.extra_filter_expression = 'true'
     form_page.action.select_by_value('console-log')
     form_page.wait_for_element('message')
@@ -135,7 +133,6 @@ def test_create_recipe_show_heartbeat(selenium):
 
     # Fill out form
     form_page.name = 'Show-Heartbeat-Test'
-    form_page.enabled.click()
     form_page.extra_filter_expression = 'true'
     form_page.action.select_by_value('show-heartbeat')
     form_page.wait_for_element('survey_id')

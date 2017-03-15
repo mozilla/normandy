@@ -158,6 +158,7 @@ export class DisconnectedRecipeList extends React.Component {
 
       return (
         <Td
+          key={slug}
           column={slug}
           data={displayValue}
         >
@@ -230,7 +231,7 @@ export class DisconnectedRecipeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  recipes: getRecipesList(state.recipes),
+  recipes: getRecipesList(state.recipes, state.filters),
   dispatch: ownProps.dispatch,
   recipeListNeedsFetch: state.recipes.recipeListNeedsFetch,
   isFetching: state.controlApp.isFetching,

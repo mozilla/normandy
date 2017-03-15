@@ -9,15 +9,24 @@ import {
 } from 'control/selectors/FiltersSelector';
 
 /**
- * Given the `recipes` state, returns an array
- * of all the recipes stored in `recipes.entries`.
+ * Utility to find pre-cached recipes based on activated filters.
  *
- * @param  {Object} recipes `recipes` store state tree
- * @return {Array}         Array of all loaded recipes
+ * This is used to cache the results of filtered recipes
+ * returned from the server - given a set of filters,
+ * the func will find the list (if any) of previously-returned items.
+ * This allows us to display the cached recipes while the new call is made.
+ *
+ * @param  {Object}     recipes Recipes object from the redux store
+ * @param  {Array<Object>}  filters Filters array from the redux store
+ * @return {Array<Object>}  List of recipes that match the provided 'filters' config
  */
-export function getRecipesList(recipes) {
-  return [].concat(Object.keys(recipes.entries))
-    .map(recipeId => recipes.entries[recipeId]);
+export function getRecipesList(recipes, filters) {
+  const filterCacheKey = getFilterParamString(filters);
+
+  let foundList = filterCacheKey ? recipes.cache[filterCacheKey] : recipes.entries;
+  foundList = foundList || {};
+
+  return Object.keys(foundList).map(recipeId => foundList[recipeId]);
 }
 
 /**
@@ -30,26 +39,6 @@ export function getRecipesList(recipes) {
 export function getSelectedRecipe(recipes) {
   return recipes.entries[recipes.selectedRecipe] || null;
 }
-
-/**
- * Utility to find pre-cached recipes based on activated filters.
- *
- * This is used to cache the results of filtered recipes
- * returned from the server - given a set of filters,
- * the func will find the list (if any) of previously-returned items.
- * This allows us to display the cached recipes while the new call is made.
- *
- * @param  {Object} 		recipes Recipes object from the redux store
- * @param  {Array<Object>}  filters Filters array from the redux store
- * @return {Array<Object>}  List of recipes that match the provided 'filters' config
- */
-export function getCachedRecipes(recipes, filters) {
-  const filterCacheKey = getFilterParamString(filters);
-  const foundList = filterCacheKey ? recipes.cache[filterCacheKey] : recipes.entries;
-
-  return [].concat(Object.keys(foundList || {})).map(recipeId => foundList[recipeId]);
-}
-
 
 export function getLastApprovedRevision(revisions) {
   return [].concat(Object.keys(revisions || {}))
@@ -81,8 +70,7 @@ export function getSelectedRevision({ recipes = {} }) {
   const recipeRevisions = recipes.revisions[selectedRecipeId] || {};
 
   if (selectedRecipeId) {
-    recipe = recipes.list
-      .find(rec => rec.id === selectedRecipeId);
+    recipe = recipes.entries[selectedRecipeId];
 
     let latestId = -1;
     let latestTime;

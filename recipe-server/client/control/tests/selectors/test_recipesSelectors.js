@@ -2,6 +2,7 @@ import * as recipesSelectors from 'control/selectors/RecipesSelector';
 
 import {
   fixtureRecipes,
+  fixtureRecipeDict,
   fixtureStoredRevisions,
 } from '../fixtures.js';
 
@@ -70,7 +71,7 @@ describe('Recipe Selectors', () => {
 
     const state = {
       recipes: {
-        list: fixtureRecipes,
+        entries: fixtureRecipeDict,
         revisions,
         selectedRecipe: 1,
         selectedRevision: 'abc',

@@ -43,8 +43,8 @@ export const getSelectedFilterGroups = state => state.active.filter(isGroupSelec
  * @param  {Array<Object>} groups All possible filter groups
  * @return {Array<Object>}        Active filter groups and their selected options
  */
-export const getActiveFilterOptions = state =>
-  [].concat(state.active)
+export const getActiveFilterOptions = (state = {}) =>
+  [].concat(state.active || [])
     .map(group => {
       // group has no selection = remove it
       if (!group || !group.selected) {

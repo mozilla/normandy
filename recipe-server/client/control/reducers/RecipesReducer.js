@@ -14,6 +14,7 @@ import {
 const initialState = {
   entries: {},
   revisions: {},
+  cache: {},
   selectedRecipe: null,
   recipeListNeedsFetch: true,
 };
@@ -33,6 +34,11 @@ function recipesReducer(state = initialState, action) {
         };
       });
 
+      const cacheObj = {};
+      if (action.cacheKey) {
+        cacheObj[action.cacheKey] = [].concat(action.recipes);
+      }
+
       return {
         ...state,
         entries: {
@@ -42,6 +48,10 @@ function recipesReducer(state = initialState, action) {
         revisions: {
           ...state.revisions,
           ...revisionsObj,
+        },
+        cache: {
+          ...state.cache,
+          ...cacheObj,
         },
         recipeListNeedsFetch: false,
       };

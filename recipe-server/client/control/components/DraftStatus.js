@@ -58,7 +58,7 @@ export default function DraftStatus(props) {
         {
           !!flavorText.length &&
             <div className="flavor-text">{
-              flavorText.map(flavorFlav => <div children={flavorFlav} />)
+              flavorText.map((flavorFlav, index) => <div key={index} children={flavorFlav} />)
             }</div>
         }
       </div>

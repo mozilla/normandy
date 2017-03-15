@@ -106,6 +106,7 @@ export const initialState = {
   user: {},
   recipes: {
     entries: {},
+    cache: {},
     revisions: {},
     selectedRecipe: null,
     recipeListNeedsFetch: true,

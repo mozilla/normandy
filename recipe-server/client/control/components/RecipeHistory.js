@@ -13,8 +13,8 @@ import {
 export class DisconnectedRecipeHistory extends React.Component {
   static propTypes = {
     dispatch: pt.func.isRequired,
-    recipe: pt.object.isRequired,
     recipeId: pt.number.isRequired,
+    recipe: pt.object,
   }
 
   constructor(props) {
@@ -71,8 +71,8 @@ export function HistoryList({ recipe, revisions, dispatch }) {
 }
 HistoryList.propTypes = {
   dispatch: pt.func.isRequired,
-  recipe: pt.object.isRequired,
   revisions: pt.arrayOf(pt.object).isRequired,
+  recipe: pt.object,
 };
 
 export class HistoryItem extends React.Component {
@@ -80,14 +80,14 @@ export class HistoryItem extends React.Component {
     dispatch: pt.func.isRequired,
     revision: pt.shape({
       recipe: pt.shape({
-        revision_id: pt.number.isRequired,
+        revision_id: pt.string.isRequired,
       }).isRequired,
       date_created: pt.string.isRequired,
       comment: pt.string.isRequired,
     }).isRequired,
     recipe: pt.shape({
-      revision_id: pt.number.isRequired,
-    }).isRequired,
+      revision_id: pt.string.isRequired,
+    }),
     approvedId: pt.string,
   }
 
@@ -113,11 +113,17 @@ export class HistoryItem extends React.Component {
   }
 
   render() {
-    const { revision, recipe, approvedId } = this.props;
+    const {
+      revision,
+      recipe,
+      approvedId,
+    } = this.props;
 
     return (
       <tr className="history-item" onClick={this.handleClick}>
-        <td className="revision-number">{revision.recipe.revision_id}</td>
+        <td className="revision-number">
+          {revision && revision.recipe && revision.recipe.revision_id}
+        </td>
         <td className="revision-created">
           <span className="label">Created On:</span>
           {moment(revision.date_created).format('MMM Do YYYY - h:mmA')}
@@ -133,7 +139,7 @@ export class HistoryItem extends React.Component {
         </td>
         <td>
           <DraftStatus
-            latestRevisionId={recipe.latest_revision_id}
+            latestRevisionId={recipe && recipe.latest_revision_id}
             lastApprovedRevisionId={approvedId}
             recipe={revision.recipe}
           />

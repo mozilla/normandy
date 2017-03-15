@@ -11,10 +11,11 @@ export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
 export const RECIPE_DELETED = 'RECIPE_DELETED';
 
-export function recipesReceived(recipes) {
+export function recipesReceived(recipes, cacheKey) {
   return {
     type: RECIPES_RECEIVED,
     recipes,
+    cacheKey,
   };
 }
 

@@ -34,7 +34,7 @@ export const FormButton = ({
 };
 
 FormButton.propTypes = {
-  display: pt.bool.isRequired,
+  display: pt.bool,
   className: pt.string,
   label: pt.string,
   element: pt.any,

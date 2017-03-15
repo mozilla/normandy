@@ -62,7 +62,7 @@ export default class CheckboxList extends React.Component {
                 <input
                   name={option.value}
                   type="checkbox"
-                  checked={option.enabled}
+                  defaultChecked={option.enabled}
                   onChange={this.handleCheckboxChange(option.value)}
                 />
                 { option.label }
