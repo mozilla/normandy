@@ -38,6 +38,10 @@ this.ClientEnvironment = {
     return yield _classifyRequest;
   }),
 
+  clearClassifyCache() {
+    _classifyRequest = null;
+  },
+
   /**
    * Test wrapper that mocks the server request for classifying the client.
    * @param  {Object}   data          Fake server data to use
