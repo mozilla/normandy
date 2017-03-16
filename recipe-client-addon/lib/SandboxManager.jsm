@@ -65,6 +65,43 @@ this.SandboxManager = class {
       }
     });
   }
+
+  /**
+   * Wraps a function that returns a Promise from a privileged (e.g. chrome)
+   * context and returns a Promise from this SandboxManager's sandbox. Useful
+   * for exposing privileged functions to the sandbox, since the sandbox can't
+   * access properties on privileged objects, e.g. Promise.then on a privileged
+   * Promise.
+   * @param {Function} wrappedFunction
+   * @param {Object} [options]
+   * @param {boolean} [options.cloneInto=false]
+   *   If true, the value resolved by the privileged Promise is cloned into the
+   *   sandbox before being resolved by the sandbox Promise. Without this, the
+   *   result will be Xray-wrapped.
+   * @param {boolean} [options.cloneArguments=false]
+   *   If true, the arguments passed to wrappedFunction will be cloned into the
+   *   privileged chrome context. If wrappedFunction holds a reference to any of
+   *   its arguments, you will need this to avoid losing access to the arguments
+   *   when the sandbox they originate from is nuked.
+   * @return {Function}
+   */
+  wrapAsync(wrappedFunction, options = {cloneInto: false, cloneArguments: false}) {
+    return (...args) => new this.sandbox.Promise((resolve, reject) => {
+      if (options.cloneArguments) {
+        args = this.cloneInto(args, {});
+      }
+
+      wrappedFunction(...args).then(result => {
+        if (options.cloneInto) {
+          result = this.cloneInto(result);
+        }
+
+        resolve(result);
+      }, err => {
+        reject(new this.sandbox.Error(err.message, err.fileName, err.lineNumber));
+      });
+    });
+  }
 };
 
 

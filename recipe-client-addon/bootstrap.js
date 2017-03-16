@@ -87,6 +87,7 @@ this.shutdown = function(data, reason) {
     "lib/LogManager.jsm",
     "lib/NormandyApi.jsm",
     "lib/NormandyDriver.jsm",
+    "lib/PreferenceExperiments.jsm",
     "lib/RecipeRunner.jsm",
     "lib/Sampling.jsm",
     "lib/SandboxManager.jsm",

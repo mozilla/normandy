@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
-/* globals Components */
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
@@ -17,6 +16,8 @@ Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
+Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -143,6 +144,18 @@ this.NormandyDriver = function(sandboxManager) {
     clearTimeout(token) {
       clearTimeout(token);
       sandboxManager.removeHold(`setTimeout-${token}`);
+    },
+
+    // Sampling
+    bucketSample: sandboxManager.wrapAsync(Sampling.bucketSample),
+
+    // Preference Experiment API
+    preferenceExperiments: {
+      start: sandboxManager.wrapAsync(PreferenceExperiments.start, {cloneArguments: true}),
+      markLastSeen: sandboxManager.wrapAsync(PreferenceExperiments.markLastSeen),
+      stop: sandboxManager.wrapAsync(PreferenceExperiments.stop),
+      get: sandboxManager.wrapAsync(PreferenceExperiments.get, {cloneInto: true}),
+      has: sandboxManager.wrapAsync(PreferenceExperiments.has),
     },
   };
 };

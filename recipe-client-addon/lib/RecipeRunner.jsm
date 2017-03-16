@@ -151,9 +151,7 @@ this.RecipeRunner = {
       const prepScript = `
         function registerAction(name, Action) {
           let a = new Action(sandboxedDriver, sandboxedRecipe);
-          a.execute()
-            .then(actionFinished)
-            .catch(actionFailed);
+          a.execute().then(actionFinished, actionFailed);
         };
 
         this.window = this;
@@ -176,11 +174,11 @@ this.RecipeRunner = {
       sandboxManager.addGlobal("actionFailed", err => {
         Cu.reportError(err);
 
-        // Error objects can't be cloned, so we just copy the message
-        // (which doesn't need to be cloned) to be somewhat useful.
-        const message = err.message;
+        // Copy the error before calling `removeHold`, which will nuke
+        // the sandbox and break the wrapper around the error.
+        const {message, fileName, lineNumber} = err.message;
         sandboxManager.removeHold("recipeExecution");
-        reject(new Error(message));
+        reject(new Error(message, fileName, lineNumber));
       });
 
       sandboxManager.addHold("recipeExecution");
