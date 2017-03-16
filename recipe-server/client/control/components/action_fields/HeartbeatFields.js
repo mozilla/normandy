@@ -9,7 +9,8 @@ import ActionFields from 'control/components/action_fields/ActionFields';
  * Form fields for the show-heartbeat action.
  */
 export class HeartbeatFields extends ActionFields {
-  render({ recipeArguments }) {
+  render() {
+    const { recipeArguments } = this.props;
     return (
       <div className="arguments-fields">
         <p className="info">
