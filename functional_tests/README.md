@@ -8,4 +8,4 @@ See the [documentation][] for more info.
 
 [Selenium]: http://www.seleniumhq.org/
 [recipe server]: https://github.com/mozilla/normandy/tree/master/recipe-server
-[documentation]: http://normandy.readthedocs.io/en/latest/dev/mock-recipe-server.html
+[documentation]: https://normandy.readthedocs.io/en/latest/dev/functional-tests.html
