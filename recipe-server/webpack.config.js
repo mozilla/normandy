@@ -10,11 +10,14 @@ var childProcess = require('child_process');
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
 const production = process.env.NODE_ENV === 'production';
+const cssNamePattern = production ? '[name].[hash].css' : '[name].css';
+const jsNamePattern = production ? '[name].[hash].js' : '[name].js';
 
 var plugins = [
   new BundleTracker({ filename: './webpack-stats.json' }),
   new webpack.optimize.OccurrenceOrderPlugin(true),
-  new ExtractTextPlugin(production ? '[name]-[hash].css' : '[name].css'),
+  // Note: This matches Django's idea of what a hashed url looks like. Be careful when changing it!
+  new ExtractTextPlugin(cssNamePattern),
   new webpack.DefinePlugin({
     PRODUCTION: production,
     DEVELOPMENT: !production,
@@ -61,7 +64,7 @@ module.exports = [
 
     output: {
       path: path.resolve('./assets/bundles/'),
-      filename: production ? '[name]-[hash].js' : '[name].js',
+      filename: jsNamePattern,
       chunkFilename: '[id].bundle.js',
     },
     externals: {
@@ -144,7 +147,7 @@ module.exports = [
 
     output: {
       path: path.resolve('./assets/bundles/'),
-      filename: production ? '[name]-[hash].js' : '[name].js',
+      filename: jsNamePattern,
     },
 
     module: {

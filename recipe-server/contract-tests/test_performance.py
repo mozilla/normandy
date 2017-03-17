@@ -1,6 +1,9 @@
-import pytest
+from urllib.parse import urljoin
 
+import html5lib
+import pytest
 from pytest_testrail.plugin import testrail
+
 
 """These are paths hit by self repair that need to be very fast"""
 HOT_PATHS = [
@@ -46,3 +49,38 @@ class TestHotPaths(object):
         max_age_seconds = int(max_age.split('=')[1])
         assert 'public' in parts
         assert max_age_seconds > 0
+
+
+def test_static_cache_headers(conf, requests_session):
+    """Test that all scripts included from self-repair have long lived cache headers"""
+    req = requests_session.get(conf.getoption('server') + '/en-US/repair')
+    req.raise_for_status()
+    document = html5lib.parse(req.content, treebuilder='dom')
+    scripts = document.getElementsByTagName('script')
+    for script in scripts:
+        src = script.getAttribute('src')
+        url = urljoin(conf.getoption('server'), src)
+        script_req = requests_session.get(url)
+        script_req.raise_for_status()
+        cache_control = parse_cache_control(script_req.headers['cache-control'])
+        assert cache_control['public'], f'Cache-control: public for {url}'
+        ONE_YEAR = 31536000
+        assert cache_control['max-age'] >= ONE_YEAR, f'Cache-control: max-age > 1 year for {url}'
+        assert cache_control['immutable'], f'Cache-control: immutable for {url}'
+
+
+def parse_cache_control(header):
+    parsed = {}
+    parts = header.split(',')
+    for part in parts:
+        part = part.strip()
+        if '=' in part:
+            key, val = part.split('=', 1)
+            try:
+                val = int(val)
+            except ValueError:
+                pass
+            parsed[key] = val
+        else:
+            parsed[part] = True
+    return parsed
