@@ -96,7 +96,8 @@ class Core(Configuration):
         'DEFAULT_RENDERER_CLASSES': (
             'normandy.base.api.renderers.CanonicalJSONRenderer',
             'normandy.base.api.renderers.CustomBrowsableAPIRenderer',
-        )
+        ),
+        'EXCEPTION_HANDLER': 'normandy.base.api.views.exception_handler',
     }
 
     WEBPACK_LOADER = {

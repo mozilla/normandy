@@ -1,11 +1,13 @@
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 
-from rest_framework.compat import NoReverseMatch
+from rest_framework import status
+from rest_framework.compat import NoReverseMatch, set_rollback
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.views import APIView
+from rest_framework.views import APIView, exception_handler as original_exception_handler
 
 
 class APIRootView(APIView):
@@ -40,3 +42,25 @@ class APIRootView(APIView):
                 pass
 
         return Response(ret)
+
+
+def exception_handler(exc, context):
+    """
+    Returns the response that should be used for any given exception.
+
+    Adds support the DRF default to also handle django.core.exceptions.ValidationError
+
+    Any unhandled exceptions may return `None`, which will cause a 500 error
+    to be raised.
+    """
+    response = original_exception_handler(exc, context)
+
+    if response:
+        return response
+
+    elif isinstance(exc, DjangoValidationError):
+        data = {'messages': exc.messages}
+        set_rollback()
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    return None
