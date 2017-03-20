@@ -28,6 +28,7 @@ class Core(Configuration):
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
+        'whitenoise.runserver_nostatic',
         'django.contrib.staticfiles',
     ]
 
@@ -37,6 +38,7 @@ class Core(Configuration):
         'normandy.base.middleware.request_received_at_middleware',
         'normandy.base.middleware.RequestSummaryLogger',
         'django.middleware.security.SecurityMiddleware',
+        'normandy.base.middleware.NormandyWhiteNoiseMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'csp.middleware.CSPMiddleware',
@@ -71,7 +73,6 @@ class Core(Configuration):
     USE_TZ = True
 
     # Static files (CSS, JavaScript, Images)
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -185,7 +186,7 @@ class Base(Core):
     def LOGGING(self):
         return {
             'version': 1,
-            'disable_existing_loggers': True,
+            'disable_existing_loggers': False,
             'formatters': {
                 'json': {
                     '()': 'mozilla_cloud_services_logger.formatters.JsonLogFormatter',

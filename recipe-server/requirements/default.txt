@@ -109,11 +109,14 @@ sphinxcontrib-httpdomain==1.4.0 \
 statsd==3.2.1 \
     --hash=sha256:7aff40c6cdda703193fac6231410c6c0ad5939ce053a168016501e982c755c84 \
     --hash=sha256:3fa92bf0192af926f7a0d9be031fe3fd0fbaa1992d42cf2f07e68f76ac18288e
-whitenoise==2.0.6 \
-    --hash=sha256:826ffe5d608c9dc8daebef1b0b43d01f7958f17c2fce36e75c80e26160172c4f \
-    --hash=sha256:5aea935dfc09ef2beeb76960b4a808b0bbe65e85fb0b0312434b9c365ca02a41
+whitenoise==3.3.0 \
+    --hash=sha256:1d62a003a0ab747de96da45c831cbb512dcb7f69c1ef0bd20b1cd4ae45d8a0c4 \
+    --hash=sha256:d098327276de6fd189398a7bcb95789d1bb2d41b3e011eeae4562f6b1a107dd4
 newrelic==2.78.0.57 \
     --hash=sha256:2191b7699e14a07efa5d9221270eb29bdf6cce643aa56cff08546ecb3f729be6
 django-csp==3.2 \
     --hash=sha256:7cec78ba7c426deba6d4bea188dcfc1a8b2609ad98dd539c365605c9ec2996b2 \
     --hash=sha256:fb56c0126b4e69f854fd1581a4bef25fa7cac1f10235e95f697e297ceef88132
+html5lib==1.0b10 \
+    --hash=sha256:08a3efc117a4fc8c82c3c6d10d6f58ae266428d57ed50258a1466d2cd88de745 \
+    --hash=sha256:0d5fd54d5b2b79b876007a70c033a4023577768d18022c15681c00561432a0f9
