@@ -88,7 +88,7 @@ this.SandboxManager = class {
   wrapAsync(wrappedFunction, options = {cloneInto: false, cloneArguments: false}) {
     return (...args) => new this.sandbox.Promise((resolve, reject) => {
       if (options.cloneArguments) {
-        args = this.cloneInto(args, {});
+        args = Cu.cloneInto(args, {});
       }
 
       wrappedFunction(...args).then(result => {

@@ -75,6 +75,26 @@ CleanupManager.addCleanupHandler(() => PreferenceExperiments.stopAllObservers())
 
 this.PreferenceExperiments = {
   /**
+   * Test wrapper that temporarily replaces the stored experiment data with fake
+   * data for testing.
+   */
+  withMockExperiments(testGenerator) {
+    return function* inner(...args) {
+      const oldPromise = storePromise;
+      const mockExperiments = {};
+      storePromise = Promise.resolve({
+        data: mockExperiments,
+        saveSoon() { },
+      });
+      try {
+        yield testGenerator(...args, mockExperiments);
+      } finally {
+        storePromise = oldPromise;
+      }
+    };
+  },
+
+  /**
    * Clear all stored data about active and past experiments.
    */
   async clearAllExperimentStorage() {
