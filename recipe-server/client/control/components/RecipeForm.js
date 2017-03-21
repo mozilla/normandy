@@ -230,14 +230,6 @@ export const formConfig = {
     ]);
     const isCloning = route && route.isCloning;
 
-    // Some values may be strings but the API requires arrays
-    ['locales', 'countries', 'channels'].forEach(key => {
-      if (typeof recipe[key] === 'string') {
-        recipe[key] = recipe[key].split(',');
-      }
-    });
-
-
     let result;
     if (recipeId && !isCloning) {
       result = updateRecipe(recipeId, recipe);

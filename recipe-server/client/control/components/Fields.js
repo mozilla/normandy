@@ -50,20 +50,28 @@ buildControlField.propTypes = {
   children: pt.node,
 };
 
+export const CheckboxGroup = ({ name, onChange, options = [], value }) => {
+  /**
+   * Checkbox change event handler. Appends or removes the selected checkbox's
+   * value to the existing `value` prop, and reports the change up to redux-form.
+   *
+   * @param  {Event} onChange event object
+   */
+  const handleChange = ({ event: target }) => {
+    if (target.checked) {
+      // Use Set to remove any dupes from the new value array
+      const newValue = new Set(value.concat([target.value]));
+      // Report an array up to redux-form
+      onChange(Array.from(newValue));
+    } else {
+      // Remove this target's value from the array of values and return that array
+      onChange(value.filter(val => val !== target.value));
+    }
+  };
 
-export const CheckboxGroup = ({ name, options = [], value, onChange }) => {
-  const handleChange = option =>
-    event => {
-      const newValue = [...value];
-      if (event.target.checked) {
-        newValue.push(option.value);
-      } else {
-        newValue.splice(newValue.indexOf(option.value), 1);
-      }
-
-      return onChange(newValue);
-    };
-
+  /**
+   * Render the full list of inputs
+   */
   return (
     <div>
       {
@@ -71,13 +79,14 @@ export const CheckboxGroup = ({ name, options = [], value, onChange }) => {
           <label className="checkbox" key={index}>
             <input
               type="checkbox"
-              name={`${name}[${index}]`}
+              name={name}
               value={option.value}
               checked={value.includes(option.value)}
-              onChange={handleChange(option)}
+              onChange={handleChange}
             />
-            {option.label}
-          </label>)
+            <span>{option.label}</span>
+          </label>
+        )
       }
     </div>
   );

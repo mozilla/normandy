@@ -22,23 +22,14 @@ class PickerControl extends React.Component {
     this.state = {
       // `filterText` is the user-inputted string to filter the list options by
       filterText: '',
-      // `selected` is the existing options that the user currently has
-      selected: [],
+      // `focused` is the existing options that the user currently has
+      focused: [],
     };
     this.handleTextChange = ::this.handleTextChange;
     this.handleSelectUpdate = ::this.handleSelectUpdate;
     this.handleConfirmation = ::this.handleConfirmation;
-    this.handleRef = ::this.handleRef;
     this.renderSelectOption = ::this.renderSelectOption;
-  }
-
-  /**
-   * Collect and return an array of selected values for this PickerControl.
-   *
-   * @return {Array<string>}    Array of selected option values
-   */
-  getCurrentSelection() {
-    return Array.from(this.selectRef.selectedOptions).map(option => option.value).filter(x => x);
+    this.handleRefMount = ::this.handleRefMount;
   }
 
   /**
@@ -51,24 +42,16 @@ class PickerControl extends React.Component {
    * @return {Array<Object>}  Array of available options that meet search criteria
    */
   getFilteredOptions(options, search) {
-    let newOptions = [].concat(options);
-
-    // There may not even be a search, so check that first.
     if (search) {
       // Lowercase-ify the search value to remove case sensitivity
       const filterValue = search.toLowerCase();
 
-      // For each option, create a string value to search over, and then determine
-      // if that value contains our search text.
-      newOptions = newOptions.filter(({ value, label }) => {
-        const searchValues = [value, label].join('   ').toLowerCase();
-        return searchValues.indexOf(filterValue) > -1;
-      });
+      // Determine if selected option properties contain the filterValue.
+      return options.filter(({ value, label }) =>
+        [value, label].find(str => str.toLowerCase().indexOf(filterValue) > -1));
     }
 
-    // newOptions will either be existing options, or filtered options (if search
-    // text exists)
-    return newOptions;
+    return options;
   }
 
   /**
@@ -79,25 +62,28 @@ class PickerControl extends React.Component {
    * @return {String} Comma-separated string of selected option values
    */
   handleConfirmation() {
-    this.props.onSubmit(this.getCurrentSelection());
+    this.props.onSubmit(this.state.focused);
 
     // Clear the internal selection memory
     this.setState({
-      selected: [],
+      focused: [],
     });
 
     // Clear user selection (otherwise it will remain in place, even after list
     // children are added/removed)
-    this.selectRef.value = null;
+    this.selectedRef.value = null;
   }
 
   /**
-   * Updates internal `selected` state with currently selected options, which is
-   * later used for things such as disabling the submit button.
+   * Updates internal `focused` state with currently focused options, which is
+   * used later when 'submitting' the selection.
    */
-  handleSelectUpdate() {
+  handleSelectUpdate(evt) {
+    // Convert selected options to an array of string values.
+    const focused = Array.prototype.slice.call(evt.target.selectedOptions).map(opt => opt.value);
+
     this.setState({
-      selected: this.getCurrentSelection(),
+      focused,
     });
   }
 
@@ -119,7 +105,7 @@ class PickerControl extends React.Component {
    *
    * @param  {Element} ref  Element for this <select>
    */
-  handleRef(ref) {
+  handleRefMount(ref) {
     this.selectedRef = ref;
   }
 
@@ -169,7 +155,7 @@ class PickerControl extends React.Component {
   render() {
     const {
       filterText,
-      selected,
+      focused,
     } = this.state;
 
     const {
@@ -194,7 +180,7 @@ class PickerControl extends React.Component {
         />
 
         <select
-          ref={this.handleRef}
+          ref={this.handleRefMount}
           onChange={this.handleSelectUpdate}
           multiple
         >
@@ -203,7 +189,7 @@ class PickerControl extends React.Component {
         </select>
 
         <button
-          disabled={selected.length <= 0}
+          disabled={focused.length <= 0}
           type="button"
           onClick={this.handleConfirmation}
         >
@@ -249,17 +235,14 @@ export default class MultiPicker extends React.Component {
       value = [],
     } = this.props;
 
-    // A redux-form value can be a string or an array, but we want an array.
-    const valueArray = typeof value === 'string' ? value.split(', ') : value;
-
     // Get a set of unique selected values from existing values and those coming in
-    const uniqueSelections = new Set(valueArray.concat(selection));
+    const uniqueSelections = new Set(value.concat(selection));
 
     // Convert the Set of unique values into an array.
     const newEnabled = Array.from(uniqueSelections);
 
     // Send that value to redux-form.
-    this.props.onChange(newEnabled.join(', '));
+    this.props.onChange(newEnabled);
   }
 
   /**
@@ -275,14 +258,11 @@ export default class MultiPicker extends React.Component {
       value = [],
     } = this.props;
 
-    // A redux-form value can be a string or an array, but we want an array.
-    const valueArray = typeof value === 'string' ? value.split(', ') : value;
-
     // New enabled selections will be those remaining after filtering de-selections.
-    const newEnabled = valueArray.filter(val => selection.indexOf(val) === -1);
+    const newEnabled = value.filter(val => selection.indexOf(val) === -1);
 
     // Send that value to redux-form.
-    this.props.onChange(newEnabled.join(', '));
+    this.props.onChange(newEnabled);
   }
 
   /**
