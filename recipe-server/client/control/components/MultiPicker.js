@@ -1,5 +1,4 @@
 import React, { PropTypes as pt } from 'react';
-import { propTypes as reduxFormPropTypes } from 'redux-form';
 import cx from 'classnames';
 
 /**
@@ -209,9 +208,9 @@ class PickerControl extends React.Component {
 export default class MultiPicker extends React.Component {
   static propTypes = {
     unit: pt.string.isRequired,
+    onChange: pt.func.isRequired,
     options: pt.array,
-    value: reduxFormPropTypes.value,
-    onChange: reduxFormPropTypes.onChange,
+    value: pt.arrayOf(pt.string),
   };
 
   constructor(props) {
