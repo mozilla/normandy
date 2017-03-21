@@ -15,7 +15,15 @@ Prerequisites
 
 Generating Files
 ----------------
-1. Run the ``runtests.sh`` file, passing in the path where you wish to save the
+1. Build the functional test Docker container:
+
+   .. code-block:: bash
+
+      # From the root of the repo
+      cd functional_tests
+      docker build -t mozilla/normandy-functional-tests:latest .
+
+2. Run the ``runtests.sh`` file, passing in the path where you wish to save the
    XML test report, and the path you wish to save the HTML test results:
 
    .. code-block:: bash
