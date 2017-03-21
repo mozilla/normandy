@@ -114,7 +114,7 @@ this.PreferenceExperiments = {
    *   for the given preference is active.
    */
   async start(experimentName, branch, preferenceName, preferenceValue) {
-    log.debug(`PreferenceExperiments.start(${experimentName})`);
+    log.debug(`PreferenceExperiments.start(${experimentName}, ${branch})`);
 
     const store = await loadStorage();
     if (experimentName in store.data) {
