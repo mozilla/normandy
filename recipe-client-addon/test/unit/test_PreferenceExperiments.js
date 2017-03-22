@@ -62,17 +62,17 @@ add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPre
     "start registered an observer",
   );
 
-  const experiment = experiments["test"];
-  equal(experiment.name, "test", "start saved the experiment name");
-  equal(experiment.branch, "branch", "start saved the experiment branch");
-  equal(experiment.expired, false, "start saved the expired status");
-  equal(experiment.preferenceName, "fake.preference", "start saved the preference name");
-  equal(experiment.preferenceValue, "newvalue", "start saved the preference value");
-  equal(
-    experiment.previousPreferenceValue,
-    "oldvalue",
-    "start saved the previous preference value",
-  );
+  const expectedExperiment = {
+    name: "test",
+    branch: "branch",
+    expired: false,
+    preferenceName: "fake.preference",
+    preferenceValue: "newvalue",
+    previousPreferenceValue: "oldvalue",
+  };
+  const experiment = {};
+  Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
+  deepEqual(experiment, expectedExperiment, "start saved the experiment");
 
   equal(Preferences.get("fake.preference"), "newvalue", "start modified the preference");
 

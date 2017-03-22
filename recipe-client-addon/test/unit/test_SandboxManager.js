@@ -20,7 +20,7 @@ add_task(function* () {
   // Assertion helpers
   manager.addGlobal("ok", ok);
 
-  const wrappedResult = yield new Promise(resolve => {
+  const sandboxResult = yield new Promise(resolve => {
     manager.addGlobal("resolve", result => resolve(result));
     manager.evalInSandbox(`
       // Unwrapped privileged promises are not accessible in the sandbox
@@ -38,7 +38,7 @@ add_task(function* () {
       wrappedResult.then(resolve);
     `);
   });
-  equal(wrappedResult, "wrapped", "wrapAsync methods return Promises that work in the sandbox");
+  equal(sandboxResult, "wrapped", "wrapAsync methods return Promises that work in the sandbox");
 
   manager.removeHold("testing");
 });

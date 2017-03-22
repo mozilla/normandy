@@ -11,7 +11,7 @@ export default class PreferenceExperimentAction extends Action {
     // to call `then` on Promises from a privileged context. I'm not entirely
     // sure why, but it works fine if we use Promises directly.
     //
-    // Once we remove self-repair support, we should be save to use native
+    // Once we remove self-repair support, we should be able to use native
     // async/await anyway, which solves the issue.
     const { slug, preferenceName, branches } = this.recipe.arguments;
     const experiments = this.normandy.preferenceExperiments;

@@ -132,8 +132,8 @@ this.Sampling = {
   }),
 
   /**
-   * Sample over a list of ratios such that, over time, each ratio has a number
-   * of matches in correct proportion to the other ratios.
+   * Sample over a list of ratios such that, over the input space, each ratio
+   * has a number of matches in correct proportion to the other ratios.
    *
    * @param {object} input
    * @param {Array<integer>} ratios
@@ -148,7 +148,7 @@ this.Sampling = {
     }
 
     const inputHash = yield Sampling.truncatedHash(input);
-    const ratioTotal = ratios.reduce((acc, ratio) => acc + ratio, 0);
+    const ratioTotal = ratios.reduce((acc, ratio) => acc + ratio);
 
     let samplePoint = 0;
     for (let k = 0; k < ratios.length - 1; k++) {

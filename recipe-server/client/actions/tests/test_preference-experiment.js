@@ -1,7 +1,7 @@
 import PreferenceExperimentAction from '../preference-experiment/';
 import { recipeFactory } from '../../tests/utils.js';
 
-function preferenceExperimentFactory({ ...args }) {
+function preferenceExperimentFactory(args) {
   return recipeFactory({
     arguments: {
       slug: 'test',
