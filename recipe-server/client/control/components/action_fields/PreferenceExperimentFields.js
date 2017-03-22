@@ -1,5 +1,5 @@
 import React, { PropTypes as pt } from 'react';
-import { FieldArray, propTypes as reduxFormPropTypes } from 'redux-form';
+import { FieldArray } from 'redux-form';
 import { connect } from 'react-redux';
 
 import {
@@ -68,71 +68,104 @@ export default class PreferenceExperimentFields extends ActionFields {
           label="Sample of Total Population (out of 100,000 buckets)"
           name="arguments.bucketCount"
         />
-        <FieldArray name="arguments.branches" component={renderBranches} />
+        <FieldArray name="arguments.branches" component={PreferenceBranches} />
       </div>
     );
   }
 }
 
-export function renderBranches({ fields }) {
-  return (
-    <div>
-      <h4 className="branch-header">Experiment Branches</h4>
-      <ul className="branch-list">
-        {fields.map((branch, index) => (
-          <li key={index} className="branch">
-            <ConnectedBranchFields
-              branch={branch}
-              onClickDelete={() => fields.remove(index)}
-            />
-          </li>
-        ))}
-        <li>
-          <a
-            className="button"
-            onClick={() => fields.push(Object.assign({}, DEFAULT_BRANCH_VALUES))}
-          >
-            <i className="fa fa-plus pre" />
-            Add Branch
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
-}
-renderBranches.propTypes = {
-  fields: reduxFormPropTypes.array,
-};
+export class PreferenceBranches extends React.Component {
+  static propTypes = {
+    fields: pt.object.isRequired,
+  }
 
-export function BranchFields({ branch, onClickDelete, preferenceType = 'boolean' }) {
-  const ValueField = VALUE_FIELDS[preferenceType];
-  return (
-    <div className="branch-fields">
-      <ControlField
-        label="Branch Slug"
-        name={`${branch}.slug`}
-        component="input"
-        type="text"
-      />
-      <ValueField name={`${branch}.value`} />
-      <IntegerControlField
-        label="Ratio"
-        name={`${branch}.ratio`}
-      />
-      <div className="remove-branch">
-        <a className="button delete" onClick={onClickDelete}>
-          <i className="fa fa-times pre" />
-          Remove Branch
-        </a>
+  constructor(props) {
+    super(props);
+    this.handleClickDelete = ::this.handleClickDelete;
+    this.handleClickAdd = ::this.handleClickAdd;
+  }
+
+  handleClickDelete(index) {
+    this.props.fields.remove(index);
+  }
+
+  handleClickAdd() {
+    this.props.fields.push({ ...DEFAULT_BRANCH_VALUES });
+  }
+
+  render() {
+    const { fields } = this.props;
+    return (
+      <div>
+        <h4 className="branch-header">Experiment Branches</h4>
+        <ul className="branch-list">
+          {fields.map((branch, index) => (
+            <li key={index} className="branch">
+              <ConnectedBranchFields
+                branch={branch}
+                index={index}
+                onClickDelete={this.handleClickDelete}
+              />
+            </li>
+          ))}
+          <li>
+            <a
+              className="button"
+              onClick={this.handleClickAdd}
+            >
+              <i className="fa fa-plus pre" />
+              Add Branch
+            </a>
+          </li>
+        </ul>
       </div>
-    </div>
-  );
+    );
+  }
 }
-BranchFields.propTypes = {
-  branch: pt.string.required,
-  onClickDelete: pt.func.required,
-  preferenceType: pt.string.required,
-};
+
+export class BranchFields extends React.Component {
+  static propTypes = {
+    branch: pt.string.isRequired,
+    onClickDelete: pt.func.isRequired,
+    preferenceType: pt.string.isRequired,
+    index: pt.number.isRequired,
+  }
+
+  constructor(props) {
+    super(props);
+    this.handleClickDelete = ::this.handleClickDelete;
+  }
+
+  handleClickDelete() {
+    this.props.onClickDelete(this.props.index);
+  }
+
+  render() {
+    const { branch, preferenceType = 'boolean' } = this.props;
+    const ValueField = VALUE_FIELDS[preferenceType];
+    return (
+      <div className="branch-fields">
+        <ControlField
+          label="Branch Slug"
+          name={`${branch}.slug`}
+          component="input"
+          type="text"
+        />
+        <ValueField name={`${branch}.value`} />
+        <IntegerControlField
+          label="Ratio"
+          name={`${branch}.ratio`}
+        />
+        <div className="remove-branch">
+          <a className="button delete" onClick={this.handleClickDelete}>
+            <i className="fa fa-times pre" />
+            Remove Branch
+          </a>
+        </div>
+      </div>
+    );
+  }
+}
 
 export const ConnectedBranchFields = connect(
   state => ({

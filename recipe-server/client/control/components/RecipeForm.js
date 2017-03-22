@@ -229,15 +229,12 @@ export function initialValuesWrapper(Component) {
 
     // If we still don't have initial values, roll with the defaults.
     if (!initialValues) {
-      initialValues = { ...DEFAULT_FORM_VALUES };
+      initialValues = { ...DEFAULT_FORM_VALUES, arguments: {} };
 
       // ActionField subclasses define their own initial values.
       if (selectedAction) {
         const ActionFields = RecipeForm.argumentsFields[selectedAction];
         initialValues.arguments = { ...ActionFields.initialValues };
-      } else {
-        // DEFAULT_FORM_VALUES wouldn't copy this, so we add it here instead.
-        initialValues.arguments = {};
       }
     }
 
