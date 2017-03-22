@@ -313,6 +313,21 @@ class TestRecipeAPI(object):
         assert res.status_code == 200
         assert [r['id'] for r in res.data] == [r1.id]
 
+    def test_filtering_by_enabled_fuzz(self, api_client):
+        """
+        Test that we don't return 500 responses when we get unexpected boolean filters.
+
+        This was a real case that showed up in our error logging.
+        """
+        url = "/api/v1/recipe/?enabled=javascript%3a%2f*<%2fscript><svg%2fonload%3d'%2b%2f'%2f%2b"
+        res = api_client.get(url)
+        assert res.status_code == 400
+        assert res.data == {
+            'messages': [
+                "'javascript:/*</script><svg/onload='+/'/+' value must be either True or False.",
+            ],
+        }
+
     def test_list_view_includes_cache_headers(self, api_client):
         res = api_client.get('/api/v1/recipe/')
         assert res.status_code == 200
