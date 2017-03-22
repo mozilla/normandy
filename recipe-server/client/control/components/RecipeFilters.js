@@ -128,7 +128,7 @@ export class RecipeFilters extends React.Component {
     return (
       <div className="fluid-8">
         <div id="secondary-header" className="fluid-8">
-          <div className="header-search" className="fluid-2">
+          <div className="header-search fluid-2">
             <RecipeCombobox
               onFilterSelect={this.handleAddFilter}
               availableFilters={availableFilters}
