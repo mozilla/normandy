@@ -141,8 +141,12 @@
     text-align: center;
   }
 
-  & > .form-field {
+  .form-field {
     margin: 0 0 1em;
+  }
+
+  /* Only top-level form-fields should be half-width */
+  & > .form-field {
     position: relative;
     width: 50%;
   }
@@ -151,15 +155,36 @@
     color: $red;
     display: block;
     padding-bottom: 5px;
+    text-transform: uppercase;
   }
 
-  /* Checkbox inputs should appear to the left of the label. */
-  .checkbox-field {
+  /* A group of related fields, generally for things like radio buttons. */
+  .fieldset {
+    @extend .form-field;
+
+    border: none;
+
+    .fieldset-label {
+      @extend .label;
+    }
+
+    /* Checkbox/radio fields within fieldsets should be inline in a row. */
+    .checkbox-field,
+    .radio-field {
+      display: inline-flex;
+      margin-right: 1.5em;
+    }
+  }
+
+  /* Checkbox/radio inputs should appear to the left of the label. */
+  .checkbox-field,
+  .radio-field {
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
 
-    input[type="checkbox"] {
+    input[type="checkbox"],
+    input[type="radio"] {
       flex: 0;
       margin: 6px 6px 6px 0;
     }
@@ -211,6 +236,43 @@
     color: $darkBrown;
     margin: 0 0 1em;
     width: 50%;
+  }
+}
+
+/* Preference Experiment Forms */
+.branch-header {
+  margin: 15px 0;
+}
+
+.branch-list {
+  list-style-type: none;
+
+  .branch {
+    background: $darkCream;
+    margin: 0 0 15px;
+    padding: 15px;
+  }
+
+  .branch-fields {
+    display: flex;
+    flex-direction: row;
+    margin: -15px;
+
+    & > * {
+      flex: 2;
+      margin: 15px;
+    }
+  }
+
+  .remove-branch {
+    flex: 1;
+    padding-top: 26px; /* Empty label gap */
+
+    .button {
+      display: block;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   }
 }
 

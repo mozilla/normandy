@@ -116,6 +116,7 @@ module.exports = [
     entry: {
       'console-log': './client/actions/console-log/index',
       'show-heartbeat': './client/actions/show-heartbeat/index',
+      'preference-experiment': './client/actions/preference-experiment/index',
     },
 
     plugins: [
