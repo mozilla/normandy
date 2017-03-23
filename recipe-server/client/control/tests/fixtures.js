@@ -1,7 +1,25 @@
 export const fixtureRecipes = [
-  { id: 1, name: 'Lorem Ipsum', enabled: true, revision_id: 'abc', approval_request: null },
-  { id: 2, name: 'Dolor set amet', enabled: true, revision_id: 'def', approval_request: null },
-  { id: 3, name: 'Consequitar adipscing', enabled: false, revision_id: 'ghi', approval_request: null },
+  {
+    id: 1,
+    name: 'Lorem Ipsum',
+    enabled: true,
+    revision_id: 'abc',
+    approval_request: null,
+  },
+  {
+    id: 2,
+    name: 'Dolor set amet',
+    enabled: true,
+    revision_id: 'def',
+    approval_request: null,
+  },
+  {
+    id: 3,
+    name: 'Consequitar adipscing',
+    enabled: false,
+    revision_id: 'ghi',
+    approval_request: null,
+  },
 ];
 
 export const fixtureRecipeDict = {};
