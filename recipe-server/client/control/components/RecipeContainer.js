@@ -62,7 +62,7 @@ export class RecipeContainer extends React.Component {
 
     dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
       .then(revisions => {
-        dispatch(setSelectedRevision(revisionId || revisions[0].id));
+        dispatch(setSelectedRevision(revisionId));
 
         dispatch(revisionsReceived({
           recipeId,

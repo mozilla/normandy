@@ -158,7 +158,7 @@ export default class RecipeFormActions extends React.Component {
           />
         }
       >
-        <div>
+        <div className="approve-dropdown">
           Add a review comment
           <textarea
             defaultValue={this.state.comment.approve}
@@ -192,7 +192,7 @@ export default class RecipeFormActions extends React.Component {
           />
         }
       >
-        <div>
+        <div className="reject-dropdown">
           Add a review comment
           <textarea
             defaultValue={this.state.comment.reject}

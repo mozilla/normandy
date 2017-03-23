@@ -71,7 +71,9 @@ function recipesReducer(state = initialState, action) {
           [action.recipe.id]: {
             ...state.revisions[action.recipe.id],
             [action.recipe.revision_id]: {
-              ...action.recipe,
+              approval_request: action.recipe.approval_request,
+              id: action.recipe.revision_id,
+              recipe: action.recipe,
             },
           },
         },
@@ -86,7 +88,7 @@ function recipesReducer(state = initialState, action) {
           [action.revision.recipe.id]: {
             ...state.revisions[action.revision.recipe.id],
             [action.revision.id]: {
-              ...action.revision.recipe,
+              ...action.revision,
             },
           },
         },

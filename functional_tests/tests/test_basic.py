@@ -6,10 +6,10 @@ class LoginPage(Page):
     username = FormField('#id_username')
     password = FormField('#id_password')
 
-    def login(self):
+    def login(self, username=None, password=None):
         self.wait_for_element('form')
-        self.username = 'admin'
-        self.password = 'asdfqwer'
+        self.username = username or 'user1'
+        self.password = password or 'testpass'
         self.password.submit()
 
 
@@ -25,6 +25,15 @@ class RecipeFormPage(Page):
     extra_filter_expression = FormField('[name="extra_filter_expression"]')
     action = SelectField('select[name="action"]')
     delete_button = Element('a.action-delete')
+    request_approval_button = Element('.action-request')
+    approve_button = Element('.action-approve')
+    reject_button = Element('.action-reject')
+    approve_comment = FormField('.approve-dropdown textarea')
+    reject_comment = FormField('.reject-dropdown textarea')
+    approve_confirm_button = Element('.approve-dropdown .mini-button')
+    reject_confirm_button = Element('.reject-dropdown .mini-button')
+    approved_status_indicator = Element('.status-indicator.approved')
+    rejected_status_indicator = Element('.status-indicator.rejected')
 
 
 class ConsoleLogFormPage(RecipeFormPage):
@@ -163,3 +172,106 @@ def test_create_recipe_show_heartbeat(selenium):
 
     recipe_list_page.wait_for_element('recipe_list')
     assert len(recipe_list_page.recipe_rows) == 0
+
+
+class TestPeerApproval():
+    def _setup(self, selenium):
+        """Test creating a recipe, requesting approval and granting approval."""
+        # Load control interface, expect login redirect.
+        selenium.get('http://normandy:8000/control/')
+        assert '/control/login' in selenium.current_url
+        LoginPage(selenium).login()
+
+        # Check for empty recipe listing
+        self.recipe_list_page = RecipeListPage(selenium)
+        self.recipe_list_page.wait_for_element('recipe_list')
+        assert len(self.recipe_list_page.recipe_rows) == 0
+
+        # Load new recipe page
+        self.recipe_list_page.new_recipe_button.click()
+        self.form_page = ConsoleLogFormPage(selenium)
+        self.form_page.wait_for_element('form')
+
+        # Fill out form
+        self.form_page.name = 'Approve-This-Recipe'
+        self.form_page.extra_filter_expression = 'true'
+        self.form_page.action.select_by_value('console-log')
+        self.form_page.wait_for_element('message')
+        self.form_page.message = 'Test Message'
+        self.form_page.form.submit()
+
+        # Wait until we navigate away from the new recipe page
+        wait_for(selenium, lambda driver: '/control/recipe/new/' not in driver.current_url)
+
+        # Check that the recipe list is updated
+        selenium.get('http://normandy:8000/control/')
+        assert len(self.recipe_list_page.recipe_rows) == 1
+        columns = self.recipe_list_page.recipe_rows[0].find_elements_by_tag_name('td')
+        assert columns[0].text == 'Approve-This-Recipe'
+
+        # Request approval for the recipe we created
+        self.recipe_list_page.recipe_rows[0].click()
+        self.form_page.wait_for_element('form')
+        self.form_page.wait_for_element('request_approval_button')
+        self.form_page.request_approval_button.click()
+
+        # Check that the approval request was created
+        self.form_page.wait_for_element('approve_button')
+        assert self.form_page.approve_button
+
+        # Logout and then login as another user
+        selenium.get('http://normandy:8000/control/logout/')
+        selenium.get('http://normandy:8000/control/')
+        assert '/control/login' in selenium.current_url
+        LoginPage(selenium).login(username='user2')
+
+        # Go to the recipe details page
+        self.recipe_list_page.wait_for_element('recipe_list')
+        self.recipe_list_page.recipe_rows[0].click()
+
+    def _teardown(self, selenium):
+        # Delete the recipe we created
+        selenium.get('http://normandy:8000/control/')
+        self.recipe_list_page.recipe_rows[0].click()
+        self.form_page.wait_for_element('delete_button')
+        self.form_page.delete_button.click()
+
+        recipe_delete_page = RecipeDeletePage(selenium)
+        recipe_delete_page.wait_for_element('form')
+        recipe_delete_page.wait_for_element('confirm_button')
+        recipe_delete_page.confirm_button.click()
+
+        self.recipe_list_page.wait_for_element('recipe_list')
+        assert len(self.recipe_list_page.recipe_rows) == 0
+
+    def test_approve(self, selenium):
+        self._setup(selenium)
+
+        # Approve the recipe
+        self.form_page.wait_for_element('approve_button')
+        self.form_page.approve_button.click()
+        self.form_page.wait_for_element('approve_confirm_button')
+        self.form_page.approve_comment = 'r+'
+        self.form_page.approve_confirm_button.click()
+
+        # Ensure the recipe was approved
+        self.form_page.wait_for_element('approved_status_indicator')
+        assert self.form_page.approved_status_indicator
+
+        self._teardown(selenium)
+
+    def test_reject(self, selenium):
+        self._setup(selenium)
+
+        # Reject the recipe
+        self.form_page.wait_for_element('reject_button')
+        self.form_page.reject_button.click()
+        self.form_page.wait_for_element('reject_confirm_button')
+        self.form_page.reject_comment = 'r-'
+        self.form_page.reject_confirm_button.click()
+
+        # Ensure the recipe was rejected
+        self.form_page.wait_for_element('rejected_status_indicator')
+        assert self.form_page.rejected_status_indicator
+
+        self._teardown(selenium)

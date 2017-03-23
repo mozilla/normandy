@@ -17,6 +17,7 @@ import {
   recipeUpdated,
   recipeAdded,
   setSelectedRecipe,
+  singleRecipeReceived,
   revisionsReceived,
 } from 'control/actions/RecipeActions';
 
@@ -203,52 +204,76 @@ export class RecipeForm extends React.Component {
       dispatch,
     } = this.props;
 
-    // Form actions follow the same pattern: call api, show success message, update
-    // history. This is just an abstracted handler to keep things DRY.
-    const handleAction = ({ apiEndpoint, successMessage, ...apiData }) =>
-      dispatch(makeApiRequest(apiEndpoint), apiData || {})
-        .then(() => {
-          dispatch(showNotification({
-            messageType: 'success',
-            message: successMessage,
-          }));
-
-          this.getRecipeHistory(recipe.id);
-        });
-
     switch (action) {
       case 'cancel':
-        return handleAction({
-          apiEndpoint: 'closeApprovalRequest',
-          successMessage: 'Approval review closed.',
-          // Request data
-          requestId: revision.approval_request.id,
+        return dispatch(makeApiRequest('closeApprovalRequest', {
+          requestId: recipe.approval_request.id,
+        })).then(() => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Approval request closed.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: null,
+          }));
         });
 
       case 'approve':
-        return handleAction({
-          apiEndpoint: 'acceptApprovalRequest',
-          successMessage: 'Recipe review successfully approved!',
-          // Request data
-          requestId: revision.approval_request.id,
+        return dispatch(makeApiRequest('approveApprovalRequest', {
+          requestId: recipe.approval_request.id,
           ...data,
+        })).then(updatedRequest => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Revision was approved.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            is_approved: true,
+            approved_revision_id: revision.revision_id,
+            approval_request: updatedRequest,
+          }));
         });
 
       case 'reject':
-        return handleAction({
-          apiEndpoint: 'rejectApprovalRequest',
-          successMessage: 'Recipe review successfully rejected.',
-          // Request data
-          requestId: revision.approval_request.id,
+        return dispatch(makeApiRequest('rejectApprovalRequest', {
+          requestId: recipe.approval_request.id,
           ...data,
+        })).then(updatedRequest => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Revision was rejected.',
+          }));
+          // update approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            is_approved: false,
+            approval_request: updatedRequest,
+          }));
         });
 
       case 'request':
-        return handleAction({
-          apiEndpoint: 'openApprovalRequest',
-          successMessage: 'Approval review requested!',
-          // Request data
-          revisionId: revision.revision_id,
+        return dispatch(makeApiRequest('openApprovalRequest', {
+          revisionId: recipe.revision_id,
+        })).then(response => {
+          // show success message
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Approval requested.',
+          }));
+          // patch existing recipe with new approval_request
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: {
+              ...response,
+            },
+          }));
         });
 
       default:
