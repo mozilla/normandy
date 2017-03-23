@@ -100,7 +100,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_extra_filter_expression(self, value):
         jexl = JEXL()
 
-        # Add mock transforms for validation
+        # Add mock transforms for validation. See
+        # http://normandy.readthedocs.io/en/latest/user/filter_expressions.html#transforms
+        # for a list of what transforms we expect to be available.
         jexl.add_transform('date', lambda x: x)
         jexl.add_transform('stableSample', lambda x: x)
         jexl.add_transform('bucketSample', lambda x: x)
