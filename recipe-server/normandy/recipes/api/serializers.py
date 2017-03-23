@@ -1,3 +1,4 @@
+from pyjexl import JEXL
 from rest_framework import serializers
 from reversion.models import Version
 
@@ -95,6 +96,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.save()
 
         return self.update(recipe, validated_data)
+
+    def validate_extra_filter_expression(self, value):
+        jexl = JEXL()
+
+        # Add mock transforms for validation
+        jexl.add_transform('date', lambda x: x)
+        jexl.add_transform('stableSample', lambda x: x)
+        jexl.add_transform('bucketSample', lambda x: x)
+
+        errors = list(jexl.validate(value))
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return value
 
     def validate_arguments(self, value):
         # Get the schema associated with the selected action
