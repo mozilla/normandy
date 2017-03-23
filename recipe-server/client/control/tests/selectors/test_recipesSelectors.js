@@ -80,7 +80,7 @@ describe('Recipe Selectors', () => {
 
     expect(recipesSelectors.getSelectedRevision(state)).toEqual({
       recipe: fixtureRecipes[0],
-      revision: fixtureStoredRevisions[1].abc,
+      revision: fixtureStoredRevisions[1].abc.recipe,
     });
   });
 });

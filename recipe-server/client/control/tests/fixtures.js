@@ -1,7 +1,7 @@
 export const fixtureRecipes = [
-  { id: 1, name: 'Lorem Ipsum', enabled: true, revision_id: 'abc' },
-  { id: 2, name: 'Dolor set amet', enabled: true, revision_id: 'def' },
-  { id: 3, name: 'Consequitar adipscing', enabled: false, revision_id: 'ghi' },
+  { id: 1, name: 'Lorem Ipsum', enabled: true, revision_id: 'abc', approval_request: null },
+  { id: 2, name: 'Dolor set amet', enabled: true, revision_id: 'def', approval_request: null },
+  { id: 3, name: 'Consequitar adipscing', enabled: false, revision_id: 'ghi', approval_request: null },
 ];
 
 export const fixtureRecipeDict = {};
@@ -12,10 +12,15 @@ fixtureRecipes.forEach(recipe => {
 export const fixtureStoredSingleRevision = {
   1: {
     abc: {
-      id: 1,
-      name: 'Lorem Ipsum',
-      enabled: true,
-      revision_id: 'abc',
+      approval_request: null,
+      id: 'abc',
+      recipe: {
+        id: 1,
+        name: 'Lorem Ipsum',
+        enabled: true,
+        revision_id: 'abc',
+        approval_request: null,
+      },
     },
   },
 };
@@ -30,26 +35,41 @@ export const fixtureSingleRevision = {
 export const fixtureStoredRevisions = {
   1: {
     abc: {
-      id: 1,
-      name: 'Lorem Ipsum',
-      enabled: true,
-      revision_id: 'abc',
+      approval_request: null,
+      id: 'abc',
+      recipe: {
+        id: 1,
+        name: 'Lorem Ipsum',
+        enabled: true,
+        revision_id: 'abc',
+        approval_request: null,
+      },
     },
   },
   2: {
     def: {
-      id: 2,
-      name: 'Dolor set amet',
-      enabled: true,
-      revision_id: 'def',
+      approval_request: null,
+      id: 'def',
+      recipe: {
+        id: 2,
+        name: 'Dolor set amet',
+        enabled: true,
+        revision_id: 'def',
+        approval_request: null,
+      },
     },
   },
   3: {
     ghi: {
-      id: 3,
-      name: 'Consequitar adipscing',
-      enabled: false,
-      revision_id: 'ghi',
+      approval_request: null,
+      id: 'ghi',
+      recipe: {
+        id: 3,
+        name: 'Consequitar adipscing',
+        enabled: false,
+        revision_id: 'ghi',
+        approval_request: null,
+      },
     },
   },
 };

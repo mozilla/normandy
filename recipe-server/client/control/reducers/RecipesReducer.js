@@ -30,7 +30,11 @@ function recipesReducer(state = initialState, action) {
         recipesObj[recipe.id] = { ...recipe };
         revisionsObj[recipe.id] = {
           ...revisionsObj[recipe.id],
-          [recipe.revision_id]: { ...recipe },
+          [recipe.revision_id]: {
+            approval_request: recipe.approval_request,
+            id: recipe.revision_id,
+            recipe,
+          },
         };
       });
 
@@ -69,7 +73,6 @@ function recipesReducer(state = initialState, action) {
         revisions: {
           ...state.revisions,
           [action.recipe.id]: {
-            ...state.revisions[action.recipe.id],
             [action.recipe.revision_id]: {
               approval_request: action.recipe.approval_request,
               id: action.recipe.revision_id,
@@ -144,7 +147,11 @@ function recipesReducer(state = initialState, action) {
           ...state.revisions,
           [action.recipe.id]: {
             ...state.revisions[action.recipe.id],
-            [action.recipe.revision_id]: { ...action.recipe },
+            [action.recipe.revision_id]: {
+              approval_request: null,
+              id: action.recipe.revision_id,
+              recipe: action.recipe,
+            },
           },
         },
       };

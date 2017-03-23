@@ -11,7 +11,7 @@ import {
 
 const fakeRecipe = fixtureRecipeDict[1];
 
-describe('Notification reducer', () => {
+describe('Recipe reducer', () => {
   it('should return initial state by default', () => {
     expect(appReducer(undefined, {})).toEqual(initialState);
   });
