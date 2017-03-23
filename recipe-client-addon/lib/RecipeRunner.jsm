@@ -173,8 +173,6 @@ this.RecipeRunner = {
         resolve(clonedResult);
       });
       sandboxManager.addGlobal("actionFailed", err => {
-        Cu.reportError(err);
-
         // Error objects can't be cloned, so we just copy the message
         // (which doesn't need to be cloned) to be somewhat useful.
         const message = err.message;
