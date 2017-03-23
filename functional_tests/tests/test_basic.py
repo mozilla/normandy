@@ -24,7 +24,7 @@ class RecipeFormPage(Page):
     name = FormField('[name="name"]')
     extra_filter_expression = FormField('[name="extra_filter_expression"]')
     action = SelectField('select[name="action"]')
-    delete_button = Element('a.delete')
+    delete_button = Element('a.action-delete')
 
 
 class ConsoleLogFormPage(RecipeFormPage):
@@ -78,11 +78,12 @@ def test_create_recipe_console_log(selenium):
 
     # Delete the recipe we created
     recipe_list_page.recipe_rows[0].click()
-    form_page.wait_for_element('form')
+    form_page.wait_for_element('delete_button')
     form_page.delete_button.click()
 
     recipe_delete_page = RecipeDeletePage(selenium)
     recipe_delete_page.wait_for_element('form')
+    recipe_delete_page.wait_for_element('confirm_button')
     recipe_delete_page.confirm_button.click()
 
     recipe_list_page.wait_for_element('recipe_list')
@@ -152,11 +153,12 @@ def test_create_recipe_show_heartbeat(selenium):
 
     # Delete the recipe we created
     recipe_list_page.recipe_rows[0].click()
-    form_page.wait_for_element('form')
+    form_page.wait_for_element('delete_button')
     form_page.delete_button.click()
 
     recipe_delete_page = RecipeDeletePage(selenium)
     recipe_delete_page.wait_for_element('form')
+    recipe_delete_page.wait_for_element('confirm_button')
     recipe_delete_page.confirm_button.click()
 
     recipe_list_page.wait_for_element('recipe_list')
