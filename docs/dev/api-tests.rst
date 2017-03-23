@@ -3,6 +3,24 @@ API Contract Tests
 These tests are designed to look for changes to the recipe server API that are
 not expected.
 
+Before running these tests you will need the following installed:
+
+.. Python 3.6.0 or greater
+.. _virtualenv: https://virtualenv.pypa.io/en/latest/virtualenv installed
+
+Before running these tests you need to create a virtual environment using
+Python 3.6.0 or greater. To create it, make sure you are in the ``recipe-server``
+directory and then do the following:
+
+.. code-block:: bash
+
+    virtualenv -p /path/to/python3.6 venv
+    source venv/bin/activate
+    pip install -r requirements/default.txt -c requirements/constraints.txt
+
+This creates the virtual environment, activates it, and installs the Python
+dependencies needed to run the tests.
+
 To run these tests, use the following command from the root project directory.
 
 .. code-block:: bash
@@ -11,8 +29,8 @@ To run these tests, use the following command from the root project directory.
 
 where ``<server>`` is one of
 
-`https://normandy-admin.stage.mozaws.net`
-`https://normandy-admin.prod.mozaws.net`
+.. `https://normandy.stage.mozaws.net`
+.. `https://self-repair.mozilla.org`
 
 If you want to send results of the test run to TestRail, you need the following
 pre-requisites:
@@ -23,7 +41,7 @@ pre-requisites:
 4. Modify that TestRail configuration file with your email, TestRail password and TestRail user ID
 
 Then, for any test case you want to report results for, make sure the
-script file the test is in imports the proper testrail module:
+script file the test is in imports the proper TestRail module:
 
 .. code-block:: python
 
