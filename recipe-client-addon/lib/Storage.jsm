@@ -14,6 +14,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm
 this.EXPORTED_SYMBOLS = ["Storage"];
 
 const log = LogManager.getLogger("storage");
+
+const STORAGE_DURABILITY_KEY = '_storageDurability';
 let storePromise;
 
 function loadStorage() {
@@ -36,6 +38,56 @@ this.Storage = {
 
     const storageInterface = {
       /**
+       * Sets the initial 'durability values' for this store to increase durability
+       * confidence in later checks. Should only be called on instantiation.
+       *
+       * @returns  {Promise}
+       * @resolves When the store durability is set successfully.
+       * @rejects  Javascript exception.
+       */
+      seedStoreDurability() {
+        return new sandbox.Promise((resolve, reject) =>
+          loadStorage()
+            .then(store => {
+              store.data[prefix] = store.data[prefix] || {};
+              store.data[prefix][STORAGE_DURABILITY_KEY] = 0;
+              store.saveSoon();
+            })
+            .catch(err => reject(new sandbox.Error()))
+        );
+      },
+
+      /**
+       * Checks the durability of the current store
+       *
+       * @returns  {Promise}
+       * @resolves When the store durability is set successfully.
+       * @rejects  Javascript exception.
+       */
+      checkStoreDurability(store) {
+        store.data[prefix] = store.data[prefix] || {};
+        const localStore = store.data[prefix];
+
+        // Determine if the store has an existing durability key, and if so,
+        // detect if it is an actual number or not.
+        let durability = parseInt(localStore[STORAGE_DURABILITY_KEY], 10);
+        const isDurabilityInvalid = isNaN(durability);
+
+        // If `durability` is invalid (doesn't exist, is NaN), there is a problem
+        // with the storage's integrity.
+        if(isDurabilityInvalid) {
+          log.warn('Storage durability unconfirmed');
+        } else {
+          // If we're still here, set the new durability value into storage.
+          store.data[prefix][STORAGE_DURABILITY_KEY] = durability + 1;
+          store.saveSoon();
+        }
+
+        // Return the store so this method can be chained into promises.
+        return store;
+      }
+
+      /**
        * Sets an item in the prefixed storage.
        * @returns {Promise}
        * @resolves With the stored value, or null.
@@ -44,6 +96,7 @@ this.Storage = {
       getItem(keySuffix) {
         return new sandbox.Promise((resolve, reject) => {
           loadStorage()
+            .then(this.checkStoreDurability)
             .then(store => {
               const namespace = store.data[prefix] || {};
               const value = namespace[keySuffix] || null;
@@ -65,6 +118,7 @@ this.Storage = {
       setItem(keySuffix, value) {
         return new sandbox.Promise((resolve, reject) => {
           loadStorage()
+            .then(this.checkStoreDurability)
             .then(store => {
               if (!(prefix in store.data)) {
                 store.data[prefix] = {};
@@ -89,6 +143,7 @@ this.Storage = {
       removeItem(keySuffix) {
         return new sandbox.Promise((resolve, reject) => {
           loadStorage()
+            .then(this.checkStoreDurability)
             .then(store => {
               if (!(prefix in store.data)) {
                 return;
@@ -113,6 +168,7 @@ this.Storage = {
       clear() {
         return new sandbox.Promise((resolve, reject) => {
           return loadStorage()
+            .then(this.checkStoreDurability)
             .then(store => {
               store.data[prefix] = {};
               store.saveSoon();
@@ -125,6 +181,9 @@ this.Storage = {
         });
       },
     };
+
+    // Prepare this store for future durability checks.
+    storageInterface.seedStoreDurability();
 
     return Cu.cloneInto(storageInterface, sandbox, {
       cloneFunctions: true,
