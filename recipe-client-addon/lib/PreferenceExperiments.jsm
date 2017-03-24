@@ -78,8 +78,8 @@ this.PreferenceExperiments = {
    * Test wrapper that temporarily replaces the stored experiment data with fake
    * data for testing.
    */
-  withMockExperiments(testGenerator) {
-    return function* inner(...args) {
+  withMockExperiments(testFunction) {
+    return async function inner(...args) {
       const oldPromise = storePromise;
       const mockExperiments = {};
       storePromise = Promise.resolve({
@@ -87,7 +87,7 @@ this.PreferenceExperiments = {
         saveSoon() { },
       });
       try {
-        yield testGenerator(...args, mockExperiments);
+        await testFunction(...args, mockExperiments);
       } finally {
         storePromise = oldPromise;
       }
@@ -255,9 +255,10 @@ this.PreferenceExperiments = {
 
     if (resetValue) {
       const {preferenceName, previousPreferenceValue} = experiment;
-      Preferences.reset(preferenceName);
       if (previousPreferenceValue !== undefined) {
         Preferences.set(preferenceName, previousPreferenceValue);
+      } else {
+        Preferences.reset(preferenceName);
       }
     }
 

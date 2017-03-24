@@ -32,9 +32,10 @@ class MockPreferences {
 
   cleanup() {
     for (const [name, value] of Object.entries(this.oldValues)) {
-      Preferences.reset(name);
       if (value !== undefined) {
         Preferences.set(name, value);
+      } else {
+        Preferences.reset(name);
       }
     }
   }
