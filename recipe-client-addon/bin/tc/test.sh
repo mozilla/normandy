@@ -22,8 +22,9 @@ npm install
 popd
 
 pushd gecko-dev-master
-python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
+python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser_artifact_mode
 source /root/.cargo/env
+echo "ac_add_options --enable-artifact-builds" >> ./mozconfig
 ./mach lint browser/extensions/shield-recipe-client/
 ./mach build
 xvfb-run ./mach test browser/extensions/shield-recipe-client/
