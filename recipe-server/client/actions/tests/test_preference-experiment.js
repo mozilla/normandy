@@ -54,6 +54,9 @@ describe('PreferenceExperimentAction', () => {
 
   beforeEach(() => {
     normandy = {
+      async ratioSample() {
+        return 0;
+      },
       userId: 'fake-userid',
       log: jasmine.createSpy('log'),
       preferenceExperiments: new MockPreferenceExperiments(),
@@ -110,6 +113,24 @@ describe('PreferenceExperimentAction', () => {
 
       await action.execute();
       expect(normandy.preferenceExperiments.markLastSeen).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('chooseBranch', () => {
+    it('should return the branch chosen by ratioSample', async () => {
+      normandy.userId = 'fake-id';
+      spyOn(normandy, 'ratioSample').and.returnValue(Promise.resolve(1));
+      const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+        slug: 'exp-slug',
+      }));
+
+      const branch = await action.chooseBranch([
+        { value: 'branch0', ratio: 1 },
+        { value: 'branch1', ratio: 2 },
+      ]);
+      expect(normandy.ratioSample)
+        .toHaveBeenCalledWith('fake-id-exp-slug-branch', [1, 2]);
+      expect(branch).toEqual({ value: 'branch1', ratio: 2 });
     });
   });
 });
