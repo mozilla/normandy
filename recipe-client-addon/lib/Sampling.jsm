@@ -135,6 +135,15 @@ this.Sampling = {
    * Sample over a list of ratios such that, over the input space, each ratio
    * has a number of matches in correct proportion to the other ratios.
    *
+   * For example, given the ratios:
+   *
+   * [1, 2, 3]
+   *
+   * ~16% of all inputs will return 0, ~33% of all inputs will return 1, and 50%
+   * of all inputs will return 2. You can determine the percent of inputs that
+   * will return an index by dividing the ratio by the sum of all ratios passed
+   * in. In the case above, 3 / (1 + 2 + 3) == 0.5, or 50% of the inputs.
+   *
    * @param {object} input
    * @param {Array<integer>} ratios
    * @promises {integer}

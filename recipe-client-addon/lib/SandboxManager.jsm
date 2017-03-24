@@ -67,7 +67,7 @@ this.SandboxManager = class {
   }
 
   /**
-   * Wraps a function that returns a Promise from a privileged (e.g. chrome)
+   * Wraps a function that returns a Promise from a privileged (i.e. chrome)
    * context and returns a Promise from this SandboxManager's sandbox. Useful
    * for exposing privileged functions to the sandbox, since the sandbox can't
    * access properties on privileged objects, e.g. Promise.then on a privileged

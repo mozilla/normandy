@@ -58,7 +58,7 @@ const EXPERIMENT_FILE = "shield-preference-experiments.json";
  * Asynchronously load the JSON file that stores experiment status in the profile.
  */
 let storePromise;
-function loadStorage() {
+function ensureStorage() {
   if (storePromise === undefined) {
     const path = OS.Path.join(OS.Constants.Path.profileDir, EXPERIMENT_FILE);
     const storage = new JSONFile({path});
@@ -70,7 +70,7 @@ function loadStorage() {
 const log = LogManager.getLogger("preference-experiments");
 
 // List of active preference observers. Cleaned up on shutdown.
-let experimentObservers = {};
+const experimentObservers = new Map();
 CleanupManager.addCleanupHandler(() => PreferenceExperiments.stopAllObservers());
 
 this.PreferenceExperiments = {
@@ -98,7 +98,7 @@ this.PreferenceExperiments = {
    * Clear all stored data about active and past experiments.
    */
   async clearAllExperimentStorage() {
-    const store = await loadStorage();
+    const store = await ensureStorage();
     store.data = {};
     store.saveSoon();
   },
@@ -116,7 +116,7 @@ this.PreferenceExperiments = {
   async start(experimentName, branch, preferenceName, preferenceValue) {
     log.debug(`PreferenceExperiments.start(${experimentName}, ${branch})`);
 
-    const store = await loadStorage();
+    const store = await ensureStorage();
     if (experimentName in store.data) {
       throw new Error(`A preference experiment named "${experimentName}" already exists.`);
     }
@@ -160,7 +160,7 @@ this.PreferenceExperiments = {
   startObserver(experimentName, preferenceName, preferenceValue) {
     log.debug(`PreferenceExperiments.startObserver(${experimentName})`);
 
-    if (experimentName in experimentObservers) {
+    if (experimentObservers.has(experimentName)) {
       throw new Error(
         `An observer for the preference experiment ${experimentName} is already active.`
       );
@@ -174,7 +174,7 @@ this.PreferenceExperiments = {
         }
       },
     };
-    experimentObservers[experimentName] = observerInfo;
+    experimentObservers.set(experimentName, observerInfo);
     Preferences.observe(preferenceName, observerInfo.observer);
   },
 
@@ -187,13 +187,13 @@ this.PreferenceExperiments = {
   stopObserver(experimentName) {
     log.debug(`PreferenceExperiments.stopObserver(${experimentName})`);
 
-    if (!(experimentName in experimentObservers)) {
+    if (!experimentObservers.has(experimentName)) {
       throw new Error(`No observer for the preference experiment ${experimentName} found.`);
     }
 
-    const {preferenceName, observer} = experimentObservers[experimentName];
+    const {preferenceName, observer} = experimentObservers.get(experimentName);
     Preferences.ignore(preferenceName, observer);
-    delete experimentObservers[experimentName];
+    experimentObservers.delete(experimentName);
   },
 
   /**
@@ -201,10 +201,10 @@ this.PreferenceExperiments = {
    */
   stopAllObservers() {
     log.debug("PreferenceExperiments.stopAllObservers()");
-    for (const {preferenceName, observer} of Object.values(experimentObservers)) {
+    for (const {preferenceName, observer} of experimentObservers.values()) {
       Preferences.ignore(preferenceName, observer);
     }
-    experimentObservers = {};
+    experimentObservers.clear();
   },
 
   /**
@@ -217,7 +217,7 @@ this.PreferenceExperiments = {
   async markLastSeen(experimentName) {
     log.debug(`PreferenceExperiments.markLastSeen(${experimentName})`);
 
-    const store = await loadStorage();
+    const store = await ensureStorage();
     if (!(experimentName in store.data)) {
       throw new Error(`Could not find a preference experiment named "${experimentName}"`);
     }
@@ -239,7 +239,7 @@ this.PreferenceExperiments = {
   async stop(experimentName, resetValue = true) {
     log.debug(`PreferenceExperiments.stop(${experimentName})`);
 
-    const store = await loadStorage();
+    const store = await ensureStorage();
     if (!(experimentName in store.data)) {
       throw new Error(`Could not find a preference experiment named "${experimentName}"`);
     }
@@ -274,7 +274,7 @@ this.PreferenceExperiments = {
    */
   async get(experimentName) {
     log.debug(`PreferenceExperiments.get(${experimentName})`);
-    const store = await loadStorage();
+    const store = await ensureStorage();
     if (!(experimentName in store.data)) {
       throw new Error(`Could not find a preference experiment named "${experimentName}"`);
     }
@@ -290,7 +290,7 @@ this.PreferenceExperiments = {
    */
   async has(experimentName) {
     log.debug(`PreferenceExperiments.has(${experimentName})`);
-    const store = await loadStorage();
+    const store = await ensureStorage();
     return experimentName in store.data;
   },
 };

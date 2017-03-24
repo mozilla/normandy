@@ -176,7 +176,7 @@ this.RecipeRunner = {
 
         // Copy the error before calling `removeHold`, which will nuke
         // the sandbox and break the wrapper around the error.
-        const {message, fileName, lineNumber} = err.message;
+        const {message, fileName, lineNumber} = err;
         sandboxManager.removeHold("recipeExecution");
         reject(new Error(message, fileName, lineNumber));
       });

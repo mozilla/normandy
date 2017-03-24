@@ -18,9 +18,11 @@ if (!extensionDir.exists()) {
 }
 Components.manager.addBootstrappedManifestLocation(extensionDir);
 
-// Load mocking/stubbing library, sinon
-// docs: http://sinonjs.org/docs/
+// Load Sinon for mocking/stubbing during tests.
+// Sinon assumes that setTimeout and friends are available, and looks for a
+// global object named self during initialization.
 Cu.import("resource://gre/modules/Timer.jsm");
 const self = {}; // eslint-disable-line no-unused-vars
+
 const loader = Cc["@mozilla.org/moz/jssubscript-loader;1"].getService(Ci.mozIJSSubScriptLoader);
 loader.loadSubScript("resource://testing-common/sinon-1.16.1.js");
