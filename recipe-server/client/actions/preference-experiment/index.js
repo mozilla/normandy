@@ -42,18 +42,8 @@ export default class PreferenceExperimentAction extends Action {
   }
 
   chooseBranch(branches) {
-    const slug = this.recipe.arguments.slug;
-    const ratios = branches.map(branch => branch.ratio);
-
-    // It's important that the input be:
-    // - Unique per-user (no one is bucketed alike)
-    // - Unique per-experiment (bucketing differs across multiple experiments)
-    // - Differs from the input used for sampling the recipe (otherwise only
-    //   branches that contain the same buckets as the recipe sampling will
-    //   receive users)
-    const input = `${this.normandy.userId}-${slug}-branch`;
-
-    return this.normandy.ratioSample(input, ratios).then(index => branches[index]);
+    // Stub, eventually will be replaced by a proper branch choice method.
+    return Promise.resolve(branches[0]);
   }
 }
 

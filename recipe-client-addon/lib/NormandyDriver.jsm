@@ -146,9 +146,6 @@ this.NormandyDriver = function(sandboxManager) {
       sandboxManager.removeHold(`setTimeout-${token}`);
     },
 
-    // Sampling
-    ratioSample: sandboxManager.wrapAsync(Sampling.ratioSample),
-
     // Preference Experiment API
     preferenceExperiments: {
       start: sandboxManager.wrapAsync(PreferenceExperiments.start, {cloneArguments: true}),

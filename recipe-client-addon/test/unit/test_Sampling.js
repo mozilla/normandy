@@ -24,23 +24,6 @@ add_task(function* testBucketSample() {
   equal(yield Sampling.bucketSample("test-1", 0, 5, 10), false, "bucketSample returns false for known non-matching sample");
 });
 
-add_task(function* testRatioSample() {
-  // Invalid input
-  Assert.rejects(Sampling.ratioSample("test", []), "ratioSample rejects for a list with no ratios");
-
-  // Absolute samples
-  equal(yield Sampling.ratioSample("test", [1]), 0, "ratioSample returns 0 for a list with only 1 ratio");
-  equal(
-    yield Sampling.ratioSample("test", [0, 0, 1, 0]),
-    2,
-    "ratioSample returns the only non-zero bucket if all other buckets are zero"
-  );
-
-  // Known samples. The numbers are nonces to make the tests pass
-  equal(yield Sampling.ratioSample("test-0", [1, 1]), 0, "ratioSample returns the correct index for known matching sample");
-  equal(yield Sampling.ratioSample("test-1", [1, 1]), 1, "ratioSample returns the correct index for known non-matching sample");
-});
-
 add_task(function* testFractionToKey() {
   // Test that results are always 12 character hexadecimal strings.
   const expected_regex = /[0-9a-f]{12}/;
