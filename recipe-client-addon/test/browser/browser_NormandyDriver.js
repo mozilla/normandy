@@ -23,7 +23,6 @@ add_task(withDriver(Assert, async function syncDeviceCounts(driver) {
 
   await SpecialPowers.pushPrefEnv({
     set: [
-      ["services.sync.numClients", 9],
       ["services.sync.clients.devices.mobile", 5],
       ["services.sync.clients.devices.desktop", 4],
     ],
