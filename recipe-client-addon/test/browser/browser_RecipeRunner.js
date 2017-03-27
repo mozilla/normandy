@@ -1,5 +1,6 @@
 "use strict";
 
+Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 
@@ -143,7 +144,7 @@ add_task(async function checkFilter() {
   ok(!(await RecipeRunner.checkFilter(recipe)), "The recipe is available in the filter context");
 });
 
-add_task(async function testStart() {
+add_task(async function testClientClassificationCache() {
   const getStub = sinon.stub(ClientEnvironment, "getClientClassification")
     .returns(Promise.resolve(false));
 
@@ -152,8 +153,8 @@ add_task(async function testStart() {
     ["extensions.shield-recipe-client.experiments.lazy_classify", false],
   ]});
   ok(!getStub.called, "getClientClassification hasn't been called");
-  await RecipeRunner.start();
-  ok(getStub.called, "getClientClassfication was called eagerly");
+  await RecipeRunner.run();
+  ok(getStub.called, "getClientClassification was called eagerly");
 
   // When the experiment pref is true, do not eagerly call getClientClassification.
   await SpecialPowers.pushPrefEnv({set: [
@@ -161,8 +162,8 @@ add_task(async function testStart() {
   ]});
   getStub.reset();
   ok(!getStub.called, "getClientClassification hasn't been called");
-  await RecipeRunner.start();
-  ok(!getStub.called, "getClientClassfication was not called eagerly");
+  await RecipeRunner.run();
+  ok(!getStub.called, "getClientClassification was not called eagerly");
 
   getStub.restore();
 });
