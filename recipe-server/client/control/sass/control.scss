@@ -274,6 +274,7 @@
   font-size: 12px;
   height: 100%;
   line-height: 1em;
+  margin-left: 1em;
   margin-top: 10px;
   max-width: 150px;
   min-width: 130px;
@@ -326,7 +327,9 @@
 
   .draft-status-icon {
     font-size: 1.9em;
+    line-height: 1em;
     margin-left: 0.125em;
+    min-height: 1em;
   }
 
   .status-text {

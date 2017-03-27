@@ -53,7 +53,7 @@ export class RecipeContainer extends React.Component {
       .then(newRecipe => {
         dispatch(singleRecipeReceived(newRecipe));
 
-        this.getRecipeHistory(recipeId, revisionId);
+        this.getRecipeHistory(recipeId, revisionId || newRecipe.revision_id);
       });
   }
 

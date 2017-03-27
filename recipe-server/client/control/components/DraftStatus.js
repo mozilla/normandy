@@ -1,4 +1,5 @@
 import React, { PropTypes as pt } from 'react';
+import RecipeStatus from 'control/components/RecipeStatus';
 import DraftStatusIcon from 'control/components/DraftStatusIcon';
 
 export const STATUS_MESSAGES = {
@@ -45,26 +46,17 @@ export default function DraftStatus(props) {
   }
 
   const status = STATUS_MESSAGES[state];
-
-  return (
-    <div className={`status-indicator ${state}`}>
-      <DraftStatusIcon
-        request={request}
-        altText={status}
-        isLatestRevision={isLatestRevision}
-      />
-      <div className="status-text">
-        <span>{status}</span>
-        {
-          !!flavorText.length &&
-            <div className="flavor-text">{
-              flavorText.map((flavorFlav, index) => <div key={index} children={flavorFlav} />)
-            }</div>
-        }
-      </div>
-    </div>
+  const draftIcon = (
+    <DraftStatusIcon
+      request={request}
+      altText={status}
+      isLatestRevision={isLatestRevision}
+    />
   );
+
+  return <RecipeStatus className={state} icon={draftIcon} text={status} flavorText={flavorText} />;
 }
+
 DraftStatus.propTypes = {
   recipe: pt.object.isRequired,
   latestRevisionId: pt.string,

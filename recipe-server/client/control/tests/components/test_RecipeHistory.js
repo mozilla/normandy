@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import { HistoryItem, HistoryList } from 'control/components/RecipeHistory';
 import DraftStatus, { STATUS_MESSAGES } from 'control/components/DraftStatus';
 import DraftStatusIcon, { STATUS_ICONS } from 'control/components/DraftStatusIcon';
@@ -60,12 +60,12 @@ describe('Recipe history components', () => {
     };
 
     it('should render a `Draft` message', () => {
-      const wrapper = shallow(<DraftStatus recipe={recipe} />);
+      const wrapper = mount(<DraftStatus recipe={recipe} />);
       expect(wrapper.find('.status-text').text()).toBe(STATUS_MESSAGES.draft);
     });
 
     it('should render a `Pending` message', () => {
-      const wrapper = shallow(<DraftStatus
+      const wrapper = mount(<DraftStatus
         recipe={{
           ...recipe,
           approval_request: {},
@@ -75,7 +75,7 @@ describe('Recipe history components', () => {
     });
 
     it('should render a `Rejected` message', () => {
-      const wrapper = shallow(<DraftStatus
+      const wrapper = mount(<DraftStatus
         recipe={{
           ...recipe,
           approval_request: {
@@ -87,7 +87,7 @@ describe('Recipe history components', () => {
     });
 
     it('should render an `Approved` message', () => {
-      const wrapper = shallow(<DraftStatus
+      const wrapper = mount(<DraftStatus
         recipe={{
           ...recipe,
           approval_request: {
@@ -99,7 +99,7 @@ describe('Recipe history components', () => {
     });
 
     it('should render a `Latest Draft` message', () => {
-      const wrapper = shallow(<DraftStatus
+      const wrapper = mount(<DraftStatus
         recipe={recipe}
         latestRevisionId={recipe.revision_id}
       />);
@@ -107,7 +107,7 @@ describe('Recipe history components', () => {
     });
 
     it('should render a `Last Approved Revision` message', () => {
-      const wrapper = shallow(<DraftStatus
+      const wrapper = mount(<DraftStatus
         recipe={recipe}
         lastApprovedRevisionId={recipe.revision_id}
       />);

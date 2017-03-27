@@ -38,6 +38,7 @@ import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+import RecipeStatus from 'control/components/RecipeStatus';
 import DraftStatus from 'control/components/DraftStatus';
 import BooleanIcon from 'control/components/BooleanIcon';
 
@@ -305,6 +306,7 @@ export class RecipeForm extends React.Component {
     } = renderVars;
 
     const thisRevisionRequest = revision && revision.approval_request;
+    const statusText = renderVars.isEnabled ? 'Enabled' : 'Disabled';
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
@@ -334,10 +336,17 @@ export class RecipeForm extends React.Component {
           )
         }
 
-        <div className="status-indicator">
-          <BooleanIcon value={renderVars.isEnabled} />
-          { renderVars.isEnabled ? 'Enabled' : 'Disabled' }
-        </div>
+        <RecipeStatus
+          className={renderVars.isEnabled ? 'green' : 'red'}
+          icon={
+            <BooleanIcon
+              className="draft-status-icon"
+              value={renderVars.isEnabled}
+              title={statusText}
+            />
+          }
+          text={statusText}
+        />
 
         <ControlField
           disabled={isFormDisabled}

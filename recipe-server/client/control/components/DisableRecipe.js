@@ -1,6 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { push } from 'react-router-redux';
-import { makeApiRequest, singleRecipeReceived } from 'control/actions/ControlActions';
+import makeApiRequest from 'control/api';
+import { singleRecipeReceived } from 'control/actions/RecipeActions';
 import composeRecipeContainer from 'control/components/RecipeContainer';
 
 class DisableRecipe extends React.Component {
