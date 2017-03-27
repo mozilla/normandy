@@ -27,7 +27,6 @@ import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
-import JexlEnvironment from 'selfrepair/JexlEnvironment';
 
 
 export const selector = formValueSelector('recipe');
@@ -150,16 +149,9 @@ export const formConfig = {
 
   async asyncValidate(values) {
     const errors = {};
-    // Validate that filter expression is valid JEXL
+    // Validate that filter expression is not empty
     if (!values.extra_filter_expression) {
       errors.extra_filter_expression = 'Filter expression cannot be empty.';
-    } else {
-      const jexlEnvironment = new JexlEnvironment({});
-      try {
-        await jexlEnvironment.eval(values.extra_filter_expression);
-      } catch (err) {
-        errors.extra_filter_expression = err.toString();
-      }
     }
 
     // Throw if we found any errors.
