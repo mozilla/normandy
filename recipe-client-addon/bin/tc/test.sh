@@ -10,7 +10,8 @@ echo 'deb https://deb.nodesource.com/node_6.x yakkety main' > /etc/apt/sources.l
 echo 'deb-src https://deb.nodesource.com/node_6.x yakkety main' >> /etc/apt/sources.list.d/nodesource.list
 apt-get update
 
-apt-get install -y curl python2.7 xvfb nodejs
+# libgl1-mesa-dev works around a webrender build issue
+apt-get install -y curl python2.7 xvfb nodejs libgl1-mesa-dev
 
 # Creates gecko-dev-master
 echo 'Downloading gecko-dev...'

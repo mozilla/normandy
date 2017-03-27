@@ -8,31 +8,13 @@ Cu.import("resource://testing-common/httpd.js"); /* globals HttpServer */
 Cu.import("resource://gre/modules/osfile.jsm", this); /* globals OS */
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 
-class PrefManager {
-  constructor() {
-    this.oldValues = {};
-  }
-
-  setCharPref(name, value) {
-    if (!(name in this.oldValues)) {
-      this.oldValues[name] = Services.prefs.getCharPref(name);
-    }
-    Services.prefs.setCharPref(name, value);
-  }
-
-  cleanup() {
-    for (const name of Object.keys(this.oldValues)) {
-      Services.prefs.setCharPref(name, this.oldValues[name]);
-    }
-  }
-}
+load("utils.js"); /* globals withMockPreferences */
 
 function withServer(server, task) {
-  return function* inner() {
+  return withMockPreferences(function* inner(preferences) {
     const serverUrl = `http://localhost:${server.identity.primaryPort}`;
-    const prefManager = new PrefManager();
-    prefManager.setCharPref("extensions.shield-recipe-client.api_url", `${serverUrl}/api/v1`);
-    prefManager.setCharPref(
+    preferences.set("extensions.shield-recipe-client.api_url", `${serverUrl}/api/v1`);
+    preferences.set(
       "security.content.signature.root_hash",
       // Hash of the key that signs the normandy dev certificates
       "4C:35:B1:C3:E3:12:D9:55:E7:78:ED:D0:A7:E7:8A:38:83:04:EF:01:BF:FA:03:29:B2:46:9F:3C:C5:EC:36:04"
@@ -41,10 +23,9 @@ function withServer(server, task) {
     try {
       yield task(serverUrl);
     } finally {
-      prefManager.cleanup();
       yield new Promise(resolve => server.stop(resolve));
     }
-  };
+  });
 }
 
 function makeScriptServer(scriptPath) {
