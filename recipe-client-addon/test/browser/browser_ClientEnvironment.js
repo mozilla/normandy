@@ -64,7 +64,6 @@ add_task(async function testSync() {
   is(environment.syncTotalDevices, 0, "syncTotalDevices defaults to zero");
   await SpecialPowers.pushPrefEnv({
     set: [
-      ["services.sync.numClients", 9],
       ["services.sync.clients.devices.mobile", 5],
       ["services.sync.clients.devices.desktop", 4],
     ],

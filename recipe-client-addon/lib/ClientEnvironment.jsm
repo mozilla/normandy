@@ -149,7 +149,7 @@ this.ClientEnvironment = {
     });
 
     XPCOMUtils.defineLazyGetter(environment, "syncTotalDevices", () => {
-      return Preferences.get("services.sync.numClients", 0);
+      return environment.syncDesktopDevices + environment.syncMobileDevices;
     });
 
     XPCOMUtils.defineLazyGetter(environment, "plugins", async function() {
