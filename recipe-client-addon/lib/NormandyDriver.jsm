@@ -31,8 +31,11 @@ this.NormandyDriver = function(sandboxManager) {
   }
   const {sandbox} = sandboxManager;
 
+  Storage.seedDurability(sandbox);
+
   return {
     testing: false,
+    skipDurabilityCheck: false,
 
     get locale() {
       return Cc["@mozilla.org/chrome/chrome-registry;1"]
@@ -117,9 +120,13 @@ this.NormandyDriver = function(sandboxManager) {
       return ret;
     },
 
-    createStorage(keyPrefix) {
+    async createStorage(keyPrefix) {
       let storage;
       try {
+        if (!this.skipDurabilityCheck) {
+          await Storage.checkDurability(sandbox);
+        }
+
         storage = Storage.makeStorage(keyPrefix, sandbox);
       } catch (e) {
         log.error(e.stack);
