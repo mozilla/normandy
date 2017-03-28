@@ -101,7 +101,12 @@ this.RecipeRunner = {
 
   getFilterContext(recipe) {
     return {
-      normandy: Object.assign(ClientEnvironment.getEnvironment(), {recipe}),
+      normandy: Object.assign(ClientEnvironment.getEnvironment(), {
+        recipe: {
+          id: recipe.id,
+          arguments: recipe.arguments,
+        },
+      }),
     };
   },
 

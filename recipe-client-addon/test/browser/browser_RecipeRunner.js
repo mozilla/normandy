@@ -87,7 +87,7 @@ add_task(async function globalObject() {
 });
 
 add_task(async function getFilterContext() {
-  const recipe = {filter_expression: "1+1==2"};
+  const recipe = {id: 17, arguments: {foo: "bar"}, unrelated: false};
   const context = RecipeRunner.getFilterContext(recipe);
 
   // Test for expected properties in the filter expression context.
@@ -114,10 +114,16 @@ add_task(async function getFilterContext() {
     ok(key in context.normandy, `normandy.${key} is available`);
   }
 
+  is(
+    context.normandy.recipe.id,
+    recipe.id,
+    "normandy.recipe is the recipe passed to getFilterContext",
+  );
+  delete recipe.unrelated;
   Assert.deepEqual(
     context.normandy.recipe,
     recipe,
-    "normandy.recipe is the recipe passed to getFilterContext",
+    "normandy.recipe drops unrecognized attributes from the recipe",
   );
 });
 
@@ -131,9 +137,9 @@ add_task(async function checkFilter() {
   ok(await check("[1, 2, 3]"), "Non-boolean filter expressions return true");
 
   // The given recipe must be available to the filter context.
-  const recipe = {filter_expression: "normandy.recipe.seven == 7", seven: 7};
+  const recipe = {filter_expression: "normandy.recipe.id == 7", id: 7};
   ok(await RecipeRunner.checkFilter(recipe), "The recipe is available in the filter context");
-  recipe.seven = 4;
+  recipe.id = 4;
   ok(!(await RecipeRunner.checkFilter(recipe)), "The recipe is available in the filter context");
 });
 
