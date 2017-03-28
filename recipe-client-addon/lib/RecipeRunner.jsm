@@ -99,9 +99,9 @@ this.RecipeRunner = {
     }
   },
 
-  getFilterContext() {
+  getFilterContext(recipe) {
     return {
-      normandy: ClientEnvironment.getEnvironment(),
+      normandy: Object.assign(ClientEnvironment.getEnvironment(), {recipe}),
     };
   },
 
@@ -113,7 +113,7 @@ this.RecipeRunner = {
    *                   if an error occurred during evaluation.
    */
   async checkFilter(recipe) {
-    const context = this.getFilterContext();
+    const context = this.getFilterContext(recipe);
     try {
       const result = await FilterExpressions.eval(recipe.filter_expression, context);
       return !!result;

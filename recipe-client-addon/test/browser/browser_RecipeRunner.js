@@ -87,7 +87,8 @@ add_task(async function globalObject() {
 });
 
 add_task(async function getFilterContext() {
-  const context = RecipeRunner.getFilterContext();
+  const recipe = {filter_expression: "1+1==2"};
+  const context = RecipeRunner.getFilterContext(recipe);
 
   // Test for expected properties in the filter expression context.
   const expectedNormandyKeys = [
@@ -98,6 +99,7 @@ add_task(async function getFilterContext() {
     "isDefaultBrowser",
     "locale",
     "plugins",
+    "recipe",
     "request_time",
     "searchEngine",
     "syncDesktopDevices",
@@ -111,6 +113,12 @@ add_task(async function getFilterContext() {
   for (const key of expectedNormandyKeys) {
     ok(key in context.normandy, `normandy.${key} is available`);
   }
+
+  Assert.deepEqual(
+    context.normandy.recipe,
+    recipe,
+    "normandy.recipe is the recipe passed to getFilterContext",
+  );
 });
 
 add_task(async function checkFilter() {
@@ -121,6 +129,12 @@ add_task(async function checkFilter() {
 
   // Non-boolean filter results result in a true return value.
   ok(await check("[1, 2, 3]"), "Non-boolean filter expressions return true");
+
+  // The given recipe must be available to the filter context.
+  const recipe = {filter_expression: "normandy.recipe.seven == 7", seven: 7};
+  ok(await RecipeRunner.checkFilter(recipe), "The recipe is available in the filter context");
+  recipe.seven = 4;
+  ok(!(await RecipeRunner.checkFilter(recipe)), "The recipe is available in the filter context");
 });
 
 add_task(async function testStart() {
