@@ -30,27 +30,28 @@ function loadStorage() {
 }
 
 this.Storage = {
-  DURABILITY_NAMESPACE: '_storageDurability',
+  DURABILITY_NAMESPACE: 'normandy_storageDurability',
   DURABILITY_KEY: 'durable',
+  isDurabilityInvalid(value) {
+    return typeof value === 'undefined' || isNaN(value);
+  },
   async seedDurability(sandbox) {
     const globalDurabilityStore = Storage.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
     let durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY);
 
-    durability = parseInt(durability, 10);
-
-    if (isNaN(durability)) {
+    if (this.isDurabilityInvalid(durability)) {
       durability = 0;
     }
+
     globalDurabilityStore.setItem(this.DURABILITY_KEY, durability + 1);
   },
 
   async checkDurability(sandbox) {
       const globalDurabilityStore = Storage.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
 
-      let durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY)
-      durability = parseInt(durability, 10);
+      const durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY)
 
-      const isDurabilityInvalid = isNaN(durability) || durability < 1;
+      const isDurabilityInvalid = this.isDurabilityInvalid(durability) || durability < 2;
 
       if(isDurabilityInvalid) {
         throw new Error('Storage durability unconfirmed');

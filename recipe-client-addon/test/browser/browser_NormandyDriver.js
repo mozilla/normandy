@@ -8,7 +8,7 @@ Cu.import("resource://shield-recipe-client/lib/Storage.jsm", this);
 // This test determines if `skipDurabilityCheck` correctly ignores the
 // store durability.
 add_task(async function(){
-  const fakeSandbox = { Promise };
+  const fakeSandbox = { Promise, Error };
   const driver = new NormandyDriver({ sandbox: fakeSandbox });
 
   const store = Storage.makeStorage(Storage.DURABILITY_NAMESPACE, fakeSandbox);
@@ -29,7 +29,8 @@ add_task(async function(){
     // Create storage with 'skipDurabilityCheck' disabled
     await driver.createStorage('test', false);
   } catch(e) {
-    Assert.equal(e.message, 'Storage durability unconfirmed');
+    Assert.equal(e.message, 'Storage durability unconfirmed',
+      'skipDurabilityCheck should throw an error for invalid storage durability');
   }
 });
 

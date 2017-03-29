@@ -2,7 +2,7 @@
 
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm", this);
 
-const fakeSandbox = {Promise};
+const fakeSandbox = { Promise, Error };
 const store1 = Storage.makeStorage("prefix1", fakeSandbox);
 const store2 = Storage.makeStorage("prefix2", fakeSandbox);
 

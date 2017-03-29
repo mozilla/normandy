@@ -26,16 +26,14 @@ const log = LogManager.getLogger("normandy-driver");
 const actionLog = LogManager.getLogger("normandy-driver.actions");
 
 this.NormandyDriver = function(sandboxManager) {
+
   if (!sandboxManager) {
     throw new Error("sandboxManager is required");
   }
   const {sandbox} = sandboxManager;
 
-  Storage.seedDurability(sandbox);
-
   return {
     testing: false,
-    skipDurabilityCheck: false,
 
     get locale() {
       return Cc["@mozilla.org/chrome/chrome-registry;1"]
@@ -120,10 +118,10 @@ this.NormandyDriver = function(sandboxManager) {
       return ret;
     },
 
-    async createStorage(keyPrefix) {
+    async createStorage(keyPrefix, skipDurabilityCheck) {
       let storage;
       try {
-        if (!this.skipDurabilityCheck) {
+        if (!skipDurabilityCheck) {
           await Storage.checkDurability(sandbox);
         }
 
