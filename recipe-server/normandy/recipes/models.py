@@ -250,7 +250,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         super().save(*args, **kwargs)
 
 
-class RecipeRevision(models.Model):
+class RecipeRevision(DirtyFieldsMixin, models.Model):
     id = models.CharField(max_length=64, primary_key=True)
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
@@ -324,6 +324,11 @@ class RecipeRevision(models.Model):
         return hashlib.sha256(data.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
+        # validation
+        previous_arguments = self.parent.arguments if self.parent else None
+        self.action.validate_arguments(self.arguments, old_arguments=previous_arguments)
+
+        # automatic fields
         if not self.created:
             self.created = timezone.now()
         self.id = self.hash()
@@ -340,6 +345,18 @@ class Action(models.Model):
     implementation_hash = models.CharField(max_length=40, editable=False)
 
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
+
+    errors = {
+        'duplicate_branch_slug': ('Feature branch slugs must be unique within an '
+                                  'experiment: "{slug}" is duplicated.'),
+        'duplicate_branch_value': ('Feature branch values must be unique within an '
+                                   'experiment: "{value}" is duplicated.'),
+        'duplicate_experiment_slug': ('Experiment slugs must be globally unique: "{slug}" '
+                                      'is duplicated'),
+        'immutable_branches': ('Experiment branches cannot change after experiment '
+                               'creation. To change the feature branches, launch a '
+                               'new experiment'),
+    }
 
     @property
     def arguments_schema(self):
@@ -372,6 +389,45 @@ class Action(models.Model):
         # Update hash
         self.implementation_hash = self.compute_implementation_hash()
         super().save(update_fields=['implementation_hash'])
+
+    def validate_arguments(self, arguments, old_arguments=None):
+        """
+        Test if `arguments` follows all action-specific rules.
+
+        If there is a previous version of the arguments, they should
+        be passed as `old_arguments`. Some validation rules depend on
+        the history of the arguments.
+
+        Raises `ValidationError` if any rules are violated.
+        """
+        if self.name == 'preference-experiment':
+            # Feature branch slugs should be unique within an experiment.
+            branch_slugs = set()
+            branch_values = set()
+            for branch in arguments['branches']:
+                if branch['slug'] in branch_slugs:
+                    raise ValidationError(self.errors['duplicate_branch_slug']
+                                          .format(slug=branch['slug']))
+                if branch['value'] in branch_values:
+                    raise ValidationError(self.errors['duplicate_branch_value']
+                                          .format(value=branch['value']))
+                branch_slugs.add(branch['slug'])
+                branch_values.add(branch['value'])
+
+            # Experiment slugs should be unique.
+            experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
+            experiment_slugs = set()
+            if old_arguments is None:
+                # This is a newly created revision, so its slug should not be in the DB
+                experiment_slugs.add(arguments['slug'])
+            for recipe in experiment_recipes:
+                if recipe.arguments['slug'] in experiment_slugs:
+                    raise ValidationError(self.errors['duplicate_experiment_slug']
+                                          .format(slug=arguments['slug']))
+
+            # Once published, branches of a feature experiment cannot be modified.
+            if old_arguments is not None and arguments['branches'] != old_arguments['branches']:
+                raise ValidationError(self.errors['immutable_branches'])
 
 
 class Client(object):

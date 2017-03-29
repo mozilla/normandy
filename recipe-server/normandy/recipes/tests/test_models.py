@@ -44,6 +44,56 @@ class TestAction(object):
         RecipeFactory.create_batch(2, action=action, enabled=False)
         assert list(action.recipes_used_by) == []
 
+    def test_validate_arguments_it_works(self):
+        action = ActionFactory(name='nothing special')
+        # does not raise an exception
+        action.validate_arguments({})
+
+    def test_validate_arguments_preference_exeriments_unique_branch_slugs(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {
+            'branches': [
+                {'slug': 'unique', 'value': 'a'},
+                {'slug': 'duplicate', 'value': 'b'},
+                {'slug': 'duplicate', 'value': 'c'}
+            ]
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            action.validate_arguments(arguments)
+        assert exc_info.value.message == (action.errors['duplicate_branch_slug']
+                                          .format(slug='duplicate'))
+
+    def test_validate_arguments_preference_exeriments_unique_branch_values(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {
+            'branches': [
+                {'slug': 'a', 'value': 'unique'},
+                {'slug': 'b', 'value': 'duplicate'},
+                {'slug': 'c', 'value': 'duplicate'}
+            ]
+        }
+        with pytest.raises(ValidationError) as exc_info:
+            action.validate_arguments(arguments)
+        assert exc_info.value.message == (action.errors['duplicate_branch_value']
+                                          .format(value='duplicate'))
+
+    def test_validate_arguments_preference_experiments_unique_experiment_slug(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {'slug': 'duplicate', 'branches': []}
+        RecipeFactory(action=action, arguments=arguments)
+        with pytest.raises(ValidationError) as exc_info:
+            action.validate_arguments(arguments)
+        assert exc_info.value.message == (action.errors['duplicate_experiment_slug']
+                                          .format(slug='duplicate'))
+
+    def test_validate_arguments_preference_experiments_immutable_branches(self):
+        action = ActionFactory(name='preference-experiment')
+        old_arguments = {'branches': [{'slug': 'old', 'value': 'old'}]}
+        new_arguments = {'branches': [{'slug': 'new', 'value': 'new'}]}
+        with pytest.raises(ValidationError) as exc_info:
+            action.validate_arguments(old_arguments, new_arguments)
+        assert exc_info.value.message == action.errors['immutable_branches']
+
 
 @pytest.mark.django_db
 class TestRecipe(object):
@@ -299,7 +349,7 @@ class TestRecipe(object):
         assert recipe.locales.count() == 0
 
     def test_recipe_update_arguments(self):
-        recipe = RecipeFactory(arguments_json='')
+        recipe = RecipeFactory(arguments_json='{}')
         recipe.update(arguments={'something': 'value'})
         assert recipe.arguments_json == '{"something": "value"}'
 
