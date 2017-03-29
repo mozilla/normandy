@@ -17,7 +17,6 @@ import {
   recipeUpdated,
   recipeAdded,
   setSelectedRecipe,
-  setSelectedRevision,
   singleRecipeReceived,
   revisionsReceived,
 } from 'control/actions/RecipeActions';
