@@ -17,6 +17,7 @@ import {
   recipeUpdated,
   recipeAdded,
   setSelectedRecipe,
+  setSelectedRevision,
   singleRecipeReceived,
   revisionsReceived,
 } from 'control/actions/RecipeActions';
@@ -162,8 +163,8 @@ export class RecipeForm extends React.Component {
       isUserRequester: requestAuthorID === currentUserID,
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
-      isApproved: !!recipeId && recipe.is_approved,
-      isEnabled: !!recipeId && recipe.enabled,
+      isApproved: !!recipeId && requestDetails && requestDetails.approved,
+      isEnabled: !!recipeId && revision.enabled,
       isUserViewingOutdated,
       isViewingLatestApproved,
       isPendingApproval,
@@ -480,7 +481,13 @@ const connector = connect(
     },
     updateRecipe(recipeId, recipe) {
       return dispatch(makeApiRequest('updateRecipe', { recipeId, recipe }))
-      .then(response => dispatch(recipeUpdated(response)));
+      .then(response => {
+        dispatch(recipeUpdated({
+          ...response,
+          recipe: response,
+        }));
+        dispatch(setSelectedRevision(response.revision_id));
+      });
     },
   }),
 );
