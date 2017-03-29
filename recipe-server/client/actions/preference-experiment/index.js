@@ -1,5 +1,8 @@
 import { Action, registerAction } from '../utils';
 
+// If FINISHED is thrown from within the promise chain, it exits early.
+const FINISHED = Symbol('finished');
+
 /**
  * Enrolls a user in a preference experiment, in which we assign the user to an
  * experiment branch and modify a preference temporarily to measure how it
@@ -13,7 +16,7 @@ export default class PreferenceExperimentAction extends Action {
     //
     // Once we remove self-repair support, we should be able to use native
     // async/await anyway, which solves the issue.
-    const { slug, preferenceName, branches } = this.recipe.arguments;
+    const { slug, preferenceName, branches, bucketCount } = this.recipe.arguments;
     const experiments = this.normandy.preferenceExperiments;
 
     // Exit early if we're on an incompatible client.
@@ -22,7 +25,19 @@ export default class PreferenceExperimentAction extends Action {
       return Promise.resolve();
     }
 
-    return experiments.has(slug).then(hasSlug => {
+    // Check the sample buckets to see if this user qualifies for the experiment.
+    const input = `${this.normandy.userId}-${slug}`;
+    return this.normandy.bucketSample(input, 0, bucketCount, 100000).then(userQualifies => {
+      if (!userQualifies) {
+        this.normandy.log(
+          'Client did not match the sample for this experiment, aborting.',
+          'debug',
+        );
+        throw FINISHED;
+      }
+
+      return experiments.has(slug);
+    }).then(hasSlug => {
       // If the experiment doesn't exist yet, enroll!
       if (!hasSlug) {
         return this.chooseBranch(branches)
@@ -33,11 +48,16 @@ export default class PreferenceExperimentAction extends Action {
       return experiments.get(slug).then(experiment => {
         if (experiment.expired) {
           this.normandy.log(`Experiment ${slug} has expired, aborting.`, 'info');
-          return true;
+          throw FINISHED;
         }
 
         return experiments.markLastSeen(slug);
       });
+    }).catch(err => {
+      // FINISHED is a flag to exit early, not an error
+      if (err !== FINISHED) {
+        throw err;
+      }
     });
   }
 
