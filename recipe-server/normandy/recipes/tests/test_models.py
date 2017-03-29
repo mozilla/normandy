@@ -86,14 +86,6 @@ class TestAction(object):
         assert exc_info.value.message == (action.errors['duplicate_experiment_slug']
                                           .format(slug='duplicate'))
 
-    def test_validate_arguments_preference_experiments_immutable_branches(self):
-        action = ActionFactory(name='preference-experiment')
-        old_arguments = {'branches': [{'slug': 'old', 'value': 'old'}]}
-        new_arguments = {'branches': [{'slug': 'new', 'value': 'new'}]}
-        with pytest.raises(ValidationError) as exc_info:
-            action.validate_arguments(old_arguments, new_arguments)
-        assert exc_info.value.message == action.errors['immutable_branches']
-
 
 @pytest.mark.django_db
 class TestRecipe(object):

@@ -324,11 +324,8 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         return hashlib.sha256(data.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
-        # validation
-        previous_arguments = self.parent.arguments if self.parent else None
-        self.action.validate_arguments(self.arguments, old_arguments=previous_arguments)
+        self.action.validate_arguments(self.arguments)
 
-        # automatic fields
         if not self.created:
             self.created = timezone.now()
         self.id = self.hash()
@@ -353,9 +350,6 @@ class Action(models.Model):
                                    'experiment: "{value}" is duplicated.'),
         'duplicate_experiment_slug': ('Experiment slugs must be globally unique: "{slug}" '
                                       'is duplicated'),
-        'immutable_branches': ('Experiment branches cannot change after experiment '
-                               'creation. To change the feature branches, launch a '
-                               'new experiment'),
     }
 
     @property
@@ -424,10 +418,6 @@ class Action(models.Model):
                 if recipe.arguments['slug'] in experiment_slugs:
                     raise ValidationError(self.errors['duplicate_experiment_slug']
                                           .format(slug=arguments['slug']))
-
-            # Once published, branches of a feature experiment cannot be modified.
-            if old_arguments is not None and arguments['branches'] != old_arguments['branches']:
-                raise ValidationError(self.errors['immutable_branches'])
 
 
 class Client(object):
