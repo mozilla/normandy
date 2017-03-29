@@ -486,7 +486,7 @@ const connector = connect(
           ...response,
           recipe: response,
         }));
-        dispatch(setSelectedRevision(response.revision_id));
+        dispatch(push(`/control/recipe/${response.id}/${response.latest_revision_id}/`));
       });
     },
   }),

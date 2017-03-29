@@ -31,7 +31,7 @@ export class RecipeContainer extends React.Component {
     const isRouteRevisionChanging =
       routeParams.revisionId !== this.props.routeParams.revisionId;
 
-    if (isRecipeChanging) {
+    if (isRecipeChanging || isRouteRevisionChanging) {
       this.getRecipeData(recipeId, routeParams && routeParams.revisionId);
     }
 
