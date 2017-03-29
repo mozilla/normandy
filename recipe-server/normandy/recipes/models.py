@@ -250,7 +250,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         super().save(*args, **kwargs)
 
 
-class RecipeRevision(DirtyFieldsMixin, models.Model):
+class RecipeRevision(models.Model):
     id = models.CharField(max_length=64, primary_key=True)
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
@@ -344,12 +344,15 @@ class Action(models.Model):
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
 
     errors = {
-        'duplicate_branch_slug': ('Feature branch slugs must be unique within an '
-                                  'experiment: "{slug}" is duplicated.'),
-        'duplicate_branch_value': ('Feature branch values must be unique within an '
-                                   'experiment: "{value}" is duplicated.'),
-        'duplicate_experiment_slug': ('Experiment slugs must be globally unique: "{slug}" '
-                                      'is duplicated'),
+        'duplicate_branch_slug': (
+            'Feature branch slugs must be unique within an experiment: "{slug}" is duplicated.'
+        ),
+        'duplicate_branch_value': (
+            'Feature branch values must be unique within an experiment: "{value}" is duplicated.'
+        ),
+        'duplicate_experiment_slug': (
+            'Experiment slugs must be globally unique: "{slug}" is duplicated'
+        ),
     }
 
     @property
