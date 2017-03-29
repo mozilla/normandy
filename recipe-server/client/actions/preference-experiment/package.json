@@ -13,7 +13,6 @@
                 "slug",
                 "preferenceName",
                 "preferenceType",
-                "bucketCount",
                 "branches"
             ],
             "properties": {
@@ -38,13 +37,6 @@
                     "type": "string",
                     "enum": ["string", "integer", "boolean"],
                     "default": "boolean"
-                },
-                "bucketCount": {
-                    "description": "Number of sample buckets to assign to this experiment",
-                    "type": "integer",
-                    "default": 10,
-                    "minimum": 0,
-                    "maximum": 100000
                 },
                 "branches": {
                     "description": "List of experimental branches",

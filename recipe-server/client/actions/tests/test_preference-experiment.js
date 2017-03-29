@@ -7,7 +7,6 @@ function preferenceExperimentFactory(args) {
       slug: 'test',
       preferenceName: 'fake.preference',
       preferenceType: 'string',
-      bucketCount: 10,
       branches: [
         { slug: 'test', value: 'foo', ratio: 1 },
       ],

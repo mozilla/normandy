@@ -30,7 +30,6 @@ export default class PreferenceExperimentFields extends ActionFields {
     experimentDocumentUrl: '',
     preferenceName: '',
     preferenceType: 'boolean',
-    bucketCount: 10,
   }
 
   render() {
@@ -64,10 +63,6 @@ export default class PreferenceExperimentFields extends ActionFields {
           <option value="integer">Integer</option>
           <option value="string">String</option>
         </ControlField>
-        <IntegerControlField
-          label="Sample of Total Population (out of 100,000 buckets)"
-          name="arguments.bucketCount"
-        />
         <FieldArray name="arguments.branches" component={PreferenceBranches} />
       </div>
     );
