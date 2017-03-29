@@ -3,7 +3,7 @@
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 
-add_task(function* execute() {
+add_task(async function execute() {
   // Test that RecipeRunner can execute a basic recipe/action and return
   // the result of execute.
   const recipe = {
@@ -25,11 +25,11 @@ add_task(function* execute() {
     registerAction('test-action', TestAction);
   `;
 
-  const result = yield RecipeRunner.executeAction(recipe, actionScript);
+  const result = await RecipeRunner.executeAction(recipe, actionScript);
   is(result.foo, "bar", "Recipe executed correctly");
 });
 
-add_task(function* error() {
+add_task(async function error() {
   // Test that RecipeRunner rejects with error messages from within the
   // sandbox.
   const actionScript = `
@@ -46,7 +46,7 @@ add_task(function* error() {
 
   let gotException = false;
   try {
-    yield RecipeRunner.executeAction({}, actionScript);
+    await RecipeRunner.executeAction({}, actionScript);
   } catch (err) {
     gotException = true;
     is(err.message, "ERROR MESSAGE", "RecipeRunner throws errors from the sandbox correctly.");
@@ -54,7 +54,7 @@ add_task(function* error() {
   ok(gotException, "RecipeRunner threw an error from the sandbox.");
 });
 
-add_task(function* globalObject() {
+add_task(async function globalObject() {
   // Test that window is an alias for the global object, and that it
   // has some expected functions available on it.
   const actionScript = `
@@ -77,7 +77,7 @@ add_task(function* globalObject() {
     registerAction('test-action', TestAction);
   `;
 
-  const result = yield RecipeRunner.executeAction({}, actionScript);
+  const result = await RecipeRunner.executeAction({}, actionScript);
   Assert.deepEqual(result, {
     setOnWindow: "set",
     setOnGlobal: "set",
@@ -86,7 +86,7 @@ add_task(function* globalObject() {
   }, "sandbox.window is the global object and has expected functions.");
 });
 
-add_task(function* getFilterContext() {
+add_task(async function getFilterContext() {
   const context = RecipeRunner.getFilterContext();
 
   // Test for expected properties in the filter expression context.
@@ -113,35 +113,35 @@ add_task(function* getFilterContext() {
   }
 });
 
-add_task(function* checkFilter() {
+add_task(async function checkFilter() {
   const check = filter => RecipeRunner.checkFilter({filter_expression: filter});
 
   // Errors must result in a false return value.
-  ok(!(yield check("invalid ( + 5yntax")), "Invalid filter expressions return false");
+  ok(!(await check("invalid ( + 5yntax")), "Invalid filter expressions return false");
 
   // Non-boolean filter results result in a true return value.
-  ok(yield check("[1, 2, 3]"), "Non-boolean filter expressions return true");
+  ok(await check("[1, 2, 3]"), "Non-boolean filter expressions return true");
 });
 
-add_task(function* testStart() {
+add_task(async function testStart() {
   const getStub = sinon.stub(ClientEnvironment, "getClientClassification")
     .returns(Promise.resolve(false));
 
   // When the experiment pref is false, eagerly call getClientClassification.
-  yield SpecialPowers.pushPrefEnv({set: [
+  await SpecialPowers.pushPrefEnv({set: [
     ["extensions.shield-recipe-client.experiments.lazy_classify", false],
   ]});
   ok(!getStub.called, "getClientClassification hasn't been called");
-  yield RecipeRunner.start();
+  await RecipeRunner.start();
   ok(getStub.called, "getClientClassfication was called eagerly");
 
   // When the experiment pref is true, do not eagerly call getClientClassification.
-  yield SpecialPowers.pushPrefEnv({set: [
+  await SpecialPowers.pushPrefEnv({set: [
     ["extensions.shield-recipe-client.experiments.lazy_classify", true],
   ]});
   getStub.reset();
   ok(!getStub.called, "getClientClassification hasn't been called");
-  yield RecipeRunner.start();
+  await RecipeRunner.start();
   ok(!getStub.called, "getClientClassfication was not called eagerly");
 
   getStub.restore();

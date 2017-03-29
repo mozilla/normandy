@@ -7,7 +7,6 @@
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
-Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
@@ -63,15 +62,15 @@ this.RecipeRunner = {
     return true;
   },
 
-  start: Task.async(function* () {
+  async start() {
     // Unless lazy classification is enabled, prep the classify cache.
     if (!Preferences.get("extensions.shield-recipe-client.experiments.lazy_classify", false)) {
-      yield ClientEnvironment.getClientClassification();
+      await ClientEnvironment.getClientClassification();
     }
 
     let recipes;
     try {
-      recipes = yield NormandyApi.fetchRecipes({enabled: true});
+      recipes = await NormandyApi.fetchRecipes({enabled: true});
     } catch (e) {
       const apiUrl = prefs.getCharPref("api_url");
       log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
@@ -81,7 +80,7 @@ this.RecipeRunner = {
     const recipesToRun = [];
 
     for (const recipe of recipes) {
-      if (yield this.checkFilter(recipe)) {
+      if (await this.checkFilter(recipe)) {
         recipesToRun.push(recipe);
       }
     }
@@ -92,13 +91,13 @@ this.RecipeRunner = {
       for (const recipe of recipesToRun) {
         try {
           log.debug(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
-          yield this.executeRecipe(recipe);
+          await this.executeRecipe(recipe);
         } catch (e) {
           log.error(`Could not execute recipe ${recipe.name}:`, e);
         }
       }
     }
-  }),
+  },
 
   getFilterContext() {
     return {
@@ -113,10 +112,10 @@ this.RecipeRunner = {
    * @return {boolean} The result of evaluating the filter, cast to a bool, or false
    *                   if an error occurred during evaluation.
    */
-  checkFilter: Task.async(function* (recipe) {
+  async checkFilter(recipe) {
     const context = this.getFilterContext();
     try {
-      const result = yield FilterExpressions.eval(recipe.filter_expression, context);
+      const result = await FilterExpressions.eval(recipe.filter_expression, context);
       return !!result;
     } catch (err) {
       log.error(`Error checking filter for "${recipe.name}"`);
@@ -124,20 +123,20 @@ this.RecipeRunner = {
       log.error(`Error: "${err}"`);
       return false;
     }
-  }),
+  },
 
   /**
    * Execute a recipe by fetching it action and executing it.
    * @param  {Object} recipe A recipe to execute
    * @promise Resolves when the action has executed
    */
-  executeRecipe: Task.async(function* (recipe) {
-    const action = yield NormandyApi.fetchAction(recipe.action);
-    const response = yield fetch(action.implementation_url);
+  async executeRecipe(recipe) {
+    const action = await NormandyApi.fetchAction(recipe.action);
+    const response = await fetch(action.implementation_url);
 
-    const actionScript = yield response.text();
-    yield this.executeAction(recipe, actionScript);
-  }),
+    const actionScript = await response.text();
+    await this.executeAction(recipe, actionScript);
+  },
 
   /**
    * Execute an action in a sandbox for a specific recipe.
@@ -174,8 +173,6 @@ this.RecipeRunner = {
         resolve(clonedResult);
       });
       sandboxManager.addGlobal("actionFailed", err => {
-        Cu.reportError(err);
-
         // Error objects can't be cloned, so we just copy the message
         // (which doesn't need to be cloned) to be somewhat useful.
         const message = err.message;
@@ -194,17 +191,18 @@ this.RecipeRunner = {
    * API url. This is used mainly by the mock-recipe-server JS that is
    * executed in the browser console.
    */
-  testRun: Task.async(function* (baseApiUrl) {
+  async testRun(baseApiUrl) {
     const oldApiUrl = prefs.getCharPref("api_url");
     prefs.setCharPref("api_url", baseApiUrl);
 
     try {
       Storage.clearAllStorage();
+      ClientEnvironment.clearClassifyCache();
       NormandyApi.clearIndexCache();
-      yield this.start();
+      await this.start();
     } finally {
       prefs.setCharPref("api_url", oldApiUrl);
       NormandyApi.clearIndexCache();
     }
-  }),
+  },
 };

@@ -29,6 +29,7 @@ class Core(Configuration):
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
+        'whitenoise.runserver_nostatic',
         'django.contrib.staticfiles',
     ]
 
@@ -38,6 +39,7 @@ class Core(Configuration):
         'normandy.base.middleware.request_received_at_middleware',
         'normandy.base.middleware.RequestSummaryLogger',
         'django.middleware.security.SecurityMiddleware',
+        'normandy.base.middleware.NormandyWhiteNoiseMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'csp.middleware.CSPMiddleware',
@@ -72,7 +74,6 @@ class Core(Configuration):
     USE_TZ = True
 
     # Static files (CSS, JavaScript, Images)
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -97,7 +98,8 @@ class Core(Configuration):
         'DEFAULT_RENDERER_CLASSES': (
             'normandy.base.api.renderers.CanonicalJSONRenderer',
             'normandy.base.api.renderers.CustomBrowsableAPIRenderer',
-        )
+        ),
+        'EXCEPTION_HANDLER': 'normandy.base.api.views.exception_handler',
     }
 
     WEBPACK_LOADER = {
@@ -125,8 +127,13 @@ class Core(Configuration):
 
     # these don't fallback to default-src
     CSP_BASE_URI = "'none'"  # not using <base>
-    CSP_FRAME_ANCESTORS = "'none'"  # this page isn't iframed elsewhere
     CSP_FORM_ACTION = "'self'"  # we only submit forms to ourselves
+
+    # TODO(mythmon) Re-add this once either:
+    #   1) We know the domain we can use for Firefox's framing of the self-repair frame
+    #   2) We've deprecated the self-repair frame entirely
+    #   3) django-csp allows removing directives on an individual view (mozilla/django-csp#85)
+    # CSP_FRAME_ANCESTORS = "'none'"  # Block framing by default
 
     # Action names and the path they are located at.
     ACTIONS = {
@@ -185,7 +192,7 @@ class Base(Core):
     def LOGGING(self):
         return {
             'version': 1,
-            'disable_existing_loggers': True,
+            'disable_existing_loggers': False,
             'formatters': {
                 'json': {
                     '()': 'mozilla_cloud_services_logger.formatters.JsonLogFormatter',
@@ -295,7 +302,7 @@ class Base(Core):
     APP_SERVER_URL = values.URLValue(None)
 
     # URL for the CSP report-uri directive.
-    CSP_REPORT_URI = values.Value(None)
+    CSP_REPORT_URI = values.Value('/__cspreport__')
 
     # Normandy settings
     ADMIN_ENABLED = values.BooleanValue(True)

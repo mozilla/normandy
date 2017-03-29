@@ -11,7 +11,7 @@ class CaseInsensitiveBooleanFilter(django_filters.Filter):
             lc_value = value.lower()
             if lc_value in ['true', '1']:
                 value = True
-            if lc_value in ['false', '0']:
+            elif lc_value in ['false', '0']:
                 value = False
             return qs.filter(**{self.name: value})
         return qs
