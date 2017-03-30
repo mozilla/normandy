@@ -97,16 +97,7 @@ describe('<RecipeForm>', () => {
       }
     });
 
-    it('should throw if the filter expression is invalid JEXL', async () => {
-      try {
-        await formConfig.asyncValidate({ extra_filter_expression: '2-- + 4 (' });
-        expect(false).toBe(true); // Fail if we don't throw.
-      } catch (err) {
-        expect('extra_filter_expression' in err).toBe(true);
-      }
-    });
-
-    it('should pass if the filter expression is valid JEXL', async () => {
+    it('should pass if the filter expression is not blank', async () => {
       // Should not throw.
       await formConfig.asyncValidate({ extra_filter_expression: '1+1' });
     });

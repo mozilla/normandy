@@ -11,7 +11,6 @@ PROJECTS=(
     recipe-client-addon
     recipe-server
     mock-recipe-server
-    functional_tests
     lints
     compose
     eslint-config-normandy

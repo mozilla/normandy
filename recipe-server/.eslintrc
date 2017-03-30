@@ -1,8 +1,11 @@
-extends: airbnb
+extends:
+  - airbnb
+  - plugin:react/recommended
 parser: babel-eslint
 plugins:
   - jasmine
   - babel
+  - react
 globals:
   PRODUCTION: false
   DEVELOPMENT: false
@@ -26,7 +29,12 @@ rules:
   import/no-named-as-default: [off]
   react/jsx-filename-extension: [error, { extensions: [.js] }]
   react/no-multi-comp: [off]
+  react/jsx-no-bind: [error]
+  react/jsx-boolean-value: [warn]
+  react/jsx-wrap-multilines: [error]
+  react/no-danger-with-children: [error]
   react/require-extension: [off]  # deprecated
+  react/self-closing-comp: [warn]
   jsx-a11y/label-has-for: [off]
 
   # generator-star-spacing is broken with parser: babel-eslint. Use a patched version

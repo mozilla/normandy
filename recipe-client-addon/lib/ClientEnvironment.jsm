@@ -7,7 +7,6 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "ShellService", "resource:///modules/ShellService.jsm");
@@ -31,12 +30,12 @@ this.ClientEnvironment = {
    * The server request is made lazily and is cached for the entire browser
    * session.
    */
-  getClientClassification: Task.async(function *() {
+  async getClientClassification() {
     if (!_classifyRequest) {
       _classifyRequest = NormandyApi.classifyClient();
     }
-    return yield _classifyRequest;
-  }),
+    return await _classifyRequest;
+  },
 
   clearClassifyCache() {
     _classifyRequest = null;
@@ -45,13 +44,13 @@ this.ClientEnvironment = {
   /**
    * Test wrapper that mocks the server request for classifying the client.
    * @param  {Object}   data          Fake server data to use
-   * @param  {Function} testGenerator Test generator to execute while mock data is in effect.
+   * @param  {Function} testFunction  Test function to execute while mock data is in effect.
    */
-  withMockClassify(data, testGenerator) {
-    return function* inner() {
+  withMockClassify(data, testFunction) {
+    return async function inner() {
       const oldRequest = _classifyRequest;
       _classifyRequest = Promise.resolve(data);
-      yield testGenerator();
+      await testFunction();
       _classifyRequest = oldRequest;
     };
   },
@@ -94,8 +93,8 @@ this.ClientEnvironment = {
       return Preferences.get("distribution.id", "default");
     });
 
-    XPCOMUtils.defineLazyGetter(environment, "telemetry", Task.async(function *() {
-      const pings = yield TelemetryArchive.promiseArchivedPingList();
+    XPCOMUtils.defineLazyGetter(environment, "telemetry", async function() {
+      const pings = await TelemetryArchive.promiseArchivedPingList();
 
       // get most recent ping per type
       const mostRecentPings = {};
@@ -112,10 +111,10 @@ this.ClientEnvironment = {
       const telemetry = {};
       for (const key in mostRecentPings) {
         const ping = mostRecentPings[key];
-        telemetry[ping.type] = yield TelemetryArchive.promiseArchivedPingById(ping.id);
+        telemetry[ping.type] = await TelemetryArchive.promiseArchivedPingById(ping.id);
       }
       return telemetry;
-    }));
+    });
 
     XPCOMUtils.defineLazyGetter(environment, "version", () => {
       return Services.appinfo.version;
@@ -129,13 +128,13 @@ this.ClientEnvironment = {
       return ShellService.isDefaultBrowser();
     });
 
-    XPCOMUtils.defineLazyGetter(environment, "searchEngine", Task.async(function* () {
-      const searchInitialized = yield new Promise(resolve => Services.search.init(resolve));
+    XPCOMUtils.defineLazyGetter(environment, "searchEngine", async function() {
+      const searchInitialized = await new Promise(resolve => Services.search.init(resolve));
       if (Components.isSuccessCode(searchInitialized)) {
         return Services.search.defaultEngine.identifier;
       }
       return null;
-    }));
+    });
 
     XPCOMUtils.defineLazyGetter(environment, "syncSetup", () => {
       return Preferences.isSet("services.sync.username");
@@ -150,11 +149,11 @@ this.ClientEnvironment = {
     });
 
     XPCOMUtils.defineLazyGetter(environment, "syncTotalDevices", () => {
-      return Preferences.get("services.sync.numClients", 0);
+      return environment.syncDesktopDevices + environment.syncMobileDevices;
     });
 
-    XPCOMUtils.defineLazyGetter(environment, "plugins", Task.async(function* () {
-      const plugins = yield AddonManager.getAddonsByTypes(["plugin"]);
+    XPCOMUtils.defineLazyGetter(environment, "plugins", async function() {
+      const plugins = await AddonManager.getAddonsByTypes(["plugin"]);
       return plugins.reduce((pluginMap, plugin) => {
         pluginMap[plugin.name] = {
           name: plugin.name,
@@ -163,7 +162,7 @@ this.ClientEnvironment = {
         };
         return pluginMap;
       }, {});
-    }));
+    });
 
     XPCOMUtils.defineLazyGetter(environment, "locale", () => {
       return Cc["@mozilla.org/chrome/chrome-registry;1"]
