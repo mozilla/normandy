@@ -8,6 +8,7 @@ const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/CanonicalJSON.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
+Cu.import("resource://shield-recipe-client/lib/Utils.jsm");
 Cu.importGlobalProperties(["fetch", "URL"]); /* globals fetch, URL */
 
 this.EXPORTED_SYMBOLS = ["NormandyApi"];
@@ -127,12 +128,15 @@ this.NormandyApi = {
     return clientData;
   },
 
-  async fetchAction(name) {
-    let actionApiUrl = await this.getApiUrl("action-list");
-    if (!actionApiUrl.endsWith("/")) {
-      actionApiUrl += "/";
-    }
-    const res = await this.get(actionApiUrl + name);
-    return await res.json();
+  /**
+   * Fetch an array of available actions from the server.
+   * @resolves {Object}
+   *   Mapping of action names to action objects.
+   */
+  async fetchActions() {
+    const actionApiUrl = await this.getApiUrl("action-list");
+    const res = await this.get(actionApiUrl);
+    const actionList = await res.json();
+    return Utils.keyBy(actionList, "name");
   },
 };

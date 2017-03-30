@@ -103,9 +103,11 @@ this.shutdown = function(data, reason) {
     "lib/NormandyDriver.jsm",
     "lib/PreferenceExperiments.jsm",
     "lib/RecipeRunner.jsm",
+    "lib/ActionSandboxManager.jsm",
     "lib/Sampling.jsm",
     "lib/SandboxManager.jsm",
     "lib/Storage.jsm",
+    "lib/Utils.jsm",
   ];
   for (const module of modules) {
     log.debug(`Unloading ${module}`);

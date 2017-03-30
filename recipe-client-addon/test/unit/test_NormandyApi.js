@@ -103,9 +103,11 @@ add_task(withMockApiServer(async function test_classifyClient() {
   });
 }));
 
-add_task(withMockApiServer(async function test_fetchAction() {
-  const action = await NormandyApi.fetchAction("show-heartbeat");
-  equal(action.name, "show-heartbeat");
+add_task(withMockApiServer(async function test_fetchActions() {
+  const actions = await NormandyApi.fetchActions("show-heartbeat");
+  equal(Object.values(actions).length, 2);
+  ok("console-log" in actions);
+  ok("show-heartbeat" in actions);
 }));
 
 add_task(withScriptServer("test_server.sjs", async function test_getTestServer(serverUrl) {

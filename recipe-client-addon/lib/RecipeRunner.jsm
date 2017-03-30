@@ -13,6 +13,7 @@ Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
+Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
@@ -99,6 +100,20 @@ this.RecipeRunner = {
       await ClientEnvironment.getClientClassification();
     }
 
+    // Run pre-execution hooks. If a hook fails, we don't run recipes with that
+    // action to avoid inconsistencies.
+    const actions = await NormandyApi.fetchActions();
+    for (const action of Object.values(actions)) {
+      try {
+        await this.runActionCallback(action, "preExecution");
+        action.failed = false;
+      } catch (err) {
+        log.error(`Could not run pre-execution hook for ${action.name}:`, err.message);
+        action.failed = true;
+      }
+    }
+
+    // Fetch recipes from the API
     let recipes;
     try {
       recipes = await NormandyApi.fetchRecipes({enabled: true});
@@ -108,24 +123,52 @@ this.RecipeRunner = {
       return;
     }
 
+    // Evaluate recipe filters
     const recipesToRun = [];
-
     for (const recipe of recipes) {
       if (await this.checkFilter(recipe)) {
         recipesToRun.push(recipe);
       }
     }
 
+    // Execute recipes, if we have any.
     if (recipesToRun.length === 0) {
       log.debug("No recipes to execute");
     } else {
       for (const recipe of recipesToRun) {
-        try {
-          log.debug(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
-          await this.executeRecipe(recipe);
-        } catch (e) {
-          log.error(`Could not execute recipe ${recipe.name}:`, e);
+        const action = actions[recipe.action];
+        if (!action) {
+          log.error(
+            `Could not execute recipe ${recipe.name}:`,
+            `Server reported no action with the name ${recipe.action}`
+          );
+        } else if (action.failed) {
+          log.warn(
+            `Skipping recipe ${recipe.name} because ${action.name} failed during pre-execution.`
+          );
+        } else {
+          try {
+            log.info(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
+            await this.runActionCallback(action, "action", recipe);
+          } catch (e) {
+            log.error(`Could not execute recipe ${recipe.name}:`, e);
+          }
         }
+      }
+    }
+
+    // Run post-execution hooks
+    for (const action of Object.values(actions)) {
+      // Skip if pre-execution failed.
+      if (action.failed) {
+        log.info(`Skipping post-execution hook for ${action.name} due to earlier failure.`);
+        continue;
+      }
+
+      try {
+        await this.runActionCallback(action, "postExecution");
+      } catch (err) {
+        log.info(`Could not run post-execution hook for ${action.name}:`, err.message);
       }
     }
   },
@@ -162,62 +205,23 @@ this.RecipeRunner = {
   },
 
   /**
-   * Execute a recipe by fetching it action and executing it.
-   * @param  {Object} recipe A recipe to execute
-   * @promise Resolves when the action has executed
+   * Execute a named callback in a sandbox that is registered by an action.
+   * @param {Object} action
+   * @param {String} callbackName
+   * @promise Resolves when the callback has executed.
    */
-  async executeRecipe(recipe) {
-    const action = await NormandyApi.fetchAction(recipe.action);
+  async runActionCallback(action, callbackName, ...args) {
+    log.debug(`runActionCallback(${action.name}, callbackName)`);
     const response = await fetch(action.implementation_url);
-
     const actionScript = await response.text();
-    await this.executeAction(recipe, actionScript);
-  },
 
-  /**
-   * Execute an action in a sandbox for a specific recipe.
-   * @param  {Object} recipe A recipe to execute
-   * @param  {String} actionScript The JavaScript for the action to execute.
-   * @promise Resolves or rejects when the action has executed or failed.
-   */
-  executeAction(recipe, actionScript) {
-    return new Promise((resolve, reject) => {
-      const sandboxManager = new SandboxManager();
-      const prepScript = `
-        function registerAction(name, Action) {
-          let a = new Action(sandboxedDriver, sandboxedRecipe);
-          a.execute().then(actionFinished, actionFailed);
-        };
-
-        this.window = this;
-        this.registerAction = registerAction;
-        this.setTimeout = sandboxedDriver.setTimeout;
-        this.clearTimeout = sandboxedDriver.clearTimeout;
-      `;
-
-      const driver = new NormandyDriver(sandboxManager);
-      sandboxManager.cloneIntoGlobal("sandboxedDriver", driver, {cloneFunctions: true});
-      sandboxManager.cloneIntoGlobal("sandboxedRecipe", recipe);
-
-      // Results are cloned so that they don't become inaccessible when
-      // the sandbox they came from is nuked when the hold is removed.
-      sandboxManager.addGlobal("actionFinished", result => {
-        const clonedResult = Cu.cloneInto(result, {});
-        sandboxManager.removeHold("recipeExecution");
-        resolve(clonedResult);
-      });
-      sandboxManager.addGlobal("actionFailed", err => {
-        // Copy the error before calling `removeHold`, which will nuke
-        // the sandbox and break the wrapper around the error.
-        const {message, fileName, lineNumber} = err;
-        sandboxManager.removeHold("recipeExecution");
-        reject(new Error(message, fileName, lineNumber));
-      });
-
-      sandboxManager.addHold("recipeExecution");
-      sandboxManager.evalInSandbox(prepScript);
-      sandboxManager.evalInSandbox(actionScript);
-    });
+    const sandboxManager = new ActionSandboxManager();
+    sandboxManager.addHold("callbackExecution");
+    try {
+      await sandboxManager.runAsyncCallbackFromScript(actionScript, callbackName, ...args);
+    } finally {
+      sandboxManager.removeHold("callbackExecution");
+    }
   },
 
   /**

@@ -4,6 +4,8 @@ Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm", this);
 
 add_task(async function execute() {
   // Test that RecipeRunner can execute a basic recipe/action and return
@@ -145,7 +147,7 @@ add_task(async function checkFilter() {
   ok(!(await RecipeRunner.checkFilter(recipe)), "The recipe is available in the filter context");
 });
 
-add_task(async function testClientClassificationCache() {
+add_task(withMockNormandyApi(async function testClientClassificationCache() {
   const getStub = sinon.stub(ClientEnvironment, "getClientClassification")
     .returns(Promise.resolve(false));
 
@@ -167,6 +169,92 @@ add_task(async function testClientClassificationCache() {
   ok(!getStub.called, "getClientClassification was not called eagerly");
 
   getStub.restore();
+}));
+
+add_task(withMockNormandyApi(async function testRun(mockApi) {
+  const runActionCallback = sinon.stub(RecipeRunner, "runActionCallback", async () => {});
+
+  const matchAction = {name: "matchAction"};
+  const noMatchAction = {name: "noMatchAction"};
+  mockApi.actions = [matchAction, noMatchAction];
+
+  const matchRecipe = {action: "matchAction", filter_expression: "true"};
+  const noMatchRecipe = {action: "noMatchAction", filter_expression: "false"};
+  const missingRecipe = {action: "missingAction", filter_expression: "true"};
+  mockApi.recipes = [matchRecipe, noMatchRecipe, missingRecipe];
+
+  await RecipeRunner.run();
+
+  // match should be called for preExecution, action, and postExecution
+  sinon.assert.calledWith(runActionCallback, matchAction, "preExecution");
+  sinon.assert.calledWith(runActionCallback, matchAction, "action", matchRecipe);
+  sinon.assert.calledWith(runActionCallback, matchAction, "postExecution");
+
+  // noMatch should be called for preExecution and postExecution, and skipped
+  // for action since the filter expression does not match.
+  sinon.assert.calledWith(runActionCallback, noMatchAction, "preExecution");
+  sinon.assert.neverCalledWith(runActionCallback, noMatchAction, "action", noMatchRecipe);
+  sinon.assert.calledWith(runActionCallback, noMatchAction, "postExecution");
+
+  // missing should not be called at all due to no matching action.
+  sinon.assert.neverCalledWith(runActionCallback, sinon.match.any, sinon.match.any, missingRecipe);
+
+  runActionCallback.restore();
+}));
+
+add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) {
+  const runActionCallback = sinon.stub(RecipeRunner, "runActionCallback", async action => {
+    if (action.name.startsWith("fail")) {
+      throw new Error("oh no");
+    }
+  });
+
+  const passAction = {name: "passAction"};
+  const failAction = {name: "failAction"};
+  mockApi.actions = [passAction, failAction];
+
+  const passRecipe = {action: "passAction", filter_expression: "true"};
+  const failRecipe = {action: "failAction", filter_expression: "true"};
+  mockApi.recipes = [passRecipe, failRecipe];
+
+  await RecipeRunner.run();
+
+  // pass should be called for preExecution, action, and postExecution
+  sinon.assert.calledWith(runActionCallback, passAction, "preExecution");
+  sinon.assert.calledWith(runActionCallback, passAction, "action", passRecipe);
+  sinon.assert.calledWith(runActionCallback, passAction, "postExecution");
+
+  // fail should only be called for preExecution, since it fails during that
+  sinon.assert.calledWith(runActionCallback, failAction, "preExecution");
+  sinon.assert.neverCalledWith(runActionCallback, failAction, "action", failRecipe);
+  sinon.assert.neverCalledWith(runActionCallback, failAction, "postExecution");
+
+  runActionCallback.restore();
+}));
+
+add_task(async function testRunActionCallback() {
+  const runAsyncCallbackFromScript = sinon.stub(
+    ActionSandboxManager.prototype,
+    "runAsyncCallbackFromScript",
+    async () => {},
+  );
+
+  const action = {
+    implementation_url: (
+      "http://test/browser/browser/extensions/shield-recipe-client/test/browser/action_server.sjs"
+    ),
+  };
+  await RecipeRunner.runActionCallback(action, "action", "foo", "bar");
+
+  sinon.assert.calledWith(
+    runAsyncCallbackFromScript,
+    'registerAsyncCallback("action", async () => {});',
+    "action",
+    "foo",
+    "bar",
+  );
+
+  runAsyncCallbackFromScript.restore();
 });
 
 add_task(async function testStartup() {
