@@ -10,9 +10,6 @@ tasks = [
         'name': 'recipe-client-addon:test',
         'description': 'Test recipe-client-addon with gecko-dev',
         'command': 'normandy/recipe-client-addon/bin/tc/test.sh',
-        'env': {
-            'GECKO_DEV_URL': 'https://github.com/mozilla/gecko-dev',
-        },
     },
     {
         'name': 'recipe-client-addon:make-xpi',
@@ -59,7 +56,7 @@ def main():
                 'deadline': fromNow('4 hours'),
                 'expires': fromNow('365 days'),
                 'payload': {
-                    'image': 'ubuntu:zesty',
+                    'image': 'mozilla/normandy-taskcluster:latest',
                     'command': [
                         '/bin/bash',
                         '-c',
