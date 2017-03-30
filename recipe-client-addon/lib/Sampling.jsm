@@ -137,12 +137,13 @@ this.Sampling = {
    *
    * For example, given the ratios:
    *
-   * [1, 2, 3]
+   * [1, 2, 3, 4]
    *
-   * ~16% of all inputs will return 0, ~33% of all inputs will return 1, and 50%
-   * of all inputs will return 2. You can determine the percent of inputs that
-   * will return an index by dividing the ratio by the sum of all ratios passed
-   * in. In the case above, 3 / (1 + 2 + 3) == 0.5, or 50% of the inputs.
+   * 10% of all inputs will return 0, 20% of all inputs will return 1, 30% will
+   * return 2, and 40% will return 3. You can determine the percent of inputs
+   * that will return an index by dividing the ratio by the sum of all ratios
+   * passed in. In the case above, 4 / (1 + 2 + 3 + 4) == 0.4, or 40% of the
+   * inputs.
    *
    * @param {object} input
    * @param {Array<integer>} ratios
@@ -151,12 +152,12 @@ this.Sampling = {
    * @rejects {Error}
    *   If the list of ratios doesn't have at least one element
    */
-  ratioSample: Task.async(function* (input, ratios) {
+  async ratioSample(input, ratios) {
     if (ratios.length < 1) {
       throw new Error(`ratios must be at least 1 element long (got length: ${ratios.length})`);
     }
 
-    const inputHash = yield Sampling.truncatedHash(input);
+    const inputHash = await Sampling.truncatedHash(input);
     const ratioTotal = ratios.reduce((acc, ratio) => acc + ratio);
 
     let samplePoint = 0;
@@ -169,5 +170,5 @@ this.Sampling = {
 
     // No need to check the last bucket if the others didn't match.
     return ratios.length - 1;
-  }),
+  },
 };
