@@ -29,6 +29,9 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    # Attributes serialized here are made available to filter expressions via
+    # normandy.recipe, and should be documented if they are intended to be
+    # used in filter expressions.
     enabled = serializers.BooleanField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
     revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
