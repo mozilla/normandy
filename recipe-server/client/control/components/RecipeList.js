@@ -110,21 +110,21 @@ export class DisconnectedRecipeList extends React.Component {
    * Caches generated functions to prevent lots of function
    * creation on each render loop.
    *
-   * @param  {string}   id  Recipe ID user has attempted to view
-   * @return {function}     Generated event handler for this recipe
+   * @param  {string}   recipe  Recipe object that the user is trying to view
+   * @return {function}         Generated event handler for this recipe
    */
-  handleViewRecipe(id) {
-    if (!this.handlerCache[id]) {
+  handleViewRecipe(recipe) {
+    if (!this.handlerCache[recipe.id]) {
       const { dispatch } = this.props;
 
-      this.handlerCache[id] = () => {
-        dispatch(setSelectedRecipe(id));
-        dispatch(push(`/control/recipe/${id}/`));
+      this.handlerCache[recipe.id] = () => {
+        dispatch(setSelectedRecipe(recipe.id));
+        dispatch(push(`/control/recipe/${recipe.id}/revision/${recipe.latest_revision_id}`));
       };
     }
 
     return () => {
-      this.handlerCache[id]();
+      this.handlerCache[recipe.id]();
     };
   }
 
@@ -216,7 +216,7 @@ export class DisconnectedRecipeList extends React.Component {
             {filteredRecipes.map(recipe =>
               <Tr
                 key={recipe.id}
-                onClick={this.handleViewRecipe(recipe.id)}
+                onClick={this.handleViewRecipe(recipe)}
               >
                 {
                   displayedColumns.map(this.renderTableCell(recipe))

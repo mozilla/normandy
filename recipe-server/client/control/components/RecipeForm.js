@@ -19,6 +19,7 @@ import {
   setSelectedRecipe,
   singleRecipeReceived,
   revisionsReceived,
+  revisionRecipeUpdated,
 } from 'control/actions/RecipeActions';
 
 import {
@@ -147,7 +148,8 @@ export class RecipeForm extends React.Component {
     const hasApprovalRequest = !!requestDetails;
     const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
 
-    const isUserViewingOutdated = !!routeParams.revisionId;
+    const isUserViewingOutdated = recipe && routeParams.revisionId
+      && routeParams.revisionId !== recipe.latest_revision_id;
     const isPendingApproval = hasApprovalRequest && requestDetails.approved === null;
     const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated) || !userId;
 
@@ -163,7 +165,8 @@ export class RecipeForm extends React.Component {
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
       isApproved: !!recipeId && requestDetails && requestDetails.approved,
-      isEnabled: !!recipeId && revision.enabled,
+      isRecipeApproved: recipe && recipe.is_approved,
+      isEnabled: !!recipeId && !!revision.enabled,
       isUserViewingOutdated,
       isViewingLatestApproved,
       isPendingApproval,
@@ -203,6 +206,8 @@ export class RecipeForm extends React.Component {
       dispatch,
     } = this.props;
 
+    const revisionId = revision ? revision.latest_revision_id : recipe.latest_revision_id;
+
     switch (action) {
       case 'cancel':
         return dispatch(makeApiRequest('closeApprovalRequest', {
@@ -217,6 +222,13 @@ export class RecipeForm extends React.Component {
           dispatch(singleRecipeReceived({
             ...recipe,
             approval_request: null,
+          }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: null,
+            },
+            revisionId,
           }));
         });
 
@@ -259,7 +271,7 @@ export class RecipeForm extends React.Component {
 
       case 'request':
         return dispatch(makeApiRequest('openApprovalRequest', {
-          revisionId: recipe.revision_id,
+          revisionId: revision ? revision.latest_revision_id : recipe.latest_revision_id,
         })).then(response => {
           // show success message
           dispatch(showNotification({
@@ -272,6 +284,15 @@ export class RecipeForm extends React.Component {
             approval_request: {
               ...response,
             },
+          }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: {
+                ...response,
+              },
+            },
+            revisionId,
           }));
         });
 
@@ -334,17 +355,21 @@ export class RecipeForm extends React.Component {
           )
         }
 
-        <RecipeStatus
-          className={renderVars.isEnabled ? 'green' : 'red'}
-          icon={
-            <BooleanIcon
-              className="draft-status-icon"
-              value={renderVars.isEnabled}
-              title={statusText}
+        {
+          recipe && (
+            <RecipeStatus
+              className={renderVars.isEnabled ? 'green' : 'red'}
+              icon={
+                <BooleanIcon
+                  className="draft-status-icon"
+                  value={renderVars.isEnabled}
+                  title={statusText}
+                />
+              }
+              text={statusText}
             />
-          }
-          text={statusText}
-        />
+          )
+        }
 
         <ControlField
           disabled={isFormDisabled}
@@ -474,7 +499,7 @@ const connector = connect(
       return dispatch(makeApiRequest('addRecipe', { recipe }))
       .then(response => {
         dispatch(recipeAdded(response));
-        dispatch(push(`/control/recipe/${response.id}/`));
+        dispatch(push(`/control/recipe/${response.id}/revision/${response.latest_revision_id}/`));
         dispatch(setSelectedRecipe(response.id));
       });
     },
@@ -485,7 +510,7 @@ const connector = connect(
           ...response,
           recipe: response,
         }));
-        dispatch(push(`/control/recipe/${response.id}/${response.latest_revision_id}/`));
+        dispatch(push(`/control/recipe/${response.id}/revision/${response.latest_revision_id}/`));
       });
     },
   }),

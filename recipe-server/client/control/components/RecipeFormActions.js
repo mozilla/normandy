@@ -81,10 +81,9 @@ export default class RecipeFormActions extends React.Component {
   }
 
   getActions({
-    isApproved,
+    isRecipeApproved,
     isEnabled,
     isUserViewingOutdated,
-    isViewingLatestApproved,
     isPendingApproval,
     isUserRequester,
     isAlreadySaved,
@@ -122,11 +121,10 @@ export default class RecipeFormActions extends React.Component {
       />,
       // enable
       <FormButton
-        display={isViewingLatestApproved && !isEnabled}
-        disabled={!isApproved}
+        display={isRecipeApproved && !isEnabled}
         className="action-enable submit"
         label="Enable"
-        element={isApproved ? Link : 'button'}
+        element={isRecipeApproved ? Link : 'button'}
         to={`/control/recipe/${recipeId}/enable/`}
       />,
       // disable

@@ -4,6 +4,7 @@ import {
   RECIPE_UPDATED,
   RECIPES_RECEIVED,
   RECIPES_NEED_FETCH,
+  REVISION_RECIPE_UPDATED,
   REVISIONS_RECEIVED,
   SET_SELECTED_RECIPE,
   SET_SELECTED_REVISION,
@@ -73,6 +74,7 @@ function recipesReducer(state = initialState, action) {
         revisions: {
           ...state.revisions,
           [action.recipe.id]: {
+            ...state.revisions[action.recipe.id],
             [action.recipe.revision_id]: {
               approval_request: action.recipe.approval_request,
               id: action.recipe.revision_id,
@@ -92,6 +94,24 @@ function recipesReducer(state = initialState, action) {
             ...state.revisions[action.revision.recipe.id],
             [action.revision.id]: {
               ...action.revision,
+            },
+          },
+        },
+      };
+    }
+
+    case REVISION_RECIPE_UPDATED: {
+      return {
+        ...state,
+        revisions: {
+          ...state.revisions,
+          [action.recipe.id]: {
+            ...state.revisions[action.recipe.id],
+            [action.revisionId]: {
+              ...state.revisions[action.recipe.id][action.revisionId],
+              recipe: {
+                ...action.recipe,
+              },
             },
           },
         },

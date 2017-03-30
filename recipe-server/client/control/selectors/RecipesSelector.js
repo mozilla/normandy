@@ -72,29 +72,17 @@ export function getSelectedRevision({ recipes = {} }) {
   if (selectedRecipeId) {
     recipe = recipes.entries[selectedRecipeId];
 
-    let latestId = -1;
-    let latestTime;
-    // If there is a selected revision, attempt to pull that info.
     if (!selectedRevisionId) {
-      // If there is _not_ a selected revision, default to the latest
-
-      for (const revisionId in recipeRevisions) {
-        if (recipeRevisions.hasOwnProperty(revisionId)) {
-          const sinceRevision = moment().diff(recipeRevisions[revisionId].date_created);
-          if (!selectedRevisionId || sinceRevision < latestTime) {
-            latestId = revisionId;
-            latestTime = sinceRevision;
-          }
-        }
-      }
-      selectedRevisionId = latestId;
+      selectedRevisionId = recipe && recipe.latest_revision_id;
     }
 
     revision = (recipeRevisions[selectedRevisionId] || {}).recipe;
 
-    if (!revision) {
-      recipe = null;
-    }
+    console.log('===');
+    console.log(recipe);
+    console.log(revision);
+    console.log(recipeRevisions);
+    console.log(selectedRevisionId);
   }
 
   return {

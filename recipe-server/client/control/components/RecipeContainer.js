@@ -26,7 +26,7 @@ export class RecipeContainer extends React.Component {
     }
   }
 
-  componentWillReceiveProps({ recipeId, routeParams = {} }) {
+  componentWillReceiveProps({ recipe, recipeId, routeParams = {} }) {
     const isRecipeChanging = recipeId !== this.props.recipeId;
     const isRouteRevisionChanging =
       routeParams.revisionId !== this.props.routeParams.revisionId;

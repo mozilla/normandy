@@ -6,6 +6,7 @@ export const RECIPES_NEED_FETCH = 'RECIPES_NEED_FETCH';
 export const SET_SELECTED_RECIPE = 'SET_SELECTED_RECIPE';
 export const SET_SELECTED_REVISION = 'SET_SELECTED_REVISION';
 export const REVISIONS_RECEIVED = 'REVISIONS_RECEIVED';
+export const REVISION_RECIPE_UPDATED = 'REVISION_RECIPE_UPDATED';
 
 export const RECIPE_ADDED = 'RECIPE_ADDED';
 export const RECIPE_UPDATED = 'RECIPE_UPDATED';
@@ -79,5 +80,13 @@ export function revisionsReceived({ recipeId, revisions }) {
     type: REVISIONS_RECEIVED,
     recipeId,
     revisions,
+  };
+}
+
+export function revisionRecipeUpdated({ revisionId, recipe }) {
+  return {
+    type: REVISION_RECIPE_UPDATED,
+    revisionId,
+    recipe,
   };
 }
