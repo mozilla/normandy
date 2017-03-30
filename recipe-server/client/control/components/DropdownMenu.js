@@ -29,6 +29,8 @@ export default class DropdownMenu extends React.Component {
     useClick: pt.bool,
     useFocus: pt.bool,
     pinRight: pt.bool,
+    pinTop: pt.bool,
+    display: pt.bool,
   };
 
   constructor(props) {
@@ -141,11 +143,14 @@ export default class DropdownMenu extends React.Component {
 
   render() {
     const {
+      pinRight,
+      pinTop,
       useClick,
       useFocus,
       trigger,
-      disabled,
+      display,
       children,
+      disabled,
     } = this.props;
 
     const {
@@ -154,7 +159,13 @@ export default class DropdownMenu extends React.Component {
 
     const menuClass = cx('dropdown-menu', this.id);
     const contentClass = cx('dropdown-content',
-      this.props.pinRight && 'pin-right');
+      pinRight && 'pin-right',
+      pinTop && 'pin-top'
+    );
+
+    if (display === false) {
+      return null;
+    }
 
     return (
       <div
@@ -163,7 +174,6 @@ export default class DropdownMenu extends React.Component {
         <div
           className="dropdown-trigger"
           onClick={useClick && this.enableVisibility}
-
           onFocus={useFocus && this.enableVisibility}
           onChange={useFocus && this.enableVisibility}
           onKeyDown={useFocus && this.enableVisibility}
@@ -172,9 +182,7 @@ export default class DropdownMenu extends React.Component {
         </div>
         {
           !disabled && isVisible &&
-            <div
-              className={contentClass}
-            >
+            <div className={contentClass}>
               { children }
             </div>
         }

@@ -8,11 +8,12 @@ import pytest
 from rest_framework.reverse import reverse
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
-from normandy.base.tests import Whatever
+from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import aware_datetime
-from normandy.recipes.models import Recipe
+from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
+    ApprovalRequestFactory,
     ChannelFactory,
     CountryFactory,
     LocaleFactory,
@@ -278,8 +279,8 @@ class TestRecipeAPI(object):
 
     def test_history(self, api_client):
         recipe = RecipeFactory(name='version 1')
-        recipe.update(name='version 2')
-        recipe.update(name='version 3')
+        recipe.revise(name='version 2')
+        recipe.revise(name='version 3')
 
         res = api_client.get('/api/v1/recipe/%s/history/' % recipe.id)
 
@@ -288,25 +289,35 @@ class TestRecipeAPI(object):
         assert res.data[2]['recipe']['name'] == 'version 1'
 
     def test_it_can_enable_recipes(self, api_client):
-        recipe = RecipeFactory(enabled=False)
+        recipe = RecipeFactory(enabled=False, approver=UserFactory())
 
         res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-        assert res.status_code == 204
+        assert res.status_code == 200
+        assert res.data['enabled'] is True
 
         recipe = Recipe.objects.all()[0]
         assert recipe.enabled
 
+    def test_cannot_enable_unapproved_recipes(self, api_client):
+        recipe = RecipeFactory(enabled=False)
+
+        res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
+        assert res.status_code == 409
+        assert res.data['enabled'] == 'Cannot enable a recipe that is not approved.'
+
     def test_it_can_disable_recipes(self, api_client):
-        recipe = RecipeFactory(enabled=True)
+        recipe = RecipeFactory(approver=UserFactory(), enabled=True)
 
         res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
-        assert res.status_code == 204
+        assert res.status_code == 200
+        assert res.data['enabled'] is False
 
         recipe = Recipe.objects.all()[0]
+        assert not recipe.is_approved
         assert not recipe.enabled
 
     def test_filtering_by_enabled_lowercase(self, api_client):
-        r1 = RecipeFactory(enabled=True)
+        r1 = RecipeFactory(approver=UserFactory(), enabled=True)
         RecipeFactory(enabled=False)
 
         res = api_client.get('/api/v1/recipe/?enabled=true')
@@ -374,7 +385,7 @@ class TestRecipeAPI(object):
         assert res.data[1]['signature']['signature'] == r2.signature.signature
 
     def test_signed_listing_filters_by_enabled(Self, api_client):
-        enabled_recipe = RecipeFactory(signed=True, enabled=True)
+        enabled_recipe = RecipeFactory(signed=True, approver=UserFactory(), enabled=True)
         disabled_recipe = RecipeFactory(signed=True, enabled=False)
 
         res = api_client.get('/api/v1/recipe/signed/?enabled=1')
@@ -400,7 +411,7 @@ class TestRecipeAPI(object):
 
     def test_list_filter_status(self, api_client):
         r1 = RecipeFactory(enabled=False)
-        r2 = RecipeFactory(enabled=True)
+        r2 = RecipeFactory(approver=UserFactory(), enabled=True)
 
         res = api_client.get('/api/v1/recipe/?status=enabled')
         assert res.status_code == 200
@@ -491,6 +502,93 @@ class TestRecipeRevisionAPI(object):
         assert res.status_code == 200
         assert res.data['id'] == recipe.latest_revision.id
 
+    def test_request_approval(self, api_client):
+        recipe = RecipeFactory()
+        res = api_client.post(
+            '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
+        assert res.status_code == 201
+        assert res.data['id'] == recipe.latest_revision.approval_request.id
+
+    def test_cannot_open_second_approval_request(self, api_client):
+        recipe = RecipeFactory()
+        ApprovalRequestFactory(revision=recipe.latest_revision)
+        res = api_client.post(
+            '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
+        assert res.status_code == 400
+
+
+@pytest.mark.django_db
+class TestApprovalRequestAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v1/approval_request/')
+        assert res.status_code == 200
+        assert res.data == []
+
+    def test_approve(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id),
+                              {'comment': 'r+'})
+        assert res.status_code == 200
+
+        r.refresh_from_db()
+        assert r.is_approved
+        assert r.approved_revision.approval_request.comment == 'r+'
+
+    def test_approve_no_comment(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
+        assert res.status_code == 400
+        assert res.data['comment'] == 'This field is required.'
+
+    def test_approve_not_actionable(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        a.approve(UserFactory(), 'r+')
+
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id),
+                              {'comment': 'r+'})
+        assert res.status_code == 400
+        assert res.data['error'] == 'This approval request has already been approved or rejected.'
+
+    def test_reject(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id),
+                              {'comment': 'r-'})
+        assert res.status_code == 200
+
+        r.latest_revision.approval_request.refresh_from_db()
+        assert r.latest_revision.approval_status == r.latest_revision.REJECTED
+        assert r.latest_revision.approval_request.comment == 'r-'
+
+    def test_reject_no_comment(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
+        assert res.status_code == 400
+        assert res.data['comment'] == 'This field is required.'
+
+    def test_reject_not_actionable(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        a.approve(UserFactory(), 'r+')
+
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id),
+                              {'comment': '-r'})
+        assert res.status_code == 400
+        assert res.data['error'] == 'This approval request has already been approved or rejected.'
+
+    def test_close(self, api_client):
+        r = RecipeFactory()
+        a = ApprovalRequestFactory(revision=r.latest_revision)
+        res = api_client.post('/api/v1/approval_request/{}/close/'.format(a.id))
+        assert res.status_code == 204
+
+        with pytest.raises(ApprovalRequest.DoesNotExist):
+            ApprovalRequest.objects.get(pk=a.pk)
+
 
 @pytest.mark.django_db
 class TestClassifyClient(object):
@@ -520,3 +618,103 @@ class TestClassifyClient(object):
         res = api_client.get('/api/v1/classify_client/')
         assert res.status_code == 200
         assert res.client.cookies == {}
+
+
+@pytest.mark.django_db
+def test_full_approval_flow(api_client):
+    action = ActionFactory()
+    user1 = UserFactory(is_superuser=True)
+    user2 = UserFactory(is_superuser=True)
+    api_client.force_authenticate(user1)
+
+    # Create a recipe
+    res = api_client.post('/api/v1/recipe/', {
+        'action': action.name,
+        'arguments': {},
+        'name': 'test recipe',
+        'extra_filter_expression': 'counter == 0',
+        'enabled': 'false',
+    })
+    assert res.status_code == 201
+    recipe_data_1 = res.json()
+
+    # Request approval for it
+    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                          .format(recipe_data_1['revision_id']))
+    approval_data = res.json()
+    assert res.status_code == 201
+
+    # The requester isn't allowed to approve a recipe
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                          {'comment': 'r+'})
+    assert res.status_code == 403  # Forbidden
+
+    # Approve the recipe
+    api_client.force_authenticate(user2)
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                          {'comment': 'r+'})
+    assert res.status_code == 200
+
+    # Make another change
+    api_client.force_authenticate(user1)
+    res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
+        'extra_filter_expression': 'counter == 1',
+    })
+    assert res.status_code == 200
+
+    # The change should not be visible yet, since it isn't approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    recipe_data_2 = res.json()
+    assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
+
+    # Request approval for the change
+    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                          .format(recipe_data_2['latest_revision_id']))
+    approval_data = res.json()
+    recipe_data_2['approval_request'] = approval_data
+    assert res.status_code == 201
+
+    # The change should not be visible yet, since it isn't approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    assert res.json() == recipe_data_2
+
+    # Reject the change
+    api_client.force_authenticate(user2)
+    res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
+                          {'comment': 'r-'})
+    recipe_data_2['approval_request'] = res.json()
+    assert res.status_code == 200
+
+    # The change should not be visible yet, since it isn't approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    assert res.json() == recipe_data_2
+
+    # Make a third version of the recipe
+    api_client.force_authenticate(user1)
+    res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
+        'extra_filter_expression': 'counter == 2',
+    })
+    recipe_data_3 = res.json()
+    assert res.status_code == 200
+
+    # Request approval
+    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                          .format(recipe_data_3['latest_revision_id']))
+    approval_data = res.json()
+    assert res.status_code == 201
+
+    # Approve the change
+    api_client.force_authenticate(user2)
+    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                          {'comment': 'r+'})
+    assert res.status_code == 200
+
+    # The change should be visible now, since it is approved
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+    assert res.status_code == 200
+    recipe_data_4 = res.json()
+    assert recipe_data_4['extra_filter_expression'] == 'counter == 2'
+    assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']

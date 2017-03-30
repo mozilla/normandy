@@ -7,11 +7,13 @@ import {
 // API request configs
 import * as recipeApi from 'control/api/RecipeApi';
 import * as filterApi from 'control/api/FilterApi';
+import * as userApi from 'control/api/UserApi';
 
 // Combined list of API request configs
 const apiMap = {
   ...recipeApi,
   ...filterApi,
+  ...userApi,
 };
 
 // Root URL for API requests

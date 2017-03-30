@@ -1,5 +1,4 @@
 .dropdown-menu {
-  background: #CCC;
   display: block;
   float: right;
   position: relative;
@@ -38,6 +37,13 @@
     &.pin-right {
       left: auto;
       right: 0;
+    }
+
+    &.pin-top {
+      bottom: 100%;
+      min-width: 200px;
+      top: auto;
+      width: 30vw;
     }
 
     ul,

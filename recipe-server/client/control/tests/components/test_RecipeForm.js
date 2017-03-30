@@ -14,7 +14,9 @@ import { recipeFactory } from '../../../tests/utils.js';
 function propFactory(props = {}) {
   return {
     handleSubmit: () => undefined,
+    dispatch: () => Promise.resolve(),
     submitting: false,
+    user: {},
     ...props,
   };
 }
@@ -41,22 +43,6 @@ describe('<RecipeForm>', () => {
     });
   });
 
-
-  it('should render a delete button if editing an existing recipe', () => {
-    const recipe = recipeFactory();
-    const wrapper = shallow(
-      <RecipeForm recipeId={recipe.id} recipe={recipe} {...propFactory()} />
-    );
-    expect(wrapper.find('.delete').length).toBe(1);
-  });
-
-  it('should not render a delete button if creating a new recipe', () => {
-    const wrapper = shallow(
-      <RecipeForm {...propFactory()} />
-    );
-    expect(wrapper.find('.delete').length).toBe(0);
-  });
-
   it('should render a clone message if user is cloning', () => {
     const recipe = recipeFactory();
     const wrapper = shallow(
@@ -69,20 +55,6 @@ describe('<RecipeForm>', () => {
     );
     // message should exist
     expect(wrapper.find('.cloning-message').length).toBe(1);
-  });
-
-  it('should disable the submit button if currently submitting the form', () => {
-    const wrapper = shallow(
-      <RecipeForm {...propFactory({ submitting: true })} />
-    );
-    expect(wrapper.find('.submit').prop('disabled')).toBe(true);
-  });
-
-  it('should enable the submit button if not currently submitting the form', () => {
-    const wrapper = shallow(
-      <RecipeForm {...propFactory({ submitting: false })} />
-    );
-    expect(wrapper.find('.submit').prop('disabled')).toBe(false);
   });
 
   describe('asyncValidate', () => {
@@ -192,7 +164,7 @@ describe('<RecipeForm>', () => {
       const Component = ({ initialValues }) => <div>{initialValues}</div>;
       const WrappedComponent = initialValuesWrapper(Component);
       const wrapper = shallow(
-        <WrappedComponent recipe="fakerecipe" location={{}} />
+        <WrappedComponent recipe={'fakerecipe'} location={{}} />
       );
 
       expect(wrapper.find(Component).prop('initialValues')).toBe('fakerecipe');
@@ -201,9 +173,8 @@ describe('<RecipeForm>', () => {
     it('should pass the selected revision as initialValues when available', () => {
       const Component = ({ initialValues }) => <div>{initialValues}</div>;
       const WrappedComponent = initialValuesWrapper(Component);
-      const location = { state: { selectedRevision: 'fakerevision' } };
       const wrapper = shallow(
-        <WrappedComponent recipe="fakerecipe" location={location} />
+        <WrappedComponent recipe={'fakerecipe'} revision={'fakerevision'} />
       );
 
       expect(wrapper.find(Component).prop('initialValues')).toBe('fakerevision');

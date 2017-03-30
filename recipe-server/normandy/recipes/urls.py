@@ -4,6 +4,7 @@ from normandy.base.api.routers import MixedViewRouter
 from normandy.recipes.api.views import (
     ActionImplementationView,
     ActionViewSet,
+    ApprovalRequestViewSet,
     ClassifyClient,
     Filters,
     RecipeViewSet,
@@ -16,6 +17,7 @@ router = MixedViewRouter()
 router.register('action', ActionViewSet)
 router.register('recipe', RecipeViewSet)
 router.register('recipe_revision', RecipeRevisionViewSet)
+router.register(r'approval_request', ApprovalRequestViewSet)
 
 router.register_view('classify_client', ClassifyClient, name='classify-client', allow_cdn=False)
 router.register_view('filters', Filters, name='filters')

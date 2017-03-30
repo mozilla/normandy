@@ -7,6 +7,7 @@ import factory
 from normandy.base.tests import FuzzyUnicode
 from normandy.recipes.models import (
     Action,
+    ApprovalRequest,
     Client,
     Channel,
     Country,
@@ -54,16 +55,14 @@ class RecipeFactory(factory.DjangoModelFactory):
     class Meta:
         model = Recipe
 
-    enabled = True
-
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        obj = model_class(enabled=kwargs.pop('enabled'))
+        obj = model_class()
         obj.save()
 
         revision = RecipeRevisionFactory(**kwargs)
         revision.action.save()
-        obj.update(**revision.data)
+        obj.revise(**revision.data)
 
         return obj
 
@@ -107,6 +106,20 @@ class RecipeFactory(factory.DjangoModelFactory):
             for locale in extracted:
                 self.locales.add(locale)
 
+    # This should always be before `enabled`
+    @factory.post_generation
+    def approver(self, create, extracted, **kwargs):
+        if extracted:
+            approval = ApprovalRequestFactory(revision=self.latest_revision)
+            approval.approve(extracted, 'r+')
+
+    # This should always be after `approver` as we require approval to enable a recipe
+    @factory.post_generation
+    def enabled(self, create, extracted, **kwargs):
+        if extracted:
+            self.enabled = True
+            self.save()
+
 
 @factory.use_strategy(factory.BUILD_STRATEGY)
 class RecipeRevisionFactory(factory.DjangoModelFactory):
@@ -116,6 +129,13 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
+
+
+class ApprovalRequestFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = ApprovalRequest
+
+    revision = factory.SubFactory(RecipeRevisionFactory)
 
 
 class SignatureFactory(factory.DjangoModelFactory):

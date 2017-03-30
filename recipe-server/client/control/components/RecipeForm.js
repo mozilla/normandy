@@ -17,16 +17,31 @@ import {
   recipeUpdated,
   recipeAdded,
   setSelectedRecipe,
+  singleRecipeReceived,
+  revisionsReceived,
+  revisionRecipeUpdated,
 } from 'control/actions/RecipeActions';
 
 import {
   showNotification,
 } from 'control/actions/NotificationActions';
 
+import {
+  userInfoReceived,
+} from 'control/actions/ControlActions';
+
+import {
+  getLastApprovedRevision,
+} from 'control/selectors/RecipesSelector';
+
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
+import RecipeFormActions from 'control/components/RecipeFormActions';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+import RecipeStatus from 'control/components/RecipeStatus';
+import DraftStatus from 'control/components/DraftStatus';
+import BooleanIcon from 'control/components/BooleanIcon';
 
 
 export const selector = formValueSelector('recipe');
@@ -47,9 +62,16 @@ export class RecipeForm extends React.Component {
       action: pt.string.isRequired,
       arguments: pt.object.isRequired,
     }),
+    revision: pt.object,
+    allRevisions: pt.object,
     recipeFields: pt.object,
-    // route prop passed from router
+    user: pt.object,
+    dispatch: pt.func.isRequired,
+    // route props passed from router
     route: pt.object,
+    routeParams: pt.object.isRequired,
+    // from redux-form
+    pristine: pt.bool,
   };
 
   static argumentsFields = {
@@ -57,84 +79,339 @@ export class RecipeForm extends React.Component {
     'show-heartbeat': HeartbeatFields,
   };
 
-  renderCloningMessage() {
-    const isCloning = this.props.route && this.props.route.isCloning;
-    const displayedRecipe = this.props.recipe;
+  static LoadingSpinner = (
+    <div className="recipe-form loading">
+      <i className="fa fa-spinner fa-spin fa-3x fa-fw" />
+      <p>Loading recipe...</p>
+    </div>
+  );
 
-    if (!isCloning || !displayedRecipe) {
+  static renderCloningMessage({ route, recipe }) {
+    const isCloning = route && route.isCloning;
+    if (!isCloning || !recipe) {
       return null;
     }
 
     return (
       <span className="cloning-message callout">
         {'You are cloning '}
-        <Link to={`/control/recipe/${displayedRecipe.id}/`}>
-          {displayedRecipe.name} ({displayedRecipe.action})
+        <Link to={`/control/recipe/${recipe.id}/`}>
+          {recipe.name} ({recipe.action})
         </Link>.
       </span>
     );
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.handleFormAction = ::this.handleFormAction;
+  }
+
+  componentWillMount() {
+    const {
+      user,
+      dispatch,
+    } = this.props;
+
+    if (!user || !user.id) {
+      dispatch(makeApiRequest('getCurrentUser'))
+        .then(receivedUser => dispatch(userInfoReceived(receivedUser)));
+    }
+  }
+
+  /**
+   * Generates an object relevant to the user/draft state. All values returned
+   * are cast as booleans.
+   *
+   * @return {Object} Hash of user/draft state data, formatted as booleans
+   */
+  getRenderVariables() {
+    const {
+      route,
+      routeParams = {},
+      recipe = {},
+      revision = {},
+      allRevisions = {},
+      pristine,
+      submitting,
+      recipeId,
+      user: {
+        id: userId,
+      },
+    } = this.props;
+
+    const requestDetails = revision && revision.approval_request;
+    const currentUserID = userId;
+    const isViewingLatestApproved = recipe && recipe.approved_revision_id
+      && revision.revision_id === recipe.approved_revision_id;
+    const hasApprovalRequest = !!requestDetails;
+    const requestAuthorID = hasApprovalRequest && requestDetails.creator.id;
+
+    const isUserViewingOutdated = recipe && routeParams.revisionId
+      && routeParams.revisionId !== recipe.latest_revision_id;
+    const isPendingApproval = hasApprovalRequest && requestDetails.approved === null;
+    const isFormDisabled = submitting || (isPendingApproval && !isUserViewingOutdated) || !userId;
+
+    const isAccepted = hasApprovalRequest && requestDetails.approved === true;
+    const isRejected = hasApprovalRequest && requestDetails.approved === false;
+
+    const recipeRevisions = recipe ? allRevisions[recipe.id] : {};
+    const lastApprovedRevisionId = getLastApprovedRevision(recipeRevisions).revision_id;
+
+    return {
+      isCloning: !!(route && route.isCloning),
+      isUserRequester: requestAuthorID === currentUserID,
+      isAlreadySaved: !!recipeId,
+      isFormPristine: pristine,
+      isApproved: !!recipeId && requestDetails && requestDetails.approved,
+      isRecipeApproved: !!recipeId && recipe.is_approved,
+      isEnabled: !!recipeId && !!revision.enabled,
+      isUserViewingOutdated,
+      isViewingLatestApproved,
+      isPendingApproval,
+      isFormDisabled,
+      isAccepted,
+      isRejected,
+      hasApprovalRequest,
+      lastApprovedRevisionId,
+    };
+  }
+
+  getRecipeHistory(recipeId) {
+    const {
+      dispatch,
+    } = this.props;
+
+    return dispatch(makeApiRequest('fetchRecipeHistory', { recipeId }))
+      .then(revisions => {
+        dispatch(revisionsReceived({
+          recipeId,
+          revisions,
+        }));
+      });
+  }
+
+  /**
+   * Event handler for form action buttons.
+   * Form action buttons remotely fire this handler with a (string) action type,
+   * which then triggers the appropriate API requests/etc.
+   *
+   * @param  {string} action Action type to trigger. ex: 'cancel', 'approve', 'reject'
+   */
+  handleFormAction(action, data) {
+    const {
+      recipe,
+      revision,
+      dispatch,
+    } = this.props;
+
+    const revisionId = revision ? revision.latest_revision_id : recipe.latest_revision_id;
+
+    switch (action) {
+      case 'cancel':
+        return dispatch(makeApiRequest('closeApprovalRequest', {
+          requestId: recipe.approval_request.id,
+        })).then(() => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Approval request closed.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: null,
+          }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: null,
+            },
+            revisionId,
+          }));
+        });
+
+      case 'approve':
+        return dispatch(makeApiRequest('approveApprovalRequest', {
+          requestId: recipe.approval_request.id,
+          ...data,
+        })).then(updatedRequest => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Revision was approved.',
+          }));
+          // remove approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            is_approved: true,
+            approved_revision_id: revision.revision_id,
+            approval_request: updatedRequest,
+          }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: updatedRequest,
+            },
+            revisionId,
+          }));
+        });
+
+      case 'reject':
+        return dispatch(makeApiRequest('rejectApprovalRequest', {
+          requestId: recipe.approval_request.id,
+          ...data,
+        })).then(updatedRequest => {
+          // show success
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Revision was rejected.',
+          }));
+          // update approval request from recipe in memory
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            is_approved: false,
+            approval_request: updatedRequest,
+          }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: updatedRequest,
+            },
+            revisionId,
+          }));
+        });
+
+      case 'request':
+        return dispatch(makeApiRequest('openApprovalRequest', {
+          revisionId: revision ? revision.latest_revision_id : recipe.latest_revision_id,
+        })).then(response => {
+          // show success message
+          dispatch(showNotification({
+            messageType: 'success',
+            message: 'Approval requested.',
+          }));
+          // patch existing recipe with new approval_request
+          dispatch(singleRecipeReceived({
+            ...recipe,
+            approval_request: response,
+          }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: response,
+            },
+            revisionId,
+          }));
+        });
+
+      default:
+        throw new Error(`Unrecognized form action "${action}"`);
+    }
   }
 
   render() {
     const {
       handleSubmit,
       selectedAction,
-      submitting,
       recipe,
+      revision,
       recipeId,
-      route,
       recipeFields,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
 
     // Show a loading indicator if we haven't yet loaded the recipe.
-    if (recipeId && !recipe) {
-      return (
-        <div className="recipe-form loading">
-          <i className="fa fa-spinner fa-spin fa-3x fa-fw" />
-          <p>Loading recipe...</p>
-        </div>
-      );
+    if (recipeId && (!recipe && !revision)) {
+      return RecipeForm.LoadingSpinner;
     }
 
-    const isCloning = route && route.isCloning;
+    const renderVars = this.getRenderVariables();
+    const {
+      isFormDisabled,
+      lastApprovedRevisionId,
+    } = renderVars;
 
-    const submitButtonCaption = recipeId && !isCloning ? 'Update Recipe' : 'Add New Recipe';
+    const thisRevisionRequest = revision && revision.approval_request;
+    const statusText = renderVars.isEnabled ? 'Enabled' : 'Disabled';
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
-        { this.renderCloningMessage() }
+        { RecipeForm.renderCloningMessage(this.props) }
+        {
+          revision &&
+            <DraftStatus
+              latestRevisionId={recipe.latest_revision_id}
+              lastApprovedRevisionId={lastApprovedRevisionId}
+              recipe={revision}
+            />
+        }
 
-        <ControlField label="Name" name="name" component="input" type="text" />
+        {
+          thisRevisionRequest
+          && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
+          && (
+            <div className="approval-status">
+              This revision has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
+              <pre className="approval-comment">
+                {revision.approval_request.comment}
+                <span className="comment-author">
+                  &ndash; {revision.approval_request.approver.email}
+                </span>
+              </pre>
+            </div>
+          )
+        }
+
+        {
+          recipe && (
+            <RecipeStatus
+              className={renderVars.isEnabled ? 'green' : 'red'}
+              icon={
+                <BooleanIcon
+                  className="draft-status-icon"
+                  value={renderVars.isEnabled}
+                  title={statusText}
+                />
+              }
+              text={statusText}
+            />
+          )
+        }
+
         <ControlField
-          label="Enabled"
-          name="enabled"
-          className="checkbox-field"
+          disabled={isFormDisabled}
+          label="Name"
+          name="name"
           component="input"
-          type="checkbox"
+          type="text"
         />
         <ControlField
+          disabled={isFormDisabled}
           label="Filter Expression"
           name="extra_filter_expression"
           component="textarea"
         />
-        <ControlField label="Action" name="action" component="select">
+        <ControlField
+          disabled={isFormDisabled}
+          label="Action"
+          name="action"
+          component="select"
+        >
           <option value="">Choose an action...</option>
           <option value="console-log">Log to Console</option>
           <option value="show-heartbeat">Heartbeat Prompt</option>
         </ControlField>
-        <ArgumentsFields fields={recipeFields} />
-        <div className="form-actions">
-          {recipeId && !isCloning &&
-            <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>
-              Delete
-            </Link>
-          }
-          <button className="button submit" type="submit" disabled={submitting}>
-            {submitButtonCaption}
-          </button>
-        </div>
+
+        <ArgumentsFields disabled={isFormDisabled} fields={recipeFields} />
+
+        <RecipeFormActions
+          onAction={this.handleFormAction}
+          recipeId={recipeId}
+          {...renderVars}
+        />
       </form>
     );
   }
@@ -145,6 +422,7 @@ export class RecipeForm extends React.Component {
  */
 export const formConfig = {
   form: 'recipe',
+  enableReinitialize: true,
   asyncBlurFields: ['extra_filter_expression'],
 
   async asyncValidate(values) {
@@ -202,15 +480,14 @@ export const formConfig = {
  */
 export function initialValuesWrapper(Component) {
   function Wrapped(props) {
-    const { recipe, location } = props;
-    let initialValues = recipe;
-    if (location.state && location.state.selectedRevision) {
-      initialValues = location.state.selectedRevision;
-    }
+    const { recipe, revision } = props;
+
+    const initialValues = revision || recipe;
     return <Component initialValues={initialValues} {...props} />;
   }
   Wrapped.propTypes = {
     recipe: pt.object,
+    revision: pt.object,
     location: locationShape,
   };
 
@@ -222,6 +499,8 @@ const connector = connect(
   state => ({
     selectedAction: selector(state, 'action'),
     recipeFields: selector(state, 'arguments'),
+    user: state.user,
+    allRevisions: state.recipes.revisions,
   }),
 
   // Bound functions for writing to the server.
@@ -230,13 +509,19 @@ const connector = connect(
       return dispatch(makeApiRequest('addRecipe', { recipe }))
       .then(response => {
         dispatch(recipeAdded(response));
-        dispatch(push(`/control/recipe/${response.id}/`));
+        dispatch(push(`/control/recipe/${response.id}/revision/${response.latest_revision_id}/`));
         dispatch(setSelectedRecipe(response.id));
       });
     },
     updateRecipe(recipeId, recipe) {
       return dispatch(makeApiRequest('updateRecipe', { recipeId, recipe }))
-      .then(response => dispatch(recipeUpdated(response)));
+      .then(response => {
+        dispatch(recipeUpdated({
+          ...response,
+          recipe: response,
+        }));
+        dispatch(push(`/control/recipe/${response.id}/revision/${response.latest_revision_id}/`));
+      });
     },
   }),
 );
