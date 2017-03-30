@@ -86,8 +86,8 @@ pytest==3.0.2 \
 pytest-mock==0.11.0 \
     --hash=sha256:a897c6283aa116c161f5f08b8f73301685f6b8abfcd0b9b0d000668bc0faaaa3 \
     --hash=sha256:5d109071ac1c6a5a883aece92c507b4562efce86054ab39c83a9f3554688289d
-pytest-testrail==0.0.9 \
-    --hash=sha256:74a46e3f61eecccb43b55e44a7c99ae22bdf75f85ecf10caf88f03e2a95d0eb3
+pytest-testrail==0.0.11 \
+    --hash=sha256:0d671981dbc406189f42f52c890142e1728197821e3f25f888fe1791e59620aa
 raven==5.10.2 \
     --hash=sha256:f17269486e9f64ccd5a38a859e8191a8d8f5609e8f0efee6f1881e8a0fb20ed8 \
     --hash=sha256:58d52e16c834f70046f07d53795cafbf2709aef87afa9ca2a9d21be28a6ed92c
