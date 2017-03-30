@@ -77,12 +77,6 @@ export function getSelectedRevision({ recipes = {} }) {
     }
 
     revision = (recipeRevisions[selectedRevisionId] || {}).recipe;
-
-    console.log('===');
-    console.log(recipe);
-    console.log(revision);
-    console.log(recipeRevisions);
-    console.log(selectedRevisionId);
   }
 
   return {
