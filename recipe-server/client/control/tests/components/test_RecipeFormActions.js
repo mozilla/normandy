@@ -13,6 +13,8 @@ const propFactory = props => ({
   isAlreadySaved: false,
   isFormPristine: false,
   isCloning: false,
+  isRecipeApproved: false,
+  isEnabled: false,
   recipeId: 12345,
   ...props,
 });
@@ -320,12 +322,15 @@ describe('<RecipeFormActions>', () => {
   describe('Enable button', () => {
     const displayCriteria = {
       isViewingLatestApproved: true,
+      isRecipeApproved: true,
+      isEnabled: false,
     };
 
     it('should NOT display when user is NOT viewing the latest approved revision', () => {
       const wrapper = mount(<RecipeFormActions
         {...propFactory({
           isViewingLatestApproved: false,
+          isRecipeApproved: true,
         })}
       />);
       expect(wrapper.find('.action-enable').length).toBe(0);
