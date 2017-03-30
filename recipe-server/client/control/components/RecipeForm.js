@@ -165,7 +165,7 @@ export class RecipeForm extends React.Component {
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
       isApproved: !!recipeId && requestDetails && requestDetails.approved,
-      isRecipeApproved: recipe && recipe.is_approved,
+      isRecipeApproved: !!recipeId && recipe.is_approved,
       isEnabled: !!recipeId && !!revision.enabled,
       isUserViewingOutdated,
       isViewingLatestApproved,
