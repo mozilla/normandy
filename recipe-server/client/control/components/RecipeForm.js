@@ -249,6 +249,13 @@ export class RecipeForm extends React.Component {
             approved_revision_id: revision.revision_id,
             approval_request: updatedRequest,
           }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: updatedRequest,
+            },
+            revisionId,
+          }));
         });
 
       case 'reject':
@@ -267,6 +274,13 @@ export class RecipeForm extends React.Component {
             is_approved: false,
             approval_request: updatedRequest,
           }));
+          dispatch(revisionRecipeUpdated({
+            recipe: {
+              ...revision,
+              approval_request: updatedRequest,
+            },
+            revisionId,
+          }));
         });
 
       case 'request':
@@ -281,16 +295,12 @@ export class RecipeForm extends React.Component {
           // patch existing recipe with new approval_request
           dispatch(singleRecipeReceived({
             ...recipe,
-            approval_request: {
-              ...response,
-            },
+            approval_request: response,
           }));
           dispatch(revisionRecipeUpdated({
             recipe: {
               ...revision,
-              approval_request: {
-                ...response,
-              },
+              approval_request: response,
             },
             revisionId,
           }));
