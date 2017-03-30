@@ -14,6 +14,7 @@ npm install
 popd
 
 pushd gecko-dev-master
+source /root/.cargo/env
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
 source /root/.cargo/env
 ./mach lint browser/extensions/shield-recipe-client/
