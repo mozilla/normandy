@@ -6,7 +6,6 @@
 
 const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Task.jsm");
 Cu.import("resource://gre/modules/CanonicalJSON.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.importGlobalProperties(["fetch", "URL"]); /* globals fetch, URL */
@@ -61,23 +60,23 @@ this.NormandyApi = {
     throw new Error("Can't use relative urls");
   },
 
-  getApiUrl: Task.async(function * (name) {
+  async getApiUrl(name) {
     const apiBase = prefs.getCharPref("api_url");
     if (!indexPromise) {
       indexPromise = this.get(apiBase).then(res => res.json());
     }
-    const index = yield indexPromise;
+    const index = await indexPromise;
     if (!(name in index)) {
       throw new Error(`API endpoint with name "${name}" not found.`);
     }
     const url = index[name];
     return this.absolutify(url);
-  }),
+  },
 
-  fetchRecipes: Task.async(function* (filters = {enabled: true}) {
-    const signedRecipesUrl = yield this.getApiUrl("recipe-signed");
-    const recipesResponse = yield this.get(signedRecipesUrl, filters);
-    const rawText = yield recipesResponse.text();
+  async fetchRecipes(filters = {enabled: true}) {
+    const signedRecipesUrl = await this.getApiUrl("recipe-signed");
+    const recipesResponse = await this.get(signedRecipesUrl, filters);
+    const rawText = await recipesResponse.text();
     const recipesWithSigs = JSON.parse(rawText);
 
     const verifiedRecipes = [];
@@ -89,8 +88,8 @@ this.NormandyApi = {
         throw new Error("Canonical recipe serialization does not match!");
       }
 
-      const certChainResponse = yield fetch(this.absolutify(x5u));
-      const certChain = yield certChainResponse.text();
+      const certChainResponse = await fetch(this.absolutify(x5u));
+      const certChain = await certChainResponse.text();
       const builtSignature = `p384ecdsa=${signature}`;
 
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
@@ -114,26 +113,26 @@ this.NormandyApi = {
     );
 
     return verifiedRecipes;
-  }),
+  },
 
   /**
    * Fetch metadata about this client determined by the server.
    * @return {object} Metadata specified by the server
    */
-  classifyClient: Task.async(function* () {
-    const classifyClientUrl = yield this.getApiUrl("classify-client");
-    const response = yield this.get(classifyClientUrl);
-    const clientData = yield response.json();
+  async classifyClient() {
+    const classifyClientUrl = await this.getApiUrl("classify-client");
+    const response = await this.get(classifyClientUrl);
+    const clientData = await response.json();
     clientData.request_time = new Date(clientData.request_time);
     return clientData;
-  }),
+  },
 
-  fetchAction: Task.async(function* (name) {
-    let actionApiUrl = yield this.getApiUrl("action-list");
+  async fetchAction(name) {
+    let actionApiUrl = await this.getApiUrl("action-list");
     if (!actionApiUrl.endsWith("/")) {
       actionApiUrl += "/";
     }
-    const res = yield this.get(actionApiUrl + name);
-    return yield res.json();
-  }),
+    const res = await this.get(actionApiUrl + name);
+    return await res.json();
+  },
 };

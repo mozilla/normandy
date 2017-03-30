@@ -87,6 +87,31 @@ class TestRecipeSerializer:
             }
         }
 
+    def test_validation_with_invalid_filter_expression(self):
+        ActionFactory(
+            name='show-heartbeat',
+            arguments_schema=ARGUMENTS_SCHEMA
+        )
+
+        serializer = RecipeSerializer(data={
+            'name': 'bar',
+            'enabled': True,
+            'extra_filter_expression': 'inv(-alsid',
+            'action': 'show-heartbeat',
+            'arguments': {
+                'surveyId': 'lorem-ipsum-dolor',
+                'surveys': [
+                    {'title': 'adipscing', 'weight': 1},
+                    {'title': 'consequetar', 'weight': 1}
+                ]
+            }
+        })
+
+        assert not serializer.is_valid()
+        assert serializer.errors['extra_filter_expression'] == [
+            'Could not parse expression: inv(-alsid'
+        ]
+
     def test_validation_with_valid_data(self):
         mockAction = ActionFactory(
             name='show-heartbeat',

@@ -10,7 +10,6 @@ Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "JSONFile", "resource://gre/modules/JSONFile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Task", "resource://gre/modules/Task.jsm");
 
 this.EXPORTED_SYMBOLS = ["Storage"];
 
@@ -21,10 +20,10 @@ function loadStorage() {
   if (storePromise === undefined) {
     const path = OS.Path.join(OS.Constants.Path.profileDir, "shield-recipe-client.json");
     const storage = new JSONFile({path});
-    storePromise = Task.spawn(function* () {
-      yield storage.load();
+    storePromise = (async function () {
+      await storage.load();
       return storage;
-    });
+    })();
   }
   return storePromise;
 }
