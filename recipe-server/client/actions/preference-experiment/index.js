@@ -1,4 +1,14 @@
-import { Action, registerAction } from '../utils';
+/* globals normandy */
+import { Action, registerAction, registerAsyncCallback } from '../utils';
+
+/**
+ * Sets up the list of seen experiments for the postExecutionHook.
+ */
+export function preExecutionHook(normandy) {
+  const storage = normandy.createStorage('_preferenceExperiments');
+  return storage.setItem('seenExperimentNames', []);
+}
+registerAsyncCallback('preExecution', preExecutionHook);
 
 /**
  * Enrolls a user in a preference experiment, in which we assign the user to an
@@ -18,11 +28,17 @@ export default class PreferenceExperimentAction extends Action {
 
     // Exit early if we're on an incompatible client.
     if (experiments === undefined) {
-      this.normandy.log('Client does not support preference experiments, aborting.', 'warn');
+      this.normandy.log('Client does not support preference experiments, aborting.', 'info');
       return Promise.resolve();
     }
 
-    return experiments.has(slug).then(hasSlug => {
+    const storage = this.normandy.createStorage('_preferenceExperiments');
+    return storage.getItem('seenExperimentNames').then(seenExperimentNames => {
+      seenExperimentNames.push(slug);
+      return storage.setItem('seenExperimentNames', seenExperimentNames);
+    }).then(
+      () => experiments.has(slug)
+    ).then(hasSlug => {
       // If the experiment doesn't exist yet, enroll!
       if (!hasSlug) {
         return this.chooseBranch(branches).then(branch =>
@@ -39,7 +55,7 @@ export default class PreferenceExperimentAction extends Action {
       // If the experiment exists, and isn't expired, bump the lastSeen date.
       return experiments.get(slug).then(experiment => {
         if (experiment.expired) {
-          this.normandy.log(`Experiment ${slug} has expired, aborting.`, 'info');
+          this.normandy.log(`Experiment ${slug} has expired, aborting.`, 'debug');
           return true;
         }
 
@@ -63,5 +79,32 @@ export default class PreferenceExperimentAction extends Action {
     return this.normandy.ratioSample(input, ratios).then(index => branches[index]);
   }
 }
-
 registerAction('preference-experiment', PreferenceExperimentAction);
+
+/**
+ * Finds active experiments that were not stored in the seenExperimentNames list
+ * during action execution, and stop them.
+ */
+export function postExecutionHook(normandy) {
+  // Exit early if we're on an incompatible client.
+  if (normandy.preferenceExperiments === undefined) {
+    normandy.log('Client does not support preference experiments, aborting.', 'info');
+    return Promise.resolve();
+  }
+
+  // If any of the active experiments were not seen during a run, stop them.
+  const storage = normandy.createStorage('_preferenceExperiments');
+  return Promise.all([
+    storage.getItem('seenExperimentNames'),
+    normandy.preferenceExperiments.getAllActive(),
+  ]).then(([seenExperimentNames, activeExperiments]) => {
+    const stopPromises = [];
+    for (const experiment of activeExperiments) {
+      if (!seenExperimentNames.includes(experiment.name)) {
+        stopPromises.push(normandy.preferenceExperiments.stop(experiment.name, true));
+      }
+    }
+    return Promise.all(stopPromises);
+  });
+}
+registerAsyncCallback('postExecution', postExecutionHook);

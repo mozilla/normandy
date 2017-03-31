@@ -154,6 +154,7 @@ this.NormandyDriver = function(sandboxManager) {
       markLastSeen: sandboxManager.wrapAsync(PreferenceExperiments.markLastSeen),
       stop: sandboxManager.wrapAsync(PreferenceExperiments.stop),
       get: sandboxManager.wrapAsync(PreferenceExperiments.get, {cloneInto: true}),
+      getAllActive: sandboxManager.wrapAsync(PreferenceExperiments.getAllActive, {cloneInto: true}),
       has: sandboxManager.wrapAsync(PreferenceExperiments.has),
     },
   };

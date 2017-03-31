@@ -215,6 +215,18 @@ add_task(withMockPreferences(function* (mockPreferences) {
   stop.restore();
 }));
 
+add_task(function* testHasObserver() {
+  PreferenceExperiments.startObserver("test", "fake.preference", "experimentValue");
+
+  ok(yield PreferenceExperiments.hasObserver("test"), "hasObserver detects active observers");
+  ok(
+    !(yield PreferenceExperiments.hasObserver("missing")),
+    "hasObserver doesn't detect inactive observers",
+  );
+
+  PreferenceExperiments.stopAllObservers();
+});
+
 // stopObserver should throw if there is no observer active for it to stop.
 add_task(function* () {
   Assert.throws(
@@ -454,6 +466,31 @@ add_task(withMockExperiments(async function testGetAll(experiments) {
   fetchedExperiment2.name = "othername";
   equal(experiment2.name, "experiment2", "getAll returns copies of the experiments");
 }));
+
+add_task(withMockExperiments(withMockPreferences(function* testGetAllActive(experiments) {
+  experiments["active"] = experimentFactory({
+    name: "active",
+    expired: false,
+  });
+  experiments["inactive"] = experimentFactory({
+    name: "inactive",
+    expired: true,
+  });
+
+  const activeExperiments = yield PreferenceExperiments.getAllActive();
+  deepEqual(
+    activeExperiments,
+    [experiments["active"]],
+    "getAllActive only returns active experiments",
+  );
+
+  activeExperiments[0].name = "newfakename";
+  notEqual(
+    experiments["active"].name,
+    "newfakename",
+    "getAllActive returns copies of stored experiments",
+  );
+})));
 
 // has
 add_task(withMockExperiments(function* (experiments) {

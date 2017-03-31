@@ -218,6 +218,16 @@ this.PreferenceExperiments = {
   },
 
   /**
+   * Check if a preference observer is active for an experiment.
+   * @param {string} experimentName
+   * @return {Boolean}
+   */
+  hasObserver(experimentName) {
+    log.debug(`PreferenceExperiments.hasObserver(${experimentName})`);
+    return experimentObservers.has(experimentName);
+  },
+
+  /**
    * Disable a preference observer for the named experiment.
    * @param {string} experimentName
    * @throws {Error}
@@ -290,7 +300,9 @@ this.PreferenceExperiments = {
       );
     }
 
-    PreferenceExperiments.stopObserver(experimentName);
+    if (PreferenceExperiments.hasObserver(experimentName)) {
+      PreferenceExperiments.stopObserver(experimentName);
+    }
 
     if (resetValue) {
       const {preferenceName, previousPreferenceValue, preferenceBranchType} = experiment;
@@ -337,6 +349,18 @@ this.PreferenceExperiments = {
     // Return copies so that mutating returned experiments doesn't affect the
     // stored values.
     return Object.values(store.data).map(experiment => Object.assign({}, experiment));
+  },
+
+  /**
+  * Get a list of experiment objects for all active experiments.
+  * @resolves {Experiment[]}
+  */
+  async getAllActive() {
+    log.debug("PreferenceExperiments.getAllActive()");
+    const store = await ensureStorage();
+
+    // Return copies so mutating them doesn't affect the storage.
+    return Object.values(store.data).filter(e => !e.expired).map(e => Object.assign({}, e));
   },
 
   /**
