@@ -30,13 +30,15 @@ function loadStorage() {
 }
 
 this.Storage = {
-  DURABILITY_NAMESPACE: 'normandy_storageDurability',
-  DURABILITY_KEY: 'durable',
+  DURABILITY_NAMESPACE: "normandy_storageDurability",
+  DURABILITY_KEY: "durable",
   isDurabilityInvalid(value) {
-    return typeof value === 'undefined' || isNaN(value);
+    return typeof value === "undefined" || isNaN(value);
   },
   async seedDurability(sandbox) {
-    const globalDurabilityStore = Storage.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
+    let globalDurabilityStore = this.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
+    globalDurabilityStore = Cu.waiveXrays(globalDurabilityStore);
+
     let durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY);
 
     if (this.isDurabilityInvalid(durability)) {
@@ -47,10 +49,10 @@ this.Storage = {
   },
 
   async checkDurability(sandbox) {
-      const globalDurabilityStore = Storage.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
+      let globalDurabilityStore = this.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
+      globalDurabilityStore = Cu.waiveXrays(globalDurabilityStore);
 
       const durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY)
-
       const isDurabilityInvalid = this.isDurabilityInvalid(durability) || durability < 2;
 
       if(isDurabilityInvalid) {
