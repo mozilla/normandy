@@ -26,6 +26,7 @@ const log = LogManager.getLogger("normandy-driver");
 const actionLog = LogManager.getLogger("normandy-driver.actions");
 
 this.NormandyDriver = function(sandboxManager) {
+
   if (!sandboxManager) {
     throw new Error("sandboxManager is required");
   }
@@ -118,9 +119,13 @@ this.NormandyDriver = function(sandboxManager) {
       return ret;
     },
 
-    createStorage(keyPrefix) {
+    async createStorage(keyPrefix, skipDurabilityCheck) {
       let storage;
       try {
+        if (!skipDurabilityCheck) {
+          await Storage.checkDurability(sandbox);
+        }
+
         storage = Storage.makeStorage(keyPrefix, sandbox);
       } catch (e) {
         log.error(e.stack);
