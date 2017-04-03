@@ -4,6 +4,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm", this);
 
 
 add_task(async function testTelemetry() {
@@ -84,4 +85,30 @@ add_task(async function testDoNotTrack() {
   await SpecialPowers.pushPrefEnv({set: [["privacy.donottrackheader.enabled", true]]});
   environment = ClientEnvironment.getEnvironment();
   ok(environment.doNotTrack, "doNotTrack is read from preferences");
+});
+
+add_task(async function testExperiments() {
+  const active = {name: "active", expired: false};
+  const expired = {name: "expired", expired: true};
+  const getAll = sinon.stub(PreferenceExperiments, "getAll", async () => [active, expired]);
+
+  const environment = ClientEnvironment.getEnvironment();
+  const experiments = await environment.experiments;
+  Assert.deepEqual(
+    experiments.all,
+    ["active", "expired"],
+    "experiments.all returns all stored experiment names",
+  );
+  Assert.deepEqual(
+    experiments.active,
+    ["active"],
+    "experiments.active returns all active experiment names",
+  );
+  Assert.deepEqual(
+    experiments.expired,
+    ["expired"],
+    "experiments.expired returns all expired experiment names",
+  );
+
+  getAll.restore();
 });

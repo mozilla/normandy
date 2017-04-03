@@ -13,6 +13,11 @@ XPCOMUtils.defineLazyModuleGetter(this, "ShellService", "resource:///modules/She
 XPCOMUtils.defineLazyModuleGetter(this, "AddonManager", "resource://gre/modules/AddonManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TelemetryArchive", "resource://gre/modules/TelemetryArchive.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "NormandyApi", "resource://shield-recipe-client/lib/NormandyApi.jsm");
+XPCOMUtils.defineLazyModuleGetter(
+    this,
+    "PreferenceExperiments",
+    "resource://shield-recipe-client/lib/PreferenceExperiments.jsm",
+);
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -172,6 +177,15 @@ this.ClientEnvironment = {
 
     XPCOMUtils.defineLazyGetter(environment, "doNotTrack", () => {
       return Preferences.get("privacy.donottrackheader.enabled", false);
+    });
+
+    XPCOMUtils.defineLazyGetter(environment, "experiments", async () => {
+      const experiments = await PreferenceExperiments.getAll();
+      return {
+        all: experiments.map(e => e.name),
+        active: experiments.filter(e => !e.expired).map(e => e.name),
+        expired: experiments.filter(e => e.expired).map(e => e.name),
+      };
     });
 
     return environment;
