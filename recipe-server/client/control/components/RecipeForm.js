@@ -52,6 +52,9 @@ import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import PreferenceExperimentFields from
   'control/components/action_fields/PreferenceExperimentFields';
+
+import MultiPicker from 'control/components/MultiPicker';
+import Frame from 'control/components/Frame';
 import RecipeStatus from 'control/components/RecipeStatus';
 import DraftStatus from 'control/components/DraftStatus';
 import BooleanIcon from 'control/components/BooleanIcon';
@@ -408,32 +411,24 @@ export class RecipeForm extends React.Component {
           )
         }
 
-        <ControlField
-          disabled={isFormDisabled}
-          label="Name"
-          name="name"
-          component="input"
-          type="text"
-        />
+        <Frame>
+          <ControlField
+            disabled={isFormDisabled}
+            label="Name"
+            name="name"
+            component="input"
+            type="text"
+          />
 
-        <ControlField
-          disabled={isFormDisabled}
-          label="Filter Expression"
-          name="extra_filter_expression"
-          component="textarea"
-        />
+          <ControlField
+            disabled={isFormDisabled}
+            label="Filter Expression"
+            name="extra_filter_expression"
+            component="textarea"
+          />
+        </Frame>
 
-        <ControlField
-          disabled={isFormDisabled}
-          label="Action"
-          name="action"
-          component="select"
-        />
-
-        <fieldset className="form-frame">
-          <legend className="frame-title">
-            Filters
-          </legend>
+        <Frame title="Filters">
           <ControlField
             component={MultiPicker}
             wrapper="div"
@@ -449,21 +444,31 @@ export class RecipeForm extends React.Component {
             options={filters.countries || []}
           />
 
-          <ControlField
-            component={CheckboxGroup}
-            name="channels"
-            label="Release Channels"
-            options={filters.channels || []}
-          />
+          <Frame className="channels" title="Release Channels">
+            <ControlField
+              component={CheckboxGroup}
+              name="channels"
+              options={filters.channels || []}
+            />
+          </Frame>
 
           <ControlField
             label="Additional Filter Expressions"
             name="extra_filter_expression"
             component="textarea"
           />
-        </fieldset>
+        </Frame>
 
-        <ArgumentsFields disabled={isFormDisabled} />
+        <Frame title="Action Configuration">
+          <ControlField
+            disabled={isFormDisabled}
+            label="Action"
+            name="action"
+            component="select"
+          />
+
+          <ArgumentsFields disabled={isFormDisabled} fields={recipeArguments} />
+        </Frame>
 
         <RecipeFormActions
           onAction={this.handleFormAction}

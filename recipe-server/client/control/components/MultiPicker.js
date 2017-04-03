@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import cx from 'classnames';
+import Frame from 'control/components/Frame';
 
 /**
  * Abstracted piece of the multipicker - contains the actual select element and
@@ -169,9 +170,7 @@ class PickerControl extends React.Component {
     const frameClass = cx('mp-frame', className);
 
     return (
-      <div className={frameClass}>
-        {titleLabel}
-
+      <Frame className={frameClass} title={titleLabel}>
         <input
           type="search"
           placeholder={searchLabel}
@@ -183,8 +182,11 @@ class PickerControl extends React.Component {
           onChange={this.handleSelectUpdate}
           multiple
         >
-          { filteredOptions.map(this.renderSelectOption) }
-          { !filteredOptions.length && this.renderEmptyMessage() }
+          {
+            filteredOptions.length ?
+              filteredOptions.map(this.renderSelectOption)
+              : this.renderEmptyMessage()
+          }
         </select>
 
         <button
@@ -194,7 +196,7 @@ class PickerControl extends React.Component {
         >
           { buttonLabel }
         </button>
-      </div>
+      </Frame>
     );
   }
 }
