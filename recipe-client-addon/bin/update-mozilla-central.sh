@@ -8,10 +8,9 @@ if [[ $# -lt 1 ]]; then
 fi
 
 baseDir="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
-mozCentral=$(readlink -f "$1")
+mozCentral="$1"
 dest="${mozCentral}/browser/extensions/shield-recipe-client"
 
-cd "$baseDir"
 rm -rf "${dest}"/*
 
 while read -r line || [[ -n "${line}" ]]; do
@@ -20,5 +19,5 @@ while read -r line || [[ -n "${line}" ]]; do
 done < "${baseDir}/build-includes.txt"
 
 # This produces versions like "45", "45.5.abcdef", and "45.5.abcdef.dirty"
-version=$(git describe --dirty | sed -e 's/^v//' -e 's/-/./g')
+version=$(git -C "${baseDir}" describe --dirty | sed -e 's/^v//' -e 's/-/./g')
 sed -i -e "s/@NORMANDY_VERSION@/${version}/" "${dest}/install.rdf.in"
