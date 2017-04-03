@@ -33,6 +33,7 @@ import {
 } from 'control/actions/NotificationActions';
 
 import MultiPicker from 'control/components/MultiPicker';
+import Frame from 'control/components/Frame';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField, CheckboxGroup } from 'control/components/Fields';
@@ -125,25 +126,18 @@ export class RecipeForm extends React.Component {
       <form className="recipe-form" onSubmit={handleSubmit}>
         { this.renderCloningMessage() }
 
-        <ControlField label="Name" name="name" component="input" type="text" />
-        <ControlField
-          label="Enabled"
-          name="enabled"
-          className="checkbox-field"
-          component="input"
-          type="checkbox"
-        />
+        <Frame>
+          <ControlField label="Name" name="name" component="input" type="text" />
+          <ControlField
+            label="Enabled"
+            name="enabled"
+            className="checkbox-field"
+            component="input"
+            type="checkbox"
+          />
+        </Frame>
 
-        <ControlField
-          label="Filter Expression"
-          name="extra_filter_expression"
-          component="textarea"
-        />
-
-        <fieldset className="form-frame">
-          <legend className="frame-title">
-            Filters
-          </legend>
+        <Frame title="Filters">
           <ControlField
             component={MultiPicker}
             wrapper="div"
@@ -159,27 +153,30 @@ export class RecipeForm extends React.Component {
             options={filters.countries || []}
           />
 
-          <ControlField
-            component={CheckboxGroup}
-            name="channels"
-            label="Release Channels"
-            options={filters.channels || []}
-          />
+          <Frame className="channels" title="Release Channels">
+            <ControlField
+              component={CheckboxGroup}
+              name="channels"
+              options={filters.channels || []}
+            />
+          </Frame>
 
           <ControlField
             label="Additional Filter Expressions"
             name="extra_filter_expression"
             component="textarea"
           />
-        </fieldset>
+        </Frame>
 
-        <ControlField label="Action" name="action" component="select">
-          <option value="">Choose an action...</option>
-          <option value="console-log">Log to Console</option>
-          <option value="show-heartbeat">Heartbeat Prompt</option>
-        </ControlField>
+        <Frame title="Action Configuration">
+          <ControlField label="Action" name="action" component="select">
+            <option value="">Choose an action...</option>
+            <option value="console-log">Log to Console</option>
+            <option value="show-heartbeat">Heartbeat Prompt</option>
+          </ControlField>
+          <ArgumentsFields fields={recipeArguments} />
+        </Frame>
 
-        <ArgumentsFields fields={recipeArguments} />
         <div className="form-actions">
           {recipeId && !isCloning &&
             <Link className="button delete" to={`/control/recipe/${recipeId}/delete/`}>

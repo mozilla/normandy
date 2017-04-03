@@ -334,15 +334,23 @@ i {
 
 
 .form-frame {
+  background: $cream;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  padding: 0 1em;
+  margin-bottom: 2em;
+  padding: 0.5em 1em 1em;
 
   .frame-title {
-    background: $white;
     display: inline-block;
     padding: 0 0.5em;
-    position: relative;
-    top: -0.65em;
+  }
+
+  .form-frame {
+    border-radius: 4px;
+  }
+
+  // Recipe form-specific
+  &.channels {
+    width: 50%;
   }
 }
 
@@ -352,6 +360,7 @@ i {
   margin-bottom: 2em;
 
   .mp-frame {
+    margin-bottom: 0;
     width: 50%;
 
     label,
@@ -359,6 +368,15 @@ i {
     select,
     button {
       text-transform: none;
+    }
+
+    &.mp-from {
+      border-radius: 4px 0 0 4px;
+      border-right: none;
+    }
+
+    &.mp-to {
+      border-radius: 0 4px 4px 0;
     }
   }
 
@@ -383,7 +401,12 @@ i {
 
 .form-field .checkbox-list {
   label {
+    color: $darkBrown;
     text-transform: none;
+
+    span {
+      padding-left: 1em;
+    }
   }
 
   input {

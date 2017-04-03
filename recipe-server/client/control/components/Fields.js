@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import { Field } from 'redux-form';
+import { uniq } from 'underscore';
 
 /**
  * redux-form Field component that wraps the form input in a label and error
@@ -30,7 +31,7 @@ export function buildControlField({
   const WrappingElement = wrapper;
   return (
     <WrappingElement className={`${className} form-field`}>
-      <span className="label">{label}</span>
+      {label && <span className="label">{label}</span>}
       {error && <span className="error">{error}</span>}
       <InputComponent {...input} {...args}>
         {children}
@@ -63,6 +64,7 @@ export class CheckboxGroup extends React.Component {
     this.state = {};
 
     this.handleChange = ::this.handleChange;
+    this.renderOption = ::this.renderOption;
   }
 
   /**
@@ -77,40 +79,46 @@ export class CheckboxGroup extends React.Component {
       onChange,
     } = this.props;
 
-    if (target.checked) {
-      // Use Set to remove any dupes from the new value array
-      const newValue = new Set(value.concat([target.value]));
+    let newValue = [];
 
-      onChange(Array.from(newValue));
+    if (target.checked) {
+      newValue = uniq(value.concat([target.value]));
     } else {
       // Remove this target's value from the array of values and return that array
-      onChange(value.filter(val => val !== target.value));
+      newValue = value.filter(val => val !== target.value);
     }
+
+    onChange(newValue);
   }
 
-  render() {
+  renderOption(option, index) {
     const {
       name,
-      options = [],
       value = [],
     } = this.props;
 
     return (
-      <div>
-        {
-          options.map((option, index) =>
-            <label className="checkbox" key={index}>
-              <input
-                type="checkbox"
-                name={name}
-                value={option.value}
-                checked={value.includes(option.value)}
-                onChange={this.handleChange}
-              />
-              <span>{option.label}</span>
-            </label>
-          )
-        }
+      <label className="checkbox" key={index}>
+        <input
+          type="checkbox"
+          name={name}
+          value={option.value}
+          checked={value.includes(option.value)}
+          onChange={this.handleChange}
+        />
+        <span>{option.label}</span>
+      </label>
+    );
+  }
+
+  render() {
+    const {
+      options = [],
+    } = this.props;
+
+    return (
+      <div className="checkbox-list">
+        { options.map(this.renderOption) }
       </div>
     );
   }
