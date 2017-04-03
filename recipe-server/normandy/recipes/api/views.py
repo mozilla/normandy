@@ -118,7 +118,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     @api_cache_control()
     def history(self, request, pk=None):
         recipe = self.get_object()
-        serializer = RecipeRevisionSerializer(recipe.revisions.all(), many=True,
+        serializer = RecipeRevisionSerializer(recipe.revisions.order_by('-created'), many=True,
                                               context={'request': request})
         return Response(serializer.data)
 
