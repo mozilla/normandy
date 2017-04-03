@@ -6,7 +6,6 @@
 
 const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
@@ -19,12 +18,18 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Storage", "resource://shield-recipe-client/lib/Storage.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Storage",
+                                  "resource://shield-recipe-client/lib/Storage.jsm");
+XPCOMUtils.defineLazyServiceGetter(this, "timerManager",
+                                   "@mozilla.org/updates/timer-manager;1",
+                                   "nsIUpdateTimerManager");
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
+const PREF_BASE_NAME = "extensions.shield-recipe-client.";
+const PREF_RUN_INTERVAL = PREF_BASE_NAME + "run_interval_seconds";
 const log = LogManager.getLogger("recipe-runner");
-const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
+const prefs = Services.prefs.getBranch(PREF_BASE_NAME);
 const TIMER_NAME = "recipe-client-addon-run";
 
 this.RecipeRunner = {
@@ -41,20 +46,21 @@ this.RecipeRunner = {
       this.run();
     }
 
-    // Run once every `runInterval` wall-clock seconds.
-    // This is managed by setting a "last ran" timestamp, and running if it is
-    // more than `runInterval` seconds ago.
-    const runInterval = prefs.getIntPref("run_interval_seconds");
-    const timerManager = Cc["@mozilla.org/updates/timer-manager;1"]
-                         .getService(Ci.nsIUpdateTimerManager);
-    timerManager.registerTimer(TIMER_NAME, () => this.run(), runInterval);
+    this.updateRunInterval();
     if (timerManager.unregisterTimer) {
       CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
     } else {
       // Since we can't unregister the timer yet (Bug 1350471), re-register
       // with a period so long as to never actually run
-      timerManager.registerTimer(TIMER_NAME, () => {}, 1e10); // about 300 years
+      CleanupManager.addCleanupHandler(() => {
+        timerManager.registerTimer(TIMER_NAME, () => {}, 1e10); // about 300 years
+      });
     }
+
+    // Watch for the run interval to change, and re-register
+    Preferences.observe(PREF_RUN_INTERVAL, this.updateRunInterval);
+    CleanupManager.addCleanupHandler(
+      () => Preferences.ignore(PREF_RUN_INTERVAL, this.updateRunInterval));
   },
 
   checkPrefs() {
@@ -76,6 +82,14 @@ this.RecipeRunner = {
     }
 
     return true;
+  },
+
+  updateRunInterval() {
+    // Run once every `runInterval` wall-clock seconds. This is managed by setting a "last ran"
+    // timestamp, and running if it is more than `runInterval` seconds ago. Even with very short
+    // intervals, the timer will only fire at most once every few minutes.
+    const runInterval = prefs.getIntPref("run_interval_seconds");
+    timerManager.registerTimer(TIMER_NAME, () => this.run(), runInterval);
   },
 
   async run() {
