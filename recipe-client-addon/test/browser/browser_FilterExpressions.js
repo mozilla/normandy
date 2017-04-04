@@ -67,7 +67,7 @@ add_task(async function() {
 add_task(async function() {
   let val;
   // Compare the value of the preference
-  Preferences.set("normandy.test.value", 3);
+  await SpecialPowers.pushPrefEnv({set: [["normandy.test.value", 3]]});
   val = await FilterExpressions.eval('"normandy.test.value"|preferenceValue == 3');
   is(val, true, "preferenceValue expression compares against preference values");
 

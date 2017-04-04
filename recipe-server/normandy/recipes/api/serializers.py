@@ -135,6 +135,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         jexl.add_transform('date', lambda x: x)
         jexl.add_transform('stableSample', lambda x: x)
         jexl.add_transform('bucketSample', lambda x: x)
+        jexl.add_transform('preferenceValue', lambda x: x)
+        jexl.add_transform('preferenceIsUserSet', lambda x: x)
+        jexl.add_transform('preferenceExists', lambda x: x)
 
         errors = list(jexl.validate(value))
         if errors:
