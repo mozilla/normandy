@@ -13,7 +13,7 @@ export default class PreferenceExperimentAction extends Action {
     //
     // Once we remove self-repair support, we should be able to use native
     // async/await anyway, which solves the issue.
-    const { slug, preferenceName, branches } = this.recipe.arguments;
+    const { slug, preferenceName, preferenceBranchType, branches } = this.recipe.arguments;
     const experiments = this.normandy.preferenceExperiments;
 
     // Exit early if we're on an incompatible client.
@@ -25,8 +25,9 @@ export default class PreferenceExperimentAction extends Action {
     return experiments.has(slug).then(hasSlug => {
       // If the experiment doesn't exist yet, enroll!
       if (!hasSlug) {
-        return this.chooseBranch(branches)
-          .then(branch => experiments.start(slug, branch.slug, preferenceName, branch.value));
+        return this.chooseBranch(branches).then(branch =>
+          experiments.start(slug, branch.slug, preferenceName, branch.value, preferenceBranchType)
+        );
       }
 
       // If the experiment exists, and isn't expired, bump the lastSeen date.

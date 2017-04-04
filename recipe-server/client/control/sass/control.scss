@@ -157,6 +157,16 @@
     text-transform: uppercase;
   }
 
+  .field-warning {
+    background: $yellow;
+    font-weight: bold;
+    padding: 15px;
+
+    .fa {
+      margin-right: 15px;
+    }
+  }
+
   /* A group of related fields, generally for things like radio buttons. */
   .fieldset {
     @extend .form-field;

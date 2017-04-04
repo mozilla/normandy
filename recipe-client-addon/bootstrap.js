@@ -15,6 +15,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "RecipeRunner",
   "resource://shield-recipe-client/lib/RecipeRunner.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
   "resource://shield-recipe-client/lib/CleanupManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
+  "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 
 const REASONS = {
   APP_STARTUP: 1,      // The application is starting up.
@@ -68,7 +70,13 @@ this.startup = function() {
   CleanupManager.addCleanupHandler(
     () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure));
 
-  RecipeRunner.init();
+  // Initialize experiments first to avoid a race between initializing prefs
+  // and recipes rolling back pref changes when experiments end.
+  PreferenceExperiments.init().catch(err => {
+    log.error("Failed to initialize preference experiments:", err);
+  }).then(() => {
+    RecipeRunner.init();
+  });
 };
 
 this.shutdown = function(data, reason) {

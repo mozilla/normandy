@@ -37,6 +37,13 @@
  * @property {string|integer|boolean|undefined} previousPreferenceValue
  *   Value of the preference prior to the experiment, or undefined if it was
  *   unset.
+ * @property {PreferenceBranchType} preferenceBranchType
+ *   Controls how we modify the preference to affect the client.
+ *
+ *   If "default", when the experiment is active, the default value for the
+ *   preference is modified on startup of the add-on. If "user", the user value
+ *   for the preference is modified when the experiment starts, and is reset to
+ *   its original value when the experiment ends.
  */
 
 "use strict";
@@ -53,6 +60,16 @@ XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/P
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
 const EXPERIMENT_FILE = "shield-preference-experiments.json";
+const DefaultPreferences = new Preferences({defaultBranch: true});
+
+/**
+ * Enum storing Preference modules for each type of preference branch.
+ * @enum {Object}
+ */
+const PreferenceBranchType = {
+  user: Preferences,
+  default: DefaultPreferences,
+};
 
 /**
  * Asynchronously load the JSON file that stores experiment status in the profile.
@@ -74,6 +91,20 @@ const experimentObservers = new Map();
 CleanupManager.addCleanupHandler(() => PreferenceExperiments.stopAllObservers());
 
 this.PreferenceExperiments = {
+  /**
+   * Set the default preference value for active experiments that use the
+   * default preference branch.
+   */
+  async init() {
+    const store = await ensureStorage();
+    for (const experiment of Object.values(store.data)) {
+      const {expired, preferenceBranchType, preferenceName, preferenceValue} = experiment;
+      if (!expired && preferenceBranchType === "default") {
+        DefaultPreferences.set(preferenceName, preferenceValue);
+      }
+    }
+  },
+
   /**
    * Test wrapper that temporarily replaces the stored experiment data with fake
    * data for testing.
@@ -105,15 +136,16 @@ this.PreferenceExperiments = {
 
   /**
    * Start a new preference experiment.
-   * @param  {string} experimentName
-   * @param  {string} branch
-   * @param  {string} preferenceName
-   * @param  {string|integer|boolean} preferenceValue
+   * @param {string} experimentName
+   * @param {string} branch
+   * @param {string} preferenceName
+   * @param {string|integer|boolean} preferenceValue
+   * @param {PreferenceBranchType} preferenceBranchType
    * @rejects {Error}
    *   If an experiment with the given name already exists, or if an experiment
    *   for the given preference is active.
    */
-  async start(experimentName, branch, preferenceName, preferenceValue) {
+  async start(experimentName, branch, preferenceName, preferenceValue, preferenceBranchType) {
     log.debug(`PreferenceExperiments.start(${experimentName}, ${branch})`);
 
     const store = await ensureStorage();
@@ -131,6 +163,11 @@ this.PreferenceExperiments = {
       );
     }
 
+    const preferences = PreferenceBranchType[preferenceBranchType];
+    if (!preferences) {
+      throw new  Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
+    }
+
     /** @type {Experiment} */
     const experiment = {
       name: experimentName,
@@ -139,10 +176,11 @@ this.PreferenceExperiments = {
       lastSeen: new Date().toJSON(),
       preferenceName,
       preferenceValue,
-      previousPreferenceValue: Preferences.get(preferenceName, undefined),
+      previousPreferenceValue: preferences.get(preferenceName, undefined),
+      preferenceBranchType,
     };
 
-    Preferences.set(preferenceName, preferenceValue);
+    preferences.set(preferenceName, preferenceValue);
     PreferenceExperiments.startObserver(experimentName, preferenceName, preferenceValue);
     store.data[experimentName] = experiment;
     store.saveSoon();
@@ -254,11 +292,15 @@ this.PreferenceExperiments = {
     PreferenceExperiments.stopObserver(experimentName);
 
     if (resetValue) {
-      const {preferenceName, previousPreferenceValue} = experiment;
+      const {preferenceName, previousPreferenceValue, preferenceBranchType} = experiment;
+      const preferences = PreferenceBranchType[preferenceBranchType];
       if (previousPreferenceValue !== undefined) {
-        Preferences.set(preferenceName, previousPreferenceValue);
+        preferences.set(preferenceName, previousPreferenceValue);
       } else {
-        Preferences.reset(preferenceName);
+        // This does nothing if we're on the default branch, which is fine. The
+        // preference will be reset on next restart, and most preferences should
+        // have had a default value set before the experiment anyway.
+        preferences.reset(preferenceName);
       }
     }
 

@@ -7,6 +7,7 @@ function preferenceExperimentFactory(args) {
       slug: 'test',
       preferenceName: 'fake.preference',
       preferenceType: 'string',
+      preferenceBranchType: 'default',
       branches: [
         { slug: 'test', value: 'foo', ratio: 1 },
       ],
@@ -80,6 +81,7 @@ describe('PreferenceExperimentAction', () => {
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
         slug: 'test',
         preferenceName: 'fake.preference',
+        preferenceBranchType: 'user',
         branches: [
           { slug: 'branch1', value: 'branch1', ratio: 1 },
           { slug: 'branch2', value: 'branch2', ratio: 1 },
@@ -89,7 +91,7 @@ describe('PreferenceExperimentAction', () => {
 
       await action.execute();
       expect(normandy.preferenceExperiments.start)
-        .toHaveBeenCalledWith('test', 'branch1', 'fake.preference', 'branch1');
+        .toHaveBeenCalledWith('test', 'branch1', 'fake.preference', 'branch1', 'user');
     });
 
     it('should mark the lastSeen date for the experiment if it is active', async () => {
