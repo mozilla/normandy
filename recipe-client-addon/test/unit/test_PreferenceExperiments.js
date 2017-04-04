@@ -7,6 +7,7 @@ load("utils.js"); /* globals withMockPreferences */
 
 // Save ourselves some typing
 const {withMockExperiments} = PreferenceExperiments;
+const DefaultPreferences = new Preferences({defaultBranch: true});
 
 function experimentFactory(attrs) {
   return Object.assign({
@@ -17,6 +18,7 @@ function experimentFactory(attrs) {
     preferenceName: "fake.preference",
     preferenceValue: "falkevalue",
     previousPreferenceValue: "oldfakevalue",
+    preferenceBranchType: "default",
   }, attrs);
 }
 
@@ -49,13 +51,22 @@ add_task(withMockExperiments(function* (experiments) {
   );
 }));
 
+// start should throw if an invalid preferenceBranchType is given
+add_task(withMockExperiments(function* (experiments) {
+  experiments["test"] = experimentFactory({name: "test", preferenceName: "fake.preference"});
+  yield Assert.rejects(
+    PreferenceExperiments.start("different", "branch", "other.preference", "value", "invalid"),
+    "start threw an error due to an invalid preference branch type",
+  );
+}));
+
 // start should save experiment data, modify the preference, and register a
 // watcher.
 add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPreferences) {
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
-  mockPreferences.set("fake.preference", "oldvalue");
+  mockPreferences.set("fake.preference", "oldvalue", "default");
 
-  yield PreferenceExperiments.start("test", "branch", "fake.preference", "newvalue");
+  yield PreferenceExperiments.start("test", "branch", "fake.preference", "newvalue", "default");
   ok("test" in experiments, "start saved the experiment");
   ok(
     startObserver.calledWith("test", "fake.preference", "newvalue"),
@@ -69,12 +80,56 @@ add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPre
     preferenceName: "fake.preference",
     preferenceValue: "newvalue",
     previousPreferenceValue: "oldvalue",
+    preferenceBranchType: "default",
   };
   const experiment = {};
   Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
   deepEqual(experiment, expectedExperiment, "start saved the experiment");
 
-  equal(Preferences.get("fake.preference"), "newvalue", "start modified the preference");
+  equal(
+    DefaultPreferences.get("fake.preference"),
+    "newvalue",
+    "start modified the default preference",
+  );
+  notEqual(
+    Preferences.get("fake.preference"),
+    "newvalue",
+    "start did not modify the user preference",
+  );
+
+  startObserver.restore();
+})));
+
+// start should modify the user preference for the user branch type
+add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPreferences) {
+  const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
+  mockPreferences.set("fake.preference", "oldvalue", "user");
+
+  yield PreferenceExperiments.start("test", "branch", "fake.preference", "newvalue", "user");
+  ok(
+    startObserver.calledWith("test", "fake.preference", "newvalue"),
+    "start registered an observer",
+  );
+
+  const expectedExperiment = {
+    name: "test",
+    branch: "branch",
+    expired: false,
+    preferenceName: "fake.preference",
+    preferenceValue: "newvalue",
+    previousPreferenceValue: "oldvalue",
+    preferenceBranchType: "user",
+  };
+  const experiment = {};
+  Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
+  deepEqual(experiment, expectedExperiment, "start saved the experiment");
+
+  notEqual(
+    DefaultPreferences.get("fake.preference"),
+    "newvalue",
+    "start did not modify the default preference",
+  );
+  equal(Preferences.get("fake.preference"), "newvalue", "start modified the user preference");
 
   startObserver.restore();
 })));
@@ -104,6 +159,25 @@ add_task(withMockPreferences(function* (mockPreferences) {
 
   // Setting it to something different should trigger the call.
   Preferences.set("fake.preference", "newvalue");
+  ok(stop.called, "Changing to a different value triggered the observer");
+
+  PreferenceExperiments.stopAllObservers();
+  stop.restore();
+}));
+
+// startObserver should observe changes to the default preference value.
+add_task(withMockPreferences(function* (mockPreferences) {
+  const stop = sinon.stub(PreferenceExperiments, "stop");
+  mockPreferences.set("fake.preference", "startvalue", "default");
+
+  PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
+
+  // Setting it to the experimental value should not trigger the call.
+  DefaultPreferences.set("fake.preference", "experimentvalue");
+  ok(!stop.called, "Changing to the experimental pref value did not trigger the observer");
+
+  // Setting it to something different should trigger the call.
+  DefaultPreferences.set("fake.preference", "newvalue");
   ok(stop.called, "Changing to a different value triggered the observer");
 
   PreferenceExperiments.stopAllObservers();
@@ -213,13 +287,39 @@ add_task(withMockExperiments(function* (experiments) {
 // preference value.
 add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
-  mockPreferences.set("fake.preference", "experimentvalue");
+  mockPreferences.set("fake.preference", "experimentvalue", "default");
   experiments["test"] = experimentFactory({
     name: "test",
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
     previousPreferenceValue: "oldvalue",
+    preferenceBranchType: "default",
+  });
+
+  yield PreferenceExperiments.stop("test");
+  ok(stopObserver.calledWith("test"), "stop removed an observer");
+  equal(experiments["test"].expired, true, "stop marked the experiment as expired");
+  equal(
+    DefaultPreferences.get("fake.preference"),
+    "oldvalue",
+    "stop reverted the preference to its previous value",
+  );
+
+  stopObserver.restore();
+})));
+
+// stop should also support user pref experiments
+add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPreferences) {
+  const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
+  mockPreferences.set("fake.preference", "experimentvalue", "user");
+  experiments["test"] = experimentFactory({
+    name: "test",
+    expired: false,
+    preferenceName: "fake.preference",
+    preferenceValue: "experimentvalue",
+    previousPreferenceValue: "oldvalue",
+    preferenceBranchType: "user",
   });
 
   yield PreferenceExperiments.stop("test");
@@ -234,16 +334,17 @@ add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPre
   stopObserver.restore();
 })));
 
-// stop should remove a preference that had no value prior to an experiment
+// stop should remove a preference that had no value prior to an experiment for user prefs
 add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
-  mockPreferences.set("fake.preference", "experimentvalue");
+  mockPreferences.set("fake.preference", "experimentvalue", "user");
   experiments["test"] = experimentFactory({
     name: "test",
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
     previousPreferenceValue: undefined,
+    preferenceBranchType: "user",
   });
 
   yield PreferenceExperiments.stop("test");
@@ -258,18 +359,19 @@ add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPre
 // stop should not modify a preference if resetValue is false
 add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
-  mockPreferences.set("fake.preference", "customvalue");
+  mockPreferences.set("fake.preference", "customvalue", "default");
   experiments["test"] = experimentFactory({
     name: "test",
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
     previousPreferenceValue: "oldvalue",
+    peferenceBranchType: "default",
   });
 
   yield PreferenceExperiments.stop("test", false);
   equal(
-    Preferences.get("fake.preference"),
+    DefaultPreferences.get("fake.preference"),
     "customvalue",
     "stop did not modify the preference",
   );
@@ -328,3 +430,43 @@ add_task(withMockExperiments(function* (experiments) {
   ok(yield PreferenceExperiments.has("test"), "has returned true for a stored experiment");
   ok(!(yield PreferenceExperiments.has("missing")), "has returned false for a missing experiment");
 }));
+
+// init should set the default preference value for active, default experiments
+add_task(withMockExperiments(withMockPreferences(function* testInit(experiments, mockPreferences) {
+  experiments["user"] = experimentFactory({
+    preferenceName: "user",
+    preferenceValue: true,
+    expired: false,
+    preferenceBranchType: "user",
+  });
+  experiments["default"] = experimentFactory({
+    preferenceName: "default",
+    preferenceValue: true,
+    expired: false,
+    preferenceBranchType: "default",
+  });
+  experiments["expireddefault"] = experimentFactory({
+    preferenceName: "expireddefault",
+    preferenceValue: true,
+    expired: true,
+    preferenceBranchType: "default",
+  });
+
+  for (const name of Object.keys(experiments)) {
+    mockPreferences.set(name, false, "default");
+  }
+
+  yield PreferenceExperiments.init();
+
+  equal(DefaultPreferences.get("user"), false, "init ignored a user pref experiment");
+  equal(
+    DefaultPreferences.get("expireddefault"),
+    false,
+    "init ignored an expired default pref experiment",
+  );
+  equal(
+    DefaultPreferences.get("default"),
+    true,
+    "init set the value for a default pref experiment",
+  );
+})));

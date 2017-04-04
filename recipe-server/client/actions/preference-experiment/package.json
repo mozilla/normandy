@@ -38,6 +38,12 @@
                     "enum": ["string", "integer", "boolean"],
                     "default": "boolean"
                 },
+                "preferenceBranchType": {
+                    "descript": "Controls whether the default or user value of the preference is modified",
+                    "type": "string",
+                    "enum": ["user", "default"],
+                    "default": "default"
+                },
                 "branches": {
                     "description": "List of experimental branches",
                     "type": "array",
