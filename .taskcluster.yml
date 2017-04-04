@@ -19,17 +19,13 @@ tasks:
     payload:
       env:
       maxRunTime: 300 # 5 minutes
-      image: ubuntu:zesty
+      image: mozilla/normandy-taskcluster:latest
       features:
         taskclusterProxy: true
       command:
         - "/bin/bash"
         - "-c"
         - >-
-          apt-get update &&
-          apt-get install -y git python3.6 python3.6-venv &&
-          cd ~ &&
-
           git clone $GITHUB_HEAD_REPO_URL normandy &&
           pushd normandy &&
           git checkout $GITHUB_HEAD_SHA &&
