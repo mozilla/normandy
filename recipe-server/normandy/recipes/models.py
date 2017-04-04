@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+from collections import defaultdict
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -9,6 +10,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from dirtyfields import DirtyFieldsMixin
+from rest_framework import serializers
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
@@ -324,7 +326,11 @@ class RecipeRevision(models.Model):
         return hashlib.sha256(data.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
-        self.action.validate_arguments(self.arguments)
+        if self.parent:
+            old_arguments = self.parent.arguments
+        else:
+            old_arguments = None
+        self.action.validate_arguments(self.arguments, old_arguments)
 
         if not self.created:
             self.created = timezone.now()
@@ -345,13 +351,13 @@ class Action(models.Model):
 
     errors = {
         'duplicate_branch_slug': (
-            'Feature branch slugs must be unique within an experiment: "{slug}" is duplicated.'
+            'Feature branch slugs must be unique within an experiment'
         ),
         'duplicate_branch_value': (
-            'Feature branch values must be unique within an experiment: "{value}" is duplicated.'
+            'Feature branch values must be unique within an experiment'
         ),
         'duplicate_experiment_slug': (
-            'Experiment slugs must be globally unique: "{slug}" is duplicated'
+            'Experiment slugs must be globally unique'
         ),
     }
 
@@ -398,16 +404,23 @@ class Action(models.Model):
         Raises `ValidationError` if any rules are violated.
         """
         if self.name == 'preference-experiment':
+            # Make a default dict that always returns a default dict
+            def default():
+                return defaultdict(default)
+            errors = default()
+
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
             branch_values = set()
-            for branch in arguments['branches']:
+            for i, branch in enumerate(arguments['branches']):
                 if branch['slug'] in branch_slugs:
-                    raise ValidationError(self.errors['duplicate_branch_slug']
-                                          .format(slug=branch['slug']))
+                    msg = self.errors['duplicate_branch_slug']
+                    errors['branches'][i]['slug'] = msg
+
                 if branch['value'] in branch_values:
-                    raise ValidationError(self.errors['duplicate_branch_value']
-                                          .format(value=branch['value']))
+                    msg = self.errors['duplicate_branch_value']
+                    errors['branches'][i]['value'] = msg
+
                 branch_slugs.add(branch['slug'])
                 branch_values.add(branch['value'])
 
@@ -417,10 +430,14 @@ class Action(models.Model):
             if old_arguments is None:
                 # This is a newly created revision, so its slug should not be in the DB
                 experiment_slugs.add(arguments['slug'])
-            for recipe in experiment_recipes:
+            for i, recipe in enumerate(experiment_recipes):
                 if recipe.arguments['slug'] in experiment_slugs:
-                    raise ValidationError(self.errors['duplicate_experiment_slug']
-                                          .format(slug=arguments['slug']))
+                    msg = self.errors['duplicate_experiment_slug']
+                    errors['slug'] = msg
+                    break
+
+            if errors:
+                raise serializers.ValidationError({'arguments': errors})
 
 
 class Client(object):

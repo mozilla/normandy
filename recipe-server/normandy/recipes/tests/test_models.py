@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 
 import pytest
+from rest_framework import serializers
 
 from normandy.base.tests import Whatever
 from normandy.recipes.models import (
@@ -52,39 +53,41 @@ class TestAction(object):
     def test_validate_arguments_preference_exeriments_unique_branch_slugs(self):
         action = ActionFactory(name='preference-experiment')
         arguments = {
+            'slug': 'test',
             'branches': [
                 {'slug': 'unique', 'value': 'a'},
                 {'slug': 'duplicate', 'value': 'b'},
                 {'slug': 'duplicate', 'value': 'c'}
             ]
         }
-        with pytest.raises(ValidationError) as exc_info:
+        with pytest.raises(serializers.ValidationError) as exc_info:
             action.validate_arguments(arguments)
-        assert exc_info.value.message == (action.errors['duplicate_branch_slug']
-                                          .format(slug='duplicate'))
+        error = action.errors['duplicate_branch_slug']
+        assert exc_info.value.detail == {'arguments': {'branches': {2: {'slug': error}}}}
 
     def test_validate_arguments_preference_exeriments_unique_branch_values(self):
         action = ActionFactory(name='preference-experiment')
         arguments = {
+            'slug': 'test',
             'branches': [
                 {'slug': 'a', 'value': 'unique'},
                 {'slug': 'b', 'value': 'duplicate'},
                 {'slug': 'c', 'value': 'duplicate'}
             ]
         }
-        with pytest.raises(ValidationError) as exc_info:
+        with pytest.raises(serializers.ValidationError) as exc_info:
             action.validate_arguments(arguments)
-        assert exc_info.value.message == (action.errors['duplicate_branch_value']
-                                          .format(value='duplicate'))
+        error = action.errors['duplicate_branch_value']
+        assert exc_info.value.detail == {'arguments': {'branches': {2: {'value': error}}}}
 
     def test_validate_arguments_preference_experiments_unique_experiment_slug(self):
         action = ActionFactory(name='preference-experiment')
         arguments = {'slug': 'duplicate', 'branches': []}
         RecipeFactory(action=action, arguments=arguments)
-        with pytest.raises(ValidationError) as exc_info:
+        with pytest.raises(serializers.ValidationError) as exc_info:
             action.validate_arguments(arguments)
-        assert exc_info.value.message == (action.errors['duplicate_experiment_slug']
-                                          .format(slug='duplicate'))
+        error = action.errors['duplicate_experiment_slug']
+        assert exc_info.value.detail == {'arguments': {'slug': error}}
 
 
 @pytest.mark.django_db
