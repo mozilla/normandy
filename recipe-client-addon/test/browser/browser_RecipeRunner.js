@@ -3,6 +3,7 @@
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
 
 add_task(async function execute() {
   // Test that RecipeRunner can execute a basic recipe/action and return
@@ -166,4 +167,32 @@ add_task(async function testClientClassificationCache() {
   ok(!getStub.called, "getClientClassification was not called eagerly");
 
   getStub.restore();
+});
+
+add_task(async function testStartup() {
+  const runStub = sinon.stub(RecipeRunner, "run");
+  const addCleanupHandlerStub = sinon.stub(CleanupManager, "addCleanupHandler");
+  const updateRunIntervalStub = sinon.stub(RecipeRunner, "updateRunInterval");
+
+  // in dev mode
+  await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.dev_mode", true]]});
+  RecipeRunner.init();
+  ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
+  ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
+  ok(updateRunIntervalStub.called, "A timer is registered when in dev mode");
+
+  runStub.reset();
+  addCleanupHandlerStub.reset();
+  updateRunIntervalStub.reset();
+
+  // not in dev mode
+  await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.dev_mode", false]]});
+  RecipeRunner.init();
+  ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
+  ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");
+  ok(updateRunIntervalStub.called, "A timer is registered when not in dev mode");
+
+  runStub.restore();
+  addCleanupHandlerStub.restore();
+  updateRunIntervalStub.restore();
 });
