@@ -426,16 +426,15 @@ class Action(models.Model):
 
             # Experiment slugs should be unique.
             experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
-            experiment_slugs = set()
-            if old_arguments is None:
-                # This is a newly created revision, so its slug should not be in the DB
-                experiment_slugs.add(arguments['slug'])
-            for i, recipe in enumerate(experiment_recipes):
-                if recipe.arguments['slug'] in experiment_slugs:
-                    msg = self.errors['duplicate_experiment_slug']
-                    errors['slug'] = msg
-                    break
+            existing_slugs = set(r.arguments['slug'] for r in experiment_recipes)
+            if old_arguments:
+                # It is ok if the slug did not change
+                existing_slugs.remove(old_arguments['slug'])
+            if arguments['slug'] in existing_slugs:
+                msg = self.errors['duplicate_experiment_slug']
+                errors['slug'] = msg
 
+            # Raise errors, if any
             if errors:
                 raise serializers.ValidationError({'arguments': errors})
 
