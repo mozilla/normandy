@@ -34,6 +34,9 @@ class RecipeFormPage(Page):
     reject_confirm_button = Element('.reject-dropdown .mini-button')
     approved_status_indicator = Element('.status-indicator.approved')
     rejected_status_indicator = Element('.status-indicator.rejected')
+    clone_button = Element('#page-header .button.clone')
+    preview_button = Element('#page-header .button.preview')
+    history_button = Element('#page-header .button.history')
 
 
 class ConsoleLogFormPage(RecipeFormPage):
@@ -172,6 +175,55 @@ def test_create_recipe_show_heartbeat(selenium):
 
     recipe_list_page.wait_for_element('recipe_list')
     assert len(recipe_list_page.recipe_rows) == 0
+
+
+def test_revision_page_navbar(selenium):
+    """Test the navbar buttons on a recipe revision page."""
+    # Load control interface, expect login redirect.
+    selenium.get('http://normandy:8000/control/')
+    assert '/control/login/' in selenium.current_url
+    LoginPage(selenium).login()
+
+    # Check for empty recipe listing
+    recipe_list_page = RecipeListPage(selenium)
+    recipe_list_page.wait_for_element('recipe_list')
+    assert len(recipe_list_page.recipe_rows) == 0
+
+    # Load new recipe page
+    recipe_list_page.new_recipe_button.click()
+    form_page = ShowHeartbeatFormPage(selenium)
+    form_page.wait_for_element('form')
+
+    # Fill out form
+    form_page.name = 'Show-Heartbeat-Test'
+    form_page.extra_filter_expression = 'true'
+    form_page.action.select_by_value('show-heartbeat')
+    form_page.wait_for_element('survey_id')
+    form_page.survey_id = 'test-survey'
+    form_page.message = 'Test Message'
+    form_page.thanks_message = 'Thanks!'
+    form_page.form.submit()
+
+    # Wait until we navigate away from the new recipe page
+    wait_for(selenium, lambda driver: '/control/recipe/new/' not in driver.current_url)
+
+    # Grab the 'base' URL with the recipe id
+    recipe_url = selenium.current_url
+
+    # Make an edit and save it to createa  new revision
+    form_page.survey_id = 'test-survey-revision'
+    form_page.form.submit()
+
+    # Wait for the page to change to the revision URL
+    wait_for(selenium, lambda driver: recipe_url not in driver.current_url)
+
+    # Click the clone button and ensure it went to the right place
+    form_page.wait_for_element('clone_button')
+    form_page.clone_button.click()
+
+    clone_url = recipe_url + 'clone/'
+
+    assert clone_url in selenium.current_url
 
 
 class TestPeerApproval():
