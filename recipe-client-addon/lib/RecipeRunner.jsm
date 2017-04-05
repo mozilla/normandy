@@ -47,15 +47,7 @@ this.RecipeRunner = {
     }
 
     this.updateRunInterval();
-    if (timerManager.unregisterTimer) {
-      CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
-    } else {
-      // Since we can't unregister the timer yet (Bug 1350471), re-register
-      // with a period so long as to never actually run
-      CleanupManager.addCleanupHandler(() => {
-        timerManager.registerTimer(TIMER_NAME, () => {}, 1e10); // about 300 years
-      });
-    }
+    CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
 
     // Watch for the run interval to change, and re-register
     Preferences.observe(PREF_RUN_INTERVAL, this.updateRunInterval);
