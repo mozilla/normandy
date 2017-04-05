@@ -7,15 +7,23 @@ from taskcluster.utils import stableSlugId, dumpJson
 
 tasks = [
     {
+        'name': 'recipe-client-addon:build',
+        'description': 'Build Firefox with recipe-client-addon',
+        'command': 'normandy/recipe-client-addon/bin/tc/build.sh',
+    },
+    {
         'name': 'recipe-client-addon:test',
         'description': 'Test recipe-client-addon with gecko-dev',
         'command': 'normandy/recipe-client-addon/bin/tc/test.sh',
+        'dependencies': ['recipe-client-addon:build'],
+        'artifacts_from': {
+            'BUILD_RESULT': {'task': 'recipe-client-addon:build', 'path': 'build.tar.gz'},
+        },
     },
     {
         'name': 'recipe-client-addon:make-xpi',
         'description': 'Build XPI for recipe-client-addon',
         'command': 'normandy/recipe-client-addon/bin/tc/make-xpi.sh',
-        'dependencies': ['recipe-client-addon:test'],
     },
 ]
 
@@ -29,6 +37,7 @@ def main():
     decisionTaskId = os.environ['TASK_ID']
     owner = os.environ['GITHUB_HEAD_USER_EMAIL']
     source = os.environ['GITHUB_HEAD_REPO_URL']
+    artifact_url_pattern = 'http://taskcluster/queue/v1/task/{}/artifacts/{}'
 
     with requests.Session() as session:
         for task in tasks:
@@ -39,6 +48,11 @@ def main():
             for key, val in os.environ.items():
                 if key.startswith('GITHUB_'):
                     env.setdefault(key, val)
+
+            for envvar, artifact in task.get('artifacts_from', {}).items():
+                taskId = idMaker(artifact['task'])
+                path = artifact['path']
+                env[envvar] = f'http://taskcluster/queue/v1/task/{taskId}/artifacts/{path}'
 
             task_id = idMaker(task['name'])
             res = session.put(f'http://taskcluster/queue/v1/task/{task_id}', data=dumpJson({
