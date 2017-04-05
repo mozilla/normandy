@@ -2,7 +2,7 @@ import React, { PropTypes as pt } from 'react';
 import { Link } from 'react-router';
 import Breadcrumbs from 'react-breadcrumbs';
 
-import absolutePath from '../../utils/absolute-path';
+import absolutePath from 'client/utils/absolute-path';
 
 export default function Header({ pageType: { ctaButtons }, currentLocation, routes, params }) {
   let ctaBtns;
