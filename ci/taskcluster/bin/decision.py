@@ -37,7 +37,6 @@ def main():
     decisionTaskId = os.environ['TASK_ID']
     owner = os.environ['GITHUB_HEAD_USER_EMAIL']
     source = os.environ['GITHUB_HEAD_REPO_URL']
-    artifact_url_pattern = 'http://taskcluster/queue/v1/task/{}/artifacts/{}'
 
     with requests.Session() as session:
         for task in tasks:
