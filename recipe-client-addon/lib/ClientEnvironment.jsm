@@ -165,9 +165,7 @@ this.ClientEnvironment = {
     });
 
     XPCOMUtils.defineLazyGetter(environment, "locale", () => {
-      return Cc["@mozilla.org/chrome/chrome-registry;1"]
-        .getService(Ci.nsIXULChromeRegistry)
-        .getSelectedLocale("browser");
+      return Services.locale.getAppLocaleAsLangTag();
     });
 
     XPCOMUtils.defineLazyGetter(environment, "doNotTrack", () => {
