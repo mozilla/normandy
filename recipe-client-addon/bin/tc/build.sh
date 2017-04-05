@@ -8,11 +8,13 @@ export SHELL=$(which bash)
 echo 'Downloading gecko-dev...'
 curl -sfL https://github.com/mozilla/gecko-dev/archive/master.tar.gz | tar xz
 
+echo 'Fetching Normandy'
 pushd normandy/recipe-client-addon
 npm install
 ./bin/update-mozilla-central.sh ../gecko-dev/
 popd
 
+echo 'Building Firefox'
 pushd gecko-dev-master
 source /root/.cargo/env
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
@@ -20,4 +22,5 @@ source /root/.cargo/env
 ./mach build
 popd
 
-tar czf /artifacts/build.tar.gz gecko-dev-master
+echo 'Making build tarball artifact'
+tar czvf /artifacts/build.tar.gz gecko-dev-master
