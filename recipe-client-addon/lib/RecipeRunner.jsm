@@ -26,10 +26,8 @@ XPCOMUtils.defineLazyServiceGetter(this, "timerManager",
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
-const PREF_BASE_NAME = "extensions.shield-recipe-client.";
-const PREF_RUN_INTERVAL = PREF_BASE_NAME + "run_interval_seconds";
 const log = LogManager.getLogger("recipe-runner");
-const prefs = Services.prefs.getBranch(PREF_BASE_NAME);
+const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 const TIMER_NAME = "recipe-client-addon-run";
 
 this.RecipeRunner = {
@@ -49,10 +47,9 @@ this.RecipeRunner = {
     this.updateRunInterval();
     CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
 
-    // Watch for the run interval to change, and re-register
-    Preferences.observe(PREF_RUN_INTERVAL, this.updateRunInterval);
-    CleanupManager.addCleanupHandler(
-      () => Preferences.ignore(PREF_RUN_INTERVAL, this.updateRunInterval));
+    // Watch for the run interval to change, and re-register the timer with the new value
+    prefs.addObserver("run_interval_seconds", this, false);
+    CleanupManager.addCleanupHandler(() => prefs.removeObserver("run_interval_seconds", this));
   },
 
   checkPrefs() {
@@ -74,6 +71,14 @@ this.RecipeRunner = {
     }
 
     return true;
+  },
+
+  observe(changedPrefBranch, action, changedPref) {
+    if (action === "nsPref:changed" && changedPref === "run_interval_seconds") {
+      this.updateRunInterval();
+    } else {
+      log.debug(`Observer fired with unexpected pref change: ${action} ${changedPref}`);
+    }
   },
 
   updateRunInterval() {
