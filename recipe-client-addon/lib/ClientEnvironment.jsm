@@ -180,12 +180,18 @@ this.ClientEnvironment = {
     });
 
     XPCOMUtils.defineLazyGetter(environment, "experiments", async () => {
-      const experiments = await PreferenceExperiments.getAll();
-      return {
-        all: experiments.map(e => e.name),
-        active: experiments.filter(e => !e.expired).map(e => e.name),
-        expired: experiments.filter(e => e.expired).map(e => e.name),
-      };
+      const names = {all: [], active: [], expired: []};
+
+      for (const experiment of await PreferenceExperiments.getAll()) {
+        names.all.push(experiment.name);
+        if (experiment.expired) {
+          names.expired.push(experiment.name);
+        } else {
+          names.active.push(experiment.name);
+        }
+      }
+
+      return names;
     });
 
     return environment;

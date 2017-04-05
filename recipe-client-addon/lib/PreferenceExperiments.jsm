@@ -290,6 +290,9 @@ this.PreferenceExperiments = {
    */
   async getAll() {
     const store = await ensureStorage();
+
+    // Return copies so that mutating returned experiments doesn't affect the
+    // stored values.
     return Object.values(store.data).map(experiment => Object.assign({}, experiment));
   },
 
