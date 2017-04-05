@@ -4,14 +4,13 @@
 
 "use strict";
 
-const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
+const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -73,6 +72,9 @@ this.RecipeRunner = {
     return true;
   },
 
+  /**
+   * Watch for preference changes from Services.pref.addObserver.
+   */
   observe(changedPrefBranch, action, changedPref) {
     if (action === "nsPref:changed" && changedPref === "run_interval_seconds") {
       this.updateRunInterval();
