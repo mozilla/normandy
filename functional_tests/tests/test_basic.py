@@ -177,8 +177,8 @@ def test_create_recipe_show_heartbeat(selenium):
     assert len(recipe_list_page.recipe_rows) == 0
 
 
-def test_revision_page_navbar(selenium):
-    """Test the navbar buttons on a recipe revision page."""
+def test_revision_page_clone_button(selenium):
+    """Test the "clone" navigation button on a recipe revision page."""
     # Load control interface, expect login redirect.
     selenium.get('http://normandy:8000/control/')
     assert '/control/login/' in selenium.current_url
@@ -210,7 +210,7 @@ def test_revision_page_navbar(selenium):
     # Grab the 'base' URL with the recipe id
     recipe_url = selenium.current_url
 
-    # Make an edit and save it to createa  new revision
+    # Make an edit and save it to create a new revision
     form_page.survey_id = 'test-survey-revision'
     form_page.form.submit()
 
@@ -223,7 +223,7 @@ def test_revision_page_navbar(selenium):
 
     clone_url = recipe_url + 'clone/'
 
-    assert clone_url in selenium.current_url
+    assert clone_url == selenium.current_url
 
 
 class TestPeerApproval():

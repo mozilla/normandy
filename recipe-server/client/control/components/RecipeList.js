@@ -119,7 +119,7 @@ export class DisconnectedRecipeList extends React.Component {
 
       this.handlerCache[recipe.id] = () => {
         dispatch(setSelectedRecipe(recipe.id));
-        dispatch(push(`/control/recipe/${recipe.id}/revision/${recipe.latest_revision_id}`));
+        dispatch(push(`/control/recipe/${recipe.id}/revision/${recipe.latest_revision_id}/`));
       };
     }
 
