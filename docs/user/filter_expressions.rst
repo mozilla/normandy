@@ -222,6 +222,39 @@ filter expressions.
 
    Boolean specifying whether the user has enabled Do Not Track.
 
+.. js:attribute:: normandy.experiments
+
+   Object with several arrays containing the unique slugs for experiments that
+   the user has participated in. Currently, this is limited to preference
+   experiments.
+
+   .. js:attribute:: normandy.experiments.all
+
+      Array of experiment slugs for every experiment that the user has  enrolled
+      in, whether currently active or expired.
+
+   .. js:attribute:: normandy.experiments.active
+
+      Array of experiment slugs for active experiments that the user is enrolled
+      in.
+
+   .. js:attribute:: normandy.experiments.expired
+
+      Array of experiment slugs for expired experiments that the user has
+      enrolled in.
+
+   .. code-block:: javascript
+
+      // Target clients that have ever participated in the "australis"
+      // experiment, including clients that are currently running it
+      "australis" in normandy.experiments.all
+
+      // Target clients that are currently running the "quantum" experiment
+      "quantum" in normandy.experiments.active
+
+      // Target clients that ran the "photon" experiment, and have finished it
+      "photon" in normandy.experiments.expired
+
 Transforms
 ----------
 This section describes the transforms available to filter expressions, and what

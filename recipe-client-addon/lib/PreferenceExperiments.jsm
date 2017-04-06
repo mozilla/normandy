@@ -285,6 +285,18 @@ this.PreferenceExperiments = {
   },
 
   /**
+   * Get a list of all stored experiment objects.
+   * @resolves {Experiment[]}
+   */
+  async getAll() {
+    const store = await ensureStorage();
+
+    // Return copies so that mutating returned experiments doesn't affect the
+    // stored values.
+    return Object.values(store.data).map(experiment => Object.assign({}, experiment));
+  },
+
+  /**
    * Check if an experiment exists with the given name.
    * @param {string} experimentName
    * @resolves {boolean} True if the experiment exists, false if it doesn't.

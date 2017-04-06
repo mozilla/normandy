@@ -298,6 +298,30 @@ add_task(withMockExperiments(function* (experiments) {
   equal(experiments["test"].name, "test", "get returns a copy of the experiment");
 }));
 
+add_task(withMockExperiments(async function testGetAll(experiments) {
+  const experiment1 = experimentFactory({name: "experiment1"});
+  const experiment2 = experimentFactory({name: "experiment2", disabled: true});
+  experiments["experiment1"] = experiment1;
+  experiments["experiment2"] = experiment2;
+
+  const fetchedExperiments = await PreferenceExperiments.getAll();
+  equal(fetchedExperiments.length, 2, "getAll returns a list of all stored experiments");
+  deepEqual(
+    fetchedExperiments.find(e => e.name === "experiment1"),
+    experiment1,
+    "getAll returns a list with the correct experiments",
+  );
+  const fetchedExperiment2 = fetchedExperiments.find(e => e.name === "experiment2");
+  deepEqual(
+    fetchedExperiment2,
+    experiment2,
+    "getAll returns a list with the correct experiments, including disabled ones",
+  );
+
+  fetchedExperiment2.name = "othername";
+  equal(experiment2.name, "experiment2", "getAll returns copies of the experiments");
+}));
+
 // has
 add_task(withMockExperiments(function* (experiments) {
   experiments["test"] = experimentFactory({name: "test"});
