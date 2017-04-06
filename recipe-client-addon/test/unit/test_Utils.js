@@ -17,5 +17,5 @@ add_task(async function testKeyBy() {
 
   const missingKey = {value: 7};
   list.push(missingKey);
-  Assert.throws(() => Utils.keyBy(list, "name"));
+  deepEqual(Utils.keyBy(list, "name"), {foo, bar}, "keyBy skips items that are missing the key");
 });

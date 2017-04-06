@@ -58,6 +58,7 @@ add_task(async function testSandboxValueStorage() {
 
   await manager1.evalInSandbox("store.setItem('foo', {foo: 'bar'});");
   manager1.removeHold("testing");
+  await manager1.isNuked();
 
   const objectMatches = await manager2.evalInSandbox(`
     store.getItem("foo").then(item => item.foo === "bar");

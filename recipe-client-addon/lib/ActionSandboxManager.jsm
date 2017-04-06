@@ -33,7 +33,6 @@ this.ActionSandboxManager = class extends SandboxManager {
     this.evalInSandbox(`
       // Shim old API for registering actions
       function registerAction(name, Action) {
-        this.ActionClass = Action;
         registerAsyncCallback("action", recipe => {
           return new Action(sandboxedDriver, recipe).execute();
         });

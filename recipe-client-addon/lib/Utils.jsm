@@ -4,7 +4,12 @@
 
 "use strict";
 
+const {utils: Cu} = Components;
+Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
+
 this.EXPORTED_SYMBOLS = ["Utils"];
+
+const log = LogManager.getLogger("utils");
 
 this.Utils = {
   /**
@@ -21,7 +26,8 @@ this.Utils = {
   keyBy(list, key) {
     return list.reduce((map, item) => {
       if (!(key in item)) {
-        throw new Error(`List item was missing key "${key}".`);
+        log.warn(`Skipping list due to missing key "${key}".`);
+        return map;
       }
 
       map[item[key]] = item;

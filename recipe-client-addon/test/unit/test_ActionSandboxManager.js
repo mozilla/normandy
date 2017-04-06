@@ -99,3 +99,32 @@ add_task(withManager(async function testGlobalObject(manager) {
     clearTimeoutExists: true,
   }, "sandbox.window is the global object and has expected functions.");
 }));
+
+add_task(withManager(async function testRegisterActionShim(manager) {
+  const recipe = {
+    foo: "bar",
+  };
+  const actionScript = `
+    class TestAction {
+      constructor(driver, recipe) {
+        this.driver = driver;
+        this.recipe = recipe;
+      }
+
+      execute() {
+        return new Promise(resolve => {
+          resolve({
+            foo: this.recipe.foo,
+            isDriver: "log" in this.driver,
+          });
+        });
+      }
+    }
+
+    registerAction('test-action', TestAction);
+  `;
+
+  const result = await manager.runAsyncCallbackFromScript(actionScript, "action", recipe);
+  equal(result.foo, "bar", "registerAction registers an async callback for actions");
+  equal(result.isDriver, true, "registerAction passes the driver to the action class constructor");
+}));
