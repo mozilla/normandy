@@ -304,6 +304,9 @@ class RecipeRevision(models.Model):
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
 
+    class Meta:
+        ordering = ('-created',)
+
     @property
     def data(self):
         return {
