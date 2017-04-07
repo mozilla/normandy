@@ -14,11 +14,13 @@ npm install
 ./bin/update-mozilla-central.sh ../gecko-dev/
 popd
 
-echo 'Building Firefox'
+echo 'Setting up environment'
 pushd gecko-dev-master
 source /root/.cargo/env
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
 source /root/.cargo/env
+
+echo 'Building Firefox'
 ./mach build
 popd
 

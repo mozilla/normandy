@@ -5,6 +5,8 @@ import requests
 from taskcluster import fromNow
 from taskcluster.utils import stableSlugId, dumpJson
 
+BASE_URL = 'http://taskcluster/queue/v1'
+
 tasks = [
     {
         'name': 'recipe-client-addon:build',
@@ -16,9 +18,13 @@ tasks = [
         'description': 'Test recipe-client-addon with gecko-dev',
         'command': 'normandy/recipe-client-addon/bin/tc/test.sh',
         'dependencies': ['recipe-client-addon:build'],
-        'artifacts_from': {
-            'BUILD_RESULT': {'task': 'recipe-client-addon:build', 'path': 'build.tar.gz'},
-        },
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:build',
+                'path': 'build.tar.gz',
+                'env_var': 'BUILD_RESULT',
+            },
+        ],
     },
     {
         'name': 'recipe-client-addon:make-xpi',
@@ -48,13 +54,13 @@ def main():
                 if key.startswith('GITHUB_'):
                     env.setdefault(key, val)
 
-            for envvar, artifact in task.get('artifacts_from', {}).items():
-                taskId = idMaker(artifact['task'])
-                path = artifact['path']
-                env[envvar] = f'http://taskcluster/queue/v1/task/{taskId}/artifacts/{path}'
+            for spec in task.get('artifacts_from', []):
+                task_id = idMaker(spec['task_name'])
+                path = spec['path']
+                env[spec['env_var']] = f'{BASE_URL}/task/{task_id}/artifacts/{path}'
 
             task_id = idMaker(task['name'])
-            res = session.put(f'http://taskcluster/queue/v1/task/{task_id}', data=dumpJson({
+            res = session.put(f'{BASE_URL}/task/{task_id}', data=dumpJson({
                 'metadata': {
                     'name': task['name'],
                     'description': task['description'],
