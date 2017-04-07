@@ -177,7 +177,6 @@ class TestRecipeSerializer:
 
         assert r.action == a
 
-
     def test_update_locale(self):
         r = RecipeFactory()
         l = LocaleFactory(code='en-US')
