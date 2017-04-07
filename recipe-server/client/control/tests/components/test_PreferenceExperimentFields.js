@@ -17,8 +17,6 @@ describe('<PreferenceExperimentFields>', () => {
 
   it('should render a warning if using the user preference branch type', () => {
     const wrapper = shallow(<PreferenceExperimentFields preferenceBranchType="user" />);
-    const warning = wrapper.find('.field-warning');
-    expect(warning.length).toBe(1);
-    expect(warning.text()).toContain('not recommended');
+    expect(wrapper.contains(PreferenceExperimentFields.userBranchWarning)).toBe(true);
   });
 });

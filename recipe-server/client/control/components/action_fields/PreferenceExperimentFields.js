@@ -37,6 +37,14 @@ export class PreferenceExperimentFields extends ActionFields {
     preferenceBranchType: pt.string.isRequired,
   }
 
+  static userBranchWarning = (
+    <p className="field-warning">
+      <i className="fa fa-exclamation-triangle" />
+      Setting user preferences instead of default ones is not recommended.
+      Do not choose this unless you know what you are doing.
+    </p>
+  );
+
   render() {
     const { preferenceBranchType } = this.props;
     return (
@@ -77,13 +85,7 @@ export class PreferenceExperimentFields extends ActionFields {
           <option value="default">Default</option>
           <option value="user">User</option>
         </ControlField>
-        {preferenceBranchType === 'user' &&
-          <p className="field-warning">
-            <i className="fa fa-exclamation-triangle" />
-            Setting user preferences instead of default ones is not recommended.
-            Do not choose this unless you know what you are doing.
-          </p>
-        }
+        {preferenceBranchType === 'user' && PreferenceExperimentFields.userBranchWarning}
         <FieldArray name="arguments.branches" component={PreferenceBranches} />
       </div>
     );

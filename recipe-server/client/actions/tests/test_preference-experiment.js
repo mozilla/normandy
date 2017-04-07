@@ -21,7 +21,7 @@ class MockPreferenceExperiments {
     this.experiments = {};
   }
 
-  async start(name, branch, preferenceName, preferenceValue) {
+  async start({ name, branch, preferenceName, preferenceValue }) {
     this.experiments[name] = {
       name,
       branch,
@@ -91,7 +91,13 @@ describe('PreferenceExperimentAction', () => {
 
       await action.execute();
       expect(normandy.preferenceExperiments.start)
-        .toHaveBeenCalledWith('test', 'branch1', 'fake.preference', 'branch1', 'user');
+        .toHaveBeenCalledWith({
+          name: 'test',
+          branch: 'branch1',
+          preferenceName: 'fake.preference',
+          preferenceValue: 'branch1',
+          preferenceBranchType: 'user',
+        });
     });
 
     it('should mark the lastSeen date for the experiment if it is active', async () => {
