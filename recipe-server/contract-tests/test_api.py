@@ -134,6 +134,6 @@ def test_recipe_history(conf, requests_session):
 
         last_date = datetime.now()
         for revision in history:
-            created = datetime.strptime(revision)
+            created = datetime.strptime(revision['date_created'], '%Y-%m-%dT%H:%M:%S.%fZ')
             assert created < last_date
             last_date = created
