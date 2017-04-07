@@ -499,34 +499,37 @@ class TestRecipeAPI(object):
         assert r.action == a
 
     def test_update_recipe_locale(self, api_client):
-        r = RecipeFactory()
-        l = LocaleFactory(code='en-US')
+        l1 = LocaleFactory(code='fr-FR')
+        l2 = LocaleFactory(code='en-US')
+        r = RecipeFactory(locales=[l1])
 
         res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'locales': ['en-US']})
         assert res.status_code == 200
 
         r.refresh_from_db()
-        assert r.locales.filter(pk=l.pk).exists()
+        assert list(r.locales.all()) == [l2]
 
     def test_update_recipe_country(self, api_client):
-        r = RecipeFactory()
-        c = CountryFactory(code='CA')
+        c1 = CountryFactory(code='US')
+        c2 = CountryFactory(code='CA')
+        r = RecipeFactory(countries=[c1])
 
         res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'countries': ['CA']})
         assert res.status_code == 200
 
         r.refresh_from_db()
-        assert r.countries.filter(pk=c.pk).exists()
+        assert list(r.countries.all()) == [c2]
 
     def test_update_recipe_channel(self, api_client):
-        r = RecipeFactory()
-        c = ChannelFactory(slug='beta')
+        c1 = ChannelFactory(slug='release')
+        c2 = ChannelFactory(slug='beta')
+        r = RecipeFactory(channels=[c1])
 
         res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'channels': ['beta']})
         assert res.status_code == 200
 
         r.refresh_from_db()
-        assert r.channels.filter(pk=c.pk).exists()
+        assert list(r.channels.all()) == [c2]
 
 
 @pytest.mark.django_db

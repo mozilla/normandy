@@ -168,42 +168,6 @@ class TestRecipeSerializer:
         }
         assert serializer.errors == {}
 
-    def test_update_action(self):
-        r = RecipeFactory()
-        a = ActionFactory(name='test')
-
-        serializer = RecipeSerializer()
-        serializer.update(r, {'action': a})
-
-        assert r.action == a
-
-    def test_update_locale(self):
-        r = RecipeFactory()
-        l = LocaleFactory(code='en-US')
-
-        serializer = RecipeSerializer()
-        serializer.update(r, {'locales': [l]})
-
-        assert r.locales.filter(pk=l.pk).exists()
-
-    def test_update_country(self):
-        r = RecipeFactory()
-        c = CountryFactory(code='CA')
-
-        serializer = RecipeSerializer()
-        serializer.update(r, {'countries': [c]})
-
-        assert r.countries.filter(pk=c.pk).exists()
-
-    def test_update_channel(self):
-        r = RecipeFactory()
-        c = ChannelFactory(slug='beta')
-
-        serializer = RecipeSerializer()
-        serializer.update(r, {'channels': [c]})
-
-        assert r.channels.filter(pk=c.pk).exists()
-
 
 @pytest.mark.django_db()
 class TestActionSerializer:
