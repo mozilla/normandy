@@ -97,12 +97,12 @@ this.PreferenceExperiments = {
    */
   async init() {
     const store = await ensureStorage();
-    for (const experiment of Object.values(store.data)) {
+    Object.values(store.data).forEach(experiment => {
       const {expired, preferenceBranchType, preferenceName, preferenceValue} = experiment;
       if (!expired && preferenceBranchType === "default") {
         DefaultPreferences.set(preferenceName, preferenceValue);
       }
-    }
+    });
   },
 
   /**
@@ -136,21 +136,22 @@ this.PreferenceExperiments = {
 
   /**
    * Start a new preference experiment.
-   * @param {string} experimentName
-   * @param {string} branch
-   * @param {string} preferenceName
-   * @param {string|integer|boolean} preferenceValue
-   * @param {PreferenceBranchType} preferenceBranchType
+   * @param {Object} experiment
+   * @param {string} experiment.name
+   * @param {string} experiment.branch
+   * @param {string} experiment.preferenceName
+   * @param {string|integer|boolean} experiment.preferenceValue
+   * @param {PreferenceBranchType} experiment.preferenceBranchType
    * @rejects {Error}
    *   If an experiment with the given name already exists, or if an experiment
    *   for the given preference is active.
    */
-  async start(experimentName, branch, preferenceName, preferenceValue, preferenceBranchType) {
-    log.debug(`PreferenceExperiments.start(${experimentName}, ${branch})`);
+  async start({name, branch, preferenceName, preferenceValue, preferenceBranchType}) {
+    log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
     const store = await ensureStorage();
-    if (experimentName in store.data) {
-      throw new Error(`A preference experiment named "${experimentName}" already exists.`);
+    if (name in store.data) {
+      throw new Error(`A preference experiment named "${name}" already exists.`);
     }
 
     const activeExperiments = Object.values(store.data).filter(e => !e.expired);
@@ -170,7 +171,7 @@ this.PreferenceExperiments = {
 
     /** @type {Experiment} */
     const experiment = {
-      name: experimentName,
+      name,
       branch,
       expired: false,
       lastSeen: new Date().toJSON(),
@@ -181,8 +182,8 @@ this.PreferenceExperiments = {
     };
 
     preferences.set(preferenceName, preferenceValue);
-    PreferenceExperiments.startObserver(experimentName, preferenceName, preferenceValue);
-    store.data[experimentName] = experiment;
+    PreferenceExperiments.startObserver(name, preferenceName, preferenceValue);
+    store.data[name] = experiment;
     store.saveSoon();
   },
 

@@ -37,7 +37,13 @@ add_task(withMockExperiments(function* (experiments) {
 add_task(withMockExperiments(function* (experiments) {
   experiments["test"] = experimentFactory({name: "test"});
   yield Assert.rejects(
-    PreferenceExperiments.start("test", "branch", "fake.preference", "value"),
+    PreferenceExperiments.start({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.preference",
+      preferenceValue: "value",
+      preferenceBranchType: "default",
+    }),
     "start threw an error due to a conflicting experiment name",
   );
 }));
@@ -46,16 +52,27 @@ add_task(withMockExperiments(function* (experiments) {
 add_task(withMockExperiments(function* (experiments) {
   experiments["test"] = experimentFactory({name: "test", preferenceName: "fake.preference"});
   yield Assert.rejects(
-    PreferenceExperiments.start("different", "branch", "fake.preference", "value"),
+    PreferenceExperiments.start({
+      name: "different",
+      branch: "branch",
+      preferenceName: "fake.preference",
+      preferenceValue: "value",
+      preferenceBranchType: "default",
+    }),
     "start threw an error due to an active experiment for the given preference",
   );
 }));
 
 // start should throw if an invalid preferenceBranchType is given
-add_task(withMockExperiments(function* (experiments) {
-  experiments["test"] = experimentFactory({name: "test", preferenceName: "fake.preference"});
+add_task(withMockExperiments(function* () {
   yield Assert.rejects(
-    PreferenceExperiments.start("different", "branch", "other.preference", "value", "invalid"),
+    PreferenceExperiments.start({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.preference",
+      preferenceValue: "value",
+      preferenceBranchType: "invalid",
+    }),
     "start threw an error due to an invalid preference branch type",
   );
 }));
@@ -66,7 +83,13 @@ add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPre
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "default");
 
-  yield PreferenceExperiments.start("test", "branch", "fake.preference", "newvalue", "default");
+  yield PreferenceExperiments.start({
+    name: "test",
+    branch: "branch",
+    preferenceName: "fake.preference",
+    preferenceValue: "newvalue",
+    preferenceBranchType: "default",
+  });
   ok("test" in experiments, "start saved the experiment");
   ok(
     startObserver.calledWith("test", "fake.preference", "newvalue"),
@@ -105,7 +128,13 @@ add_task(withMockExperiments(withMockPreferences(function* (experiments, mockPre
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "user");
 
-  yield PreferenceExperiments.start("test", "branch", "fake.preference", "newvalue", "user");
+  PreferenceExperiments.start({
+    name: "test",
+    branch: "branch",
+    preferenceName: "fake.preference",
+    preferenceValue: "newvalue",
+    preferenceBranchType: "user",
+  });
   ok(
     startObserver.calledWith("test", "fake.preference", "newvalue"),
     "start registered an observer",
@@ -151,6 +180,7 @@ add_task(withMockPreferences(function* (mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
 
+  // NOTE: startObserver does not modify the pref
   PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
 
   // Setting it to the experimental value should not trigger the call.
@@ -170,6 +200,7 @@ add_task(withMockPreferences(function* (mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue", "default");
 
+  // NOTE: startObserver does not modify the pref
   PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
 
   // Setting it to the experimental value should not trigger the call.

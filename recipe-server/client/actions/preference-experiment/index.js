@@ -26,7 +26,13 @@ export default class PreferenceExperimentAction extends Action {
       // If the experiment doesn't exist yet, enroll!
       if (!hasSlug) {
         return this.chooseBranch(branches).then(branch =>
-          experiments.start(slug, branch.slug, preferenceName, branch.value, preferenceBranchType)
+          experiments.start({
+            name: slug,
+            branch: branch.slug,
+            preferenceName,
+            preferenceValue: branch.value,
+            preferenceBranchType,
+          })
         );
       }
 
