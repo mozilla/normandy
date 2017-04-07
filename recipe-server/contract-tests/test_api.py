@@ -127,7 +127,7 @@ def test_recipe_history(conf, requests_session):
         pytest.skip('No recipes found.')
 
     for item in data:
-        endpoint = '/api/v1/recipe/{}/history/'.format(item['id'])
+        endpoint = f'/api/v1/recipe/{item["id"]}/history/'
         r = requests_session.get(conf.getoption('server') + endpoint)
         r.raise_for_status()
         history = r.json()
