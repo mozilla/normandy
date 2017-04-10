@@ -1,3 +1,4 @@
+import { fromJS, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
@@ -8,13 +9,10 @@ import {
 } from '../action-types';
 
 
-function objects(state = {}, action) {
+function objects(state = Map({}), action) {
   switch (action.type) {
     case RECIPE_RECIEVE:
-      return {
-        ...state,
-        [action.recipe.id]: action.recipe,
-      };
+      return state.update(action.recipe.id, fromJS(action.recipe));
 
     default:
       return state;
@@ -22,34 +20,25 @@ function objects(state = {}, action) {
 }
 
 
-function requests(state = {}, action) {
+function requests(state = Map({}), action) {
   switch (action.type) {
     case RECIPE_FETCH:
-      return {
-        ...state,
-        [action.requestId]: {
-          loading: true,
-          error: null,
-        },
-      };
+      return state.set(action.requestId, Map({
+        loading: true,
+        error: null,
+      }));
 
     case RECIPE_FETCH_SUCCESS:
-      return {
-        ...state,
-        [action.requestId]: {
-          loading: false,
-          error: null,
-        },
-      };
+      return state.set(action.requestId, Map({
+        loading: false,
+        error: null,
+      }));
 
     case RECIPE_FETCH_FAILURE:
-      return {
-        ...state,
-        [action.requestId]: {
-          loading: false,
-          error: action.error,
-        },
-      };
+      return state.set(action.requestId, Map({
+        loading: false,
+        error: action.error,
+      }));
 
     default:
       return state;

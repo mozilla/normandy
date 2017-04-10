@@ -22,6 +22,7 @@ rules:
   no-underscore-dangle: [off]
   no-use-before-define: [warn, { functions: false }]
   prefer-const: [warn]
+  new-cap: [warn]
 
   babel/arrow-parens: [warn, as-needed]
   import/no-extraneous-dependencies: [error, {devDependencies: true}]

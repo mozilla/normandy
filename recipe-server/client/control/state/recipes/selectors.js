@@ -2,5 +2,6 @@ import { DEFAULT_REQUEST } from '../constants';
 
 
 export function getRequest(state, id) {
-  return state.recipes.requests[id] || DEFAULT_REQUEST;
+  const requests = state.get('recipes').get('requests');
+  return requests.get(id, DEFAULT_REQUEST);
 }
