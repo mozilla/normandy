@@ -56,6 +56,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "JSONFile", "resource://gre/modules/JSON
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "LogManager", "resource://shield-recipe-client/lib/LogManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/modules/TelemetryEnvironment.jsm");
 
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
@@ -97,11 +98,17 @@ this.PreferenceExperiments = {
    */
   async init() {
     const store = await ensureStorage();
+
     Object.values(store.data).forEach(experiment => {
-      const {expired, preferenceBranchType, preferenceName, preferenceValue} = experiment;
+      const {name, branch, expired, preferenceBranchType, preferenceName, preferenceValue} = experiment;
+
+      // Set experiment default preferences, since they don't persist between restarts
       if (!expired && preferenceBranchType === "default") {
         DefaultPreferences.set(preferenceName, preferenceValue);
       }
+
+      // Notify Telemetry of experiments we're running, since they don't persist between restarts
+      TelemetryEnvironment.setExperimentActive(name, branch);
     });
   },
 
@@ -185,6 +192,8 @@ this.PreferenceExperiments = {
     PreferenceExperiments.startObserver(name, preferenceName, preferenceValue);
     store.data[name] = experiment;
     store.saveSoon();
+
+    TelemetryEnvironment.setExperimentActive(name, branch);
   },
 
   /**
@@ -307,6 +316,8 @@ this.PreferenceExperiments = {
 
     experiment.expired = true;
     store.saveSoon();
+
+    TelemetryEnvironment.setExperimentInactive(experimentName, experiment.branch);
   },
 
   /**

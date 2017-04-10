@@ -1,6 +1,7 @@
 "use strict";
 
 Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://gre/modules/TelemetryEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 
 load("utils.js"); /* globals withMockPreferences */
@@ -477,3 +478,45 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
     "init set the value for a default pref experiment",
   );
 })));
+
+// init should register telemetry experiments
+add_task(withMockExperiments(async function testInit(experiments) {
+  experiments["experiment1"] = experimentFactory({name: "experiment1", branch: "branch1"});
+  experiments["experiment2"] = experimentFactory({name: "experiment2", branch: "branch2"});
+
+  let currentExperiments = TelemetryEnvironment.getActiveExperiments();
+  ok(!("experiment1" in currentExperiments), "experiment1 is not in telemetry");
+  ok(!("experiment2" in currentExperiments), "experiment2 is not in telemetry");
+
+  await PreferenceExperiments.init();
+
+  currentExperiments = TelemetryEnvironment.getActiveExperiments();
+  deepEqual(currentExperiments["experiment1"], {branch: "branch1"}, "experiment1 is in telemetry");
+  deepEqual(currentExperiments["experiment2"], {branch: "branch2"}, "experiment2 is in telemetry");
+}));
+
+// starting and stopping experiments should register in telemetry
+add_task(withMockExperiments(async function testInit() {
+  let currentExperiments = TelemetryEnvironment.getActiveExperiments();
+  ok(!("test" in currentExperiments), "test experiment is not in telemetry before starting");
+
+  await PreferenceExperiments.start({
+    name: "test",
+    branch: "branch",
+    preferenceName: "fake.preference",
+    preferenceValue: "value",
+    preferenceBranchType: "default",
+  });
+
+  currentExperiments = TelemetryEnvironment.getActiveExperiments();
+  deepEqual(
+    currentExperiments["test"],
+    {branch: "branch"},
+    "test experiment is in telemetry after starting"
+  );
+
+  await PreferenceExperiments.stop("test");
+
+  currentExperiments = TelemetryEnvironment.getActiveExperiments();
+  ok(!("test" in currentExperiments), "test experiment is not in telemetry after stopping");
+}));
