@@ -104,20 +104,21 @@ add_task(withMockApiServer(async function test_classifyClient() {
 }));
 
 add_task(withMockApiServer(async function test_fetchActions() {
-  const actions = await NormandyApi.fetchActions("show-heartbeat");
-  equal(Object.values(actions).length, 2);
-  ok("console-log" in actions);
-  ok("show-heartbeat" in actions);
+  const actions = await NormandyApi.fetchActions();
+  equal(actions.length, 2);
+  const actionNames = actions.map(a => a.name);
+  ok(actionNames.includes("console-log"));
+  ok(actionNames.includes("show-heartbeat"));
 }));
 
-add_task(withScriptServer("test_server.sjs", async function test_getTestServer(serverUrl) {
+add_task(withScriptServer("query_server.sjs", async function test_getTestServer(serverUrl) {
   // Test that NormandyApi can fetch from the test server.
   const response = await NormandyApi.get(serverUrl);
   const data = await response.json();
   Assert.deepEqual(data, {queryString: {}, body: {}}, "NormandyApi returned incorrect server data.");
 }));
 
-add_task(withScriptServer("test_server.sjs", async function test_getQueryString(serverUrl) {
+add_task(withScriptServer("query_server.sjs", async function test_getQueryString(serverUrl) {
   // Test that NormandyApi can send query string parameters to the test server.
   const response = await NormandyApi.get(serverUrl, {foo: "bar", baz: "biff"});
   const data = await response.json();
@@ -127,7 +128,7 @@ add_task(withScriptServer("test_server.sjs", async function test_getQueryString(
   );
 }));
 
-add_task(withScriptServer("test_server.sjs", async function test_postData(serverUrl) {
+add_task(withScriptServer("query_server.sjs", async function test_postData(serverUrl) {
   // Test that NormandyApi can POST JSON-formatted data to the test server.
   const response = await NormandyApi.post(serverUrl, {foo: "bar", baz: "biff"});
   const data = await response.json();
@@ -136,3 +137,30 @@ add_task(withScriptServer("test_server.sjs", async function test_postData(server
     "NormandyApi sent an incorrect query string."
   );
 }));
+
+add_task(withScriptServer("echo_server.sjs", async function test_fetchImplementation(serverUrl) {
+  const action = {
+    implementation_url: `${serverUrl}?status=200&body=testcontent`,
+  };
+  equal(
+    await NormandyApi.fetchImplementation(action),
+    "testcontent",
+    "fetchImplementation fetches the content at the correct URL",
+  );
+}));
+
+add_task(withScriptServer(
+  "echo_server.sjs",
+  async function test_fetchImplementationFail(serverUrl) {
+    const action = {
+      implementation_url: `${serverUrl}?status=500&body=servererror`,
+    };
+
+    try {
+      await NormandyApi.fetchImplementation(action);
+      ok(false, "fetchImplementation throws for non-200 response status codes");
+    } catch (err) {
+      // pass
+    }
+  },
+));

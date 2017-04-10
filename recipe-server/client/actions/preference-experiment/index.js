@@ -1,14 +1,14 @@
 /* globals normandy */
 import { Action, registerAction, registerAsyncCallback } from '../utils';
 
+let seenExperimentNames = [];
+
 /**
- * Sets up the list of seen experiments for the postExecutionHook.
+ * Used for unit tests only to reset action state.
  */
-export function preExecutionHook(normandy) {
-  const storage = normandy.createStorage('_preferenceExperiments');
-  return storage.setItem('seenExperimentNames', []);
+export function resetAction() {
+  seenExperimentNames = [];
 }
-registerAsyncCallback('preExecution', preExecutionHook);
 
 /**
  * Enrolls a user in a preference experiment, in which we assign the user to an
@@ -32,13 +32,8 @@ export default class PreferenceExperimentAction extends Action {
       return Promise.resolve();
     }
 
-    const storage = this.normandy.createStorage('_preferenceExperiments');
-    return storage.getItem('seenExperimentNames').then(seenExperimentNames => {
-      seenExperimentNames.push(slug);
-      return storage.setItem('seenExperimentNames', seenExperimentNames);
-    }).then(
-      () => experiments.has(slug)
-    ).then(hasSlug => {
+    seenExperimentNames.push(slug);
+    return experiments.has(slug).then(hasSlug => {
       // If the experiment doesn't exist yet, enroll!
       if (!hasSlug) {
         return this.chooseBranch(branches).then(branch =>
@@ -93,11 +88,7 @@ export function postExecutionHook(normandy) {
   }
 
   // If any of the active experiments were not seen during a run, stop them.
-  const storage = normandy.createStorage('_preferenceExperiments');
-  return Promise.all([
-    storage.getItem('seenExperimentNames'),
-    normandy.preferenceExperiments.getAllActive(),
-  ]).then(([seenExperimentNames, activeExperiments]) => {
+  return normandy.preferenceExperiments.getAllActive().then(activeExperiments => {
     const stopPromises = [];
     for (const experiment of activeExperiments) {
       if (!seenExperimentNames.includes(experiment.name)) {

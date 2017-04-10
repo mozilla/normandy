@@ -130,13 +130,20 @@ this.NormandyApi = {
 
   /**
    * Fetch an array of available actions from the server.
-   * @resolves {Object}
-   *   Mapping of action names to action objects.
+   * @resolves {Array}
    */
   async fetchActions() {
     const actionApiUrl = await this.getApiUrl("action-list");
     const res = await this.get(actionApiUrl);
-    const actionList = await res.json();
-    return Utils.keyBy(actionList, "name");
+    return await res.json();
+  },
+
+  async fetchImplementation(action) {
+    const response = await fetch(action.implementation_url);
+    if (response.ok) {
+      return await response.text();
+    }
+
+    throw new Error(`Failed to fetch action implementation for ${action.name}: ${response.status}`);
   },
 };

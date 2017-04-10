@@ -24,7 +24,7 @@ const log = LogManager.getLogger("recipe-sandbox-manager");
  * Callbacks are assumed to be async and must return Promises.
  */
 this.ActionSandboxManager = class extends SandboxManager {
-  constructor() {
+  constructor(actionScript) {
     super();
 
     // Prepare the sandbox environment
@@ -33,8 +33,8 @@ this.ActionSandboxManager = class extends SandboxManager {
     this.evalInSandbox(`
       // Shim old API for registering actions
       function registerAction(name, Action) {
-        registerAsyncCallback("action", recipe => {
-          return new Action(sandboxedDriver, recipe).execute();
+        registerAsyncCallback("action", (driver, recipe) => {
+          return new Action(driver, recipe).execute();
         });
       };
 
@@ -47,12 +47,12 @@ this.ActionSandboxManager = class extends SandboxManager {
       this.setTimeout = sandboxedDriver.setTimeout;
       this.clearTimeout = sandboxedDriver.clearTimeout;
     `);
+    this.evalInSandbox(actionScript);
   }
 
   /**
    * Execute a callback in the sandbox with the given name. If the script does
    * not register a callback with the given name, we log a message and return.
-   * @param {String} script
    * @param {String} callbackName
    * @param {...*} [args]
    *   Remaining arguments are cloned into the sandbox and passed as arguments
@@ -64,11 +64,8 @@ this.ActionSandboxManager = class extends SandboxManager {
    *   If the sandbox rejects, an error object with the message from the sandbox
    *   error. Due to sandbox limitations, the stack trace is not preserved.
    */
-  async runAsyncCallbackFromScript(script, callbackName, ...args) {
-    this.evalInSandbox("asyncCallbacks.clear()");
-    this.evalInSandbox(script);
+  async runAsyncCallback(callbackName, ...args) {
     const callbackWasRegistered = this.evalInSandbox(`asyncCallbacks.has("${callbackName}")`);
-
     if (!callbackWasRegistered) {
       log.debug(`Script did not register a callback with the name "${callbackName}"`);
       return undefined;

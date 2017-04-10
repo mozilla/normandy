@@ -1,6 +1,6 @@
 import PreferenceExperimentAction, {
-  preExecutionHook,
   postExecutionHook,
+  resetAction,
 } from '../preference-experiment/';
 import { recipeFactory } from '../../tests/utils.js';
 import { MockStorage } from './utils.js';
@@ -72,21 +72,20 @@ describe('PreferenceExperimentAction', () => {
       log: jasmine.createSpy('log'),
       preferenceExperiments: new MockPreferenceExperiments(),
     };
+    resetAction();
   });
 
   describe('execute', () => {
     it('should run without errors', async () => {
-      await preExecutionHook(normandy);
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory());
       await action.execute();
       await postExecutionHook(normandy);
     });
 
-    it('should log and exit if the preferenceExperiments APi is missing', async () => {
+    it('should log and exit if the preferenceExperiments API is missing', async () => {
       delete normandy.preferenceExperiments;
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory());
 
-      await preExecutionHook(normandy);
       await action.execute();
       await postExecutionHook(normandy);
 
@@ -106,7 +105,6 @@ describe('PreferenceExperimentAction', () => {
       }));
       spyOn(action, 'chooseBranch').and.callFake(branches => Promise.resolve(branches[0]));
 
-      await preExecutionHook(normandy);
       await action.execute();
       await postExecutionHook(normandy);
 
@@ -127,7 +125,6 @@ describe('PreferenceExperimentAction', () => {
       }));
       spyOn(normandy.preferenceExperiments, 'markLastSeen').and.callThrough();
 
-      await preExecutionHook(normandy);
       await action.execute();
       await postExecutionHook(normandy);
 
@@ -141,7 +138,6 @@ describe('PreferenceExperimentAction', () => {
       }));
       spyOn(normandy.preferenceExperiments, 'markLastSeen').and.callThrough();
 
-      await preExecutionHook(normandy);
       await action.execute();
       await postExecutionHook(normandy);
 
@@ -155,7 +151,6 @@ describe('PreferenceExperimentAction', () => {
         const unseen = { name: 'unseen', expired: false };
         normandy.preferenceExperiments.experiments = { seen, unseen };
 
-        await preExecutionHook(normandy);
         const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
           slug: 'seen',
         }));

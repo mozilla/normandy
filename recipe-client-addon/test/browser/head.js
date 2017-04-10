@@ -48,11 +48,22 @@ this.withDriver = function(Assert, testFunction) {
 
 this.withMockNormandyApi = function(testFunction) {
   return async function inner(...args) {
-    const mockApi = {actions: [], recipes: []};
-    sinon.stub(NormandyApi, "fetchActions", async () => Utils.keyBy(mockApi.actions, "name"));
+    const mockApi = {actions: [], recipes: [], implementations: {}};
+
+    sinon.stub(NormandyApi, "fetchActions", async () => mockApi.actions);
     sinon.stub(NormandyApi, "fetchRecipes", async () => mockApi.recipes);
+    sinon.stub(NormandyApi, "fetchImplementation", async action => {
+      const impl = mockApi.implementations[action.name];
+      if (!impl) {
+        throw new Error("Missing");
+      }
+      return impl;
+    });
+
     await testFunction(mockApi, ...args);
+
     NormandyApi.fetchActions.restore();
     NormandyApi.fetchRecipes.restore();
+    NormandyApi.fetchImplementation.restore();
   };
 };

@@ -15,7 +15,6 @@ Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Storage",
@@ -100,16 +99,18 @@ this.RecipeRunner = {
       await ClientEnvironment.getClientClassification();
     }
 
+    const actionSandboxManagers = await this.loadActionSandboxManagers();
+    Object.values(actionSandboxManagers).forEach(manager => manager.addHold("recipeRunner"));
+
     // Run pre-execution hooks. If a hook fails, we don't run recipes with that
     // action to avoid inconsistencies.
-    const actions = await NormandyApi.fetchActions();
-    for (const action of Object.values(actions)) {
+    for (const [actionName, manager] of Object.entries(actionSandboxManagers)) {
       try {
-        await this.runActionCallback(action, "preExecution");
-        action.failed = false;
+        await manager.runAsyncCallback("preExecution");
+        manager.disabled = false;
       } catch (err) {
-        log.error(`Could not run pre-execution hook for ${action.name}:`, err.message);
-        action.failed = true;
+        log.error(`Could not run pre-execution hook for ${actionName}:`, err.message);
+        manager.disabled = true;
       }
     }
 
@@ -136,20 +137,20 @@ this.RecipeRunner = {
       log.debug("No recipes to execute");
     } else {
       for (const recipe of recipesToRun) {
-        const action = actions[recipe.action];
-        if (!action) {
+        const manager = actionSandboxManagers[recipe.action];
+        if (!manager) {
           log.error(
             `Could not execute recipe ${recipe.name}:`,
-            `Server reported no action with the name ${recipe.action}`
+            `Action ${recipe.action} is either missing or invalid.`
           );
-        } else if (action.failed) {
+        } else if (manager.disabled) {
           log.warn(
-            `Skipping recipe ${recipe.name} because ${action.name} failed during pre-execution.`
+            `Skipping recipe ${recipe.name} because ${recipe.action} failed during pre-execution.`
           );
         } else {
           try {
             log.info(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
-            await this.runActionCallback(action, "action", recipe);
+            await manager.runAsyncCallback("action", recipe);
           } catch (e) {
             log.error(`Could not execute recipe ${recipe.name}:`, e);
           }
@@ -158,19 +159,36 @@ this.RecipeRunner = {
     }
 
     // Run post-execution hooks
-    for (const action of Object.values(actions)) {
+    for (const [actionName, manager] of Object.entries(actionSandboxManagers)) {
       // Skip if pre-execution failed.
-      if (action.failed) {
-        log.info(`Skipping post-execution hook for ${action.name} due to earlier failure.`);
+      if (manager.disabled) {
+        log.info(`Skipping post-execution hook for ${actionName} due to earlier failure.`);
         continue;
       }
 
       try {
-        await this.runActionCallback(action, "postExecution");
+        await manager.runAsyncCallback("postExecution");
       } catch (err) {
-        log.info(`Could not run post-execution hook for ${action.name}:`, err.message);
+        log.info(`Could not run post-execution hook for ${actionName}:`, err.message);
       }
     }
+
+    // Nuke sandboxes
+    Object.values(actionSandboxManagers).forEach(manager => manager.removeHold("recipeRunner"));
+  },
+
+  async loadActionSandboxManagers() {
+    const actions = await NormandyApi.fetchActions();
+    const actionSandboxManagers = {};
+    for (const action of actions) {
+      try {
+        const implementation = await NormandyApi.fetchImplementation(action);
+        actionSandboxManagers[action.name] = new ActionSandboxManager(implementation);
+      } catch (err) {
+        log.warn(`Could not fetch implementation for ${action.name}:`, err);
+      }
+    }
+    return actionSandboxManagers;
   },
 
   getFilterContext(recipe) {
@@ -201,26 +219,6 @@ this.RecipeRunner = {
       log.error(`Filter: "${recipe.filter_expression}"`);
       log.error(`Error: "${err}"`);
       return false;
-    }
-  },
-
-  /**
-   * Execute a named callback in a sandbox that is registered by an action.
-   * @param {Object} action
-   * @param {String} callbackName
-   * @promise Resolves when the callback has executed.
-   */
-  async runActionCallback(action, callbackName, ...args) {
-    log.debug(`runActionCallback(${action.name}, callbackName)`);
-    const response = await fetch(action.implementation_url);
-    const actionScript = await response.text();
-
-    const sandboxManager = new ActionSandboxManager();
-    sandboxManager.addHold("callbackExecution");
-    try {
-      await sandboxManager.runAsyncCallbackFromScript(actionScript, callbackName, ...args);
-    } finally {
-      sandboxManager.removeHold("callbackExecution");
     }
   },
 
