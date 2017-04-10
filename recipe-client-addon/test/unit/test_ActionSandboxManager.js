@@ -1,6 +1,7 @@
 "use strict";
 
 Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
+Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 
 async function withManager(script, testFunction) {
   const manager = new ActionSandboxManager(script);
@@ -86,13 +87,21 @@ add_task(async function testError() {
 add_task(async function testDriver() {
   const script = `
     registerAsyncCallback("testCallback", async function(normandy) {
-      return "log" in normandy;
+      return normandy;
     });
   `;
 
   await withManager(script, async manager => {
-    const logInDriver = await manager.runAsyncCallback("testCallback");
-    ok(logInDriver, "runAsyncCallback passes a driver as the first parameter");
+    const sandboxDriver = await manager.runAsyncCallback("testCallback");
+    const referenceDriver = new NormandyDriver(manager);
+    equal(
+      sandboxDriver.constructor.name,
+      "NormandyDriver",
+      "runAsyncCallback passes a driver as the first parameter",
+    );
+    for (const prop in referenceDriver) {
+      ok(prop in sandboxDriver, "runAsyncCallback passes a driver as the first parameter");
+    }
   });
 });
 
