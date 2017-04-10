@@ -6,4 +6,5 @@
 % resource shield-recipe-client %content/
   content/lib/ (./lib/*)
   content/data/ (./data/*)
+  content/bootstrap.js (./bootstrap.js)
   content/node_modules/jexl/ (./node_modules/jexl/*)

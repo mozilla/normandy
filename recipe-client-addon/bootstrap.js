@@ -45,6 +45,8 @@ const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
 let shouldRun = true;
 let log = null;
 
+this.EXPORTED_SYMBOLS = ["install", "startup", "shutdown", "uninstall"];
+
 this.install = function() {
   // Self Repair only checks its pref on start, so if we disable it, wait until
   // next startup to run, unless the dev_mode preference is set.
@@ -56,7 +58,7 @@ this.install = function() {
   }
 };
 
-this.startup = function() {
+this.startup = async function() {
   setDefaultPrefs();
 
   // Setup logging and listen for changes to logging prefs
@@ -72,11 +74,13 @@ this.startup = function() {
 
   // Initialize experiments first to avoid a race between initializing prefs
   // and recipes rolling back pref changes when experiments end.
-  PreferenceExperiments.init().catch(err => {
+  try {
+    await PreferenceExperiments.init();
+  } catch (err) {
     log.error("Failed to initialize preference experiments:", err);
-  }).then(() => {
-    RecipeRunner.init();
-  });
+  }
+
+  await RecipeRunner.init();
 };
 
 this.shutdown = function(data, reason) {
