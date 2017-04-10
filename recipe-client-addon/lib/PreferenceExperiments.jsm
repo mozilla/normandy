@@ -190,9 +190,25 @@ this.PreferenceExperiments = {
       preferenceBranchType,
     };
 
+<<<<<<< 7645206452913171a140524661194c68d9691c4d
     preferences.set(preferenceName, preferenceValue);
     PreferenceExperiments.startObserver(name, preferenceName, preferenceValue);
     store.data[name] = experiment;
+=======
+    if (experiment.previousPreferenceValue) {
+      const previousType = typeof experiment.previousPreferenceValue;
+      const givenType = typeof preferenceValue;
+      if (previousType !== givenType) {
+        throw new Error(
+          `Previous preference value is of type "${previousType}", but was given "${givenType}"`
+        );
+      }
+    }
+
+    Preferences.set(preferenceName, preferenceValue);
+    PreferenceExperiments.startObserver(experimentName, preferenceName, preferenceValue);
+    store.data[experimentName] = experiment;
+>>>>>>> Add pref experiment type checks
     store.saveSoon();
 
     TelemetryEnvironment.setExperimentActive(name, branch);

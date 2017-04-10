@@ -164,6 +164,17 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
   startObserver.restore();
 })));
 
+// start should detect if a new preference value type matches the previous value type
+add_task(withMockPreferences(function* (mockPreferences) {
+  mockPreferences.set("fake.type_preference", "oldvalue");
+
+  yield Assert.rejects(
+    PreferenceExperiments.start("test", "branch", "fake.type_preference", 12345),
+    "start threw error for incompatible preference type"
+  );
+}));
+
+
 // startObserver should throw if an observer for the experiment is already
 // active.
 add_task(async function () {
