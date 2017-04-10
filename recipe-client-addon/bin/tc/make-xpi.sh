@@ -2,7 +2,10 @@
 set -eu
 
 pushd normandy/recipe-client-addon
+echo 'NPM install'
 npm install
+
+echo 'Making XPI'
 ./bin/make-xpi.sh
 cp shield-recipe-client.xpi /artifacts/
 popd

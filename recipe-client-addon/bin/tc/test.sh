@@ -4,20 +4,19 @@ set -eu
 # mach wants this
 export SHELL=$(which bash)
 
-# Creates gecko-dev-master
-echo 'Downloading gecko-dev...'
-curl -sL https://github.com/mozilla/gecko-dev/archive/master.tar.gz | tar xz
+# Fetches build results, and creates ./gecko-dev-master/
+echo 'Downloading build result'
+curl -sfL "$BUILD_RESULT" | tar xz
 
-pushd normandy/recipe-client-addon
-npm install
-./bin/update-mozilla-central.sh ../gecko-dev/
-popd
-
+echo 'Setting up environment'
 pushd gecko-dev-master
 source /root/.cargo/env
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
 source /root/.cargo/env
+
+echo 'Running lints'
 ./mach lint browser/extensions/shield-recipe-client/
-./mach build
+
+echo 'Running tests'
 xvfb-run ./mach test browser/extensions/shield-recipe-client/
 popd
