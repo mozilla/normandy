@@ -708,7 +708,6 @@ def test_full_approval_flow(api_client, mocked_autograph):
     assert res.status_code == 200
     signed_data_1 = res.json()
     assert len(signed_data_1) == 1
-    assert signed_data_1[0]['recipe'] == recipe_data_1
     mocked_autograph.verify_api_pair(signed_data_1[0])
 
     # Make another change
@@ -724,10 +723,12 @@ def test_full_approval_flow(api_client, mocked_autograph):
     recipe_data_2 = res.json()
     assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
 
-    # The signatures should remain the same
+    # It is signed correctly
     res = api_client.get('/api/v1/recipe/signed/')
     assert res.status_code == 200
-    assert res.json() == signed_data_1
+    signed_data_2 = res.json()
+    assert len(signed_data_2) == 1
+    mocked_autograph.verify_api_pair(signed_data_2[0])
 
     # Request approval for the change
     res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
@@ -741,10 +742,12 @@ def test_full_approval_flow(api_client, mocked_autograph):
     assert res.status_code == 200
     assert res.json() == recipe_data_2
 
-    # The signatures should remain the same
+    # It is signed correctly
     res = api_client.get('/api/v1/recipe/signed/')
     assert res.status_code == 200
-    assert res.json() == signed_data_1
+    signed_data_3 = res.json()
+    assert len(signed_data_3) == 1
+    mocked_autograph.verify_api_pair(signed_data_3[0])
 
     # Reject the change
     api_client.force_authenticate(user2)
@@ -758,10 +761,12 @@ def test_full_approval_flow(api_client, mocked_autograph):
     assert res.status_code == 200
     assert res.json() == recipe_data_2
 
-    # The signatures should remain the same
+    # It is signed correctly
     res = api_client.get('/api/v1/recipe/signed/')
     assert res.status_code == 200
-    assert res.json() == signed_data_1
+    signed_data_4 = res.json()
+    assert len(signed_data_4) == 1
+    mocked_autograph.verify_api_pair(signed_data_4[0])
 
     # Make a third version of the recipe
     api_client.force_authenticate(user1)
@@ -793,7 +798,6 @@ def test_full_approval_flow(api_client, mocked_autograph):
     # It is signed correctly
     res = api_client.get('/api/v1/recipe/signed/')
     assert res.status_code == 200
-    signed_data_2 = res.json()
-    assert len(signed_data_2) == 1
-    assert signed_data_2[0]['recipe'] == recipe_data_4
-    mocked_autograph.verify_api_pair(signed_data_2[0])
+    signed_data_5 = res.json()
+    assert len(signed_data_5) == 1
+    mocked_autograph.verify_api_pair(signed_data_5[0])
