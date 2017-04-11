@@ -255,6 +255,21 @@ filter expressions.
       // Target clients that ran the "photon" experiment, and have finished it
       "photon" in normandy.experiments.expired
 
+.. js:attribute:: normandy.recipe
+
+   Object containing information about the recipe being checked. Only documented
+   attributes are guaranteed to be available.
+
+   .. js:attribute:: normandy.recipe.id
+
+      Unique ID number for the recipe.
+
+   .. js:attribute:: normandy.recipe.arguments
+
+      Object containing the arguments entered for the recipe. The shape of this
+      object varies depending on the recipe, and use of this property is only
+      recommended if you are familiar with the argument schema.
+
 Transforms
 ----------
 This section describes the transforms available to filter expressions, and what

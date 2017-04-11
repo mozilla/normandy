@@ -16,7 +16,7 @@ from reversion import revisions as reversion
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip
-from normandy.recipes.decorators import latest_revision_property
+from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.utils import Autographer
 from normandy.recipes.validators import validate_json
@@ -100,6 +100,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     latest_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
                                         related_name='latest_for_recipe')
+    approved_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
+                                          related_name='approved_for_recipe')
 
     enabled = models.BooleanField(default=False)
     signature = models.OneToOneField(Signature, related_name='recipe_revision', null=True,
@@ -108,55 +110,73 @@ class Recipe(DirtyFieldsMixin, models.Model):
     class Meta:
         ordering = ['-enabled', '-latest_revision__updated']
 
+    class NotApproved(Exception):
+        pass
+
     def __repr__(self):
         return '<Recipe "{name}">'.format(name=self.name)
 
     def __str__(self):
         return self.name
 
-    @latest_revision_property
+    @property
+    def current_revision(self):
+        return self.approved_revision or self.latest_revision
+
+    @property
+    def is_approved(self):
+        return self.approved_revision is not None
+
+    @current_revision_property
     def name(self):
-        return self.latest_revision.name
+        return self.current_revision.name
 
-    @latest_revision_property
+    @current_revision_property
     def action(self):
-        return self.latest_revision.action
+        return self.current_revision.action
 
-    @latest_revision_property
+    @current_revision_property
     def extra_filter_expression(self):
-        return self.latest_revision.extra_filter_expression
+        return self.current_revision.extra_filter_expression
 
-    @latest_revision_property
+    @current_revision_property
     def arguments_json(self):
-        return self.latest_revision.arguments_json
+        return self.current_revision.arguments_json
 
-    @latest_revision_property
+    @current_revision_property
     def arguments(self):
-        return self.latest_revision.arguments
+        return self.current_revision.arguments
 
-    @latest_revision_property
+    @current_revision_property
     def revision_id(self):
-        return self.latest_revision.id
+        return self.current_revision.id
 
-    @latest_revision_property
+    @current_revision_property
     def last_updated(self):
-        return self.latest_revision.updated
+        return self.current_revision.updated
 
-    @latest_revision_property
+    @current_revision_property
     def filter_expression(self):
-        return self.latest_revision.filter_expression
+        return self.current_revision.filter_expression
 
-    @latest_revision_property
+    @current_revision_property
     def channels(self):
-        return self.latest_revision.channels
+        return self.current_revision.channels
 
-    @latest_revision_property
+    @current_revision_property
     def countries(self):
-        return self.latest_revision.countries
+        return self.current_revision.countries
 
-    @latest_revision_property
+    @current_revision_property
     def locales(self):
-        return self.latest_revision.locales
+        return self.current_revision.locales
+
+    @property
+    def approval_request(self):
+        try:
+            return self.latest_revision.approval_request if self.latest_revision else None
+        except ApprovalRequest.DoesNotExist:
+            return None
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
@@ -177,7 +197,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         self.signature = signature
 
     @transaction.atomic
-    def update(self, force=False, **data):
+    def revise(self, force=False, **data):
         revision = self.latest_revision
 
         if 'arguments' in data:
@@ -214,6 +234,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 extra={'code': INFO_CREATE_REVISION}
             )
 
+            if revision and revision.approval_status == RecipeRevision.PENDING:
+                revision.approval_request.delete()
+
             self.latest_revision = RecipeRevision.objects.create(
                 recipe=self, parent=revision, **data)
 
@@ -234,6 +257,14 @@ class Recipe(DirtyFieldsMixin, models.Model):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             dirty_field_names = list(dirty_fields.keys())
 
+            if 'enabled' in dirty_field_names:
+                if self.enabled and not self.is_approved:
+                    raise self.NotApproved('Cannot enable a recipe that is not approved.')
+
+                if not self.enabled:
+                    # If we are disabling the recipe we should invalidate the approval
+                    self.approved_revision = None
+
             if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
                     and self.signature is not None):
                 # Setting the signature while also changing something else is probably
@@ -253,6 +284,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
 
 class RecipeRevision(models.Model):
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+    PENDING = 'pending'
+
     id = models.CharField(max_length=64, primary_key=True)
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
@@ -270,6 +305,9 @@ class RecipeRevision(models.Model):
     channels = models.ManyToManyField(Channel)
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
+
+    class Meta:
+        ordering = ('-created',)
 
     @property
     def data(self):
@@ -315,10 +353,24 @@ class RecipeRevision(models.Model):
         self.arguments_json = json.dumps(value)
 
     @property
-    def restored_recipe(self):
+    def serializable_recipe(self):
+        """Returns an unsaved recipe object with this revision's data to be serialized."""
         recipe = self.recipe
+        recipe.approved_revision = self if self.approval_status == self.APPROVED else None
         recipe.latest_revision = self
         return recipe
+
+    @property
+    def approval_status(self):
+        try:
+            if self.approval_request.approved is True:
+                return self.APPROVED
+            elif self.approval_request.approved is False:
+                return self.REJECTED
+            else:
+                return self.PENDING
+        except ApprovalRequest.DoesNotExist:
+            return None
 
     def hash(self):
         data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
@@ -337,6 +389,51 @@ class RecipeRevision(models.Model):
         self.id = self.hash()
         self.updated = timezone.now()
         super().save(*args, **kwargs)
+
+
+class ApprovalRequest(models.Model):
+    revision = models.OneToOneField(RecipeRevision, related_name='approval_request')
+    created = models.DateTimeField(default=timezone.now)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approval_requests',
+                                null=True)
+    approved = models.NullBooleanField(null=True)
+    approver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approved_requests',
+                                 null=True)
+    comment = models.TextField(null=True)
+
+    class NotActionable(Exception):
+        pass
+
+    class CannotActOnOwnRequest(Exception):
+        pass
+
+    def approve(self, approver, comment):
+        if self.approved is not None:
+            raise self.NotActionable()
+
+        if approver == self.creator:
+            raise self.CannotActOnOwnRequest()
+
+        self.approved = True
+        self.approver = approver
+        self.comment = comment
+        self.save()
+
+        recipe = self.revision.recipe
+        recipe.approved_revision = self.revision
+        recipe.save()
+
+    def reject(self, approver, comment):
+        if self.approved is not None:
+            raise self.NotActionable()
+
+        if approver == self.creator:
+            raise self.CannotActOnOwnRequest()
+
+        self.approved = False
+        self.approver = approver
+        self.comment = comment
+        self.save()
 
 
 @reversion.register()

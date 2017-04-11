@@ -11,5 +11,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "normandy.settings")
 configurations.setup()
 
 from django.contrib.auth.models import User  # noqa
-User.objects.create_superuser('admin', 'admin@example.com', 'asdfqwer')
-print('Created admin user "admin".')
+
+User.objects.create_superuser('user1', 'user1@example.com', 'testpass')
+print('Created admin user "user1".')
+
+User.objects.create_superuser('user2', 'user2@example.com', 'testpass')
+print('Created admin user "user2".')

@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
-import classNames from 'classnames';
+
+import RecipeStatus from 'control/components/RecipeStatus';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { runRecipe } from 'selfrepair/self_repair_runner';
@@ -144,12 +145,14 @@ function ExecuteStatus({ status, error, errorHelp }) {
   }
 
   return (
-    <div className={classNames('status-indicator', statusColor)}>
-      <i className={`fa fa-${statusIcon} pre`} />
-      {statusText}
-    </div>
+    <RecipeStatus
+      className={statusColor}
+      icon={<i className={`fa fa-${statusIcon} draft-status-icon pre`} title={statusText} />}
+      text={statusText}
+    />
   );
 }
+
 ExecuteStatus.propTypes = {
   status: pt.string.isRequired,
   error: pt.node,

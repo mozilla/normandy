@@ -2,6 +2,14 @@ import { showNotification } from 'control/actions/NotificationActions';
 
 export const REQUEST_IN_PROGRESS = 'REQUEST_IN_PROGRESS';
 export const REQUEST_COMPLETE = 'REQUEST_COMPLETE';
+export const RECEIVED_USER_INFO = 'RECEIVED_USER_INFO';
+
+export function userInfoReceived(user) {
+  return {
+    type: RECEIVED_USER_INFO,
+    user,
+  };
+}
 
 export function requestInProgress() {
   return {
@@ -18,10 +26,6 @@ export function requestComplete(result) {
       }));
     }
 
-    dispatch({
-      type: REQUEST_COMPLETE,
-      status: result.status,
-    });
+    dispatch({ type: REQUEST_COMPLETE, status: result.status });
   };
 }
-

@@ -151,9 +151,9 @@ the remote Normandy service.
 Peer Approval
 ^^^^^^^^^^^^^
 Recipes cannot be enabled in the Normandy admin interface without going through
-an approval process. One user must submit the recipe for approval, and a
-separate user must approve the recipe before it can be distributed by the
-service.
+an `approval process </user/peer_approval>`. One user must submit the recipe
+for approval, and a separate user must approve the recipe before it can be
+distributed by the service.
 
 This helps prevent compromise of a single account from compromising the entire
 service, since two accounts need to be compromised to publish a recipe.
