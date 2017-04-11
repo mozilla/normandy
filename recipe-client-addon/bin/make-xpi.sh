@@ -30,7 +30,7 @@ rm "${DEST}/install.rdf.in"
 
 rm "${DEST}/jar.mn"
 cp "${BASE_DIR}/chrome.manifest" "${DEST}"
-rm "${DEST}/test" -r
+rm -r "${DEST}/test"
 
 pushd $DEST
 zip -r shield-recipe-client.xpi *
