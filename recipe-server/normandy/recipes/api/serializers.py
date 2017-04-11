@@ -91,39 +91,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        if 'enabled' in validated_data:
-            instance.enabled = validated_data.pop('enabled')
-
-        instance.save()
-
-        if 'action' in validated_data:
-            validated_data.update({
-                'action': Action.objects.get(name=validated_data['action'])
-            })
-
-        if 'channels' in validated_data:
-            validated_data.update({
-                'channels': Channel.objects.filter(slug__in=validated_data['channels'])
-            })
-
-        if 'countries' in validated_data:
-            validated_data.update({
-                'countries': Country.objects.filter(code__in=validated_data['countries'])
-            })
-
-        if 'locales' in validated_data:
-            validated_data.update({
-                'locales': Locale.objects.filter(code__in=validated_data['locales'])
-            })
-
         instance.revise(**validated_data)
-
         return instance
 
     def create(self, validated_data):
         recipe = Recipe.objects.create()
-        recipe.save()
-
         return self.update(recipe, validated_data)
 
     def validate_extra_filter_expression(self, value):
