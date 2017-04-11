@@ -108,7 +108,9 @@ this.PreferenceExperiments = {
       }
 
       // Notify Telemetry of experiments we're running, since they don't persist between restarts
-      TelemetryEnvironment.setExperimentActive(name, branch);
+      if (!expired) {
+        TelemetryEnvironment.setExperimentActive(name, branch);
+      }
     });
   },
 
