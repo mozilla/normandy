@@ -555,24 +555,17 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
 
 // init should register telemetry experiments
 add_task(withMockExperiments(async function testInit(experiments) {
-  experiments["experiment1"] = experimentFactory({name: "experiment1", branch: "branch1"});
-  experiments["experiment2"] = experimentFactory({name: "experiment2", branch: "branch2"});
-
-  let currentExperiments = TelemetryEnvironment.getActiveExperiments();
-  ok(!("experiment1" in currentExperiments), "experiment1 is not in telemetry");
-  ok(!("experiment2" in currentExperiments), "experiment2 is not in telemetry");
-
+  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
+  experiments["test"] = experimentFactory({name: "test", branch: "branch"});
   await PreferenceExperiments.init();
-
-  currentExperiments = TelemetryEnvironment.getActiveExperiments();
-  deepEqual(currentExperiments["experiment1"], {branch: "branch1"}, "experiment1 is in telemetry");
-  deepEqual(currentExperiments["experiment2"], {branch: "branch2"}, "experiment2 is in telemetry");
+  ok(setActiveStub.calledWith("test", "branch"), "Experiment is registered by init");
+  setActiveStub.restore();
 }));
 
 // starting and stopping experiments should register in telemetry
 add_task(withMockExperiments(async function testInit() {
-  let currentExperiments = TelemetryEnvironment.getActiveExperiments();
-  ok(!("test" in currentExperiments), "test experiment is not in telemetry before starting");
+  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
+  const setInactiveStub = sinon.stub(TelemetryEnvironment, "setExperimentInactive");
 
   await PreferenceExperiments.start({
     name: "test",
@@ -582,15 +575,19 @@ add_task(withMockExperiments(async function testInit() {
     preferenceBranchType: "default",
   });
 
-  currentExperiments = TelemetryEnvironment.getActiveExperiments();
-  deepEqual(
-    currentExperiments["test"],
-    {branch: "branch"},
-    "test experiment is in telemetry after starting"
-  );
-
+  ok(setActiveStub.calledWith("test", "branch"), "Experiment is registerd by start()");
   await PreferenceExperiments.stop("test");
+  ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregisterd by stop()");
 
-  currentExperiments = TelemetryEnvironment.getActiveExperiments();
-  ok(!("test" in currentExperiments), "test experiment is not in telemetry after stopping");
+  setActiveStub.restore();
+  setInactiveStub.restore();
+}));
+
+// Experiments shouldn't be recorded by init() in telemetry if they are expired
+add_task(withMockExperiments(async function testInit(experiments) {
+  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
+  experiments["experiment1"] = experimentFactory({name: "expired", branch: "branch", expired: true});
+  await PreferenceExperiments.init();
+  ok(!setActiveStub.called, "Expired experiment is not registered by init");
+  setActiveStub.restore();
 }));
