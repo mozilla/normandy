@@ -45,6 +45,7 @@ const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
 let shouldRun = true;
 let log = null;
 
+// These are exported for testing purposes only.
 this.EXPORTED_SYMBOLS = ["install", "startup", "shutdown", "uninstall"];
 
 this.install = function() {
