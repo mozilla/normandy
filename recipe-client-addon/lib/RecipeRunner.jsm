@@ -12,7 +12,6 @@ Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
@@ -30,9 +29,6 @@ this.RecipeRunner = {
     if (!this.checkPrefs()) {
       return;
     }
-
-    const durabilityManager = new SandboxManager();
-    Storage.seedDurability(durabilityManager.sandbox);
 
     let delay;
     if (prefs.getBoolPref("dev_mode")) {
