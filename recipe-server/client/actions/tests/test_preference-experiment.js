@@ -56,6 +56,9 @@ describe('PreferenceExperimentAction', () => {
       async ratioSample() {
         return 0;
       },
+      async bucketSample() {
+        return true;
+      },
       userId: 'fake-userid',
       log: jasmine.createSpy('log'),
       preferenceExperiments: new MockPreferenceExperiments(),
@@ -68,11 +71,29 @@ describe('PreferenceExperimentAction', () => {
       await action.execute();
     });
 
-    it('should log and exit if the preferenceExperiments APi is missing', async () => {
+    it('should log and exit if the preferenceExperiments API is missing', async () => {
       delete normandy.preferenceExperiments;
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory());
       await action.execute();
       expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'warn');
+    });
+
+    it('should log and exit if the user is not in the sample buckets', async () => {
+      spyOn(normandy, 'bucketSample').and.returnValue(Promise.resolve(false));
+      normandy.userId = 'fakeuserid';
+      const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+        slug: 'experimentslug',
+        bucketCount: 50,
+      }));
+
+      await action.execute();
+      expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'debug');
+      expect(normandy.bucketSample).toHaveBeenCalledWith(
+        'fakeuserid-experimentslug',
+        0,
+        50,
+        100000,
+      );
     });
 
     it('should enroll the user if they have never been in the experiment', async () => {
@@ -112,6 +133,21 @@ describe('PreferenceExperimentAction', () => {
 
       await action.execute();
       expect(normandy.preferenceExperiments.markLastSeen).not.toHaveBeenCalled();
+    });
+
+    it('should throw if an error occurs within the action', async () => {
+      const error = new Error('oh no');
+      spyOn(normandy, 'bucketSample').and.throwError(error);
+      const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+        slug: 'test',
+      }));
+
+      try {
+        await action.execute();
+        fail();
+      } catch (thrownError) {
+        expect(thrownError).toBe(error);
+      }
     });
   });
 

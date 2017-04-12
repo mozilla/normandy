@@ -147,6 +147,7 @@ this.NormandyDriver = function(sandboxManager) {
 
     // Sampling
     ratioSample: sandboxManager.wrapAsync(Sampling.ratioSample),
+    bucketSample: sandboxManager.wrapAsync(Sampling.bucketSample),
 
     // Preference Experiment API
     preferenceExperiments: {
