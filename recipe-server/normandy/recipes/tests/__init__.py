@@ -174,3 +174,12 @@ ARGUMENTS_SCHEMA = {
         },
     },
 }
+
+
+def fake_sign(datas):
+    sigs = []
+    for d in datas:
+        sigs.append({
+            'signature': hashlib.sha256(d).hexdigest()
+        })
+    return sigs
