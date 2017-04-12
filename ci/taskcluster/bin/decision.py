@@ -72,7 +72,7 @@ def main():
                 'schedulerId': 'taskcluster-github',
                 'taskGroupId': decisionTaskId,
                 'created': fromNow('0 seconds'),
-                'deadline': fromNow('4 hours'),
+                'deadline': fromNow('1 day'),
                 'expires': fromNow('365 days'),
                 'payload': {
                     'image': 'mozilla/normandy-taskcluster:latest',
@@ -91,7 +91,7 @@ def main():
                             task['command'],
                         ])
                     ],
-                    'maxRunTime': 14400,  # 4 hours
+                    'maxRunTime': 28800,  # 8 hours
                     'env': env,
                     'artifacts': {
                         'public': {
