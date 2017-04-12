@@ -4,7 +4,7 @@ import {
   REVISION_FETCH,
   REVISION_FETCH_FAILURE,
   REVISION_FETCH_SUCCESS,
-  REVISION_RECIEVE,
+  REVISION_RECEIVE,
   REVISIONS_FETCH,
   REVISIONS_FETCH_FAILURE,
   REVISIONS_FETCH_SUCCESS,
@@ -20,7 +20,7 @@ function fetchRevisionSuccess(dispatch, requestId, revision) {
   });
 
   dispatch({
-    type: REVISION_RECIEVE,
+    type: REVISION_RECEIVE,
     revision,
   });
 }
@@ -62,7 +62,7 @@ function fetchRevisionsSuccess(dispatch, requestId, revisions) {
 
   revisions.forEach(revision => {
     dispatch({
-      type: REVISION_RECIEVE,
+      type: REVISION_RECEIVE,
       revision,
     });
   });

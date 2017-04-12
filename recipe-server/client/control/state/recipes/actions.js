@@ -4,7 +4,7 @@ import {
   RECIPE_FETCH,
   RECIPE_FETCH_FAILURE,
   RECIPE_FETCH_SUCCESS,
-  RECIPE_RECIEVE,
+  RECIPE_RECEIVE,
   RECIPES_FETCH,
   RECIPES_FETCH_FAILURE,
   RECIPES_FETCH_SUCCESS,
@@ -20,7 +20,7 @@ function fetchRecipeSuccess(dispatch, requestId, recipe) {
   });
 
   dispatch({
-    type: RECIPE_RECIEVE,
+    type: RECIPE_RECEIVE,
     recipe,
   });
 }
@@ -61,7 +61,7 @@ function fetchRecipesSuccess(dispatch, requestId, recipes) {
 
   recipes.forEach(recipe => {
     dispatch({
-      type: RECIPE_RECIEVE,
+      type: RECIPE_RECEIVE,
       recipe,
     });
   });

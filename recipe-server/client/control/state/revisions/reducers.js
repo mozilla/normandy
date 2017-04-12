@@ -5,7 +5,7 @@ import {
   REVISION_FETCH,
   REVISION_FETCH_FAILURE,
   REVISION_FETCH_SUCCESS,
-  REVISION_RECIEVE,
+  REVISION_RECEIVE,
   REVISIONS_FETCH,
   REVISIONS_FETCH_FAILURE,
   REVISIONS_FETCH_SUCCESS,
@@ -14,7 +14,7 @@ import {
 
 function objects(state = Map({}), action) {
   switch (action.type) {
-    case REVISION_RECIEVE:
+    case REVISION_RECEIVE:
       return state.set(action.revision.id, fromJS(action.revision));
 
     default:
