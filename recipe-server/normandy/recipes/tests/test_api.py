@@ -701,19 +701,19 @@ class TestApprovalFlow(object):
 
         # Request approval for it
         res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                            .format(recipe_data_0['revision_id']))
+                              .format(recipe_data_0['revision_id']))
         approval_data = res.json()
         assert res.status_code == 201
 
         # The requester isn't allowed to approve a recipe
         res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                            {'comment': 'r+'})
+                              {'comment': 'r+'})
         assert res.status_code == 403  # Forbidden
 
         # Approve the recipe
         api_client.force_authenticate(user2)
         res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                            {'comment': 'r+'})
+                              {'comment': 'r+'})
         assert res.status_code == 200
 
         # It is now visible in the API
@@ -738,7 +738,7 @@ class TestApprovalFlow(object):
 
         # Request approval for the change
         res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                            .format(recipe_data_2['latest_revision_id']))
+                              .format(recipe_data_2['latest_revision_id']))
         approval_data = res.json()
         recipe_data_2['approval_request'] = approval_data
         assert res.status_code == 201
@@ -752,7 +752,7 @@ class TestApprovalFlow(object):
         # Reject the change
         api_client.force_authenticate(user2)
         res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
-                            {'comment': 'r-'})
+                              {'comment': 'r-'})
         recipe_data_2['approval_request'] = res.json()
         assert res.status_code == 200
 
@@ -772,14 +772,14 @@ class TestApprovalFlow(object):
 
         # Request approval
         res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                            .format(recipe_data_3['latest_revision_id']))
+                              .format(recipe_data_3['latest_revision_id']))
         approval_data = res.json()
         assert res.status_code == 201
 
         # Approve the change
         api_client.force_authenticate(user2)
         res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                            {'comment': 'r+'})
+                              {'comment': 'r+'})
         assert res.status_code == 200
 
         # The change should be visible now, since it is approved
@@ -790,7 +790,7 @@ class TestApprovalFlow(object):
         assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']
         self.verify_signatures(api_client, expected_count=1)
 
-    def test_request_and_then_unrequest(self, api_client, mocked_autograph):
+    def test_cancel_approval(self, api_client, mocked_autograph):
         action = ActionFactory()
         user1 = UserFactory(is_superuser=True)
         user2 = UserFactory(is_superuser=True)
