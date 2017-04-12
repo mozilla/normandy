@@ -253,7 +253,7 @@ class TestRecipe(object):
     def test_signature_is_cleared_if_autograph_unavailable(self, mocker):
         # Mock the Autographer to return an error
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-        mock_autograph.return_value.sign_data.side_effect = ImproperlyConfigured
+        mock_autograph.side_effect = ImproperlyConfigured
 
         recipe = RecipeFactory(name='unchanged', signed=True)
         original_signature = recipe.signature
