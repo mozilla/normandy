@@ -1,13 +1,11 @@
 import { DEFAULT_REQUEST } from '../constants';
 
 
-export function getRequest(state, id) {
-  const requests = state.get('actions').get('requests');
-  return requests.get(id, DEFAULT_REQUEST);
+export function getRequest(state, id, defaultsTo = DEFAULT_REQUEST) {
+  return state.getIn(['actions', 'requests', id], defaultsTo);
 }
 
 
-export function getAction(state, id) {
-  const recipes = state.get('actions').get('objects');
-  return recipes.get(id);
+export function getAction(state, id, defaultsTo) {
+  return state.getIn(['actions', 'objects', id], defaultsTo);
 }
