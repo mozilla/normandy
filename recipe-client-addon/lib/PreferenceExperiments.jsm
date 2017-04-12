@@ -88,7 +88,7 @@ function ensureStorage() {
 const log = LogManager.getLogger("preference-experiments");
 
 // List of active preference observers. Cleaned up on shutdown.
-const experimentObservers = new Map();
+let experimentObservers = new Map();
 CleanupManager.addCleanupHandler(() => PreferenceExperiments.stopAllObservers());
 
 this.PreferenceExperiments = {
@@ -97,21 +97,26 @@ this.PreferenceExperiments = {
    * default preference branch.
    */
   async init() {
-    const store = await ensureStorage();
-
-    Object.values(store.data).forEach(experiment => {
-      const {name, branch, expired, preferenceBranchType, preferenceName, preferenceValue} = experiment;
-
+    for (const experiment of await this.getAllActive()) {
       // Set experiment default preferences, since they don't persist between restarts
-      if (!expired && preferenceBranchType === "default") {
-        DefaultPreferences.set(preferenceName, preferenceValue);
+      if (experiment.preferenceBranchType === "default") {
+        DefaultPreferences.set(experiment.preferenceName, experiment.preferenceValue);
+      }
+
+      // Check that the current value of the preference is still what we set it to
+      if (Preferences.get(experiment.preferenceName, undefined) !== experiment.preferenceValue) {
+        // if not, stop the experiment, and skip the remaining steps
+        log.info(`Stopping experiment "${experiment.name}" because its value changed`);
+        await this.stop(experiment.name, false);
+        continue;
       }
 
       // Notify Telemetry of experiments we're running, since they don't persist between restarts
-      if (!expired) {
-        TelemetryEnvironment.setExperimentActive(name, branch);
-      }
-    });
+      TelemetryEnvironment.setExperimentActive(experiment.name, experiment.branch);
+
+      // Watch for changes to the experiment's preference
+      this.startObserver(experiment.name, experiment.preferenceName, experiment.preferenceValue);
+    }
   },
 
   /**
@@ -126,10 +131,14 @@ this.PreferenceExperiments = {
         data: mockExperiments,
         saveSoon() { },
       });
+      const oldObservers = experimentObservers;
+      experimentObservers = new Map();
       try {
         await testFunction(...args, mockExperiments);
       } finally {
         storePromise = oldPromise;
+        PreferenceExperiments.stopAllObservers();
+        experimentObservers = oldObservers;
       }
     };
   },
