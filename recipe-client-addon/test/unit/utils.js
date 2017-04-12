@@ -8,11 +8,11 @@ const preferenceBranches = {
   default: new Preferences({defaultBranch: true}),
 };
 
-function withMockPreferences(testGenerator) {
-  return function* inner(...args) {
+function withMockPreferences(testFunction) {
+  return async function inner(...args) {
     const prefManager = new MockPreferences();
     try {
-      yield testGenerator(...args, prefManager);
+      await testFunction(...args, prefManager);
     } finally {
       prefManager.cleanup();
     }

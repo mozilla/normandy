@@ -36,9 +36,6 @@ this.RecipeRunner = {
       return;
     }
 
-    const durabilityManager = new SandboxManager();
-    Storage.seedDurability(durabilityManager.sandbox);
-
     if (prefs.getBoolPref("dev_mode")) {
       // Run right now in dev mode
       this.run();
