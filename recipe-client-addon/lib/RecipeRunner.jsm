@@ -6,24 +6,29 @@
 
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout */
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
+Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Storage", "resource://shield-recipe-client/lib/Storage.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Storage",
+                                  "resource://shield-recipe-client/lib/Storage.jsm");
+XPCOMUtils.defineLazyServiceGetter(this, "timerManager",
+                                   "@mozilla.org/updates/timer-manager;1",
+                                   "nsIUpdateTimerManager");
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
 const log = LogManager.getLogger("recipe-runner");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
+const TIMER_NAME = "recipe-client-addon-run";
+const RUN_INTERVAL_PREF = "run_interval_seconds";
 
 this.RecipeRunner = {
   init() {
@@ -34,15 +39,17 @@ this.RecipeRunner = {
     const durabilityManager = new SandboxManager();
     Storage.seedDurability(durabilityManager.sandbox);
 
-    let delay;
     if (prefs.getBoolPref("dev_mode")) {
-      delay = 0;
-    } else {
-      // startup delay is in seconds
-      delay = prefs.getIntPref("startup_delay_seconds") * 1000;
+      // Run right now in dev mode
+      this.run();
     }
 
-    setTimeout(this.start.bind(this), delay);
+    this.updateRunInterval();
+    CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
+
+    // Watch for the run interval to change, and re-register the timer with the new value
+    prefs.addObserver(RUN_INTERVAL_PREF, this, false);
+    CleanupManager.addCleanupHandler(() => prefs.removeObserver(RUN_INTERVAL_PREF, this));
   },
 
   checkPrefs() {
@@ -66,7 +73,27 @@ this.RecipeRunner = {
     return true;
   },
 
-  async start() {
+  /**
+   * Watch for preference changes from Services.pref.addObserver.
+   */
+  observe(changedPrefBranch, action, changedPref) {
+    if (action === "nsPref:changed" && changedPref === RUN_INTERVAL_PREF) {
+      this.updateRunInterval();
+    } else {
+      log.debug(`Observer fired with unexpected pref change: ${action} ${changedPref}`);
+    }
+  },
+
+  updateRunInterval() {
+    // Run once every `runInterval` wall-clock seconds. This is managed by setting a "last ran"
+    // timestamp, and running if it is more than `runInterval` seconds ago. Even with very short
+    // intervals, the timer will only fire at most once every few minutes.
+    const runInterval = prefs.getIntPref(RUN_INTERVAL_PREF);
+    timerManager.registerTimer(TIMER_NAME, () => this.run(), runInterval);
+  },
+
+  async run() {
+    this.clearCaches();
     // Unless lazy classification is enabled, prep the classify cache.
     if (!Preferences.get("extensions.shield-recipe-client.experiments.lazy_classify", false)) {
       await ClientEnvironment.getClientClassification();
@@ -196,6 +223,15 @@ this.RecipeRunner = {
   },
 
   /**
+   * Clear all caches of systems used by RecipeRunner, in preparation
+   * for a clean run.
+   */
+  clearCaches() {
+    ClientEnvironment.clearClassifyCache();
+    NormandyApi.clearIndexCache();
+  },
+
+  /**
    * Clear out cached state and fetch/execute recipes from the given
    * API url. This is used mainly by the mock-recipe-server JS that is
    * executed in the browser console.
@@ -206,12 +242,11 @@ this.RecipeRunner = {
 
     try {
       Storage.clearAllStorage();
-      ClientEnvironment.clearClassifyCache();
-      NormandyApi.clearIndexCache();
-      await this.start();
+      this.clearCaches();
+      await this.run();
     } finally {
       prefs.setCharPref("api_url", oldApiUrl);
-      NormandyApi.clearIndexCache();
+      this.clearCaches();
     }
   },
 };
