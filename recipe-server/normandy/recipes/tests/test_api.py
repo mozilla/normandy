@@ -664,7 +664,7 @@ class TestClassifyClient(object):
 
 
 @pytest.mark.django_db
-def test_full_approval_flow(api_client):
+def test_full_approval_flow(api_client, mocked_autograph):
     action = ActionFactory()
     user1 = UserFactory(is_superuser=True)
     user2 = UserFactory(is_superuser=True)
@@ -679,11 +679,11 @@ def test_full_approval_flow(api_client):
         'enabled': 'false',
     })
     assert res.status_code == 201
-    recipe_data_1 = res.json()
+    recipe_data_0 = res.json()
 
     # Request approval for it
     res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                          .format(recipe_data_1['revision_id']))
+                          .format(recipe_data_0['revision_id']))
     approval_data = res.json()
     assert res.status_code == 201
 
@@ -698,6 +698,18 @@ def test_full_approval_flow(api_client):
                           {'comment': 'r+'})
     assert res.status_code == 200
 
+    # It is now visible in the API
+    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_0['id']))
+    assert res.status_code == 200
+    recipe_data_1 = res.json()
+
+    # It is signed correctly
+    res = api_client.get('/api/v1/recipe/signed/')
+    assert res.status_code == 200
+    signed_data_1 = res.json()
+    assert len(signed_data_1) == 1
+    mocked_autograph.verify_api_pair(signed_data_1[0])
+
     # Make another change
     api_client.force_authenticate(user1)
     res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
@@ -711,6 +723,13 @@ def test_full_approval_flow(api_client):
     recipe_data_2 = res.json()
     assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
 
+    # It is signed correctly
+    res = api_client.get('/api/v1/recipe/signed/')
+    assert res.status_code == 200
+    signed_data_2 = res.json()
+    assert len(signed_data_2) == 1
+    mocked_autograph.verify_api_pair(signed_data_2[0])
+
     # Request approval for the change
     res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
                           .format(recipe_data_2['latest_revision_id']))
@@ -723,6 +742,13 @@ def test_full_approval_flow(api_client):
     assert res.status_code == 200
     assert res.json() == recipe_data_2
 
+    # It is signed correctly
+    res = api_client.get('/api/v1/recipe/signed/')
+    assert res.status_code == 200
+    signed_data_3 = res.json()
+    assert len(signed_data_3) == 1
+    mocked_autograph.verify_api_pair(signed_data_3[0])
+
     # Reject the change
     api_client.force_authenticate(user2)
     res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
@@ -734,6 +760,13 @@ def test_full_approval_flow(api_client):
     res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
     assert res.status_code == 200
     assert res.json() == recipe_data_2
+
+    # It is signed correctly
+    res = api_client.get('/api/v1/recipe/signed/')
+    assert res.status_code == 200
+    signed_data_4 = res.json()
+    assert len(signed_data_4) == 1
+    mocked_autograph.verify_api_pair(signed_data_4[0])
 
     # Make a third version of the recipe
     api_client.force_authenticate(user1)
@@ -761,3 +794,10 @@ def test_full_approval_flow(api_client):
     recipe_data_4 = res.json()
     assert recipe_data_4['extra_filter_expression'] == 'counter == 2'
     assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']
+
+    # It is signed correctly
+    res = api_client.get('/api/v1/recipe/signed/')
+    assert res.status_code == 200
+    signed_data_5 = res.json()
+    assert len(signed_data_5) == 1
+    mocked_autograph.verify_api_pair(signed_data_5[0])
