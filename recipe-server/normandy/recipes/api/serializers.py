@@ -2,9 +2,11 @@ from pyjexl import JEXL
 from rest_framework import serializers
 from reversion.models import Version
 
+from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import (
     Action,
+    ApprovalRequest,
     Channel,
     Country,
     Locale,
@@ -28,10 +30,30 @@ class ActionSerializer(serializers.ModelSerializer):
         ]
 
 
+class ApprovalRequestSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(read_only=True)
+    creator = UserSerializer()
+    approver = UserSerializer()
+
+    class Meta:
+        model = ApprovalRequest
+        fields = [
+            'id',
+            'created',
+            'creator',
+            'approved',
+            'approver',
+            'comment',
+        ]
+
+
 class RecipeSerializer(serializers.ModelSerializer):
-    enabled = serializers.BooleanField(required=False)
+    # Attributes serialized here are made available to filter expressions via
+    # normandy.recipe, and should be documented if they are intended to be
+    # used in filter expressions.
+    enabled = serializers.BooleanField(read_only=True)
     last_updated = serializers.DateTimeField(read_only=True)
-    revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    revision_id = serializers.CharField(read_only=True)
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
@@ -43,6 +65,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                                            many=True, required=False)
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
+    latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
+    approved_revision_id = serializers.CharField(source='approved_revision.id', read_only=True)
+    approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
         model = Recipe
@@ -51,6 +76,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'last_updated',
             'name',
             'enabled',
+            'is_approved',
             'revision_id',
             'action',
             'arguments',
@@ -59,42 +85,17 @@ class RecipeSerializer(serializers.ModelSerializer):
             'locales',
             'extra_filter_expression',
             'filter_expression',
+            'latest_revision_id',
+            'approved_revision_id',
+            'approval_request',
         ]
 
     def update(self, instance, validated_data):
-        if 'enabled' in validated_data:
-            instance.enabled = validated_data.pop('enabled')
-
-        instance.save()
-
-        if 'action' in validated_data:
-            validated_data.update({
-                'action': Action.objects.get(name=validated_data['action'])
-            })
-
-        if 'channels' in validated_data:
-            validated_data.update({
-                'channels': Channel.objects.filter(slug__in=validated_data['channels'])
-            })
-
-        if 'countries' in validated_data:
-            validated_data.update({
-                'countries': Country.objects.filter(code__in=validated_data['countries'])
-            })
-
-        if 'locales' in validated_data:
-            validated_data.update({
-                'locales': Locale.objects.filter(code__in=validated_data['locales'])
-            })
-
-        instance.update(**validated_data)
-
+        instance.revise(**validated_data)
         return instance
 
     def create(self, validated_data):
-        recipe = Recipe.objects.create(enabled=validated_data.pop('enabled', False))
-        recipe.save()
-
+        recipe = Recipe.objects.create()
         return self.update(recipe, validated_data)
 
     def validate_extra_filter_expression(self, value):
@@ -106,6 +107,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         jexl.add_transform('date', lambda x: x)
         jexl.add_transform('stableSample', lambda x: x)
         jexl.add_transform('bucketSample', lambda x: x)
+        jexl.add_transform('preferenceValue', lambda x: x)
+        jexl.add_transform('preferenceIsUserSet', lambda x: x)
+        jexl.add_transform('preferenceExists', lambda x: x)
 
         errors = list(jexl.validate(value))
         if errors:
@@ -163,7 +167,8 @@ class ClientSerializer(serializers.Serializer):
 class RecipeRevisionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='created', read_only=True)
     comment = serializers.CharField(read_only=True)
-    recipe = RecipeSerializer(source='restored_recipe', read_only=True)
+    recipe = RecipeSerializer(source='serializable_recipe', read_only=True)
+    approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
         model = RecipeRevision
@@ -172,6 +177,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
             'comment',
+            'approval_request',
         ]
 
 
@@ -187,6 +193,7 @@ class RecipeVersionSerializer(serializers.ModelSerializer):
             'date_created',
             'recipe',
             'comment',
+            'approval_status'
         ]
 
 

@@ -5,5 +5,5 @@ password =
 
 [TESTRUN]
 assignedto_id =
-project_id = 18
-suite_id = 153
+project_id = 23
+suite_id = 220

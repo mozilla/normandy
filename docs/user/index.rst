@@ -7,4 +7,5 @@ configure recipes with the control interface.
    :maxdepth: 2
 
    filter_expressions
+   peer_approval
    actions/index

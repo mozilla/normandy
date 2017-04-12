@@ -5,20 +5,31 @@ import requests
 from taskcluster import fromNow
 from taskcluster.utils import stableSlugId, dumpJson
 
+BASE_URL = 'http://taskcluster/queue/v1'
+
 tasks = [
+    {
+        'name': 'recipe-client-addon:build',
+        'description': 'Build Firefox with recipe-client-addon',
+        'command': 'normandy/recipe-client-addon/bin/tc/build.sh',
+    },
     {
         'name': 'recipe-client-addon:test',
         'description': 'Test recipe-client-addon with gecko-dev',
         'command': 'normandy/recipe-client-addon/bin/tc/test.sh',
-        'env': {
-            'GECKO_DEV_URL': 'https://github.com/mozilla/gecko-dev',
-        },
+        'dependencies': ['recipe-client-addon:build'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:build',
+                'path': 'build.tar.gz',
+                'env_var': 'BUILD_RESULT',
+            },
+        ],
     },
     {
         'name': 'recipe-client-addon:make-xpi',
         'description': 'Build XPI for recipe-client-addon',
         'command': 'normandy/recipe-client-addon/bin/tc/make-xpi.sh',
-        'dependencies': ['recipe-client-addon:test'],
     },
 ]
 
@@ -43,8 +54,13 @@ def main():
                 if key.startswith('GITHUB_'):
                     env.setdefault(key, val)
 
+            for spec in task.get('artifacts_from', []):
+                task_id = idMaker(spec['task_name'])
+                path = spec['path']
+                env[spec['env_var']] = f'{BASE_URL}/task/{task_id}/artifacts/{path}'
+
             task_id = idMaker(task['name'])
-            res = session.put(f'http://taskcluster/queue/v1/task/{task_id}', data=dumpJson({
+            res = session.put(f'{BASE_URL}/task/{task_id}', data=dumpJson({
                 'metadata': {
                     'name': task['name'],
                     'description': task['description'],
@@ -59,7 +75,7 @@ def main():
                 'deadline': fromNow('4 hours'),
                 'expires': fromNow('365 days'),
                 'payload': {
-                    'image': 'ubuntu:zesty',
+                    'image': 'mozilla/normandy-taskcluster:latest',
                     'command': [
                         '/bin/bash',
                         '-c',

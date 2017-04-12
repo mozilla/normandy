@@ -6,6 +6,7 @@ from django.core.management import call_command
 import pytest
 from reversion.models import Version
 
+from normandy.base.tests import UserFactory
 from normandy.recipes.models import Action
 from normandy.recipes.tests import ActionFactory, RecipeFactory
 
@@ -70,7 +71,7 @@ class TestUpdateActions(object):
 
     def test_it_doesnt_disable_recipes(self, mock_action):
         action = ActionFactory(name='test-action', implementation='old')
-        recipe = RecipeFactory(action=action, enabled=True)
+        recipe = RecipeFactory(action=action, approver=UserFactory(), enabled=True)
         action = recipe.action
         mock_action(action.name, 'impl', action.arguments_schema)
 
@@ -114,7 +115,7 @@ class TestUpdateActions(object):
 
 
 @pytest.mark.django_db
-class TestUpdateRecipeSignantures(object):
+class TestUpdateRecipeSignatures(object):
     def test_it_works(self):
         """
         Verify that the update_recipe_signatures command doesn't throw an error.
@@ -122,13 +123,13 @@ class TestUpdateRecipeSignantures(object):
         call_command('update_recipe_signatures')
 
     def test_it_signs_unsigned_enabled_recipes(self, mocked_autograph):
-        r = RecipeFactory(enabled=True, signed=False)
+        r = RecipeFactory(approver=UserFactory(), enabled=True, signed=False)
         call_command('update_recipe_signatures')
         r.refresh_from_db()
         assert r.signature is not None
 
     def test_it_signs_out_of_date_recipes(self, settings, mocked_autograph):
-        r = RecipeFactory(enabled=True, signed=True)
+        r = RecipeFactory(approver=UserFactory(), enabled=True, signed=True)
         r.signature.timestamp -= timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE * 2)
         r.signature.signature = 'old signature'
         r.signature.save()
@@ -151,7 +152,7 @@ class TestUpdateRecipeSignantures(object):
         assert r.signature is None
 
     def test_it_resigns_signed_recipes_with_force(self, mocked_autograph):
-        r = RecipeFactory(enabled=True, signed=True)
+        r = RecipeFactory(approver=UserFactory(), enabled=True, signed=True)
         r.signature.signature = 'old signature'
         r.signature.save()
         call_command('update_recipe_signatures', '--force')

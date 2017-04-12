@@ -66,4 +66,13 @@ describe('controlApp Actions', () => {
       });
     });
   });
+
+  it('makes a proper API request for getCurrentUser', () => {
+    fetchMock.get('/api/v1/user/me/', {});
+
+    return store.dispatch(makeApiRequest('getCurrentUser'))
+    .then(() => {
+      expect(fetchMock.calls('/api/v1/user/me/').length).toEqual(1);
+    });
+  });
 });

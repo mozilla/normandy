@@ -162,7 +162,7 @@ export default class RecipeCombobox extends React.Component {
             <input
               type="text"
               placeholder="Search"
-              initialValue={searchText}
+              defaultValue={searchText}
               onKeyUp={this.updateSearch}
               onChange={this.updateSearch}
               ref={input => { this.inputRef = input; }}

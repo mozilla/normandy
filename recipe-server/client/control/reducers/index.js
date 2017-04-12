@@ -10,6 +10,7 @@ import filtersReducer from 'control/reducers/FiltersReducer';
 import columnReducer from 'control/reducers/ColumnReducer';
 import recipesReducer from 'control/reducers/RecipesReducer';
 import notificationReducer from 'control/reducers/NotificationReducer';
+import userReducer from 'control/reducers/UserReducer';
 
 export default combineReducers({
   columns: columnReducer,
@@ -17,6 +18,7 @@ export default combineReducers({
   filters: filtersReducer,
   form: formReducer,
   notifications: notificationReducer,
+  user: userReducer,
   recipes: recipesReducer,
   routing: routerReducer,
 });

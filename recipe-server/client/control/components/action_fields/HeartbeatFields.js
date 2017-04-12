@@ -9,8 +9,13 @@ import ActionFields from 'control/components/action_fields/ActionFields';
  * Form fields for the show-heartbeat action.
  */
 export class HeartbeatFields extends ActionFields {
+  static propTypes = {
+    recipeArguments: pt.object.required,
+    disabled: pt.bool,
+  }
+
   render() {
-    const { recipeArguments } = this.props;
+    const { recipeArguments, disabled } = this.props;
     return (
       <div className="arguments-fields">
         <p className="info">
@@ -21,30 +26,35 @@ export class HeartbeatFields extends ActionFields {
           name="arguments.surveyId"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Message"
           name="arguments.message"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Engagement Button Label"
           name="arguments.engagementButtonLabel"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Thanks Message"
           name="arguments.thanksMessage"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Post-Answer URL"
           name="arguments.postAnswerUrl"
           component="input"
           type="text"
+          disabled={disabled}
         />
 
         <ControlField
@@ -52,18 +62,21 @@ export class HeartbeatFields extends ActionFields {
           name="arguments.learnMoreMessage"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Learn More URL"
           name="arguments.learnMoreUrl"
           component="input"
           type="text"
+          disabled={disabled}
         />
 
         <ControlField
           label="How often should the prompt be shown?"
           name="arguments.repeatOption"
           component="select"
+          disabled={disabled}
         >
           <option value="once" default>{`
             Do not show this prompt to users more than once.
@@ -95,15 +108,12 @@ export class HeartbeatFields extends ActionFields {
           component="input"
           type="checkbox"
           className="checkbox-field"
+          disabled={disabled}
         />
       </div>
     );
   }
 }
-
-HeartbeatFields.propTypes = {
-  recipeArguments: pt.object.required,
-};
 
 export default connect(
   state => ({
