@@ -53,6 +53,7 @@ export function fetchApprovalRequest(pk) {
   };
 }
 
+
 function fetchApprovalRequestsSuccess(dispatch, requestId, approvalRequests) {
   dispatch({
     type: APPROVAL_REQUESTS_FETCH_SUCCESS,

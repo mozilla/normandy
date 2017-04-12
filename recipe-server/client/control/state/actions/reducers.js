@@ -15,7 +15,7 @@ import {
 function objects(state = Map({}), action) {
   switch (action.type) {
     case ACTION_RECEIVE:
-      return state.update(action.action.id, fromJS(action.action));
+      return state.set(action.action.id, fromJS(action.action));
 
     default:
       return state;

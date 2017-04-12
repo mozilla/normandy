@@ -15,7 +15,7 @@ import {
 function objects(state = Map({}), action) {
   switch (action.type) {
     case APPROVAL_REQUEST_RECEIVE:
-      return state.update(action.approvalRequest.id, fromJS(action.approvalRequest));
+      return state.set(action.approvalRequest.id, fromJS(action.approvalRequest));
 
     default:
       return state;
