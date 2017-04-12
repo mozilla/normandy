@@ -2,20 +2,20 @@ import { fromJS, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
-  RECIPE_FETCH,
-  RECIPE_FETCH_FAILURE,
-  RECIPE_FETCH_SUCCESS,
-  RECIPE_RECIEVE,
-  RECIPES_FETCH,
-  RECIPES_FETCH_FAILURE,
-  RECIPES_FETCH_SUCCESS,
+  REVISION_FETCH,
+  REVISION_FETCH_FAILURE,
+  REVISION_FETCH_SUCCESS,
+  REVISION_RECIEVE,
+  REVISIONS_FETCH,
+  REVISIONS_FETCH_FAILURE,
+  REVISIONS_FETCH_SUCCESS,
 } from '../action-types';
 
 
 function objects(state = Map({}), action) {
   switch (action.type) {
-    case RECIPE_RECIEVE:
-      return state.update(action.recipe.id, fromJS(action.recipe));
+    case REVISION_RECIEVE:
+      return state.set(action.revision.id, fromJS(action.revision));
 
     default:
       return state;
@@ -25,22 +25,22 @@ function objects(state = Map({}), action) {
 
 function requests(state = Map({}), action) {
   switch (action.type) {
-    case RECIPE_FETCH:
-    case RECIPES_FETCH:
+    case REVISION_FETCH:
+    case REVISIONS_FETCH:
       return state.set(action.requestId, Map({
         loading: true,
         error: null,
       }));
 
-    case RECIPE_FETCH_SUCCESS:
-    case RECIPES_FETCH_SUCCESS:
+    case REVISION_FETCH_SUCCESS:
+    case REVISIONS_FETCH_SUCCESS:
       return state.set(action.requestId, Map({
         loading: false,
         error: null,
       }));
 
-    case RECIPE_FETCH_FAILURE:
-    case RECIPES_FETCH_FAILURE:
+    case REVISION_FETCH_FAILURE:
+    case REVISIONS_FETCH_FAILURE:
       return state.set(action.requestId, Map({
         loading: false,
         error: action.error,
