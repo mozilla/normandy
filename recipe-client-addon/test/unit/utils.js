@@ -3,6 +3,11 @@
 
 Cu.import("resource://gre/modules/Preferences.jsm");
 
+const preferenceBranches = {
+  user: Preferences,
+  default: new Preferences({defaultBranch: true}),
+};
+
 function withMockPreferences(testGenerator) {
   return function* inner(...args) {
     const prefManager = new MockPreferences();
@@ -16,26 +21,29 @@ function withMockPreferences(testGenerator) {
 
 class MockPreferences {
   constructor() {
-    this.oldValues = {};
+    this.oldValues = {user: {}, default: {}};
   }
 
-  set(name, value) {
-    this.preserve(name);
-    Preferences.set(name, value);
+  set(name, value, branch = "user") {
+    this.preserve(name, branch);
+    preferenceBranches[branch].set(name, value);
   }
 
-  preserve(name) {
-    if (!(name in this.oldValues)) {
-      this.oldValues[name] = Preferences.get(name, undefined);
+  preserve(name, branch) {
+    if (!(name in this.oldValues[branch])) {
+      this.oldValues[branch][name] = preferenceBranches[branch].get(name, undefined);
     }
   }
 
   cleanup() {
-    for (const [name, value] of Object.entries(this.oldValues)) {
-      if (value !== undefined) {
-        Preferences.set(name, value);
-      } else {
-        Preferences.reset(name);
+    for (const [branchName, values] of Object.entries(this.oldValues)) {
+      const preferenceBranch = preferenceBranches[branchName];
+      for (const [name, value] of Object.entries(values)) {
+        if (value !== undefined) {
+          preferenceBranch.set(name, value);
+        } else {
+          preferenceBranch.reset(name);
+        }
       }
     }
   }

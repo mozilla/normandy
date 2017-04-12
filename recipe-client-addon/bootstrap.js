@@ -15,6 +15,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "RecipeRunner",
   "resource://shield-recipe-client/lib/RecipeRunner.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
   "resource://shield-recipe-client/lib/CleanupManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
+  "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 
 const REASONS = {
   APP_STARTUP: 1,      // The application is starting up.
@@ -43,6 +45,9 @@ const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
 let shouldRun = true;
 let log = null;
 
+// These are exported for testing purposes only.
+this.EXPORTED_SYMBOLS = ["install", "startup", "shutdown", "uninstall"];
+
 this.install = function() {
   // Self Repair only checks its pref on start, so if we disable it, wait until
   // next startup to run, unless the dev_mode preference is set.
@@ -54,7 +59,7 @@ this.install = function() {
   }
 };
 
-this.startup = function() {
+this.startup = async function() {
   setDefaultPrefs();
 
   // Setup logging and listen for changes to logging prefs
@@ -68,7 +73,15 @@ this.startup = function() {
     return;
   }
 
-  RecipeRunner.init();
+  // Initialize experiments first to avoid a race between initializing prefs
+  // and recipes rolling back pref changes when experiments end.
+  try {
+    await PreferenceExperiments.init();
+  } catch (err) {
+    log.error("Failed to initialize preference experiments:", err);
+  }
+
+  await RecipeRunner.init();
 };
 
 this.shutdown = function(data, reason) {

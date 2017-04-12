@@ -24,15 +24,29 @@ const DEFAULT_BRANCH_VALUES = {
 /**
  * Form fields for the preference-experiment action.
  */
-export default class PreferenceExperimentFields extends ActionFields {
+export class PreferenceExperimentFields extends ActionFields {
   static initialValues = {
     slug: '',
     experimentDocumentUrl: '',
     preferenceName: '',
     preferenceType: 'boolean',
+    preferenceBranchType: 'default',
   }
 
+  static propTypes = {
+    preferenceBranchType: pt.string.isRequired,
+  }
+
+  static userBranchWarning = (
+    <p className="field-warning">
+      <i className="fa fa-exclamation-triangle" />
+      Setting user preferences instead of default ones is not recommended.
+      Do not choose this unless you know what you are doing.
+    </p>
+  );
+
   render() {
+    const { preferenceBranchType } = this.props;
     return (
       <div className="arguments-fields">
         <p className="info">Run a feature experiment activated by a preference.</p>
@@ -63,11 +77,26 @@ export default class PreferenceExperimentFields extends ActionFields {
           <option value="integer">Integer</option>
           <option value="string">String</option>
         </ControlField>
+        <ControlField
+          label="Preference Branch Type"
+          name="arguments.preferenceBranchType"
+          component="select"
+        >
+          <option value="default">Default</option>
+          <option value="user">User</option>
+        </ControlField>
+        {preferenceBranchType === 'user' && PreferenceExperimentFields.userBranchWarning}
         <FieldArray name="arguments.branches" component={PreferenceBranches} />
       </div>
     );
   }
 }
+
+export default connect(
+  state => ({
+    preferenceBranchType: selector(state, 'arguments.preferenceBranchType'),
+  })
+)(PreferenceExperimentFields);
 
 export class PreferenceBranches extends React.Component {
   static propTypes = {
