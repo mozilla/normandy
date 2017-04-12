@@ -28,6 +28,7 @@ this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 const log = LogManager.getLogger("recipe-runner");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 const TIMER_NAME = "recipe-client-addon-run";
+const RUN_INTERVAL_PREF = "run_interval_seconds";
 
 this.RecipeRunner = {
   init() {
@@ -47,8 +48,8 @@ this.RecipeRunner = {
     CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
 
     // Watch for the run interval to change, and re-register the timer with the new value
-    prefs.addObserver("run_interval_seconds", this, false);
-    CleanupManager.addCleanupHandler(() => prefs.removeObserver("run_interval_seconds", this));
+    prefs.addObserver(RUN_INTERVAL_PREF, this, false);
+    CleanupManager.addCleanupHandler(() => prefs.removeObserver(RUN_INTERVAL_PREF, this));
   },
 
   checkPrefs() {
@@ -76,7 +77,7 @@ this.RecipeRunner = {
    * Watch for preference changes from Services.pref.addObserver.
    */
   observe(changedPrefBranch, action, changedPref) {
-    if (action === "nsPref:changed" && changedPref === "run_interval_seconds") {
+    if (action === "nsPref:changed" && changedPref === RUN_INTERVAL_PREF) {
       this.updateRunInterval();
     } else {
       log.debug(`Observer fired with unexpected pref change: ${action} ${changedPref}`);
@@ -87,7 +88,7 @@ this.RecipeRunner = {
     // Run once every `runInterval` wall-clock seconds. This is managed by setting a "last ran"
     // timestamp, and running if it is more than `runInterval` seconds ago. Even with very short
     // intervals, the timer will only fire at most once every few minutes.
-    const runInterval = prefs.getIntPref("run_interval_seconds");
+    const runInterval = prefs.getIntPref(RUN_INTERVAL_PREF);
     timerManager.registerTimer(TIMER_NAME, () => this.run(), runInterval);
   },
 
