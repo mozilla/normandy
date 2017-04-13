@@ -6,7 +6,7 @@ export SHELL=$(which bash)
 
 # Fetches build results, and creates ./gecko-dev-master/
 echo 'Downloading build result'
-curl --location --fail "$BUILD_RESULT" | tar xz
+curl --location --fail --silent --show-error "$BUILD_RESULT" | tar xz
 
 echo 'Setting up environment'
 pushd gecko-dev-master
