@@ -68,7 +68,7 @@ def main():
                     'source': source,
                 },
                 'provisionerId': 'aws-provisioner-v1',
-                'workerType': 'github-worker',
+                'workerType': 'gecko-1-b-linux',
                 'schedulerId': 'taskcluster-github',
                 'taskGroupId': decisionTaskId,
                 'created': fromNow('0 seconds'),
