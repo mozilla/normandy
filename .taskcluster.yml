@@ -16,6 +16,7 @@ tasks:
     workerType: "{{ taskcluster.docker.workerType }}"
     scopes:
       - queue:create-task:aws-provisioner-v1/github-worker
+      - queue:create-task:aws-provisioner-v1/gecko-1-b-linux
     payload:
       env:
       maxRunTime: 300 # 5 minutes
