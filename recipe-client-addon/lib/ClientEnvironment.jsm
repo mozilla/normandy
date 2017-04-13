@@ -18,6 +18,7 @@ XPCOMUtils.defineLazyModuleGetter(
     "PreferenceExperiments",
     "resource://shield-recipe-client/lib/PreferenceExperiments.jsm",
 );
+XPCOMUtils.defineLazyModuleGetter(this, "Utils", "resource://shield-recipe-client/lib/Utils.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -158,15 +159,13 @@ this.ClientEnvironment = {
     });
 
     XPCOMUtils.defineLazyGetter(environment, "plugins", async function() {
-      const plugins = await AddonManager.getAddonsByTypes(["plugin"]);
-      return plugins.reduce((pluginMap, plugin) => {
-        pluginMap[plugin.name] = {
-          name: plugin.name,
-          description: plugin.description,
-          version: plugin.version,
-        };
-        return pluginMap;
-      }, {});
+      let plugins = await AddonManager.getAddonsByTypes(["plugin"]);
+      plugins = plugins.map(plugin => ({
+        name: plugin.name,
+        description: plugin.description,
+        version: plugin.version,
+      }));
+      return Utils.keyBy(plugins, "name");
     });
 
     XPCOMUtils.defineLazyGetter(environment, "locale", () => {

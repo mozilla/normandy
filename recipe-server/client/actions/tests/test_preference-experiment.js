@@ -1,5 +1,9 @@
-import PreferenceExperimentAction from '../preference-experiment/';
+import PreferenceExperimentAction, {
+  postExecutionHook,
+  resetAction,
+} from '../preference-experiment/';
 import { recipeFactory } from '../../tests/utils.js';
+import { MockStorage } from './utils.js';
 
 function preferenceExperimentFactory(args) {
   return recipeFactory({
@@ -44,6 +48,10 @@ class MockPreferenceExperiments {
     return this.experiments[name];
   }
 
+  async getAllActive() {
+    return Object.values(this.experiments).filter(e => e.expired === false);
+  }
+
   async has(name) {
     return name in this.experiments;
   }
@@ -51,29 +59,37 @@ class MockPreferenceExperiments {
 
 describe('PreferenceExperimentAction', () => {
   let normandy;
+  let storage;
 
   beforeEach(() => {
+    storage = new MockStorage();
     normandy = {
       async ratioSample() {
         return 0;
       },
+      createStorage: () => storage,
       userId: 'fake-userid',
       log: jasmine.createSpy('log'),
       preferenceExperiments: new MockPreferenceExperiments(),
     };
+    resetAction();
   });
 
   describe('execute', () => {
     it('should run without errors', async () => {
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory());
       await action.execute();
+      await postExecutionHook(normandy);
     });
 
-    it('should log and exit if the preferenceExperiments APi is missing', async () => {
+    it('should log and exit if the preferenceExperiments API is missing', async () => {
       delete normandy.preferenceExperiments;
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory());
+
       await action.execute();
-      expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'warn');
+      await postExecutionHook(normandy);
+
+      expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'info');
     });
 
     it('should enroll the user if they have never been in the experiment', async () => {
@@ -90,6 +106,8 @@ describe('PreferenceExperimentAction', () => {
       spyOn(action, 'chooseBranch').and.callFake(branches => Promise.resolve(branches[0]));
 
       await action.execute();
+      await postExecutionHook(normandy);
+
       expect(normandy.preferenceExperiments.start)
         .toHaveBeenCalledWith({
           name: 'test',
@@ -101,26 +119,48 @@ describe('PreferenceExperimentAction', () => {
     });
 
     it('should mark the lastSeen date for the experiment if it is active', async () => {
-      normandy.preferenceExperiments.experiments.test = { expired: false };
+      normandy.preferenceExperiments.experiments.test = { name: 'test', expired: false };
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
         slug: 'test',
       }));
       spyOn(normandy.preferenceExperiments, 'markLastSeen').and.callThrough();
 
       await action.execute();
+      await postExecutionHook(normandy);
+
       expect(normandy.preferenceExperiments.markLastSeen).toHaveBeenCalledWith('test');
     });
 
     it('should do nothing if the experiment is expired', async () => {
-      normandy.preferenceExperiments.experiments.test = { expired: true };
+      normandy.preferenceExperiments.experiments.test = { name: 'test', expired: true };
       const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
         slug: 'test',
       }));
       spyOn(normandy.preferenceExperiments, 'markLastSeen').and.callThrough();
 
       await action.execute();
+      await postExecutionHook(normandy);
+
       expect(normandy.preferenceExperiments.markLastSeen).not.toHaveBeenCalled();
     });
+
+    it(
+      'should stop active experiments not seen between the pre and post execution hooks',
+      async () => {
+        const seen = { name: 'seen', expired: false };
+        const unseen = { name: 'unseen', expired: false };
+        normandy.preferenceExperiments.experiments = { seen, unseen };
+
+        const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+          slug: 'seen',
+        }));
+        await action.execute();
+        await postExecutionHook(normandy);
+
+        expect(seen.expired).toBe(false);
+        expect(unseen.expired).toBe(true);
+      },
+    );
   });
 
   describe('chooseBranch', () => {

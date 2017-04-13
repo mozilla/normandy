@@ -3,9 +3,20 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 this.EXPORTED_SYMBOLS = ["SandboxManager"];
 
+/**
+ * A wrapper class with helper methods for manipulating a sandbox.
+ *
+ * Along with convenient utility methods, SandboxManagers maintain a list of
+ * "holds", which prevent the sandbox from being nuked until all registered
+ * holds are removed. This allows sandboxes to trigger async operations and
+ * automatically nuke themselves when they're done.
+ */
 this.SandboxManager = class {
   constructor() {
-    this._sandbox = makeSandbox();
+    this._sandbox = new Cu.Sandbox(null, {
+      wantComponents: false,
+      wantGlobalProperties: ["URL", "URLSearchParams"],
+    });
     this.holds = [];
   }
 
@@ -103,13 +114,3 @@ this.SandboxManager = class {
     });
   }
 };
-
-
-function makeSandbox() {
-  const sandbox = new Cu.Sandbox(null, {
-    wantComponents: false,
-    wantGlobalProperties: ["URL", "URLSearchParams"],
-  });
-
-  return sandbox;
-}

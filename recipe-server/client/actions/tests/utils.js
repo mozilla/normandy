@@ -13,7 +13,7 @@ export class MockStorage {
   }
 
   setItem(key, value) {
-    this.data[key] = String(value);
+    this.data[key] = value;
     return Promise.resolve();
   }
 
