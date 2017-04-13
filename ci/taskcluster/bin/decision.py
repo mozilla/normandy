@@ -100,6 +100,9 @@ def main():
                             'expires': fromNow('364 days'),  # must expire before task
                         },
                     },
+                    'features': {
+                        'taskclusterProxy': True,
+                    },
                 },
                 'dependencies': dependencies,
             }))
