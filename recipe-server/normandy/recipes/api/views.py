@@ -160,8 +160,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'This revision already has an approval request.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        approval_request = ApprovalRequest(revision=revision, creator=request.user)
-        approval_request.save()
+        approval_request = revision.request_approval(creator=request.user)
 
         return Response(ApprovalRequestSerializer(approval_request).data,
                         status=status.HTTP_201_CREATED)

@@ -74,9 +74,16 @@ class RecipeQuerySet(models.QuerySet):
         """
         Update the signatures on all Recipes in the queryset.
         """
-        autographer = Autographer()
         # Convert to a list because order must be preserved
         recipes = list(self)
+
+        try:
+            autographer = Autographer()
+        except ImproperlyConfigured:
+            for recipe in recipes:
+                recipe.signature = None
+                recipe.save()
+            return
 
         recipe_ids = [r.id for r in recipes]
         logger.info(
@@ -184,7 +191,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return CanonicalJSONRenderer().render(data)
 
     def update_signature(self):
-        autographer = Autographer()
+        try:
+            autographer = Autographer()
+        except ImproperlyConfigured:
+            self.signature = None
+            return
 
         logger.info(
             f'Requesting signatures for recipes with ids [{self.id}] from Autograph',
@@ -275,10 +286,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 super().save(*args, **kwargs)
                 kwargs['force_insert'] = False
 
-                try:
-                    self.update_signature()
-                except ImproperlyConfigured:
-                    self.signature = None
+                self.update_signature()
 
         super().save(*args, **kwargs)
 
@@ -390,6 +398,13 @@ class RecipeRevision(models.Model):
         self.updated = timezone.now()
         super().save(*args, **kwargs)
 
+    def request_approval(self, creator):
+        approval_request = ApprovalRequest(revision=self, creator=creator)
+        approval_request.save()
+        self.recipe.update_signature()
+        self.recipe.save()
+        return approval_request
+
 
 class ApprovalRequest(models.Model):
     revision = models.OneToOneField(RecipeRevision, related_name='approval_request')
@@ -434,6 +449,10 @@ class ApprovalRequest(models.Model):
         self.approver = approver
         self.comment = comment
         self.save()
+
+        recipe = self.revision.recipe
+        recipe.update_signature()
+        recipe.save()
 
 
 @reversion.register()
