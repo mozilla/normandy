@@ -21,7 +21,7 @@ tasks = [
         'artifacts_from': [
             {
                 'task_name': 'recipe-client-addon:build',
-                'path': 'build.tar.gz',
+                'path': 'public/build.tar.gz',
                 'env_var': 'BUILD_RESULT',
             },
         ],
