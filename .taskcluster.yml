@@ -16,6 +16,8 @@ tasks:
     workerType: "{{ taskcluster.docker.workerType }}"
     scopes:
       - queue:create-task:aws-provisioner-v1/github-worker
+      # the decision task creates tasks that run on the gecko worker for speed
+      # and to ensure the same execution environment as "regular" gecko builds
       - queue:create-task:aws-provisioner-v1/gecko-1-b-linux
     payload:
       env:
