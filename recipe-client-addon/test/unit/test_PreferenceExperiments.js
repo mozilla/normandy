@@ -1,6 +1,7 @@
 "use strict";
 
 Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://gre/modules/TelemetryEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 
 load("utils.js"); /* globals withMockPreferences */
@@ -551,3 +552,42 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
     "init set the value for a default pref experiment",
   );
 })));
+
+// init should register telemetry experiments
+add_task(withMockExperiments(async function testInit(experiments) {
+  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
+  experiments["test"] = experimentFactory({name: "test", branch: "branch"});
+  await PreferenceExperiments.init();
+  ok(setActiveStub.calledWith("test", "branch"), "Experiment is registered by init");
+  setActiveStub.restore();
+}));
+
+// starting and stopping experiments should register in telemetry
+add_task(withMockExperiments(async function testInit() {
+  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
+  const setInactiveStub = sinon.stub(TelemetryEnvironment, "setExperimentInactive");
+
+  await PreferenceExperiments.start({
+    name: "test",
+    branch: "branch",
+    preferenceName: "fake.preference",
+    preferenceValue: "value",
+    preferenceBranchType: "default",
+  });
+
+  ok(setActiveStub.calledWith("test", "branch"), "Experiment is registerd by start()");
+  await PreferenceExperiments.stop("test");
+  ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregisterd by stop()");
+
+  setActiveStub.restore();
+  setInactiveStub.restore();
+}));
+
+// Experiments shouldn't be recorded by init() in telemetry if they are expired
+add_task(withMockExperiments(async function testInit(experiments) {
+  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
+  experiments["experiment1"] = experimentFactory({name: "expired", branch: "branch", expired: true});
+  await PreferenceExperiments.init();
+  ok(!setActiveStub.called, "Expired experiment is not registered by init");
+  setActiveStub.restore();
+}));
