@@ -21,7 +21,7 @@ tasks = [
         'artifacts_from': [
             {
                 'task_name': 'recipe-client-addon:build',
-                'path': 'build.tar.gz',
+                'path': 'public/build.tar.gz',
                 'env_var': 'BUILD_RESULT',
             },
         ],
@@ -68,11 +68,11 @@ def main():
                     'source': source,
                 },
                 'provisionerId': 'aws-provisioner-v1',
-                'workerType': 'github-worker',
+                'workerType': 'gecko-1-b-linux',
                 'schedulerId': 'taskcluster-github',
                 'taskGroupId': decisionTaskId,
                 'created': fromNow('0 seconds'),
-                'deadline': fromNow('4 hours'),
+                'deadline': fromNow('1 day'),
                 'expires': fromNow('365 days'),
                 'payload': {
                     'image': 'mozilla/normandy-taskcluster:latest',
@@ -91,7 +91,7 @@ def main():
                             task['command'],
                         ])
                     ],
-                    'maxRunTime': 14400,  # 4 hours
+                    'maxRunTime': 28800,  # 8 hours
                     'env': env,
                     'artifacts': {
                         'public': {
@@ -99,6 +99,9 @@ def main():
                             'path': '/artifacts',
                             'expires': fromNow('364 days'),  # must expire before task
                         },
+                    },
+                    'features': {
+                        'taskclusterProxy': True,
                     },
                 },
                 'dependencies': dependencies,
