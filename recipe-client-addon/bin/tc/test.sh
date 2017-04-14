@@ -14,9 +14,6 @@ source /root/.cargo/env
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
 source /root/.cargo/env
 
-echo 'Running lints'
-./mach lint browser/extensions/shield-recipe-client/
-
 echo 'Running tests'
 xvfb-run ./mach test browser/extensions/shield-recipe-client/
 popd

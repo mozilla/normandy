@@ -14,9 +14,7 @@ source /root/.cargo/env
 python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
 source /root/.cargo/env
 
-echo 'Building Firefox'
-./mach build
-popd
+echo 'Running lints'
+./mach lint browser/extensions/shield-recipe-client/
 
-echo 'Making build tarball artifact'
-tar czvf /artifacts/build.tar.gz gecko-dev-master
+popd
