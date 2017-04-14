@@ -12,6 +12,8 @@ import recipesReducer from 'control/reducers/RecipesReducer';
 import notificationReducer from 'control/reducers/NotificationReducer';
 import userReducer from 'control/reducers/UserReducer';
 
+import newState from '../state';
+
 export default combineReducers({
   columns: columnReducer,
   controlApp: controlAppReducer,
@@ -21,4 +23,5 @@ export default combineReducers({
   user: userReducer,
   recipes: recipesReducer,
   routing: routerReducer,
+  newState,
 });
