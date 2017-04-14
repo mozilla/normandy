@@ -51,6 +51,7 @@
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "Services", "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager", "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "JSONFile", "resource://gre/modules/JSONFile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
@@ -155,7 +156,7 @@ this.PreferenceExperiments = {
    *   If an experiment with the given name already exists, or if an experiment
    *   for the given preference is active.
    */
-  async start({name, branch, preferenceName, preferenceValue, preferenceBranchType}) {
+  async start({name, branch, preferenceName, preferenceValue, preferenceBranchType, preferenceType}) {
     log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
     const store = await ensureStorage();
@@ -190,25 +191,38 @@ this.PreferenceExperiments = {
       preferenceBranchType,
     };
 
-<<<<<<< 7645206452913171a140524661194c68d9691c4d
-    preferences.set(preferenceName, preferenceValue);
-    PreferenceExperiments.startObserver(name, preferenceName, preferenceValue);
-    store.data[name] = experiment;
-=======
-    if (experiment.previousPreferenceValue) {
-      const previousType = typeof experiment.previousPreferenceValue;
-      const givenType = typeof preferenceValue;
+
+    // If there's a previous preference value set, we need to ensure that the
+    // incoming value is of the same type.
+    if (preferences.has(preferenceName)) {
+      // get the previous type in PREF_ form
+      const previousType = Services.prefs.getPrefType(preferenceName);
+
+      let argumentValueType = preferenceType;
+      const typeConversions = {
+        boolean: Services.prefs.PREF_BOOL,
+        string: Services.prefs.PREF_STRING,
+        integer: Services.prefs.PREF_INT,
+      };
+
+      // Default to an INVALID pref type, unless there is a key in the typeConversions
+      // that matches the given argument type
+      let givenType = Services.prefs.PREF_INVALID || 0;
+      if(typeConversions.hasOwnProperty(argumentValueType)){
+        givenType = typeConversions[givenType];
+      }
+
+      // Compare both PREF_'d value types
       if (previousType !== givenType) {
         throw new Error(
-          `Previous preference value is of type "${previousType}", but was given "${givenType}"`
+          `Previous preference value is of type "${previousType}", but was given "${givenType}" (${preferenceType})`
         );
       }
     }
 
-    Preferences.set(preferenceName, preferenceValue);
-    PreferenceExperiments.startObserver(experimentName, preferenceName, preferenceValue);
-    store.data[experimentName] = experiment;
->>>>>>> Add pref experiment type checks
+    preferences.set(preferenceName, preferenceValue);
+    PreferenceExperiments.startObserver(name, preferenceName, preferenceValue);
+    store.data[name] = experiment;
     store.saveSoon();
 
     TelemetryEnvironment.setExperimentActive(name, branch);

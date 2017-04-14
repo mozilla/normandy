@@ -165,11 +165,18 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 })));
 
 // start should detect if a new preference value type matches the previous value type
-add_task(withMockPreferences(function* (mockPreferences) {
+add_task(withMockPreferences(async function (mockPreferences) {
   mockPreferences.set("fake.type_preference", "oldvalue");
 
-  yield Assert.rejects(
-    PreferenceExperiments.start("test", "branch", "fake.type_preference", 12345),
+  await Assert.rejects(
+    PreferenceExperiments.start({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.type_preference",
+      preferenceBranchType: "invalid",
+      preferenceValue: 12345,
+      preferenceType: "integer"
+    }),
     "start threw error for incompatible preference type"
   );
 }));
