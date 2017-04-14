@@ -5,6 +5,10 @@ import {
   RECIPE_FETCH_FAILURE,
   RECIPE_FETCH_SUCCESS,
   RECIPE_RECEIVE,
+  RECIPE_FILTERS_FETCH,
+  RECIPE_FILTERS_FETCH_FAILURE,
+  RECIPE_FILTERS_FETCH_SUCCESS,
+  RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_FETCH,
   RECIPE_HISTORY_FETCH_FAILURE,
   RECIPE_HISTORY_FETCH_SUCCESS,
@@ -147,5 +151,46 @@ export function fetchRecipeHistory(pk) {
     return apiFetch(`recipe/${pk}/history/`, { method: 'GET' })
       .then(revisions => fetchRecipeHistorySuccess(dispatch, requestId, pk, revisions))
       .catch(error => fetchRecipeHistoryFailure(dispatch, requestId, error));
+  };
+}
+
+
+function fetchRecipeFiltersSuccess(dispatch, requestId, filters) {
+  dispatch({
+    type: RECIPE_FILTERS_FETCH_SUCCESS,
+    requestId,
+  });
+
+  dispatch({
+    type: RECIPE_FILTERS_RECEIVE,
+    filters,
+  });
+}
+
+
+function fetchRecipeFiltersFailure(dispatch, requestId, error) {
+  dispatch({
+    type: RECIPE_FILTERS_FETCH_FAILURE,
+    error,
+    requestId,
+  });
+}
+
+
+export function fetchRecipeFilters() {
+  return (dispatch, getState) => {
+    const requestId = 'fetch-filters';
+    const request = getRequest(getState(), requestId);
+
+    if (request.loading) { return true; }
+
+    dispatch({
+      type: RECIPE_FILTERS_FETCH,
+      requestId,
+    });
+
+    return apiFetch('', { method: 'GET' })
+      .then(filters => fetchRecipeFiltersSuccess(dispatch, requestId, filters))
+      .catch(error => fetchRecipeFiltersFailure(dispatch, requestId, error));
   };
 }
