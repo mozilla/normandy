@@ -11,6 +11,11 @@ baseDir="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
 mozCentral="$1"
 dest="${mozCentral}/browser/extensions/shield-recipe-client"
 
+if [[ ! -d "$dest" ]]; then
+    echo "Sync destination $dest does not exist" >&2
+    exit 1
+fi
+
 rm -rf "${dest}"/*
 
 while read -r line || [[ -n "${line}" ]]; do
