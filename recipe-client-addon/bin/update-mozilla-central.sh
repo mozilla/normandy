@@ -25,4 +25,7 @@ done < "${baseDir}/build-includes.txt"
 
 # This produces versions like "45", "45.5.abcdef", and "45.5.abcdef.dirty"
 version=$(git -C "${baseDir}" describe --dirty | sed -e 's/^v//' -e 's/-/./g')
+if [[ -z "$version" ]]; then
+    version=$(git -C "${baseDir}" rev-parse HEAD)
+fi
 sed -i -e "s/@NORMANDY_VERSION@/${version}/" "${dest}/install.rdf.in"
