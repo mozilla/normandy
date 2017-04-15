@@ -19,4 +19,4 @@ echo 'Building Firefox'
 popd
 
 echo 'Making build tarball artifact'
-tar czvf /artifacts/build.tar.gz gecko-dev-master
+tar czf /artifacts/build.tar.gz gecko-dev-master

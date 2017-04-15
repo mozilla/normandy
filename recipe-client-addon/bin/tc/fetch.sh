@@ -15,4 +15,4 @@ npm install
 popd
 
 echo 'Making build tarball artifact'
-tar czvf /artifacts/source.tar.gz gecko-dev-master
+tar czf /artifacts/source.tar.gz gecko-dev-master
