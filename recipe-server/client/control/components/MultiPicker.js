@@ -48,7 +48,7 @@ class PickerControl extends React.Component {
 
       // Determine if selected option properties contain the filterValue.
       return options.filter(({ value, label }) =>
-        [value, label].find(str => str.toLowerCase().indexOf(filterValue) > -1));
+        [value, label].some(str => str.toLowerCase().indexOf(filterValue) > -1));
     }
 
     return options;
