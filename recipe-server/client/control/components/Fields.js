@@ -55,7 +55,7 @@ export class CheckboxGroup extends React.Component {
   static propTypes = {
     name: pt.string.isRequired,
     onChange: pt.func.isRequired,
-    options: pt.array,
+    options: pt.array.isRequired,
     value: pt.arrayOf(pt.string),
   };
 
@@ -84,7 +84,6 @@ export class CheckboxGroup extends React.Component {
     if (target.checked) {
       newValue = uniq(value.concat([target.value]));
     } else {
-      // Remove this target's value from the array of values and return that array
       newValue = value.filter(val => val !== target.value);
     }
 
