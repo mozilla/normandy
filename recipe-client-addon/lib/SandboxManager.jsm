@@ -97,20 +97,25 @@ this.SandboxManager = class {
    * @return {Function}
    */
   wrapAsync(wrappedFunction, options = {cloneInto: false, cloneArguments: false}) {
-    return (...args) => new this.sandbox.Promise((resolve, reject) => {
-      if (options.cloneArguments) {
-        args = Cu.cloneInto(args, {});
-      }
-
-      wrappedFunction(...args).then(result => {
-        if (options.cloneInto) {
-          result = this.cloneInto(result);
+    // In order for `this` to work in wrapped functions, we must return a
+    // non-arrow function, which requires saving a reference to the manager.
+    const sandboxManager = this;
+    return function(...args) {
+      return new sandboxManager.sandbox.Promise((resolve, reject) => {
+        if (options.cloneArguments) {
+          args = Cu.cloneInto(args, {});
         }
 
-        resolve(result);
-      }, err => {
-        reject(new this.sandbox.Error(err.message, err.fileName, err.lineNumber));
+        wrappedFunction.apply(this, args).then(result => {
+          if (options.cloneInto) {
+            result = sandboxManager.cloneInto(result);
+          }
+
+          resolve(result);
+        }, err => {
+          reject(new sandboxManager.sandbox.Error(err.message, err.fileName, err.lineNumber));
+        });
       });
-    });
+    };
   }
 };

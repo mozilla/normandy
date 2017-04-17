@@ -15,10 +15,15 @@ add_task(function* () {
     wrapped: manager.wrapAsync(async function() {
       return "wrapped";
     }),
+    aValue: "aValue",
+    wrappedThis: manager.wrapAsync(async function() {
+      return this.aValue;
+    }),
   }, {cloneFunctions: true});
 
   // Assertion helpers
   manager.addGlobal("ok", ok);
+  manager.addGlobal("equal", equal);
 
   const sandboxResult = yield new Promise(resolve => {
     manager.addGlobal("resolve", result => resolve(result));
@@ -39,6 +44,16 @@ add_task(function* () {
     `);
   });
   equal(sandboxResult, "wrapped", "wrapAsync methods return Promises that work in the sandbox");
+
+  yield manager.evalInSandbox(`
+    (async function sandboxTest() {
+      equal(
+        await driver.wrappedThis(),
+        "aValue",
+        "wrapAsync preserves the behavior of the this keyword",
+      );
+    })();
+  `);
 
   manager.removeHold("testing");
 });
