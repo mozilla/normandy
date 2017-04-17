@@ -24,6 +24,7 @@ version=$(git describe --dirty | sed -e 's/^v//' -e 's/-/./g')
 sed -e "s/@NORMANDY_VERSION@/${version}/" \
     -e 's/@MOZ_APP_VERSION@/52/' \
     -e 's/@MOZ_APP_MAXVERSION@/*/' \
+    -e '/^#filter substitution$/d' \
     "${DEST}/install.rdf.in" \
     > "${DEST}/install.rdf"
 rm "${DEST}/install.rdf.in"

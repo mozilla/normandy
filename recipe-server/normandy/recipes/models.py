@@ -454,6 +454,13 @@ class ApprovalRequest(models.Model):
         recipe.update_signature()
         recipe.save()
 
+    def close(self):
+        self.delete()
+
+        recipe = self.revision.recipe
+        recipe.update_signature()
+        recipe.save()
+
 
 @reversion.register()
 class Action(models.Model):

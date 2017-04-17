@@ -219,7 +219,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST'])
     def close(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.delete()
+        approval_request.close()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
