@@ -26,7 +26,7 @@ function listenerC(x = 1) {
   evidence.log += "c";
 }
 
-add_task(withSandboxManager(Assert, async function (sandboxManager) {
+add_task(withSandboxManager(Assert, async function(sandboxManager) {
   const eventEmitter = new EventEmitter(sandboxManager);
 
   // Fire an unrelated event, to make sure nothing goes wrong

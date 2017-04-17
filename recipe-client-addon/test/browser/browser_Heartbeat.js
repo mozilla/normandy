@@ -77,7 +77,7 @@ sandboxManager.addHold("test running");
 // into three batches.
 
 /* Batch #1 - General UI, Stars, and telemetry data */
-add_task(async function () {
+add_task(async function() {
   const targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
   const notificationBox = targetWindow.document.querySelector("#high-priority-global-notificationbox");
 
@@ -119,7 +119,7 @@ add_task(async function () {
 
 
 // Batch #2 - Engagement buttons
-add_task(async function () {
+add_task(async function() {
   const targetWindow = Services.wm.getMostRecentWindow("navigator:browser");
   const notificationBox = targetWindow.document.querySelector("#high-priority-global-notificationbox");
   const hb = new Heartbeat(targetWindow, sandboxManager, {
@@ -154,7 +154,7 @@ add_task(async function () {
 });
 
 // Batch 3 - Closing the window while heartbeat is open
-add_task(async function () {
+add_task(async function() {
   const targetWindow = await BrowserTestUtils.openNewBrowserWindow();
 
   const hb = new Heartbeat(targetWindow, sandboxManager, {
@@ -171,7 +171,7 @@ add_task(async function () {
 
 
 // Cleanup
-add_task(async function () {
+add_task(async function() {
   // Make sure the sandbox is clean.
   sandboxManager.removeHold("test running");
   await sandboxManager.isNuked()

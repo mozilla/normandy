@@ -62,7 +62,7 @@ function makeMockApiServer() {
   const server = new HttpServer();
   server.registerDirectory("/", do_get_file("mock_api"));
 
-  server.setIndexHandler(async function (request, response) {
+  server.setIndexHandler(async function(request, response) {
     response.processAsync();
     const dir = request.getProperty("directory");
     const index = dir.clone();

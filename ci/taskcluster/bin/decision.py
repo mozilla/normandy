@@ -9,9 +9,35 @@ BASE_URL = 'http://taskcluster/queue/v1'
 
 tasks = [
     {
+        'name': 'recipe-client-addon:fetch',
+        'description': 'Download gecko-dev and sync Normandy changes',
+        'command': 'normandy/recipe-client-addon/bin/tc/fetch.sh',
+    },
+    {
+        'name': 'recipe-client-addon:lint',
+        'description': 'Run lint checks on the add-on',
+        'command': 'normandy/recipe-client-addon/bin/tc/lint.sh',
+        'dependencies': ['recipe-client-addon:fetch'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:fetch',
+                'path': 'public/source.tar.gz',
+                'env_var': 'FETCH_RESULT',
+            },
+        ],
+    },
+    {
         'name': 'recipe-client-addon:build',
         'description': 'Build Firefox with recipe-client-addon',
         'command': 'normandy/recipe-client-addon/bin/tc/build.sh',
+        'dependencies': ['recipe-client-addon:fetch'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:fetch',
+                'path': 'public/source.tar.gz',
+                'env_var': 'FETCH_RESULT',
+            },
+        ],
     },
     {
         'name': 'recipe-client-addon:test',
