@@ -1,5 +1,7 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
+
+Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
@@ -67,3 +69,53 @@ this.withMockNormandyApi = function(testFunction) {
     NormandyApi.fetchImplementation.restore();
   };
 };
+
+const preferenceBranches = {
+  user: Preferences,
+  default: new Preferences({defaultBranch: true}),
+};
+
+this.withMockPreferences = function(testFunction) {
+  return async function inner(...args) {
+    const prefManager = new MockPreferences();
+    try {
+      await testFunction(...args, prefManager);
+    } finally {
+      prefManager.cleanup();
+    }
+  };
+};
+
+class MockPreferences {
+  constructor() {
+    this.oldValues = {user: {}, default: {}};
+  }
+
+  set(name, value, branch = "user") {
+    this.preserve(name, branch);
+    preferenceBranches[branch].set(name, value);
+  }
+
+  preserve(name, branch) {
+    if (!(name in this.oldValues[branch])) {
+      const preferenceBranch = preferenceBranches[branch];
+      this.oldValues[branch][name] = {
+        oldValue: preferenceBranch.get(name),
+        existed: preferenceBranch.has(name),
+      };
+    }
+  }
+
+  cleanup() {
+    for (const [branchName, values] of Object.entries(this.oldValues)) {
+      const preferenceBranch = preferenceBranches[branchName];
+      for (const [name, {oldValue, existed}] of Object.entries(values)) {
+        if (existed) {
+          preferenceBranch.set(name, oldValue);
+        } else {
+          preferenceBranch.reset(name);
+        }
+      }
+    }
+  }
+}
