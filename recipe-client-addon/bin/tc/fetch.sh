@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -eu
 
-# mach wants this
-export SHELL=$(which bash)
-
 # Creates gecko-dev-master
 echo 'Downloading gecko-dev...'
 curl --location --fail --silent --show-error https://github.com/mozilla/gecko-dev/archive/master.tar.gz | tar xz
