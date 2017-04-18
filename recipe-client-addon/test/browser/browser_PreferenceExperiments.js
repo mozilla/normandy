@@ -127,6 +127,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "user");
+  mockPreferences.set("fake.preference", "olddefaultvalue", "default");
 
   await PreferenceExperiments.start({
     name: "test",
@@ -339,6 +340,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "default",
   });
+  PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
 
   await PreferenceExperiments.stop("test");
   ok(stopObserver.calledWith("test"), "stop removed an observer");
@@ -350,6 +352,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
   );
 
   stopObserver.restore();
+  PreferenceExperiments.stopAllObservers();
 })));
 
 // stop should also support user pref experiments
@@ -376,6 +379,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
   );
 
   stopObserver.restore();
+  PreferenceExperiments.stopAllObservers();
 })));
 
 // stop should not call stopObserver if there is no observer registered.
@@ -387,6 +391,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments) {
   ok(!stopObserver.called, "stop did not bother to stop an observer that wasn't active");
 
   stopObserver.restore();
+  PreferenceExperiments.stopAllObservers();
 })));
 
 // stop should remove a preference that had no value prior to an experiment for user prefs
@@ -404,7 +409,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 
   await PreferenceExperiments.stop("test");
   ok(
-    !Preferences.has("fake.preference"),
+    !Preferences.isSet("fake.preference"),
     "stop removed the preference that had no value prior to the experiment",
   );
 
