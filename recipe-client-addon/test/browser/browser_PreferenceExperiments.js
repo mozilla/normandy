@@ -16,6 +16,7 @@ function experimentFactory(attrs) {
     lastSeen: new Date().toJSON(),
     preferenceName: "fake.preference",
     preferenceValue: "falkevalue",
+    preferenceType: "string",
     previousPreferenceValue: "oldfakevalue",
     preferenceBranchType: "default",
   }, attrs);
@@ -41,6 +42,7 @@ add_task(withMockExperiments(async function (experiments) {
       branch: "branch",
       preferenceName: "fake.preference",
       preferenceValue: "value",
+      preferenceType: "string",
       preferenceBranchType: "default",
     }),
     "start threw an error due to a conflicting experiment name",
@@ -56,6 +58,7 @@ add_task(withMockExperiments(async function (experiments) {
       branch: "branch",
       preferenceName: "fake.preference",
       preferenceValue: "value",
+      preferenceType: "string",
       preferenceBranchType: "default",
     }),
     "start threw an error due to an active experiment for the given preference",
@@ -70,6 +73,7 @@ add_task(withMockExperiments(async function () {
       branch: "branch",
       preferenceName: "fake.preference",
       preferenceValue: "value",
+      preferenceType: "string",
       preferenceBranchType: "invalid",
     }),
     "start threw an error due to an invalid preference branch type",
@@ -89,6 +93,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     preferenceName: "fake.preference",
     preferenceValue: "newvalue",
     preferenceBranchType: "default",
+    preferenceType: "string",
   });
   ok("test" in experiments, "start saved the experiment");
   ok(
@@ -102,6 +107,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "newvalue",
+    preferenceType: "string",
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "default",
   };
@@ -134,6 +140,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     branch: "branch",
     preferenceName: "fake.preference",
     preferenceValue: "newvalue",
+    preferenceType: "string",
     preferenceBranchType: "user",
   });
   ok(
@@ -147,9 +154,11 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "newvalue",
+    preferenceType: "string",
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "user",
   };
+
   const experiment = {};
   Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
   Assert.deepEqual(experiment, expectedExperiment, "start saved the experiment");
@@ -355,6 +364,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
+    preferenceType: "string",
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "default",
   });
@@ -382,6 +392,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
+    preferenceType: "string",
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "user",
   });
@@ -421,6 +432,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
+    preferenceType: "string",
     previousPreferenceValue: undefined,
     preferenceBranchType: "user",
   });
@@ -443,6 +455,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     expired: false,
     preferenceName: "fake.preference",
     preferenceValue: "experimentvalue",
+    preferenceType: "string",
     previousPreferenceValue: "oldvalue",
     peferenceBranchType: "default",
   });
@@ -539,18 +552,21 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
   experiments["user"] = experimentFactory({
     preferenceName: "user",
     preferenceValue: true,
+    preferenceType: "boolean",
     expired: false,
     preferenceBranchType: "user",
   });
   experiments["default"] = experimentFactory({
     preferenceName: "default",
     preferenceValue: true,
+    preferenceType: "boolean",
     expired: false,
     preferenceBranchType: "default",
   });
   experiments["expireddefault"] = experimentFactory({
     preferenceName: "expireddefault",
     preferenceValue: true,
+    preferenceType: "boolean",
     expired: true,
     preferenceBranchType: "default",
   });
@@ -593,6 +609,7 @@ add_task(withMockExperiments(async function testInit() {
     branch: "branch",
     preferenceName: "fake.preference",
     preferenceValue: "value",
+    preferenceType: "string",
     preferenceBranchType: "default",
   });
 

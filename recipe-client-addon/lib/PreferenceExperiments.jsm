@@ -187,10 +187,10 @@ this.PreferenceExperiments = {
       lastSeen: new Date().toJSON(),
       preferenceName,
       preferenceValue,
+      preferenceType,
       previousPreferenceValue: preferences.get(preferenceName, undefined),
       preferenceBranchType,
     };
-
 
     // If there's a previous preference value set, we need to ensure that the
     // incoming value is of the same type.
@@ -209,7 +209,7 @@ this.PreferenceExperiments = {
       // that matches the given argument type
       let givenType = Services.prefs.PREF_INVALID || 0;
       if(typeConversions.hasOwnProperty(argumentValueType)){
-        givenType = typeConversions[givenType];
+        givenType = typeConversions[argumentValueType];
       }
 
       // Compare both PREF_'d value types
