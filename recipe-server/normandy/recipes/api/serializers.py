@@ -1,6 +1,5 @@
 from pyjexl import JEXL
 from rest_framework import serializers
-from reversion.models import Version
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
@@ -47,6 +46,28 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
         ]
 
 
+class RecipeRevisionSerializer(serializers.ModelSerializer):
+    date_created = serializers.DateTimeField(source='created', read_only=True)
+    recipe = serializers.SerializerMethodField(read_only=True)
+    comment = serializers.CharField(read_only=True)
+    approval_request = ApprovalRequestSerializer(read_only=True)
+
+    class Meta:
+        model = RecipeRevision
+        fields = [
+            'id',
+            'date_created',
+            'recipe',
+            'comment',
+            'approval_request',
+        ]
+
+    def get_recipe(self, obj):
+        serializer = RecipeSerializer(
+            obj.recipe, exclude_fields=['latest_revision', 'approved_revision'])
+        return serializer.data
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     # Attributes serialized here are made available to filter expressions via
     # normandy.recipe, and should be documented if they are intended to be
@@ -67,6 +88,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     filter_expression = serializers.CharField(read_only=True)
     latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
     approved_revision_id = serializers.CharField(source='approved_revision.id', read_only=True)
+    latest_revision = RecipeRevisionSerializer(read_only=True)
+    approved_revision = RecipeRevisionSerializer(read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
@@ -87,8 +110,21 @@ class RecipeSerializer(serializers.ModelSerializer):
             'filter_expression',
             'latest_revision_id',
             'approved_revision_id',
+            'latest_revision',
+            'approved_revision',
             'approval_request',
         ]
+
+    def __init__(self, *args, **kwargs):
+        exclude_fields = kwargs.pop('exclude_fields', None)
+
+        super().__init__(*args, **kwargs)
+
+        if exclude_fields:
+            existing_fields = self.fields.keys()
+            for field in exclude_fields:
+                if field in exclude_fields:
+                    self.fields.pop(field)
 
     def update(self, instance, validated_data):
         if 'enabled' in validated_data:
@@ -187,39 +223,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.Serializer):
     country = serializers.CharField()
     request_time = serializers.DateTimeField()
-
-
-class RecipeRevisionSerializer(serializers.ModelSerializer):
-    date_created = serializers.DateTimeField(source='created', read_only=True)
-    comment = serializers.CharField(read_only=True)
-    recipe = RecipeSerializer(source='serializable_recipe', read_only=True)
-    approval_request = ApprovalRequestSerializer(read_only=True)
-
-    class Meta:
-        model = RecipeRevision
-        fields = [
-            'id',
-            'date_created',
-            'recipe',
-            'comment',
-            'approval_request',
-        ]
-
-
-class RecipeVersionSerializer(serializers.ModelSerializer):
-    date_created = serializers.DateTimeField(source='revision.date_created', read_only=True)
-    comment = serializers.CharField(source='revision.comment', read_only=True)
-    recipe = RecipeSerializer(source='_object_version.object', read_only=True)
-
-    class Meta:
-        model = Version
-        fields = [
-            'id',
-            'date_created',
-            'recipe',
-            'comment',
-            'approval_status'
-        ]
 
 
 class SignatureSerializer(serializers.ModelSerializer):

@@ -43,9 +43,18 @@ function history(state = Map({}), action) {
 
 
 function objects(state = Map({}), action) {
+  let recipe;
+
   switch (action.type) {
     case RECIPE_RECEIVE:
-      return state.set(action.recipe.id, fromJS(action.recipe));
+      recipe = fromJS(action.recipe);
+
+      recipe.set('latest_revision', action.recipe.latest_revision.id);
+      if (action.recipe.approved_revision) {
+        recipe.set('approved_revision', action.recipe.approved_revision.id);
+      }
+
+      return state.set(action.recipe.id, recipe);
 
     default:
       return state;
