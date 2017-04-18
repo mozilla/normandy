@@ -6,14 +6,11 @@ development environment for it.
 .. toctree::
    :maxdepth: 2
 
-   install
-   workflow
    concepts
-   self-repair
    driver
-   troubleshooting
-   api-tests
-   functional-tests
+   recipe-server/index
+   recipe-client-addon/index
    mock-recipe-server
    code-style
    feature-experiments
+   troubleshooting
