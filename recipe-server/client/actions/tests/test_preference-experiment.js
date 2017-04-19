@@ -25,12 +25,13 @@ class MockPreferenceExperiments {
     this.experiments = {};
   }
 
-  async start({ name, branch, preferenceName, preferenceValue }) {
+  async start({ name, branch, preferenceName, preferenceValue, preferenceType }) {
     this.experiments[name] = {
       name,
       branch,
       preferenceName,
       preferenceValue,
+      preferenceType,
       expired: false,
       lastSeen: 'start',
     };
@@ -115,6 +116,7 @@ describe('PreferenceExperimentAction', () => {
           preferenceName: 'fake.preference',
           preferenceValue: 'branch1',
           preferenceBranchType: 'user',
+          preferenceType: 'string',
         });
     });
 

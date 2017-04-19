@@ -34,11 +34,15 @@
  *   Name of the preference affected by this experiment.
  * @property {string|integer|boolean} preferenceValue
  *   Value to change the preference to during the experiment.
+ * @property {string} preferenceType
+ *   Type of the preference value being set.
  * @property {string|integer|boolean|undefined} previousPreferenceValue
  *   Value of the preference prior to the experiment, or undefined if it was
  *   unset.
  * @property {PreferenceBranchType} preferenceBranchType
  *   Controls how we modify the preference to affect the client.
+ * @rejects {Error}
+ *   If the given preferenceType does not match the existing stored preference.
  *
  *   If "default", when the experiment is active, the default value for the
  *   preference is modified on startup of the add-on. If "user", the user value
@@ -62,6 +66,13 @@ XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
 const EXPERIMENT_FILE = "shield-preference-experiments.json";
+
+const PREFERENCE_TYPE_MAP = {
+  boolean: Services.prefs.PREF_BOOL,
+  string: Services.prefs.PREF_STRING,
+  integer: Services.prefs.PREF_INT,
+};
+
 const DefaultPreferences = new Preferences({defaultBranch: true});
 
 /**
@@ -176,7 +187,7 @@ this.PreferenceExperiments = {
 
     const preferences = PreferenceBranchType[preferenceBranchType];
     if (!preferences) {
-      throw new  Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
+      throw new Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
     }
 
     /** @type {Experiment} */
@@ -192,32 +203,17 @@ this.PreferenceExperiments = {
       preferenceBranchType,
     };
 
-    // If there's a previous preference value set, we need to ensure that the
-    // incoming value is of the same type.
-    if (preferences.has(preferenceName)) {
-      // get the previous type in PREF_ form
-      const previousType = Services.prefs.getPrefType(preferenceName);
+    const existingPreferenceType = Services.prefs.getPrefType(preferenceName);
+    const givenType = PREFERENCE_TYPE_MAP[preferenceType];
 
-      let argumentValueType = preferenceType;
-      const typeConversions = {
-        boolean: Services.prefs.PREF_BOOL,
-        string: Services.prefs.PREF_STRING,
-        integer: Services.prefs.PREF_INT,
-      };
+    if (!preferenceType || !givenType) {
+      throw new Error(`Invalid preferenceType provided (given "${preferenceType}")`);
+    }
 
-      // Default to an INVALID pref type, unless there is a key in the typeConversions
-      // that matches the given argument type
-      let givenType = Services.prefs.PREF_INVALID || 0;
-      if(typeConversions.hasOwnProperty(argumentValueType)){
-        givenType = typeConversions[argumentValueType];
-      }
-
-      // Compare both PREF_'d value types
-      if (previousType !== givenType) {
-        throw new Error(
-          `Previous preference value is of type "${previousType}", but was given "${givenType}" (${preferenceType})`
-        );
-      }
+    if (existingPreferenceType && existingPreferenceType !== givenType) {
+      throw new Error(
+        `Previous preference value is of type "${existingPreferenceType}", but was given "${givenType}" (${preferenceType})`
+      );
     }
 
     preferences.set(preferenceName, preferenceValue);
