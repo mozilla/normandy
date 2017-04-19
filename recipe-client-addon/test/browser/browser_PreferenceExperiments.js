@@ -197,26 +197,6 @@ add_task(withMockExperiments(withMockPreferences(async function(mockExperiments,
   stop.restore();
 })));
 
-// startObserver should observe changes to the default preference value.
-add_task(withMockExperiments(withMockPreferences(async function(mockExperiments, mockPreferences) {
-  const stop = sinon.stub(PreferenceExperiments, "stop");
-  mockPreferences.set("fake.preference", "startvalue", "default");
-
-  // NOTE: startObserver does not modify the pref
-  PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
-
-  // Setting it to the experimental value should not trigger the call.
-  DefaultPreferences.set("fake.preference", "experimentvalue");
-  ok(!stop.called, "Changing to the experimental pref value did not trigger the observer");
-
-  // Setting it to something different should trigger the call.
-  DefaultPreferences.set("fake.preference", "newvalue");
-  ok(stop.called, "Changing to a different value triggered the observer");
-
-  PreferenceExperiments.stopAllObservers();
-  stop.restore();
-})));
-
 add_task(withMockExperiments(async function testHasObserver() {
   PreferenceExperiments.startObserver("test", "fake.preference", "experimentValue");
 
