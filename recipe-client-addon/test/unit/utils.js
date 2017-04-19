@@ -8,6 +8,7 @@ const preferenceBranches = {
   default: new Preferences({defaultBranch: true}),
 };
 
+// duplicated from test/browser/head.js until we move everything over to mochitests.
 function withMockPreferences(testFunction) {
   return async function inner(...args) {
     const prefManager = new MockPreferences();

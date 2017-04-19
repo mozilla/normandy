@@ -1,10 +1,8 @@
 "use strict";
 
-Cu.import("resource://gre/modules/Preferences.jsm");
-Cu.import("resource://gre/modules/TelemetryEnvironment.jsm");
-Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
-
-load("utils.js"); /* globals withMockPreferences */
+Cu.import("resource://gre/modules/Preferences.jsm", this);
+Cu.import("resource://gre/modules/TelemetryEnvironment.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm", this);
 
 // Save ourselves some typing
 const {withMockExperiments} = PreferenceExperiments;
@@ -109,14 +107,14 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
   };
   const experiment = {};
   Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
-  deepEqual(experiment, expectedExperiment, "start saved the experiment");
+  Assert.deepEqual(experiment, expectedExperiment, "start saved the experiment");
 
-  equal(
+  is(
     DefaultPreferences.get("fake.preference"),
     "newvalue",
     "start modified the default preference",
   );
-  equal(
+  is(
     Preferences.get("fake.preference"),
     "uservalue",
     "start did not modify the user preference",
@@ -129,6 +127,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "user");
+  mockPreferences.set("fake.preference", "olddefaultvalue", "default");
 
   await PreferenceExperiments.start({
     name: "test",
@@ -153,14 +152,14 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
   };
   const experiment = {};
   Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
-  deepEqual(experiment, expectedExperiment, "start saved the experiment");
+  Assert.deepEqual(experiment, expectedExperiment, "start saved the experiment");
 
-  notEqual(
+  Assert.notEqual(
     DefaultPreferences.get("fake.preference"),
     "newvalue",
     "start did not modify the default preference",
   );
-  equal(Preferences.get("fake.preference"), "newvalue", "start modified the user preference");
+  is(Preferences.get("fake.preference"), "newvalue", "start modified the user preference");
 
   startObserver.restore();
 })));
@@ -304,7 +303,7 @@ add_task(withMockExperiments(async function (experiments) {
   const oldDate = new Date(1988, 10, 1).toJSON();
   experiments["test"] = experimentFactory({name: "test", lastSeen: oldDate});
   await PreferenceExperiments.markLastSeen("test");
-  notEqual(
+  Assert.notEqual(
     experiments["test"].lastSeen,
     oldDate,
     "markLastSeen updated the experiment lastSeen date",
@@ -341,17 +340,19 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "default",
   });
+  PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
 
   await PreferenceExperiments.stop("test");
   ok(stopObserver.calledWith("test"), "stop removed an observer");
-  equal(experiments["test"].expired, true, "stop marked the experiment as expired");
-  equal(
+  is(experiments["test"].expired, true, "stop marked the experiment as expired");
+  is(
     DefaultPreferences.get("fake.preference"),
     "oldvalue",
     "stop reverted the preference to its previous value",
   );
 
   stopObserver.restore();
+  PreferenceExperiments.stopAllObservers();
 })));
 
 // stop should also support user pref experiments
@@ -370,14 +371,15 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 
   await PreferenceExperiments.stop("test");
   ok(stopObserver.calledWith("test"), "stop removed an observer");
-  equal(experiments["test"].expired, true, "stop marked the experiment as expired");
-  equal(
+  is(experiments["test"].expired, true, "stop marked the experiment as expired");
+  is(
     Preferences.get("fake.preference"),
     "oldvalue",
     "stop reverted the preference to its previous value",
   );
 
   stopObserver.restore();
+  PreferenceExperiments.stopAllObservers();
 })));
 
 // stop should not call stopObserver if there is no observer registered.
@@ -389,6 +391,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments) {
   ok(!stopObserver.called, "stop did not bother to stop an observer that wasn't active");
 
   stopObserver.restore();
+  PreferenceExperiments.stopAllObservers();
 })));
 
 // stop should remove a preference that had no value prior to an experiment for user prefs
@@ -406,7 +409,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 
   await PreferenceExperiments.stop("test");
   ok(
-    !Preferences.has("fake.preference"),
+    !Preferences.isSet("fake.preference"),
     "stop removed the preference that had no value prior to the experiment",
   );
 
@@ -427,7 +430,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
   });
 
   await PreferenceExperiments.stop("test", false);
-  equal(
+  is(
     DefaultPreferences.get("fake.preference"),
     "customvalue",
     "stop did not modify the preference",
@@ -450,11 +453,11 @@ add_task(withMockExperiments(async function (experiments) {
   experiments["test"] = experiment;
 
   const fetchedExperiment = await PreferenceExperiments.get("test");
-  deepEqual(fetchedExperiment, experiment, "get fetches the correct experiment");
+  Assert.deepEqual(fetchedExperiment, experiment, "get fetches the correct experiment");
 
   // Modifying the fetched experiment must not edit the data source.
   fetchedExperiment.name = "othername";
-  equal(experiments["test"].name, "test", "get returns a copy of the experiment");
+  is(experiments["test"].name, "test", "get returns a copy of the experiment");
 }));
 
 add_task(withMockExperiments(async function testGetAll(experiments) {
@@ -464,21 +467,21 @@ add_task(withMockExperiments(async function testGetAll(experiments) {
   experiments["experiment2"] = experiment2;
 
   const fetchedExperiments = await PreferenceExperiments.getAll();
-  equal(fetchedExperiments.length, 2, "getAll returns a list of all stored experiments");
-  deepEqual(
+  is(fetchedExperiments.length, 2, "getAll returns a list of all stored experiments");
+  Assert.deepEqual(
     fetchedExperiments.find(e => e.name === "experiment1"),
     experiment1,
     "getAll returns a list with the correct experiments",
   );
   const fetchedExperiment2 = fetchedExperiments.find(e => e.name === "experiment2");
-  deepEqual(
+  Assert.deepEqual(
     fetchedExperiment2,
     experiment2,
     "getAll returns a list with the correct experiments, including disabled ones",
   );
 
   fetchedExperiment2.name = "othername";
-  equal(experiment2.name, "experiment2", "getAll returns copies of the experiments");
+  is(experiment2.name, "experiment2", "getAll returns copies of the experiments");
 }));
 
 add_task(withMockExperiments(withMockPreferences(async function testGetAllActive(experiments) {
@@ -492,14 +495,14 @@ add_task(withMockExperiments(withMockPreferences(async function testGetAllActive
   });
 
   const activeExperiments = await PreferenceExperiments.getAllActive();
-  deepEqual(
+  Assert.deepEqual(
     activeExperiments,
     [experiments["active"]],
     "getAllActive only returns active experiments",
   );
 
   activeExperiments[0].name = "newfakename";
-  notEqual(
+  Assert.notEqual(
     experiments["active"].name,
     "newfakename",
     "getAllActive returns copies of stored experiments",
@@ -540,13 +543,13 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
 
   await PreferenceExperiments.init();
 
-  equal(DefaultPreferences.get("user"), false, "init ignored a user pref experiment");
-  equal(
+  is(DefaultPreferences.get("user"), false, "init ignored a user pref experiment");
+  is(
     DefaultPreferences.get("expireddefault"),
     false,
     "init ignored an expired default pref experiment",
   );
-  equal(
+  is(
     DefaultPreferences.get("default"),
     true,
     "init set the value for a default pref experiment",

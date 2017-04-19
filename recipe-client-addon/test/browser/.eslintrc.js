@@ -18,5 +18,6 @@ module.exports = {
     withSandboxManager: false,
     withDriver: false,
     withMockNormandyApi: false,
+    withMockPreferences: false,
   },
 };
