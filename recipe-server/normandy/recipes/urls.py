@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 
 from normandy.base.api.routers import MixedViewRouter
-from normandy.recipes.api.views import (
+from normandy.recipes.api.v1.views import (
     ActionImplementationView,
     ActionViewSet,
     ApprovalRequestViewSet,

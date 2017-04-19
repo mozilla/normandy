@@ -186,7 +186,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
             return None
 
     def canonical_json(self):
-        from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
+        from normandy.recipes.api.v1.serializers import RecipeSerializer  # Avoid circular import
         data = RecipeSerializer(self).data
         return CanonicalJSONRenderer().render(data)
 

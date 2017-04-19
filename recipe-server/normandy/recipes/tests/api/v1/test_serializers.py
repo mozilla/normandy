@@ -11,7 +11,7 @@ from normandy.recipes.tests import (
     LocaleFactory,
     RecipeFactory,
 )
-from normandy.recipes.api.serializers import (
+from normandy.recipes.api.v1.serializers import (
     ActionSerializer, RecipeSerializer, SignedRecipeSerializer)
 
 
