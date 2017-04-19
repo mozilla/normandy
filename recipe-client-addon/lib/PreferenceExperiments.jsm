@@ -175,7 +175,7 @@ this.PreferenceExperiments = {
 
     const preferences = PreferenceBranchType[preferenceBranchType];
     if (!preferences) {
-      throw new  Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
+      throw new Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
     }
 
     /** @type {Experiment} */

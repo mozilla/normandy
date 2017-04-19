@@ -20,7 +20,7 @@ function loadStorage() {
   if (storePromise === undefined) {
     const path = OS.Path.join(OS.Constants.Path.profileDir, "shield-recipe-client.json");
     const storage = new JSONFile({path});
-    storePromise = (async function () {
+    storePromise = (async function() {
       await storage.load();
       return storage;
     })();
