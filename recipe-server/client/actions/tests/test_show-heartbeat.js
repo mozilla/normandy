@@ -120,6 +120,15 @@ describe('ShowHeartbeatAction', () => {
 
         jasmine.clock().uninstall();
       });
+
+      it('should NOT show even if the lastShown date is malformed', async() => {
+        const onceRecipe = recipeFactory();
+        const action = new ShowHeartbeatAction(normandy, onceRecipe);
+        normandy.mock.storage.data.lastShown = 'ROYALTY GOT LOYALTY INSIDE MY DNA';
+
+        await action.execute();
+        expect(normandy.showHeartbeat).not.toHaveBeenCalled();
+      });
     });
 
 

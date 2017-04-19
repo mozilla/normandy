@@ -45,7 +45,7 @@ this.RecipeRunner = {
     CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
 
     // Watch for the run interval to change, and re-register the timer with the new value
-    prefs.addObserver(RUN_INTERVAL_PREF, this, false);
+    prefs.addObserver(RUN_INTERVAL_PREF, this);
     CleanupManager.addCleanupHandler(() => prefs.removeObserver(RUN_INTERVAL_PREF, this));
   },
 

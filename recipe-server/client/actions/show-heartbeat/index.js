@@ -84,17 +84,16 @@ export default class ShowHeartbeatAction extends Action {
   }
 
   /**
-   * Checks when this survey was last shown,
-   * and returns a boolean indicating if the
-   * user has ever seen this survey or not.
-   *
+   * Return whether this survey has been seen by the user before.
+
    * @async
-   * @return {Boolean}  Has the survey ever been shown?
+   * @return {Boolean}
    */
   async hasShownBefore() {
-    const lastShown = await this.getLastShown();
-    // If no survey has been shown, lastShown will be falsey.
-    return !!lastShown;
+    // Even if the stored date is unparsable due to weirdness in the user's
+    // storage, if there's _something_ stored then we probably have shown at
+    // least once.
+    return await this.storage.getItem('lastShown') !== null;
   }
 
   /**
