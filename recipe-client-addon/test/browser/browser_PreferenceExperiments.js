@@ -22,7 +22,7 @@ function experimentFactory(attrs) {
 }
 
 // clearAllExperimentStorage
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
   ok(await PreferenceExperiments.has("test"), "Mock experiment is detected.");
   await PreferenceExperiments.clearAllExperimentStorage();
@@ -33,7 +33,7 @@ add_task(withMockExperiments(async function (experiments) {
 }));
 
 // start should throw if an experiment with the given name already exists
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
   await Assert.rejects(
     PreferenceExperiments.start({
@@ -48,7 +48,7 @@ add_task(withMockExperiments(async function (experiments) {
 }));
 
 // start should throw if an experiment for the given preference is active
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test", preferenceName: "fake.preference"});
   await Assert.rejects(
     PreferenceExperiments.start({
@@ -63,7 +63,7 @@ add_task(withMockExperiments(async function (experiments) {
 }));
 
 // start should throw if an invalid preferenceBranchType is given
-add_task(withMockExperiments(async function () {
+add_task(withMockExperiments(async function() {
   await Assert.rejects(
     PreferenceExperiments.start({
       name: "test",
@@ -78,7 +78,7 @@ add_task(withMockExperiments(async function () {
 
 // start should save experiment data, modify the preference, and register a
 // watcher.
-add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "default");
   mockPreferences.set("fake.preference", "uservalue", "user");
@@ -124,7 +124,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 })));
 
 // start should modify the user preference for the user branch type
-add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "user");
   mockPreferences.set("fake.preference", "olddefaultvalue", "default");
@@ -166,7 +166,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 
 // startObserver should throw if an observer for the experiment is already
 // active.
-add_task(async function () {
+add_task(async function() {
   PreferenceExperiments.startObserver("test", "fake.preference", "newvalue");
   Assert.throws(
     () => PreferenceExperiments.startObserver("test", "another.fake", "othervalue"),
@@ -177,7 +177,7 @@ add_task(async function () {
 
 // startObserver should register an observer that calls stop when a preference
 // changes from its experimental value.
-add_task(withMockPreferences(async function (mockPreferences) {
+add_task(withMockPreferences(async function(mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
 
@@ -197,7 +197,7 @@ add_task(withMockPreferences(async function (mockPreferences) {
 }));
 
 // startObserver should observe changes to the default preference value.
-add_task(withMockPreferences(async function (mockPreferences) {
+add_task(withMockPreferences(async function(mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue", "default");
 
@@ -229,7 +229,7 @@ add_task(async function testHasObserver() {
 });
 
 // stopObserver should throw if there is no observer active for it to stop.
-add_task(async function () {
+add_task(async function() {
   Assert.throws(
     () => PreferenceExperiments.stopObserver("neveractive", "another.fake", "othervalue"),
     "stopObserver threw because there was not matching active observer",
@@ -237,7 +237,7 @@ add_task(async function () {
 });
 
 // stopObserver should cancel an active observer.
-add_task(withMockPreferences(async function (mockPreferences) {
+add_task(withMockPreferences(async function(mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
 
@@ -262,7 +262,7 @@ add_task(withMockPreferences(async function (mockPreferences) {
 }));
 
 // stopAllObservers
-add_task(withMockPreferences(async function (mockPreferences) {
+add_task(withMockPreferences(async function(mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
   mockPreferences.set("other.fake.preference", "startvalue");
@@ -291,7 +291,7 @@ add_task(withMockPreferences(async function (mockPreferences) {
 }));
 
 // markLastSeen should throw if it can't find a matching experiment
-add_task(async function () {
+add_task(async function() {
   await Assert.rejects(
     PreferenceExperiments.markLastSeen("neveractive"),
     "markLastSeen threw because there was not a matching experiment",
@@ -299,7 +299,7 @@ add_task(async function () {
 });
 
 // markLastSeen should update the lastSeen date
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   const oldDate = new Date(1988, 10, 1).toJSON();
   experiments["test"] = experimentFactory({name: "test", lastSeen: oldDate});
   await PreferenceExperiments.markLastSeen("test");
@@ -311,7 +311,7 @@ add_task(withMockExperiments(async function (experiments) {
 }));
 
 // stop should throw if an experiment with the given name doesn't exist
-add_task(withMockExperiments(async function () {
+add_task(withMockExperiments(async function() {
   await Assert.rejects(
     PreferenceExperiments.stop("test"),
     "stop threw an error because there are no experiments with the given name",
@@ -319,7 +319,7 @@ add_task(withMockExperiments(async function () {
 }));
 
 // stop should throw if the experiment is already expired
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test", expired: true});
   await Assert.rejects(
     PreferenceExperiments.stop("test"),
@@ -329,7 +329,7 @@ add_task(withMockExperiments(async function (experiments) {
 
 // stop should mark the experiment as expired, stop its observer, and revert the
 // preference value.
-add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.spy(PreferenceExperiments, "stopObserver");
   mockPreferences.set("fake.preference", "experimentvalue", "default");
   experiments["test"] = experimentFactory({
@@ -356,7 +356,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 })));
 
 // stop should also support user pref experiments
-add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
   mockPreferences.set("fake.preference", "experimentvalue", "user");
   experiments["test"] = experimentFactory({
@@ -383,7 +383,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 })));
 
 // stop should not call stopObserver if there is no observer registered.
-add_task(withMockExperiments(withMockPreferences(async function (experiments) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments) {
   const stopObserver = sinon.spy(PreferenceExperiments, "stopObserver");
   experiments["test"] = experimentFactory({name: "test", expired: false});
 
@@ -395,7 +395,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments) {
 })));
 
 // stop should remove a preference that had no value prior to an experiment for user prefs
-add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
   mockPreferences.set("fake.preference", "experimentvalue", "user");
   experiments["test"] = experimentFactory({
@@ -417,7 +417,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 })));
 
 // stop should not modify a preference if resetValue is false
-add_task(withMockExperiments(withMockPreferences(async function (experiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
   mockPreferences.set("fake.preference", "customvalue", "default");
   experiments["test"] = experimentFactory({
@@ -440,7 +440,7 @@ add_task(withMockExperiments(withMockPreferences(async function (experiments, mo
 })));
 
 // get should throw if no experiment exists with the given name
-add_task(withMockExperiments(async function () {
+add_task(withMockExperiments(async function() {
   await Assert.rejects(
     PreferenceExperiments.get("neverexisted"),
     "get rejects if no experiment with the given name is found",
@@ -448,7 +448,7 @@ add_task(withMockExperiments(async function () {
 }));
 
 // get
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   const experiment = experimentFactory({name: "test"});
   experiments["test"] = experiment;
 
@@ -510,7 +510,7 @@ add_task(withMockExperiments(withMockPreferences(async function testGetAllActive
 })));
 
 // has
-add_task(withMockExperiments(async function (experiments) {
+add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
   ok(await PreferenceExperiments.has("test"), "has returned true for a stored experiment");
   ok(!(await PreferenceExperiments.has("missing")), "has returned false for a missing experiment");
