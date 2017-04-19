@@ -184,7 +184,7 @@ add_task(withMockPreferences(async function(mockPreferences) {
       preferenceName: "fake.type_preference",
       preferenceBranchType: "user",
       preferenceValue: 12345,
-      preferenceType: "integer"
+      preferenceType: "integer",
     }),
     "start threw error for incompatible preference type"
   );
