@@ -126,7 +126,6 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
 // start should modify the user preference for the user branch type
 add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
-  mockPreferences.set("fake.preference", "defaultvalue", "default");
   mockPreferences.set("fake.preference", "oldvalue", "user");
   mockPreferences.set("fake.preference", "olddefaultvalue", "default");
 
@@ -312,8 +311,6 @@ add_task(withMockExperiments(async function(experiments) {
 // preference value.
 add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.spy(PreferenceExperiments, "stopObserver");
-  const hasObserver = sinon.stub(PreferenceExperiments, "hasObserver");
-  hasObserver.returns(Promise.resolve(true));
 
   mockPreferences.set("fake.preference", "experimentvalue", "default");
   experiments["test"] = experimentFactory({
@@ -335,7 +332,6 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
     "stop reverted the preference to its previous value",
   );
 
-  hasObserver.restore();
   stopObserver.restore();
   PreferenceExperiments.stopAllObservers();
 })));
@@ -381,7 +377,6 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments) {
 // stop should remove a preference that had no value prior to an experiment for user prefs
 add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
-  mockPreferences.set("fake.preference", "defaultvalue", "default");
   mockPreferences.set("fake.preference", "experimentvalue", "user");
   experiments["test"] = experimentFactory({
     name: "test",
