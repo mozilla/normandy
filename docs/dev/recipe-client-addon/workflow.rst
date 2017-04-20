@@ -86,6 +86,6 @@ installed within to get the eslint plugins we rely on:
 
    cd recipe-client-addon
    npm install
-   ./node_modules/.bin/eslint
+   ./node_modules/.bin/eslint .
 
 .. _eslint: http://eslint.org/
