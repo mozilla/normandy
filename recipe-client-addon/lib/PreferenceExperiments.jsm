@@ -203,16 +203,16 @@ this.PreferenceExperiments = {
       preferenceBranchType,
     };
 
-    const existingPreferenceType = Services.prefs.getPrefType(preferenceName);
-    const givenType = PREFERENCE_TYPE_MAP[preferenceType];
+    const prevPrefType = Services.prefs.getPrefType(preferenceName);
+    const givenPrefType = PREFERENCE_TYPE_MAP[preferenceType];
 
-    if (!preferenceType || !givenType) {
+    if (!preferenceType || !givenPrefType) {
       throw new Error(`Invalid preferenceType provided (given "${preferenceType}")`);
     }
 
-    if (existingPreferenceType && existingPreferenceType !== givenType) {
+    if (prevPrefType !== Services.prefs.PREF_INVALID && prevPrefType !== givenPrefType) {
       throw new Error(
-        `Previous preference value is of type "${existingPreferenceType}", but was given "${givenType}" (${preferenceType})`
+        `Previous preference value is of type "${prevPrefType}", but was given "${givenPrefType}" (${preferenceType})`
       );
     }
 
