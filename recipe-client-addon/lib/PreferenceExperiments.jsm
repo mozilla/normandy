@@ -34,11 +34,15 @@
  *   Name of the preference affected by this experiment.
  * @property {string|integer|boolean} preferenceValue
  *   Value to change the preference to during the experiment.
+ * @property {string} preferenceType
+ *   Type of the preference value being set.
  * @property {string|integer|boolean|undefined} previousPreferenceValue
  *   Value of the preference prior to the experiment, or undefined if it was
  *   unset.
  * @property {PreferenceBranchType} preferenceBranchType
  *   Controls how we modify the preference to affect the client.
+ * @rejects {Error}
+ *   If the given preferenceType does not match the existing stored preference.
  *
  *   If "default", when the experiment is active, the default value for the
  *   preference is modified on startup of the add-on. If "user", the user value
@@ -51,6 +55,7 @@
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "Services", "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager", "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "JSONFile", "resource://gre/modules/JSONFile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
@@ -61,6 +66,13 @@ XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
 const EXPERIMENT_FILE = "shield-preference-experiments.json";
+
+const PREFERENCE_TYPE_MAP = {
+  boolean: Services.prefs.PREF_BOOL,
+  string: Services.prefs.PREF_STRING,
+  integer: Services.prefs.PREF_INT,
+};
+
 const DefaultPreferences = new Preferences({defaultBranch: true});
 
 /**
@@ -155,7 +167,7 @@ this.PreferenceExperiments = {
    *   If an experiment with the given name already exists, or if an experiment
    *   for the given preference is active.
    */
-  async start({name, branch, preferenceName, preferenceValue, preferenceBranchType}) {
+  async start({name, branch, preferenceName, preferenceValue, preferenceBranchType, preferenceType}) {
     log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
     const store = await ensureStorage();
@@ -186,9 +198,23 @@ this.PreferenceExperiments = {
       lastSeen: new Date().toJSON(),
       preferenceName,
       preferenceValue,
+      preferenceType,
       previousPreferenceValue: preferences.get(preferenceName, undefined),
       preferenceBranchType,
     };
+
+    const prevPrefType = Services.prefs.getPrefType(preferenceName);
+    const givenPrefType = PREFERENCE_TYPE_MAP[preferenceType];
+
+    if (!preferenceType || !givenPrefType) {
+      throw new Error(`Invalid preferenceType provided (given "${preferenceType}")`);
+    }
+
+    if (prevPrefType !== Services.prefs.PREF_INVALID && prevPrefType !== givenPrefType) {
+      throw new Error(
+        `Previous preference value is of type "${prevPrefType}", but was given "${givenPrefType}" (${preferenceType})`
+      );
+    }
 
     preferences.set(preferenceName, preferenceValue);
     PreferenceExperiments.startObserver(name, preferenceName, preferenceValue);

@@ -23,7 +23,9 @@ export default class PreferenceExperimentAction extends Action {
     //
     // Once we remove self-repair support, we should be able to use native
     // async/await anyway, which solves the issue.
-    const { slug, preferenceName, preferenceBranchType, branches } = this.recipe.arguments;
+    const {
+      slug, preferenceName, preferenceBranchType, branches, preferenceType
+    } = this.recipe.arguments;
     const experiments = this.normandy.preferenceExperiments;
 
     // Exit early if we're on an incompatible client.
@@ -43,6 +45,7 @@ export default class PreferenceExperimentAction extends Action {
             preferenceName,
             preferenceValue: branch.value,
             preferenceBranchType,
+            preferenceType,
           })
         );
       }
