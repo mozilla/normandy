@@ -34,15 +34,14 @@ Writing and Running Tests
 The recipe client tests are designed to be run using mozilla-central's test
 frameworks. There are multiple test suites:
 
-* xpcshell_ tests, located in ``/recipe-client-addon/test/unit``, are run in a
-  JavaScript shell. Some modules do not work in this environment because it
-  lacks things like access to a browser window, but the test output is more
-  readable, and executing tests does not require focus.
-
 * mochitest_ tests, located in ``/recipe-client-addon/test/browser``, are run in
   a webpage that can import and run chrome code. Mochitest can test pretty much
   anything, but running the test requires you to focus the browser windows that
   the test framework opens, and the test output is sometimes difficult to read.
+
+* xpcshell_ tests, located in ``/recipe-client-addon/test/unit``, are run in a
+  JavaScript shell. We are planning to migrate these tests to mochitest; do not
+  write new tests as xpcshell tests where possible.
 
 To run the tests, you must sync your code do mozilla-central, and use the
 ``./mach test`` command:
