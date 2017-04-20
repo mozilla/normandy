@@ -12,7 +12,7 @@ from normandy.recipes.tests import (
     RecipeFactory,
 )
 from normandy.recipes.api.serializers import (
-    ActionSerializer, RecipeSerializer, SignedRecipeSerializer)
+    ActionSerializer, RecipeRevisionSerializer, RecipeSerializer, SignedRecipeSerializer)
 
 
 @pytest.mark.django_db()
@@ -45,6 +45,8 @@ class TestRecipeSerializer:
             'is_approved': False,
             'latest_revision_id': recipe.latest_revision.id,
             'approved_revision_id': recipe.approved_revision_id,
+            'latest_revision': RecipeRevisionSerializer(recipe.latest_revision).data,
+            'approved_revision': None,
             'approval_request': {
                 'id': approval.id,
                 'created': Whatever(),
@@ -220,6 +222,8 @@ class TestSignedRecipeSerializer:
                 'is_approved': False,
                 'latest_revision_id': recipe.latest_revision.id,
                 'approved_revision_id': recipe.approved_revision_id,
+                'latest_revision': RecipeRevisionSerializer(recipe.latest_revision).data,
+                'approved_revision': None,
                 'approval_request': None,
             }
         }
