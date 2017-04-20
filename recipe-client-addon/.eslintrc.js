@@ -1,7 +1,10 @@
 "use strict";
 
 module.exports = {
-  extends: "eslint:recommended",
+  extends: [
+    "eslint:recommended",
+    "plugin:mozilla/recommended",
+  ],
 
   plugins: [
     "mozilla",
