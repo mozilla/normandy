@@ -75,9 +75,9 @@ add_task(async function() {
   // preferenceValue can take a default value as an optional argument, which
   // defaults to `undefined`.
   val = await FilterExpressions.eval('"normandy.test.default"|preferenceValue(false) == false');
-  ok(val, `preferenceValue takes optional 'default value' param for prefs without set values`);
+  ok(val, "preferenceValue takes optional 'default value' param for prefs without set values");
   val = await FilterExpressions.eval('"normandy.test.value"|preferenceValue(5) == 5');
-  ok(!val, `preferenceValue default param is not returned for prefs with set values`);
+  ok(!val, "preferenceValue default param is not returned for prefs with set values");
 
   // Compare if the preference is user set
   val = await FilterExpressions.eval('"normandy.test.isSet"|preferenceIsUserSet == true');
