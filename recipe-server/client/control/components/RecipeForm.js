@@ -341,7 +341,7 @@ export class RecipeForm extends React.Component {
       <form className="recipe-form" onSubmit={handleSubmit}>
         { RecipeForm.renderCloningMessage(this.props) }
         {
-          revision &&
+          !renderVars.isCloning && revision &&
             <DraftStatus
               latestRevisionId={recipe.latest_revision_id}
               lastApprovedRevisionId={lastApprovedRevisionId}
@@ -350,7 +350,8 @@ export class RecipeForm extends React.Component {
         }
 
         {
-          thisRevisionRequest
+          !renderVars.isCloning
+          && thisRevisionRequest
           && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
           && (
             <div className="approval-status">
@@ -366,6 +367,7 @@ export class RecipeForm extends React.Component {
         }
 
         {
+          !renderVars.isCloning &&
           recipe && (
             <RecipeStatus
               className={renderVars.isEnabled ? 'green' : 'red'}

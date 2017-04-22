@@ -36,7 +36,7 @@ export default (
           ]}
         />
         <Route
-          path="revision/:revisionId"
+          path="revision/:revisionId/"
           component={RecipeForm}
           name="Revision"
           ctaButtons={[
