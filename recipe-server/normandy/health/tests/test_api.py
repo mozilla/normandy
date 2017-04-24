@@ -70,44 +70,44 @@ class TestGetVersionInfo(object):
         return f
 
     @pytest.fixture
-    def clear_version_info_cache(self):
+    def clear_version_info(self):
         """Clear the cache for get_version_info() after each test run"""
         try:
             yield
         finally:
             views.get_version_info.cache_clear()
 
-    def test_with_everything(self, commit_file, tag_file, build_time_file, clear_version_info_cache):
+    def test_with_everything(self, commit_file, tag_file, build_time_file, clear_version_info):
         version_info = views.get_version_info()
         assert version_info['commit'] == commit_file.commit
         assert version_info['version'] == tag_file.tag
         assert version_info['build_time'] == build_time_file.datetime
 
-    def test_with_only_commit(self, commit_file, clear_version_info_cache):
+    def test_with_only_commit(self, commit_file, clear_version_info):
         version_info = views.get_version_info()
         assert version_info['commit'] == commit_file.commit
-        assert version_info['version'] == None
-        assert version_info['build_time'] == None
+        assert version_info['version'] is None
+        assert version_info['build_time'] is None
 
-    def test_with_only_tag(self, tag_file, clear_version_info_cache):
+    def test_with_only_tag(self, tag_file, clear_version_info):
         version_info = views.get_version_info()
-        assert version_info['commit'] == None
+        assert version_info['commit'] is None
         assert version_info['version'] == tag_file.tag
-        assert version_info['build_time'] == None
+        assert version_info['build_time'] is None
 
-    def test_with_only_build_time(self, build_time_file, clear_version_info_cache):
+    def test_with_only_build_time(self, build_time_file, clear_version_info):
         version_info = views.get_version_info()
-        assert version_info['commit'] == None
-        assert version_info['version'] == None
+        assert version_info['commit'] is None
+        assert version_info['version'] is None
         assert version_info['build_time'] == build_time_file.datetime
 
-    def test_with_nothing(self, version_info_dir, clear_version_info_cache):
+    def test_with_nothing(self, version_info_dir, clear_version_info):
         version_info = views.get_version_info()
-        assert version_info['commit'] == None
-        assert version_info['version'] == None
-        assert version_info['build_time'] == None
+        assert version_info['commit'] is None
+        assert version_info['version'] is None
+        assert version_info['build_time'] is None
 
-    def test_it_is_cached(self, commit_file, tag_file, build_time_file, clear_version_info_cache):
+    def test_it_is_cached(self, commit_file, tag_file, build_time_file, clear_version_info):
         version_info = views.get_version_info()
         commit_file.remove()
         tag_file.remove()
