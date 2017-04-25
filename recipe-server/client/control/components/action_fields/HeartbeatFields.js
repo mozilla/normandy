@@ -10,12 +10,16 @@ import ActionFields from 'control/components/action_fields/ActionFields';
  */
 export class HeartbeatFields extends ActionFields {
   static propTypes = {
-    recipeArguments: pt.object.required,
+    recipeArguments: pt.object.isRequired,
     disabled: pt.bool,
   }
 
   render() {
-    const { recipeArguments, disabled } = this.props;
+    const {
+      recipeArguments,
+      disabled,
+    } = this.props;
+
     return (
       <div className="arguments-fields">
         <p className="info">
@@ -87,7 +91,7 @@ export class HeartbeatFields extends ActionFields {
           `}</option>
           <option value="xdays">{`
             Allow re-prompting users who have already seen this prompt
-            after ${(recipeArguments && recipeArguments.repeatEvery) || 'X'}
+            after ${recipeArguments.repeatEvery || 'X'}
             days since they last saw it.
           `}</option>
         </ControlField>
@@ -117,6 +121,6 @@ export class HeartbeatFields extends ActionFields {
 
 export default connect(
   state => ({
-    recipeArguments: selector(state, 'arguments'),
+    recipeArguments: selector(state, 'arguments') || {},
   })
 )(HeartbeatFields);
