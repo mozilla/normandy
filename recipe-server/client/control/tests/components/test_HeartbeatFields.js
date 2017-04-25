@@ -2,19 +2,12 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
+import { HeartbeatFields } from 'control/components/action_fields/HeartbeatFields';
 
 describe('<HeartbeatFields>', () => {
-  it('should render when a `fields` prop is given', () => {
+  it('should render when a `recipeArguments` prop is given', () => {
     const wrapper = () =>
-      shallow(<HeartbeatFields fields={{}} />);
-
-    expect(wrapper).not.toThrow();
-  });
-
-  it('should render when a `fields` prop is not given', () => {
-    const wrapper = () =>
-      shallow(<HeartbeatFields />);
+      shallow(<HeartbeatFields recipeArguments={{}} />);
 
     expect(wrapper).not.toThrow();
   });

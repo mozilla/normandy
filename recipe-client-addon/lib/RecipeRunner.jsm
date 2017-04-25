@@ -13,8 +13,8 @@ Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
+Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Storage",
@@ -96,6 +96,22 @@ this.RecipeRunner = {
       await ClientEnvironment.getClientClassification();
     }
 
+    const actionSandboxManagers = await this.loadActionSandboxManagers();
+    Object.values(actionSandboxManagers).forEach(manager => manager.addHold("recipeRunner"));
+
+    // Run pre-execution hooks. If a hook fails, we don't run recipes with that
+    // action to avoid inconsistencies.
+    for (const [actionName, manager] of Object.entries(actionSandboxManagers)) {
+      try {
+        await manager.runAsyncCallback("preExecution");
+        manager.disabled = false;
+      } catch (err) {
+        log.error(`Could not run pre-execution hook for ${actionName}:`, err.message);
+        manager.disabled = true;
+      }
+    }
+
+    // Fetch recipes from the API
     let recipes;
     try {
       recipes = await NormandyApi.fetchRecipes({enabled: true});
@@ -105,26 +121,71 @@ this.RecipeRunner = {
       return;
     }
 
+    // Evaluate recipe filters
     const recipesToRun = [];
-
     for (const recipe of recipes) {
       if (await this.checkFilter(recipe)) {
         recipesToRun.push(recipe);
       }
     }
 
+    // Execute recipes, if we have any.
     if (recipesToRun.length === 0) {
       log.debug("No recipes to execute");
     } else {
       for (const recipe of recipesToRun) {
-        try {
-          log.debug(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
-          await this.executeRecipe(recipe);
-        } catch (e) {
-          log.error(`Could not execute recipe ${recipe.name}:`, e);
+        const manager = actionSandboxManagers[recipe.action];
+        if (!manager) {
+          log.error(
+            `Could not execute recipe ${recipe.name}:`,
+            `Action ${recipe.action} is either missing or invalid.`
+          );
+        } else if (manager.disabled) {
+          log.warn(
+            `Skipping recipe ${recipe.name} because ${recipe.action} failed during pre-execution.`
+          );
+        } else {
+          try {
+            log.info(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
+            await manager.runAsyncCallback("action", recipe);
+          } catch (e) {
+            log.error(`Could not execute recipe ${recipe.name}:`, e);
+          }
         }
       }
     }
+
+    // Run post-execution hooks
+    for (const [actionName, manager] of Object.entries(actionSandboxManagers)) {
+      // Skip if pre-execution failed.
+      if (manager.disabled) {
+        log.info(`Skipping post-execution hook for ${actionName} due to earlier failure.`);
+        continue;
+      }
+
+      try {
+        await manager.runAsyncCallback("postExecution");
+      } catch (err) {
+        log.info(`Could not run post-execution hook for ${actionName}:`, err.message);
+      }
+    }
+
+    // Nuke sandboxes
+    Object.values(actionSandboxManagers).forEach(manager => manager.removeHold("recipeRunner"));
+  },
+
+  async loadActionSandboxManagers() {
+    const actions = await NormandyApi.fetchActions();
+    const actionSandboxManagers = {};
+    for (const action of actions) {
+      try {
+        const implementation = await NormandyApi.fetchImplementation(action);
+        actionSandboxManagers[action.name] = new ActionSandboxManager(implementation);
+      } catch (err) {
+        log.warn(`Could not fetch implementation for ${action.name}:`, err);
+      }
+    }
+    return actionSandboxManagers;
   },
 
   getFilterContext(recipe) {
@@ -156,67 +217,6 @@ this.RecipeRunner = {
       log.error(`Error: "${err}"`);
       return false;
     }
-  },
-
-  /**
-   * Execute a recipe by fetching it action and executing it.
-   * @param  {Object} recipe A recipe to execute
-   * @promise Resolves when the action has executed
-   */
-  async executeRecipe(recipe) {
-    const action = await NormandyApi.fetchAction(recipe.action);
-    const response = await fetch(action.implementation_url);
-
-    const actionScript = await response.text();
-    await this.executeAction(recipe, actionScript);
-  },
-
-  /**
-   * Execute an action in a sandbox for a specific recipe.
-   * @param  {Object} recipe A recipe to execute
-   * @param  {String} actionScript The JavaScript for the action to execute.
-   * @promise Resolves or rejects when the action has executed or failed.
-   */
-  executeAction(recipe, actionScript) {
-    return new Promise((resolve, reject) => {
-      const sandboxManager = new SandboxManager();
-      const prepScript = `
-        function registerAction(name, Action) {
-          let a = new Action(sandboxedDriver, sandboxedRecipe);
-          a.execute()
-            .then(actionFinished)
-            .catch(actionFailed);
-        };
-
-        this.window = this;
-        this.registerAction = registerAction;
-        this.setTimeout = sandboxedDriver.setTimeout;
-        this.clearTimeout = sandboxedDriver.clearTimeout;
-      `;
-
-      const driver = new NormandyDriver(sandboxManager);
-      sandboxManager.cloneIntoGlobal("sandboxedDriver", driver, {cloneFunctions: true});
-      sandboxManager.cloneIntoGlobal("sandboxedRecipe", recipe);
-
-      // Results are cloned so that they don't become inaccessible when
-      // the sandbox they came from is nuked when the hold is removed.
-      sandboxManager.addGlobal("actionFinished", result => {
-        const clonedResult = Cu.cloneInto(result, {});
-        sandboxManager.removeHold("recipeExecution");
-        resolve(clonedResult);
-      });
-      sandboxManager.addGlobal("actionFailed", err => {
-        // Error objects can't be cloned, so we just copy the message
-        // (which doesn't need to be cloned) to be somewhat useful.
-        const message = err.message;
-        sandboxManager.removeHold("recipeExecution");
-        reject(new Error(message));
-      });
-
-      sandboxManager.addHold("recipeExecution");
-      sandboxManager.evalInSandbox(prepScript);
-      sandboxManager.evalInSandbox(actionScript);
-    });
   },
 
   /**

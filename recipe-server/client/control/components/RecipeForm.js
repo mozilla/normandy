@@ -39,12 +39,20 @@ import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+import PreferenceExperimentFields from
+  'control/components/action_fields/PreferenceExperimentFields';
 import RecipeStatus from 'control/components/RecipeStatus';
 import DraftStatus from 'control/components/DraftStatus';
 import BooleanIcon from 'control/components/BooleanIcon';
 
-
 export const selector = formValueSelector('recipe');
+
+// The arguments field is handled in initialValuesWrapper.
+const DEFAULT_FORM_VALUES = {
+  name: '',
+  extra_filter_expression: '',
+  action: '',
+};
 
 /**
  * Form for creating new recipes or editing existing recipes.
@@ -64,7 +72,6 @@ export class RecipeForm extends React.Component {
     }),
     revision: pt.object,
     allRevisions: pt.object,
-    recipeFields: pt.object,
     user: pt.object,
     dispatch: pt.func.isRequired,
     // route props passed from router
@@ -77,6 +84,7 @@ export class RecipeForm extends React.Component {
   static argumentsFields = {
     'console-log': ConsoleLogFields,
     'show-heartbeat': HeartbeatFields,
+    'preference-experiment': PreferenceExperimentFields,
   };
 
   static LoadingSpinner = (
@@ -318,7 +326,6 @@ export class RecipeForm extends React.Component {
       recipe,
       revision,
       recipeId,
-      recipeFields,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -403,9 +410,10 @@ export class RecipeForm extends React.Component {
           <option value="">Choose an action...</option>
           <option value="console-log">Log to Console</option>
           <option value="show-heartbeat">Heartbeat Prompt</option>
+          <option value="preference-experiment">Preference Experiment</option>
         </ControlField>
 
-        <ArgumentsFields disabled={isFormDisabled} fields={recipeFields} />
+        <ArgumentsFields disabled={isFormDisabled} />
 
         <RecipeFormActions
           onAction={this.handleFormAction}
@@ -424,6 +432,7 @@ export const formConfig = {
   form: 'recipe',
   enableReinitialize: true,
   asyncBlurFields: ['extra_filter_expression'],
+  keepDirtyOnReinitialize: true,
 
   async asyncValidate(values) {
     const errors = {};
@@ -480,15 +489,27 @@ export const formConfig = {
  */
 export function initialValuesWrapper(Component) {
   function Wrapped(props) {
-    const { recipe, revision } = props;
+    const { recipe, revision, selectedAction } = props;
+    let initialValues = revision || recipe;
 
-    const initialValues = revision || recipe;
+    // If we still don't have initial values, roll with the defaults.
+    if (!initialValues) {
+      initialValues = { ...DEFAULT_FORM_VALUES, arguments: {} };
+
+      // ActionField subclasses define their own initial values.
+      if (selectedAction) {
+        const ActionFields = RecipeForm.argumentsFields[selectedAction];
+        initialValues.arguments = { ...ActionFields.initialValues };
+      }
+    }
+
     return <Component initialValues={initialValues} {...props} />;
   }
   Wrapped.propTypes = {
     recipe: pt.object,
     revision: pt.object,
     location: locationShape,
+    selectedAction: pt.string,
   };
 
   return Wrapped;
@@ -498,7 +519,6 @@ const connector = connect(
   // Pull selected action from the form state.
   state => ({
     selectedAction: selector(state, 'action'),
-    recipeFields: selector(state, 'arguments'),
     user: state.user,
     allRevisions: state.recipes.revisions,
   }),
@@ -529,7 +549,7 @@ const connector = connect(
 // Use reduce to call several wrapper functions in a row.
 export default [
   reduxForm(formConfig),
-  connector,
   initialValuesWrapper,
+  connector,
   composeRecipeContainer,
 ].reduce((prev, func) => func(prev), RecipeForm);

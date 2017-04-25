@@ -234,7 +234,7 @@ class TestRecipeAPI(object):
         assert recipe.action == action
 
     def test_it_can_change_arguments_for_recipes(self, api_client):
-        recipe = RecipeFactory(arguments_json='')
+        recipe = RecipeFactory(arguments_json='{}')
         action = ActionFactory(
             name='foobarbaz',
             arguments_schema={

@@ -4,89 +4,8 @@ Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
-
-add_task(async function execute() {
-  // Test that RecipeRunner can execute a basic recipe/action and return
-  // the result of execute.
-  const recipe = {
-    foo: "bar",
-  };
-  const actionScript = `
-    class TestAction {
-      constructor(driver, recipe) {
-        this.recipe = recipe;
-      }
-
-      execute() {
-        return new Promise(resolve => {
-          resolve({foo: this.recipe.foo});
-        });
-      }
-    }
-
-    registerAction('test-action', TestAction);
-  `;
-
-  const result = await RecipeRunner.executeAction(recipe, actionScript);
-  is(result.foo, "bar", "Recipe executed correctly");
-});
-
-add_task(async function error() {
-  // Test that RecipeRunner rejects with error messages from within the
-  // sandbox.
-  const actionScript = `
-    class TestAction {
-      execute() {
-        return new Promise((resolve, reject) => {
-          reject(new Error("ERROR MESSAGE"));
-        });
-      }
-    }
-
-    registerAction('test-action', TestAction);
-  `;
-
-  let gotException = false;
-  try {
-    await RecipeRunner.executeAction({}, actionScript);
-  } catch (err) {
-    gotException = true;
-    is(err.message, "ERROR MESSAGE", "RecipeRunner throws errors from the sandbox correctly.");
-  }
-  ok(gotException, "RecipeRunner threw an error from the sandbox.");
-});
-
-add_task(async function globalObject() {
-  // Test that window is an alias for the global object, and that it
-  // has some expected functions available on it.
-  const actionScript = `
-    window.setOnWindow = "set";
-    this.setOnGlobal = "set";
-
-    class TestAction {
-      execute() {
-        return new Promise(resolve => {
-          resolve({
-            setOnWindow: setOnWindow,
-            setOnGlobal: window.setOnGlobal,
-            setTimeoutExists: setTimeout !== undefined,
-            clearTimeoutExists: clearTimeout !== undefined,
-          });
-        });
-      }
-    }
-
-    registerAction('test-action', TestAction);
-  `;
-
-  const result = await RecipeRunner.executeAction({}, actionScript);
-  Assert.deepEqual(result, {
-    setOnWindow: "set",
-    setOnGlobal: "set",
-    setTimeoutExists: true,
-    clearTimeoutExists: true,
-  }, "sandbox.window is the global object and has expected functions.");
-});
+Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm", this);
 
 add_task(async function getFilterContext() {
   const recipe = {id: 17, arguments: {foo: "bar"}, unrelated: false};
@@ -145,7 +64,7 @@ add_task(async function checkFilter() {
   ok(!(await RecipeRunner.checkFilter(recipe)), "The recipe is available in the filter context");
 });
 
-add_task(async function testClientClassificationCache() {
+add_task(withMockNormandyApi(async function testClientClassificationCache() {
   const getStub = sinon.stub(ClientEnvironment, "getClientClassification")
     .returns(Promise.resolve(false));
 
@@ -172,7 +91,108 @@ add_task(async function testClientClassificationCache() {
   ok(!getStub.called, "getClientClassification was not called eagerly");
 
   getStub.restore();
-});
+}));
+
+/**
+ * Mocks RecipeRunner.loadActionSandboxManagers for testing run.
+ */
+async function withMockActionSandboxManagers(actions, testFunction) {
+  const managers = {};
+  for (const action of actions) {
+    managers[action.name] = new ActionSandboxManager("");
+    sinon.stub(managers[action.name], "runAsyncCallback");
+  }
+
+  const loadActionSandboxManagers = sinon.stub(
+    RecipeRunner,
+    "loadActionSandboxManagers",
+    async () => managers,
+  );
+  await testFunction(managers);
+  loadActionSandboxManagers.restore();
+}
+
+add_task(withMockNormandyApi(async function testRun(mockApi) {
+  const matchAction = {name: "matchAction"};
+  const noMatchAction = {name: "noMatchAction"};
+  mockApi.actions = [matchAction, noMatchAction];
+
+  const matchRecipe = {action: "matchAction", filter_expression: "true"};
+  const noMatchRecipe = {action: "noMatchAction", filter_expression: "false"};
+  const missingRecipe = {action: "missingAction", filter_expression: "true"};
+  mockApi.recipes = [matchRecipe, noMatchRecipe, missingRecipe];
+
+  await withMockActionSandboxManagers(mockApi.actions, async managers => {
+    const matchManager = managers["matchAction"];
+    const noMatchManager = managers["noMatchAction"];
+
+    await RecipeRunner.run();
+
+    // match should be called for preExecution, action, and postExecution
+    sinon.assert.calledWith(matchManager.runAsyncCallback, "preExecution");
+    sinon.assert.calledWith(matchManager.runAsyncCallback, "action", matchRecipe);
+    sinon.assert.calledWith(matchManager.runAsyncCallback, "postExecution");
+
+    // noMatch should be called for preExecution and postExecution, and skipped
+    // for action since the filter expression does not match.
+    sinon.assert.calledWith(noMatchManager.runAsyncCallback, "preExecution");
+    sinon.assert.neverCalledWith(noMatchManager.runAsyncCallback, "action", noMatchRecipe);
+    sinon.assert.calledWith(noMatchManager.runAsyncCallback, "postExecution");
+
+    // missing is never called at all due to no matching action/manager.
+    await matchManager.isNuked();
+    await noMatchManager.isNuked();
+  });
+}));
+
+add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) {
+  const passAction = {name: "passAction"};
+  const failAction = {name: "failAction"};
+  mockApi.actions = [passAction, failAction];
+
+  const passRecipe = {action: "passAction", filter_expression: "true"};
+  const failRecipe = {action: "failAction", filter_expression: "true"};
+  mockApi.recipes = [passRecipe, failRecipe];
+
+  await withMockActionSandboxManagers(mockApi.actions, async managers => {
+    const passManager = managers["passAction"];
+    const failManager = managers["failAction"];
+    failManager.runAsyncCallback.returns(Promise.reject(new Error("oh no")));
+
+    await RecipeRunner.run();
+
+    // pass should be called for preExecution, action, and postExecution
+    sinon.assert.calledWith(passManager.runAsyncCallback, "preExecution");
+    sinon.assert.calledWith(passManager.runAsyncCallback, "action", passRecipe);
+    sinon.assert.calledWith(passManager.runAsyncCallback, "postExecution");
+
+    // fail should only be called for preExecution, since it fails during that
+    sinon.assert.calledWith(failManager.runAsyncCallback, "preExecution");
+    sinon.assert.neverCalledWith(failManager.runAsyncCallback, "action", failRecipe);
+    sinon.assert.neverCalledWith(failManager.runAsyncCallback, "postExecution");
+
+    await passManager.isNuked();
+    await failManager.isNuked();
+  });
+}));
+
+add_task(withMockNormandyApi(async function testLoadActionSandboxManagers(mockApi) {
+  mockApi.actions = [
+    {name: "normalAction"},
+    {name: "missingImpl"},
+  ];
+  mockApi.implementations["normalAction"] = "window.scriptRan = true";
+
+  const managers = await RecipeRunner.loadActionSandboxManagers();
+  ok("normalAction" in managers, "Actions with implementations have managers");
+  ok(!("missingImpl" in managers), "Actions without implementations are skipped");
+
+  const normalManager = managers["normalAction"];
+  ok(
+    await normalManager.evalInSandbox("window.scriptRan"),
+    "Implementations are run in the sandbox",
+  );
+}));
 
 add_task(async function testStartup() {
   const runStub = sinon.stub(RecipeRunner, "run");

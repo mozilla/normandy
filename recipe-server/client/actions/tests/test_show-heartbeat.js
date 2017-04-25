@@ -86,7 +86,7 @@ describe('ShowHeartbeatAction', () => {
 
         expect(normandy.mock.storage.data.lastShown).toBeUndefined();
         await action.execute();
-        expect(normandy.mock.storage.data.lastShown).toEqual('10');
+        expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
 
       it('should show if it has not been shown already', async() => {
@@ -164,7 +164,7 @@ describe('ShowHeartbeatAction', () => {
 
         expect(normandy.mock.storage.data.lastShown).toBeUndefined();
         await action.execute();
-        expect(normandy.mock.storage.data.lastShown).toEqual('10');
+        expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
 
       it('should show if a user has not interacted with it', async () => {
@@ -240,7 +240,7 @@ describe('ShowHeartbeatAction', () => {
 
         expect(normandy.mock.storage.data.lastShown).toBeUndefined();
         await action.execute();
-        expect(normandy.mock.storage.data.lastShown).toEqual('10');
+        expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
     });
   });

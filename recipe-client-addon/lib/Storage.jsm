@@ -69,7 +69,7 @@ this.Storage = {
               if (!(prefix in store.data)) {
                 store.data[prefix] = {};
               }
-              store.data[prefix][keySuffix] = value;
+              store.data[prefix][keySuffix] = Cu.cloneInto(value, {});
               store.saveSoon();
               resolve();
             })

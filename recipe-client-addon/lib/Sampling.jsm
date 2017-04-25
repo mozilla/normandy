@@ -129,4 +129,45 @@ this.Sampling = {
 
     return Sampling.isHashInBucket(inputHash, wrappedStart, end, total);
   },
+
+  /**
+   * Sample over a list of ratios such that, over the input space, each ratio
+   * has a number of matches in correct proportion to the other ratios.
+   *
+   * For example, given the ratios:
+   *
+   * [1, 2, 3, 4]
+   *
+   * 10% of all inputs will return 0, 20% of all inputs will return 1, 30% will
+   * return 2, and 40% will return 3. You can determine the percent of inputs
+   * that will return an index by dividing the ratio by the sum of all ratios
+   * passed in. In the case above, 4 / (1 + 2 + 3 + 4) == 0.4, or 40% of the
+   * inputs.
+   *
+   * @param {object} input
+   * @param {Array<integer>} ratios
+   * @promises {integer}
+   *   Index of the ratio that matched the input
+   * @rejects {Error}
+   *   If the list of ratios doesn't have at least one element
+   */
+  async ratioSample(input, ratios) {
+    if (ratios.length < 1) {
+      throw new Error(`ratios must be at least 1 element long (got length: ${ratios.length})`);
+    }
+
+    const inputHash = await Sampling.truncatedHash(input);
+    const ratioTotal = ratios.reduce((acc, ratio) => acc + ratio);
+
+    let samplePoint = 0;
+    for (let k = 0; k < ratios.length - 1; k++) {
+      samplePoint += ratios[k];
+      if (inputHash <= Sampling.fractionToKey(samplePoint / ratioTotal)) {
+        return k;
+      }
+    }
+
+    // No need to check the last bucket if the others didn't match.
+    return ratios.length - 1;
+  },
 };

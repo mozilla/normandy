@@ -139,6 +139,7 @@ class Core(Configuration):
     ACTIONS = {
         'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
         'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
+        'preference-experiment': os.path.join(BASE_DIR, 'client/actions/preference-experiment'),
     }
 
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
@@ -399,3 +400,6 @@ class Test(Base):
     SECRET_KEY = 'not a secret'
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
     SECURE_SSL_REDIRECT = False
+    AUTOGRAPH_URL = None
+    AUTOGRAPH_HAWK_ID = None
+    AUTOGRAPH_HAWK_SECRET_KEY = None

@@ -7,23 +7,15 @@ export class Action {
 
 // Attempt to find the global registerAction, and fall back to a noop if it's
 // not available.
-export let registerAction = null;
+export const registerAction = (
+  (global && global.registerAction) ||
+  (window && window.registerAction) ||
+  function registerAction() {}
+);
 
-try {
-  registerAction = global.registerAction;
-} catch (err) {
-    // Not running in Node.
-}
-
-if (!registerAction) {
-  try {
-    registerAction = window.registerAction;
-  } catch (err) {
-        // Not running in a browser.
-  }
-}
-
-// If it still isn't found, just shim it.
-if (!registerAction) {
-  registerAction = () => {};
-}
+// Same as above, for registerAsyncCallback
+export const registerAsyncCallback = (
+  (global && global.registerAsyncCallback) ||
+  (window && window.registerAsyncCallback) ||
+  function registerAsyncCallback() {}
+);
