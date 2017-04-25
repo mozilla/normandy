@@ -6,22 +6,31 @@
 
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm");
-Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
-Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm");
-Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
-Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Storage",
-                                  "resource://shield-recipe-client/lib/Storage.jsm");
 XPCOMUtils.defineLazyServiceGetter(this, "timerManager",
                                    "@mozilla.org/updates/timer-manager;1",
                                    "nsIUpdateTimerManager");
+XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Storage",
+                                  "resource://shield-recipe-client/lib/Storage.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "NormandyDriver",
+                                  "resource://shield-recipe-client/lib/NormandyDriver.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "FilterExpressions",
+                                  "resource://shield-recipe-client/lib/FilterExpressions.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "NormandyApi",
+                                  "resource://shield-recipe-client/lib/NormandyApi.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "SandboxManager",
+                                  "resource://shield-recipe-client/lib/SandboxManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ClientEnvironment",
+                                  "resource://shield-recipe-client/lib/ClientEnvironment.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
+                                  "resource://shield-recipe-client/lib/CleanupManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ActionSandboxManager",
+                                  "resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
+
+Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 this.EXPORTED_SYMBOLS = ["RecipeRunner"];
 
