@@ -7,8 +7,13 @@ import {
 } from '../requests/actions';
 
 
-function receiveApprovalRequest(approvalRequest) {
-  return dispatch => {
+export function fetchApprovalRequest(pk) {
+  return async dispatch => {
+    const requestId = `fetch-approval-request-${pk}`;
+    const response = dispatch(
+      makeApiRequest(requestId, `approval_request/${pk}/`, { method: 'GET' }));
+    const approvalRequest = await response;
+
     dispatch({
       type: APPROVAL_REQUEST_RECEIVE,
       approvalRequest,
@@ -17,15 +22,12 @@ function receiveApprovalRequest(approvalRequest) {
 }
 
 
-export function fetchApprovalRequest(pk) {
-  const requestId = `fetch-${pk}`;
-  return makeApiRequest(requestId, `approval_request/${pk}/`, { method: 'GET' })
-    .then(approvalRequest => receiveApprovalRequest(approvalRequest));
-}
+export function fetchAllApprovalRequests() {
+  return async dispatch => {
+    const requestId = 'fetch-all-approval-requests';
+    const response = dispatch(makeApiRequest(requestId, 'approval_request/', { method: 'GET' }));
+    const approvalRequests = await response;
 
-
-function receiveAllApprovalRequests(approvalRequests) {
-  return dispatch => {
     approvalRequests.forEach(approvalRequest => {
       dispatch({
         type: APPROVAL_REQUEST_RECEIVE,
@@ -33,11 +35,4 @@ function receiveAllApprovalRequests(approvalRequests) {
       });
     });
   };
-}
-
-
-export function fetchAllApprovalRequests() {
-  const requestId = 'fetch-all';
-  return makeApiRequest(requestId, 'approval_request/', { method: 'GET' })
-    .then(approvalRequests => receiveAllApprovalRequests(approvalRequests));
 }

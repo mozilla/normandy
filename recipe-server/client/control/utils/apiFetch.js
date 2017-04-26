@@ -1,6 +1,6 @@
 const API_ROOT = '/api/v1/';
 
-export default function apiFetch(url, options = {}) {
+export default async function apiFetch(url, options = {}) {
   let queryString = '';
 
   const headers = new Headers();
@@ -35,13 +35,6 @@ export default function apiFetch(url, options = {}) {
     delete settings.data;
   }
 
-  return fetch(`${API_ROOT}${url}${queryString}`, settings)
-    .then(response => Promise.all([response.ok, response.json()]))
-    .catch(error => [false, { message: error.message }])
-    .then(([ok, data]) => {
-      if (!ok) {
-        throw data;
-      }
-      return data;
-    });
+  const response = await fetch(`${API_ROOT}${url}${queryString}`, settings);
+  return response.json();
 }

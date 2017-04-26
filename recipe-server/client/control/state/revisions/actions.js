@@ -7,8 +7,13 @@ import {
 } from '../requests/actions';
 
 
-function receiveRevision(revision) {
-  return dispatch => {
+export function fetchRevision(pk) {
+  return async dispatch => {
+    const requestId = `fetch-revision-${pk}`;
+    const response = dispatch(
+      makeApiRequest(requestId, `recipe_revision/${pk}/`, { method: 'GET' }));
+    const revision = await response;
+
     dispatch({
       type: REVISION_RECEIVE,
       revision,
@@ -17,15 +22,12 @@ function receiveRevision(revision) {
 }
 
 
-export function fetchRevision(pk) {
-  const requestId = `fetch-${pk}`;
-  return makeApiRequest(requestId, `recipe_revision/${pk}/`, { method: 'GET' })
-    .then(revision => receiveRevision(revision));
-}
+export function fetchAllRevisions() {
+  return async dispatch => {
+    const requestId = 'fetch-all-revisions';
+    const response = dispatch(makeApiRequest(requestId, 'recipe_revision/', { method: 'GET' }));
+    const revisions = await response;
 
-
-function receiveAllRevisions(revisions) {
-  return dispatch => {
     revisions.forEach(revision => {
       dispatch({
         type: REVISION_RECEIVE,
@@ -33,10 +35,4 @@ function receiveAllRevisions(revisions) {
       });
     });
   };
-}
-
-export function fetchAllRevisions() {
-  const requestId = 'fetch-all';
-  return makeApiRequest(requestId, 'recipe_revision/', { method: 'GET' })
-    .then(revisions => receiveAllRevisions(revisions));
 }

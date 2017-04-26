@@ -4,5 +4,5 @@ import { DEFAULT_REQUEST } from '../constants';
 
 
 export function getRequest(state, id, defaultsTo = DEFAULT_REQUEST) {
-  return state.requests.get(id, defaultsTo);
+  return state.newState.requests.get(id, defaultsTo);
 }

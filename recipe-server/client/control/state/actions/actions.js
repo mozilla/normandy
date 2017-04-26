@@ -7,8 +7,12 @@ import {
 } from '../requests/actions';
 
 
-function receiveAction(action) {
-  return dispatch => {
+export function fetchAction(name) {
+  return async dispatch => {
+    const requestId = `fetch-action-${name}`;
+    const response = dispatch(makeApiRequest(requestId, `action/${name}/`, { method: 'GET' }));
+    const action = await response;
+
     dispatch({
       type: ACTION_RECEIVE,
       action,
@@ -17,15 +21,12 @@ function receiveAction(action) {
 }
 
 
-export function fetchAction(name) {
-  const requestId = `fetch-${name}`;
-  return makeApiRequest(requestId, `action/${name}/`, { method: 'GET' })
-    .then(action => receiveAction(action));
-}
+export function fetchAllActions() {
+  return async dispatch => {
+    const requestId = 'fetch-all-actions';
+    const response = dispatch(makeApiRequest(requestId, 'action/', { method: 'GET' }));
+    const actions = await response;
 
-
-function receiveAllActions(actions) {
-  return dispatch => {
     actions.forEach(action => {
       dispatch({
         type: ACTION_RECEIVE,
@@ -33,11 +34,4 @@ function receiveAllActions(actions) {
       });
     });
   };
-}
-
-
-export function fetchAllActions() {
-  const requestId = 'fetch-all';
-  return makeApiRequest(requestId, 'action/', { method: 'GET' })
-    .then(actions => receiveAllActions(actions));
 }
