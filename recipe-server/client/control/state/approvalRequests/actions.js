@@ -7,7 +7,7 @@ import {
 } from '../requests/actions';
 
 
-function fetchApprovalRequestSuccess(approvalRequest) {
+function receiveApprovalRequest(approvalRequest) {
   return dispatch => {
     dispatch({
       type: APPROVAL_REQUEST_RECEIVE,
@@ -20,11 +20,11 @@ function fetchApprovalRequestSuccess(approvalRequest) {
 export function fetchApprovalRequest(pk) {
   const requestId = `fetch-${pk}`;
   return makeApiRequest(requestId, `approval_request/${pk}/`, { method: 'GET' })
-    .then(approvalRequest => fetchApprovalRequestSuccess(approvalRequest));
+    .then(approvalRequest => receiveApprovalRequest(approvalRequest));
 }
 
 
-function fetchAllApprovalRequestsSuccess(approvalRequests) {
+function receiveAllApprovalRequests(approvalRequests) {
   return dispatch => {
     approvalRequests.forEach(approvalRequest => {
       dispatch({
@@ -39,5 +39,5 @@ function fetchAllApprovalRequestsSuccess(approvalRequests) {
 export function fetchAllApprovalRequests() {
   const requestId = 'fetch-all';
   return makeApiRequest(requestId, 'approval_request/', { method: 'GET' })
-    .then(approvalRequests => fetchAllApprovalRequestsSuccess(approvalRequests));
+    .then(approvalRequests => receiveAllApprovalRequests(approvalRequests));
 }

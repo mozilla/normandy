@@ -7,7 +7,7 @@ import {
 } from '../requests/actions';
 
 
-function fetchActionSuccess(action) {
+function receiveAction(action) {
   return dispatch => {
     dispatch({
       type: ACTION_RECEIVE,
@@ -20,11 +20,11 @@ function fetchActionSuccess(action) {
 export function fetchAction(name) {
   const requestId = `fetch-${name}`;
   return makeApiRequest(requestId, `action/${name}/`, { method: 'GET' })
-    .then(action => fetchActionSuccess(action));
+    .then(action => receiveAction(action));
 }
 
 
-function fetchAllActionsSuccess(actions) {
+function receiveAllActions(actions) {
   return dispatch => {
     actions.forEach(action => {
       dispatch({
@@ -39,5 +39,5 @@ function fetchAllActionsSuccess(actions) {
 export function fetchAllActions() {
   const requestId = 'fetch-all';
   return makeApiRequest(requestId, 'action/', { method: 'GET' })
-    .then(actions => fetchAllActionsSuccess(actions));
+    .then(actions => receiveAllActions(actions));
 }

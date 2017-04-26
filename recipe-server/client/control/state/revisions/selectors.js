@@ -1,5 +1,5 @@
 /* eslint import/prefer-default-export: "off" */
 
 export function getRevision(state, id, defaultsTo) {
-  return state.getIn(['revisions', 'items', id], defaultsTo);
+  return state.revisions.items.get(id, defaultsTo);
 }

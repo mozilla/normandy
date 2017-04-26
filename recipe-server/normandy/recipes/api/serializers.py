@@ -116,14 +116,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         ]
 
     def __init__(self, *args, **kwargs):
-        exclude_fields = kwargs.pop('exclude_fields', None)
+        exclude_fields = kwargs.pop('exclude_fields', [])
 
         super().__init__(*args, **kwargs)
 
         if exclude_fields:
-            existing_fields = self.fields.keys()
             for field in exclude_fields:
-                if field in exclude_fields:
+                if field in self.fields:
                     self.fields.pop(field)
 
     def update(self, instance, validated_data):

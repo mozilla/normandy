@@ -10,7 +10,7 @@ import {
 } from '../requests/actions';
 
 
-function fetchRecipeSuccess(recipe) {
+function receiveRecipe(recipe) {
   return dispatch => {
     dispatch({
       type: RECIPE_RECEIVE,
@@ -23,11 +23,11 @@ function fetchRecipeSuccess(recipe) {
 export function fetchRecipe(pk) {
   const requestId = `fetch-${pk}`;
   return makeApiRequest(requestId, `recipe/${pk}/`, { method: 'GET' })
-    .then(recipe => fetchRecipeSuccess(recipe));
+    .then(recipe => receiveRecipe(recipe));
 }
 
 
-function fetchAllRecipesSuccess(recipes) {
+function receiveAllRecipes(recipes) {
   return dispatch => {
     recipes.forEach(recipe => {
       dispatch({
@@ -42,11 +42,11 @@ function fetchAllRecipesSuccess(recipes) {
 export function fetchAllRecipes() {
   const requestId = 'fetch-all';
   return makeApiRequest(requestId, 'recipe/', { method: 'GET' })
-    .then(recipes => fetchAllRecipesSuccess(recipes));
+    .then(recipes => receiveAllRecipes(recipes));
 }
 
 
-function fetchRecipeHistorySuccess(recipeId, revisions) {
+function receiveRecipeHistory(recipeId, revisions) {
   return dispatch => {
     dispatch({
       type: RECIPE_HISTORY_RECEIVE,
@@ -67,11 +67,11 @@ function fetchRecipeHistorySuccess(recipeId, revisions) {
 export function fetchRecipeHistory(pk) {
   const requestId = `fetch-history-${pk}`;
   return makeApiRequest(requestId, `recipe/${pk}/history/`, { method: 'GET' })
-    .then(revisions => fetchRecipeHistorySuccess(pk, revisions));
+    .then(revisions => receiveRecipeHistory(pk, revisions));
 }
 
 
-function fetchRecipeFiltersSuccess(filters) {
+function receiveRecipeFilters(filters) {
   return dispatch => {
     dispatch({
       type: RECIPE_FILTERS_RECEIVE,
@@ -84,5 +84,5 @@ function fetchRecipeFiltersSuccess(filters) {
 export function fetchRecipeFilters() {
   const requestId = 'fetch-filters';
   return makeApiRequest(requestId, 'filters/', { method: 'GET' })
-    .then(filters => fetchRecipeFiltersSuccess(filters));
+    .then(filters => receiveRecipeFilters(filters));
 }
