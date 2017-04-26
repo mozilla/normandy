@@ -13,8 +13,7 @@ import {
 export function fetchRecipe(pk) {
   return async dispatch => {
     const requestId = `fetch-recipe-${pk}`;
-    const response = makeApiRequest(requestId, `recipe/${pk}/`, { method: 'GET' });
-    const recipe = await response;
+    const recipe = await dispatch(makeApiRequest(requestId, `recipe/${pk}/`));
 
     dispatch({
       type: RECIPE_RECEIVE,
@@ -27,8 +26,7 @@ export function fetchRecipe(pk) {
 export function fetchAllRecipes() {
   return async dispatch => {
     const requestId = 'fetch-all-recipes';
-    const response = makeApiRequest(requestId, 'recipe/', { method: 'GET' });
-    const recipes = await response;
+    const recipes = await dispatch(makeApiRequest(requestId, 'recipe/'));
 
     recipes.forEach(recipe => {
       dispatch({
@@ -43,9 +41,7 @@ export function fetchAllRecipes() {
 export function fetchRecipeHistory(pk) {
   return async dispatch => {
     const requestId = `fetch-recipe-history-${pk}`;
-    const response = dispatch(
-      makeApiRequest(requestId, `recipe/${pk}/history/`, { method: 'GET' }));
-    const revisions = await response;
+    const revisions = await dispatch(makeApiRequest(requestId, `recipe/${pk}/history/`));
 
     dispatch({
       type: RECIPE_HISTORY_RECEIVE,
@@ -66,8 +62,7 @@ export function fetchRecipeHistory(pk) {
 export function fetchRecipeFilters() {
   return async dispatch => {
     const requestId = 'fetch-recipe-filters';
-    const response = dispatch(makeApiRequest(requestId, 'filters/', { method: 'GET' }));
-    const filters = await response;
+    const filters = await dispatch(makeApiRequest(requestId, 'filters/'));
 
     dispatch({
       type: RECIPE_FILTERS_RECEIVE,

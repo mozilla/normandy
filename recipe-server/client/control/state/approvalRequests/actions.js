@@ -10,8 +10,7 @@ import {
 export function fetchApprovalRequest(pk) {
   return async dispatch => {
     const requestId = `fetch-approval-request-${pk}`;
-    const response = dispatch(
-      makeApiRequest(requestId, `approval_request/${pk}/`, { method: 'GET' }));
+    const response = dispatch(makeApiRequest(requestId, `approval_request/${pk}/`));
     const approvalRequest = await response;
 
     dispatch({
@@ -25,8 +24,7 @@ export function fetchApprovalRequest(pk) {
 export function fetchAllApprovalRequests() {
   return async dispatch => {
     const requestId = 'fetch-all-approval-requests';
-    const response = dispatch(makeApiRequest(requestId, 'approval_request/', { method: 'GET' }));
-    const approvalRequests = await response;
+    const approvalRequests = await dispatch(makeApiRequest(requestId, 'approval_request/'));
 
     approvalRequests.forEach(approvalRequest => {
       dispatch({
