@@ -1,196 +1,88 @@
-import { getRequest } from './selectors';
-
 import {
-  RECIPE_FETCH,
-  RECIPE_FETCH_FAILURE,
-  RECIPE_FETCH_SUCCESS,
   RECIPE_RECEIVE,
-  RECIPE_FILTERS_FETCH,
-  RECIPE_FILTERS_FETCH_FAILURE,
-  RECIPE_FILTERS_FETCH_SUCCESS,
   RECIPE_FILTERS_RECEIVE,
-  RECIPE_HISTORY_FETCH,
-  RECIPE_HISTORY_FETCH_FAILURE,
-  RECIPE_HISTORY_FETCH_SUCCESS,
   RECIPE_HISTORY_RECEIVE,
-  RECIPES_FETCH,
-  RECIPES_FETCH_FAILURE,
-  RECIPES_FETCH_SUCCESS,
   REVISION_RECEIVE,
 } from '../action-types';
 
-import apiFetch from '../../utils/apiFetch';
+import {
+  makeApiRequest,
+} from '../requests/actions';
 
 
-function fetchRecipeSuccess(dispatch, requestId, recipe) {
-  dispatch({
-    type: RECIPE_FETCH_SUCCESS,
-    requestId,
-  });
-
-  dispatch({
-    type: RECIPE_RECEIVE,
-    recipe,
-  });
-}
-
-
-function fetchRecipeFailure(dispatch, requestId, error) {
-  dispatch({
-    type: RECIPE_FETCH_FAILURE,
-    error,
-    requestId,
-  });
-}
-
-
-export function fetchRecipe(pk) {
-  return (dispatch, getState) => {
-    const requestId = `fetch-${pk}`;
-    const request = getRequest(getState(), requestId);
-
-    if (request.loading) { return true; }
-
-    dispatch({
-      type: RECIPE_FETCH,
-      requestId,
-    });
-
-    return apiFetch(`recipe/${pk}/`, { method: 'GET' })
-      .then(recipe => fetchRecipeSuccess(dispatch, requestId, recipe))
-      .catch(error => fetchRecipeFailure(dispatch, requestId, error));
-  };
-}
-
-
-function fetchRecipesSuccess(dispatch, requestId, recipes) {
-  dispatch({
-    type: RECIPES_FETCH_SUCCESS,
-    requestId,
-  });
-
-  recipes.forEach(recipe => {
+function fetchRecipeSuccess(recipe) {
+  return dispatch => {
     dispatch({
       type: RECIPE_RECEIVE,
       recipe,
     });
-  });
-}
-
-
-function fetchRecipesFailure(dispatch, requestId, error) {
-  dispatch({
-    type: RECIPES_FETCH_FAILURE,
-    error,
-    requestId,
-  });
-}
-
-
-export function fetchRecipes() {
-  return (dispatch, getState) => {
-    const requestId = 'fetch';
-    const request = getRequest(getState(), requestId);
-
-    if (request.loading) { return true; }
-
-    dispatch({
-      type: RECIPES_FETCH,
-      requestId,
-    });
-
-    return apiFetch('recipe/', { method: 'GET' })
-      .then(recipes => fetchRecipesSuccess(dispatch, requestId, recipes))
-      .catch(error => fetchRecipesFailure(dispatch, requestId, error));
   };
 }
 
 
-function fetchRecipeHistorySuccess(dispatch, requestId, recipeId, revisions) {
-  dispatch({
-    type: RECIPE_HISTORY_FETCH_SUCCESS,
-    requestId,
-  });
-
-  dispatch({
-    type: RECIPE_HISTORY_RECEIVE,
-    recipeId,
-    revisions,
-  });
-
-  revisions.forEach(revision => {
-    dispatch({
-      type: REVISION_RECEIVE,
-      revision,
-    });
-  });
+export function fetchRecipe(pk) {
+  const requestId = `fetch-${pk}`;
+  return makeApiRequest(requestId, `recipe/${pk}/`, { method: 'GET' })
+    .then(recipe => fetchRecipeSuccess(recipe));
 }
 
 
-function fetchRecipeHistoryFailure(dispatch, requestId, error) {
-  dispatch({
-    type: RECIPE_HISTORY_FETCH_FAILURE,
-    error,
-    requestId,
-  });
+function fetchAllRecipesSuccess(recipes) {
+  return dispatch => {
+    recipes.forEach(recipe => {
+      dispatch({
+        type: RECIPE_RECEIVE,
+        recipe,
+      });
+    });
+  };
+}
+
+
+export function fetchAllRecipes() {
+  const requestId = 'fetch-all';
+  return makeApiRequest(requestId, 'recipe/', { method: 'GET' })
+    .then(recipes => fetchAllRecipesSuccess(recipes));
+}
+
+
+function fetchRecipeHistorySuccess(recipeId, revisions) {
+  return dispatch => {
+    dispatch({
+      type: RECIPE_HISTORY_RECEIVE,
+      recipeId,
+      revisions,
+    });
+
+    revisions.forEach(revision => {
+      dispatch({
+        type: REVISION_RECEIVE,
+        revision,
+      });
+    });
+  };
 }
 
 
 export function fetchRecipeHistory(pk) {
-  return (dispatch, getState) => {
-    const requestId = `fetch-history-${pk}`;
-    const request = getRequest(getState(), requestId);
+  const requestId = `fetch-history-${pk}`;
+  return makeApiRequest(requestId, `recipe/${pk}/history/`, { method: 'GET' })
+    .then(revisions => fetchRecipeHistorySuccess(pk, revisions));
+}
 
-    if (request.loading) { return true; }
 
+function fetchRecipeFiltersSuccess(filters) {
+  return dispatch => {
     dispatch({
-      type: RECIPE_HISTORY_FETCH,
-      requestId,
+      type: RECIPE_FILTERS_RECEIVE,
+      filters,
     });
-
-    return apiFetch(`recipe/${pk}/history/`, { method: 'GET' })
-      .then(revisions => fetchRecipeHistorySuccess(dispatch, requestId, pk, revisions))
-      .catch(error => fetchRecipeHistoryFailure(dispatch, requestId, error));
   };
-}
-
-
-function fetchRecipeFiltersSuccess(dispatch, requestId, filters) {
-  dispatch({
-    type: RECIPE_FILTERS_FETCH_SUCCESS,
-    requestId,
-  });
-
-  dispatch({
-    type: RECIPE_FILTERS_RECEIVE,
-    filters,
-  });
-}
-
-
-function fetchRecipeFiltersFailure(dispatch, requestId, error) {
-  dispatch({
-    type: RECIPE_FILTERS_FETCH_FAILURE,
-    error,
-    requestId,
-  });
 }
 
 
 export function fetchRecipeFilters() {
-  return (dispatch, getState) => {
-    const requestId = 'fetch-filters';
-    const request = getRequest(getState(), requestId);
-
-    if (request.loading) { return true; }
-
-    dispatch({
-      type: RECIPE_FILTERS_FETCH,
-      requestId,
-    });
-
-    return apiFetch('', { method: 'GET' })
-      .then(filters => fetchRecipeFiltersSuccess(dispatch, requestId, filters))
-      .catch(error => fetchRecipeFiltersFailure(dispatch, requestId, error));
-  };
+  const requestId = 'fetch-filters';
+  return makeApiRequest(requestId, 'filters/', { method: 'GET' })
+    .then(filters => fetchRecipeFiltersSuccess(filters));
 }
