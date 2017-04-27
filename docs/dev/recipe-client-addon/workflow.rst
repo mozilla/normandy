@@ -43,7 +43,7 @@ frameworks. There are multiple test suites:
   JavaScript shell. We are planning to migrate these tests to mochitest; do not
   write new tests as xpcshell tests where possible.
 
-To run the tests, you must sync your code do mozilla-central, and use the
+To run the tests, you must sync your code to mozilla-central, and use the
 ``./mach test`` command:
 
 .. code-block:: bash
