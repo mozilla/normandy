@@ -55,6 +55,14 @@ this.ShieldRecipeClient = {
   async startup() {
     ShieldRecipeClient.setDefaultPrefs();
 
+    // Setup logging and listen for changes to logging prefs
+    LogManager.configure(Services.prefs.getIntPref(PREF_LOGGING_LEVEL));
+    Preferences.observe(PREF_LOGGING_LEVEL, LogManager.configure);
+    CleanupManager.addCleanupHandler(
+      () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure),
+    );
+    log = LogManager.getLogger("bootstrap");
+
     // Disable self-support, since we replace its behavior.
     // Self-support only checks its pref on start, so if we disable it, wait
     // until next startup to run, unless the dev_mode preference is set.
@@ -64,14 +72,6 @@ this.ShieldRecipeClient = {
         return;
       }
     }
-
-    // Setup logging and listen for changes to logging prefs
-    LogManager.configure(Services.prefs.getIntPref(PREF_LOGGING_LEVEL));
-    Preferences.observe(PREF_LOGGING_LEVEL, LogManager.configure);
-    CleanupManager.addCleanupHandler(
-      () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure),
-    );
-    log = LogManager.getLogger("bootstrap");
 
     // Initialize experiments first to avoid a race between initializing prefs
     // and recipes rolling back pref changes when experiments end.
