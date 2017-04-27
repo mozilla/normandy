@@ -53,6 +53,19 @@ tasks = [
         ],
     },
     {
+        'name': 'recipe-client-addon:package',
+        'description': 'Package the built Firefox (with shield-recipe-client) for distribution',
+        'command': 'normandy/recipe-client-addon/bin/tc/package.sh',
+        'dependencies': ['recipe-client-addon:build'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:build',
+                'path': 'public/build.tar.gz',
+                'env_var': 'BUILD_RESULT',
+            },
+        ],
+    },
+    {
         'name': 'recipe-client-addon:make-xpi',
         'description': 'Build XPI for recipe-client-addon',
         'command': 'normandy/recipe-client-addon/bin/tc/make-xpi.sh',
