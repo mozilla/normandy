@@ -77,7 +77,7 @@ function withMockApiServer(task) {
 
 add_task(withMockApiServer(async function test_get(serverUrl) {
   // Test that NormandyApi can fetch from the test server.
-  const response = await NormandyApi.get(`${serverUrl}/api/v1`);
+  const response = await NormandyApi.get(`${serverUrl}/api/v1/`);
   const data = await response.json();
   equal(data["recipe-list"], "/api/v1/recipe/", "Expected data in response");
 }));
