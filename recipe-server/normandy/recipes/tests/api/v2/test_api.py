@@ -1,15 +1,11 @@
 import hashlib
-from unittest.mock import patch
-
-from django.db import connection
-from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
-from normandy.base.utils import aware_datetime, canonical_json_dumps
+from normandy.base.utils import canonical_json_dumps
 from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
