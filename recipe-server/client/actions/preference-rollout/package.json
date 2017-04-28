@@ -28,16 +28,17 @@
                     "type": ["string", "number", "boolean"],
                     "default": ""
                 },
+                "preferenceType": {
+                    "description": "Data type of the preference that controls this experiment",
+                    "type": "string",
+                    "enum": ["string", "integer", "boolean"],
+                    "default": "boolean"
+                },
                 "preferenceBranch": {
                     "descript": "Controls whether the default or user value of the preference is modified",
                     "type": "string",
                     "enum": ["user", "default"],
                     "default": "default"
-                },
-                "branchConfirmation": {
-                    "descript": "Controls whether the default or user value of the preference is modified",
-                    "type": "boolean",
-                    "default": false
                 }
             }
         }

@@ -37,17 +37,15 @@ import {
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
+import RecipeStatus from 'control/components/RecipeStatus';
+import DraftStatus from 'control/components/DraftStatus';
+import BooleanIcon from 'control/components/BooleanIcon';
 
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import PreferenceExperimentFields from
   'control/components/action_fields/PreferenceExperimentFields';
 import RolloutFields from 'control/components/action_fields/RolloutFields';
-
-
-import RecipeStatus from 'control/components/RecipeStatus';
-import DraftStatus from 'control/components/DraftStatus';
-import BooleanIcon from 'control/components/BooleanIcon';
 
 export const selector = formValueSelector('recipe');
 

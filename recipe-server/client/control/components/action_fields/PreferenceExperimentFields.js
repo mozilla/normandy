@@ -49,7 +49,16 @@ export class PreferenceExperimentFields extends ActionFields {
     const { preferenceBranchType } = this.props;
     return (
       <div className="arguments-fields">
-        <p className="info">Run a feature experiment activated by a preference.</p>
+        <div className="info">
+          <p>
+            Run a feature experiment activated by a preference.
+            <br />
+            <br />
+            Experiments are intended for features that require testing and are NOT ready for wide
+            release. If you are aiming to permanently change a preference, use a <b>Preference
+            Rollout</b> action instead.
+          </p>
+        </div>
         <ControlField
           label="Slug"
           name="arguments.slug"

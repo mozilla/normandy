@@ -21,22 +21,26 @@ export class RolloutFields extends ActionFields {
 
     return (
       <div className="arguments-fields">
-        <p className="info">
-          Change a preference for a portion of the population.
-          <br /><br />
-          Supports gradually increasing the number of users that get a feature, multiple features
-          rolling out at once to in/dependent groups, and rolling back a deployment entirely
-          (if problems arise).
-        </p>
+        <div className="info">
+          <p>
+            Change a preference permanently for a variable portion of the population.
+            <br />
+            <br />
+            Rollouts are intended for features that have been tested and are ready for release. If
+            you are aiming to test preference changes, use a <b>Preference Experiment</b> action
+            instead.
+          </p>
+        </div>
+
         <ControlField
           disabled={disabled}
-          label="Rollout name"
+          label="Rollout Name"
           name="arguments.name"
           component="input"
           type="text"
         />
         <ControlField
-          label="Preference to change"
+          label="Preference Name"
           name="arguments.preferenceName"
           component="input"
           type="text"
@@ -48,23 +52,28 @@ export class RolloutFields extends ActionFields {
           type="text"
         />
         <ControlField
+          label="Preference Type"
+          name="arguments.preferenceType"
+          component="select"
+        >
+          <option value="boolean">Boolean</option>
+          <option value="integer">Integer</option>
+          <option value="string">String</option>
+        </ControlField>
+        <ControlField
           label="Preference Branch"
           name="arguments.preferenceBranch"
           component="select"
         >
           <option value="default">Default</option>
-          <option value="user">User*</option>
+          <option value="user">User</option>
         </ControlField>
         {
           recipeArguments.preferenceBranch === 'user' &&
-            <ControlField
-              name="arguments.branchConfirmation"
-              label="* I understand this will override existing user-set preferences."
-              component="input"
-              type="checkbox"
-              className="checkbox-field"
-              required
-            />
+            <div className="callout-warning has-arrow user-branch-warning">
+              Using the <b>User</b> preference branch will override existing user-set preferences.
+              Use with caution.
+            </div>
         }
       </div>
     );
