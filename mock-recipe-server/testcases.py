@@ -125,6 +125,15 @@ class TestCase(object):
         root_path.add('classify_client').save(client_json)
 
     def serialize_action_api(self, root_path, domain):
+        # Action index
+        index_path = root_path.add('action')
+        index_data = json.loads(index_path.fetch())
+        for action_data in index_data:
+            new_url = self.update_url(action_data['implementation_url'], domain)
+            action_data['implementation_url'] = new_url
+        index_path.save(canonical_json_dumps(index_data))
+
+        # Individual actions
         for action in Action.objects.all():
             # Action
             action_path = root_path.add('action', action.name)
