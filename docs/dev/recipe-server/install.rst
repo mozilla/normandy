@@ -144,3 +144,30 @@ The site should be available at https://localhost:8000/control/.
 .. _peep: https://github.com/erikrose/peep/
 .. _fork: http://help.github.com/fork-a-repo/
 .. _issue: https://bugs.python.org/issue18378
+
+Autograph
+---------
+If you want to execute recipes on your local instance using the
+:doc:`recipe client </dev/recipe-client-addon/index>`, you'll need to set up
+Autograph_ to sign recipes as you save them:
+
+1. Follow the `Autograph installation instructions`_ to launch a development
+   instance of Autograph.
+
+2. Add the following configuration to ``/recipe-server/.env`` (create the file
+   if it does not exist yet):
+
+   .. code-block:: ini
+
+      DJANGO_AUTOGRAPH_URL=http://localhost:8765/
+      DJANGO_AUTOGRAPH_HAWK_ID=normandev
+      DJANGO_AUTOGRAPH_HAWK_SECRET_KEY=3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
+
+With the configuration in place, you should see log messages when saving recipes
+that look like this::
+
+   INFO 2017-05-01 19:58:04,274 normandy.recipes.models Requesting signatures for recipes with ids [16] from Autograph
+   INFO 2017-05-01 19:58:04,301 normandy.recipes.utils Got 1 signatures from Autograph
+
+.. _Autograph: https://github.com/mozilla-services/autograph
+.. _Autograph installation instructions: https://github.com/mozilla-services/autograph#installation
