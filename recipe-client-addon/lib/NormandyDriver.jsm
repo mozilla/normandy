@@ -17,6 +17,7 @@ Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+Cu.import("resource://shield-recipe-client/lib/PreferenceRollout.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
@@ -167,6 +168,11 @@ this.NormandyDriver = function(sandboxManager) {
       get: sandboxManager.wrapAsync(PreferenceExperiments.get, {cloneInto: true}),
       getAllActive: sandboxManager.wrapAsync(PreferenceExperiments.getAllActive, {cloneInto: true}),
       has: sandboxManager.wrapAsync(PreferenceExperiments.has),
+    },
+
+    preferenceRollout: {
+      register: sandboxManager.wrapAsync(PreferenceRollout.register, {cloneArguments: true}),
+      withdraw: sandboxManager.wrapAsync(PreferenceRollout.withdraw),
     },
   };
 };
