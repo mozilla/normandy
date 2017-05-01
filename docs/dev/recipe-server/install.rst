@@ -139,7 +139,7 @@ running:
    site for the first time, you will have to create a certificate exception to
    allow Firefox to accept the certificate and access the site over HTTPS.
 
-The site should be available at https://localhost:8000/admin/.
+The site should be available at https://localhost:8000/control/.
 
 .. _peep: https://github.com/erikrose/peep/
 .. _fork: http://help.github.com/fork-a-repo/
