@@ -187,7 +187,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     def canonical_json(self):
         from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
-        data = RecipeSerializer(self, exclude_fields=['approved_revision', 'latest_revision']).data
+        data = RecipeSerializer(self).data
         return CanonicalJSONRenderer().render(data)
 
     def update_signature(self):

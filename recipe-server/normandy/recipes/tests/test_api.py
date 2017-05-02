@@ -741,9 +741,6 @@ class TestApprovalFlow(object):
                               .format(recipe_data_2['latest_revision_id']))
         approval_data = res.json()
         recipe_data_2['approval_request'] = approval_data
-        recipe_data_2['approval_request'] = approval_data
-        recipe_data_2['latest_revision']['approval_request'] = approval_data
-        recipe_data_2['latest_revision']['recipe']['approval_request'] = approval_data
         assert res.status_code == 201
 
         # The change should not be visible yet, since it isn't approved
@@ -758,8 +755,6 @@ class TestApprovalFlow(object):
                               {'comment': 'r-'})
         approval_data = res.json()
         recipe_data_2['approval_request'] = approval_data
-        recipe_data_2['latest_revision']['approval_request'] = approval_data
-        recipe_data_2['latest_revision']['recipe']['approval_request'] = approval_data
         assert res.status_code == 200
 
         # The change should not be visible yet, since it isn't approved

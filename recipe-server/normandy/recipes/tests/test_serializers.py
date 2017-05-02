@@ -25,9 +25,7 @@ class TestRecipeSerializer:
                                locales=[locale])
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
-        serializer = RecipeSerializer(
-            recipe, context={'request': rf.get('/')},
-            exclude_fields=['approved_revision', 'latest_revision'])
+        serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
 
         assert serializer.data == {
             'name': recipe.name,
@@ -186,9 +184,7 @@ class TestSignedRecipeSerializer:
         recipe = RecipeFactory(signed=True)
         context = {'request': rf.get('/')}
         combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
-        recipe_serializer = RecipeSerializer(
-            instance=recipe, context=context,
-            exclude_fields=['approved_revision', 'latest_revision'])
+        recipe_serializer = RecipeSerializer(instance=recipe, context=context)
 
         # Testing for shape of data, not contents
         assert combined_serializer.data == {
