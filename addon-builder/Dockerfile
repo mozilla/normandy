@@ -19,4 +19,4 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     apt-get install -y nodejs
 
 RUN curl -O https://hg.mozilla.org/mozilla-central/raw-file/tip/python/mozboot/bin/bootstrap.py && \
-    python2.7 bootstrap.py --no-interactive --application-choice=browser
+    python2.7 bootstrap.py --no-interactive --application-choice=browser_artifact_mode

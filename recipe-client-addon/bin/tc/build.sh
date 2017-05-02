@@ -11,7 +11,7 @@ curl --location --fail --silent --show-error "$FETCH_RESULT" | tar xz
 echo 'Setting up environment'
 pushd mozilla-central
 source /root/.cargo/env
-python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
+python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser_artifact_mode
 source /root/.cargo/env
 
 echo 'Building Firefox'
