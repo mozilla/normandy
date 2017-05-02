@@ -105,7 +105,7 @@ add_task(withMockApiServer(async function test_getApiUrlSlashes(serverUrl, prefe
     equal(endpoint, `${serverUrl}/test/`);
     ok(mockGet.calledWithExactly(`${serverUrl}/api/v1/`), "trailing slash was added");
     mockGet.reset();
-  };
+  }
 
   // with slash
   {
@@ -117,6 +117,7 @@ add_task(withMockApiServer(async function test_getApiUrlSlashes(serverUrl, prefe
     mockGet.reset();
   }
 
+  NormandyApi.clearIndexCache();
   mockGet.restore();
 }));
 
