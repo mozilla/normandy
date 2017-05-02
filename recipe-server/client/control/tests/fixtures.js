@@ -157,19 +157,19 @@ export const initialState = {
   },
   newState: {
     actions: {
-      items: new Map({}),
+      items: new Map(),
     },
     approvalRequests: {
-      items: new Map({}),
+      items: new Map(),
     },
     form: {},
     recipes: {
-      filters: new Map({}),
-      history: new Map({}),
-      items: new Map({}),
+      filters: new Map(),
+      history: new Map(),
+      items: new Map(),
     },
     revisions: {
-      items: new Map({}),
+      items: new Map(),
     },
     routing: {
       locationBeforeTransitions: null,

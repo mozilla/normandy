@@ -8,7 +8,7 @@ import {
 } from '../action-types';
 
 
-function filters(state = new Map({}), action) {
+function filters(state = new Map(), action) {
   switch (action.type) {
     case RECIPE_FILTERS_RECEIVE:
       return fromJS(action.filters);
@@ -19,7 +19,7 @@ function filters(state = new Map({}), action) {
 }
 
 
-function history(state = new Map({}), action) {
+function history(state = new Map(), action) {
   switch (action.type) {
     case RECIPE_HISTORY_RECEIVE:
       return state.set(action.recipeId, fromJS(action.revisions.map(revision => revision.id)));
@@ -30,7 +30,7 @@ function history(state = new Map({}), action) {
 }
 
 
-function items(state = new Map({}), action) {
+function items(state = new Map(), action) {
   switch (action.type) {
     case RECIPE_RECEIVE:
       return state.set(action.recipe.id, fromJS(action.recipe));

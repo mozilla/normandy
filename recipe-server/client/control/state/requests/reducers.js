@@ -7,7 +7,7 @@ import {
 } from '../action-types';
 
 
-export default function requests(state = new Map({}), action) {
+export default function requests(state = new Map(), action) {
   switch (action.type) {
     case REQUEST_SEND:
       return state.set(action.requestId, new Map({

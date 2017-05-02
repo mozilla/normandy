@@ -6,7 +6,7 @@ import {
 } from '../action-types';
 
 
-function items(state = new Map({}), action) {
+function items(state = new Map(), action) {
   switch (action.type) {
     case REVISION_RECEIVE:
       return state.set(action.revision.id, fromJS(action.revision));
