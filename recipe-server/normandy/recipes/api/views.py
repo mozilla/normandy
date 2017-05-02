@@ -160,8 +160,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'This revision already has an approval request.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        approval_request = ApprovalRequest(revision=revision, creator=request.user)
-        approval_request.save()
+        approval_request = revision.request_approval(creator=request.user)
 
         return Response(ApprovalRequestSerializer(approval_request).data,
                         status=status.HTTP_201_CREATED)
@@ -220,7 +219,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(methods=['POST'])
     def close(self, request, pk=None):
         approval_request = self.get_object()
-        approval_request.delete()
+        approval_request.close()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

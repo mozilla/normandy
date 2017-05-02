@@ -20,7 +20,7 @@ rules:
   no-restricted-syntax: [off]
   no-throw-literal: [off]
   no-underscore-dangle: [off]
-  no-use-before-define: [warn, { functions: false }]
+  no-use-before-define: [warn, { functions: false, classes: false }]
   prefer-const: [warn]
 
   babel/arrow-parens: [warn, as-needed]

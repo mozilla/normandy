@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
-from normandy.base.utils import aware_datetime
+from normandy.base.utils import aware_datetime, canonical_json_dumps
 from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
@@ -18,6 +18,7 @@ from normandy.recipes.tests import (
     CountryFactory,
     LocaleFactory,
     RecipeFactory,
+    fake_sign,
 )
 
 
@@ -233,7 +234,7 @@ class TestRecipeAPI(object):
         assert recipe.action == action
 
     def test_it_can_change_arguments_for_recipes(self, api_client):
-        recipe = RecipeFactory(arguments_json='')
+        recipe = RecipeFactory(arguments_json='{}')
         action = ActionFactory(
             name='foobarbaz',
             arguments_schema={
@@ -488,6 +489,49 @@ class TestRecipeAPI(object):
         for recipe in res.data:
             assert recipe['id'] in [r1.id, r2.id]
 
+    def test_update_recipe_action(self, api_client):
+        r = RecipeFactory()
+        a = ActionFactory(name='test')
+
+        res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'action': 'test'})
+        assert res.status_code == 200
+
+        r.refresh_from_db()
+        assert r.action == a
+
+    def test_update_recipe_locale(self, api_client):
+        l1 = LocaleFactory(code='fr-FR')
+        l2 = LocaleFactory(code='en-US')
+        r = RecipeFactory(locales=[l1])
+
+        res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'locales': ['en-US']})
+        assert res.status_code == 200
+
+        r.refresh_from_db()
+        assert list(r.locales.all()) == [l2]
+
+    def test_update_recipe_country(self, api_client):
+        c1 = CountryFactory(code='US')
+        c2 = CountryFactory(code='CA')
+        r = RecipeFactory(countries=[c1])
+
+        res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'countries': ['CA']})
+        assert res.status_code == 200
+
+        r.refresh_from_db()
+        assert list(r.countries.all()) == [c2]
+
+    def test_update_recipe_channel(self, api_client):
+        c1 = ChannelFactory(slug='release')
+        c2 = ChannelFactory(slug='beta')
+        r = RecipeFactory(channels=[c1])
+
+        res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'channels': ['beta']})
+        assert res.status_code == 200
+
+        r.refresh_from_db()
+        assert list(r.channels.all()) == [c2]
+
 
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):
@@ -621,105 +665,185 @@ class TestClassifyClient(object):
 
 
 @pytest.mark.django_db
-def test_full_approval_flow(api_client):
-    action = ActionFactory()
-    user1 = UserFactory(is_superuser=True)
-    user2 = UserFactory(is_superuser=True)
-    api_client.force_authenticate(user1)
+class TestApprovalFlow(object):
 
-    # Create a recipe
-    res = api_client.post('/api/v1/recipe/', {
-        'action': action.name,
-        'arguments': {},
-        'name': 'test recipe',
-        'extra_filter_expression': 'counter == 0',
-        'enabled': 'false',
-    })
-    assert res.status_code == 201
-    recipe_data_1 = res.json()
+    def verify_signatures(self, api_client, expected_count=None):
+        res = api_client.get('/api/v1/recipe/signed/')
+        assert res.status_code == 200
+        signed_data = res.json()
 
-    # Request approval for it
-    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                          .format(recipe_data_1['revision_id']))
-    approval_data = res.json()
-    assert res.status_code == 201
+        if expected_count is not None:
+            assert len(signed_data) == expected_count
 
-    # The requester isn't allowed to approve a recipe
-    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                          {'comment': 'r+'})
-    assert res.status_code == 403  # Forbidden
+        for recipe_and_signature in signed_data:
+            recipe = recipe_and_signature['recipe']
+            expected_signature = recipe_and_signature['signature']['signature']
+            data = canonical_json_dumps(recipe).encode()
+            actual_signature = fake_sign([data])[0]['signature']
+            assert actual_signature == expected_signature
 
-    # Approve the recipe
-    api_client.force_authenticate(user2)
-    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                          {'comment': 'r+'})
-    assert res.status_code == 200
+    def test_full_approval_flow(self, api_client, mocked_autograph):
+        action = ActionFactory()
+        user1 = UserFactory(is_superuser=True)
+        user2 = UserFactory(is_superuser=True)
+        api_client.force_authenticate(user1)
 
-    # Make another change
-    api_client.force_authenticate(user1)
-    res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
-        'extra_filter_expression': 'counter == 1',
-    })
-    assert res.status_code == 200
+        # Create a recipe
+        res = api_client.post('/api/v1/recipe/', {
+            'action': action.name,
+            'arguments': {},
+            'name': 'test recipe',
+            'extra_filter_expression': 'counter == 0',
+            'enabled': 'false',
+        })
+        assert res.status_code == 201
+        recipe_data_0 = res.json()
 
-    # The change should not be visible yet, since it isn't approved
-    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-    assert res.status_code == 200
-    recipe_data_2 = res.json()
-    assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
+        # Request approval for it
+        res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                              .format(recipe_data_0['revision_id']))
+        approval_data = res.json()
+        assert res.status_code == 201
 
-    # Request approval for the change
-    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                          .format(recipe_data_2['latest_revision_id']))
-    approval_data = res.json()
-    recipe_data_2['approval_request'] = approval_data
-    recipe_data_2['latest_revision']['approval_request'] = approval_data
-    recipe_data_2['latest_revision']['recipe']['approval_request'] = approval_data
-    assert res.status_code == 201
+        # The requester isn't allowed to approve a recipe
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                              {'comment': 'r+'})
+        assert res.status_code == 403  # Forbidden
 
-    # The change should not be visible yet, since it isn't approved
-    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-    assert res.status_code == 200
-    assert res.json() == recipe_data_2
+        # Approve the recipe
+        api_client.force_authenticate(user2)
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                              {'comment': 'r+'})
+        assert res.status_code == 200
 
-    # Reject the change
-    api_client.force_authenticate(user2)
-    res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
-                          {'comment': 'r-'})
-    approval_data = res.json()
-    recipe_data_2['approval_request'] = approval_data
-    recipe_data_2['latest_revision']['approval_request'] = approval_data
-    recipe_data_2['latest_revision']['recipe']['approval_request'] = approval_data
-    assert res.status_code == 200
+        # It is now visible in the API
+        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_0['id']))
+        assert res.status_code == 200
+        recipe_data_1 = res.json()
+        self.verify_signatures(api_client, expected_count=1)
 
-    # The change should not be visible yet, since it isn't approved
-    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-    assert res.status_code == 200
-    assert res.json() == recipe_data_2
+        # Make another change
+        api_client.force_authenticate(user1)
+        res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
+            'extra_filter_expression': 'counter == 1',
+        })
+        assert res.status_code == 200
 
-    # Make a third version of the recipe
-    api_client.force_authenticate(user1)
-    res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
-        'extra_filter_expression': 'counter == 2',
-    })
-    recipe_data_3 = res.json()
-    assert res.status_code == 200
+        # The change should not be visible yet, since it isn't approved
+        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+        assert res.status_code == 200
+        recipe_data_2 = res.json()
+        assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
+        self.verify_signatures(api_client, expected_count=1)
 
-    # Request approval
-    res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                          .format(recipe_data_3['latest_revision_id']))
-    approval_data = res.json()
-    assert res.status_code == 201
+        # Request approval for the change
+        res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                              .format(recipe_data_2['latest_revision_id']))
+        approval_data = res.json()
+        recipe_data_2['approval_request'] = approval_data
+        recipe_data_2['approval_request'] = approval_data
+        recipe_data_2['latest_revision']['approval_request'] = approval_data
+        recipe_data_2['latest_revision']['recipe']['approval_request'] = approval_data
+        assert res.status_code == 201
 
-    # Approve the change
-    api_client.force_authenticate(user2)
-    res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                          {'comment': 'r+'})
-    assert res.status_code == 200
+        # The change should not be visible yet, since it isn't approved
+        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+        assert res.status_code == 200
+        assert res.json() == recipe_data_2
+        self.verify_signatures(api_client, expected_count=1)
 
-    # The change should be visible now, since it is approved
-    res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-    assert res.status_code == 200
-    recipe_data_4 = res.json()
-    assert recipe_data_4['extra_filter_expression'] == 'counter == 2'
-    assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']
+        # Reject the change
+        api_client.force_authenticate(user2)
+        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
+                              {'comment': 'r-'})
+        approval_data = res.json()
+        recipe_data_2['approval_request'] = approval_data
+        recipe_data_2['latest_revision']['approval_request'] = approval_data
+        recipe_data_2['latest_revision']['recipe']['approval_request'] = approval_data
+        assert res.status_code == 200
+
+        # The change should not be visible yet, since it isn't approved
+        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+        assert res.status_code == 200
+        assert res.json() == recipe_data_2
+        self.verify_signatures(api_client, expected_count=1)
+
+        # Make a third version of the recipe
+        api_client.force_authenticate(user1)
+        res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
+            'extra_filter_expression': 'counter == 2',
+        })
+        recipe_data_3 = res.json()
+        assert res.status_code == 200
+
+        # Request approval
+        res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
+                              .format(recipe_data_3['latest_revision_id']))
+        approval_data = res.json()
+        assert res.status_code == 201
+
+        # Approve the change
+        api_client.force_authenticate(user2)
+        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
+                              {'comment': 'r+'})
+        assert res.status_code == 200
+
+        # The change should be visible now, since it is approved
+        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
+        assert res.status_code == 200
+        recipe_data_4 = res.json()
+        assert recipe_data_4['extra_filter_expression'] == 'counter == 2'
+        assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']
+        self.verify_signatures(api_client, expected_count=1)
+
+    def test_cancel_approval(self, api_client, mocked_autograph):
+        action = ActionFactory()
+        user1 = UserFactory(is_superuser=True)
+        user2 = UserFactory(is_superuser=True)
+        api_client.force_authenticate(user1)
+
+        # Create a recipe
+        res = api_client.post('/api/v1/recipe/', {
+            'action': action.name,
+            'arguments': {},
+            'name': 'test recipe',
+            'extra_filter_expression': 'counter == 0',
+            'enabled': 'false',
+        })
+        assert res.status_code == 201
+        recipe_id = res.json()['id']
+        revision_id = res.json()['latest_revision_id']
+
+        # Request approval
+        res = api_client.post(f'/api/v1/recipe_revision/{revision_id}/request_approval/')
+        assert res.status_code == 201
+        approval_request_id = res.json()['id']
+
+        # Approve the recipe
+        api_client.force_authenticate(user2)
+        res = api_client.post(
+            f'/api/v1/approval_request/{approval_request_id}/approve/',
+            {'comment': 'r+'}
+        )
+        assert res.status_code == 200
+
+        # Make another change
+        api_client.force_authenticate(user1)
+        res = api_client.patch(
+            f'/api/v1/recipe/{recipe_id}/',
+            {'extra_filter_expression': 'counter == 1'}
+        )
+        assert res.status_code == 200
+        revision_id = res.json()['latest_revision_id']
+
+        # Request approval for the second change
+        res = api_client.post(f'/api/v1/recipe_revision/{revision_id}/request_approval/')
+        approval_request_id = res.json()['id']
+        assert res.status_code == 201
+
+        # Cancel the approval request
+        res = api_client.post(f'/api/v1/approval_request/{approval_request_id}/close/')
+        assert res.status_code == 204
+
+        # The API should still have correct signatures
+        self.verify_signatures(api_client, expected_count=1)

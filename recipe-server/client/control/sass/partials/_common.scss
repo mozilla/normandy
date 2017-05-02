@@ -29,8 +29,11 @@ label,
   color: rgba($darkBrown, 0.6);
   display: block;
   font: normal normal 400 12px/16px $OpenSans;
-  padding: 5px 0;
   text-transform: uppercase;
+}
+
+.label {
+  padding: 5px 0;
 }
 
 input,

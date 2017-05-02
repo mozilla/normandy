@@ -1,12 +1,13 @@
 "use strict";
 
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm", this);
-
-const fakeSandbox = { Promise, Error };
-const store1 = Storage.makeStorage("prefix1", fakeSandbox);
-const store2 = Storage.makeStorage("prefix2", fakeSandbox);
+Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 
 add_task(async function() {
+  const fakeSandbox = {Promise};
+  const store1 = Storage.makeStorage("prefix1", fakeSandbox);
+  const store2 = Storage.makeStorage("prefix2", fakeSandbox);
+
   // Make sure values return null before being set
   Assert.equal(await store1.getItem("key"), null);
   Assert.equal(await store2.getItem("key"), null);
@@ -45,35 +46,24 @@ add_task(async function() {
   Assert.equal(await store2.getItem("removeTest"), null);
 });
 
-// Tests fail if durability is not seeded properly
-add_task(async function() {
-  const store = Storage.makeStorage(Storage.DURABILITY_NAMESPACE, fakeSandbox);
-  await Storage.seedDurability(fakeSandbox);
+add_task(async function testSandboxValueStorage() {
+  const manager1 = new SandboxManager();
+  const manager2 = new SandboxManager();
+  const store1 = Storage.makeStorage("testSandboxValueStorage", manager1.sandbox);
+  const store2 = Storage.makeStorage("testSandboxValueStorage", manager2.sandbox);
+  manager1.addGlobal("store", store1);
+  manager2.addGlobal("store", store2);
+  manager1.addHold("testing");
+  manager2.addHold("testing");
 
-  // Properly seeded store should have a starting value of 1
-  Assert.equal(await store.getItem(Storage.DURABILITY_KEY), 1, "Storage durability is set to 1 on start");
-});
+  await manager1.evalInSandbox("store.setItem('foo', {foo: 'bar'});");
+  manager1.removeHold("testing");
+  await manager1.isNuked();
 
-// Tests fails if storage is does not appear to be durable.
-add_task(async function() {
-  // Manually edit the storage durability values to be invalid
-  const store = Storage.makeStorage(Storage.DURABILITY_NAMESPACE, fakeSandbox);
-  await store.setItem(Storage.DURABILITY_KEY, -1);
+  const objectMatches = await manager2.evalInSandbox(`
+    store.getItem("foo").then(item => item.foo === "bar");
+  `);
+  ok(objectMatches, "Values persisted in a store survive after their originating sandbox is nuked");
 
-  // Ensure invalid values fail durability checks
-  try {
-    await Storage.checkDurability(fakeSandbox);
-    throw new Error('Did not throw error');
-  } catch (err) {
-    Assert.equal(err.message, 'Storage durability unconfirmed', "Storage durability fails for invalid values");
-  }
-
-  // Ensure NaN's fail durability checks
-  await store.setItem(Storage.DURABILITY_KEY, 'not a number');
-  try {
-    await Storage.checkDurability(fakeSandbox);
-    throw new Error('Did not throw error');
-  } catch (err) {
-    Assert.equal(err.message, 'Storage durability unconfirmed', "Storage durability fails for NaN values");
-  }
+  manager2.removeHold("testing");
 });

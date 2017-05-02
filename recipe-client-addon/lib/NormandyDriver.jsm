@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
-/* globals Components */
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
@@ -17,6 +16,8 @@ Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
+Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -26,7 +27,6 @@ const log = LogManager.getLogger("normandy-driver");
 const actionLog = LogManager.getLogger("normandy-driver.actions");
 
 this.NormandyDriver = function(sandboxManager) {
-
   if (!sandboxManager) {
     throw new Error("sandboxManager is required");
   }
@@ -36,9 +36,13 @@ this.NormandyDriver = function(sandboxManager) {
     testing: false,
 
     get locale() {
+      if (Services.locale.getAppLocaleAsLangTag) {
+        return Services.locale.getAppLocaleAsLangTag();
+      }
+
       return Cc["@mozilla.org/chrome/chrome-registry;1"]
         .getService(Ci.nsIXULChromeRegistry)
-        .getSelectedLocale("browser");
+        .getSelectedLocale("global");
     },
 
     get userId() {
@@ -119,13 +123,9 @@ this.NormandyDriver = function(sandboxManager) {
       return ret;
     },
 
-    async createStorage(keyPrefix, skipDurabilityCheck) {
+    createStorage(keyPrefix) {
       let storage;
       try {
-        if (!skipDurabilityCheck) {
-          await Storage.checkDurability(sandbox);
-        }
-
         storage = Storage.makeStorage(keyPrefix, sandbox);
       } catch (e) {
         log.error(e.stack);
@@ -149,6 +149,19 @@ this.NormandyDriver = function(sandboxManager) {
     clearTimeout(token) {
       clearTimeout(token);
       sandboxManager.removeHold(`setTimeout-${token}`);
+    },
+
+    // Sampling
+    ratioSample: sandboxManager.wrapAsync(Sampling.ratioSample),
+
+    // Preference Experiment API
+    preferenceExperiments: {
+      start: sandboxManager.wrapAsync(PreferenceExperiments.start, {cloneArguments: true}),
+      markLastSeen: sandboxManager.wrapAsync(PreferenceExperiments.markLastSeen),
+      stop: sandboxManager.wrapAsync(PreferenceExperiments.stop),
+      get: sandboxManager.wrapAsync(PreferenceExperiments.get, {cloneInto: true}),
+      getAllActive: sandboxManager.wrapAsync(PreferenceExperiments.getAllActive, {cloneInto: true}),
+      has: sandboxManager.wrapAsync(PreferenceExperiments.has),
     },
   };
 };

@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+from collections import defaultdict
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -9,6 +10,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from dirtyfields import DirtyFieldsMixin
+from rest_framework import serializers
 from rest_framework.reverse import reverse
 from reversion import revisions as reversion
 
@@ -72,9 +74,16 @@ class RecipeQuerySet(models.QuerySet):
         """
         Update the signatures on all Recipes in the queryset.
         """
-        autographer = Autographer()
         # Convert to a list because order must be preserved
         recipes = list(self)
+
+        try:
+            autographer = Autographer()
+        except ImproperlyConfigured:
+            for recipe in recipes:
+                recipe.signature = None
+                recipe.save()
+            return
 
         recipe_ids = [r.id for r in recipes]
         logger.info(
@@ -182,7 +191,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return CanonicalJSONRenderer().render(data)
 
     def update_signature(self):
-        autographer = Autographer()
+        try:
+            autographer = Autographer()
+        except ImproperlyConfigured:
+            self.signature = None
+            return
 
         logger.info(
             f'Requesting signatures for recipes with ids [{self.id}] from Autograph',
@@ -273,10 +286,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
                 super().save(*args, **kwargs)
                 kwargs['force_insert'] = False
 
-                try:
-                    self.update_signature()
-                except ImproperlyConfigured:
-                    self.signature = None
+                self.update_signature()
 
         super().save(*args, **kwargs)
 
@@ -303,6 +313,9 @@ class RecipeRevision(models.Model):
     channels = models.ManyToManyField(Channel)
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
+
+    class Meta:
+        ordering = ('-created',)
 
     @property
     def data(self):
@@ -373,11 +386,24 @@ class RecipeRevision(models.Model):
         return hashlib.sha256(data.encode()).hexdigest()
 
     def save(self, *args, **kwargs):
+        if self.parent:
+            old_arguments = self.parent.arguments
+        else:
+            old_arguments = None
+        self.action.validate_arguments(self.arguments, old_arguments)
+
         if not self.created:
             self.created = timezone.now()
         self.id = self.hash()
         self.updated = timezone.now()
         super().save(*args, **kwargs)
+
+    def request_approval(self, creator):
+        approval_request = ApprovalRequest(revision=self, creator=creator)
+        approval_request.save()
+        self.recipe.update_signature()
+        self.recipe.save()
+        return approval_request
 
 
 class ApprovalRequest(models.Model):
@@ -424,6 +450,17 @@ class ApprovalRequest(models.Model):
         self.comment = comment
         self.save()
 
+        recipe = self.revision.recipe
+        recipe.update_signature()
+        recipe.save()
+
+    def close(self):
+        self.delete()
+
+        recipe = self.revision.recipe
+        recipe.update_signature()
+        recipe.save()
+
 
 @reversion.register()
 class Action(models.Model):
@@ -434,6 +471,18 @@ class Action(models.Model):
     implementation_hash = models.CharField(max_length=40, editable=False)
 
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
+
+    errors = {
+        'duplicate_branch_slug': (
+            'Feature branch slugs must be unique within an experiment'
+        ),
+        'duplicate_branch_value': (
+            'Feature branch values must be unique within an experiment'
+        ),
+        'duplicate_experiment_slug': (
+            'Experiment slugs must be globally unique'
+        ),
+    }
 
     @property
     def arguments_schema(self):
@@ -466,6 +515,51 @@ class Action(models.Model):
         # Update hash
         self.implementation_hash = self.compute_implementation_hash()
         super().save(update_fields=['implementation_hash'])
+
+    def validate_arguments(self, arguments, old_arguments=None):
+        """
+        Test if `arguments` follows all action-specific rules.
+
+        If there is a previous version of the arguments, they should
+        be passed as `old_arguments`. Some validation rules depend on
+        the history of the arguments.
+
+        Raises `ValidationError` if any rules are violated.
+        """
+        if self.name == 'preference-experiment':
+            # Make a default dict that always returns a default dict
+            def default():
+                return defaultdict(default)
+            errors = default()
+
+            # Feature branch slugs should be unique within an experiment.
+            branch_slugs = set()
+            branch_values = set()
+            for i, branch in enumerate(arguments['branches']):
+                if branch['slug'] in branch_slugs:
+                    msg = self.errors['duplicate_branch_slug']
+                    errors['branches'][i]['slug'] = msg
+
+                if branch['value'] in branch_values:
+                    msg = self.errors['duplicate_branch_value']
+                    errors['branches'][i]['value'] = msg
+
+                branch_slugs.add(branch['slug'])
+                branch_values.add(branch['value'])
+
+            # Experiment slugs should be unique.
+            experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
+            existing_slugs = set(r.arguments['slug'] for r in experiment_recipes)
+            if old_arguments:
+                # It is ok if the slug did not change
+                existing_slugs.remove(old_arguments['slug'])
+            if arguments['slug'] in existing_slugs:
+                msg = self.errors['duplicate_experiment_slug']
+                errors['slug'] = msg
+
+            # Raise errors, if any
+            if errors:
+                raise serializers.ValidationError({'arguments': errors})
 
 
 class Client(object):

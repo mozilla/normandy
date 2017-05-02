@@ -5,20 +5,70 @@ import requests
 from taskcluster import fromNow
 from taskcluster.utils import stableSlugId, dumpJson
 
+BASE_URL = 'http://taskcluster/queue/v1'
+
 tasks = [
+    {
+        'name': 'recipe-client-addon:fetch',
+        'description': 'Download gecko-dev and sync Normandy changes',
+        'command': 'normandy/recipe-client-addon/bin/tc/fetch.sh',
+    },
+    {
+        'name': 'recipe-client-addon:lint',
+        'description': 'Run lint checks on the add-on',
+        'command': 'normandy/recipe-client-addon/bin/tc/lint.sh',
+        'dependencies': ['recipe-client-addon:fetch'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:fetch',
+                'path': 'public/source.tar.gz',
+                'env_var': 'FETCH_RESULT',
+            },
+        ],
+    },
+    {
+        'name': 'recipe-client-addon:build',
+        'description': 'Build Firefox with recipe-client-addon',
+        'command': 'normandy/recipe-client-addon/bin/tc/build.sh',
+        'dependencies': ['recipe-client-addon:fetch'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:fetch',
+                'path': 'public/source.tar.gz',
+                'env_var': 'FETCH_RESULT',
+            },
+        ],
+    },
     {
         'name': 'recipe-client-addon:test',
         'description': 'Test recipe-client-addon with gecko-dev',
         'command': 'normandy/recipe-client-addon/bin/tc/test.sh',
-        'env': {
-            'GECKO_DEV_URL': 'https://github.com/mozilla/gecko-dev',
-        },
+        'dependencies': ['recipe-client-addon:build'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:build',
+                'path': 'public/build.tar.gz',
+                'env_var': 'BUILD_RESULT',
+            },
+        ],
+    },
+    {
+        'name': 'recipe-client-addon:package',
+        'description': 'Package the built Firefox (with shield-recipe-client) for distribution',
+        'command': 'normandy/recipe-client-addon/bin/tc/package.sh',
+        'dependencies': ['recipe-client-addon:build'],
+        'artifacts_from': [
+            {
+                'task_name': 'recipe-client-addon:build',
+                'path': 'public/build.tar.gz',
+                'env_var': 'BUILD_RESULT',
+            },
+        ],
     },
     {
         'name': 'recipe-client-addon:make-xpi',
         'description': 'Build XPI for recipe-client-addon',
         'command': 'normandy/recipe-client-addon/bin/tc/make-xpi.sh',
-        'dependencies': ['recipe-client-addon:test'],
     },
 ]
 
@@ -43,8 +93,13 @@ def main():
                 if key.startswith('GITHUB_'):
                     env.setdefault(key, val)
 
+            for spec in task.get('artifacts_from', []):
+                task_id = idMaker(spec['task_name'])
+                path = spec['path']
+                env[spec['env_var']] = f'{BASE_URL}/task/{task_id}/artifacts/{path}'
+
             task_id = idMaker(task['name'])
-            res = session.put(f'http://taskcluster/queue/v1/task/{task_id}', data=dumpJson({
+            res = session.put(f'{BASE_URL}/task/{task_id}', data=dumpJson({
                 'metadata': {
                     'name': task['name'],
                     'description': task['description'],
@@ -52,14 +107,14 @@ def main():
                     'source': source,
                 },
                 'provisionerId': 'aws-provisioner-v1',
-                'workerType': 'github-worker',
+                'workerType': 'gecko-1-b-linux',
                 'schedulerId': 'taskcluster-github',
                 'taskGroupId': decisionTaskId,
                 'created': fromNow('0 seconds'),
-                'deadline': fromNow('4 hours'),
+                'deadline': fromNow('1 day'),
                 'expires': fromNow('365 days'),
                 'payload': {
-                    'image': 'ubuntu:zesty',
+                    'image': 'mozilla/normandy-taskcluster:latest',
                     'command': [
                         '/bin/bash',
                         '-c',
@@ -75,7 +130,7 @@ def main():
                             task['command'],
                         ])
                     ],
-                    'maxRunTime': 14400,  # 4 hours
+                    'maxRunTime': 28800,  # 8 hours
                     'env': env,
                     'artifacts': {
                         'public': {
@@ -83,6 +138,9 @@ def main():
                             'path': '/artifacts',
                             'expires': fromNow('364 days'),  # must expire before task
                         },
+                    },
+                    'features': {
+                        'taskclusterProxy': True,
                     },
                 },
                 'dependencies': dependencies,

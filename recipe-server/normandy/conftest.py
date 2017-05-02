@@ -1,10 +1,9 @@
-import hashlib
-
 import pytest
 from rest_framework.test import APIClient
 
 from normandy.base.tests import UserFactory, skip_except_in_ci
 from normandy.recipes import geolocation as geolocation_module
+from normandy.recipes.tests import fake_sign
 
 
 @pytest.fixture
@@ -29,14 +28,5 @@ def geolocation():
 @pytest.fixture
 def mocked_autograph(mocker):
     mocked = mocker.patch('normandy.recipes.models.Autographer')
-
-    def fake_sign(datas):
-        sigs = []
-        for d in datas:
-            sigs.append({
-                'signature': hashlib.sha256(d).hexdigest()
-            })
-        return sigs
-
     mocked.return_value.sign_data.side_effect = fake_sign
     return mocked

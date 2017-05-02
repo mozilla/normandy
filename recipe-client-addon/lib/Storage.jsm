@@ -14,14 +14,13 @@ XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm
 this.EXPORTED_SYMBOLS = ["Storage"];
 
 const log = LogManager.getLogger("storage");
-
 let storePromise;
 
 function loadStorage() {
   if (storePromise === undefined) {
     const path = OS.Path.join(OS.Constants.Path.profileDir, "shield-recipe-client.json");
     const storage = new JSONFile({path});
-    storePromise = (async function () {
+    storePromise = (async function() {
       await storage.load();
       return storage;
     })();
@@ -30,37 +29,6 @@ function loadStorage() {
 }
 
 this.Storage = {
-  DURABILITY_NAMESPACE: "normandy_storageDurability",
-  DURABILITY_KEY: "durable",
-  isDurabilityInvalid(value) {
-    return typeof value === "undefined" || isNaN(value);
-  },
-  async seedDurability(sandbox) {
-    let globalDurabilityStore = this.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
-    globalDurabilityStore = Cu.waiveXrays(globalDurabilityStore);
-
-    let durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY);
-
-    if (this.isDurabilityInvalid(durability)) {
-      durability = 0;
-    }
-
-    globalDurabilityStore.setItem(this.DURABILITY_KEY, durability + 1);
-  },
-
-  async checkDurability(sandbox) {
-      let globalDurabilityStore = this.makeStorage(this.DURABILITY_NAMESPACE, sandbox);
-      globalDurabilityStore = Cu.waiveXrays(globalDurabilityStore);
-
-      const durability = await globalDurabilityStore.getItem(this.DURABILITY_KEY)
-      const isDurabilityInvalid = this.isDurabilityInvalid(durability) || durability < 2;
-
-      if(isDurabilityInvalid) {
-        throw new Error('Storage durability unconfirmed');
-      }
-    },
-
-
   makeStorage(prefix, sandbox) {
     if (!sandbox) {
       throw new Error("No sandbox passed");
@@ -101,7 +69,7 @@ this.Storage = {
               if (!(prefix in store.data)) {
                 store.data[prefix] = {};
               }
-              store.data[prefix][keySuffix] = value;
+              store.data[prefix][keySuffix] = Cu.cloneInto(value, {});
               store.saveSoon();
               resolve();
             })

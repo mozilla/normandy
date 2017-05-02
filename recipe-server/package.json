@@ -40,7 +40,7 @@
     "react-router-redux": "4.0.5",
     "reactable": "0.14.1",
     "redux": "3.6.0",
-    "redux-form": "6.1.0",
+    "redux-form": "6.5.0",
     "redux-thunk": "2.1.0",
     "sha.js": "2.4.5",
     "uglifyjs": "2.4.10",

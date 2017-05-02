@@ -2,6 +2,8 @@ import json
 import jsonschema
 import pytest
 
+from datetime import datetime
+
 from normandy.recipes.utils import verify_signature
 from pytest_testrail.plugin import testrail
 
@@ -30,7 +32,7 @@ def test_expected_action_types(conf, requests_session):
     assert len(response) >= 1
 
     # Make sure we only have expected action types
-    expected_records = ['console-log', 'show-heartbeat']
+    expected_records = ['console-log', 'show-heartbeat', 'preference-experiment']
 
     for record in response:
         assert record['name'] in expected_records
@@ -114,3 +116,24 @@ def test_recipe_api_is_json(conf, requests_session):
     r.raise_for_status()
     data = r.json()
     assert isinstance(data, list)
+
+
+def test_recipe_history(conf, requests_session):
+    r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/')
+    r.raise_for_status()
+    data = r.json()
+
+    if len(data) == 0:
+        pytest.skip('No recipes found.')
+
+    for item in data:
+        endpoint = f'/api/v1/recipe/{item["id"]}/history/'
+        r = requests_session.get(conf.getoption('server') + endpoint)
+        r.raise_for_status()
+        history = r.json()
+
+        last_date = datetime.now()
+        for revision in history:
+            created = datetime.strptime(revision['date_created'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            assert created < last_date
+            last_date = created

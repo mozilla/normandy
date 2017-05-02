@@ -12,7 +12,7 @@ from normandy.recipes.tests import (
     RecipeFactory,
 )
 from normandy.recipes.api.serializers import (
-    ActionSerializer, RecipeRevisionSerializer, RecipeSerializer, SignedRecipeSerializer)
+    ActionSerializer, RecipeSerializer, SignedRecipeSerializer)
 
 
 @pytest.mark.django_db()
@@ -25,7 +25,9 @@ class TestRecipeSerializer:
                                locales=[locale])
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
-        serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
+        serializer = RecipeSerializer(
+            recipe, context={'request': rf.get('/')},
+            exclude_fields=['approved_revision', 'latest_revision'])
 
         assert serializer.data == {
             'name': recipe.name,
@@ -45,8 +47,6 @@ class TestRecipeSerializer:
             'is_approved': False,
             'latest_revision_id': recipe.latest_revision.id,
             'approved_revision_id': recipe.approved_revision_id,
-            'latest_revision': RecipeRevisionSerializer(recipe.latest_revision).data,
-            'approved_revision': None,
             'approval_request': {
                 'id': approval.id,
                 'created': Whatever(),
@@ -186,7 +186,9 @@ class TestSignedRecipeSerializer:
         recipe = RecipeFactory(signed=True)
         context = {'request': rf.get('/')}
         combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
-        recipe_serializer = RecipeSerializer(instance=recipe, context=context)
+        recipe_serializer = RecipeSerializer(
+            instance=recipe, context=context,
+            exclude_fields=['approved_revision', 'latest_revision'])
 
         # Testing for shape of data, not contents
         assert combined_serializer.data == {
@@ -222,8 +224,6 @@ class TestSignedRecipeSerializer:
                 'is_approved': False,
                 'latest_revision_id': recipe.latest_revision.id,
                 'approved_revision_id': recipe.approved_revision_id,
-                'latest_revision': RecipeRevisionSerializer(recipe.latest_revision).data,
-                'approved_revision': None,
                 'approval_request': None,
             }
         }

@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 
 import pytest
+from rest_framework import serializers
 
 from normandy.base.tests import UserFactory, Whatever
 from normandy.recipes.models import (
@@ -47,6 +48,90 @@ class TestAction(object):
         action = ActionFactory()
         RecipeFactory.create_batch(2, action=action, enabled=False)
         assert list(action.recipes_used_by) == []
+
+
+@pytest.mark.django_db
+class TestValidateArgumentPreferenceExperiments(object):
+    """
+    This tests methods on Action, usually by creating Recipe instances.
+    """
+
+    def test_it_works(self):
+        action = ActionFactory(name='nothing special')
+        # does not raise an exception
+        action.validate_arguments({})
+
+    def test_preference_experiments_no_errors(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {
+            'slug': 'a', 'branches': [
+                {'slug': 'a', 'value': 'a'},
+                {'slug': 'b', 'value': 'b'},
+            ]
+        }
+        # does not throw when saving the revision
+        RecipeFactory(action=action, arguments=arguments)
+
+    def test_preference_exeriments_unique_branch_slugs(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {
+            'slug': 'test',
+            'branches': [
+                {'slug': 'unique', 'value': 'a'},
+                {'slug': 'duplicate', 'value': 'b'},
+                {'slug': 'duplicate', 'value': 'c'}
+            ]
+        }
+        with pytest.raises(serializers.ValidationError) as exc_info:
+            action.validate_arguments(arguments)
+        error = action.errors['duplicate_branch_slug']
+        assert exc_info.value.detail == {'arguments': {'branches': {2: {'slug': error}}}}
+
+    def test_preference_exeriments_unique_branch_values(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {
+            'slug': 'test',
+            'branches': [
+                {'slug': 'a', 'value': 'unique'},
+                {'slug': 'b', 'value': 'duplicate'},
+                {'slug': 'c', 'value': 'duplicate'}
+            ]
+        }
+        with pytest.raises(serializers.ValidationError) as exc_info:
+            action.validate_arguments(arguments)
+        error = action.errors['duplicate_branch_value']
+        assert exc_info.value.detail == {'arguments': {'branches': {2: {'value': error}}}}
+
+    def test_preference_experiments_unique_experiment_slug_no_collision(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments_a = {'slug': 'a', 'branches': []}
+        arguments_b = {'slug': 'b', 'branches': []}
+        # Does not throw when saving revisions
+        RecipeFactory(action=action, arguments=arguments_a)
+        RecipeFactory(action=action, arguments=arguments_b)
+
+    def test_preference_experiments_unique_experiment_slug_new_collision(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments = {'slug': 'a', 'branches': []}
+        RecipeFactory(action=action, arguments=arguments)
+
+        with pytest.raises(serializers.ValidationError) as exc_info1:
+            RecipeFactory(action=action, arguments=arguments)
+        error = action.errors['duplicate_experiment_slug']
+        assert exc_info1.value.detail == {'arguments': {'slug': error}}
+
+    def test_preference_experiments_unique_experiment_slug_update_collision(self):
+        action = ActionFactory(name='preference-experiment')
+        arguments_a = {'slug': 'a', 'branches': []}
+        arguments_b = {'slug': 'b', 'branches': []}
+        # Does not throw when saving revisions
+        RecipeFactory(action=action, arguments=arguments_a)
+        recipe = RecipeFactory(action=action, arguments=arguments_b)
+
+        with pytest.raises(serializers.ValidationError) as exc_info1:
+            recipe.revise(arguments=arguments_a)
+        error = action.errors['duplicate_experiment_slug']
+        assert exc_info1.value.detail == {'arguments': {'slug': error}}
 
 
 @pytest.mark.django_db
@@ -168,7 +253,7 @@ class TestRecipe(object):
     def test_signature_is_cleared_if_autograph_unavailable(self, mocker):
         # Mock the Autographer to return an error
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-        mock_autograph.return_value.sign_data.side_effect = ImproperlyConfigured
+        mock_autograph.side_effect = ImproperlyConfigured
 
         recipe = RecipeFactory(name='unchanged', signed=True)
         original_signature = recipe.signature
@@ -308,7 +393,7 @@ class TestRecipe(object):
         assert recipe.locales.count() == 0
 
     def test_recipe_revise_arguments(self):
-        recipe = RecipeFactory(arguments_json='')
+        recipe = RecipeFactory(arguments_json='{}')
         recipe.revise(arguments={'something': 'value'})
         assert recipe.arguments_json == '{"something": "value"}'
 

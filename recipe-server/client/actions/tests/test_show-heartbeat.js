@@ -86,7 +86,7 @@ describe('ShowHeartbeatAction', () => {
 
         expect(normandy.mock.storage.data.lastShown).toBeUndefined();
         await action.execute();
-        expect(normandy.mock.storage.data.lastShown).toEqual('10');
+        expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
 
       it('should show if it has not been shown already', async() => {
@@ -119,6 +119,15 @@ describe('ShowHeartbeatAction', () => {
         expect(normandy.showHeartbeat).not.toHaveBeenCalled();
 
         jasmine.clock().uninstall();
+      });
+
+      it('should NOT show even if the lastShown date is malformed', async() => {
+        const onceRecipe = recipeFactory();
+        const action = new ShowHeartbeatAction(normandy, onceRecipe);
+        normandy.mock.storage.data.lastShown = 'ROYALTY GOT LOYALTY INSIDE MY DNA';
+
+        await action.execute();
+        expect(normandy.showHeartbeat).not.toHaveBeenCalled();
       });
     });
 
@@ -155,7 +164,7 @@ describe('ShowHeartbeatAction', () => {
 
         expect(normandy.mock.storage.data.lastShown).toBeUndefined();
         await action.execute();
-        expect(normandy.mock.storage.data.lastShown).toEqual('10');
+        expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
 
       it('should show if a user has not interacted with it', async () => {
@@ -231,7 +240,7 @@ describe('ShowHeartbeatAction', () => {
 
         expect(normandy.mock.storage.data.lastShown).toBeUndefined();
         await action.execute();
-        expect(normandy.mock.storage.data.lastShown).toEqual('10');
+        expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
     });
   });
