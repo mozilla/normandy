@@ -1,3 +1,5 @@
+/* eslint import/prefer-default-export: "off" */
+
 import { Map } from 'immutable';
 
 
