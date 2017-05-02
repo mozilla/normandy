@@ -8,4 +8,7 @@ export const INITIAL_STATE = {
 
 export const REVISION = {
   id: '9f86d081',
+  recipe: {
+    id: 1,
+  },
 };

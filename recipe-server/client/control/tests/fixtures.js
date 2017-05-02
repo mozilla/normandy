@@ -168,6 +168,7 @@ export const initialState = {
       history: new Map(),
       items: new Map(),
     },
+    requests: new Map(),
     revisions: {
       items: new Map(),
     },

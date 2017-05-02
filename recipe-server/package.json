@@ -70,6 +70,7 @@
     "file-loader": "0.9.0",
     "imports-loader": "0.6.5",
     "jasmine-core": "2.5.0",
+    "jasmine-immutable-matchers": "1.0.1",
     "jasmine-promises": "0.4.1",
     "karma": "1.2.0",
     "karma-firefox-launcher": "1.0.0",

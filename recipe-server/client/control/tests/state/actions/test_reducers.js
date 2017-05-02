@@ -16,7 +16,7 @@ describe('Actions reducer', () => {
     expect(actionsReducer(undefined, {})).toEqual(INITIAL_STATE);
   });
 
-  it('should handle ACTION_RECEIVED', () => {
+  it('should handle ACTION_RECEIVE', () => {
     expect(actionsReducer(undefined, {
       type: ACTION_RECEIVE,
       action: ACTION,

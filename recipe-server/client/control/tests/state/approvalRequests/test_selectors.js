@@ -11,7 +11,7 @@ import {
 } from '..';
 
 
-describe('getRevision', () => {
+describe('getApprovalRequest', () => {
   const STATE = {
     ...INITIAL_STATE,
     newState: {

@@ -16,7 +16,7 @@ describe('Revisions reducer', () => {
     expect(revisionsReducer(undefined, {})).toEqual(INITIAL_STATE);
   });
 
-  it('should handle REVISION_RECEIVED', () => {
+  it('should handle REVISION_RECEIVE', () => {
     expect(revisionsReducer(undefined, {
       type: REVISION_RECEIVE,
       revision: REVISION,
