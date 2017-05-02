@@ -16,6 +16,7 @@ source /root/.cargo/env
 
 echo 'Building Firefox'
 echo 'ac_add_options --enable-artifact-builds' > ./mozconfig
+./mach artifact install --verbose
 ./mach build
 popd
 
