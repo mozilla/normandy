@@ -20,7 +20,7 @@ function withServer(server, task) {
     );
 
     try {
-      await task(serverUrl);
+      await task(serverUrl, preferences);
     } finally {
       await new Promise(resolve => server.stop(resolve));
     }
@@ -87,6 +87,37 @@ add_task(withMockApiServer(async function test_getApiUrl(serverUrl) {
   // Test that NormandyApi can use the self-describing API's index
   const recipeListUrl = await NormandyApi.getApiUrl("action-list");
   equal(recipeListUrl, `${apiBase}/action/`, "Can retrieve action-list URL from API");
+}));
+
+add_task(withMockApiServer(async function test_getApiUrlSlashes(serverUrl, preferences) {
+  const fakeResponse = {
+    async json() {
+      return { "test-endpoint": `${serverUrl}/test/` };
+    },
+  };
+  const mockGet = sinon.stub(NormandyApi, "get", async () => fakeResponse)
+
+  // without slash
+  {
+    NormandyApi.clearIndexCache();
+    preferences.set("extensions.shield-recipe-client.api_url", `${serverUrl}/api/v1`)
+    let endpoint = await NormandyApi.getApiUrl("test-endpoint")
+    equal(endpoint, `${serverUrl}/test/`);
+    ok(mockGet.calledWithExactly(`${serverUrl}/api/v1/`), "trailing slash was added");
+    mockGet.reset();
+  };
+
+  // with slash
+  {
+    NormandyApi.clearIndexCache();
+    preferences.set("extensions.shield-recipe-client.api_url", `${serverUrl}/api/v1/`)
+    let endpoint = await NormandyApi.getApiUrl("test-endpoint")
+    equal(endpoint, `${serverUrl}/test/`);
+    ok(mockGet.calledWithExactly(`${serverUrl}/api/v1/`), "existing trailing slash was preserved");
+    mockGet.reset();
+  }
+
+  mockGet.restore();
 }));
 
 add_task(withMockApiServer(async function test_fetchRecipes() {
