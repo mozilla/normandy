@@ -16,6 +16,9 @@ jobs:
           name: Prepare environment
           working_directory: ~/normandy/ci/circleci
           command: |
+            # Setup a virtualenv
+            python -m venv venv
+            source venv/bin/activate
             # Use pipstrap to bootstrap a trusted pip 8 for hash checking.
             ./bin/pipstrap.py
             # Install latest pip (for constraint support), then the rest of the CI requirements.
