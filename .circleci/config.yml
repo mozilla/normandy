@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.6.1-browsers
       - image: circleci/postgres:9.5.6-alpine
 
-    working_directory: /root/normandy
+    working_directory: ~/normandy
 
     steps:
       - checkout
@@ -14,7 +14,7 @@ jobs:
 
       - run:
           name: Prepare environment
-          working_directory: /root/normandy/ci/circleci
+          working_directory: ~/normandy/ci/circleci
           command: |
             # Use pipstrap to bootstrap a trusted pip 8 for hash checking.
             ./ci/circle/ci/bin/pipstrap.py
@@ -24,27 +24,27 @@ jobs:
 
       - run:
           name: Lint Dependencies
-          working_directory: /root/normandy/lints
+          working_directory: ~/normandy/lints
           command: ./bin/ci/dependencies
 
       - run:
           name: Lints
-          working_directory: /root/normandy/lints
+          working_directory: ~/normandy/lints
           command: ./bin/ci/test
 
       - run:
           name: Recipe Server Dependencies
-          working_directory: /root/normandy/recipe-server
+          working_directory: ~/normandy/recipe-server
           command: ./bin/ci/dependencies
 
       - run:
           name: Recipe Server Test
-          working_directory: /root/normandy/recipe-server
+          working_directory: ~/normandy/recipe-server
           command: ./bin/ci/test
 
       - run:
           name: Mock Server Dependencies
-          working_directory: /root/normandy/mock-recipe-server
+          working_directory: ~/normandy/mock-recipe-server
           environment:
             MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
             MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
@@ -52,7 +52,7 @@ jobs:
 
       - run:
           name: Mock Server Compile
-          working_directory: /root/normandy/mock-recipe-server
+          working_directory: ~/normandy/mock-recipe-server
           environment:
             MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
             MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
@@ -60,7 +60,7 @@ jobs:
 
       - run:
           name: Mock Server Test
-          working_directory: /root/normandy/mock-recipe-server
+          working_directory: ~/normandy/mock-recipe-server
           environment:
             MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
             MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
