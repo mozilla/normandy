@@ -17,7 +17,7 @@ jobs:
           working_directory: ~/normandy/ci/circleci
           command: |
             # Use pipstrap to bootstrap a trusted pip 8 for hash checking.
-            ./ci/circle/ci/bin/pipstrap.py
+            ./bin/pipstrap.py
             # Install latest pip (for constraint support), then the rest of the CI requirements.
             pip install -r ./requirements/pip.txt
             pip install -r ./requirements/default.txt -c ./requirements/constraints.txt
