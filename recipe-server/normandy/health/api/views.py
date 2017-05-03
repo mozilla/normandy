@@ -21,6 +21,13 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def get_version_info():
+    """
+    Gets data about the current build.
+
+    This pulls the data from files in a directory named __version__ in
+    the root of the project. The files in this directory are generated
+    during the CI build by the script `bin/ci/dependencies`.
+    """
 
     def fetch_key(name):
         path = os.path.join(settings.BASE_DIR, '__version__', name)
@@ -48,6 +55,9 @@ def get_version_info():
 
 @api_view(['GET'])
 def version(request):
+    """
+    Return data for developers and users to inspect the state of a server.
+    """
     repo_url = 'https://github.com/mozilla/normandy'
     version_info = get_version_info()
 
