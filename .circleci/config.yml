@@ -15,7 +15,6 @@ jobs:
       - run:
           name: Prepare environment
           command: |
-            chmod -R 777 $CIRCLE_TEST_REPORTS $CIRCLE_ARTIFACTS
             # Use pipstrap to bootstrap a trusted pip 8 for hash checking.
             ./ci/circle/ci/bin/pipstrap.py
             # Install latest pip (for constraint support), then the rest of the CI requirements.
@@ -47,7 +46,7 @@ jobs:
           working_directory: /root/normandy/mock-recipe-server
           environment:
             MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
-            MOCK_SERVER_ARTIFACTS: "${CIRCLE_ARTIFACTS}/mock-recipe-server"
+            MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
           command: ./bin/ci/dependencies
 
       - run:
@@ -55,7 +54,7 @@ jobs:
           working_directory: /root/normandy/mock-recipe-server
           environment:
             MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
-            MOCK_SERVER_ARTIFACTS: "${CIRCLE_ARTIFACTS}/mock-recipe-server"
+            MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
           command: ./bin/ci/compile
 
       - run:
@@ -63,7 +62,7 @@ jobs:
           working_directory: /root/normandy/mock-recipe-server
           environment:
             MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
-            MOCK_SERVER_ARTIFACTS: "${CIRCLE_ARTIFACTS}/mock-recipe-server"
+            MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
           command: ./bin/ci/test
 
 
