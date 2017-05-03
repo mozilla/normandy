@@ -4,7 +4,7 @@ set -eu
 echo "Running lint tests"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../.. && pwd)"
 
-docker run \
+echo docker run \
   --net host \
   --volume $REPO_DIR:/app/code \
   normandy-lint:build
