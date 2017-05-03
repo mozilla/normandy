@@ -8,7 +8,7 @@ echo "Running JS tests"
 # Start Karma test server, and run JS tests in Firefox
 (
   echo "* Waiting for Karma server to start"
-  docker run --net host -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis
+  docker run -e CHECK_PORT=9876 -e CHECK_HOST=localhost giorgos/takis
   echo "* Starting Firefox"
   firefox localhost:9876
 ) &
@@ -28,7 +28,7 @@ echo "* Starting recipe-server"
 SERVER_ID=$(bin/ci/docker-run.sh -e DJANGO_CONFIGURATION=ProductionInsecure -d)
 
 echo "* Waiting for server to be ready"
-docker run --net host -e CHECK_PORT=8000 -e CHECK_HOST=localhost giorgos/takis
+docker run -e CHECK_PORT=8000 -e CHECK_HOST=localhost giorgos/takis
 echo "* Running acceptance tests"
 bin/ci/docker-run.sh py.test contract-tests/ \
   -vv \

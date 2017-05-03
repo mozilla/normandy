@@ -13,7 +13,6 @@ fi
 
 docker run \
   --env DJANGO_CONFIGURATION=Test \
-  --net host \
   --volume $1:/mock-recipe-server-build \
   --volume $REPO_DIR/mock-recipe-server:/mock-recipe-server \
   "${DOCKER_ARGS[@]}" \
