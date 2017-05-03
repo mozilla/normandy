@@ -9,61 +9,17 @@ BASE_URL = 'http://taskcluster/queue/v1'
 
 tasks = [
     {
-        'name': 'recipe-client-addon:fetch',
-        'description': 'Download gecko-dev and sync Normandy changes',
-        'command': 'normandy/recipe-client-addon/bin/tc/fetch.sh',
+        'name': 'recipe-client-addon:build_test',
+        'description': (
+            'Download mozilla-central, sync Normandy changes, build Firefox, and run Normandy '
+            'tests'
+        ),
+        'command': 'normandy/recipe-client-addon/bin/tc/build_test.sh',
     },
     {
         'name': 'recipe-client-addon:lint',
         'description': 'Run lint checks on the add-on',
         'command': 'normandy/recipe-client-addon/bin/tc/lint.sh',
-        'dependencies': ['recipe-client-addon:fetch'],
-        'artifacts_from': [
-            {
-                'task_name': 'recipe-client-addon:fetch',
-                'path': 'public/source.tar.gz',
-                'env_var': 'FETCH_RESULT',
-            },
-        ],
-    },
-    {
-        'name': 'recipe-client-addon:build',
-        'description': 'Build Firefox with recipe-client-addon',
-        'command': 'normandy/recipe-client-addon/bin/tc/build.sh',
-        'dependencies': ['recipe-client-addon:fetch'],
-        'artifacts_from': [
-            {
-                'task_name': 'recipe-client-addon:fetch',
-                'path': 'public/source.tar.gz',
-                'env_var': 'FETCH_RESULT',
-            },
-        ],
-    },
-    {
-        'name': 'recipe-client-addon:test',
-        'description': 'Test recipe-client-addon with gecko-dev',
-        'command': 'normandy/recipe-client-addon/bin/tc/test.sh',
-        'dependencies': ['recipe-client-addon:build'],
-        'artifacts_from': [
-            {
-                'task_name': 'recipe-client-addon:build',
-                'path': 'public/build.tar.gz',
-                'env_var': 'BUILD_RESULT',
-            },
-        ],
-    },
-    {
-        'name': 'recipe-client-addon:package',
-        'description': 'Package the built Firefox (with shield-recipe-client) for distribution',
-        'command': 'normandy/recipe-client-addon/bin/tc/package.sh',
-        'dependencies': ['recipe-client-addon:build'],
-        'artifacts_from': [
-            {
-                'task_name': 'recipe-client-addon:build',
-                'path': 'public/build.tar.gz',
-                'env_var': 'BUILD_RESULT',
-            },
-        ],
     },
     {
         'name': 'recipe-client-addon:make-xpi',
