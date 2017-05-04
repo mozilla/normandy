@@ -1,4 +1,4 @@
-const API_ROOT = '/api/v1/';
+const API_ROOT = '/api';
 
 export default async function apiFetch(url, options = {}) {
   let queryString = '';

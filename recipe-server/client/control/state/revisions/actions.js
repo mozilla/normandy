@@ -10,7 +10,7 @@ import {
 export function fetchRevision(pk) {
   return async dispatch => {
     const requestId = `fetch-revision-${pk}`;
-    const revision = await dispatch(makeApiRequest(requestId, `recipe_revision/${pk}/`));
+    const revision = await dispatch(makeApiRequest(requestId, `v2/recipe_revision/${pk}/`));
 
     dispatch({
       type: REVISION_RECEIVE,
@@ -23,7 +23,7 @@ export function fetchRevision(pk) {
 export function fetchAllRevisions() {
   return async dispatch => {
     const requestId = 'fetch-all-revisions';
-    const revisions = await dispatch(makeApiRequest(requestId, 'recipe_revision/'));
+    const revisions = await dispatch(makeApiRequest(requestId, 'v2/recipe_revision/'));
 
     revisions.forEach(revision => {
       dispatch({

@@ -10,7 +10,7 @@ import {
 export function fetchAction(name) {
   return async dispatch => {
     const requestId = `fetch-action-${name}`;
-    const action = await dispatch(makeApiRequest(requestId, `action/${name}/`));
+    const action = await dispatch(makeApiRequest(requestId, `v2/action/${name}/`));
 
     dispatch({
       type: ACTION_RECEIVE,
@@ -23,7 +23,7 @@ export function fetchAction(name) {
 export function fetchAllActions() {
   return async dispatch => {
     const requestId = 'fetch-all-actions';
-    const actions = await dispatch(makeApiRequest(requestId, 'action/'));
+    const actions = await dispatch(makeApiRequest(requestId, 'v2/action/'));
 
     actions.forEach(action => {
       dispatch({
