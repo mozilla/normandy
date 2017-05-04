@@ -56,10 +56,18 @@ add_task(withSandboxManager(Assert, async function testCreateStorage(sandboxMana
   await sandboxManager.evalInSandbox(`
     (async function sandboxTest() {
       const store = driver.createStorage("testprefix");
+      const otherStore = driver.createStorage("othertestprefix");
       await store.clear();
+      await otherStore.clear();
 
       await store.setItem("willremove", 7);
+      await otherStore.setItem("willremove", 4);
       is(await store.getItem("willremove"), 7, "createStorage stores sandbox values");
+      is(
+        await otherStore.getItem("willremove"),
+        4,
+        "values are not shared between createStorage stores",
+      );
 
       const deepValue = {"foo": ["bar", "baz"]};
       await store.setItem("deepValue", deepValue);
@@ -67,6 +75,8 @@ add_task(withSandboxManager(Assert, async function testCreateStorage(sandboxMana
 
       await store.removeItem("willremove");
       is(await store.getItem("willremove"), null, "createStorage removes items");
+
+      is('prefix' in store, false, "createStorage doesn't expose non-whitelist attributes");
     })();
   `);
 }));

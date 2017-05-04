@@ -128,14 +128,15 @@ this.NormandyDriver = function(sandboxManager) {
 
       // Wrapped methods that we expose to the sandbox. These are documented in
       // the driver spec in docs/dev/driver.rst.
+      const storageInterface = {};
       for (const method of ["getItem", "setItem", "removeItem", "clear"]) {
-        storage[method] = sandboxManager.wrapAsync(storage[method], {
+        storageInterface[method] = sandboxManager.wrapAsync(storage[method].bind(storage), {
           cloneArguments: true,
           cloneInto: true,
         });
       }
 
-      return sandboxManager.cloneInto(storage, {cloneFunctions: true});
+      return sandboxManager.cloneInto(storageInterface, {cloneFunctions: true});
     },
 
     setTimeout(cb, time) {
