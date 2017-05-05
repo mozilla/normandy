@@ -1,3 +1,6 @@
+import { Map } from 'immutable';
+
+
 export const fixtureRecipes = [
   {
     id: 1,
@@ -151,6 +154,27 @@ export const initialState = {
   },
   routing: {
     locationBeforeTransitions: null,
+  },
+  newState: {
+    actions: {
+      items: new Map(),
+    },
+    approvalRequests: {
+      items: new Map(),
+    },
+    form: {},
+    recipes: {
+      filters: new Map(),
+      history: new Map(),
+      items: new Map(),
+    },
+    requests: new Map(),
+    revisions: {
+      items: new Map(),
+    },
+    routing: {
+      locationBeforeTransitions: null,
+    },
   },
 };
 
