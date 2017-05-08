@@ -16,6 +16,7 @@ Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
 Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
+Cu.import("resource://shield-recipe-client/lib/PreferenceManagement.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceRollout.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
@@ -26,6 +27,9 @@ this.EXPORTED_SYMBOLS = ["NormandyDriver"];
 
 const log = LogManager.getLogger("normandy-driver");
 const actionLog = LogManager.getLogger("normandy-driver.actions");
+
+const ExperimentManager = PreferenceManagement("experiments");
+const RolloutManager = PreferenceManagement("rollouts");
 
 this.NormandyDriver = function(sandboxManager) {
   if (!sandboxManager) {
@@ -163,16 +167,20 @@ this.NormandyDriver = function(sandboxManager) {
     // Preference Experiment API
     preferenceExperiments: {
       start: sandboxManager.wrapAsync(PreferenceExperiments.start, {cloneArguments: true}),
-      markLastSeen: sandboxManager.wrapAsync(PreferenceExperiments.markLastSeen),
       stop: sandboxManager.wrapAsync(PreferenceExperiments.stop),
-      get: sandboxManager.wrapAsync(PreferenceExperiments.get, {cloneInto: true}),
-      getAllActive: sandboxManager.wrapAsync(PreferenceExperiments.getAllActive, {cloneInto: true}),
-      has: sandboxManager.wrapAsync(PreferenceExperiments.has),
+      markLastSeen: sandboxManager.wrapAsync(ExperimentManager.markLastSeen),
+      get: sandboxManager.wrapAsync(ExperimentManager.get, {cloneInto: true}),
+      getAllActive: sandboxManager.wrapAsync(ExperimentManager.getActivePrefChanges, {cloneInto: true}),
+      has: sandboxManager.wrapAsync(ExperimentManager.has),
     },
 
     preferenceRollout: {
-      register: sandboxManager.wrapAsync(PreferenceRollout.register, {cloneArguments: true}),
-      withdraw: sandboxManager.wrapAsync(PreferenceRollout.withdraw),
+      start: sandboxManager.wrapAsync(PreferenceRollout.start, {cloneArguments: true}),
+      stop: sandboxManager.wrapAsync(PreferenceRollout.stop),
+      markLastSeen: sandboxManager.wrapAsync(RolloutManager.markLastSeen),
+      get: sandboxManager.wrapAsync(RolloutManager.get, {cloneInto: true}),
+      getAllActive: sandboxManager.wrapAsync(RolloutManager.getActivePrefChanges, {cloneInto: true}),
+      has: sandboxManager.wrapAsync(RolloutManager.has),
     },
   };
 };
