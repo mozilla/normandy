@@ -1,3 +1,6 @@
+from datetime import datetime
+from contextlib import contextmanager
+
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
@@ -8,7 +11,12 @@ from normandy.health.api import views
 
 def test_version(client, mocker):
     get_version_info = mocker.patch('normandy.health.api.views.get_version_info')
-    get_version_info.return_value = ('<git hash>', '<tag>')
+    build_time = datetime.now()
+    get_version_info.return_value = {
+        'commit': '<git hash>',
+        'version': '<tag>',
+        'build_time': build_time,
+    }
 
     res = client.get('/__version__')
     assert res.status_code == 200
@@ -18,6 +26,7 @@ def test_version(client, mocker):
         'commit_link': 'https://github.com/mozilla/normandy/commit/<git hash>',
         'configuration': 'Test',
         'version': '<tag>',
+        'build_time': build_time.isoformat(),
     }
 
 
@@ -42,39 +51,71 @@ class TestGetVersionInfo(object):
     @pytest.fixture
     def commit_file(self, version_info_dir):
         f = version_info_dir.join('commit')
-        f.write('bc685e4be05a182ae819990509c92affa3d882ab\n')
+        f.commit = 'bc685e4be05a182ae819990509c92affa3d882ab'
+        f.write(f.commit + '\n')
         return f
 
     @pytest.fixture
     def tag_file(self, version_info_dir):
         f = version_info_dir.join('tag')
-        f.write('v20\n')
+        f.tag = 'v20'
+        f.write(f.tag + '\n')
         return f
 
-    def test_with_both(self, commit_file, tag_file):
-        commit, tag = views.get_version_info()
-        assert commit == 'bc685e4be05a182ae819990509c92affa3d882ab'
-        assert tag == 'v20'
+    @pytest.fixture
+    def build_time_file(self, version_info_dir):
+        f = version_info_dir.join('build_time')
+        ts = 1493051820
+        f.write(str(ts) + '\n')
+        f.datetime = datetime.utcfromtimestamp(ts)
+        return f
+
+    @contextmanager
+    def clear_version_info(self):
+        try:
+            yield
+        finally:
+            views.get_version_info.cache_clear()
+
+    def test_with_everything(self, commit_file, tag_file, build_time_file):
+        with self.clear_version_info():
+            version_info = views.get_version_info()
+            assert version_info['commit'] == commit_file.commit
+            assert version_info['version'] == tag_file.tag
+            assert version_info['build_time'] == build_time_file.datetime
 
     def test_with_only_commit(self, commit_file):
-        commit, tag = views.get_version_info()
-        assert commit == 'bc685e4be05a182ae819990509c92affa3d882ab'
-        assert tag == 'unknown'
+        with self.clear_version_info():
+            version_info = views.get_version_info()
+            assert version_info['commit'] == commit_file.commit
+            assert version_info['version'] is None
+            assert version_info['build_time'] is None
 
     def test_with_only_tag(self, tag_file):
-        commit, tag = views.get_version_info()
-        assert commit == 'unknown'
-        assert tag == 'v20'
+        with self.clear_version_info():
+            version_info = views.get_version_info()
+            assert version_info['commit'] is None
+            assert version_info['version'] == tag_file.tag
+            assert version_info['build_time'] is None
+
+    def test_with_only_build_time(self, build_time_file):
+        with self.clear_version_info():
+            version_info = views.get_version_info()
+            assert version_info['commit'] is None
+            assert version_info['version'] is None
+            assert version_info['build_time'] == build_time_file.datetime
 
     def test_with_nothing(self, version_info_dir):
-        commit, tag = views.get_version_info()
-        assert commit == 'unknown'
-        assert tag == 'unknown'
+        with self.clear_version_info():
+            version_info = views.get_version_info()
+            assert version_info['commit'] is None
+            assert version_info['version'] is None
+            assert version_info['build_time'] is None
 
-    def test_it_is_cached(self, commit_file, tag_file):
-        commit, tag = views.get_version_info()
-        assert commit == 'bc685e4be05a182ae819990509c92affa3d882ab'
-        assert tag == 'v20'
-        commit_file.remove()
-        tag_file.remove()
-        assert (commit, tag) == views.get_version_info()
+    def test_it_is_cached(self, commit_file, tag_file, build_time_file):
+        with self.clear_version_info():
+            version_info = views.get_version_info()
+            commit_file.remove()
+            tag_file.remove()
+            build_time_file.remove()
+            assert version_info == views.get_version_info()
