@@ -323,13 +323,32 @@ i {
 }
 
 
-.callout {
+.callout,
+.callout-warning {
   background: rgba(19, 124, 189, 0.15);
   border-radius: 4px;
   display: block;
   padding: 1em;
   text-align: center;
   width: 100%;
+}
+
+.callout-warning {
+  background: $yellow;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
+  position: relative;
+
+  &.has-arrow {
+    &::before {
+      border: solid;
+      border-color: $yellow transparent;
+      border-width: 0 8px 8px;
+      content: "";
+      left: 15px;
+      position: absolute;
+      top: -8px;
+    }
+  }
 }
 
 .recipe-form {

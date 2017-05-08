@@ -16,6 +16,7 @@ export class HeartbeatFields extends ActionFields {
 
   render() {
     const { recipeArguments, disabled } = this.props;
+
     return (
       <div className="arguments-fields">
         <p className="info">

@@ -1,0 +1,46 @@
+{
+    "name": "preference-rollout",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./index.js",
+    "normandy": {
+        "driverVersion": "1.x",
+        "argumentsSchema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "title": "Change a preference for a portion of the population",
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "name": {
+                    "description": "Rollout name",
+                    "type": "string",
+                    "default": ""
+                },
+                "preferenceName": {
+                    "description": "Preference to change",
+                    "type": "string",
+                    "default": ""
+                },
+                "preferenceValue": {
+                    "description": "Value to set preference to.",
+                    "type": ["string", "number", "boolean"],
+                    "default": ""
+                },
+                "preferenceType": {
+                    "description": "Data type of the preference that controls this experiment",
+                    "type": "string",
+                    "enum": ["string", "integer", "boolean"],
+                    "default": "boolean"
+                },
+                "preferenceBranch": {
+                    "descript": "Controls whether the default or user value of the preference is modified",
+                    "type": "string",
+                    "enum": ["user", "default"],
+                    "default": "default"
+                }
+            }
+        }
+    }
+}
