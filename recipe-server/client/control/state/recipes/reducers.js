@@ -36,18 +36,18 @@ function items(state = new Map(), action) {
   switch (action.type) {
     case RECIPE_RECEIVE:
       recipe = fromJS(action.recipe);
-      recipe.set('action_id', action.recipe.action.id);
-      recipe.remove('action');
+      recipe = recipe.set('action_id', action.recipe.action.id);
+      recipe = recipe.remove('action');
 
-      recipe.set('latest_revision_id', action.recipe.latest_revision.id);
-      recipe.remove('latest_revision');
+      recipe = recipe.set('latest_revision_id', action.recipe.latest_revision.id);
+      recipe = recipe.remove('latest_revision');
 
       if (action.recipe.approved_revision) {
-        recipe.set('approved_revision_id', action.recipe.approved_revision.id);
+        recipe = recipe.set('approved_revision_id', action.recipe.approved_revision.id);
       } else {
-        recipe.set('approved_revision_id', null);
+        recipe = recipe.set('approved_revision_id', null);
       }
-      recipe.remove('approved_revision');
+      recipe = recipe.remove('approved_revision');
 
       return state.set(action.recipe.id, recipe);
 

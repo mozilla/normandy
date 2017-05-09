@@ -18,6 +18,10 @@ export const RECIPE = {
     id: '9f86d081',
     recipe: {
       id: 1,
+      action: {
+        id: 1,
+        name: 'test-action',
+      },
     },
   },
   approved_revision: null,
