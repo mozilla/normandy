@@ -156,6 +156,79 @@ this.NormandyDriver = function(sandboxManager) {
       sandboxManager.removeHold(`setTimeout-${token}`);
     },
 
+    /*
+     * Return a promise that resolves to an Addon ID if installation is successful.
+     */
+    installAddon(url) {
+        /* We need to clobber chrome URLs into file based URLs before they
+         * get forwarded to the AddonManager.
+         *
+         * The AddonManager can only handle file:// and downloadable URLs.
+         *
+         */
+
+      let tempUrl = Services.io.newURI(url);
+      if (tempUrl.scheme == "chrome") {
+        let baseURI = tempUrl.clone().QueryInterface(Ci.nsIURL);
+        const registry = Cc['@mozilla.org/chrome/chrome-registry;1'].
+          getService(Ci.nsIChromeRegistry);
+        url = registry.convertChromeURL(baseURI).spec;
+      }
+
+      var installObjectCallback = (installObject, resolve, reject) => {
+        installObject.install();
+        installObject.addListener({
+          onInstallEnded: (addonInstall, addon) => {
+            let addonId = addon.id;
+            resolve(addonId);
+          },
+          onInstallFailed: (addonInstall) => {
+            reject(`AddonInstall error code: [${addonInstall.error}]`);
+          },
+        });
+      };
+
+      function installObjectPromise(installObject) {
+        return new Promise(function(resolve, reject) {
+          installObjectCallback(installObject, resolve, reject);
+        });
+      }
+
+      function getInstallForURLPromise(url) {
+        return new Promise(function(resolve, reject) {
+          AddonManager.getInstallForURL(url, resolve, 'application/x-xpinstall');
+        });
+      };
+
+      // Return a promise
+      return getInstallForURLPromise(url).then(installObjectPromise);
+    },
+
+    /*
+     * Return a promise that resolves to a success messsage if
+     * addon uninstall is successful.
+     */
+    uninstallAddon(addonId) {
+      function uninstallPromise(id) {
+        return new Promise(function(resolve, reject) {
+          AddonManager.getAddonByID(id, addon => {
+            if (addon != null) {
+              try {
+                addon.uninstall();
+              } catch (e) {
+                reject("Addon uninstall triggered an error");
+                return;
+              }
+            } else {
+              reject("Addon is null - can't uninstall it");
+            }
+            resolve();
+          });
+        });
+      }
+      return uninstallPromise(addonId);
+    },
+
     // Sampling
     ratioSample: sandboxManager.wrapAsync(Sampling.ratioSample),
 

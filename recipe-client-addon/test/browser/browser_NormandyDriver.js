@@ -2,6 +2,15 @@
 
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 
+const TEST_DIR = gTestPath.substr(0, gTestPath.lastIndexOf("/"));
+const CHROME_URL_ROOT = TEST_DIR + "/";
+
+function getFixtureURL(path) {
+  let cr = Cc["@mozilla.org/chrome/chrome-registry;1"]
+    .getService(Ci.nsIChromeRegistry);
+  return Services.io.newURI(CHROME_URL_ROOT + path).asciiSpec;
+}
+
 add_task(withDriver(Assert, async function uuids(driver) {
   // Test that it is a UUID
   const uuid1 = driver.uuid();
@@ -10,6 +19,22 @@ add_task(withDriver(Assert, async function uuids(driver) {
   // Test that UUIDs are different each time
   const uuid2 = driver.uuid();
   isnot(uuid1, uuid2, "uuids are unique");
+}));
+
+add_task(withDriver(Assert, async function installXpi(driver) {
+  // Test that we can install an XPI from any URL
+  let xpiURL = getFixtureURL("fixtures/normandy.xpi");
+  console.log(`URL for XPI is: ${xpiURL}`);
+  var xpiPromise = driver.installAddon(xpiURL);
+  xpiPromise.then(addonId => {
+    return driver.uninstallAddon(addonId)
+  }, reason => {
+    ok(false, `Install of addon failed ${reason}`);
+  }).then(() => {
+    // Everything passed
+  }, reason => {
+    ok(false, `=== Failed to uninstall addon ${reason}`);
+  });
 }));
 
 add_task(withDriver(Assert, async function userId(driver) {
