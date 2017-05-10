@@ -2,6 +2,7 @@ import { fromJS, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
+  RECIPE_DELETE,
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
@@ -23,6 +24,9 @@ function history(state = new Map(), action) {
   switch (action.type) {
     case RECIPE_HISTORY_RECEIVE:
       return state.set(action.recipeId, fromJS(action.revisions.map(revision => revision.id)));
+
+    case RECIPE_DELETE:
+      return state.remove(action.recipeId);
 
     default:
       return state;
@@ -53,6 +57,9 @@ function items(state = new Map(), action) {
       recipe = recipe.remove('approved_revision');
 
       return state.set(action.recipe.id, recipe);
+
+    case RECIPE_DELETE:
+      return state.remove(action.recipeId);
 
     default:
       return state;

@@ -1,5 +1,6 @@
 import {
   ACTION_RECEIVE,
+  RECIPE_DELETE,
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
@@ -54,6 +55,46 @@ export function fetchAllRecipes() {
 
     recipes.forEach(recipe => {
       dispatch(recipeReceived(recipe));
+    });
+  };
+}
+
+
+export function createRecipe(recipeData) {
+  return async dispatch => {
+    const requestId = 'create-recipe';
+    const recipe = await dispatch(makeApiRequest(requestId, 'v2/recipe/', {
+      method: 'POST',
+      data: recipeData,
+    }));
+    dispatch(recipeReceived(recipe));
+  };
+}
+
+
+export function updateRecipe(pk, recipeData) {
+  return async dispatch => {
+    const requestId = `update-recipe-${pk}`;
+    const recipe = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}`, {
+      method: 'PATCH',
+      data: recipeData,
+    }));
+    dispatch(recipeReceived(recipe));
+  };
+}
+
+
+export function deleteRecipe(pk) {
+  return async dispatch => {
+    const requestId = `delete-recipe-${pk}`;
+
+    await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}`, {
+      method: 'DELETE',
+    }));
+
+    dispatch({
+      type: RECIPE_DELETE,
+      recipeId: pk,
     });
   };
 }
