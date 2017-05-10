@@ -334,9 +334,11 @@ i {
 
 .recipe-form {
   .callout {
+    clear: both;
     float: right;
+    margin: 0 0 2em;
     text-align: left;
-    width: 45%;
+    width: 100%;
   }
 
   .status-indicator {
@@ -369,15 +371,21 @@ i {
   }
 }
 
-.form-frame {
+.recipe-form .form-frame {
   background: $cream;
+}
+
+.form-frame {
   border: 1px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 1px 1px 3px 1px rgba(255, 255, 255, 0.5);
   margin-bottom: 2em;
   padding: 0.5em 1em 1em;
+
 
   .frame-title {
     display: inline-block;
     padding: 0 0.5em;
+    text-shadow: 0 1px 0 #FFF, 0 2px 2px rgba(0, 0, 0, 0.25);
   }
 
   .form-frame {
@@ -406,6 +414,17 @@ i {
       text-transform: none;
     }
 
+    select {
+      height: 12vh;
+      margin-bottom: 0.5em;
+      min-height: 110px;
+    }
+
+    input[type="search"],
+    input[type="text"] {
+      font-weight: 400;
+    }
+
     &.mp-from {
       border-radius: 4px 0 0 4px;
       border-right: none;
@@ -426,6 +445,7 @@ i {
     &::after {
       content: " (" attr(title) ")";
       font-size: 0.75em;
+      font-weight: 400;
       margin-left: 0.5em;
     }
 
@@ -438,6 +458,7 @@ i {
 .form-field .checkbox-list {
   label {
     color: $darkBrown;
+    margin: 1em 0;
     text-transform: none;
 
     span {

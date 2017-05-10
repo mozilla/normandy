@@ -8,7 +8,7 @@ import {
   ErrorMessageField,
   IntegerControlField,
 } from 'control/components/Fields';
-import { selector } from 'control/components/RecipeForm';
+import { formSelector } from 'control/components/RecipeForm';
 import ActionFields from 'control/components/action_fields/ActionFields';
 
 const VALUE_FIELDS = {
@@ -107,7 +107,7 @@ export class PreferenceExperimentFields extends ActionFields {
 
 export default connect(
   state => ({
-    preferenceBranchType: selector(state, 'arguments.preferenceBranchType'),
+    preferenceBranchType: formSelector(state, 'arguments.preferenceBranchType') || 'default',
   })
 )(PreferenceExperimentFields);
 
@@ -232,7 +232,7 @@ RemoveBranchButton.propTypes = {
 
 export const ConnectedBranchFields = connect(
   state => ({
-    preferenceType: selector(state, 'arguments.preferenceType'),
+    preferenceType: formSelector(state, 'arguments.preferenceType'),
   })
 )(BranchFields);
 

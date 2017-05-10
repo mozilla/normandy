@@ -46,7 +46,6 @@ import {
 import composeRecipeContainer from 'control/components/RecipeContainer';
 import { ControlField, CheckboxGroup } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
-import MultiPicker from 'control/components/MultiPicker';
 
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
@@ -345,9 +344,8 @@ export class RecipeForm extends React.Component {
       recipe,
       revision,
       recipeId,
-      route,
       recipeArguments,
-      filters = {},
+      filters,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -365,7 +363,6 @@ export class RecipeForm extends React.Component {
 
     const thisRevisionRequest = revision && revision.approval_request;
     const statusText = renderVars.isEnabled ? 'Enabled' : 'Disabled';
-    const filters = getFilterObject(this.props.filters.list);
 
     return (
       <form className="recipe-form" onSubmit={handleSubmit}>
@@ -419,13 +416,6 @@ export class RecipeForm extends React.Component {
             component="input"
             type="text"
           />
-
-          <ControlField
-            disabled={isFormDisabled}
-            label="Filter Expression"
-            name="extra_filter_expression"
-            component="textarea"
-          />
         </Frame>
 
         <Frame title="Filters">
@@ -465,7 +455,12 @@ export class RecipeForm extends React.Component {
             label="Action"
             name="action"
             component="select"
-          />
+          >
+            <option value="">Choose an action...</option>
+            <option value="console-log">Log to Console</option>
+            <option value="show-heartbeat">Heartbeat Prompt</option>
+            <option value="preference-experiment">Preference Experiment</option>
+          </ControlField>
 
           <ArgumentsFields disabled={isFormDisabled} fields={recipeArguments} />
         </Frame>
