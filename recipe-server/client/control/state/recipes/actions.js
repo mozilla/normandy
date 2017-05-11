@@ -90,7 +90,7 @@ export function createRecipe(recipeData) {
 export function updateRecipe(pk, recipeData) {
   return async dispatch => {
     const requestId = `update-recipe-${pk}`;
-    const recipe = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}`, {
+    const recipe = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/`, {
       method: 'PATCH',
       data: recipeData,
     }));
@@ -103,7 +103,7 @@ export function deleteRecipe(pk) {
   return async dispatch => {
     const requestId = `delete-recipe-${pk}`;
 
-    await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}`, {
+    await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/`, {
       method: 'DELETE',
     }));
 
@@ -111,6 +111,28 @@ export function deleteRecipe(pk) {
       type: RECIPE_DELETE,
       recipeId: pk,
     });
+  };
+}
+
+
+export function enableRecipe(pk) {
+  return async dispatch => {
+    const requestId = `enable-recipe-${pk}`;
+    const recipe = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/enable/`, {
+      method: 'POST',
+    }));
+    dispatch(recipeReceived(recipe));
+  };
+}
+
+
+export function disableRecipe(pk) {
+  return async dispatch => {
+    const requestId = `enable-recipe-${pk}`;
+    const recipe = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/disable/`, {
+      method: 'POST',
+    }));
+    dispatch(recipeReceived(recipe));
   };
 }
 
