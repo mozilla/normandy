@@ -60,6 +60,21 @@ export function fetchAllRecipes() {
 }
 
 
+export function fetchFilteredRecipes(filters) {
+  return async dispatch => {
+    const filterIds = Object.keys(filters).map(key => `${key}-${filters[key]}`);
+    const requestId = `fetch-filtered-recipes-${filterIds.join('-')}`;
+    const recipes = await dispatch(makeApiRequest(requestId, 'v2/recipe/', {
+      data: filters,
+    }));
+
+    recipes.forEach(recipe => {
+      dispatch(recipeReceived(recipe));
+    });
+  };
+}
+
+
 export function createRecipe(recipeData) {
   return async dispatch => {
     const requestId = 'create-recipe';
