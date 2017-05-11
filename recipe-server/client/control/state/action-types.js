@@ -1,6 +1,7 @@
 /* Keep this list alphabetized */
 
 export const ACTION_RECEIVE = 'ACTION_RECEIVE';
+export const APPROVAL_REQUEST_DELETE = 'APPROVAL_REQUEST_DELETE';
 export const APPROVAL_REQUEST_RECEIVE = 'APPROVAL_REQUEST_RECEIVE';
 export const RECIPE_DELETE = 'RECIPE_DELETE';
 export const RECIPE_RECEIVE = 'RECIPE_RECEIVE';
