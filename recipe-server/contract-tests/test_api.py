@@ -32,7 +32,7 @@ def test_expected_action_types(conf, requests_session):
     assert len(response) >= 1
 
     # Make sure we only have expected action types
-    expected_records = ['console-log', 'show-heartbeat', 'preference-experiment']
+    expected_records = ['console-log', 'show-heartbeat', 'preference-experiment', 'opt-out-study']
 
     for record in response:
         assert record['name'] in expected_records

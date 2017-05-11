@@ -117,6 +117,7 @@ module.exports = [
       'console-log': './client/actions/console-log/index',
       'show-heartbeat': './client/actions/show-heartbeat/index',
       'preference-experiment': './client/actions/preference-experiment/index',
+      'opt-out-study': './client/actions/opt-out-study/index',
     },
 
     plugins: [
