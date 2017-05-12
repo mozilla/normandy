@@ -27,8 +27,8 @@ describe('getAction', () => {
     expect(getAction(STATE, ACTION.id)).toEqual(fromJS(ACTION));
   });
 
-  it('should return `undefined` for invalid ID', () => {
-    expect(getAction(STATE, 0)).toEqual(undefined);
+  it('should return `null` for invalid ID', () => {
+    expect(getAction(STATE, 0)).toEqual(null);
   });
 
   it('should return default value for invalid ID with default provided', () => {

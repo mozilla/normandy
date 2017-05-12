@@ -29,8 +29,8 @@ describe('getApprovalRequest', () => {
     expect(getApprovalRequest(STATE, APPROVAL_REQUEST.id)).toEqual(fromJS(APPROVAL_REQUEST));
   });
 
-  it('should return `undefined` for invalid ID', () => {
-    expect(getApprovalRequest(STATE, 0)).toEqual(undefined);
+  it('should return `null` for invalid ID', () => {
+    expect(getApprovalRequest(STATE, 0)).toEqual(null);
   });
 
   it('should return default value for invalid ID with default provided', () => {

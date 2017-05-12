@@ -1,7 +1,7 @@
 /* eslint import/prefer-default-export: "off" */
 import { getAction } from '../actions/selectors';
 
-export function getRevision(state, id, defaultsTo) {
+export function getRevision(state, id, defaultsTo = null) {
   const revision = state.newState.revisions.items.get(id);
 
   if (revision) {

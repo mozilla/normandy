@@ -4,7 +4,7 @@ import { getAction } from '../actions/selectors';
 import { getRevision } from '../revisions/selectors';
 
 
-export function getRecipe(state, id, defaultsTo) {
+export function getRecipe(state, id, defaultsTo = null) {
   const recipe = state.newState.recipes.items.get(id);
 
   if (recipe) {
