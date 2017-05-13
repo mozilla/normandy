@@ -15,6 +15,7 @@ class Core(Configuration):
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
+        'normandy.studies',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
