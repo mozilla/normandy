@@ -207,19 +207,12 @@ class TestRecipe(object):
         expected = (
             '{'
             '"action":"action",'
-            '"approval_request":null,'
-            '"approved_revision_id":null,'
             '"arguments":{"bar":2,"foo":1},'
-            '"channels":["beta"],'
-            '"countries":["CA"],'
             '"enabled":false,'
-            '"extra_filter_expression":"2 + 2 == 4",'
             '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
             '"is_approved":false,'
             '"last_updated":"%(last_updated)s",'
-            '"latest_revision_id":"%(latest_revision_id)s",'
-            '"locales":["en-US"],'
             '"name":"canonical",'
             '"revision_id":"%(revision_id)s"'
             '}'
@@ -227,7 +220,6 @@ class TestRecipe(object):
             'id': recipe.id,
             'revision_id': recipe.revision_id,
             'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'latest_revision_id': recipe.latest_revision.id,
             'filter_expression': filter_expression
         }
         expected = expected.encode()
