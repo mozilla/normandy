@@ -65,38 +65,17 @@ XPCOMUtils.defineLazyModuleGetter(this, "PreferenceManagement", "resource://shie
 
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
-const Manager = PreferenceManagement("experiments");
 const log = LogManager.getLogger("preference-experiments");
 
-this.PreferenceExperiments = {
+const PREF_NAMESPACE = "experiments";
+
+this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPACE), {
   async init() {
-    Manager.applyAll();
+    this.applyAll();
   },
 
   async getAll() {
-    return Manager.getChangedPrefs();
-  },
-
-  /**
-   * Test wrapper that temporarily replaces the stored experiment data with fake
-   * data for testing.
-   */
-  withMockExperiments(testFunction) {
-    return async function inner(...args) {
-      const mockExperiments = {};
-      const storePromise = Promise.resolve({
-        data: mockExperiments,
-        saveSoon() { },
-      });
-
-      try {
-        await testFunction(...args, mockExperiments);
-      } finally {
-        Manager.stopAllObservers();
-      }
-
-      return storePromise;
-    };
+    return this.getAllPrefChanges();
   },
 
   /**
@@ -115,12 +94,12 @@ this.PreferenceExperiments = {
   async start({name, branch, preferenceName, preferenceValue, preferenceBranchType, preferenceType}) {
     log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
-    const hasExistingExperiment = await Manager.has(name);
+    const hasExistingExperiment = await this.has(name);
     if (hasExistingExperiment) {
       throw new Error(`A preference experiment named "${name}" already exists.`);
     }
 
-    const activeExperiments = await Manager.getActive();
+    const activeExperiments = await this.getActiveRecipes();
     const hasConflictingExperiment = activeExperiments.some(
       e => e.preferenceName === preferenceName
     );
@@ -130,7 +109,7 @@ this.PreferenceExperiments = {
       );
     }
 
-    const preferences = Manager.getPreferenceBranch(preferenceBranchType);
+    const preferences = this.getPreferenceBranch(preferenceBranchType);
 
     /** @type {Experiment} */
     const experiment = {
@@ -146,7 +125,7 @@ this.PreferenceExperiments = {
     };
 
     // Validation will throw
-    Manager.validateRecipe(experiment);
+    this.validateRecipe(experiment);
 
     if (!preferenceType || !givenPrefType) {
       throw new Error(`Invalid preferenceType provided (given "${preferenceType}")`);
@@ -160,8 +139,8 @@ this.PreferenceExperiments = {
     }
 
     // Save experiment data locally to be read from on startup later
-    Manager.saveRecipeData(experiment);
-    Manager.startObserver(experiment.name, experiment.preferenceName, experiment.preferenceValue);
+    this.saveRecipeData(experiment);
+    this.startObserver(experiment.name, experiment.preferenceName, experiment.preferenceValue);
 
     // Actually alter the set preference (this is done automatically on startup)
     preferences.set(preferenceName, preferenceValue);
@@ -183,26 +162,26 @@ this.PreferenceExperiments = {
   async stop(experimentName, resetValue = true) {
     log.debug(`PreferenceExperiments.stop(${experimentName})`);
 
-    const hasExistingExperiment = await Manager.has(experimentName);
+    const hasExistingExperiment = await this.has(experimentName);
     if (!hasExistingExperiment) {
       throw new Error(`Could not find a preference experiment named "${experimentName}"`);
     }
 
-    const experiment = await Manager.get(experimentName);
+    const experiment = await this.get(experimentName);
     if (experiment.expired) {
       throw new Error(
         `Cannot stop preference experiment "${experimentName}" because it is already expired`
       );
     }
 
-    if (Manager.hasObserver(experimentName)) {
-      Manager.stopObserver(experimentName);
+    if (this.hasObserver(experimentName)) {
+      this.stopObserver(experimentName);
     }
 
     if (resetValue) {
       const {preferenceName, previousPreferenceValue, preferenceBranchType} = experiment;
 
-      const preferences = Manager.getPreferenceBranch(preferenceBranchType);
+      const preferences = this.getPreferenceBranch(preferenceBranchType);
 
       if (previousPreferenceValue !== undefined) {
         preferences.set(preferenceName, previousPreferenceValue);
@@ -214,7 +193,7 @@ this.PreferenceExperiments = {
       }
     }
 
-    Manager.expire(experiment.name);
+    this.expire(experiment.name);
     TelemetryEnvironment.setExperimentInactive(experimentName, experiment.branch);
   },
-};
+});

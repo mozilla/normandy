@@ -2,13 +2,12 @@
 
 Cu.import("resource://gre/modules/Preferences.jsm", this);
 Cu.import("resource://gre/modules/TelemetryEnvironment.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/PreferenceManagement.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm", this);
 
-const experimentManager = PreferenceManagement("experiments");
-
 // Save ourselves some typing
-const {withMockExperiments} = PreferenceExperiments;
+const {withMockData} = PreferenceExperiments;
+const withMockExperiments = withMockData.bind(PreferenceExperiments);
+
 const DefaultPreferences = new Preferences({defaultBranch: true});
 
 function experimentFactory(attrs) {
@@ -24,15 +23,15 @@ function experimentFactory(attrs) {
     preferenceBranchType: "default",
   }, attrs);
 }
-
-// clearAllExperimentStorage
+// clearStorage
 add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
+
   ok(await PreferenceExperiments.has("test"), "Mock experiment is detected.");
-  await PreferenceExperiments.clearAllExperimentStorage();
+  await PreferenceExperiments.clearStorage();
   ok(
     !(await PreferenceExperiments.has("test")),
-    "clearAllExperimentStorage removed all stored experiments",
+    "clearStorage removed all stored experiments",
   );
 }));
 
@@ -86,7 +85,7 @@ add_task(withMockExperiments(async function() {
 // start should save experiment data, modify the preference, and register a
 // watcher.
 add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
-  const startObserver = sinon.stub(experimentManager, "startObserver");
+  const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "default");
   mockPreferences.set("fake.preference", "uservalue", "user");
 
@@ -98,7 +97,7 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
     preferenceBranchType: "default",
     preferenceType: "string",
   });
-  ok("test" in experiments, "start saved the experiment");
+  ok(PreferenceExperiments.get("test"), "start saved the experiment");
   ok(
     startObserver.calledWith("test", "fake.preference", "newvalue"),
     "start registered an observer",
@@ -115,7 +114,8 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
     preferenceBranchType: "default",
   };
   const experiment = {};
-  Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
+  const saved = PreferenceExperiments.get("test");
+  Object.keys(expectedExperiment).forEach(key => experiment[key] = saved[key]);
   Assert.deepEqual(experiment, expectedExperiment, "start saved the experiment");
 
   is(
@@ -134,7 +134,7 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
 
 // start should modify the user preference for the user branch type
 add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
-  const startObserver = sinon.stub(experimentManager, "startObserver");
+  const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "oldvalue", "user");
   mockPreferences.set("fake.preference", "olddefaultvalue", "default");
 
@@ -163,7 +163,8 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
   };
 
   const experiment = {};
-  Object.keys(expectedExperiment).forEach(key => experiment[key] = experiments.test[key]);
+  const saved = PreferenceExperiments.get("test");
+  Object.keys(expectedExperiment).forEach(key => experiment[key] = saved[key]);
   Assert.deepEqual(experiment, expectedExperiment, "start saved the experiment");
 
   Assert.notEqual(
@@ -579,7 +580,7 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
 // init should register telemetry experiments
 add_task(withMockExperiments(withMockPreferences(async function testInit(experiments, mockPreferences) {
   const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
-  const startObserverStub = sinon.stub(experimentManager, "startObserver");
+  const startObserverStub = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.pref", "experiment value");
 
   experiments["test"] = experimentFactory({
@@ -647,7 +648,7 @@ add_task(withMockExperiments(withMockPreferences(async function testInitChanges(
 
 // init should register an observer for experiments
 add_task(withMockExperiments(withMockPreferences(async function testInitRegistersObserver(experiments, mockPreferences) {
-  const startObserver = sinon.stub(experimentManager, "startObserver");
+  const startObserver = sinon.stub(PreferenceExperiments, "startObserver");
   mockPreferences.set("fake.preference", "experiment value", "default");
   experiments["test"] = experimentFactory({
     name: "test",
