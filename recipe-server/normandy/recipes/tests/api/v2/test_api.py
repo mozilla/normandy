@@ -547,7 +547,7 @@ class TestApprovalFlow(object):
             assert actual_signature == expected_signature
 
     def test_full_approval_flow(self, api_client, mocked_autograph):
-        # Make sure mocked_autograph fixure is included for side effects
+        # The `mocked_autograph` fixture is provided so that recipes can be signed
 
         action = ActionFactory()
         user1 = UserFactory(is_superuser=True)
