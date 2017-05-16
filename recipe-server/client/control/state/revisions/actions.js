@@ -8,16 +8,18 @@ import {
 } from '../requests/actions';
 
 
-function revisionReceived(dispatch, revision) {
-  dispatch({
-    type: REVISION_RECEIVE,
-    revision,
-  });
+function revisionReceived(revision) {
+  return dispatch => {
+    dispatch({
+      type: REVISION_RECEIVE,
+      revision,
+    });
 
-  dispatch({
-    type: ACTION_RECEIVE,
-    action: revision.recipe.action,
-  });
+    dispatch({
+      type: ACTION_RECEIVE,
+      action: revision.recipe.action,
+    });
+  };
 }
 
 
@@ -25,7 +27,7 @@ export function fetchRevision(pk) {
   return async dispatch => {
     const requestId = `fetch-revision-${pk}`;
     const revision = await dispatch(makeApiRequest(requestId, `v2/recipe_revision/${pk}/`));
-    revisionReceived(dispatch, revision);
+    dispatch(revisionReceived(revision));
   };
 }
 
@@ -36,7 +38,7 @@ export function fetchAllRevisions() {
     const revisions = await dispatch(makeApiRequest(requestId, 'v2/recipe_revision/'));
 
     revisions.forEach(revision => {
-      revisionReceived(dispatch, revision);
+      dispatch(revisionReceived(revision));
     });
   };
 }

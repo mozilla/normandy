@@ -11,28 +11,30 @@ import {
 } from '../requests/actions';
 
 
-function recipeReceived(dispatch, recipe) {
-  dispatch({
-    type: RECIPE_RECEIVE,
-    recipe,
-  });
+function recipeReceived(recipe) {
+  return dispatch => {
+    dispatch({
+      type: RECIPE_RECEIVE,
+      recipe,
+    });
 
-  dispatch({
-    type: ACTION_RECEIVE,
-    action: recipe.action,
-  });
+    dispatch({
+      type: ACTION_RECEIVE,
+      action: recipe.action,
+    });
 
-  dispatch({
-    type: REVISION_RECEIVE,
-    revision: recipe.latest_revision,
-  });
-
-  if (recipe.approved_revision) {
     dispatch({
       type: REVISION_RECEIVE,
-      revision: recipe.approved_revision,
+      revision: recipe.latest_revision,
     });
-  }
+
+    if (recipe.approved_revision) {
+      dispatch({
+        type: REVISION_RECEIVE,
+        revision: recipe.approved_revision,
+      });
+    }
+  };
 }
 
 
@@ -40,7 +42,7 @@ export function fetchRecipe(pk) {
   return async dispatch => {
     const requestId = `fetch-recipe-${pk}`;
     const recipe = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/`));
-    recipeReceived(dispatch, recipe);
+    dispatch(recipeReceived(recipe));
   };
 }
 
@@ -51,7 +53,7 @@ export function fetchAllRecipes() {
     const recipes = await dispatch(makeApiRequest(requestId, 'v2/recipe/'));
 
     recipes.forEach(recipe => {
-      recipeReceived(dispatch, recipe);
+      dispatch(recipeReceived(recipe));
     });
   };
 }
