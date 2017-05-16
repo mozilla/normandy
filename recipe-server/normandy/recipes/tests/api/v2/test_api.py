@@ -75,54 +75,6 @@ class TestActionAPI(object):
 
 
 @pytest.mark.django_db
-class TestImplementationAPI(object):
-    def test_it_serves_implementations(self, api_client):
-        action = ActionFactory()
-        res = api_client.get('/api/v2/action/{id}/implementation/{hash}/'.format(
-            id=action.id,
-            hash=action.implementation_hash,
-        ))
-        assert res.status_code == 200
-        assert res.content.decode() == action.implementation
-        assert res['Content-Type'] == 'application/javascript; charset=utf-8'
-
-    def test_it_404s_if_hash_doesnt_match(self, api_client):
-        action = ActionFactory(implementation='asdf')
-        bad_hash = hashlib.sha1('nomatch'.encode()).hexdigest()
-        res = api_client.get('/api/v2/action/{id}/implementation/{hash}/'.format(
-            id=action.id,
-            hash=bad_hash,
-        ))
-        assert res.status_code == 404
-        assert res.content.decode() == '/* Hash does not match current stored action. */'
-        assert res['Content-Type'] == 'application/javascript; charset=utf-8'
-
-    def test_it_includes_cache_headers(self, api_client, settings):
-        # Note: Can't override the cache time setting, since it is read
-        # when invoking the decorator at import time. Changing it would
-        # require mocking, and that isn't worth it.
-        action = ActionFactory()
-        res = api_client.get('/api/v2/action/{id}/implementation/{hash}/'.format(
-            id=action.id,
-            hash=action.implementation_hash,
-        ))
-        assert res.status_code == 200
-
-        max_age = 'max-age={}'.format(settings.ACTION_IMPLEMENTATION_CACHE_TIME)
-        assert max_age in res['Cache-Control']
-        assert 'public' in res['Cache-Control']
-
-    def test_sets_no_cookies(self, api_client):
-        action = ActionFactory()
-        res = api_client.get('/api/v2/action/{id}/implementation/{hash}/'.format(
-            id=action.id,
-            hash=action.implementation_hash,
-        ))
-        assert res.status_code == 200
-        assert res.client.cookies == {}
-
-
-@pytest.mark.django_db
 class TestRecipeAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get('/api/v2/recipe/')
@@ -335,13 +287,6 @@ class TestRecipeAPI(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
-    def test_signed_view_includes_cache_headers(self, api_client):
-        res = api_client.get('/api/v2/recipe/signed/')
-        assert res.status_code == 200
-        # It isn't important to assert a particular value for max-age
-        assert 'max-age=' in res['Cache-Control']
-        assert 'public' in res['Cache-Control']
-
     def test_detail_view_includes_cache_headers(self, api_client):
         recipe = RecipeFactory()
         res = api_client.get(f'/api/v2/recipe/{recipe.id}/')
@@ -349,43 +294,6 @@ class TestRecipeAPI(object):
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
-
-    def test_signed_listing_works(self, api_client):
-        r1 = RecipeFactory(signed=True)
-        res = api_client.get('/api/v2/recipe/signed/')
-        assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['recipe']['id'] == r1.id
-        assert res.data[0]['signature']['signature'] == r1.signature.signature
-
-    def test_signed_only_lists_signed_recipes(self, api_client):
-        r1 = RecipeFactory(signed=True)
-        r2 = RecipeFactory(signed=True)
-        RecipeFactory(signed=False)
-        res = api_client.get('/api/v2/recipe/signed/')
-        assert res.status_code == 200
-        assert len(res.data) == 2
-
-        res.data.sort(key=lambda r: r['recipe']['id'])
-
-        assert res.data[0]['recipe']['id'] == r1.id
-        assert res.data[0]['signature']['signature'] == r1.signature.signature
-        assert res.data[1]['recipe']['id'] == r2.id
-        assert res.data[1]['signature']['signature'] == r2.signature.signature
-
-    def test_signed_listing_filters_by_enabled(Self, api_client):
-        enabled_recipe = RecipeFactory(signed=True, approver=UserFactory(), enabled=True)
-        disabled_recipe = RecipeFactory(signed=True, enabled=False)
-
-        res = api_client.get('/api/v2/recipe/signed/?enabled=1')
-        assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['recipe']['id'] == enabled_recipe.id
-
-        res = api_client.get('/api/v2/recipe/signed/?enabled=0')
-        assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['recipe']['id'] == disabled_recipe.id
 
     def test_list_sets_no_cookies(self, api_client):
         res = api_client.get('/api/v2/recipe/')
@@ -626,7 +534,7 @@ class TestApprovalRequestAPI(object):
 class TestApprovalFlow(object):
 
     def verify_signatures(self, api_client, expected_count=None):
-        res = api_client.get('/api/v2/recipe/signed/')
+        res = api_client.get('/api/v1/recipe/signed/')
         assert res.status_code == 200
         signed_data = res.json()
 
