@@ -12,7 +12,11 @@ from normandy.recipes.tests import (
     RecipeFactory,
 )
 from normandy.recipes.api.v1.serializers import (
-    ActionSerializer, RecipeSerializer, SignedRecipeSerializer)
+    ActionSerializer,
+    MinimalRecipeSerializer,
+    RecipeSerializer,
+    SignedRecipeSerializer,
+)
 
 
 @pytest.mark.django_db()
@@ -184,7 +188,7 @@ class TestSignedRecipeSerializer:
         recipe = RecipeFactory(signed=True)
         context = {'request': rf.get('/')}
         combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
-        recipe_serializer = RecipeSerializer(instance=recipe, context=context)
+        recipe_serializer = MinimalRecipeSerializer(instance=recipe, context=context)
 
         # Testing for shape of data, not contents
         assert combined_serializer.data == {
@@ -208,18 +212,11 @@ class TestSignedRecipeSerializer:
                 'name': recipe.name,
                 'id': recipe.id,
                 'enabled': recipe.enabled,
-                'extra_filter_expression': recipe.extra_filter_expression,
                 'filter_expression': recipe.filter_expression,
                 'revision_id': recipe.revision_id,
                 'action': action.name,
                 'arguments': recipe.arguments,
                 'last_updated': Whatever(),
-                'channels': [],
-                'countries': [],
-                'locales': [],
                 'is_approved': False,
-                'latest_revision_id': recipe.latest_revision.id,
-                'approved_revision_id': recipe.approved_revision_id,
-                'approval_request': None,
             }
         }

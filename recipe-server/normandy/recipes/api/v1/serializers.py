@@ -47,9 +47,6 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    # Attributes serialized here are made available to filter expressions via
-    # normandy.recipe, and should be documented if they are intended to be
-    # used in filter expressions.
     enabled = serializers.BooleanField(read_only=True)
     last_updated = serializers.DateTimeField(read_only=True)
     revision_id = serializers.CharField(read_only=True)
@@ -158,6 +155,31 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
 
+class MinimalRecipeSerializer(RecipeSerializer):
+    """
+    The minimum amount of fields needed for clients to verify and execute recipes.
+    """
+
+    revision_id = serializers.CharField(source='current_revision.id', read_only=True)
+
+    class Meta(RecipeSerializer.Meta):
+        # Attributes serialized here are made available to filter expressions via
+        # normandy.recipe, and should be documented if they are intended to be
+        # used in filter expressions.
+        fields = [
+            'id',
+            'last_updated',
+            'name',
+            'enabled',
+            'is_approved',
+            'revision_id',
+            'action',
+            'arguments',
+            'filter_expression',
+            'revision_id',
+        ]
+
+
 class RecipeRevisionSerializer(serializers.ModelSerializer):
     date_created = serializers.DateTimeField(source='created', read_only=True)
     recipe = RecipeSerializer(source='serializable_recipe', read_only=True)
@@ -200,4 +222,5 @@ class SignedRecipeSerializer(serializers.ModelSerializer):
         fields = ['signature', 'recipe']
 
     def get_recipe(self, recipe):
-        return RecipeSerializer(recipe).data
+        # `recipe` here is the main object for the serializer.
+        return MinimalRecipeSerializer(recipe).data
