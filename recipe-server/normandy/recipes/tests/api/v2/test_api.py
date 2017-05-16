@@ -1,5 +1,3 @@
-import hashlib
-
 import pytest
 from rest_framework.reverse import reverse
 
