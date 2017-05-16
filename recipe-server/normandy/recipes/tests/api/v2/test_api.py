@@ -546,7 +546,9 @@ class TestApprovalFlow(object):
             actual_signature = fake_sign([data])[0]['signature']
             assert actual_signature == expected_signature
 
-    def test_full_approval_flow(self, api_client):
+    def test_full_approval_flow(self, api_client, mocked_autograph):
+        # Make sure mocked_autograph fixure is included for side effects
+
         action = ActionFactory()
         user1 = UserFactory(is_superuser=True)
         user2 = UserFactory(is_superuser=True)
@@ -605,6 +607,7 @@ class TestApprovalFlow(object):
                               .format(recipe_data_2['latest_revision']['id']))
         approval_data = res.json()
         recipe_data_2['approval_request'] = approval_data
+        recipe_data_2['latest_revision']['approval_request'] = approval_data
         assert res.status_code == 201
 
         # The change should not be visible yet, since it isn't approved
@@ -619,6 +622,7 @@ class TestApprovalFlow(object):
                               {'comment': 'r-'})
         approval_data = res.json()
         recipe_data_2['approval_request'] = approval_data
+        recipe_data_2['latest_revision']['approval_request'] = approval_data
         assert res.status_code == 200
 
         # The change should not be visible yet, since it isn't approved

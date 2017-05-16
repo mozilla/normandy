@@ -64,7 +64,8 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
 
     def get_recipe(self, instance):
         serializer = RecipeSerializer(instance.serializable_recipe,
-                                      exclude_fields=['latest_revision', 'approved_revision'])
+                                      exclude_fields=['latest_revision', 'approved_revision',
+                                                      'approval_request'])
         return serializer.data
 
 
