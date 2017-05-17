@@ -10,6 +10,21 @@ export const INITIAL_STATE = {
 
 export const RECIPE = {
   id: 1,
+  action: {
+    id: 1,
+    name: 'test-action',
+  },
+  latest_revision: {
+    id: '9f86d081',
+    recipe: {
+      id: 1,
+      action: {
+        id: 1,
+        name: 'test-action',
+      },
+    },
+  },
+  approved_revision: null,
 };
 
 export const FILTERS = {

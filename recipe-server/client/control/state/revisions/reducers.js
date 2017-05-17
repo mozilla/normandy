@@ -7,9 +7,15 @@ import {
 
 
 function items(state = new Map(), action) {
+  let revision;
+
   switch (action.type) {
     case REVISION_RECEIVE:
-      return state.set(action.revision.id, fromJS(action.revision));
+      revision = fromJS(action.revision);
+      revision = revision.setIn(['recipe', 'action_id'], action.revision.recipe.action.id);
+      revision = revision.removeIn(['recipe', 'action']);
+
+      return state.set(action.revision.id, revision);
 
     default:
       return state;

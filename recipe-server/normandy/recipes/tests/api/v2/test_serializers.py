@@ -11,8 +11,11 @@ from normandy.recipes.tests import (
     LocaleFactory,
     RecipeFactory,
 )
-from normandy.recipes.api.serializers import (
-    ActionSerializer, RecipeSerializer, MinimalRecipeSerializer, SignedRecipeSerializer)
+from normandy.recipes.api.v2.serializers import (
+    ActionSerializer,
+    RecipeRevisionSerializer,
+    RecipeSerializer,
+)
 
 
 @pytest.mark.django_db()
@@ -34,8 +37,12 @@ class TestRecipeSerializer:
             'enabled': recipe.enabled,
             'extra_filter_expression': recipe.extra_filter_expression,
             'filter_expression': recipe.filter_expression,
-            'revision_id': recipe.revision_id,
-            'action': action.name,
+            'action': {
+                'arguments_schema': {},
+                'id': action.id,
+                'implementation_url': Whatever(),
+                'name': action.name,
+            },
             'arguments': {
                 'foo': 'bar',
             },
@@ -43,8 +50,8 @@ class TestRecipeSerializer:
             'countries': [country.code],
             'locales': [locale.code],
             'is_approved': False,
-            'latest_revision_id': recipe.latest_revision.id,
-            'approved_revision_id': recipe.approved_revision_id,
+            'latest_revision': RecipeRevisionSerializer(recipe.latest_revision).data,
+            'approved_revision': None,
             'approval_request': {
                 'id': approval.id,
                 'created': Whatever(),
@@ -70,13 +77,13 @@ class TestRecipeSerializer:
     # If the action can be found, raise validation error
     # with the arguments error formatted appropriately
     def test_validation_with_wrong_arguments(self):
-        ActionFactory(
+        action = ActionFactory(
             name='show-heartbeat',
             arguments_schema=ARGUMENTS_SCHEMA
         )
 
         serializer = RecipeSerializer(data={
-            'action': 'show-heartbeat',
+            'action_id': action.id,
             'arguments': {
                 'surveyId': '',
                 'surveys': [
@@ -137,7 +144,7 @@ class TestRecipeSerializer:
 
         serializer = RecipeSerializer(data={
             'name': 'bar', 'enabled': True, 'extra_filter_expression': '[]',
-            'action': 'show-heartbeat',
+            'action_id': mockAction.id,
             'channels': ['release'],
             'countries': ['CA'],
             'locales': ['en-US'],
@@ -176,43 +183,3 @@ class TestActionSerializer:
         action = ActionFactory()
         serializer = ActionSerializer(action, context={'request': rf.get('/')})
         assert serializer.data['implementation_url'].startswith(settings.CDN_URL)
-
-
-@pytest.mark.django_db()
-class TestSignedRecipeSerializer:
-    def test_it_works_with_signature(self, rf):
-        recipe = RecipeFactory(signed=True)
-        context = {'request': rf.get('/')}
-        combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
-        recipe_serializer = MinimalRecipeSerializer(instance=recipe, context=context)
-
-        # Testing for shape of data, not contents
-        assert combined_serializer.data == {
-            'signature': {
-                'signature': Whatever(),
-                'timestamp': Whatever(),
-                'x5u': Whatever(),
-                'public_key': Whatever(),
-            },
-            'recipe': recipe_serializer.data,
-        }
-
-    def test_it_works_with_no_signature(self, rf):
-        recipe = RecipeFactory(signed=False)
-        action = recipe.action
-        serializer = SignedRecipeSerializer(instance=recipe, context={'request': rf.get('/')})
-
-        assert serializer.data == {
-            'signature': None,
-            'recipe': {
-                'name': recipe.name,
-                'id': recipe.id,
-                'enabled': recipe.enabled,
-                'filter_expression': recipe.filter_expression,
-                'revision_id': recipe.revision_id,
-                'action': action.name,
-                'arguments': recipe.arguments,
-                'last_updated': Whatever(),
-                'is_approved': False,
-            }
-        }
