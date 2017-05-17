@@ -71,11 +71,11 @@ const PREF_NAMESPACE = "experiments";
 
 this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPACE), {
   async init() {
-    this.applyAll();
+    await this.applyAll();
   },
 
   async getAll() {
-    return this.getAllPrefChanges();
+    return await this.getActiveChanges();
   },
 
   /**
@@ -99,7 +99,7 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
       throw new Error(`A preference experiment named "${name}" already exists.`);
     }
 
-    const activeExperiments = await this.getActiveRecipes();
+    const activeExperiments = await this.getActiveChanges();
     const hasConflictingExperiment = activeExperiments.some(
       e => e.preferenceName === preferenceName
     );
@@ -193,7 +193,7 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
       }
     }
 
-    this.expire(experiment.name);
+    await this.expire(experiment.name);
     TelemetryEnvironment.setExperimentInactive(experimentName, experiment.branch);
   },
 });

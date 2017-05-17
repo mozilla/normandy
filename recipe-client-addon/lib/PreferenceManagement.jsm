@@ -3,9 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * blurb
+ * PreferenceManagement exposes an API for recipes such as Preference Experiments
+ * to handle manipulating default/user branch preferences. Recipes should extend
+ * this module.
+ *
+ * Info on active and past experiments is stored in a JSON file in the profile
+ * folder. Preference observers can also be tracked/instantiated/etc.
  */
-
 "use strict";
 
 const {utils: Cu} = Components;
@@ -48,7 +52,7 @@ this.PreferenceManagement = (namespace) => ({
   /**
    * Asynchronously load the JSON file that stores preference changes in the profile.
    */
-  storePromise: null,
+  storePromise: undefined,
   ensureStorage() {
     if (this.storePromise === undefined) {
       const path = OS.Path.join(OS.Constants.Path.profileDir, STORE_FILE);
@@ -62,6 +66,7 @@ this.PreferenceManagement = (namespace) => ({
     const store = await this.ensureStorage();
     store.data = store.data || {};
     store.data[namespace] = store.data[namespace] || {};
+    store.saveSoon();
 
     return store;
   },
@@ -82,24 +87,26 @@ this.PreferenceManagement = (namespace) => ({
    * data for testing.
    */
   withMockData(testFunction) {
-    const stopAllObservers = this.stopAllObservers.bind(this);
-
-    const mockData = {};
-    mockData[namespace] = {};
-
-    this.storePromise = Promise.resolve({
-      data: mockData,
-      saveSoon() { },
-    });
+    this.mockData = {
+      [namespace]: {},
+    };
 
     return async (...args) => {
+      this.storePromise = Promise.resolve({
+        data: this.mockData,
+        saveSoon() {},
+      });
+
       try {
-        await testFunction(mockData[namespace], ...args)
+        await testFunction(this.mockData[namespace], ...args)
       } finally {
-        stopAllObservers();
+        this.stopAllObservers();
+
+        this.clearStorage();
+        this.storePromise = undefined;
       }
 
-      return await this.getStorage();
+      return await this.ensureStorage();
     };
   },
 
@@ -107,10 +114,12 @@ this.PreferenceManagement = (namespace) => ({
     // On shutdown, clear all the observers that we're about to instantiate.
     CleanupManager.addCleanupHandler(this.stopAllObservers.bind(this));
 
-    for (const experiment of await this.getActiveRecipes()) {
+    for (const experiment of await this.getActiveChanges()) {
       // Set experiment default preferences, since they don't persist between restarts
       if (experiment.preferenceBranchType === "default") {
         DefaultPreferences.set(experiment.preferenceName, experiment.preferenceValue);
+      } else {
+        Preferences.set(experiment.preferenceName, experiment.preferenceValue);
       }
 
       // Notify Telemetry of experiments we're running, since they don't persist between restarts
@@ -150,7 +159,7 @@ this.PreferenceManagement = (namespace) => ({
 
     const observerInfo = {
       preferenceName,
-      observer(newValue) {
+      observer: (newValue) => {
         if (newValue !== preferenceValue) {
           this.stop(recipeName, false);
         }
@@ -254,15 +263,15 @@ this.PreferenceManagement = (namespace) => ({
     store.saveSoon();
   },
 
-  async getActiveRecipes() {
-    log.debug("PreferenceManagement.getActiveRecipes()");
-    const allPrefs = await this.getAllPrefChanges();
+  async getActiveChanges() {
+    log.debug("PreferenceManagement.getActiveChanges()");
+    const allPrefs = await this.getPreferenceChanges();
     // Return copies so mutating them doesn't affect the storage.
     return allPrefs.filter(e => !e.expired).map(e => Object.assign({}, e));
   },
 
-  async getAllPrefChanges() {
-    log.debug("PreferenceManagement.getAllPrefChanges()");
+  async getPreferenceChanges() {
+    log.debug("PreferenceManagement.getPreferenceChanges()");
     const store = await this.getStorage();
 
     // Return copies so mutating them doesn't affect the storage.
@@ -278,6 +287,7 @@ this.PreferenceManagement = (namespace) => ({
   async expire(recipeName) {
     log.debug(`PreferenceManagement.expire(${recipeName})`);
     const store = await this.getStorage();
-    delete store.data[namespace][recipeName];
+    store.data[namespace][recipeName].expired = true;
+    // delete store.data[namespace][recipeName];
   }
 });
