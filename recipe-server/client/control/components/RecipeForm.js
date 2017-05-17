@@ -408,19 +408,18 @@ export class RecipeForm extends React.Component {
           )
         }
 
-        <Frame>
-          <ControlField
-            disabled={isFormDisabled}
-            label="Name"
-            name="name"
-            component="input"
-            type="text"
-          />
-        </Frame>
+        <ControlField
+          disabled={isFormDisabled}
+          label="Name"
+          name="name"
+          component="input"
+          type="text"
+        />
 
         <Frame title="Filters">
           <ControlField
             component={MultiPicker}
+            disabled={isFormDisabled}
             wrapper="div"
             name="locales"
             unit="Locales"
@@ -428,6 +427,7 @@ export class RecipeForm extends React.Component {
           />
           <ControlField
             component={MultiPicker}
+            disabled={isFormDisabled}
             wrapper="div"
             name="countries"
             unit="Countries"
@@ -437,6 +437,7 @@ export class RecipeForm extends React.Component {
           <Frame className="channels" title="Release Channels">
             <ControlField
               component={CheckboxGroup}
+              disabled={isFormDisabled}
               name="channels"
               options={filters.channels || []}
             />
@@ -444,6 +445,7 @@ export class RecipeForm extends React.Component {
 
           <ControlField
             label="Additional Filter Expressions"
+            disabled={isFormDisabled}
             name="extra_filter_expression"
             component="textarea"
           />

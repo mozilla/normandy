@@ -123,6 +123,7 @@ export class CheckboxGroup extends React.Component {
     onChange: pt.func.isRequired,
     options: pt.array.isRequired,
     value: pt.arrayOf(pt.string),
+    disabled: pt.bool,
   };
 
   constructor(props) {
@@ -158,6 +159,7 @@ export class CheckboxGroup extends React.Component {
   renderOption(option, index) {
     const {
       name,
+      disabled,
       value = [],
     } = this.props;
 
@@ -169,6 +171,7 @@ export class CheckboxGroup extends React.Component {
           value={option.value}
           checked={value.includes(option.value)}
           onChange={this.handleChange}
+          disabled={disabled}
         />
         <span>{option.label}</span>
       </label>

@@ -14,6 +14,7 @@ class PickerControl extends React.Component {
     buttonLabel: pt.string.isRequired,
     noneLabel: pt.string.isRequired,
     searchLabel: pt.string.isRequired,
+    disabled: pt.bool,
     className: pt.string,
   };
 
@@ -164,6 +165,7 @@ class PickerControl extends React.Component {
       options,
       searchLabel,
       titleLabel,
+      disabled,
     } = this.props;
 
     const filteredOptions = this.getFilteredOptions(options, filterText);
@@ -180,6 +182,7 @@ class PickerControl extends React.Component {
         <select
           ref={this.handleRefMount}
           onChange={this.handleSelectUpdate}
+          disabled={disabled}
           multiple
         >
           {
@@ -190,7 +193,7 @@ class PickerControl extends React.Component {
         </select>
 
         <button
-          disabled={focused.length <= 0}
+          disabled={disabled || focused.length <= 0}
           type="button"
           onClick={this.handleConfirmation}
         >
@@ -212,6 +215,7 @@ export default class MultiPicker extends React.Component {
     unit: pt.string.isRequired,
     onChange: pt.func.isRequired,
     options: pt.array,
+    disabled: pt.bool,
     value: pt.arrayOf(pt.string),
   };
 
@@ -274,6 +278,7 @@ export default class MultiPicker extends React.Component {
       unit = '',
       value,
       options,
+      disabled,
     } = this.props;
 
     const lowercaseUnit = unit.toLowerCase();
@@ -294,6 +299,7 @@ export default class MultiPicker extends React.Component {
           onSubmit={this.handleApplySelection}
           buttonLabel={`Add ${unit}`}
           noneLabel={`No ${lowercaseUnit} available.`}
+          disabled={disabled}
         />
 
         <PickerControl
@@ -304,6 +310,7 @@ export default class MultiPicker extends React.Component {
           onSubmit={this.handleRemoveSelection}
           buttonLabel={`Remove ${unit}`}
           noneLabel={`No ${lowercaseUnit} selected.`}
+          disabled={disabled}
         />
       </div>
     );

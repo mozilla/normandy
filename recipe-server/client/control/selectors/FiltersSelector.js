@@ -132,7 +132,7 @@ export const isFilteringActive = state =>
  * Get all filters as an object keyed on their slug
  *
  * @param  {Array<Object>} groups All filter groups
- * @return {Object}               Object of filters keyed by their slug
+ * @return {Array<Object>}        List of filter objects.
  */
 export const getFilterObject = list =>
   list.reduce((optionsMap, group) => {
