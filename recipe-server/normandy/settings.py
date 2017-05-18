@@ -311,6 +311,11 @@ class Base(Core):
     NUM_PROXIES = values.IntegerValue(0)
     API_CACHE_TIME = values.IntegerValue(30)
     API_CACHE_ENABLED = values.BooleanValue(True)
+
+    # If true, approvals must come from two separate users. If false, the same
+    # user can approve their own request.
+    PEER_APPROVAL_ENFORCED = values.BooleanValue(True)
+
     # Autograph settings
     AUTOGRAPH_URL = values.Value()
     AUTOGRAPH_HAWK_ID = values.Value()
@@ -332,6 +337,7 @@ class Development(Base):
     EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
+    PEER_APPROVAL_ENFORCED = values.BooleanValue(False)
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
