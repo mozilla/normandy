@@ -431,7 +431,7 @@ class ApprovalRequest(models.Model):
                 raise self.CannotActOnOwnRequest()
             else:
                 logger.warning(
-                    f'Bypassing peer approver verification because it is disabled.',
+                    'Bypassing peer approver verification because it is disabled.',
                     extra={
                         'code': WARNING_BYPASSING_PEER_APPROVAL,
                         'approval_id': self.id,
