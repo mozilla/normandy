@@ -6,3 +6,4 @@ moz.build
 node_modules/jexl/lib
 node_modules/jexl/LICENSE.txt
 test
+skin

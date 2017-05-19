@@ -4,9 +4,10 @@
 
 "use strict";
 
-const {utils: Cu} = Components;
+const {utils: Cu, interfaces: Ci} = Components;
 
 Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm");
 Cu.import("resource://gre/modules/Timer.jsm"); /* globals setTimeout, clearTimeout */
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm");
@@ -17,9 +18,28 @@ Cu.importGlobalProperties(["URL"]); /* globals URL */
 
 this.EXPORTED_SYMBOLS = ["Heartbeat"];
 
-const log = LogManager.getLogger("heartbeat");
 const PREF_SURVEY_DURATION = "browser.uitour.surveyDuration";
 const NOTIFICATION_TIME = 3000;
+const HEARTBEAT_CSS_URI = Services.io.newURI("resource://shield-recipe-client/skin/shared/Heartbeat.css");
+
+const log = LogManager.getLogger("heartbeat");
+const windowsWithInjectedCss = new WeakSet();
+let anyWindowsWithInjectedCss = false;
+
+// Add cleanup handler for CSS injected into windows by Heartbeat
+CleanupManager.addCleanupHandler(() => {
+  if (anyWindowsWithInjectedCss) {
+    const windowEnumerator = Services.wm.getEnumerator('navigator:browser');
+    while (windowEnumerator.hasMoreElements()) {
+      const window = windowEnumerator.getNext();
+      if (windowsWithInjectedCss.has(window)) {
+        const utils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+        utils.removeSheet(HEARTBEAT_CSS_URI, window.AGENT_SHEET);
+        windowsWithInjectedCss.delete(window);
+      }
+    }
+  }
+});
 
 /**
  * Show the Heartbeat UI to request user feedback.
@@ -96,6 +116,13 @@ this.Heartbeat = class {
     this.options = options;
     this.surveyResults = {};
     this.buttons = null;
+
+    if (!windowsWithInjectedCss.has(chromeWindow)) {
+      windowsWithInjectedCss.add(chromeWindow);
+      const utils = chromeWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+      utils.loadSheet(HEARTBEAT_CSS_URI, chromeWindow.AGENT_SHEET);
+      anyWindowsWithInjectedCss = true;
+    }
 
     // so event handlers are consistent
     this.handleWindowClosed = this.handleWindowClosed.bind(this);
