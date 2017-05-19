@@ -377,22 +377,6 @@ export class RecipeForm extends React.Component {
         }
 
         {
-          thisRevisionRequest
-          && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
-          && (
-            <div className="approval-status">
-              This revision has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
-              <pre className="approval-comment">
-                {revision.approval_request.comment}
-                <span className="comment-author">
-                  &ndash; {revision.approval_request.approver.email}
-                </span>
-              </pre>
-            </div>
-          )
-        }
-
-        {
           recipe && (
             <RecipeStatus
               className={renderVars.isEnabled ? 'green' : 'red'}
@@ -405,6 +389,22 @@ export class RecipeForm extends React.Component {
               }
               text={statusText}
             />
+          )
+        }
+
+        {
+          thisRevisionRequest
+          && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
+          && (
+            <div className="approval-status">
+              This revision has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
+              <pre className="approval-comment">
+                {revision.approval_request.comment}
+                <span className="comment-author">
+                  &ndash; {revision.approval_request.approver.email}
+                </span>
+              </pre>
+            </div>
           )
         }
 
