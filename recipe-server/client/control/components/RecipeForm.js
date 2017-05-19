@@ -575,7 +575,7 @@ const connector = connect(
     allRevisions: state.recipes.revisions,
     selectedAction: formSelector(state, 'action'),
     recipeArguments: formSelector(state, 'arguments'),
-    filters: getFilterObject(state.filters.list),
+    filters: getFilterObject(state.filters),
   }),
 
   // Bound functions for writing to the server.

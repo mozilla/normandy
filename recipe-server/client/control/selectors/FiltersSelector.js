@@ -26,7 +26,7 @@ const isGroupSelected = group => {
 
 
 /**
- * Given a set of groups, returns only those with selected options.
+ * Given the current filter state, returns only those with selected options.
  *
  * @param  {Array<Object>} groups List of groups to find selected options within
  * @return {Array<Object>}        Filtered groups with at least one selected option
@@ -35,13 +35,13 @@ export const getSelectedFilterGroups = state => state.active.filter(isGroupSelec
 
 
 /**
- * Given a set of groups, finds the selected groups,
+ * Given the current filter state, finds the selected groups,
  * and then removes any NON-selected options.
  *
  * Essentially, returns an array of groups and their selected options.
  *
- * @param  {Array<Object>} groups All possible filter groups
- * @return {Array<Object>}        Active filter groups and their selected options
+ * @param  {Object}   state   Current filter state object
+ * @return {Array<Object>}    Active filter groups and their selected options
  */
 export const getActiveFilterOptions = (state = {}) =>
   [].concat(state.active || [])
@@ -64,11 +64,11 @@ export const getActiveFilterOptions = (state = {}) =>
 
 
 /**
- * Given a set of groups, finds the activated groups and options,
+ * Given the current filter state, finds the activated groups and options,
  * and then creates a query string with all selected values.
  *
- * @param  {Array<Object>} groups All possible filter groups
- * @return {string}        URL-safe query param string
+ * @param  {Object}   state   Current filter state object
+ * @return {string}   URL-safe query param string
  */
 export const getFilterParamString = state =>
   getActiveFilterOptions(state)
@@ -87,12 +87,12 @@ export const getFilterParamString = state =>
     .join('&');
 
 /**
- * Given a set of groups, returns only the groups/options that
+ * Given the current filter state, returns only the groups/options that
  * are available for selection. Non-multiple options will be excluded
  * entirely if an opposing option has already been selected.
  *
- * @param  {Array<Object>} groups Array of option group objects
- * @return {Array<Object>}        Array of non-selected options/groups
+ * @param  {Object}   state   Current filter state object
+ * @return {Array<Object>}    Array of non-selected options/groups
  */
 export const getAvailableFilters = state =>
   [].concat(state.active)
@@ -122,7 +122,7 @@ export const getAvailableFilters = state =>
 /**
  * Determines if any filters are activated.
  *
- * @param  {Array<Object>} groups All possible filter groups
+ * @param  {Object}   state   Current filter state object
  * @return {boolean}              Does user have at least one filter active?
  */
 export const isFilteringActive = state =>
@@ -131,11 +131,11 @@ export const isFilteringActive = state =>
 /**
  * Get all filters as an object keyed on their slug
  *
- * @param  {Array<Object>} groups All filter groups
- * @return {Array<Object>}        List of filter objects.
+ * @param  {Object}   state   Current filter state object
+ * @return {Array<Object>}    List of filter objects.
  */
-export const getFilterObject = list =>
-  list.reduce((optionsMap, group) => {
+export const getFilterObject = state =>
+  state.list.reduce((optionsMap, group) => {
     optionsMap[group.value] = group.options;
     return optionsMap;
   }, {});
