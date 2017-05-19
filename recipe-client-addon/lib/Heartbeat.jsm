@@ -6,6 +6,7 @@
 
 const {utils: Cu, interfaces: Ci} = Components;
 
+Cu.import("resource://gre/modules/AppConstants.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm");
@@ -21,6 +22,7 @@ this.EXPORTED_SYMBOLS = ["Heartbeat"];
 const PREF_SURVEY_DURATION = "browser.uitour.surveyDuration";
 const NOTIFICATION_TIME = 3000;
 const HEARTBEAT_CSS_URI = Services.io.newURI("resource://shield-recipe-client/skin/shared/Heartbeat.css");
+const HEARTBEAT_CSS_URI_OSX = Services.io.newURI("resource://shield-recipe-client/skin/osx/Heartbeat.css");
 
 const log = LogManager.getLogger("heartbeat");
 const windowsWithInjectedCss = new WeakSet();
@@ -35,6 +37,9 @@ CleanupManager.addCleanupHandler(() => {
       if (windowsWithInjectedCss.has(window)) {
         const utils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
         utils.removeSheet(HEARTBEAT_CSS_URI, window.AGENT_SHEET);
+        if (AppConstants.platform === 'macosx') {
+          utils.removeSheet(HEARTBEAT_CSS_URI, window.AGENT_SHEET);
+        }
         windowsWithInjectedCss.delete(window);
       }
     }
@@ -121,6 +126,9 @@ this.Heartbeat = class {
       windowsWithInjectedCss.add(chromeWindow);
       const utils = chromeWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
       utils.loadSheet(HEARTBEAT_CSS_URI, chromeWindow.AGENT_SHEET);
+      if (AppConstants.platform === 'macosx') {
+        utils.loadSheet(HEARTBEAT_CSS_URI_OSX, chromeWindow.AGENT_SHEET);
+      }
       anyWindowsWithInjectedCss = true;
     }
 
