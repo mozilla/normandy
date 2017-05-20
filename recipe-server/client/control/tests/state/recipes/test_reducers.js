@@ -1,4 +1,4 @@
-import { fromJS, List, Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import * as matchers from 'jasmine-immutable-matchers';
 
 import {
