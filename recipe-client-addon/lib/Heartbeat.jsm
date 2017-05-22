@@ -31,13 +31,13 @@ let anyWindowsWithInjectedCss = false;
 // Add cleanup handler for CSS injected into windows by Heartbeat
 CleanupManager.addCleanupHandler(() => {
   if (anyWindowsWithInjectedCss) {
-    const windowEnumerator = Services.wm.getEnumerator('navigator:browser');
+    const windowEnumerator = Services.wm.getEnumerator("navigator:browser");
     while (windowEnumerator.hasMoreElements()) {
       const window = windowEnumerator.getNext();
       if (windowsWithInjectedCss.has(window)) {
         const utils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
         utils.removeSheet(HEARTBEAT_CSS_URI, window.AGENT_SHEET);
-        if (AppConstants.platform === 'macosx') {
+        if (AppConstants.platform === "macosx") {
           utils.removeSheet(HEARTBEAT_CSS_URI_OSX, window.AGENT_SHEET);
         }
         windowsWithInjectedCss.delete(window);
@@ -126,7 +126,7 @@ this.Heartbeat = class {
       windowsWithInjectedCss.add(chromeWindow);
       const utils = chromeWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
       utils.loadSheet(HEARTBEAT_CSS_URI, chromeWindow.AGENT_SHEET);
-      if (AppConstants.platform === 'macosx') {
+      if (AppConstants.platform === "macosx") {
         utils.loadSheet(HEARTBEAT_CSS_URI_OSX, chromeWindow.AGENT_SHEET);
       }
       anyWindowsWithInjectedCss = true;
