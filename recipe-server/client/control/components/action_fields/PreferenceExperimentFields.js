@@ -25,6 +25,10 @@ const DEFAULT_BRANCH_VALUES = {
  * Form fields for the preference-experiment action.
  */
 export class PreferenceExperimentFields extends ActionFields {
+  static propTypes = {
+    disabled: pt.bool,
+  }
+
   static initialValues = {
     slug: '',
     experimentDocumentUrl: '',
@@ -46,7 +50,7 @@ export class PreferenceExperimentFields extends ActionFields {
   );
 
   render() {
-    const { preferenceBranchType } = this.props;
+    const { disabled, preferenceBranchType } = this.props;
     return (
       <div className="arguments-fields">
         <div className="info">
@@ -64,23 +68,27 @@ export class PreferenceExperimentFields extends ActionFields {
           name="arguments.slug"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Experiment Document URL"
           name="arguments.experimentDocumentUrl"
           component="input"
           type="url"
+          disabled={disabled}
         />
         <ControlField
           label="Preference Name"
           name="arguments.preferenceName"
           component="input"
           type="text"
+          disabled={disabled}
         />
         <ControlField
           label="Preference Type"
           name="arguments.preferenceType"
           component="select"
+          disabled={disabled}
         >
           <option value="boolean">Boolean</option>
           <option value="integer">Integer</option>
@@ -90,12 +98,17 @@ export class PreferenceExperimentFields extends ActionFields {
           label="Preference Branch Type"
           name="arguments.preferenceBranchType"
           component="select"
+          disabled={disabled}
         >
           <option value="default">Default</option>
           <option value="user">User</option>
         </ControlField>
         {preferenceBranchType === 'user' && PreferenceExperimentFields.userBranchWarning}
-        <FieldArray name="arguments.branches" component={PreferenceBranches} />
+        <FieldArray
+          name="arguments.branches"
+          component={PreferenceBranches}
+          disabled={disabled}
+        />
       </div>
     );
   }
@@ -110,6 +123,7 @@ export default connect(
 export class PreferenceBranches extends React.Component {
   static propTypes = {
     fields: pt.object.isRequired,
+    disabled: pt.bool,
   }
 
   constructor(props) {
@@ -119,15 +133,19 @@ export class PreferenceBranches extends React.Component {
   }
 
   handleClickDelete(index) {
-    this.props.fields.remove(index);
+    if (!this.props.disabled) {
+      this.props.fields.remove(index);
+    }
   }
 
   handleClickAdd() {
-    this.props.fields.push({ ...DEFAULT_BRANCH_VALUES });
+    if (!this.props.disabled) {
+      this.props.fields.push({ ...DEFAULT_BRANCH_VALUES });
+    }
   }
 
   render() {
-    const { fields } = this.props;
+    const { fields, disabled } = this.props;
     return (
       <div>
         <h4 className="branch-header">Experiment Branches</h4>
@@ -137,24 +155,31 @@ export class PreferenceBranches extends React.Component {
               <ConnectedBranchFields
                 branch={branch}
                 index={index}
+                disabled={disabled}
                 onClickDelete={this.handleClickDelete}
               />
             </li>
           ))}
-          <li>
-            <a
-              className="button"
-              onClick={this.handleClickAdd}
-            >
-              <i className="fa fa-plus pre" />
-              Add Branch
-            </a>
-          </li>
+          {!disabled && <AddBranchButton onClick={this.handleClickAdd} />}
         </ul>
       </div>
     );
   }
 }
+
+export function AddBranchButton({ onClick }) {
+  return (
+    <li>
+      <a className="button" onClick={onClick}>
+        <i className="fa fa-plus pre" />
+        Add Branch
+      </a>
+    </li>
+  );
+}
+AddBranchButton.propTypes = {
+  onClick: pt.func.isRequired,
+};
 
 export class BranchFields extends React.Component {
   static propTypes = {
@@ -162,6 +187,7 @@ export class BranchFields extends React.Component {
     onClickDelete: pt.func.isRequired,
     preferenceType: pt.string.isRequired,
     index: pt.number.isRequired,
+    disabled: pt.bool,
   }
 
   constructor(props) {
@@ -170,11 +196,13 @@ export class BranchFields extends React.Component {
   }
 
   handleClickDelete() {
-    this.props.onClickDelete(this.props.index);
+    if (!this.props.disabled) {
+      this.props.onClickDelete(this.props.index);
+    }
   }
 
   render() {
-    const { branch, preferenceType = 'boolean' } = this.props;
+    const { branch, preferenceType = 'boolean', disabled } = this.props;
     const ValueField = VALUE_FIELDS[preferenceType];
     return (
       <div className="branch-fields">
@@ -183,22 +211,33 @@ export class BranchFields extends React.Component {
           name={`${branch}.slug`}
           component="input"
           type="text"
+          disabled={disabled}
         />
-        <ValueField name={`${branch}.value`} />
+        <ValueField name={`${branch}.value`} disabled={disabled} />
         <IntegerControlField
           label="Ratio"
           name={`${branch}.ratio`}
+          disabled={disabled}
         />
-        <div className="remove-branch">
-          <a className="button delete" onClick={this.handleClickDelete}>
-            <i className="fa fa-times pre" />
-            Remove Branch
-          </a>
-        </div>
+        {!disabled && <RemoveBranchButton onClick={this.handleClickDelete} />}
       </div>
     );
   }
 }
+
+export function RemoveBranchButton({ onClick }) {
+  return (
+    <div className="remove-branch">
+      <a className="button delete" onClick={onClick}>
+        <i className="fa fa-times pre" />
+        Remove Branch
+      </a>
+    </div>
+  );
+}
+RemoveBranchButton.propTypes = {
+  onClick: pt.func.isRequired,
+};
 
 export const ConnectedBranchFields = connect(
   state => ({

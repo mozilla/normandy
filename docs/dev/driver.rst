@@ -211,3 +211,8 @@ Storage
 
       :param key: Key to remove.
       :returns: A Promise that resolves when the value has been removed.
+
+   .. js:function:: clear()
+
+      Removes all stored values.
+      :returns: A Promise that resolves when the values have been removed.

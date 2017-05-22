@@ -16,6 +16,7 @@ const propFactory = props => ({
   isRecipeApproved: false,
   isEnabled: false,
   recipeId: 12345,
+  isPeerApprovalEnforced: true,
   ...props,
 });
 
@@ -109,16 +110,35 @@ describe('<RecipeFormActions>', () => {
       expect(wrapper.find('.action-reject').length).toBe(0);
     });
 
-    it('should NOT be enabled when user is the approval requester', () => {
-      const wrapper = mount(<RecipeFormActions
-        {...propFactory({
-          ...displayCriteria,
-          isUserRequester: true,
-        })}
-      />);
-      expect(wrapper.find('.action-approve').prop('disabled')).toBe(true);
-      expect(wrapper.find('.action-reject').prop('disabled')).toBe(true);
-    });
+    it(
+      'should NOT be enabled when user is the approval requester and peer approval is enforced',
+      () => {
+        const wrapper = mount(<RecipeFormActions
+          {...propFactory({
+            ...displayCriteria,
+            isUserRequester: true,
+            isPeerApprovalEnforced: true,
+          })}
+        />);
+        expect(wrapper.find('.action-approve').prop('disabled')).toBe(true);
+        expect(wrapper.find('.action-reject').prop('disabled')).toBe(true);
+      },
+    );
+
+    it(
+      'should be enabled when user is the approval requester and peer approval is not enforced',
+      () => {
+        const wrapper = mount(<RecipeFormActions
+          {...propFactory({
+            ...displayCriteria,
+            isUserRequester: true,
+            isPeerApprovalEnforced: false,
+          })}
+        />);
+        expect(wrapper.find('.action-approve').prop('disabled')).toBe(false);
+        expect(wrapper.find('.action-reject').prop('disabled')).toBe(false);
+      },
+    );
 
     it('should display with proper criteria', () => {
       const wrapper = mount(<RecipeFormActions {...propFactory(displayCriteria)} />);

@@ -4,17 +4,28 @@ set -eu
 # mach wants this
 export SHELL=$(which bash)
 
-# Fetches source code from fetch task, and creates ./gecko-dev-master/
-echo 'Downloading fetch result'
-curl --location --fail --silent --show-error "$FETCH_RESULT" | tar xz
+# Creates mozilla-central
+echo 'Downloading mozilla-central...'
+hg clone http://hg.mozilla.org/mozilla-central/
+
+echo 'Pulling tags from mozilla/normandy repo on Github...'
+pushd normandy
+git remote add mozilla https://github.com/mozilla/normandy.git
+git fetch mozilla
+popd
+
+echo 'Syncing recipe-client-addon to mozilla-central...'
+pushd normandy/recipe-client-addon
+npm install
+./bin/update-mozilla-central.sh ../../mozilla-central/
+popd
 
 echo 'Setting up environment'
-pushd gecko-dev-master
+pushd mozilla-central
 source /root/.cargo/env
-python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser
+python2.7 ./python/mozboot/bin/bootstrap.py --no-interactive --application-choice=browser_artifact_mode
 source /root/.cargo/env
 
 echo 'Running lints'
 ./mach lint browser/extensions/shield-recipe-client/
-
 popd

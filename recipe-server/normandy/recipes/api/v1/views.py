@@ -23,7 +23,7 @@ from normandy.recipes.models import (
     Recipe,
     RecipeRevision
 )
-from normandy.recipes.api.serializers import (
+from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
     ClientSerializer,

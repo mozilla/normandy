@@ -5,9 +5,13 @@ set -eu
 mkdir -p __version__
 git rev-parse HEAD > __version__/commit
 git describe --tags --exact-match > __version__/tag || true # may fail if not on a tag
+date '+%s' > __version__/build_time
+
 # build image
 docker build -t mozilla/normandy:latest .
+
 # pull other docker images used below
 docker pull giorgos/takis
+
 # get MaxMind GeoIP database for tests
 ./bin/download_geolite2.sh

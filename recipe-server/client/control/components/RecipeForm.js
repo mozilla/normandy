@@ -173,6 +173,7 @@ export class RecipeForm extends React.Component {
     return {
       isCloning: !!(route && route.isCloning),
       isUserRequester: requestAuthorID === currentUserID,
+      isPeerApprovalEnforced: document.documentElement.dataset.peerApprovalEnforced === 'true',
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
       isApproved: !!recipeId && requestDetails && requestDetails.approved,
