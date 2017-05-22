@@ -38,7 +38,7 @@ CleanupManager.addCleanupHandler(() => {
         const utils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
         utils.removeSheet(HEARTBEAT_CSS_URI, window.AGENT_SHEET);
         if (AppConstants.platform === 'macosx') {
-          utils.removeSheet(HEARTBEAT_CSS_URI, window.AGENT_SHEET);
+          utils.removeSheet(HEARTBEAT_CSS_URI_OSX, window.AGENT_SHEET);
         }
         windowsWithInjectedCss.delete(window);
       }
