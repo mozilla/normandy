@@ -69,8 +69,10 @@ add_task(withMockNormandyApi(async function testClientClassificationCache() {
     .returns(Promise.resolve(false));
 
   await SpecialPowers.pushPrefEnv({set: [
-    ["extensions.shield-recipe-client.api_url",
-     "https://example.com/selfsupport-dummy"],
+    [
+      "extensions.shield-recipe-client.api_url",
+      "https://example.com/selfsupport-dummy",
+    ],
   ]});
 
   // When the experiment pref is false, eagerly call getClientClassification.

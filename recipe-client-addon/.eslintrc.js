@@ -1,13 +1,21 @@
 "use strict";
 
 module.exports = {
-  extends: "normandy",
+  extends: [
+    "eslint:recommended",
+    "plugin:mozilla/recommended",
+  ],
 
   plugins: [
     "mozilla",
   ],
 
   rules: {
+    "consistent-return": 2,
+    "eqeqeq": 2,
+    "semi": [2, "always"],
+    "comma-dangle": [2, "always-multiline"],
+    "no-unused-vars": [2],
     "computed-property-spacing": 2,
     "space-infix-ops": [2],
     "no-else-return": 2,
@@ -21,7 +29,6 @@ module.exports = {
     "mozilla/no-aArgs": 1,
     "no-console": 1,
     "quotes": [1, "double", {avoidEscape: true}],
-    "babel/new-cap": 0,
     "mozilla/balanced-listeners": 0,
   },
 
