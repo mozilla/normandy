@@ -159,10 +159,10 @@ module.exports = [
           loader: 'babel-loader',
           query: {
             plugins: [
-                ['transform-runtime', {
-                  polyfill: false,
-                  regenerator: true,
-                }],
+              ['transform-runtime', {
+                polyfill: false,
+                regenerator: true,
+              }],
             ],
           },
         },

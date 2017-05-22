@@ -84,7 +84,7 @@ export default class GroupMenu extends React.Component {
         >
           <h3 className="group-label">Text Search</h3>
           <div
-            className={"menu-item"}
+            className={'menu-item'}
             key={searchText}
             onClick={this.makeClickItemHandler('text', searchText)}
             children={searchText}
