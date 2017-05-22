@@ -2,6 +2,7 @@ import { fromJS, List } from 'immutable';
 import * as matchers from 'jasmine-immutable-matchers';
 
 import {
+  RECIPE_DELETE,
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
@@ -48,6 +49,20 @@ describe('Recipes reducer', () => {
     expect(updatedState.items).toEqualImmutable(
       INITIAL_STATE.items.set(RECIPE.id, fromJS(reducedRecipe))
     );
+  });
+
+  it('should handle RECIPE_DELETE', () => {
+    const state = recipesReducer(undefined, {
+      type: RECIPE_RECEIVE,
+      recipe: RECIPE,
+    });
+
+    const updateState = recipesReducer(state, {
+      type: RECIPE_DELETE,
+      recipeId: RECIPE.id,
+    });
+
+    expect(updateState).toEqual(INITIAL_STATE);
   });
 
   it('should handle RECIPE_FILTERS_RECEIVE', () => {

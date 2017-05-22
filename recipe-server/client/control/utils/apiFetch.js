@@ -22,11 +22,10 @@ export default async function apiFetch(url, options = {}) {
     }
 
     if (['GET', 'HEAD'].includes(settings.method.toUpperCase())) {
-      queryString = '?';
-      Object.keys(settings.data).forEach(key => {
-        queryString += `${key}=${encodeURIComponent(settings.data[key])}&`;
-      });
-      queryString.slice(0, -1);
+      const queryStringData = Object.keys(settings.data).map(key => (
+        `${key}=${encodeURIComponent(settings.data[key])}`
+      ));
+      queryString = `?${queryStringData.join('&')}`;
     } else {
       settings.body = JSON.stringify(settings.data);
     }
