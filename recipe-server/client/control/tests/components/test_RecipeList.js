@@ -48,4 +48,14 @@ describe('<RecipeList>', () => {
 
     expect(wrapper.find(Tr).length).toBe(1);
   });
+
+  describe('renderTableCell', () => {
+    it('should not throw if the recipe attribute being displayed is null', () => {
+      const recipeList = shallow(<RecipeList {...propFactory()} />).instance();
+
+      const recipe = { foo: null };
+      const wrapper = () => shallow(recipeList.renderTableCell(recipe)({ slug: 'foo' }));
+      expect(wrapper).not.toThrow();
+    });
+  });
 });
