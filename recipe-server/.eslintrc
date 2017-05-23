@@ -1,3 +1,5 @@
+env:
+  es6: true
 extends:
   - airbnb
   - plugin:react/recommended
@@ -10,7 +12,7 @@ globals:
   PRODUCTION: false
   DEVELOPMENT: false
 rules:
-  arrow-parens: [off]
+  arrow-parens: [warn, as-needed]
   comma-dangle: [warn]
   no-console: [off]
   no-continue: [off]
@@ -23,7 +25,6 @@ rules:
   no-use-before-define: [warn, { functions: false, classes: false }]
   prefer-const: [warn]
 
-  babel/arrow-parens: [warn, as-needed]
   import/no-extraneous-dependencies: [error, {devDependencies: true}]
   import/no-mutable-exports: [off]
   import/no-named-as-default: [off]
@@ -37,9 +38,7 @@ rules:
   react/self-closing-comp: [warn]
   jsx-a11y/label-has-for: [off]
 
-  # generator-star-spacing is broken with parser: babel-eslint. Use a patched version
-  generator-star-spacing: [off]
-  babel/generator-star-spacing: [warn]
+  generator-star-spacing: [warn]
 settings:
   import/resolver:
     webpack:

@@ -9,11 +9,11 @@
   },
   "license": "MPL-2.0",
   "devDependencies": {
-    "babel-eslint": "6.1.2",
-    "eslint": "^3.8.1",
+    "babel-eslint": "7.2.3",
+    "eslint": "^3.19.0",
     "eslint-config-normandy": "1.0.0",
-    "eslint-plugin-babel": "3.3.0",
-    "eslint-plugin-mozilla": "0.2.5"
+    "eslint-plugin-babel": "4.1.1",
+    "eslint-plugin-mozilla": "0.3.2"
   },
   "dependencies": {
     "jexl": "1.1.4"
