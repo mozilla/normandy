@@ -117,7 +117,7 @@ notification.heartbeat {
 }
 
 .heartbeat > #star-rating-container > .star-x {
-  background: url("chrome://browser/skin/heartbeat-star-off.svg");
+  background: url("resource://shield-recipe-client/skin/shared/heartbeat-star-off.svg");
   cursor: pointer;
   height: 16px;
   margin-inline-end: 4px !important; /* Overrides the margin-inline-end for all platforms defined in the .plain class */
@@ -126,5 +126,5 @@ notification.heartbeat {
 
 .heartbeat > #star-rating-container > .star-x:hover,
 .heartbeat > #star-rating-container > .star-x:hover ~ .star-x {
-  background: url("chrome://browser/skin/heartbeat-star-lit.svg");
+  background: url("resource://shield-recipe-client/skin/shared/heartbeat-star-lit.svg");
 }

@@ -159,7 +159,7 @@ this.Heartbeat = class {
     this.notice = this.notificationBox.appendNotification(
       this.options.message,
       "heartbeat-" + this.options.flowId,
-      "chrome://browser/skin/heartbeat-icon.svg",
+      "resource://shield-recipe-client/skin/shared/heatbeat-icon.svg",
       this.notificationBox.PRIORITY_INFO_HIGH,
       this.buttons,
       eventType => {
