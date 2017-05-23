@@ -2,6 +2,7 @@ import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
+import { isObject } from 'underscore';
 
 import makeApiRequest from 'control/api';
 
@@ -139,7 +140,7 @@ export class DisconnectedRecipeList extends React.Component {
             value={displayValue}
           />
         );
-      } else if (typeof displayValue === 'object') {
+      } else if (isObject(displayValue)) {
         displayValue = (
           <ul className="nested-list">
             {
@@ -182,10 +183,7 @@ export class DisconnectedRecipeList extends React.Component {
 
     return (
       <div>
-        <RecipeFilters
-          displayCount={filteredRecipes.length}
-          totalCount={recipes.length}
-        />
+        <RecipeFilters />
         <div className="fluid-8">
           {
             !noResults && recipeListNeedsFetch &&

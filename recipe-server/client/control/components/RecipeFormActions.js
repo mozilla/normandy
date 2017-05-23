@@ -60,6 +60,7 @@ export default class RecipeFormActions extends React.Component {
     isRejected: pt.bool,
     hasApprovalRequest: pt.bool,
     recipeId: pt.number,
+    isPeerApprovalEnforced: pt.bool,
   };
 
   constructor(props) {
@@ -93,6 +94,7 @@ export default class RecipeFormActions extends React.Component {
     isFormDisabled,
     hasApprovalRequest,
     recipeId,
+    isPeerApprovalEnforced,
   }) {
     return [
       // delete
@@ -151,7 +153,7 @@ export default class RecipeFormActions extends React.Component {
         useClick
         trigger={
           <FormButton
-            disabled={isUserRequester}
+            disabled={isUserRequester && isPeerApprovalEnforced}
             className="action-approve submit"
             label="Approve"
           />
@@ -185,7 +187,7 @@ export default class RecipeFormActions extends React.Component {
         useClick
         trigger={
           <FormButton
-            disabled={isUserRequester}
+            disabled={isUserRequester && isPeerApprovalEnforced}
             className="action-reject submit delete"
             label="Reject"
           />

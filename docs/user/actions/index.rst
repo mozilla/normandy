@@ -10,3 +10,4 @@ they accept.
 
    console-log
    show-heartbeat
+   preference-experiment

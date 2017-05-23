@@ -3,6 +3,7 @@ import json
 import logging
 from collections import defaultdict
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
@@ -24,6 +25,7 @@ from normandy.recipes.validators import validate_json
 
 INFO_REQUESTING_RECIPE_SIGNATURES = 'normandy.recipes.I001'
 INFO_CREATE_REVISION = 'normandy.recipes.I002'
+WARNING_BYPASSING_PEER_APPROVAL = 'normandy.recipes.W001'
 
 
 logger = logging.getLogger(__name__)
@@ -186,8 +188,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
             return None
 
     def canonical_json(self):
-        from normandy.recipes.api.serializers import RecipeSerializer  # Avoid circular import
-        data = RecipeSerializer(self).data
+        # Avoid circular import
+        from normandy.recipes.api.v1.serializers import MinimalRecipeSerializer
+        data = MinimalRecipeSerializer(self).data
         return CanonicalJSONRenderer().render(data)
 
     def update_signature(self):
@@ -422,12 +425,25 @@ class ApprovalRequest(models.Model):
     class CannotActOnOwnRequest(Exception):
         pass
 
+    def verify_approver(self, approver):
+        if approver == self.creator:
+            if settings.PEER_APPROVAL_ENFORCED:
+                raise self.CannotActOnOwnRequest()
+            else:
+                logger.warning(
+                    'Bypassing peer approver verification because it is disabled.',
+                    extra={
+                        'code': WARNING_BYPASSING_PEER_APPROVAL,
+                        'approval_id': self.id,
+                        'approver': approver
+                    },
+                )
+
     def approve(self, approver, comment):
         if self.approved is not None:
             raise self.NotActionable()
 
-        if approver == self.creator:
-            raise self.CannotActOnOwnRequest()
+        self.verify_approver(approver)
 
         self.approved = True
         self.approver = approver
@@ -442,8 +458,7 @@ class ApprovalRequest(models.Model):
         if self.approved is not None:
             raise self.NotActionable()
 
-        if approver == self.creator:
-            raise self.CannotActOnOwnRequest()
+        self.verify_approver(approver)
 
         self.approved = False
         self.approver = approver
