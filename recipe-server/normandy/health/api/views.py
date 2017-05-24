@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+from functools import lru_cache
+from datetime import datetime
 
 from django.conf import settings
 from django.core.checks.registry import registry as checks_registry
@@ -15,42 +17,61 @@ from normandy.base.decorators import short_circuit_middlewares
 
 
 logger = logging.getLogger(__name__)
-_commit = None
-_tag = None
 
 
+@lru_cache(maxsize=1)
 def get_version_info():
-    global _commit, _tag
-    if _commit is None:
-        path = os.path.join(settings.BASE_DIR, '__version__', 'commit')
+    """
+    Gets data about the current build.
+
+    This pulls the data from files in a directory named __version__ in
+    the root of the project. The files in this directory are generated
+    during the CI build by the script `bin/ci/dependencies`.
+    """
+
+    def fetch_key(name):
+        path = os.path.join(settings.BASE_DIR, '__version__', name)
+        val = None
         try:
             with open(path) as f:
-                _commit = f.read().strip() or 'unknown'
+                val = f.read().strip()
         except OSError:
-            _commit = 'unknown'
+            pass
+        return val or None
 
-    if _tag is None:
-        path = os.path.join(settings.BASE_DIR, '__version__', 'tag')
-        try:
-            with open(path) as f:
-                _tag = f.read().strip() or 'unknown'
-        except OSError:
-            _tag = 'unknown'
+    try:
+        build_time = datetime.utcfromtimestamp(int(fetch_key('build_time')))
+    except (ValueError, TypeError) as e:
+        build_time = None
 
-    return _commit, _tag
+    version_info = {
+        'commit': fetch_key('commit'),
+        'version': fetch_key('tag'),
+        'build_time': build_time,
+    }
+
+    return version_info
 
 
 @api_view(['GET'])
 def version(request):
+    """
+    Return data for developers and users to inspect the state of a server.
+    """
     repo_url = 'https://github.com/mozilla/normandy'
-    commit, tag = get_version_info()
+    version_info = get_version_info()
+
+    commit = version_info['commit']
+    version = version_info['version']
+    build_time = version_info['build_time']
 
     return Response({
         'source': repo_url,
         'commit': commit,
         'commit_link': '{0}/commit/{1}'.format(repo_url, commit) if commit else None,
         'configuration': os.environ.get('DJANGO_CONFIGURATION'),
-        'version': tag,
+        'version': version,
+        'build_time': build_time.isoformat(),
     })
 
 

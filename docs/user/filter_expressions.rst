@@ -359,6 +359,49 @@ function is the value being transformed.
 
    .. _ISO 8601: https://www.w3.org/TR/NOTE-datetime
 
+Preference Filters
+^^^^^^^^^^^^^^^^^^
+.. js:function:: preferenceValue(prefKey, defaultValue)
+
+   :param string prefKey:
+      Full dotted-path name of the preference to read.
+   :param defaultValue:
+      The value to return if the preference does not have a value. Defaults to
+      ``undefined``.
+   :returns:
+      The value of the preference.
+
+   .. code-block:: javascript
+
+      // Match users with more than 2 content processes
+      'dom.ipc.processCount'|preferenceValue > 2
+
+.. js:function:: preferenceIsUserSet(prefKey)
+
+   :param string prefKey:
+      Full dotted-path name of the preference to read.
+   :returns:
+      ``true`` if the preference has a value that is different than its default
+      value, or ``false`` if it does not.
+
+   .. code-block:: javascript
+
+      // Match users who have modified add-on signature checks
+      'xpinstall.signatures.required'|preferenceIsUserSet
+
+.. js:function:: preferenceExists(prefKey)
+
+   :param string prefKey:
+      Full dotted-path name of the preference to read.
+   :returns:
+      ``true`` if the preference has *any* value (whether it is the default
+      value or a user-set value), or ``false`` if it does not.
+
+   .. code-block:: javascript
+
+      // Match users with an HTTP proxy
+      'network.proxy.http'|preferenceExists
+
 Examples
 --------
 This section lists some examples of commonly-used filter expressions.

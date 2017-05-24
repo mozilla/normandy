@@ -23,6 +23,7 @@ describe('<ControlField>', () => {
         InputComponent: 'input',
         type: 'text',
         name: 'test',
+        label: 'Test',
         ...props,
       };
     }

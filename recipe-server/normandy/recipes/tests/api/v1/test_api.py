@@ -682,7 +682,9 @@ class TestApprovalFlow(object):
             actual_signature = fake_sign([data])[0]['signature']
             assert actual_signature == expected_signature
 
-    def test_full_approval_flow(self, api_client, mocked_autograph):
+    def test_full_approval_flow(self, settings, api_client, mocked_autograph):
+        settings.PEER_APPROVAL_ENFORCED = True
+
         action = ActionFactory()
         user1 = UserFactory(is_superuser=True)
         user2 = UserFactory(is_superuser=True)
@@ -753,7 +755,8 @@ class TestApprovalFlow(object):
         api_client.force_authenticate(user2)
         res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
                               {'comment': 'r-'})
-        recipe_data_2['approval_request'] = res.json()
+        approval_data = res.json()
+        recipe_data_2['approval_request'] = approval_data
         assert res.status_code == 200
 
         # The change should not be visible yet, since it isn't approved
