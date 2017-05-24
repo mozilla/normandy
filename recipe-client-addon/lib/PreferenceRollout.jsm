@@ -59,7 +59,7 @@ this.PreferenceRollout = Object.assign({}, PreferenceManagement(PREF_NAMESPACE),
     }
 
     // Validation will throw
-    this.validateRecipe(experiment);
+    this.validateRecipePrefTypes(experiment);
 
     // Save experiment data locally to be read from on startup later
     this.saveRecipeData(experiment);

@@ -186,7 +186,7 @@ add_task(withMockPreferences(async function(mockPreferences) {
 
 // startObserver should register an observer that calls stop when a preference
 // changes from its experimental value.
-add_task(withMockData(withMockPreferences(async function(mockExperiments, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(mockExperiments, mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
 
@@ -474,7 +474,7 @@ add_task(withMockExperiments(withMockPreferences(async function testInitRegister
 
 
 // stopObserver should cancel an active observer.
-add_task(withMockData(withMockPreferences(async function(mockData, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(mockData, mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
 
@@ -499,7 +499,7 @@ add_task(withMockData(withMockPreferences(async function(mockData, mockPreferenc
 })));
 
 // stopAllObservers
-add_task(withMockData(withMockPreferences(async function(mockData, mockPreferences) {
+add_task(withMockExperiments(withMockPreferences(async function(mockData, mockPreferences) {
   const stop = sinon.stub(PreferenceExperiments, "stop");
   mockPreferences.set("fake.preference", "startvalue");
   mockPreferences.set("other.fake.preference", "startvalue");

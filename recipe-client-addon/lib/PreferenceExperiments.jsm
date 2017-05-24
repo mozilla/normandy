@@ -125,18 +125,7 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
     };
 
     // Validation will throw
-    this.validateRecipe(experiment);
-
-    if (!preferenceType || !givenPrefType) {
-      throw new Error(`Invalid preferenceType provided (given "${preferenceType}")`);
-    }
-
-    if (prevPrefType !== Services.prefs.PREF_INVALID && prevPrefType !== givenPrefType) {
-      throw new Error(
-        `Previous preference value is of type "${prevPrefType}", but was given ` +
-        `"${givenPrefType}" (${preferenceType})`
-      );
-    }
+    this.validateRecipePrefTypes(experiment);
 
     // Save experiment data locally to be read from on startup later
     this.saveRecipeData(experiment);
