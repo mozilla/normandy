@@ -10,7 +10,7 @@ from normandy.base.api import UpdateOrCreateModelViewSet
 from normandy.base.api.filters import CaseInsensitiveBooleanFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
-from normandy.base.decorators import api_cache_control, reversion_transaction
+from normandy.base.decorators import api_cache_control
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
