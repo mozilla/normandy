@@ -19,5 +19,6 @@ module.exports = {
     withDriver: false,
     withMockNormandyApi: false,
     withMockPreferences: false,
+    experimentFactory: false,
   },
 };

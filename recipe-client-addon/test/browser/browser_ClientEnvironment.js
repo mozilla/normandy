@@ -90,7 +90,7 @@ add_task(async function testDoNotTrack() {
 add_task(async function testExperiments() {
   const active = {name: "active", expired: false};
   const expired = {name: "expired", expired: true};
-  const getAll = sinon.stub(PreferenceExperiments, "getAll", async () => [active, expired]);
+  const getAll = sinon.stub(PreferenceExperiments, "getStoredRecipes", async () => [active, expired]);
 
   const environment = ClientEnvironment.getEnvironment();
   const experiments = await environment.experiments;

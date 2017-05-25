@@ -185,7 +185,7 @@ this.ClientEnvironment = {
     XPCOMUtils.defineLazyGetter(environment, "experiments", async () => {
       const names = {all: [], active: [], expired: []};
 
-      for (const experiment of await PreferenceExperiments.getAll()) {
+      for (const experiment of await PreferenceExperiments.getAllExperiments()) {
         names.all.push(experiment.name);
         if (experiment.expired) {
           names.expired.push(experiment.name);

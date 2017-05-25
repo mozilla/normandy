@@ -98,20 +98,6 @@ this.PreferenceManagement = (namespace) => ({
     store.saveSoon();
   },
 
-
-  /**
-   * Returns the internal storage object, after properly ensuring the store and
-   * store namespace are initiated.
-   *
-   * @returns {Promise}
-   * @resolves When the operation is completed succesfully
-   * @rejects Javascript exception.
-   */
-  async setStorageItem(key, value) {
-    const store = await this.getStorage();
-    store.data[namespace][key] = value;
-  },
-
   /**
    * Test wrapper that temporarily replaces the stored recipe data with fake
    * data for testing. Given a test function, mocks the data store, then executes
@@ -156,18 +142,19 @@ this.PreferenceManagement = (namespace) => ({
    * @resolves When the operation is completed succesfully
    * @rejects Javascript exception.
    */
-  async applyAll() {
+  async applyActiveRecipes() {
     // On shutdown, clear all the observers that we're about to instantiate.
     CleanupManager.addCleanupHandler(this.stopAllObservers.bind(this));
 
-    for (const recipe of await this.getActiveChanges()) {
+    for (const recipe of await this.getActiveRecipes()) {
       // Select the User or Default branch, then update the recipe's preference
       // with the appropriate value.
       const prefs = this.getPreferenceBranch(recipe.preferenceBranchType);
       prefs.set(recipe.preferenceName, recipe.preferenceValue);
 
       // Notify Telemetry of recipes we're running, since they don't persist between restarts
-      TelemetryEnvironment.setExperimentActive(recipe.name, recipe.branch);
+      const branchName = recipe.branch || recipe.preferenceBranch;
+      TelemetryEnvironment.setExperimentActive(recipe.name, branchName);
 
       // Watch for changes to the recipe's preference
       this.startObserver(recipe.name, recipe.preferenceName, recipe.preferenceValue);
@@ -181,16 +168,15 @@ this.PreferenceManagement = (namespace) => ({
    * @return {Object}       Selected preferences branch
    */
   getPreferenceBranch(which) {
-    const branch = PreferenceBranchType[which];
-    if (!branch) {
+    if (!PreferenceBranchType.hasOwnProperty(which)) {
       throw new Error(`Invalid value for preference branch: "${which}"`);
     }
 
-    return branch;
+    return PreferenceBranchType[which];
   },
 
   /**
-   * Register a preference observer that stops an recipe when the user
+   * Register a preference observer that stops a recipe when the user
    * modifies the preference.
    * @param {string} recipeName
    * @param {string} preferenceName
@@ -220,7 +206,7 @@ this.PreferenceManagement = (namespace) => ({
   },
 
   /**
-   * Check if a preference observer is active for an recipe.
+   * Check if a preference observer is active for a recipe.
    * @param {string} recipeName
    * @return {Boolean}
    */
@@ -285,8 +271,8 @@ this.PreferenceManagement = (namespace) => ({
    * @rejects {Error}
    *   If there is no stored recipe with the given name.
    */
-  async get(recipeName) {
-    log.debug(`PreferenceManagement.get(${recipeName})`);
+  async getRecipe(recipeName) {
+    log.debug(`PreferenceManagement.getRecipe(${recipeName})`);
     const store = await this.getStorage();
     if (!(recipeName in store.data[namespace])) {
       throw new Error(`Could not find a preference recipe named "${recipeName}"`);
@@ -343,8 +329,8 @@ this.PreferenceManagement = (namespace) => ({
    * @resolves When the operation is completed succesfully
    * @rejects Javascript exception.
    */
-  async getActiveChanges() {
-    log.debug("PreferenceManagement.getActiveChanges()");
+  async getActiveRecipes() {
+    log.debug("PreferenceManagement.getActiveRecipes()");
     const allPrefs = await this.getStoredRecipes();
     // Return copies so mutating them doesn't affect the storage.
     return allPrefs.filter(e => !e.expired).map(e => Object.assign({}, e));
@@ -373,8 +359,8 @@ this.PreferenceManagement = (namespace) => ({
    * @resolves When the operation is completed succesfully
    * @rejects Javascript exception.
    */
-  async has(recipeName) {
-    log.debug(`PreferenceManagement.has(${recipeName})`);
+  async hasRecipe(recipeName) {
+    log.debug(`PreferenceManagement.hasRecipe(${recipeName})`);
     const store = await this.getStorage();
     return store.data[namespace].hasOwnProperty(recipeName);
   },
@@ -387,9 +373,14 @@ this.PreferenceManagement = (namespace) => ({
    * @resolves When the operation is completed succesfully
    * @rejects Javascript exception.
    */
-  async expire(recipeName) {
-    log.debug(`PreferenceManagement.expire(${recipeName})`);
+  async expireRecipe(recipeName) {
+    log.debug(`PreferenceManagement.expireRecipe(${recipeName})`);
     const store = await this.getStorage();
+
+    if (!store.data[namespace].hasOwnProperty(recipeName)) {
+      throw new Error(`Can not find recipe "${recipeName}" to expire.`);
+    }
+
     store.data[namespace][recipeName].expired = true;
   }
 });

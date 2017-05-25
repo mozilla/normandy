@@ -10,21 +10,6 @@ const withMockExperiments = withMockData.bind(PreferenceExperiments);
 
 const DefaultPreferences = new Preferences({defaultBranch: true});
 
-function experimentFactory(attrs) {
-  return Object.assign({
-    name: "fakename",
-    branch: "fakebranch",
-    expired: false,
-    lastSeen: new Date().toJSON(),
-    preferenceName: "fake.preference",
-    preferenceValue: "falkevalue",
-    preferenceType: "string",
-    previousPreferenceValue: "oldfakevalue",
-    preferenceBranchType: "default",
-  }, attrs);
-}
-
-
 // start should throw if an experiment with the given name already exists
 add_task(withMockExperiments(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
@@ -87,7 +72,7 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
     preferenceBranchType: "default",
     preferenceType: "string",
   });
-  ok(await PreferenceExperiments.get("test"), "start saved the experiment");
+  ok(await PreferenceExperiments.getRecipe("test"), "start saved the experiment");
   ok(
     startObserver.calledWith("test", "fake.preference", "newvalue"),
     "start registered an observer",
@@ -153,7 +138,7 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
   };
 
   const experiment = {};
-  const saved = await PreferenceExperiments.get("test");
+  const saved = await PreferenceExperiments.getRecipe("test");
   Object.keys(expectedExperiment).forEach(key => experiment[key] = saved[key]);
   Assert.deepEqual(experiment, expectedExperiment, "start saved the experiment");
 

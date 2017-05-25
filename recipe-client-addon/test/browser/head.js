@@ -119,3 +119,17 @@ class MockPreferences {
     }
   }
 }
+
+this.experimentFactory = function(attrs) {
+  return Object.assign({
+    name: "fakename",
+    branch: "fakebranch",
+    expired: false,
+    lastSeen: new Date().toJSON(),
+    preferenceName: "fake.preference",
+    preferenceValue: "falkevalue",
+    preferenceType: "string",
+    previousPreferenceValue: "oldfakevalue",
+    preferenceBranchType: "default",
+  }, attrs);
+};

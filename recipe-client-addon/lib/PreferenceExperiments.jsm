@@ -53,14 +53,8 @@
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "Services", "resource://gre/modules/Services.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager", "resource://shield-recipe-client/lib/CleanupManager.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "JSONFile", "resource://gre/modules/JSONFile.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "LogManager", "resource://shield-recipe-client/lib/LogManager.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/modules/TelemetryEnvironment.jsm");
-
 XPCOMUtils.defineLazyModuleGetter(this, "PreferenceManagement", "resource://shield-recipe-client/lib/PreferenceManagement.jsm");
 
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
@@ -69,13 +63,13 @@ const log = LogManager.getLogger("preference-experiments");
 
 const PREF_NAMESPACE = "experiments";
 
-this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPACE), {
+this.PreferenceExperiments = Object.assign(PreferenceManagement(PREF_NAMESPACE), {
   async init() {
-    await this.applyAll();
+    await this.applyActiveRecipes();
   },
 
-  async getAll() {
-    return await this.getActiveChanges();
+  async getAllExperiments() {
+    return await this.getStoredRecipes();
   },
 
   /**
@@ -94,12 +88,12 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
   async start({name, branch, preferenceName, preferenceValue, preferenceBranchType, preferenceType}) {
     log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
-    const hasExistingExperiment = await this.has(name);
+    const hasExistingExperiment = await this.hasRecipe(name);
     if (hasExistingExperiment) {
       throw new Error(`A preference experiment named "${name}" already exists.`);
     }
 
-    const activeExperiments = await this.getActiveChanges();
+    const activeExperiments = await this.getActiveRecipes();
     const hasConflictingExperiment = activeExperiments.some(
       e => e.preferenceName === preferenceName
     );
@@ -124,17 +118,18 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
       preferenceBranchType,
     };
 
-    // Validation will throw
+    // Validation will throw if preference types associated with this recipe
+    // are incompatible with the existing value type.
     this.validateRecipePrefTypes(experiment);
 
-    // Save experiment data locally to be read from on startup later
+    // Save experiment data locally to be read from on startup later.
     this.saveRecipeData(experiment);
     this.startObserver(experiment.name, experiment.preferenceName, experiment.preferenceValue);
 
-    // Actually alter the set preference (this is done automatically on startup)
+    // Actually alter the set preference (this is done automatically on startup).
     preferences.set(preferenceName, preferenceValue);
 
-    // Notify Telemetry
+    // Notify Telemetry.
     TelemetryEnvironment.setExperimentActive(name, branch);
   },
 
@@ -151,12 +146,12 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
   async stop(experimentName, resetValue = true) {
     log.debug(`PreferenceExperiments.stop(${experimentName})`);
 
-    const hasExistingExperiment = await this.has(experimentName);
+    const hasExistingExperiment = await this.hasRecipe(experimentName);
     if (!hasExistingExperiment) {
       throw new Error(`Could not find a preference experiment named "${experimentName}"`);
     }
 
-    const experiment = await this.get(experimentName);
+    const experiment = await this.getRecipe(experimentName);
     if (experiment.expired) {
       throw new Error(
         `Cannot stop preference experiment "${experimentName}" because it is already expired`
@@ -182,7 +177,7 @@ this.PreferenceExperiments = Object.assign({}, PreferenceManagement(PREF_NAMESPA
       }
     }
 
-    await this.expire(experiment.name);
+    await this.expireRecipe(experiment.name);
     TelemetryEnvironment.setExperimentInactive(experimentName, experiment.branch);
   },
 });

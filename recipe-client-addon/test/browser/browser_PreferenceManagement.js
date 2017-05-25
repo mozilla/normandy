@@ -1,37 +1,20 @@
 "use strict";
 
 Cu.import("resource://gre/modules/Preferences.jsm", this);
-Cu.import("resource://gre/modules/TelemetryEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/PreferenceManagement.jsm", this);
 
 // Save ourselves some typing
 const Manager = PreferenceManagement("test");
 const withMockData = Manager.withMockData.bind(Manager);
 
-const DefaultPreferences = new Preferences({defaultBranch: true});
-
-function experimentFactory(attrs) {
-  return Object.assign({
-    name: "fakename",
-    branch: "fakebranch",
-    expired: false,
-    lastSeen: new Date().toJSON(),
-    preferenceName: "fake.preference",
-    preferenceValue: "falkevalue",
-    preferenceType: "string",
-    previousPreferenceValue: "oldfakevalue",
-    preferenceBranchType: "default",
-  }, attrs);
-}
-
 // clearStorage
 add_task(withMockData(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
 
-  ok(await Manager.has("test"), "Mock experiment is detected.");
+  ok(await Manager.hasRecipe("test"), "Mock experiment is detected.");
   await Manager.clearStorage();
   ok(
-    !(await Manager.has("test")),
+    !(await Manager.hasRecipe("test")),
     "clearStorage removed all stored experiments",
   );
 }));
@@ -91,17 +74,17 @@ add_task(withMockData(async function(experiments) {
 // get should throw if no experiment exists with the given name
 add_task(withMockData(async function() {
   await Assert.rejects(
-    Manager.get("neverexisted"),
+    Manager.getRecipe("neverexisted"),
     "get rejects if no experiment with the given name is found",
   );
 }));
 
-// get
+// get should return the currently stored experiment appropriately
 add_task(withMockData(async function(experiments) {
   const experiment = experimentFactory({name: "test"});
   experiments["test"] = experiment;
 
-  const fetchedExperiment = await Manager.get("test");
+  const fetchedExperiment = await Manager.getRecipe("test");
   Assert.deepEqual(fetchedExperiment, experiment, "get fetches the correct experiment");
 
   // Modifying the fetched experiment must not edit the data source.
@@ -109,31 +92,34 @@ add_task(withMockData(async function(experiments) {
   is(experiments["test"].name, "test", "get returns a copy of the experiment");
 }));
 
-add_task(withMockData(async function testGetActiveChanges(experiments) {
+
+// getStoredRecipes should return all stored recipes, regardless of expired state
+add_task(withMockData(async function testGetStoredRecipes(experiments) {
   const experiment1 = experimentFactory({name: "experiment1"});
   const experiment2 = experimentFactory({name: "experiment2", disabled: true});
   experiments["experiment1"] = experiment1;
   experiments["experiment2"] = experiment2;
 
-  const fetchedExperiments = await Manager.getActiveChanges();
-  is(fetchedExperiments.length, 2, "getActiveChanges returns a list of all stored experiments");
+  const fetchedExperiments = await Manager.getStoredRecipes();
+  is(fetchedExperiments.length, 2, "getStoredRecipes returns a list of all stored experiments");
   Assert.deepEqual(
     fetchedExperiments.find(e => e.name === "experiment1"),
     experiment1,
-    "getActiveChanges returns a list with the correct experiments",
+    "getStoredRecipes returns a list with the correct experiments",
   );
   const fetchedExperiment2 = fetchedExperiments.find(e => e.name === "experiment2");
   Assert.deepEqual(
     fetchedExperiment2,
     experiment2,
-    "getActiveChanges returns a list with the correct experiments, including disabled ones",
+    "getStoredRecipes returns a list with the correct experiments, including disabled ones",
   );
 
   fetchedExperiment2.name = "othername";
-  is(experiment2.name, "experiment2", "getActiveChanges returns copies of the experiments");
+  is(experiment2.name, "experiment2", "getStoredRecipes returns copies of the experiments");
 }));
 
-add_task(withMockData(withMockPreferences(async function testGetActiveChanges(experiments) {
+// getActiveRecipes should
+add_task(withMockData(withMockPreferences(async function testGetActiveRecipes(experiments) {
   experiments["active"] = experimentFactory({
     name: "active",
     expired: false,
@@ -143,24 +129,24 @@ add_task(withMockData(withMockPreferences(async function testGetActiveChanges(ex
     expired: true,
   });
 
-  const activeExperiments = await Manager.getActiveChanges();
+  const activeExperiments = await Manager.getActiveRecipes();
   Assert.deepEqual(
     activeExperiments,
     [experiments["active"]],
-    "getActiveChanges only returns active experiments",
+    "getActiveRecipes only returns active experiments",
   );
 
   activeExperiments[0].name = "newfakename";
   Assert.notEqual(
     experiments["active"].name,
     "newfakename",
-    "getActiveChanges returns copies of stored experiments",
+    "getActiveRecipes returns copies of stored experiments",
   );
 })));
 
 // has
 add_task(withMockData(async function(experiments) {
   experiments["test"] = experimentFactory({name: "test"});
-  ok(await Manager.has("test"), "has returned true for a stored experiment");
-  ok(!(await Manager.has("missing")), "has returned false for a missing experiment");
+  ok(await Manager.hasRecipe("test"), "has returned true for a stored experiment");
+  ok(!(await Manager.hasRecipe("missing")), "has returned false for a missing experiment");
 }));
