@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 
 import django_filters
@@ -75,6 +76,14 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         return queryset
 
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+
     @detail_route(methods=['GET'])
     @api_cache_control()
     def history(self, request, pk=None):
@@ -83,7 +92,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
                                               context={'request': request})
         return Response(serializer.data)
 
-    @reversion_transaction
     @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
@@ -96,7 +104,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         return Response(RecipeSerializer(recipe).data)
 
-    @reversion_transaction
     @detail_route(methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
