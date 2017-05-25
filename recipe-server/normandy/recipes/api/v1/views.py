@@ -110,11 +110,11 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
+        return super().create(request, *args, **kwargs)
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
+        return super().update(request, *args, **kwargs)
 
     @list_route(methods=['GET'])
     @api_cache_control()
