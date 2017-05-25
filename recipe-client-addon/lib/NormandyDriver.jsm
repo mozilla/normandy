@@ -167,14 +167,6 @@ this.NormandyDriver = function(sandboxManager) {
          *
          */
 
-      let tempUrl = Services.io.newURI(url);
-      if (tempUrl.scheme == "chrome") {
-        let baseURI = tempUrl.clone().QueryInterface(Ci.nsIURL);
-        const registry = Cc['@mozilla.org/chrome/chrome-registry;1'].
-          getService(Ci.nsIChromeRegistry);
-        url = registry.convertChromeURL(baseURI).spec;
-      }
-
       var installObjectCallback = (installObject, resolve, reject) => {
         installObject.install();
         installObject.addListener({
