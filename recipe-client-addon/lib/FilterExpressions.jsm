@@ -22,7 +22,7 @@ XPCOMUtils.defineLazyGetter(this, "nodeRequire", () => {
 });
 
 XPCOMUtils.defineLazyGetter(this, "jexl", () => {
-  const {Jexl} = nodeRequire("jexl/lib/Jexl.js");
+  const {Jexl} = nodeRequire("mozjexl/lib/Jexl.js");
   const jexl = new Jexl();
   jexl.addTransforms({
     date: dateString => new Date(dateString),

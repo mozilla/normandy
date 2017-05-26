@@ -3,6 +3,6 @@ install.rdf.in
 jar.mn
 lib
 moz.build
-node_modules/jexl/lib
-node_modules/jexl/LICENSE.txt
+node_modules/mozjexl/lib
+node_modules/mozjexl/LICENSE.txt
 test

@@ -1,4 +1,5 @@
-Copyright (c) 2015 TechnologyAdvice
+Copyright for portions of mozJexl are held by TechnologyAdvice, 2015 as part of Jexl.
+All other copyright for mozJexl are held by the Mozilla Foundation, 2017.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

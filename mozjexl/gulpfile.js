@@ -26,7 +26,7 @@ gulp.task('dist', function() {
 		.pipe(browserified)
 		.pipe(uglify())
 		.pipe(rename({
-			basename: 'jexl',
+			basename: 'mozjexl',
 			extname: '.min.js'
 		}))
 		.pipe(gulp.dest('./dist/'));

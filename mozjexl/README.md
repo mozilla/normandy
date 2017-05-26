@@ -1,3 +1,8 @@
+mozJexl is a fork of Jexl for use at Mozilla, specifically as a part
+of SHIELD and Normandy.
+
+---
+
 <a href="http://promisesaplus.com/">
     <img src="https://promises-aplus.github.io/promises-spec/assets/logo-small.png"
          align="right" valign="top" alt="Promises/A+ logo" />

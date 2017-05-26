@@ -14,6 +14,7 @@ PROJECTS=(
     lints
     compose
     eslint-config-normandy
+    mozjexl
 )
 
 count=0

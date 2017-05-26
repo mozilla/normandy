@@ -88,7 +88,7 @@ class Core(Configuration):
         'jquery': ['dist/*.js'],
         'json-editor': ['dist/*.js'],
         'wolfy87-eventemitter': ['EventEmitter.js'],
-        'jexl': ['dist/*.js'],
+        'mozjexl': ['dist/*.js'],
     }
 
     REST_FRAMEWORK = {
