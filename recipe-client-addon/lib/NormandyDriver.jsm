@@ -160,11 +160,8 @@ this.NormandyDriver = function(sandboxManager) {
      * Return a promise that resolves to an Addon ID if installation is successful.
      */
     installAddon(url) {
-        /* We need to clobber chrome URLs into file based URLs before they
-         * get forwarded to the AddonManager.
-         *
-         * The AddonManager can only handle file:// and downloadable URLs.
-         *
+        /* Install an addon.  Note that the AddonManager can only handle
+         * file:// and downloadable URLs.
          */
 
       var installObjectCallback = (installObject, resolve, reject) => {

@@ -14,7 +14,6 @@ add_task(withDriver(Assert, async function uuids(driver) {
 
 add_task(withDriver(Assert, async function installXpi(driver) {
   // Test that we can install an XPI from any URL
-  dump(`SIGNAL: ${gTestPath}`);
   const dir = getChromeDir(getResolvedURI(gTestPath));
   dir.append("fixtures");
   dir.append("normandy.xpi");
