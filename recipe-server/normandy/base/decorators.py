@@ -1,7 +1,6 @@
 from functools import wraps
 
 from django.conf import settings
-from django.db import transaction
 from django.views.decorators.cache import cache_control
 
 from reversion import revisions
@@ -19,13 +18,6 @@ def short_circuit_middlewares(view_func):
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
     wrapped_view.short_circuit_middlewares = True
-    return wraps(view_func)(wrapped_view)
-
-
-def reversion_transaction(view_func):
-    def wrapped_view(*args, **kwargs):
-        with transaction.atomic(), revisions.create_revision(manage_manually=True):
-            return view_func(*args, **kwargs)
     return wraps(view_func)(wrapped_view)
 
 
