@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Q
 
 import django_filters
@@ -12,7 +13,7 @@ from normandy.base.api.filters import CaseInsensitiveBooleanFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
-from normandy.base.decorators import api_cache_control, reversion_transaction
+from normandy.base.decorators import api_cache_control
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
@@ -107,6 +108,14 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         return queryset
 
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
     @list_route(methods=['GET'])
     @api_cache_control()
     def signed(self, request, pk=None):
@@ -122,7 +131,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
                                               context={'request': request})
         return Response(serializer.data)
 
-    @reversion_transaction
     @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
@@ -135,7 +143,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         return Response(RecipeSerializer(recipe).data)
 
-    @reversion_transaction
     @detail_route(methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
