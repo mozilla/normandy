@@ -3,8 +3,6 @@ from functools import wraps
 from django.conf import settings
 from django.views.decorators.cache import cache_control
 
-from reversion import revisions
-
 
 def short_circuit_middlewares(view_func):
     """
