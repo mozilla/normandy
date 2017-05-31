@@ -1,5 +1,6 @@
 FROM ubuntu:zesty
 WORKDIR /root
+ENV CACHEBUST=2017-05-31
 RUN apt-get update && apt-get install -y --no-install-recommends \
         apt-transport-https \
         curl \
@@ -25,3 +26,7 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 
 RUN curl -O https://hg.mozilla.org/mozilla-central/raw-file/tip/python/mozboot/bin/bootstrap.py && \
     python2.7 bootstrap.py --no-interactive --application-choice=browser_artifact_mode
+
+RUN hg clone https://hg.mozilla.org/hgcustom/version-control-tools/
+
+COPY dot.hgrc ./.hgrc
