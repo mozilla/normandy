@@ -367,6 +367,9 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
 // stop should also support user pref experiments
 add_task(withMockExperiments(withMockPreferences(async function(experiments, mockPreferences) {
   const stopObserver = sinon.stub(PreferenceExperiments, "stopObserver");
+  const hasObserver = sinon.stub(PreferenceExperiments, "hasObserver");
+  hasObserver.returns(true);
+
   mockPreferences.set("fake.preference", "experimentvalue", "user");
   experiments["test"] = experimentFactory({
     name: "test",
@@ -377,7 +380,6 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
     previousPreferenceValue: "oldvalue",
     preferenceBranchType: "user",
   });
-  PreferenceExperiments.startObserver("test", "fake.preference", "experimentvalue");
 
   await PreferenceExperiments.stop("test");
   ok(stopObserver.calledWith("test"), "stop removed an observer");
@@ -389,6 +391,7 @@ add_task(withMockExperiments(withMockPreferences(async function(experiments, moc
   );
 
   stopObserver.restore();
+  hasObserver.restore();
 })));
 
 // stop should not call stopObserver if there is no observer registered.
