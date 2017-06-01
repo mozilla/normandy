@@ -182,9 +182,7 @@ this.NormandyDriver = function(sandboxManager) {
         });
           })(installObject, resolve, reject);
         });
-      }
-
-      );
+      });
     },
 
     /*
