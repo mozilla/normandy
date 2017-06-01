@@ -4,6 +4,8 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var AsyncAwaitPlugin = require('webpack-async-await');
+var BabiliPlugin = require('babili-webpack-plugin');
 var argv = require('yargs').argv;
 var childProcess = require('child_process');
 
@@ -14,7 +16,11 @@ const cssNamePattern = production ? '[name].[hash].css' : '[name].css';
 const jsNamePattern = production ? '[name].[hash].js' : '[name].js';
 
 var plugins = [
-  new BundleTracker({ filename: './webpack-stats.json' }),
+  new AsyncAwaitPlugin({
+    // Workaround for https://github.com/substack/node-browserify/issues/1668
+    // Once we update to webpack2, we can update this plugin and remove this.
+    awaitAnywhere: true,
+  }),
   new webpack.optimize.OccurrenceOrderPlugin(true),
   // Note: This matches Django's idea of what a hashed url looks like. Be careful when changing it!
   new ExtractTextPlugin(cssNamePattern),
@@ -32,11 +38,7 @@ var plugins = [
 if (production) {
   plugins = plugins.concat([
     new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-    }),
+    new BabiliPlugin(),
   ]);
 } else {
   plugins = plugins.concat([
@@ -73,7 +75,9 @@ module.exports = [
       'react/addons': true,
     },
 
-    plugins,
+    plugins: plugins.concat([
+      new BundleTracker({ filename: './webpack-stats.json' }),
+    ]),
 
     module: {
       // ignore localforage parsing
@@ -83,7 +87,7 @@ module.exports = [
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          loader: 'babel',
+          loader: 'babel-loader',
         },
         {
           test: /\.json$/,
@@ -119,14 +123,10 @@ module.exports = [
       'preference-experiment': './client/actions/preference-experiment/index',
     },
 
-    plugins: [
+    plugins: plugins.concat([
       new BundleTracker({ filename: './webpack-stats-actions.json' }),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurrenceOrderPlugin(),
-      new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }),
-
-        // Small plugin to update the actions in the database if
-        // --update-actions was passed.
+      // Small plugin to update the actions in the database if
+      // --update-actions was passed.
       function updateActions() {
         this.plugin('done', function () {
           var cmd;
@@ -144,7 +144,7 @@ module.exports = [
           }
         });
       },
-    ],
+    ]),
 
     output: {
       path: path.resolve('./assets/bundles/'),
@@ -157,14 +157,6 @@ module.exports = [
           test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
-          query: {
-            plugins: [
-              ['transform-runtime', {
-                polyfill: false,
-                regenerator: true,
-              }],
-            ],
-          },
         },
       ],
     },

@@ -27,7 +27,10 @@ module.exports = function (config) {
 
     // The first config is for the control interface. It is only coincidence
     // that this config works for the action code/tests as well.
-    webpack: Object.assign(WEBPACK_CONFIG[0], { devtool: '#cheap-module-eval-source-map' }),
+    webpack: Object.assign(WEBPACK_CONFIG[0], {
+      entry: undefined,
+      devtool: undefined,
+    }),
 
     webpackMiddleware: {
       stats: 'errors-only', // Only show errors during webpack builds.

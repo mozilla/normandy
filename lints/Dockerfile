@@ -5,11 +5,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl apt-transport-https git
 
 # Install node from NodeSource
-RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
-    echo 'deb https://deb.nodesource.com/node_6.x jessie main' > /etc/apt/sources.list.d/nodesource.list && \
-    echo 'deb-src https://deb.nodesource.com/node_6.x jessie main' >> /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && apt-get install -y nodejs
-RUN npm install -g npm@4.x.x
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+	apt-get update && apt-get install -y nodejs && \
+	npm install npm@latest -g
 
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
