@@ -179,7 +179,7 @@ this.NormandyDriver = function(sandboxManager) {
               onInstallFailed(addonInstall) {
                 innerReject(`AddonInstall error code: [${addonInstall.error}]`);
               },
-        });
+            });
           })(installObject, resolve, reject);
         });
       });
@@ -190,7 +190,7 @@ this.NormandyDriver = function(sandboxManager) {
      * addon uninstall is successful.
      */
     uninstallAddon(addonId) {
-      function uninstallPromise(id) {
+      return (id => {
         return new Promise(function(resolve, reject) {
           AddonManager.getAddonByID(id, addon => {
             if (addon !== null) {
@@ -206,8 +206,7 @@ this.NormandyDriver = function(sandboxManager) {
             resolve(null);
           });
         });
-      }
-      return uninstallPromise(addonId);
+      })(addonId);
     },
 
     // Sampling
