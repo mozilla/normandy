@@ -160,37 +160,31 @@ this.NormandyDriver = function(sandboxManager) {
      * Return a promise that resolves to an Addon ID if installation is successful.
      */
     installAddon(url) {
-        /* Install an addon.  Note that the AddonManager can only handle
-         * file:// and downloadable URLs.
-         */
-
-      var installObjectCallback = (installObject, resolve, reject) => {
-        installObject.install();
-        installObject.addListener({
-          onInstallEnded: (addonInstall, addon) => {
-            let addonId = addon.id;
-            resolve(addonId);
-          },
-          onInstallFailed: (addonInstall) => {
-            reject(`AddonInstall error code: [${addonInstall.error}]`);
-          },
-        });
-      };
-
-      function installObjectPromise(installObject) {
+      function getInstallForURLPromise(installUrl) {
         return new Promise(function(resolve, reject) {
-          installObjectCallback(installObject, resolve, reject);
+          AddonManager.getInstallForURL(installUrl, resolve, "application/x-xpinstall");
         });
       }
 
-      function getInstallForURLPromise(url) {
-        return new Promise(function(resolve, reject) {
-          AddonManager.getInstallForURL(url, resolve, 'application/x-xpinstall');
-        });
-      };
-
       // Return a promise
-      return getInstallForURLPromise(url).then(installObjectPromise);
+      return getInstallForURLPromise(url).then((installObject) => {
+        return new Promise(function(resolve, reject) {
+          ((innerInstallObject, innerResolve, innerReject) => {
+            innerInstallObject.install();
+            innerInstallObject.addListener({
+              onInstallEnded(addonInstall, addon) {
+                const addonId = addon.id;
+                innerResolve(addonId);
+              },
+              onInstallFailed(addonInstall) {
+                innerReject(`AddonInstall error code: [${addonInstall.error}]`);
+              },
+        });
+          })(installObject, resolve, reject);
+        });
+      }
+
+      );
     },
 
     /*
@@ -201,7 +195,7 @@ this.NormandyDriver = function(sandboxManager) {
       function uninstallPromise(id) {
         return new Promise(function(resolve, reject) {
           AddonManager.getAddonByID(id, addon => {
-            if (addon != null) {
+            if (addon !== null) {
               try {
                 addon.uninstall();
               } catch (e) {
@@ -211,7 +205,7 @@ this.NormandyDriver = function(sandboxManager) {
             } else {
               reject("Addon is null - can't uninstall it");
             }
-            resolve();
+            resolve(null);
           });
         });
       }

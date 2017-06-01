@@ -19,7 +19,9 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   dir.append("normandy.xpi");
   const xpiUrl = Services.io.newFileURI(dir).spec;
   var addonId = await driver.installAddon(xpiUrl);
-  await driver.uninstallAddon(addonId);
+  ok(addonId !== null, "Addon install was successful");
+  const uninstallMsg = await driver.uninstallAddon(addonId);
+  ok(uninstallMsg === null, "Uninstall failed");
 }));
 
 add_task(withDriver(Assert, async function userId(driver) {
