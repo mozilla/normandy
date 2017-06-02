@@ -1,0 +1,87 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1-browsers
+      - image: circleci/postgres:9.5.6-alpine
+
+    working_directory: ~/normandy
+
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: Prepare environment
+          working_directory: ~/normandy/ci/circleci
+          command: |
+            # Setup a virtualenv
+            python -m venv venv
+            source venv/bin/activate
+            # Use pipstrap to bootstrap a trusted pip 8 for hash checking.
+            ./bin/pipstrap.py
+            # Install latest pip (for constraint support), then the rest of the CI requirements.
+            pip install -r ./requirements/pip.txt
+            pip install -r ./requirements/default.txt -c ./requirements/constraints.txt
+
+      - run:
+          name: Lint Dependencies
+          working_directory: ~/normandy/lints
+          command: ./bin/ci/dependencies
+
+      - run:
+          name: Lints
+          working_directory: ~/normandy/lints
+          command: ./bin/ci/test
+
+      - run:
+          name: Recipe Server Dependencies
+          working_directory: ~/normandy/recipe-server
+          command: ./bin/ci/dependencies
+
+      - run:
+          name: Recipe Server Test
+          working_directory: ~/normandy/recipe-server
+          command: ./bin/ci/test
+
+      - run:
+          name: Mock Server Dependencies
+          working_directory: ~/normandy/mock-recipe-server
+          environment:
+            MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
+            MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
+          command: ./bin/ci/dependencies
+
+      - run:
+          name: Mock Server Compile
+          working_directory: ~/normandy/mock-recipe-server
+          environment:
+            MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
+            MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
+          command: ./bin/ci/compile
+
+      - run:
+          name: Mock Server Test
+          working_directory: ~/normandy/mock-recipe-server
+          environment:
+            MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
+            MOCK_SERVER_ARTIFACTS: "/tmp/mock-recipe-server"
+          command: ./bin/ci/test
+
+
+
+
+
+# TODO TODO TODO
+# deployment:
+#   latest:
+#     branch: master
+#     commands:
+#       - ./ci/circleci/bin/runner.sh deploy latest
+#
+#   tags:
+#     # push all tags
+#     tag: /.*/
+#     commands:
+#       - ./ci/circleci/bin/runner.sh deploy "$CIRCLE_TAG"
