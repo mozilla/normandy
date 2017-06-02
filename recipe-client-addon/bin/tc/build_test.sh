@@ -6,7 +6,7 @@ export SHELL=$(which bash)
 
 # Creates mozilla-central
 echo 'Downloading mozilla-central...'
-hg clone http://hg.mozilla.org/mozilla-central/
+hg robustcheckout http://hg.mozilla.org/mozilla-central/ mozilla-central --branch default
 
 echo 'Pulling tags from mozilla/normandy repo on Github...'
 pushd normandy
