@@ -1,3 +1,7 @@
+import time
+import urllib.parse as urlparse
+from urllib.parse import urlencode
+
 from pyjexl import JEXL
 from rest_framework import serializers
 
@@ -205,12 +209,24 @@ class ClientSerializer(serializers.Serializer):
 class SignatureSerializer(serializers.ModelSerializer):
     timestamp = serializers.DateTimeField(read_only=True)
     signature = serializers.ReadOnlyField()
-    x5u = serializers.ReadOnlyField()
+    x5u = serializers.SerializerMethodField()
     public_key = serializers.ReadOnlyField()
 
     class Meta:
         model = Signature
         fields = ['timestamp', 'signature', 'x5u', 'public_key']
+
+    def get_x5u(self, signature):
+        x5u = signature.x5u
+        if x5u is None:
+            return None
+
+        # Add cachebust parameter to x5u URL with the current time
+        url_parts = list(urlparse.urlparse(x5u))
+        query = dict(urlparse.parse_qsl(url_parts[4]))
+        query['cachebust'] = str(int(time.time()))
+        url_parts[4] = urlencode(query)
+        return urlparse.urlunparse(url_parts)
 
 
 class SignedRecipeSerializer(serializers.ModelSerializer):
