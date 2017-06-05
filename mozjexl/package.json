@@ -1,0 +1,48 @@
+{
+  "name": "mozjexl",
+  "version": "1.1.4",
+  "description": "Javascript Expression Language: Powerful context-based expression parser and evaluator",
+  "main": "lib/Jexl.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "istanbul cover _mocha -- -R spec --recursive test",
+    "prepublish": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mozilla/normandy/tree/master/mozjexl"
+  },
+  "keywords": [
+    "JSON",
+    "expression",
+    "evaluator",
+    "parser",
+    "target",
+    "context",
+    "jsep",
+    "filter",
+    "selector"
+  ],
+  "author": "Tom Shawver <tom@frosteddesign.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mozilla/normandy/issues"
+  },
+  "homepage": "https://github.com/mozilla/normandy/tree/master/mozjexl",
+  "devDependencies": {
+    "browserify": "=9.0.3",
+    "chai": "^2.0.0",
+    "chai-as-promised": "^4.2.0",
+    "gulp": "=3.8.11",
+    "gulp-istanbul": "^0.6.0",
+    "gulp-istanbul-enforcer": "^1.0.3",
+    "gulp-mocha": "^2.0.0",
+    "gulp-rename": "=1.2.0",
+    "gulp-uglify": "=1.1.0",
+    "istanbul": "^0.3.8",
+    "mocha": "^2.1.0",
+    "vinyl-transform": "=1.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-import { Jexl } from 'jexl';
+import { Jexl } from 'mozjexl';
 import { stableSample, bucketSample } from 'selfrepair/utils';
 
 export default class JexlEnvironment {
