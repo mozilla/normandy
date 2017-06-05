@@ -221,10 +221,12 @@ class SignatureSerializer(serializers.ModelSerializer):
         if x5u is None:
             return None
 
-        # Add cachebust parameter to x5u URL with the current time
+        # Add cachebust parameter to x5u URL that changes once per hour.
         url_parts = list(urlparse.urlparse(x5u))
-        query = dict(urlparse.parse_qsl(url_parts[4]))
-        query['cachebust'] = str(int(time.time()))
+        query = urlparse.parse_qs(url_parts[4])
+        cachebust = int(time.time())
+        cachebust -= cachebust % 3600
+        query['cachebust'] = cachebust
         url_parts[4] = urlencode(query)
         return urlparse.urlunparse(url_parts)
 

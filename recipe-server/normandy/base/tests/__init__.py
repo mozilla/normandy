@@ -23,7 +23,7 @@ class Whatever(object):
 
     @classmethod
     def contains(cls, *values):
-        name_values = ''.join(str(v) for v in values)
+        name_values = ', '.join(str(v) for v in values)
         return cls(lambda s: all(value in s for value in values), name=f'contains {name_values}')
 
     @classmethod

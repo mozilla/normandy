@@ -1,5 +1,5 @@
-from datetime import datetime
 import re
+import urllib.parse as urlparse
 
 import pytest
 from rest_framework import serializers
@@ -243,4 +243,9 @@ class TestSignatureSerializer:
     def test_it_cachebusts_x5u(self):
         signature = SignatureFactory()
         serializer = SignatureSerializer(instance=signature)
-        assert 'cachebust=' in serializer.data['x5u']
+
+        url_parts = list(urlparse.urlparse(serializer.data['x5u']))
+        query = urlparse.parse_qs(url_parts[4])
+        assert 'cachebust' in query
+        assert len(query['cachebust']) == 1
+        assert re.match('^\d+$', query['cachebust'][0])
