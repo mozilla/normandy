@@ -30,7 +30,7 @@ class Whatever(object):
     def iso8601(cls):
         def is_iso8601_date(s):
             # Will throw is it does not match
-            d = datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ')
+            datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ')
             return True
 
         return cls(is_iso8601_date, name='datetime')
