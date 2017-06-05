@@ -159,54 +159,28 @@ this.NormandyDriver = function(sandboxManager) {
     /*
      * Return a promise that resolves to an Addon ID if installation is successful.
      */
-    installAddon(url) {
-      function getInstallForURLPromise(installUrl) {
-        return new Promise(function(resolve, reject) {
-          AddonManager.getInstallForURL(installUrl, resolve, "application/x-xpinstall");
-        });
-      }
-
-      // Return a promise
-      return getInstallForURLPromise(url).then((installObject) => {
-        return new Promise(function(resolve, reject) {
-          ((innerInstallObject, innerResolve, innerReject) => {
-            innerInstallObject.install();
-            innerInstallObject.addListener({
-              onInstallEnded(addonInstall, addon) {
-                const addonId = addon.id;
-                innerResolve(addonId);
-              },
-              onInstallFailed(addonInstall) {
-                innerReject(`AddonInstall error code: [${addonInstall.error}]`);
-              },
-            });
-          })(installObject, resolve, reject);
-        });
-      });
+    async installAddon(installUrl) {
+      const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
+      const result = new Promise((resolve, reject) => installObj.addListener({
+        onInstallEnded(addonInstall, addon) {
+          resolve(addon.id);
+        },
+        onInstallFailed(addonInstall) {
+          reject(`AddonInstall error code: [${addonInstall.error}]`);
+        },
+      }));
+      installObj.install();
+      return result;
     },
 
     /*
      * Return a promise that resolves to a success messsage if
      * addon uninstall is successful.
      */
-    uninstallAddon(addonId) {
-      return (id => {
-        return new Promise(function(resolve, reject) {
-          AddonManager.getAddonByID(id, addon => {
-            if (addon !== null) {
-              try {
-                addon.uninstall();
-              } catch (e) {
-                reject("Addon uninstall triggered an error");
-                return;
-              }
-            } else {
-              reject("Addon is null - can't uninstall it");
-            }
-            resolve(null);
-          });
-        });
-      })(addonId);
+    async uninstallAddon(addonId) {
+      const addon = await AddonManager.getAddonByID(addonId);
+      addon.uninstall();
+      return null;
     },
 
     // Sampling

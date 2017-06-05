@@ -19,9 +19,16 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   dir.append("normandy.xpi");
   const xpiUrl = Services.io.newFileURI(dir).spec;
   var addonId = await driver.installAddon(xpiUrl);
+  ok(addonId === "normandydriver@example.com", "Expected test addon was installed");
   ok(addonId !== null, "Addon install was successful");
+
+  // Installing kicks off an asychronous process which tries to read the manifest.json
+  // to startup the addon. Note that onInstallEnded is triggered too early
+  // which is why we need this delay.
+  await new Promise((resolve, reject) => { setTimeout(resolve, 300); });
+
   const uninstallMsg = await driver.uninstallAddon(addonId);
-  ok(uninstallMsg === null, "Uninstall failed");
+  ok(uninstallMsg === null, "Uninstall returned no error message");
 }));
 
 add_task(withDriver(Assert, async function userId(driver) {
