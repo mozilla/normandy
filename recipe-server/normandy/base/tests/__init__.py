@@ -1,4 +1,6 @@
 import os
+import re
+from datetime import datetime
 
 from django.contrib.auth.models import User
 
@@ -7,19 +9,41 @@ import pytest
 
 
 class Whatever(object):
-    def __init__(self, test=lambda x: True):
+    def __init__(self, test=lambda x: True, name='unnamed'):
         self.test = test
+        self.name = name
+
+    @classmethod
+    def startswith(cls, prefix):
+        return cls(lambda s: s.startswith(prefix), name=f'startswith {prefix}')
 
     @classmethod
     def endswith(cls, suffix):
-        return cls(lambda s: s.endswith(suffix))
+        return cls(lambda s: s.endswith(suffix), name=f'endswith {suffix}')
 
     @classmethod
     def contains(cls, *values):
-        return cls(lambda s: all(value in s for value in values))
+        name_values = ', '.join(str(v) for v in values)
+        return cls(lambda s: all(value in s for value in values), name=f'contains {name_values}')
+
+    @classmethod
+    def iso8601(cls):
+        def is_iso8601_date(s):
+            # Will throw is it does not match
+            datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ')
+            return True
+
+        return cls(is_iso8601_date, name='datetime')
+
+    @classmethod
+    def regex(cls, regex):
+        return cls(lambda s: re.match(regex, s), name=f'regex {regex}')
 
     def __eq__(self, other):
         return self.test(other)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__} named "{self.name}">'
 
 
 class FuzzyUnicode(fuzzy.FuzzyText):
