@@ -52,10 +52,10 @@
 
 const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://shield-recipe-client/lib/PreferenceManager.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "LogManager", "resource://shield-recipe-client/lib/LogManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/modules/TelemetryEnvironment.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "PreferenceManagement", "resource://shield-recipe-client/lib/PreferenceManagement.jsm");
 
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
@@ -63,7 +63,7 @@ const log = LogManager.getLogger("preference-experiments");
 
 const PREF_NAMESPACE = "experiments";
 
-this.PreferenceExperiments = Object.assign(PreferenceManagement(PREF_NAMESPACE), {
+this.PreferenceExperiments = Object.assign(new PreferenceManager(PREF_NAMESPACE), {
   async init() {
     await this.applyActiveRecipes();
   },

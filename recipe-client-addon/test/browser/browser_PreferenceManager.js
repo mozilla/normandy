@@ -1,10 +1,10 @@
 "use strict";
 
 Cu.import("resource://gre/modules/Preferences.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/PreferenceManagement.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/PreferenceManager.jsm", this);
 
 // Save ourselves some typing
-const Manager = PreferenceManagement("test");
+const Manager = new PreferenceManager("test");
 const withMockData = Manager.withMockData.bind(Manager);
 
 // clearStorage

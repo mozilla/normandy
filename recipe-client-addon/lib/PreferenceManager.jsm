@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * PreferenceManagement exposes an API for recipes such as Preference Experiments
+ * PreferenceManager exposes an API for recipes such as Preference Experiments
  * to handle manipulating default/user branch preferences. Recipes should extend
  * this module.
  *
@@ -23,7 +23,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "LogManager", "resource://shield-recipe-
 XPCOMUtils.defineLazyModuleGetter(this, "Preferences", "resource://gre/modules/Preferences.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/modules/TelemetryEnvironment.jsm");
 
-this.EXPORTED_SYMBOLS = ["PreferenceManagement"];
+this.EXPORTED_SYMBOLS = ["PreferenceManager"];
 
 const STORE_FILE = "shield-preference-recipes.json";
 
@@ -45,11 +45,14 @@ const PreferenceBranchType = {
 
 const log = LogManager.getLogger("preference-management");
 
-this.PreferenceManagement = (namespace) => ({
-  preferenceObservers: new Map(),
+this.PreferenceManager = class PreferenceManager {
+  constructor(namespace) {
+    this.preferenceObservers = new Map();
+    this.namespace = namespace;
 
-  // Internal 'store loaded' tracking object
-  storePromise: undefined,
+    // Internal 'store loaded' tracking object
+    this.storePromise = undefined;
+  }
 
   /**
    * Asynchronously loads the local JSON file used for storage, returning the
@@ -66,7 +69,7 @@ this.PreferenceManagement = (namespace) => ({
       this.storePromise = storage.load().then(() => storage);
     }
     return this.storePromise;
-  },
+  }
 
   /**
    * Returns the internal storage object, after properly ensuring the store and
@@ -79,11 +82,11 @@ this.PreferenceManagement = (namespace) => ({
   async getStorage() {
     const store = await this.ensureStorage();
     store.data = store.data || {};
-    store.data[namespace] = store.data[namespace] || {};
+    store.data[this.namespace] = store.data[this.namespace] || {};
     store.saveSoon();
 
     return store;
-  },
+  }
 
   /**
    * Clears the namespaced storage.
@@ -94,9 +97,9 @@ this.PreferenceManagement = (namespace) => ({
    */
   async clearStorage() {
     const store = await this.getStorage();
-    store.data[namespace] = {};
+    store.data[this.namespace] = {};
     store.saveSoon();
-  },
+  }
 
   /**
    * Test wrapper that temporarily replaces the stored recipe data with fake
@@ -106,19 +109,19 @@ this.PreferenceManagement = (namespace) => ({
   withMockData(testFunction) {
     // We use a POJO to fake the internal storage.
     this.mockData = {
-      [namespace]: {},
+      [this.namespace]: {}
     };
 
     return async (...args) => {
       this.storePromise = Promise.resolve({
         data: this.mockData,
-        saveSoon() {},
+        saveSoon() {}
       });
 
       try {
         // Tests directly edit store values, so for test functions, the relevant
         // namespace is exposed for brevity.
-        await testFunction(this.mockData[namespace], ...args)
+        await testFunction(this.mockData[this.namespace], ...args)
       } finally {
         this.stopAllObservers();
 
@@ -132,7 +135,7 @@ this.PreferenceManagement = (namespace) => ({
       // ensureStorage will use the fake `storePromise`, returning mock data.
       return await this.ensureStorage();
     };
-  },
+  }
 
   /**
    * Looks up active recipes in the local store that modify preference values,
@@ -159,7 +162,7 @@ this.PreferenceManagement = (namespace) => ({
       // Watch for changes to the recipe's preference
       this.startObserver(recipe.name, recipe.preferenceName, recipe.preferenceValue);
     }
-  },
+  }
 
   /**
    * Returns a reference to either the Default or User preferences branch
@@ -173,7 +176,7 @@ this.PreferenceManagement = (namespace) => ({
     }
 
     return PreferenceBranchType[which];
-  },
+  }
 
   /**
    * Register a preference observer that stops a recipe when the user
@@ -185,7 +188,7 @@ this.PreferenceManagement = (namespace) => ({
    *   If an observer for the named recipe is already active.
    */
   startObserver(recipeName, preferenceName, preferenceValue) {
-    log.debug(`PreferenceManagement.startObserver(${recipeName})`);
+    log.debug(`PreferenceManager.startObserver(${recipeName})`);
 
     if (this.preferenceObservers.has(recipeName)) {
       throw new Error(
@@ -199,11 +202,11 @@ this.PreferenceManagement = (namespace) => ({
         if (newValue !== preferenceValue) {
           this.stop(recipeName, false);
         }
-      },
+      }
     };
     this.preferenceObservers.set(recipeName, observerInfo);
     Preferences.observe(preferenceName, observerInfo.observer);
-  },
+  }
 
   /**
    * Check if a preference observer is active for a recipe.
@@ -211,9 +214,9 @@ this.PreferenceManagement = (namespace) => ({
    * @return {Boolean}
    */
   hasObserver(recipeName) {
-    log.debug(`PreferenceManagement.hasObserver(${recipeName})`);
+    log.debug(`PreferenceManager.hasObserver(${recipeName})`);
     return this.preferenceObservers.has(recipeName);
-  },
+  }
 
   /**
    * Disable a preference observer for the named recipe.
@@ -222,7 +225,7 @@ this.PreferenceManagement = (namespace) => ({
    *   If there is no active observer for the named recipe.
    */
   stopObserver(recipeName) {
-    log.debug(`PreferenceManagement.stopObserver(${recipeName})`);
+    log.debug(`PreferenceManager.stopObserver(${recipeName})`);
 
     if (!this.preferenceObservers.has(recipeName)) {
       throw new Error(`No observer for the preference recipe ${recipeName} found.`);
@@ -231,18 +234,18 @@ this.PreferenceManagement = (namespace) => ({
     const {preferenceName, observer} = this.preferenceObservers.get(recipeName);
     Preferences.ignore(preferenceName, observer);
     this.preferenceObservers.delete(recipeName);
-  },
+  }
 
   /**
    * Disable all currently-active preference observers for recipes.
    */
   stopAllObservers() {
-    log.debug("PreferenceManagement.stopAllObservers()");
+    log.debug("PreferenceManager.stopAllObservers()");
     for (const {preferenceName, observer} of this.preferenceObservers.values()) {
       Preferences.ignore(preferenceName, observer);
     }
     this.preferenceObservers.clear();
-  },
+  }
 
   /**
    * Update the timestamp storing when Normandy last sent a recipe for the named
@@ -252,16 +255,16 @@ this.PreferenceManagement = (namespace) => ({
    *   If there is no stored recipe with the given name.
    */
   async markLastSeen(recipeName) {
-    log.debug(`PreferenceManagement.markLastSeen(${recipeName})`);
+    log.debug(`PreferenceManager.markLastSeen(${recipeName})`);
 
     const store = await this.getStorage();
-    if (!(recipeName in store.data[namespace])) {
+    if (!(recipeName in store.data[this.namespace])) {
       throw new Error(`Could not find a preference recipe named "${recipeName}"`);
     }
 
-    store.data[namespace][recipeName].lastSeen = new Date().toJSON();
+    store.data[this.namespace][recipeName].lastSeen = new Date().toJSON();
     store.saveSoon();
-  },
+  }
 
   /**
    * Given a recipe name, returns the relevant stored data, if any.
@@ -272,15 +275,15 @@ this.PreferenceManagement = (namespace) => ({
    *   If there is no stored recipe with the given name.
    */
   async getRecipe(recipeName) {
-    log.debug(`PreferenceManagement.getRecipe(${recipeName})`);
+    log.debug(`PreferenceManager.getRecipe(${recipeName})`);
     const store = await this.getStorage();
-    if (!(recipeName in store.data[namespace])) {
+    if (!(recipeName in store.data[this.namespace])) {
       throw new Error(`Could not find a preference recipe named "${recipeName}"`);
     }
 
     // Return a copy so mutating it doesn't affect the storage.
-    return Object.assign({}, store.data[namespace][recipeName]);
-  },
+    return Object.assign({}, store.data[this.namespace][recipeName]);
+  }
 
   /**
    * Determines if a recipe's preference type is valid, and checks that the new
@@ -304,7 +307,7 @@ this.PreferenceManagement = (namespace) => ({
         `Previous preference value is of type "${prevPrefType}", but was given "${givenPrefType}" (${preferenceType})`
       );
     }
-  },
+  }
 
   /**
    * Saves a recipe object into locally-namespaced storage.
@@ -315,12 +318,12 @@ this.PreferenceManagement = (namespace) => ({
    * @rejects Javascript exception.
    */
   async saveRecipeData(recipe) {
-    log.debug("PreferenceManagement.saveRecipeData()");
+    log.debug("PreferenceManager.saveRecipeData()");
 
     const store = await this.getStorage();
-    store.data[namespace][recipe.name] = recipe;
+    store.data[this.namespace][recipe.name] = recipe;
     store.saveSoon();
-  },
+  }
 
   /**
    * Returns an array of stored recipe objects which are NOT expired.
@@ -330,11 +333,10 @@ this.PreferenceManagement = (namespace) => ({
    * @rejects Javascript exception.
    */
   async getActiveRecipes() {
-    log.debug("PreferenceManagement.getActiveRecipes()");
+    log.debug("PreferenceManager.getActiveRecipes()");
     const allPrefs = await this.getStoredRecipes();
-    // Return copies so mutating them doesn't affect the storage.
-    return allPrefs.filter(e => !e.expired).map(e => Object.assign({}, e));
-  },
+    return allPrefs.filter(e => !e.expired);
+  }
 
   /**
    * Returns an array of stored recipe objects, both active and expired.
@@ -344,12 +346,12 @@ this.PreferenceManagement = (namespace) => ({
    * @rejects Javascript exception.
    */
   async getStoredRecipes() {
-    log.debug("PreferenceManagement.getStoredRecipes()");
+    log.debug("PreferenceManager.getStoredRecipes()");
     const store = await this.getStorage();
 
     // Return copies so mutating them doesn't affect the storage.
-    return Object.values(store.data[namespace]).map(e => Object.assign({}, e));
-  },
+    return Object.values(store.data[this.namespace]).map(e => Object.assign({}, e));
+  }
 
   /**
    * Determines if the local storage has data for a specific recipe.
@@ -360,10 +362,10 @@ this.PreferenceManagement = (namespace) => ({
    * @rejects Javascript exception.
    */
   async hasRecipe(recipeName) {
-    log.debug(`PreferenceManagement.hasRecipe(${recipeName})`);
+    log.debug(`PreferenceManager.hasRecipe(${recipeName})`);
     const store = await this.getStorage();
-    return store.data[namespace].hasOwnProperty(recipeName);
-  },
+    return store.data[this.namespace].hasOwnProperty(recipeName);
+  }
 
   /**
    * Expires a stored recipe.
@@ -374,13 +376,14 @@ this.PreferenceManagement = (namespace) => ({
    * @rejects Javascript exception.
    */
   async expireRecipe(recipeName) {
-    log.debug(`PreferenceManagement.expireRecipe(${recipeName})`);
+    log.debug(`PreferenceManager.expireRecipe(${recipeName})`);
     const store = await this.getStorage();
 
-    if (!store.data[namespace].hasOwnProperty(recipeName)) {
+    if (!store.data[this.namespace].hasOwnProperty(recipeName)) {
       throw new Error(`Can not find recipe "${recipeName}" to expire.`);
     }
 
-    store.data[namespace][recipeName].expired = true;
+    store.data[this.namespace][recipeName].expired = true;
   }
-});
+
+};
