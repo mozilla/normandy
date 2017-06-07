@@ -28,7 +28,34 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   await new Promise((resolve, reject) => { setTimeout(resolve, 300); });
 
   const uninstallMsg = await driver.uninstallAddon(addonId);
-  ok(uninstallMsg === null, "Uninstall returned no error message");
+  ok(uninstallMsg === null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
+}));
+
+add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
+  // Test that we can install an XPI from any URL
+  const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
+  driver.uninstallAddon(invalidAddonId).then(() => {
+    ok(false, `Uninstall returned an unexpected null for success`);
+  }, reason => {
+    ok(true, `This is the expected failure`);
+  }).catch(e => {
+    ok(false, `Uninstall should not throw an exception within the async function`);
+  });
+}));
+
+
+add_task(withDriver(Assert, async function installXpiBadURL(driver) {
+  // Test that we can install an XPI from any URL
+  const xpiUrl = "file:///tmp/invalid_xpi.xpi";
+  driver.installAddon(xpiUrl)
+    .then(() => {
+      ok(false, "Installation succeeded on an XPI that doesn't exist");
+    }, reason => {
+      ok(true, `Installation was rejected: [${reason}]`);
+    })
+    .catch(e => {
+      ok(false, `Error was thrown during invalid XPI install: ${e}`);
+    });
 }));
 
 add_task(withDriver(Assert, async function userId(driver) {

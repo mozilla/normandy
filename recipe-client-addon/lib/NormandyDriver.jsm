@@ -168,6 +168,9 @@ this.NormandyDriver = function(sandboxManager) {
         onInstallFailed(addonInstall) {
           reject(`AddonInstall error code: [${addonInstall.error}]`);
         },
+        onDownloadFailed(install) {
+          reject(`Download failed: [${installUrl}]`);
+        },
       }));
       installObj.install();
       return result;
@@ -179,6 +182,9 @@ this.NormandyDriver = function(sandboxManager) {
      */
     async uninstallAddon(addonId) {
       const addon = await AddonManager.getAddonByID(addonId);
+      if (addon === null) {
+        throw new Error(`No addon with ID [${addonId}] found.`);
+      }
       addon.uninstall();
       return null;
     },
