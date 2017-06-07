@@ -265,6 +265,11 @@ in other Django projects.
 
    This defaults to ``False`` for local developer instances.
 
+.. envvar:: DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS
+
+   If set, when checking certificates for validity, start failing
+   system checks this many days before the certificate would expire.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the
