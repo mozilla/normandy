@@ -10,14 +10,18 @@ XPCOMUtils.defineLazyModuleGetter(this, "LogManager",
   "resource://shield-recipe-client/lib/LogManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldRecipeClient",
   "resource://shield-recipe-client/lib/ShieldRecipeClient.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AboutStudiesProtocol",
+  "resource://shield-recipe-client/lib/AboutStudiesProtocol.jsm");
 
 this.install = function() {};
 
 this.startup = async function() {
   await ShieldRecipeClient.startup();
+  AboutStudiesProtocol.register();
 };
 
 this.shutdown = function(data, reason) {
+  AboutStudiesProtocol.unregister();
   ShieldRecipeClient.shutdown(reason);
 
   // Unload add-on modules. We don't do this in ShieldRecipeClient so that
