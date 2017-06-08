@@ -1,6 +1,7 @@
 import React from 'react';
 import { IndexRedirect, IndexRoute, Route } from 'react-router';
 import ControlApp from 'control/components/ControlApp';
+import ExtensionList from 'control/components/ExtensionList';
 import RecipeList from 'control/components/RecipeList';
 import RecipeForm from 'control/components/RecipeForm';
 import RecipeHistory from 'control/components/RecipeHistory';
@@ -87,6 +88,14 @@ export default (
           ]}
         />
       </Route>
+    </Route>
+    <Route path="extension/" name="Extensions">
+      <IndexRoute
+        component={ExtensionList}
+        ctaButtons={[
+          { text: 'Add New', icon: 'plus', link: 'new/' },
+        ]}
+      />
     </Route>
     <Route path="*" component={NoMatch} />
   </Route>

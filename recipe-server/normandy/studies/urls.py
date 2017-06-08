@@ -12,5 +12,5 @@ router.register('extension', ExtensionViewSet)
 app_name = 'studies'
 
 urlpatterns = [
-    url(r'^api/v1/', include(router.urls)),
+    url(r'^api/v2/', include(router.urls)),
 ]

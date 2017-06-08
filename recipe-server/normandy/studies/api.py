@@ -9,6 +9,7 @@ class ExtensionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Extension
         fields = [
+            'id',
             'name',
             'xpi',
         ]
