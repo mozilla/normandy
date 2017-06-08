@@ -41,8 +41,9 @@ experiment, regardless of other filters:
   preference experiments.
 - The user has previously participated in an experiment with the same ID.
 - The user is already in an active experiment for the same preference.
-- The preference type in the recipe does not match the type of the preference
-  in the user's profile.
+- The preference value type in the recipe does not match the type of the
+  preference in the user's profile, e.g. a boolean preference experiment for a
+  preference with an integer value in the user's profile.
 
 Branches
 --------
