@@ -334,9 +334,11 @@ i {
 
 .recipe-form {
   .callout {
+    clear: both;
     float: right;
+    margin: 0 0 2em;
     text-align: left;
-    width: 45%;
+    width: 100%;
   }
 
   .status-indicator {
@@ -367,4 +369,106 @@ i {
     margin-top: 1em;
     text-align: right;
   }
+}
+
+.recipe-form .form-frame {
+  background: $cream;
+}
+
+.form-frame {
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  margin-bottom: 2em;
+  padding: 0.5em 1em 1em;
+
+
+  .frame-title {
+    display: inline-block;
+    padding: 0 0.5em;
+  }
+
+  .form-frame {
+    border-radius: 4px;
+  }
+
+  // Recipe form-specific
+  &.channels {
+    width: 50%;
+  }
+}
+
+.multipicker {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2em;
+
+  .mp-frame {
+    margin-bottom: 0;
+    width: 50%;
+
+    label,
+    .label,
+    select,
+    button {
+      text-transform: none;
+    }
+
+    select {
+      height: 12vh;
+      margin-bottom: 0.5em;
+      min-height: 110px;
+    }
+
+    input[type="search"],
+    input[type="text"] {
+      font-weight: 400;
+    }
+
+    &.mp-from {
+      border-radius: 4px 0 0 4px;
+      border-right: none;
+    }
+
+    &.mp-to {
+      border-radius: 0 4px 4px 0;
+    }
+  }
+
+  .mp-button-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  option {
+    &::after {
+      content: " (" attr(title) ")";
+      font-size: 0.75em;
+      font-weight: 400;
+      margin-left: 0.5em;
+    }
+
+    &.option-label::after {
+      display: none;
+    }
+  }
+}
+
+.form-field .checkbox-list {
+  label {
+    color: $darkBrown;
+    margin: 1em 0;
+    text-transform: none;
+
+    span {
+      padding-left: 1em;
+    }
+  }
+
+  input {
+    float: none;
+  }
+}
+
+pre {
+  overflow: auto;
 }

@@ -682,7 +682,9 @@ class TestApprovalFlow(object):
             actual_signature = fake_sign([data])[0]['signature']
             assert actual_signature == expected_signature
 
-    def test_full_approval_flow(self, api_client, mocked_autograph):
+    def test_full_approval_flow(self, settings, api_client, mocked_autograph):
+        settings.PEER_APPROVAL_ENFORCED = True
+
         action = ActionFactory()
         user1 = UserFactory(is_superuser=True)
         user2 = UserFactory(is_superuser=True)

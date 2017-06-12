@@ -13,6 +13,11 @@ import { pick } from 'underscore';
 
 import makeApiRequest from 'control/api';
 
+
+import {
+  getFilterObject,
+} from 'control/selectors/FiltersSelector';
+
 import {
   recipeUpdated,
   recipeAdded,
@@ -21,6 +26,10 @@ import {
   revisionsReceived,
   revisionRecipeUpdated,
 } from 'control/actions/RecipeActions';
+
+import {
+  loadFilters,
+} from 'control/actions/FilterActions';
 
 import {
   showNotification,
@@ -35,17 +44,21 @@ import {
 } from 'control/selectors/RecipesSelector';
 
 import composeRecipeContainer from 'control/components/RecipeContainer';
-import { ControlField } from 'control/components/Fields';
+import { ControlField, CheckboxGroup } from 'control/components/Fields';
 import RecipeFormActions from 'control/components/RecipeFormActions';
+
 import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import PreferenceExperimentFields from
   'control/components/action_fields/PreferenceExperimentFields';
+
+import MultiPicker from 'control/components/MultiPicker';
+import Frame from 'control/components/Frame';
 import RecipeStatus from 'control/components/RecipeStatus';
 import DraftStatus from 'control/components/DraftStatus';
 import BooleanIcon from 'control/components/BooleanIcon';
 
-export const selector = formValueSelector('recipe');
+export const formSelector = formValueSelector('recipe');
 
 // The arguments field is handled in initialValuesWrapper.
 const DEFAULT_FORM_VALUES = {
@@ -79,6 +92,9 @@ export class RecipeForm extends React.Component {
     routeParams: pt.object.isRequired,
     // from redux-form
     pristine: pt.bool,
+    recipeArguments: pt.object,
+    filters: pt.object.isRequired,
+    loadFilters: pt.func.isRequired,
   };
 
   static argumentsFields = {
@@ -121,6 +137,8 @@ export class RecipeForm extends React.Component {
       user,
       dispatch,
     } = this.props;
+
+    dispatch(loadFilters());
 
     if (!user || !user.id) {
       dispatch(makeApiRequest('getCurrentUser'))
@@ -170,6 +188,7 @@ export class RecipeForm extends React.Component {
     return {
       isCloning: !!(route && route.isCloning),
       isUserRequester: requestAuthorID === currentUserID,
+      isPeerApprovalEnforced: document.documentElement.dataset.peerApprovalEnforced === 'true',
       isAlreadySaved: !!recipeId,
       isFormPristine: pristine,
       isApproved: !!recipeId && requestDetails && requestDetails.approved,
@@ -326,6 +345,8 @@ export class RecipeForm extends React.Component {
       recipe,
       revision,
       recipeId,
+      recipeArguments,
+      filters,
     } = this.props;
     const noop = () => null;
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction] || noop;
@@ -357,22 +378,6 @@ export class RecipeForm extends React.Component {
         }
 
         {
-          thisRevisionRequest
-          && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
-          && (
-            <div className="approval-status">
-              This revision has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
-              <pre className="approval-comment">
-                {revision.approval_request.comment}
-                <span className="comment-author">
-                  &ndash; {revision.approval_request.approver.email}
-                </span>
-              </pre>
-            </div>
-          )
-        }
-
-        {
           recipe && (
             <RecipeStatus
               className={renderVars.isEnabled ? 'green' : 'red'}
@@ -388,6 +393,22 @@ export class RecipeForm extends React.Component {
           )
         }
 
+        {
+          thisRevisionRequest
+          && (thisRevisionRequest.approved === true || thisRevisionRequest.approved === false)
+          && (
+            <div className="approval-status">
+              This revision has been <b>{renderVars.isAccepted ? 'approved' : 'rejected'}</b>:
+              <pre className="approval-comment">
+                {revision.approval_request.comment}
+                <span className="comment-author">
+                  &ndash; {revision.approval_request.approver.email}
+                </span>
+              </pre>
+            </div>
+          )
+        }
+
         <ControlField
           disabled={isFormDisabled}
           label="Name"
@@ -395,25 +416,57 @@ export class RecipeForm extends React.Component {
           component="input"
           type="text"
         />
-        <ControlField
-          disabled={isFormDisabled}
-          label="Filter Expression"
-          name="extra_filter_expression"
-          component="textarea"
-        />
-        <ControlField
-          disabled={isFormDisabled}
-          label="Action"
-          name="action"
-          component="select"
-        >
-          <option value="">Choose an action...</option>
-          <option value="console-log">Log to Console</option>
-          <option value="show-heartbeat">Heartbeat Prompt</option>
-          <option value="preference-experiment">Preference Experiment</option>
-        </ControlField>
 
-        <ArgumentsFields disabled={isFormDisabled} />
+        <Frame title="Filters">
+          <ControlField
+            component={MultiPicker}
+            disabled={isFormDisabled}
+            wrapper="div"
+            name="locales"
+            unit="Locales"
+            options={filters.locales || []}
+          />
+          <ControlField
+            component={MultiPicker}
+            disabled={isFormDisabled}
+            wrapper="div"
+            name="countries"
+            unit="Countries"
+            options={filters.countries || []}
+          />
+
+          <Frame className="channels" title="Release Channels">
+            <ControlField
+              component={CheckboxGroup}
+              disabled={isFormDisabled}
+              name="channels"
+              options={filters.channels || []}
+            />
+          </Frame>
+
+          <ControlField
+            label="Additional Filter Expressions"
+            disabled={isFormDisabled}
+            name="extra_filter_expression"
+            component="textarea"
+          />
+        </Frame>
+
+        <Frame title="Action Configuration">
+          <ControlField
+            disabled={isFormDisabled}
+            label="Action"
+            name="action"
+            component="select"
+          >
+            <option value="">Choose an action...</option>
+            <option value="console-log">Log to Console</option>
+            <option value="show-heartbeat">Heartbeat Prompt</option>
+            <option value="preference-experiment">Preference Experiment</option>
+          </ControlField>
+
+          <ArgumentsFields disabled={isFormDisabled} fields={recipeArguments} />
+        </Frame>
 
         <RecipeFormActions
           onAction={this.handleFormAction}
@@ -451,6 +504,7 @@ export const formConfig = {
     // Filter out unwanted keys for submission.
     const recipe = pick(values, [
       'name', 'enabled', 'extra_filter_expression', 'action', 'arguments',
+      'locales', 'countries', 'channels',
     ]);
     const isCloning = route && route.isCloning;
 
@@ -518,13 +572,16 @@ export function initialValuesWrapper(Component) {
 const connector = connect(
   // Pull selected action from the form state.
   state => ({
-    selectedAction: selector(state, 'action'),
     user: state.user,
     allRevisions: state.recipes.revisions,
+    selectedAction: formSelector(state, 'action'),
+    recipeArguments: formSelector(state, 'arguments'),
+    filters: getFilterObject(state.filters),
   }),
 
   // Bound functions for writing to the server.
   dispatch => ({
+    loadFilters,
     addRecipe(recipe) {
       return dispatch(makeApiRequest('addRecipe', { recipe }))
       .then(response => {

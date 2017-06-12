@@ -1,10 +1,8 @@
 "use strict";
-// Cu is defined in xpc_head.js
-/* globals Cu */
 
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://testing-common/httpd.js"); /* globals HttpServer */
-Cu.import("resource://gre/modules/osfile.jsm", this); /* globals OS */
+Cu.import("resource://testing-common/httpd.js");
+Cu.import("resource://gre/modules/osfile.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 
 load("utils.js"); /* globals withMockPreferences */

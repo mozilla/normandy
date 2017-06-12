@@ -1,5 +1,6 @@
 import {
   ACTION_RECEIVE,
+  APPROVAL_REQUEST_RECEIVE,
   REVISION_RECEIVE,
 } from '../action-types';
 
@@ -39,6 +40,20 @@ export function fetchAllRevisions() {
 
     revisions.forEach(revision => {
       dispatch(revisionReceived(revision));
+    });
+  };
+}
+
+
+export function requestRevisionApproval(pk) {
+  return async dispatch => {
+    const requestId = `request-revision-approval-${pk}`;
+    const approvalRequest = await dispatch(
+      makeApiRequest(requestId, `v2/recipe_revision/${pk}/request_approval/`));
+
+    dispatch({
+      type: APPROVAL_REQUEST_RECEIVE,
+      approvalRequest,
     });
   };
 }

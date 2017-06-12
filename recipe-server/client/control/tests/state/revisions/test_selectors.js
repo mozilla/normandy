@@ -1,5 +1,12 @@
 import { fromJS } from 'immutable';
+import * as matchers from 'jasmine-immutable-matchers';
 
+import {
+  ACTION_RECEIVE,
+  REVISION_RECEIVE,
+} from 'control/state/action-types';
+import actionsReducer from 'control/state/actions/reducers';
+import revisionsReducer from 'control/state/revisions/reducers';
 import { getRevision } from 'control/state/revisions/selectors';
 
 import {
@@ -16,19 +23,27 @@ describe('getRevision', () => {
     ...INITIAL_STATE,
     newState: {
       ...INITIAL_STATE.newState,
-      revisions: {
-        ...INITIAL_STATE.newState.revisions,
-        items: INITIAL_STATE.newState.revisions.items.set(REVISION.id, fromJS(REVISION)),
-      },
+      actions: actionsReducer(undefined, {
+        type: ACTION_RECEIVE,
+        action: REVISION.recipe.action,
+      }),
+      revisions: revisionsReducer(undefined, {
+        type: REVISION_RECEIVE,
+        revision: REVISION,
+      }),
     },
   };
 
-  it('should return the revision', () => {
-    expect(getRevision(STATE, REVISION.id)).toEqual(fromJS(REVISION));
+  beforeEach(() => {
+    jasmine.addMatchers(matchers);
   });
 
-  it('should return `undefined` for invalid ID', () => {
-    expect(getRevision(STATE, 'invalid')).toEqual(undefined);
+  it('should return the revision', () => {
+    expect(getRevision(STATE, REVISION.id)).toEqualImmutable(fromJS(REVISION));
+  });
+
+  it('should return `null` for invalid ID', () => {
+    expect(getRevision(STATE, 'invalid')).toEqual(null);
   });
 
   it('should return default value for invalid ID with default provided', () => {

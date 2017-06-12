@@ -14,6 +14,7 @@ from normandy.recipes.models import (
     INFO_REQUESTING_RECIPE_SIGNATURES,
     Recipe,
     RecipeRevision,
+    WARNING_BYPASSING_PEER_APPROVAL,
 )
 from normandy.recipes.tests import (
     ActionFactory,
@@ -510,13 +511,16 @@ class TestRecipeRevision(object):
 
 @pytest.mark.django_db
 class TestApprovalRequest(object):
-    def test_approve(self):
+    def test_approve(self, mocker):
         u = UserFactory()
         req = ApprovalRequestFactory()
+        mocker.patch.object(req, 'verify_approver')
+
         req.approve(u, 'r+')
         assert req.approved
         assert req.approver == u
         assert req.comment == 'r+'
+        req.verify_approver.assert_called_with(u)
 
         recipe = req.revision.recipe
         assert recipe.is_approved
@@ -529,13 +533,16 @@ class TestApprovalRequest(object):
         with pytest.raises(req.NotActionable):
             req.approve(u, 'r+')
 
-    def test_reject(self):
+    def test_reject(self, mocker):
         u = UserFactory()
         req = ApprovalRequestFactory()
+        mocker.patch.object(req, 'verify_approver')
+
         req.reject(u, 'r-')
         assert not req.approved
         assert req.approver == u
         assert req.comment == 'r-'
+        req.verify_approver.assert_called_with(u)
 
         recipe = req.revision.recipe
         assert not recipe.is_approved
@@ -547,6 +554,40 @@ class TestApprovalRequest(object):
 
         with pytest.raises(req.NotActionable):
             req.reject(u, 'r-')
+
+    def test_verify_approver_enforced(self, settings, mocker):
+        settings.PEER_APPROVAL_ENFORCED = True
+
+        creator = UserFactory()
+        user = UserFactory()
+        req = ApprovalRequestFactory(creator=creator)
+
+        # Do not raise when creator and approver are different
+        req.verify_approver(user)
+
+        # Raise when creator and approver are the same
+        with pytest.raises(req.CannotActOnOwnRequest):
+            req.verify_approver(creator)
+
+    def test_verify_approver_unenforced(self, settings, mocker):
+        logger = mocker.patch('normandy.recipes.models.logger')
+        settings.PEER_APPROVAL_ENFORCED = False
+
+        creator = UserFactory()
+        user = UserFactory()
+        req = ApprovalRequestFactory(creator=creator)
+
+        # Do not raise when creator and approver are different
+        req.verify_approver(user)
+
+        # Do not raise when creator and approver are the same since enforcement
+        # is disabled.
+        req.verify_approver(creator)
+        logger.warning.assert_called_with(Whatever(), extra={
+            'code': WARNING_BYPASSING_PEER_APPROVAL,
+            'approval_id': req.id,
+            'approver': creator,
+        })
 
 
 @pytest.mark.django_db

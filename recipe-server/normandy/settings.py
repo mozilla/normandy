@@ -88,7 +88,7 @@ class Core(Configuration):
         'jquery': ['dist/*.js'],
         'json-editor': ['dist/*.js'],
         'wolfy87-eventemitter': ['EventEmitter.js'],
-        'jexl': ['dist/*.js'],
+        'mozjexl': ['dist/*.js'],
     }
 
     REST_FRAMEWORK = {
@@ -311,11 +311,19 @@ class Base(Core):
     NUM_PROXIES = values.IntegerValue(0)
     API_CACHE_TIME = values.IntegerValue(30)
     API_CACHE_ENABLED = values.BooleanValue(True)
+
+    # If true, approvals must come from two separate users. If false, the same
+    # user can approve their own request.
+    PEER_APPROVAL_ENFORCED = values.BooleanValue(True)
+
     # Autograph settings
     AUTOGRAPH_URL = values.Value()
     AUTOGRAPH_HAWK_ID = values.Value()
     AUTOGRAPH_HAWK_SECRET_KEY = values.Value()
     AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
+
+    # How many days before expiration to warn for expired certificates
+    CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
 
     PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, 'product_details'))
 
@@ -332,6 +340,7 @@ class Development(Base):
     EMAIL_BACKEND = values.Value('django.core.mail.backends.console.EmailBackend')
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
+    PEER_APPROVAL_ENFORCED = values.BooleanValue(False)
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)

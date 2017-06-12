@@ -7,10 +7,10 @@ import {
 } from '../requests/actions';
 
 
-export function fetchAction(name) {
+export function fetchAction(pk) {
   return async dispatch => {
-    const requestId = `fetch-action-${name}`;
-    const action = await dispatch(makeApiRequest(requestId, `v2/action/${name}/`));
+    const requestId = `fetch-action-${pk}`;
+    const action = await dispatch(makeApiRequest(requestId, `v2/action/${pk}/`));
 
     dispatch({
       type: ACTION_RECEIVE,

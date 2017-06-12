@@ -1,3 +1,6 @@
+import re
+import urllib.parse as urlparse
+
 import pytest
 from rest_framework import serializers
 
@@ -10,12 +13,14 @@ from normandy.recipes.tests import (
     CountryFactory,
     LocaleFactory,
     RecipeFactory,
+    SignatureFactory,
 )
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     MinimalRecipeSerializer,
     RecipeSerializer,
     SignedRecipeSerializer,
+    SignatureSerializer,
 )
 
 
@@ -220,3 +225,27 @@ class TestSignedRecipeSerializer:
                 'is_approved': False,
             }
         }
+
+
+@pytest.mark.django_db()
+class TestSignatureSerializer:
+    def test_it_works(self):
+        signature = SignatureFactory()
+        serializer = SignatureSerializer(instance=signature)
+
+        assert serializer.data == {
+            'signature': Whatever.regex(r'[a-f0-9]{40}'),
+            'x5u': Whatever.startswith(signature.x5u),
+            'timestamp': Whatever.iso8601(),
+            'public_key': Whatever.regex(r'[a-zA-Z0-9/+]{160}')
+        }
+
+    def test_it_cachebusts_x5u(self):
+        signature = SignatureFactory()
+        serializer = SignatureSerializer(instance=signature)
+
+        url_parts = list(urlparse.urlparse(serializer.data['x5u']))
+        query = urlparse.parse_qs(url_parts[4])
+        assert 'cachebust' in query
+        assert len(query['cachebust']) == 1
+        assert re.match('^\d+$', query['cachebust'][0])

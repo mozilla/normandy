@@ -255,6 +255,21 @@ in other Django projects.
    If :envvar:`DJANGO_USE_OIDC` is set to ``True``, this settings must be set to
    the URL that a user can visit to logout. It may be a relative URL.
 
+.. envvar:: DJANGO_PEER_APPROVAL_ENFORCED
+
+   :default: ``True``
+
+   If ``True``, approval requests for recipe changes can only be approved by a
+   different user than the one who created the request. If ``False``, approval
+   requests can be approved by the same user who created it.
+
+   This defaults to ``False`` for local developer instances.
+
+.. envvar:: DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS
+
+   If set, when checking certificates for validity, start failing
+   system checks this many days before the certificate would expire.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the
