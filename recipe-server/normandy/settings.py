@@ -321,6 +321,7 @@ class Base(Core):
     AUTOGRAPH_HAWK_ID = values.Value()
     AUTOGRAPH_HAWK_SECRET_KEY = values.Value()
     AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
+    AUTOGRAPH_X5U_CACHE_BUST = values.Value(None)
 
     # How many days before expiration to warn for expired certificates
     CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)

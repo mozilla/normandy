@@ -1,4 +1,3 @@
-import re
 import urllib.parse as urlparse
 
 import pytest
@@ -240,12 +239,21 @@ class TestSignatureSerializer:
             'public_key': Whatever.regex(r'[a-zA-Z0-9/+]{160}')
         }
 
-    def test_it_cachebusts_x5u(self):
+    def test_it_cachebusts_x5u(self, settings):
         signature = SignatureFactory()
-        serializer = SignatureSerializer(instance=signature)
 
+        # If none, do not cache bust
+        settings.AUTOGRAPH_X5U_CACHE_BUST = None
+        serializer = SignatureSerializer(instance=signature)
+        url_parts = list(urlparse.urlparse(serializer.data['x5u']))
+        query = urlparse.parse_qs(url_parts[4])
+        assert 'cachebust' not in query
+
+        # If set, cachebust using the value
+        settings.AUTOGRAPH_X5U_CACHE_BUST = 'new'
+        serializer = SignatureSerializer(instance=signature)
         url_parts = list(urlparse.urlparse(serializer.data['x5u']))
         query = urlparse.parse_qs(url_parts[4])
         assert 'cachebust' in query
         assert len(query['cachebust']) == 1
-        assert re.match('^\d+$', query['cachebust'][0])
+        assert query['cachebust'][0] == 'new'

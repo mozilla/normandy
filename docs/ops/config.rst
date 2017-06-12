@@ -162,6 +162,15 @@ in other Django projects.
     possible while still guaranteeing that actions will get resigned during the
     overlap period.
 
+.. envvar:: DJANGO_AUTOGRAPH_X5U_CACHE_BUST
+
+    :default: Unset
+
+    If set, the value will be added to the URL for the x5u certificate chain as
+    a query parameter named `cachebust`. This is used to force clients to
+    re-fetch the certificate chain in cases where they're caching an expired or
+    otherwise invalid copy of the chain.
+
 .. envvar:: DJANGO_API_CACHE_TIME
 
     :default: ``30``
