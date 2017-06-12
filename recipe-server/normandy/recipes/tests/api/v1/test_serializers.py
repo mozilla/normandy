@@ -1,4 +1,3 @@
-import re
 import urllib.parse as urlparse
 
 import pytest
