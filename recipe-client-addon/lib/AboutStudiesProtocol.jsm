@@ -11,42 +11,49 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 this.EXPORTED_SYMBOLS = ["AboutStudiesProtocol"];
 
+
 /**
- * Component definition for the about:studies protocol handler.
- * Registers a component with the browser that establishes an `about:studies`
- * protocol handler. Navigating to `about:studies` displays the
- * `AboutStudies.xml` file.
+ * Required data for registering a protocol handler. This data is referred to
+ * both when creating the new channel, as well as actually registering the
+ * component factory.
  */
-function StudiesProtocolHandler() {}
-StudiesProtocolHandler.prototype = {
-  uri: Services.io.newURI("resource://shield-recipe-client/lib/AboutStudies.xml"),
+const protocolInfo = {
+  // The file/destination for the protocol.
+  uri: Services.io.newURI("resource://shield-recipe-client/lib/AboutStudies.html"),
+  // Other properties are used internally by the protocol handler.
   classDescription: "about:studies page module",
   classID: Components.ID("c7c3dd48-c1cf-4bbf-a5df-69eaf6cb27d9"),
   contractID: "@mozilla.org/network/protocol/about;1?what=studies",
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIStudiesProtocolHandler]),
+};
 
-  newChannel: (aURI) => {
+/**
+ * Component definition for the about:studies protocol handler.
+ * Registers a component with the browser that establishes an `about:studies`
+ * protocol handler. Navigating to `about:studies` displays `AboutStudies.html`.
+ */
+class StudiesProtocolHandler {
+  newChannel(uri) {
     let chan;
     try {
       chan = Services.io.newChannelFromURI2(
-        StudiesProtocolHandler.prototype.uri,
+        protocolInfo.uri,
         null,
         Services.scriptSecurityManager.getSystemPrincipal(),
         null,
         Ci.nsILoadInfo.SEC_ALLOW_CROSS_ORIGIN_DATA_IS_NULL,
-        Ci.nsIContentPolicy.TYPE_OTHER
+        Ci.nsIContentPolicy.TYPE_DOCUMENT
       );
-
-      chan.originalURI = aURI;
     } catch (ex) {
       throw new Error(`Error creating about:studies protocol - ${ex}`);
     }
 
     return chan;
-  },
+  }
 
-  getURIFlags: (aURI) => {}
-};
+  // Required by the protocol handler, despite not doing anything.
+  getURIFlags() {}
+}
 
 
 /**
@@ -81,7 +88,7 @@ const AboutStudiesProtocol = {
       classID,
       classDescription,
       contractID
-    } = StudiesProtocolHandler.prototype;
+    } = protocolInfo;
 
     // Actually register the component (and therefor protocol) with the browser.
     Cm.registerFactory(classID, classDescription, contractID, protocolFactory);
@@ -95,8 +102,7 @@ const AboutStudiesProtocol = {
    */
   unregister() {
     if (this.instance) {
-      const {classID} = StudiesProtocolHandler.prototype;
-
+      const {classID} = protocolInfo;
       Cm.unregisterFactory(classID, this.instance);
     }
 
