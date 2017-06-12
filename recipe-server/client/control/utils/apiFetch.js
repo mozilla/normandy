@@ -5,7 +5,9 @@ export default async function apiFetch(url, options = {}) {
 
   const headers = new Headers();
   headers.append('Accept', 'application/json');
-  headers.append('Content-Type', 'application/json');
+  if (!(options.body && options.body instanceof FormData)) {
+    headers.append('Content-Type', 'application/json');
+  }
   headers.append('X-CSRFToken', document.getElementsByTagName('html')[0].dataset.csrf);
 
   const settings = {

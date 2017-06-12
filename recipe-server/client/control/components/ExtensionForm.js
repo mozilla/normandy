@@ -6,14 +6,24 @@ import { initialize, reduxForm } from 'redux-form';
 
 import QueryExtension from './data/QueryExtension';
 import { ControlField } from './Fields';
+import { createExtension, updateExtension } from '../state/extensions/actions';
 import { getExtension } from '../state/extensions/selectors';
 
 
 class ExtensionForm extends React.Component {
   static propTypes = {
+    createExtension: pt.func.isRequired,
     extensionId: pt.number,
+    handleSubmit: pt.func.isRequired,
     initializeForm: pt.func.isRequired,
     initialValues: pt.object,
+    updateExtension: pt.func.isRequired,
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.handleSave = ::this.handleSave;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -24,8 +34,30 @@ class ExtensionForm extends React.Component {
     }
   }
 
-  render() {
+  handleSave(values) {
     const { extensionId } = this.props;
+    const data = values;
+
+    // Remove the XPI value passed through because this is the URL of the existing XPI
+    if (data.xpi) {
+      delete data.xpi;
+    }
+
+    // Store the newly selected XPI with the key `xpi`.
+    if (data.xpiUpload) {
+      data.xpi = data.xpiUpload[0];
+      delete data.xpiUpload;
+    }
+
+    if (extensionId) {
+      this.props.updateExtension(extensionId, data);
+    } else {
+      this.props.createExtension(data);
+    }
+  }
+
+  render() {
+    const { extensionId, handleSubmit } = this.props;
 
     return (
       <form className="recipe-form">
@@ -66,6 +98,7 @@ class ExtensionForm extends React.Component {
           <button
             className="button action-save submit"
             type="submit"
+            onClick={handleSubmit(this.handleSave)}
           >Save</button>
         </div>
       </form>
@@ -83,5 +116,7 @@ export default connect(
   },
   dispatch => (bindActionCreators({
     initializeForm: initialize,
+    createExtension,
+    updateExtension,
   }, dispatch)),
 )(reduxForm({ form: 'extension' })(ExtensionForm));
