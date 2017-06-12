@@ -109,19 +109,19 @@ this.PreferenceManager = class PreferenceManager {
   withMockData(testFunction) {
     // We use a POJO to fake the internal storage.
     this.mockData = {
-      [this.namespace]: {}
+      [this.namespace]: {},
     };
 
     return async (...args) => {
       this.storePromise = Promise.resolve({
         data: this.mockData,
-        saveSoon() {}
+        saveSoon() {},
       });
 
       try {
         // Tests directly edit store values, so for test functions, the relevant
         // namespace is exposed for brevity.
-        await testFunction(this.mockData[this.namespace], ...args)
+        await testFunction(this.mockData[this.namespace], ...args);
       } finally {
         this.stopAllObservers();
 
