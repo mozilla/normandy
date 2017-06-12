@@ -6,6 +6,7 @@ import { initialize, reduxForm } from 'redux-form';
 
 import QueryExtension from './data/QueryExtension';
 import { ControlField } from './Fields';
+import { showNotification } from '../actions/NotificationActions';
 import { createExtension, updateExtension } from '../state/extensions/actions';
 import { getExtension } from '../state/extensions/selectors';
 
@@ -17,6 +18,7 @@ class ExtensionForm extends React.Component {
     handleSubmit: pt.func.isRequired,
     initializeForm: pt.func.isRequired,
     initialValues: pt.object,
+    showNotification: pt.func.isRequired,
     updateExtension: pt.func.isRequired,
   }
 
@@ -34,7 +36,7 @@ class ExtensionForm extends React.Component {
     }
   }
 
-  handleSave(values) {
+  async handleSave(values) {
     const { extensionId } = this.props;
     const data = values;
 
@@ -49,11 +51,23 @@ class ExtensionForm extends React.Component {
       delete data.xpiUpload;
     }
 
-    if (extensionId) {
-      this.props.updateExtension(extensionId, data);
-    } else {
-      this.props.createExtension(data);
+    try {
+      if (extensionId) {
+        await this.props.updateExtension(extensionId, data);
+      } else {
+        await this.props.createExtension(data);
+      }
+    } catch (error) {
+      this.props.showNotification({
+        messageType: 'error',
+        message: 'Extension cannot be saved. Please correct any errors listed in the form below.',
+      });
     }
+
+    this.props.showNotification({
+      messageType: 'success',
+      message: 'Extension saved.',
+    });
   }
 
   render() {
@@ -117,6 +131,7 @@ export default connect(
   dispatch => (bindActionCreators({
     initializeForm: initialize,
     createExtension,
+    showNotification,
     updateExtension,
   }, dispatch)),
 )(reduxForm({ form: 'extension' })(ExtensionForm));
