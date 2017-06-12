@@ -19,7 +19,7 @@ from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip
 from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
-from normandy.recipes.utils import Autographer
+from normandy.recipes.signing import Autographer
 from normandy.recipes.validators import validate_json
 
 

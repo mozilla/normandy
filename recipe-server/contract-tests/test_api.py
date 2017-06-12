@@ -4,7 +4,7 @@ import pytest
 
 from datetime import datetime
 
-from normandy.recipes.utils import verify_signature
+from normandy.recipes import signing
 from pytest_testrail.plugin import testrail
 
 
@@ -104,11 +104,17 @@ def test_recipe_signatures(conf, requests_session):
     if len(data) == 0:
         pytest.skip('No signed recipes')
 
+    cert_urls = set()
+
     for item in data:
         canonical_recipe = canonical_json(item['recipe'])
         signature = item['signature']['signature']
         pubkey = item['signature']['public_key']
-        assert verify_signature(canonical_recipe, signature, pubkey)
+        cert_urls.add(item['signature']['x5u'])
+        assert signing.verify_signature(canonical_recipe, signature, pubkey)
+
+    for url in cert_urls:
+        signing.verify_x5u(url)
 
 
 def test_recipe_api_is_json(conf, requests_session):

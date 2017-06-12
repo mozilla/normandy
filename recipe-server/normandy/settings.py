@@ -322,6 +322,9 @@ class Base(Core):
     AUTOGRAPH_HAWK_SECRET_KEY = values.Value()
     AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
 
+    # How many days before expiration to warn for expired certificates
+    CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
+
     PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, 'product_details'))
 
 
