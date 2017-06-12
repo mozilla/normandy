@@ -91,6 +91,18 @@ describe('Evaluator', function() {
 		return e.eval(toTree('foo["ba" + "z"].bar'))
 			.should.become(context.foo.baz.bar);
 	});
+	it('should allow simple filters on undefined objects', function() {
+		var context = {foo: {}},
+		    e = new Evaluator(grammar, null, context);
+		return e.eval(toTree('foo.bar["baz"].tok'))
+			.should.become(undefined);
+	});
+	it('should allow complex filters on undefined objects', function() {
+		var context = {foo: {}},
+		    e = new Evaluator(grammar, null, context);
+		return e.eval(toTree('foo.bar[.size > 1].baz'))
+			.should.become(undefined);
+	});
 	it('should throw when transform does not exist', function() {
 		var e = new Evaluator(grammar);
 		return e.eval(toTree('"hello"|world')).should.reject;

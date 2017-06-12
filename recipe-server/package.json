@@ -27,7 +27,7 @@
     "json-loader": "0.5.4",
     "localforage": "1.4.3",
     "moment": "2.14.1",
-    "mozjexl": "1.1.4",
+    "mozjexl": "1.1.5",
     "node-sass": "3.9.3",
     "node-uuid": "1.4.7",
     "react": "15.3.1",
