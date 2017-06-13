@@ -14,7 +14,7 @@ this.EXPORTED_SYMBOLS = ["AboutStudiesProtocol"];
 
 /**
  * Required data for registering a protocol handler. This data is referred to
- * both when creating the new channel, as well as actually registering the
+ * when creating the new channel, as well as actually registering the
  * component factory.
  */
 const protocolInfo = {
