@@ -1,3 +1,4 @@
+/* globals sinon */
 "use strict";
 
 Cu.import("resource://gre/modules/Services.jsm");
