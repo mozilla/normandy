@@ -109,6 +109,8 @@ Evaluator.prototype.evalMap = function(map) {
  * @private
  */
 Evaluator.prototype._filterRelative = function(subject, expr) {
+	if (subject === undefined)
+		return undefined;
 	var promises = [];
 	if (!Array.isArray(subject))
 		subject = [subject];
@@ -146,6 +148,8 @@ Evaluator.prototype._filterStatic = function(subject, expr) {
 	return this.eval(expr).then(function(res) {
 		if (typeof res === 'boolean')
 			return res ? subject : undefined;
+		if (subject === undefined)
+			return undefined;
 		return subject[res];
 	});
 };
