@@ -173,6 +173,7 @@ this.NormandyDriver = function(sandboxManager) {
         },
       }));
       installObj.install();
+      return result;
     }),
 
     /*

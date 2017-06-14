@@ -19,43 +19,39 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   dir.append("normandy.xpi");
   const xpiUrl = Services.io.newFileURI(dir).spec;
   var addonId = await driver.installAddon(xpiUrl);
-  ok(addonId === "normandydriver@example.com", "Expected test addon was installed");
-  ok(addonId !== null, "Addon install was successful");
+  is(addonId, "normandydriver@example.com", "Expected test addon was installed");
+  isnot(addonId, null, "Addon install was successful");
 
   // Installing kicks off an asychronous process which tries to read the manifest.json
   // to startup the addon. Note that onInstallEnded is triggered too early
   // which is why we need this delay.
-  await new Promise((resolve, reject) => { setTimeout(resolve, 300); });
+  await new Promise(resolve => SimpleTest.executeSoon(resolve));
 
   const uninstallMsg = await driver.uninstallAddon(addonId);
-  ok(uninstallMsg === null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
+  is(uninstallMsg, null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
 }));
 
 add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
   // Test that we can install an XPI from any URL
   const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
-  driver.uninstallAddon(invalidAddonId).then(() => {
+  try {
+    await driver.uninstallAddon(invalidAddonId);
     ok(false, `Uninstall returned an unexpected null for success`);
-  }, reason => {
+  } catch (e) {
     ok(true, `This is the expected failure`);
-  }).catch(e => {
-    ok(false, `Uninstall should not throw an exception within the async function`);
-  });
+  }
 }));
 
 
 add_task(withDriver(Assert, async function installXpiBadURL(driver) {
   // Test that we can install an XPI from any URL
   const xpiUrl = "file:///tmp/invalid_xpi.xpi";
-  driver.installAddon(xpiUrl)
-    .then(() => {
-      ok(false, "Installation succeeded on an XPI that doesn't exist");
-    }, reason => {
-      ok(true, `Installation was rejected: [${reason}]`);
-    })
-    .catch(e => {
-      ok(false, `Error was thrown during invalid XPI install: ${e}`);
-    });
+  try {
+    await driver.installAddon(xpiUrl);
+    ok(false, "Installation succeeded on an XPI that doesn't exist");
+  } catch (reason) {
+    ok(true, `Installation was rejected: [${reason}]`);
+  }
 }));
 
 add_task(withDriver(Assert, async function userId(driver) {
