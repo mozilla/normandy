@@ -13,7 +13,7 @@ export const FormButton = ({
   type = 'button',
   onClick,
   display,
-  ...props,
+  ...props
 }) => {
   if (display === false) {
     return null;

@@ -38,5 +38,5 @@ const loader = new Loader.Loader({
   },
 });
 const require = Loader.Require(loader, {id: ""});
-const sinon = require("sinon-2.3.2");
+this.sinon = require("sinon-2.3.2");
 // ================================================
