@@ -32,11 +32,10 @@ add_task(withDriver(Assert, async function installXpi(driver) {
 }));
 
 add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
-  // Test that we can install an XPI from any URL
   const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
   try {
     await driver.uninstallAddon(invalidAddonId);
-    ok(false, `Uninstall returned an unexpected null for success`);
+    ok(false, `Uninstalling an invalid XPI should fail.  uninstallAddon resolved successfully though.`);
   } catch (e) {
     ok(true, `This is the expected failure`);
   }
@@ -44,7 +43,6 @@ add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
 
 
 add_task(withDriver(Assert, async function installXpiBadURL(driver) {
-  // Test that we can install an XPI from any URL
   const xpiUrl = "file:///tmp/invalid_xpi.xpi";
   try {
     await driver.installAddon(xpiUrl);

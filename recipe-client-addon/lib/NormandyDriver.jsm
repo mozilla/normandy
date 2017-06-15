@@ -168,7 +168,7 @@ this.NormandyDriver = function(sandboxManager) {
         onInstallFailed(addonInstall) {
           reject(`AddonInstall error code: [${addonInstall.error}]`);
         },
-        onDownloadFailed(install) {
+        onDownloadFailed() {
           reject(`Download failed: [${installUrl}]`);
         },
       }));
