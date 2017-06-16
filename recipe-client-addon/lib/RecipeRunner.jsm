@@ -105,6 +105,16 @@ this.RecipeRunner = {
       await ClientEnvironment.getClientClassification();
     }
 
+    // Fetch recipes before execution in case we fail and exit early.
+    let recipes;
+    try {
+      recipes = await NormandyApi.fetchRecipes({enabled: true});
+    } catch (e) {
+      const apiUrl = prefs.getCharPref("api_url");
+      log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
+      return;
+    }
+
     const actionSandboxManagers = await this.loadActionSandboxManagers();
     Object.values(actionSandboxManagers).forEach(manager => manager.addHold("recipeRunner"));
 
@@ -118,16 +128,6 @@ this.RecipeRunner = {
         log.error(`Could not run pre-execution hook for ${actionName}:`, err.message);
         manager.disabled = true;
       }
-    }
-
-    // Fetch recipes from the API
-    let recipes;
-    try {
-      recipes = await NormandyApi.fetchRecipes({enabled: true});
-    } catch (e) {
-      const apiUrl = prefs.getCharPref("api_url");
-      log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
-      return;
     }
 
     // Evaluate recipe filters
