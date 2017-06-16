@@ -99,17 +99,21 @@ add_task(withMockNormandyApi(async function testClientClassificationCache() {
 async function withMockActionSandboxManagers(actions, testFunction) {
   const managers = {};
   for (const action of actions) {
-    managers[action.name] = new ActionSandboxManager("");
+    const manager = new ActionSandboxManager("");
+    manager.addHold("testing");
+    managers[action.name] = manager;
     sinon.stub(managers[action.name], "runAsyncCallback");
   }
 
-  const loadActionSandboxManagers = sinon.stub(
-    RecipeRunner,
-    "loadActionSandboxManagers",
-    async () => managers,
-  );
+  const loadActionSandboxManagers = sinon.stub(RecipeRunner, "loadActionSandboxManagers")
+    .resolves(managers);
   await testFunction(managers);
   loadActionSandboxManagers.restore();
+
+  for (const manager of Object.values(managers)) {
+    manager.removeHold("testing");
+    await manager.isNuked();
+  }
 }
 
 add_task(withMockNormandyApi(async function testRun(mockApi) {
@@ -140,8 +144,20 @@ add_task(withMockNormandyApi(async function testRun(mockApi) {
     sinon.assert.calledWith(noMatchManager.runAsyncCallback, "postExecution");
 
     // missing is never called at all due to no matching action/manager.
-    await matchManager.isNuked();
-    await noMatchManager.isNuked();
+  });
+}));
+
+add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
+  const action = {name: "action"};
+  mockApi.actions = [action];
+  mockApi.fetchRecipes.rejects(new Error("Signature not valid"));
+
+  await withMockActionSandboxManagers(mockApi.actions, async managers => {
+    const manager = managers["action"];
+    await RecipeRunner.run();
+
+    // If the recipe fetch failed, do not run anything.
+    sinon.assert.notCalled(manager.runAsyncCallback);
   });
 }));
 
@@ -170,9 +186,6 @@ add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) 
     sinon.assert.calledWith(failManager.runAsyncCallback, "preExecution");
     sinon.assert.neverCalledWith(failManager.runAsyncCallback, "action", failRecipe);
     sinon.assert.neverCalledWith(failManager.runAsyncCallback, "postExecution");
-
-    await passManager.isNuked();
-    await failManager.isNuked();
   });
 }));
 
