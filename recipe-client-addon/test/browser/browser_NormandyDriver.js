@@ -12,6 +12,46 @@ add_task(withDriver(Assert, async function uuids(driver) {
   isnot(uuid1, uuid2, "uuids are unique");
 }));
 
+add_task(withDriver(Assert, async function installXpi(driver) {
+  // Test that we can install an XPI from any URL
+  const dir = getChromeDir(getResolvedURI(gTestPath));
+  dir.append("fixtures");
+  dir.append("normandy.xpi");
+  const xpiUrl = Services.io.newFileURI(dir).spec;
+  var addonId = await driver.installAddon(xpiUrl);
+  is(addonId, "normandydriver@example.com", "Expected test addon was installed");
+  isnot(addonId, null, "Addon install was successful");
+
+  // Installing kicks off an asychronous process which tries to read the manifest.json
+  // to startup the addon. Note that onInstallEnded is triggered too early
+  // which is why we need this delay.
+  await new Promise(resolve => SimpleTest.executeSoon(resolve));
+
+  const uninstallMsg = await driver.uninstallAddon(addonId);
+  is(uninstallMsg, null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
+}));
+
+add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
+  const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
+  try {
+    await driver.uninstallAddon(invalidAddonId);
+    ok(false, `Uninstalling an invalid XPI should fail.  uninstallAddon resolved successfully though.`);
+  } catch (e) {
+    ok(true, `This is the expected failure`);
+  }
+}));
+
+
+add_task(withDriver(Assert, async function installXpiBadURL(driver) {
+  const xpiUrl = "file:///tmp/invalid_xpi.xpi";
+  try {
+    await driver.installAddon(xpiUrl);
+    ok(false, "Installation succeeded on an XPI that doesn't exist");
+  } catch (reason) {
+    ok(true, `Installation was rejected: [${reason}]`);
+  }
+}));
+
 add_task(withDriver(Assert, async function userId(driver) {
   // Test that userId is a UUID
   ok(UUID_REGEX.test(driver.userId), "userId is a uuid");
