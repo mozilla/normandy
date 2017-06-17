@@ -28,6 +28,7 @@ this.shutdown = function(data, reason) {
     "lib/CleanupManager.jsm",
     "lib/ClientEnvironment.jsm",
     "lib/FilterExpressions.jsm",
+    "lib/Errors.jsm",
     "lib/EventEmitter.jsm",
     "lib/Heartbeat.jsm",
     "lib/LogManager.jsm",
@@ -39,6 +40,7 @@ this.shutdown = function(data, reason) {
     "lib/SandboxManager.jsm",
     "lib/ShieldRecipeClient.jsm",
     "lib/Storage.jsm",
+    "lib/Uptake.jsm",
     "lib/Utils.jsm",
     "vendor/mozjexl.js",
   ];

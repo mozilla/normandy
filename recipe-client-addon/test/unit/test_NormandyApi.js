@@ -3,10 +3,26 @@
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://testing-common/httpd.js");
+Cu.import("resource://gre/modules/CanonicalJSON.jsm", this);
 Cu.import("resource://gre/modules/osfile.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/Errors.jsm", this); /* globals InvalidSignatureError */
 
 load("utils.js"); /* globals withMockPreferences */
+
+class MockResponse {
+  constructor(content) {
+    this.content = content;
+  }
+
+  async text() {
+    return this.content;
+  }
+
+  async json() {
+    return JSON.loads(this.content);
+  }
+}
 
 function withServer(server, task) {
   return withMockPreferences(async function inner(preferences) {
@@ -38,9 +54,9 @@ function withScriptServer(scriptPath, task) {
   return withServer(makeScriptServer(scriptPath), task);
 }
 
-function makeMockApiServer() {
+function makeMockApiServer(directory) {
   const server = new HttpServer();
-  server.registerDirectory("/", do_get_file("mock_api"));
+  server.registerDirectory("/", directory);
 
   server.setIndexHandler(async function(request, response) {
     response.processAsync();
@@ -71,7 +87,7 @@ function makeMockApiServer() {
 }
 
 function withMockApiServer(task) {
-  return withServer(makeMockApiServer(), task);
+  return withServer(makeMockApiServer(do_get_file("mock_api")), task);
 }
 
 add_task(withMockApiServer(async function test_get(serverUrl) {
@@ -124,6 +140,73 @@ add_task(withMockApiServer(async function test_fetchRecipes() {
   const recipes = await NormandyApi.fetchRecipes();
   equal(recipes.length, 1);
   equal(recipes[0].name, "system-addon-test");
+}));
+
+add_task(async function test_fetchRecipes_canonical_mismatch() {
+  const getApiUrl = sinon.stub(NormandyApi, "getApiUrl").resolves("http://localhost/recipes/");
+
+  // Recipe is non-canonical (it has whitespace, properties are out of order)
+  const response = new MockResponse(`[
+    {
+      "recipe": {"b": 1, "a": 2},
+      "signature": {"signature": "", "x5u": ""}
+    }
+  ]`);
+  const get = sinon.stub(NormandyApi, "get").resolves(response);
+
+  try {
+    await NormandyApi.fetchRecipes();
+    ok(false, "fetchRecipes did not throw for canonical JSON mismatch");
+  } catch (err) {
+    ok(err instanceof InvalidSignatureError, "Error was not an InvalidSignatureError");
+    ok(/Canonical/.test(err), "Error was not due to canonical JSON mismatch");
+  }
+
+  getApiUrl.restore();
+  get.restore();
+});
+
+add_task(async function test_fetchRecipes_validation_error() {
+  const getApiUrl = sinon.stub(NormandyApi, "getApiUrl").resolves("http://localhost/recipes/");
+
+  // Mock two URLs: recipes and the x5u
+  const get = sinon.stub(NormandyApi, "get").callsFake(async url => {
+    if (url.endsWith("recipes/")) {
+      return new MockResponse(CanonicalJSON.stringify([
+        {
+          recipe: {a: 1, b: 2},
+          signature: {signature: "invalidsignature", x5u: "http://localhost/x5u/"},
+        },
+      ]));
+    } else if (url.endsWith("x5u/")) {
+      return new MockResponse("certchain");
+    }
+
+    return null;
+  });
+
+  // Validation should fail due to a malformed x5u and signature.
+  try {
+    await NormandyApi.fetchRecipes();
+    ok(false, "fetchRecipes did not throw for a validation error");
+  } catch (err) {
+    ok(err instanceof InvalidSignatureError, "Error was not an InvalidSignatureError");
+    ok(/signature/.test(err), "Error was not due to a validation error");
+  }
+
+  getApiUrl.restore();
+  get.restore();
+});
+
+const invalidSignatureServer = makeMockApiServer(do_get_file("invalid_recipe_signature_api"));
+add_task(withServer(invalidSignatureServer, async function test_fetchRecipes_invalid_signature() {
+  try {
+    await NormandyApi.fetchRecipes();
+    ok(false, "fetchRecipes did not throw for an invalid signature");
+  } catch (err) {
+    ok(err instanceof InvalidSignatureError, "Error was not an InvalidSignatureError");
+    ok(/signature/.test(err), "Error was not due to an invalid signature");
+  }
 }));
 
 add_task(withMockApiServer(async function test_classifyClient() {
