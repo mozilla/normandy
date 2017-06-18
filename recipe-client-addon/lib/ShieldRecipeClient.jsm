@@ -17,6 +17,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
   "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AboutStudiesProtocol",
+  "resource://shield-recipe-client/lib/AboutStudiesProtocol.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -82,6 +84,9 @@ this.ShieldRecipeClient = {
     }
 
     await RecipeRunner.init();
+
+    // Enable the about:studies page
+    AboutStudiesProtocol.register();
   },
 
   shutdown(reason) {
@@ -91,6 +96,8 @@ this.ShieldRecipeClient = {
     if (reason === REASONS.ADDON_DISABLE || reason === REASONS.ADDON_UNINSTALL) {
       Services.prefs.setBoolPref(PREF_SELF_SUPPORT_ENABLED, true);
     }
+
+    AboutStudiesProtocol.unregister();
   },
 
   setDefaultPrefs() {

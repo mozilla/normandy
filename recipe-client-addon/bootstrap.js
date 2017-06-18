@@ -24,6 +24,7 @@ this.shutdown = function(data, reason) {
   // modules are not unloaded accidentally during tests.
   const log = LogManager.getLogger("bootstrap");
   const modules = [
+    "lib/AboutStudiesProtocol.jsm",
     "lib/ActionSandboxManager.jsm",
     "lib/CleanupManager.jsm",
     "lib/ClientEnvironment.jsm",
