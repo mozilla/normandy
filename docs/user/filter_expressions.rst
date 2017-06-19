@@ -270,6 +270,27 @@ filter expressions.
       object varies depending on the recipe, and use of this property is only
       recommended if you are familiar with the argument schema.
 
+Operators
+---------
+This section describes the special operators available to filter expressions on
+top of the standard operators in JEXL. They're documented as functions, and the
+parameters correspond to the operands.
+
+.. js:function:: intersect(list1, list2)
+
+   Returns an array of all values in ``list1`` that are also present in
+   ``list2``. Values are compared using strict equality.
+
+   :param list1:
+      The array to the left of the operator.
+   :param list2:
+      The array to the right of the operator
+
+   .. code-block:: javascript
+
+      // Evaluates to [2, 3]
+      [1, 2, 3, 4] intersect [5, 6, 2, 7, 3]
+
 Transforms
 ----------
 This section describes the transforms available to filter expressions, and what
@@ -358,6 +379,21 @@ function is the value being transformed.
       '2011-10-10T14:48:00'|date // == Date object matching the given date
 
    .. _ISO 8601: https://www.w3.org/TR/NOTE-datetime
+
+.. js:function:: keys(obj)
+
+   Return an array of the given object's own keys (specifically, its enumerable
+   properties). Equivalent to `Object.keys`_.
+
+   :param obj:
+      Object to get the keys for.
+
+   .. code-block:: javascript
+
+      // Evaluates to ['foo', 'bar']
+      {foo: 1, bar:2}|keys
+
+   .. _Object.keys: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
 
 Preference Filters
 ^^^^^^^^^^^^^^^^^^

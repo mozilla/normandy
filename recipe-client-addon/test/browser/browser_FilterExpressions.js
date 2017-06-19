@@ -91,3 +91,53 @@ add_task(async function() {
   val = await FilterExpressions.eval('"normandy.test.value"|preferenceExists == true');
   ok(val, "preferenceExists expression fails existence check appropriately");
 });
+
+// keys tests
+add_task(async function testKeys() {
+  let val;
+
+  // Test an object defined in JEXL
+  val = await FilterExpressions.eval("{foo: 1, bar: 2}|keys");
+  Assert.deepEqual(
+    new Set(val),
+    new Set(["foo", "bar"]),
+    "keys returns the keys from an object in JEXL",
+  );
+
+  // Test an object in the context
+  const context = {ctxObject: {baz: "string", biff: NaN}};
+  val = await FilterExpressions.eval("ctxObject|keys", context);
+
+  Assert.deepEqual(
+    new Set(val),
+    new Set(["baz", "biff"]),
+    "keys returns the keys from an object in the context",
+  );
+});
+
+// intersect tests
+add_task(async function testIntersect() {
+  let val;
+
+  val = await FilterExpressions.eval("[1, 2, 3] intersect [4, 2, 6, 7, 3]");
+  Assert.deepEqual(
+    new Set(val),
+    new Set([2, 3]),
+    "intersect finds the common elements between two lists in JEXL",
+  );
+
+  const context = {left: [5, 7], right: [4, 5, 3]};
+  val = await FilterExpressions.eval("left intersect right", context);
+  Assert.deepEqual(
+    new Set(val),
+    new Set([5]),
+    "intersect finds the common elements between two lists in the context",
+  );
+
+  val = await FilterExpressions.eval("['string', 2] intersect [4, 'string', 'other', 3]");
+  Assert.deepEqual(
+    new Set(val),
+    new Set(["string"]),
+    "intersect can compare strings",
+  );
+});

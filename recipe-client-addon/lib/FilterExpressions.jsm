@@ -31,7 +31,9 @@ XPCOMUtils.defineLazyGetter(this, "jexl", () => {
     preferenceValue: PreferenceFilters.preferenceValue,
     preferenceIsUserSet: PreferenceFilters.preferenceIsUserSet,
     preferenceExists: PreferenceFilters.preferenceExists,
+    keys,
   });
+  jexl.addBinaryOp("intersect", 40, operatorIntersect);
   return jexl;
 });
 
@@ -41,3 +43,23 @@ this.FilterExpressions = {
     return jexl.eval(onelineExpr, context);
   },
 };
+
+/**
+ * Return an array of the given object's own keys (specifically, its enumerable
+ * properties).
+ * @param {Object} obj
+ * @return {Array[String]}
+ */
+function keys(obj) {
+  return Object.keys(obj);
+}
+
+/**
+ * Find all the values that are present in both lists.
+ * @param {Array} listA
+ * @param {Array} listB
+ * @return {Array}
+ */
+function operatorIntersect(listA, listB) {
+  return listA.filter(item => listB.includes(item));
+}
