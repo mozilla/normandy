@@ -23,21 +23,21 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   // Create before install so that the listener is added before startup completes.
   const startupPromise = AddonTestUtils.promiseWebExtensionStartup("normandydriver@example.com");
 
-  var addonId = await driver.installAddon(xpiUrl);
+  var addonId = await driver.addons.install(xpiUrl);
   is(addonId, "normandydriver@example.com", "Expected test addon was installed");
   isnot(addonId, null, "Addon install was successful");
 
   // Wait until the add-on is fully started up to uninstall it.
   await startupPromise;
 
-  const uninstallMsg = await driver.uninstallAddon(addonId);
+  const uninstallMsg = await driver.addons.uninstall(addonId);
   is(uninstallMsg, null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
 }));
 
 add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
   const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
   try {
-    await driver.uninstallAddon(invalidAddonId);
+    await driver.addons.uninstall(invalidAddonId);
     ok(false, `Uninstalling an invalid XPI should fail.  uninstallAddon resolved successfully though.`);
   } catch (e) {
     ok(true, `This is the expected failure`);
@@ -48,7 +48,7 @@ add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
 add_task(withDriver(Assert, async function installXpiBadURL(driver) {
   const xpiUrl = "file:///tmp/invalid_xpi.xpi";
   try {
-    await driver.installAddon(xpiUrl);
+    await driver.addons.install(xpiUrl);
     ok(false, "Installation succeeded on an XPI that doesn't exist");
   } catch (reason) {
     ok(true, `Installation was rejected: [${reason}]`);
