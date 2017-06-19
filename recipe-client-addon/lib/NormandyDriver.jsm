@@ -157,6 +157,29 @@ this.NormandyDriver = function(sandboxManager) {
     },
 
     addons: {
+      /**
+       * Get information about an installed add-on by ID.
+       *
+       * @param {string} addonId
+       * @returns {Object} Object containing id, installDate,
+       *                   isActive, name, type, and version of addon.
+       */
+      get: sandboxManager.wrapAsync(async function get(addonId) {
+        const addon = await AddonManager.getAddonByID(addonId);
+
+        if (!addon) {
+          return null;
+        }
+        return {
+          id: addon.id,
+          installDate: new Date(addon.installDate),
+          isActive: true,
+          name: addon.name,
+          type: addon.type,
+          version: addon.version,
+        };
+      }, {cloneInto: true}),
+
       /*
       * Return a promise that resolves to an Addon ID if installation is successful.
       */
