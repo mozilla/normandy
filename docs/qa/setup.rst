@@ -101,16 +101,6 @@ Any reference to ``localhost`` should be replaced with the IP where Docker is
 actually running. When using Docker Machine, this is the output of
 ``docker-machine ip``.
 
-.. describe:: browser.selfsupport.url
-
-  The URL that Firefox's built-in Self Repair will load. Change this to
-  ``https://localhost:8443/%LOCALE%/repair`` to use the docker-compose Normandy.
-
-.. describe:: browser.uitour.testingOrigins
-
-  A comma-seperated list of domains UITour can run on. In order for Actions to
-  run correctly without the add-on, add ``https://localhost:8443`` to this value.
-
 .. describe:: extensions.shield-recipe-client@mozilla.org.api_url
 
   The URL that the add-on will fetch recipes from. Set this to

@@ -110,6 +110,9 @@ from the rest of the command by ``--``:
 
 Self-Repair Setup
 -----------------
+.. note:: Self-repair has been removed from recent versions of Firefox and is
+   disabled by the Shield system add-on.
+
 Normandy has a self-support-compatible endpoint. If you want to test out using
 Normandy as a self-support server, you can point Firefox to it by setting the
 ``browser.selfsupport.url`` value in ``about:config`` to
