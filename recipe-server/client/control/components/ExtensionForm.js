@@ -2,18 +2,48 @@ import { Map } from 'immutable';
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { initialize, reduxForm } from 'redux-form';
+import { Field, initialize, reduxForm } from 'redux-form';
+import _ from 'underscore';
 
-import QueryExtension from './data/QueryExtension';
-import { ControlField } from './Fields';
-import { showNotification } from '../actions/NotificationActions';
-import { createExtension, updateExtension } from '../state/extensions/actions';
-import { getExtension } from '../state/extensions/selectors';
+import QueryExtension from 'control/components/data/QueryExtension';
+import { ControlField } from 'control/components/Fields';
+import { showNotification } from 'control/actions/NotificationActions';
+import { createExtension, updateExtension } from 'control/state/extensions/actions';
+import { getExtension } from 'control/state/extensions/selectors';
+
+
+const adaptFileEventToValue = delegate =>
+  e => delegate(e.target.files[0]);
+
+const FileInput = ({
+  input: {
+    value: omitValue, // eslint-disable-line no-unused-vars
+    onChange,
+    onBlur,
+    ...inputProps,
+  },
+  meta: omitMeta, // eslint-disable-line no-unused-vars
+  ...props,
+}) => (
+  <input
+    onChange={adaptFileEventToValue(onChange)}
+    onBlur={adaptFileEventToValue(onBlur)}
+    type="file"
+    {...inputProps}
+    {...props}
+  />
+);
+
+FileInput.propTypes = {
+  input: pt.object,
+  meta: pt.any,
+};
 
 
 class ExtensionForm extends React.Component {
   static propTypes = {
     createExtension: pt.func.isRequired,
+    extension: pt.object,
     extensionId: pt.number,
     handleSubmit: pt.func.isRequired,
     initializeForm: pt.func.isRequired,
@@ -31,7 +61,7 @@ class ExtensionForm extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { initialValues, initializeForm } = this.props;
 
-    if (initialValues.id !== nextProps.initialValues.id) {
+    if (!_.isEqual(initialValues, nextProps.initialValues)) {
       initializeForm('extension', nextProps.initialValues);
     }
   }
@@ -40,15 +70,8 @@ class ExtensionForm extends React.Component {
     const { extensionId } = this.props;
     const data = values;
 
-    // Remove the XPI value passed through because this is the URL of the existing XPI
-    if (data.xpi) {
+    if (!(data.xpi instanceof File)) {
       delete data.xpi;
-    }
-
-    // Store the newly selected XPI with the key `xpi`.
-    if (data.xpiUpload) {
-      data.xpi = data.xpiUpload[0];
-      delete data.xpiUpload;
     }
 
     try {
@@ -57,21 +80,21 @@ class ExtensionForm extends React.Component {
       } else {
         await this.props.createExtension(data);
       }
+
+      this.props.showNotification({
+        messageType: 'success',
+        message: 'Extension saved.',
+      });
     } catch (error) {
       this.props.showNotification({
         messageType: 'error',
         message: 'Extension cannot be saved. Please correct any errors listed in the form below.',
       });
     }
-
-    this.props.showNotification({
-      messageType: 'success',
-      message: 'Extension saved.',
-    });
   }
 
   render() {
-    const { extensionId, handleSubmit } = this.props;
+    const { extension, extensionId, handleSubmit } = this.props;
 
     return (
       <form className="recipe-form">
@@ -89,31 +112,28 @@ class ExtensionForm extends React.Component {
         />
 
         {
-          extensionId ?
-            <ControlField
-              label="XPI URL"
-              name="xpi"
-              component="input"
-              type="text"
-              disabled
-            />
-            : null
+          extension &&
+            <label className="form-field">
+              <span className="label">XPI URL</span>
+              <a className="display-field" href={extension.get('xpi', '#')} target="_blank">
+                {extension.get('xpi')}
+              </a>
+            </label>
         }
 
-        <ControlField
-          label="Upload New XPI"
-          name="xpiUpload"
-          component="input"
-          type="file"
-          accept=".xpi"
-        />
+        <label className="form-field">
+          <span className="label">Upload a new XPI</span>
+          <Field name="xpi" component={FileInput} accept=".xpi" />
+        </label>
 
         <div className="form-actions">
           <button
             className="button action-save submit"
             type="submit"
             onClick={handleSubmit(this.handleSave)}
-          >Save</button>
+          >
+            Save
+          </button>
         </div>
       </form>
     );
@@ -125,6 +145,7 @@ export default connect(
     const pk = parseInt(props.params.pk, 10);
     return {
       extensionId: pk,
+      extension: getExtension(state, pk, new Map()),
       initialValues: getExtension(state, pk, new Map()).toJS(),
     };
   },

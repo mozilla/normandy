@@ -38,9 +38,11 @@ label,
 
 input,
 select,
-textarea {
+textarea,
+.display-field {
   border: 1px solid $darkCream;
   border-radius: 3px;
+  display: block;
   font: normal normal 300 15px/30px $SourceSansPro;
   padding: 5px 10px;
   text-transform: none;

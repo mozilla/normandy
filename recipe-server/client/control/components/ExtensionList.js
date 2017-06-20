@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Table, Thead, Th, Tr, Td } from 'reactable';
 
-import QueryExtensions from './data/QueryExtensions';
-import { getAllExtensions } from '../state/extensions/selectors';
-import { isRequestInProgress } from '../state/requests/selectors';
+import QueryExtensions from 'control/components/data/QueryExtensions';
+import { getAllExtensions } from 'control/state/extensions/selectors';
+import { isRequestInProgress } from 'control/state/requests/selectors';
 
 
 class ExtensionList extends React.Component {
