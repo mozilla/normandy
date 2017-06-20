@@ -329,6 +329,11 @@ class Base(Core):
 
     PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, 'product_details'))
 
+    # AWS settings
+    AWS_ACCESS_KEY_ID = values.Value()
+    AWS_SECRET_ACCESS_KEY = values.Value()
+    AWS_STORAGE_BUCKET_NAME = values.Value()
+
 
 class Development(Base):
     """Settings for local development."""
