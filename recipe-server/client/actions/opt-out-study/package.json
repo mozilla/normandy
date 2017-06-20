@@ -1,0 +1,30 @@
+{
+    "name": "opt-out-study",
+    "version": "0.0.1",
+    "private": true,
+    "main": "./index.js",
+    "normandy": {
+        "driverVersion": "1.x",
+        "argumentsSchema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "title": "Enroll a user in an opt-out SHIELD study",
+            "type": "object",
+            "required": [
+                "message",
+                "extension"
+            ],
+            "properties": {
+                "message": {
+                    "description": "Message to log to the console",
+                    "type": "string",
+                    "default": ""
+                },
+                "extension": {
+                    "description": "URL of the extension XPI",
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        }
+    }
+}

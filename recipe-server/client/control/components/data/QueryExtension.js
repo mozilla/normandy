@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { fetchExtension } from 'control/state/extensions/actions';
 
 
-class QueryExtensions extends React.Component {
+class QueryExtension extends React.Component {
   static propTypes = {
     fetchExtension: pt.func,
     pk: pt.number.isRequired,
@@ -34,4 +34,4 @@ export default connect(
   dispatch => (bindActionCreators({
     fetchExtension,
   }, dispatch)),
-)(QueryExtensions);
+)(QueryExtension);
