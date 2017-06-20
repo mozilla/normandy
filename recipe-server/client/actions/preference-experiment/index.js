@@ -16,13 +16,7 @@ export function resetAction() {
  * affects Firefox via Telemetry.
  */
 export default class PreferenceExperimentAction extends Action {
-  execute() {
-    // Babel's async transform handles the promises in such a way that it tries
-    // to call `then` on Promises from a privileged context. I'm not entirely
-    // sure why, but it works fine if we use Promises directly.
-    //
-    // Once we remove self-repair support, we should be able to use native
-    // async/await anyway, which solves the issue.
+  async execute() {
     const {
       slug, preferenceName, preferenceBranchType, branches, preferenceType,
     } = this.recipe.arguments;
@@ -31,38 +25,35 @@ export default class PreferenceExperimentAction extends Action {
     // Exit early if we're on an incompatible client.
     if (experiments === undefined) {
       this.normandy.log('Client does not support preference experiments, aborting.', 'info');
-      return Promise.resolve();
+      return;
     }
 
     seenExperimentNames.push(slug);
-    return experiments.has(slug).then(hasSlug => {
-      // If the experiment doesn't exist yet, enroll!
-      if (!hasSlug) {
-        return this.chooseBranch(branches).then(branch =>
-          experiments.start({
-            name: slug,
-            branch: branch.slug,
-            preferenceName,
-            preferenceValue: branch.value,
-            preferenceBranchType,
-            preferenceType,
-          })
-        );
-      }
 
-      // If the experiment exists, and isn't expired, bump the lastSeen date.
-      return experiments.get(slug).then(experiment => {
-        if (experiment.expired) {
-          this.normandy.log(`Experiment ${slug} has expired, aborting.`, 'debug');
-          return true;
-        }
-
-        return experiments.markLastSeen(slug);
+    // If the experiment doesn't exist yet, enroll!
+    const hasSlug = await experiments.has(slug);
+    if (!hasSlug) {
+      const branch = await this.chooseBranch(branches);
+      await experiments.start({
+        name: slug,
+        branch: branch.slug,
+        preferenceName,
+        preferenceValue: branch.value,
+        preferenceBranchType,
+        preferenceType,
       });
-    });
+    } else {
+      // If the experiment exists, and isn't expired, bump the lastSeen date.
+      const experiment = await experiments.get(slug);
+      if (experiment.expired) {
+        this.normandy.log(`Experiment ${slug} has expired, aborting.`, 'debug');
+      } else {
+        await experiments.markLastSeen(slug);
+      }
+    }
   }
 
-  chooseBranch(branches) {
+  async chooseBranch(branches) {
     const slug = this.recipe.arguments.slug;
     const ratios = branches.map(branch => branch.ratio);
 
@@ -74,7 +65,8 @@ export default class PreferenceExperimentAction extends Action {
     //   receive users)
     const input = `${this.normandy.userId}-${slug}-branch`;
 
-    return this.normandy.ratioSample(input, ratios).then(index => branches[index]);
+    const index = await this.normandy.ratioSample(input, ratios);
+    return branches[index];
   }
 }
 registerAction('preference-experiment', PreferenceExperimentAction);
@@ -83,22 +75,19 @@ registerAction('preference-experiment', PreferenceExperimentAction);
  * Finds active experiments that were not stored in the seenExperimentNames list
  * during action execution, and stop them.
  */
-export function postExecutionHook(normandy) {
+export async function postExecutionHook(normandy) {
   // Exit early if we're on an incompatible client.
   if (normandy.preferenceExperiments === undefined) {
     normandy.log('Client does not support preference experiments, aborting.', 'info');
-    return Promise.resolve();
+    return;
   }
 
   // If any of the active experiments were not seen during a run, stop them.
-  return normandy.preferenceExperiments.getAllActive().then(activeExperiments => {
-    const stopPromises = [];
-    for (const experiment of activeExperiments) {
-      if (!seenExperimentNames.includes(experiment.name)) {
-        stopPromises.push(normandy.preferenceExperiments.stop(experiment.name, true));
-      }
+  const activeExperiments = await normandy.preferenceExperiments.getAllActive();
+  for (const experiment of activeExperiments) {
+    if (!seenExperimentNames.includes(experiment.name)) {
+      await normandy.preferenceExperiments.stop(experiment.name, true);
     }
-    return Promise.all(stopPromises);
-  });
+  }
 }
 registerAsyncCallback('postExecution', postExecutionHook);
