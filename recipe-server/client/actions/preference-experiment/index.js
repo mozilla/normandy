@@ -33,6 +33,18 @@ export default class PreferenceExperimentAction extends Action {
     // If the experiment doesn't exist yet, enroll!
     const hasSlug = await experiments.has(slug);
     if (!hasSlug) {
+      // If there's already an active experiment using this preference, abort.
+      const activeExperiments = await experiments.getAllActive();
+      const hasConflicts = activeExperiments.some(exp => exp.preferenceName === preferenceName);
+      if (hasConflicts) {
+        this.normandy.log(
+          `Experiment ${slug} ignored; another active experiment is already using the
+          ${preferenceName} preference.`, 'warn'
+        );
+        return;
+      }
+
+      // Otherwise, enroll!
       const branch = await this.chooseBranch(branches);
       await experiments.start({
         name: slug,

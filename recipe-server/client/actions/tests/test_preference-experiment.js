@@ -214,6 +214,26 @@ describe('PreferenceExperimentAction', () => {
         expect(unseen.expired).toBe(true);
       },
     );
+
+    it('should do nothing if the preference is already being actively tested', async () => {
+      spyOn(normandy.preferenceExperiments, 'start').and.callThrough();
+      normandy.preferenceExperiments.experiments.conflict = {
+        name: 'conflict',
+        preferenceName: 'conflict.pref',
+        expired: false,
+      };
+      const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+        slug: 'unseen',
+        preferenceName: 'conflict.pref',
+      }));
+      spyOn(action, 'chooseBranch').and.callFake(branches => Promise.resolve(branches[0]));
+
+      await action.execute();
+      await postExecutionHook(normandy);
+
+      expect(normandy.preferenceExperiments.start).not.toHaveBeenCalled();
+      expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'warn');
+    });
   });
 
   describe('chooseBranch', () => {
