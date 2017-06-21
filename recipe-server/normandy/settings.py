@@ -391,7 +391,6 @@ class ProductionInsecure(Production):
     CSRF_COOKIE_SECURE = values.BooleanValue(False)
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SESSION_COOKIE_SECURE = values.BooleanValue(False)
-    DEFAULT_FILE_STORAGE = values.Value('django.core.files.storage.FileSystemStorage')
 
     # These checks aren't useful for a purposefully insecure environment
     SILENCED_SYSTEM_CHECKS = values.ListValue([
