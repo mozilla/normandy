@@ -284,7 +284,7 @@ in other Django projects.
    The Access Key ID for an AWS user with read/write access to the S3 bucket.
    This is required by django-storages_ to access S3.
 
-    .. _django-storages:
+    .. _django-storages: https://github.com/jschneier/django-storages
 
 .. envvar:: DJANGO_AWS_SECRET_ACCESS_KEY
 
