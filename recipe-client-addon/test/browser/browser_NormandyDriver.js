@@ -1,5 +1,6 @@
 "use strict";
 
+Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 
 add_task(withDriver(Assert, async function uuids(driver) {
@@ -18,14 +19,16 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   dir.append("fixtures");
   dir.append("normandy.xpi");
   const xpiUrl = Services.io.newFileURI(dir).spec;
+
+  // Create before install so that the listener is added before startup completes.
+  const startupPromise = AddonTestUtils.promiseWebExtensionStartup("normandydriver@example.com");
+
   var addonId = await driver.installAddon(xpiUrl);
   is(addonId, "normandydriver@example.com", "Expected test addon was installed");
   isnot(addonId, null, "Addon install was successful");
 
-  // Installing kicks off an asychronous process which tries to read the manifest.json
-  // to startup the addon. Note that onInstallEnded is triggered too early
-  // which is why we need this delay.
-  await new Promise(resolve => SimpleTest.executeSoon(resolve));
+  // Wait until the add-on is fully started up to uninstall it.
+  await startupPromise;
 
   const uninstallMsg = await driver.uninstallAddon(addonId);
   is(uninstallMsg, null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
