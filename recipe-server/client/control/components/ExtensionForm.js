@@ -115,7 +115,12 @@ class ExtensionForm extends React.Component {
           extension &&
             <label className="form-field">
               <span className="label">XPI URL</span>
-              <a className="display-field" href={extension.get('xpi', '#')} target="_blank">
+              <a
+                className="display-field"
+                href={extension.get('xpi', '#')}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {extension.get('xpi')}
               </a>
             </label>
