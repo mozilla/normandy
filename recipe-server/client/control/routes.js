@@ -4,7 +4,6 @@ import ControlApp from 'control/components/ControlApp';
 import RecipeList from 'control/components/RecipeList';
 import RecipeForm from 'control/components/RecipeForm';
 import RecipeHistory from 'control/components/RecipeHistory';
-import RecipePreview from 'control/components/RecipePreview';
 import DeleteRecipe from 'control/components/DeleteRecipe';
 import EnableRecipe from 'control/components/EnableRecipe';
 import DisableRecipe from 'control/components/DisableRecipe';
@@ -31,7 +30,6 @@ export default (
           component={RecipeForm}
           ctaButtons={[
             { text: 'Clone', icon: 'files-o', link: 'clone/' },
-            { text: 'Preview', icon: 'eye', link: 'preview/' },
             { text: 'History', icon: 'history', link: 'history/' },
           ]}
         />
@@ -41,7 +39,6 @@ export default (
           name="Revision"
           ctaButtons={[
             { text: 'Clone', icon: 'files-o', link: '../../clone/' },
-            { text: 'Preview', icon: 'eye', link: '../../preview/' },
             { text: 'History', icon: 'history', link: '../../history/' },
           ]}
         />
@@ -53,11 +50,6 @@ export default (
           ctaButtons={[
             { text: 'Cancel', icon: 'ban', link: '../' },
           ]}
-        />
-        <Route
-          path="preview/"
-          component={RecipePreview}
-          name="Preview"
         />
         <Route
           path="history/"

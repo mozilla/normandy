@@ -58,10 +58,6 @@ module.exports = [
     devtool: production ? undefined : 'cheap-module-source-map',
 
     entry: {
-      selfrepair: [
-        'babel-polyfill',
-        './client/selfrepair/self_repair.js',
-      ],
       control: [
         'babel-polyfill',
         './client/control/index.js',
@@ -115,7 +111,6 @@ module.exports = [
         client: path.resolve(__dirname, './client'),
         actions: path.resolve(__dirname, './client/actions'),
         control: path.resolve(__dirname, './client/control'),
-        selfrepair: path.resolve(__dirname, './client/selfrepair'),
         tests: path.resolve(__dirname, './client/tests'),
       },
     },

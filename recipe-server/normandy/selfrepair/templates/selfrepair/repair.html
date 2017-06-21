@@ -1,17 +1,11 @@
-{% load staticfiles %}
-{% load render_bundle from normandy_webpack_loader %}
-
 <!DOCTYPE html>
-<html lang="en"
-      data-locale="{{ locale }}"
-      data-recipe-url="{% url 'recipes:recipe-list' %}"
-      data-classify-url="{{ classify_client_url }}"
->
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <link rel="icon" href="data:;base64,=">
   </head>
   <body>
-    {% render_bundle 'selfrepair' %}
+    <h1>Self-Repair</h1>
+    <p>The self-repair system has been replaced by <a href="https://wiki.mozilla.org/Firefox/SHIELD">Shield</a>.</p>
   </body>
 </html>

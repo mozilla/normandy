@@ -9,6 +9,5 @@ creating :ref:`recipes <recipes>`, as well as serving them to users of the
 
    install
    workflow
-   self-repair
    api-tests
    functional-tests
