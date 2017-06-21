@@ -279,6 +279,23 @@ in other Django projects.
    If set, when checking certificates for validity, start failing
    system checks this many days before the certificate would expire.
 
+.. envvar:: DJANGO_AWS_ACCESS_KEY_ID
+
+   The Access Key ID for an AWS user with read/write access to the S3 bucket.
+   This is required by django-storages_ to access S3.
+
+    .. _django-storages:
+
+.. envvar:: DJANGO_AWS_SECRET_ACCESS_KEY
+
+   The Secret Access Key for the AWS user identified by
+   :envvar:`DJANGO_AWS_ACCESS_KEY_ID`. This is also required by
+   django-storages to access S3.
+
+.. envvar:: DJANGO_AWS_STORAGE_BUCKET_NAME
+
+   The name of the S3 bucket to be used to store media files.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the
