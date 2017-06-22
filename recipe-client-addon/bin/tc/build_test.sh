@@ -31,8 +31,11 @@ echo 'ac_add_options --enable-artifact-builds' > ./mozconfig
 mkdir /root/.mozbuild  # Otherwise mach will hang forever asking for permission
 ./mach build
 
-echo 'Running tests'
-xvfb-run ./mach test browser/extensions/shield-recipe-client/
+echo 'Running mochitests'
+xvfb-run ./mach mochitest browser/extensions/shield-recipe-client/test/browser
+
+echo 'Running xpcshell tests'
+xvfb-run ./mach xpcshell-test browser/extensions/shield-recipe-client/test/unit
 
 echo 'Packaging Firefox'
 ./mach package
