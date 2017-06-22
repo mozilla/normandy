@@ -6,38 +6,10 @@ import { Field, initialize, reduxForm } from 'redux-form';
 import _ from 'underscore';
 
 import QueryExtension from 'control/components/data/QueryExtension';
-import { ControlField } from 'control/components/Fields';
+import { ControlField, FileInput } from 'control/components/Fields';
 import { showNotification } from 'control/actions/NotificationActions';
 import { createExtension, updateExtension } from 'control/state/extensions/actions';
 import { getExtension } from 'control/state/extensions/selectors';
-
-
-const adaptFileEventToValue = delegate =>
-  e => delegate(e.target.files[0]);
-
-const FileInput = ({
-  input: {
-    value: omitValue, // eslint-disable-line no-unused-vars
-    onChange,
-    onBlur,
-    ...inputProps,
-  },
-  meta: omitMeta, // eslint-disable-line no-unused-vars
-  ...props,
-}) => (
-  <input
-    onChange={adaptFileEventToValue(onChange)}
-    onBlur={adaptFileEventToValue(onBlur)}
-    type="file"
-    {...inputProps}
-    {...props}
-  />
-);
-
-FileInput.propTypes = {
-  input: pt.object,
-  meta: pt.any,
-};
 
 
 class ExtensionForm extends React.Component {
