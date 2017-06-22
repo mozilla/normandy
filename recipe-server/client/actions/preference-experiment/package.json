@@ -19,7 +19,7 @@
                 "slug": {
                     "description": "Unique identifier for this experiment",
                     "type": "string",
-                    "default": ""
+                    "pattern": "^[A-Za-z0-9\\-_]+$"
                 },
                 "experimentDocumentUrl": {
                     "description": "URL of a document describing the experiment",
@@ -59,7 +59,7 @@
                             "slug": {
                                 "description": "Unique identifier for this branch of the experiment",
                                 "type": "string",
-                                "default": ""
+                                "pattern": "^[A-Za-z0-9\\-_]+$"
                             },
                             "value": {
                                 "description": "Value to set the preference to for this branch",
