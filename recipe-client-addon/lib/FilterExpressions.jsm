@@ -46,20 +46,29 @@ this.FilterExpressions = {
 
 /**
  * Return an array of the given object's own keys (specifically, its enumerable
- * properties).
+ * properties), or undefined if the argument isn't an object.
  * @param {Object} obj
- * @return {Array[String]}
+ * @return {Array[String]|undefined}
  */
 function keys(obj) {
+  if (typeof obj !== "object" || obj === null) {
+    return undefined;
+  }
+
   return Object.keys(obj);
 }
 
 /**
- * Find all the values that are present in both lists.
+ * Find all the values that are present in both lists. Returns undefined if
+ * the arguments are not both Arrays.
  * @param {Array} listA
  * @param {Array} listB
- * @return {Array}
+ * @return {Array|undefined}
  */
 function operatorIntersect(listA, listB) {
+  if (!Array.isArray(listA) || !Array.isArray(listB)) {
+    return undefined;
+  }
+
   return listA.filter(item => listB.includes(item));
 }

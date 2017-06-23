@@ -279,7 +279,8 @@ parameters correspond to the operands.
 .. js:function:: intersect(list1, list2)
 
    Returns an array of all values in ``list1`` that are also present in
-   ``list2``. Values are compared using strict equality.
+   ``list2``. Values are compared using strict equality. If ``list1`` or
+   ``list2`` are not arrays, the returned value is ``undefined``.
 
    :param list1:
       The array to the left of the operator.
@@ -383,7 +384,8 @@ function is the value being transformed.
 .. js:function:: keys(obj)
 
    Return an array of the given object's own keys (specifically, its enumerable
-   properties). Equivalent to `Object.keys`_.
+   properties). Similar to `Object.keys`_, except that if given a non-object,
+   ``keys`` will return ``undefined``.
 
    :param obj:
       Object to get the keys for.

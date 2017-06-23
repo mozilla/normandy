@@ -105,13 +105,41 @@ add_task(async function testKeys() {
   );
 
   // Test an object in the context
-  const context = {ctxObject: {baz: "string", biff: NaN}};
+  let context = {ctxObject: {baz: "string", biff: NaN}};
   val = await FilterExpressions.eval("ctxObject|keys", context);
 
   Assert.deepEqual(
     new Set(val),
     new Set(["baz", "biff"]),
     "keys returns the keys from an object in the context",
+  );
+
+  // Test that values from the prototype are not included
+  context = {ctxObject: Object.create({fooProto: 7})};
+  context.ctxObject.baz = 8;
+  context.ctxObject.biff = 5;
+  is(
+    await FilterExpressions.eval("ctxObject.fooProto", context),
+    7,
+    "Prototype properties are accessible via property access",
+  );
+  val = await FilterExpressions.eval("ctxObject|keys", context);
+  Assert.deepEqual(
+    new Set(val),
+    new Set(["baz", "biff"]),
+    "keys does not return properties from the object's prototype chain",
+  );
+
+  // Return undefined for non-objects
+  is(
+    await FilterExpressions.eval("ctxObject|keys", {ctxObject: 45}),
+    undefined,
+    "keys returns undefined for numbers",
+  );
+  is(
+    await FilterExpressions.eval("ctxObject|keys", {ctxObject: null}),
+    undefined,
+    "keys returns undefined for null",
   );
 });
 
@@ -139,5 +167,22 @@ add_task(async function testIntersect() {
     new Set(val),
     new Set(["string"]),
     "intersect can compare strings",
+  );
+
+  // Return undefined when intersecting things that aren't lists.
+  is(
+    await FilterExpressions.eval("5 intersect 7"),
+    undefined,
+    "intersect returns undefined for numbers",
+  );
+  is(
+    await FilterExpressions.eval("val intersect other", {val: null, other: null}),
+    undefined,
+    "intersect returns undefined for null",
+  );
+  is(
+    await FilterExpressions.eval("5 intersect [1, 2, 5]"),
+    undefined,
+    "intersect returns undefined if only one operand is a list",
   );
 });
