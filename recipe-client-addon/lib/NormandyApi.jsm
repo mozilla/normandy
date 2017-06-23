@@ -11,8 +11,6 @@ Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
   this, "CanonicalJSON", "resource://gre/modules/CanonicalJSON.jsm");
-XPCOMUtils.defineLazyModuleGetter(
-  this, "InvalidSignatureError", "resource://shield-recipe-client/lib/Errors.jsm");
 
 Cu.importGlobalProperties(["fetch", "URL"]); /* globals fetch, URL */
 
@@ -24,6 +22,8 @@ const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 let indexPromise = null;
 
 this.NormandyApi = {
+  InvalidSignatureError: class InvalidSignatureError extends Error {},
+
   clearIndexCache() {
     indexPromise = null;
   },
@@ -94,7 +94,7 @@ this.NormandyApi = {
       const serialized = CanonicalJSON.stringify(recipe);
       if (!rawText.includes(serialized)) {
         log.debug(rawText, serialized);
-        throw new InvalidSignatureError("Canonical recipe serialization does not match!");
+        throw new NormandyApi.InvalidSignatureError("Canonical recipe serialization does not match!");
       }
 
       const certChainResponse = await this.get(this.absolutify(x5u));
@@ -113,11 +113,11 @@ this.NormandyApi = {
           "normandy.content-signature.mozilla.org"
         );
       } catch (err) {
-        throw new InvalidSignatureError(`Recipe signature validation failed: ${err}`);
+        throw new NormandyApi.InvalidSignatureError(`Recipe signature validation failed: ${err}`);
       }
 
       if (!valid) {
-        throw new InvalidSignatureError("Recipe signature is not valid");
+        throw new NormandyApi.InvalidSignatureError("Recipe signature is not valid");
       }
 
       verifiedRecipes.push(recipe);

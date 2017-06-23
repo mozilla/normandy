@@ -6,7 +6,6 @@ Cu.import("resource://testing-common/httpd.js");
 Cu.import("resource://gre/modules/CanonicalJSON.jsm", this);
 Cu.import("resource://gre/modules/osfile.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/Errors.jsm", this); /* globals InvalidSignatureError */
 
 load("utils.js"); /* globals withMockPreferences */
 
@@ -158,14 +157,16 @@ add_task(async function test_fetchRecipes_canonical_mismatch() {
     await NormandyApi.fetchRecipes();
     ok(false, "fetchRecipes did not throw for canonical JSON mismatch");
   } catch (err) {
-    ok(err instanceof InvalidSignatureError, "Error was not an InvalidSignatureError");
-    ok(/Canonical/.test(err), "Error was not due to canonical JSON mismatch");
+    ok(err instanceof NormandyApi.InvalidSignatureError, "Error is an InvalidSignatureError");
+    ok(/Canonical/.test(err), "Error is due to canonical JSON mismatch");
   }
 
   getApiUrl.restore();
   get.restore();
 });
 
+// Test validation errors due to validation throwing an exception (e.g. when
+// parameters passed to validation are malformed).
 add_task(async function test_fetchRecipes_validation_error() {
   const getApiUrl = sinon.stub(NormandyApi, "getApiUrl").resolves("http://localhost/recipes/");
 
@@ -190,22 +191,24 @@ add_task(async function test_fetchRecipes_validation_error() {
     await NormandyApi.fetchRecipes();
     ok(false, "fetchRecipes did not throw for a validation error");
   } catch (err) {
-    ok(err instanceof InvalidSignatureError, "Error was not an InvalidSignatureError");
-    ok(/signature/.test(err), "Error was not due to a validation error");
+    ok(err instanceof NormandyApi.InvalidSignatureError, "Error is an InvalidSignatureError");
+    ok(/signature/.test(err), "Error is due to a validation error");
   }
 
   getApiUrl.restore();
   get.restore();
 });
 
+// Test validation errors due to validation returning false (e.g. when parameters
+// passed to validation are correctly formed, but not valid for the data).
 const invalidSignatureServer = makeMockApiServer(do_get_file("invalid_recipe_signature_api"));
 add_task(withServer(invalidSignatureServer, async function test_fetchRecipes_invalid_signature() {
   try {
     await NormandyApi.fetchRecipes();
     ok(false, "fetchRecipes did not throw for an invalid signature");
   } catch (err) {
-    ok(err instanceof InvalidSignatureError, "Error was not an InvalidSignatureError");
-    ok(/signature/.test(err), "Error was not due to an invalid signature");
+    ok(err instanceof NormandyApi.InvalidSignatureError, "Error is an InvalidSignatureError");
+    ok(/signature/.test(err), "Error is due to an invalid signature");
   }
 }));
 

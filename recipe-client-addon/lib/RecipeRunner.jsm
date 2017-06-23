@@ -31,8 +31,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "ActionSandboxManager",
                                   "resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "StudyStorage",
                                   "resource://shield-recipe-client/lib/StudyStorage.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "InvalidSignatureError",
-                                  "resource://shield-recipe-client/lib/Errors.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Uptake",
                                   "resource://shield-recipe-client/lib/Uptake.jsm");
 
@@ -127,7 +125,7 @@ this.RecipeRunner = {
       let status = Uptake.RUNNER_SERVER_ERROR;
       if (/NetworkError/.test(e)) {
         status = Uptake.RUNNER_NETWORK_ERROR;
-      } else if (e instanceof InvalidSignatureError) {
+      } else if (e instanceof NormandyApi.InvalidSignatureError) {
         status = Uptake.RUNNER_INVALID_SIGNATURE;
       }
       Uptake.reportRunner(status);

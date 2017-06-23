@@ -8,7 +8,6 @@ Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Uptake.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/Errors.jsm", this); /* global InvalidSignatureError */
 
 add_task(async function getFilterContext() {
   const recipe = {id: 17, arguments: {foo: "bar"}, unrelated: false};
@@ -221,7 +220,7 @@ add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
 
     // Test that signature issues report a specific uptake error
     reportRunner.reset();
-    mockApi.fetchRecipes.rejects(new InvalidSignatureError("Signature fail"));
+    mockApi.fetchRecipes.rejects(new NormandyApi.InvalidSignatureError("Signature fail"));
     await RecipeRunner.run();
     sinon.assert.calledWith(reportRunner, Uptake.RUNNER_INVALID_SIGNATURE);
   });

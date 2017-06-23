@@ -28,7 +28,6 @@ this.shutdown = function(data, reason) {
     "lib/CleanupManager.jsm",
     "lib/ClientEnvironment.jsm",
     "lib/FilterExpressions.jsm",
-    "lib/Errors.jsm",
     "lib/EventEmitter.jsm",
     "lib/Heartbeat.jsm",
     "lib/LogManager.jsm",
