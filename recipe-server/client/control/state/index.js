@@ -4,6 +4,7 @@ import { reducer as form } from 'redux-form';
 
 import actions from './actions/reducers';
 import approvalRequests from './approvalRequests/reducers';
+import extensions from './extensions/reducers';
 import recipes from './recipes/reducers';
 import requests from './requests/reducers';
 import revisions from './revisions/reducers';
@@ -12,6 +13,7 @@ import revisions from './revisions/reducers';
 const reducer = combineReducers({
   actions,
   approvalRequests,
+  extensions,
   form,
   recipes,
   requests,

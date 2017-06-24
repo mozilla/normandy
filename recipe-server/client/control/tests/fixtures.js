@@ -162,6 +162,9 @@ export const initialState = {
     approvalRequests: {
       items: new Map(),
     },
+    extensions: {
+      items: new Map(),
+    },
     form: {},
     recipes: {
       filters: new Map(),

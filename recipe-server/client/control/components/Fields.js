@@ -190,3 +190,37 @@ export class CheckboxGroup extends React.Component {
     );
   }
 }
+
+
+/**
+ * Input component for handling files
+ */
+function adaptFileEventToValue(delegate) {
+  return e => delegate(e.target.files[0]);
+}
+
+export function FileInput({
+  input: {
+    value: omitValue, // eslint-disable-line no-unused-vars
+    onChange,
+    onBlur,
+    ...inputProps,
+  },
+  meta: omitMeta, // eslint-disable-line no-unused-vars
+  ...props,
+}) {
+  return (
+    <input
+      onChange={adaptFileEventToValue(onChange)}
+      onBlur={adaptFileEventToValue(onBlur)}
+      type="file"
+      {...inputProps}
+      {...props}
+    />
+  );
+}
+
+FileInput.propTypes = {
+  input: pt.object,
+  meta: pt.any,
+};

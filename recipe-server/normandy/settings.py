@@ -15,6 +15,7 @@ class Core(Configuration):
         'normandy.health.apps.HealthApp',
         'normandy.recipes.apps.RecipesApp',
         'normandy.selfrepair',
+        'normandy.studies',
         'product_details',
         'rest_framework',
         'rest_framework.authtoken',
@@ -328,6 +329,11 @@ class Base(Core):
 
     PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, 'product_details'))
 
+    # AWS settings
+    AWS_ACCESS_KEY_ID = values.Value()
+    AWS_SECRET_ACCESS_KEY = values.Value()
+    AWS_STORAGE_BUCKET_NAME = values.Value()
+
 
 class Development(Base):
     """Settings for local development."""
@@ -356,6 +362,7 @@ class Production(Base):
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
     LOGGING_USE_JSON = values.Value(True)
     SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
+    DEFAULT_FILE_STORAGE = values.Value('storages.backends.s3boto3.S3Boto3Storage')
 
 
 class ProductionReadOnly(Production):

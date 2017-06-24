@@ -4,6 +4,9 @@ alabaster==0.7.7 \
 Babel==2.2.0 \
     --hash=sha256:fed07cbcdcb3de79b53a8220eebed21c93f8dbb3dbce1d9c6b1c4b09e8aecf2b \
     --hash=sha256:d8cb4c0e78148aee89560f9fe21587aa57739c975bb89ff66b1e842cc697428f
+botocore==1.5.71 \
+    --hash=sha256:c3c8bcb554e450be658d183548e7d4ea24099cf3a4b18a95fe2e376c03c76cd1 \
+    --hash=sha256:d5f5e1f4ea8df0efd7fa597ed2e6f73c620ea8696b5ec90779c46baa2012efb9
 cffi==1.5.2 \
     --hash=sha256:810c52902a8a8ebdf37c3097930de1e51f0a70167444faa91f426228bc3f5277 \
     --hash=sha256:10154ed65b135fd1e94df56e6e05796c2c745e62c3233d147bf873417efdc9aa \
@@ -40,6 +43,9 @@ itypes==1.1.0 \
 Jinja2==2.8 \
     --hash=sha256:1cc03ef32b64be19e0a5b54578dd790906a34943fe9102cfdae0d4495bd536b4 \
     --hash=sha256:bc1ff2ff88dbfacefde4ddde471d1417d3b304e8df103a7a9437d47269201bf4
+jmespath==0.9.3 \
+    --hash=sha256:f11b4461f425740a1d908e9a3f7365c3d2e569f6ca68a2ff8bc5bcd9676edd63 \
+    --hash=sha256:6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64
 MarkupSafe==0.23 \
     --hash=sha256:a4ec1aff59b95a14b45eb2e23761a0179e98319da5a7eb76b56ea8cdc7b871c3
 mohawk==0.3.4 \
@@ -73,6 +79,10 @@ Pygments==2.1 \
     --hash=sha256:3e723f70dc47b4ad5ca3ab4f1d1c3f76438b3dc74d6a843ded3e154e8af99838 \
     --hash=sha256:148e04b185d3541b8d702e8cde3ee5acd06b31cc0d474127baba9f4652b2aaf1 \
     --hash=sha256:13a0ef5fafd7b16cf995bc28fe7aab0780dab1b2fda0fc89e033709af8b8a47b
+python-dateutil==2.6.0 \
+    --hash=sha256:62a2f8df3d66f878373fd0072eacf4ee52194ba302e00082828e0d263b0418d2 \
+    --hash=sha256:3acbef017340600e9ff8f2994d8f7afd6eacb295383f286466a6df3961e486f0 \
+    --hash=sha256:537bf2a8f8ce6f6862ad705cd68f9e405c0b5db014aa40fa29eab4335d4b1716
 pytz==2015.7 \
     --hash=sha256:3ede470d3d17ba3c07638dfa0d10452bc1b6e5ad326127a65ba77e6aaeb11bec \
     --hash=sha256:e079b1dadc5c06246cc1bb6fe1b23a50b1d1173f2edd5104efd40bb73a28f406 \
@@ -82,6 +92,9 @@ pytz==2015.7 \
 PyYAML==3.11 \
     --hash=sha256:c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b0846e8 \
     --hash=sha256:19bb3ac350ef878dda84a62d37c7d5c17a137386dde9c2ce7249c7a21d7f6ac9
+s3transfer==0.1.10 \
+    --hash=sha256:bc52f38637f37572ae180c08a2dd87a4825b46713797633aab6e1a42d6b2b8ff \
+    --hash=sha256:ba1a9104939b7c0331dc4dd234d79afeed8b66edce77bbeeecd4f56de74a0fc1
 setuptools==19.6 \
     --hash=sha256:57c63a363b37ffa2d64db4ffee26844e3ab81441fc02da4cd5e8cafcff9acb3a \
     --hash=sha256:ecd48d753c1a8ecc6a2826b863a6defaafbfd4ceafc0c1d62e5362f5a86912e9 \
