@@ -40,11 +40,16 @@ var plugins = [
 if (production) {
   plugins = plugins.concat([
     new webpack.optimize.DedupePlugin(),
-    new BabiliPlugin({}, {
-      // Use our own pinned versions of babel and babili in case deduplication fails
-      babel: babelCore,
-      babili: babiliPreset,
-    }),
+    new BabiliPlugin(
+      { // babiliOptions
+        evaluate: false, // mozilla/normandy#827
+      },
+      { // overrides
+        // Use our own pinned versions of babel and babili in case deduplication fails
+        babel: babelCore,
+        babili: babiliPreset,
+      }
+    ),
   ]);
 } else {
   plugins = plugins.concat([
