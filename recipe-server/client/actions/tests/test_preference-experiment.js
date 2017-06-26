@@ -1,22 +1,30 @@
+import Ajv from 'ajv';
+import json4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
+
 import PreferenceExperimentAction, {
   postExecutionHook,
   resetAction,
 } from '../preference-experiment/';
+import packageJson from '../preference-experiment/package.json';
 import { recipeFactory } from '../../tests/utils.js';
 import { MockStorage } from './utils.js';
 
+function argumentsFactory(args) {
+  return {
+    slug: 'test',
+    preferenceName: 'fake.preference',
+    preferenceType: 'string',
+    preferenceBranchType: 'default',
+    branches: [
+      { slug: 'test', value: 'foo', ratio: 1 },
+    ],
+    ...args,
+  };
+}
+
 function preferenceExperimentFactory(args) {
   return recipeFactory({
-    arguments: {
-      slug: 'test',
-      preferenceName: 'fake.preference',
-      preferenceType: 'string',
-      preferenceBranchType: 'default',
-      branches: [
-        { slug: 'test', value: 'foo', ratio: 1 },
-      ],
-      ...args,
-    },
+    arguments: argumentsFactory(args),
   });
 }
 
@@ -57,6 +65,49 @@ class MockPreferenceExperiments {
     return name in this.experiments;
   }
 }
+
+describe('Preference Experiment Schema', () => {
+  const ajv = new Ajv();
+  ajv.addMetaSchema(json4MetaSchema);
+  ajv.addSchema(packageJson.normandy.argumentsSchema, 'prefexp');
+
+  const invalidSlugs = [
+    '  unallowed whitespace  ',
+    'unallowed+special&characters',
+    'no,commas,please',
+    '',
+  ];
+  const validSlugs = [
+    'singlewordisfine',
+    'underscores_are_good',
+    'so-are-dashes',
+    '4nd-3v3n-numb3r5',
+  ];
+
+  it('should validate experiment slugs', () => {
+    for (const slug of invalidSlugs) {
+      const args = argumentsFactory({ slug });
+      expect(ajv.validate('prefexp', args)).toBe(false);
+    }
+
+    for (const slug of validSlugs) {
+      const args = argumentsFactory({ slug });
+      expect(ajv.validate('prefexp', args)).toBe(true);
+    }
+  });
+
+  it('should validate branch slugs', () => {
+    for (const slug of invalidSlugs) {
+      const args = argumentsFactory({ branches: [{ slug, value: 'foo', ratio: 2 }] });
+      expect(ajv.validate('prefexp', args)).toBe(false);
+    }
+
+    for (const slug of validSlugs) {
+      const args = argumentsFactory({ branches: [{ slug, value: 'foo', ratio: 2 }] });
+      expect(ajv.validate('prefexp', args)).toBe(true);
+    }
+  });
+});
 
 describe('PreferenceExperimentAction', () => {
   let normandy;
