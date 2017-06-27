@@ -69,6 +69,11 @@ module.exports = [
         './client/control/sass/control.scss',
         './node_modules/font-awesome/scss/font-awesome.scss',
       ],
+      control_new: [
+        'babel-polyfill',
+        './client/control_new/index.js',
+        './client/control_new/scss/main.scss',
+      ],
     },
 
     output: {
@@ -117,6 +122,7 @@ module.exports = [
         actions: path.resolve(__dirname, './client/actions'),
         control: path.resolve(__dirname, './client/control'),
         tests: path.resolve(__dirname, './client/tests'),
+        control_new: path.resolve(__dirname, './client/control_new'),
       },
     },
   },
