@@ -1,4 +1,4 @@
-import { Breadcrumb, Layout, LocaleProvider, Menu, SubMenu } from 'antd';
+import { Breadcrumb, Layout, LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
 import React, { PropTypes as pt } from 'react';
 
