@@ -11,12 +11,12 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     apt-get update && apt-get install -y nodejs
 RUN npm install -g npm@5
 
-USER app
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
 RUN pip install -U 'pip>=8' && \
-    pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
-    npm install
+    pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt
+USER app
+RUN npm install
 
 COPY . /app
 RUN NODE_ENV=production ./node_modules/.bin/webpack && \
