@@ -11,6 +11,7 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     apt-get update && apt-get install -y nodejs
 RUN npm install -g npm@5
 
+USER app
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
 RUN pip install -U 'pip>=8' && \
@@ -25,7 +26,6 @@ RUN NODE_ENV=production ./node_modules/.bin/webpack && \
     mkdir -p /test_artifacts && \
     chmod 777 /test_artifacts
 
-USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
     PORT=8000 \
