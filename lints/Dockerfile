@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
 	apt-get update && \
     apt-get install -y nodejs && \
-	npm install npm@latest -g
+	npm install npm@5 -g
 
 # Switch to app user BEFORE running npm install to avoid issue with Docker on
 # CircleCI (see https://github.com/npm/npm/issues/16766 and

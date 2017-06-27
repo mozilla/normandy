@@ -8,7 +8,7 @@ Prerequisites
 This guide assumes you have already installed and set up the following:
 
 1. Git_
-2. `Node.js`_ and npm.
+2. `Node.js`_ 6.0 and npm 5.
 
 These docs assume a Unix-like operating system.
 

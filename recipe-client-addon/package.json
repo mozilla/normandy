@@ -5,17 +5,15 @@
   "main": "index.js",
   "author": "Mike Cooper <mcooper@mozilla.com>",
   "repository": "https://github.com/mozilla/normandy-addon",
-  "scripts": {
-  },
   "license": "MPL-2.0",
   "devDependencies": {
-    "babel-eslint": "7.2.3",
+    "babel-eslint": "^7.2.3",
     "eslint": "^3.19.0",
-    "eslint-config-normandy": "1.0.0",
-    "eslint-plugin-babel": "4.1.1",
-    "eslint-plugin-mozilla": "0.3.2"
+    "eslint-config-normandy": "^1.0.0",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-mozilla": "^0.3.2"
   },
   "dependencies": {
-    "mozjexl": "1.1.5"
+    "mozjexl": "^1.1.5"
   }
 }
