@@ -9,13 +9,14 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     echo 'deb https://deb.nodesource.com/node_4.x jessie main' > /etc/apt/sources.list.d/nodesource.list && \
     echo 'deb-src https://deb.nodesource.com/node_4.x jessie main' >> /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && apt-get install -y nodejs
-RUN npm install -g npm@3.x.x
+RUN npm install -g npm@5
 
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
 RUN pip install -U 'pip>=8' && \
-    pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
-    npm install
+    pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt
+USER app
+RUN npm install
 
 COPY . /app
 RUN NODE_ENV=production ./node_modules/.bin/webpack && \
@@ -25,7 +26,6 @@ RUN NODE_ENV=production ./node_modules/.bin/webpack && \
     mkdir -p /test_artifacts && \
     chmod 777 /test_artifacts
 
-USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
     PORT=8000 \
