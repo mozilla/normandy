@@ -1,9 +1,9 @@
-import { Layout, LocaleProvider } from 'antd';
+import { Breadcrumb, Layout, LocaleProvider, Menu, SubMenu } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
 import React, { PropTypes as pt } from 'react';
 
 
-const { Header, Content } = Layout;
+const { Content, Header, Sider } = Layout;
 
 
 export default function App({ children }) {
@@ -11,11 +11,26 @@ export default function App({ children }) {
     <LocaleProvider locale={enUS}>
       <Layout>
         <Header>
-          <h1>SHIELD Control Panel</h1>
+          <div className="logo">
+            SHIELD Control Panel
+          </div>
         </Header>
-        <Content className="content">
-          {children}
-        </Content>
+
+        <Layout>
+          <Sider width={200} className="sidebar">
+            Menu goes here.
+          </Sider>
+
+          <Layout className="content-wrapper">
+            <Breadcrumb>
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+            </Breadcrumb>
+
+            <Content className="content">
+              {children}
+            </Content>
+          </Layout>
+        </Layout>
       </Layout>
     </LocaleProvider>
   );
