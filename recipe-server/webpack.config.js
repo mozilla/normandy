@@ -72,7 +72,7 @@ module.exports = [
       control_new: [
         'babel-polyfill',
         './client/control_new/index.js',
-        './client/control_new/scss/main.scss',
+        './client/control_new/less/main.less',
       ],
     },
 
@@ -108,6 +108,10 @@ module.exports = [
         {
           test: /\.scss$/,
           loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap'),
+        },
+        {
+          test: /\.less$/,
+          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!less'),
         },
         {
           test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
