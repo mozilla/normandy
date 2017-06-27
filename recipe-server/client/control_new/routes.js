@@ -4,7 +4,7 @@ import { routerForBrowser } from 'redux-little-router';
 
 import App from 'control_new/components/App';
 import Dummy from 'control_new/components/Dummy';
-
+import Gateway from 'control_new/components/Gateway';
 
 export const {
   reducer,
@@ -28,6 +28,8 @@ export const {
   basename: '/control-new',
 });
 
+const recipesPage = <Dummy text="recipes" />;
+const extensionsPage = <Dummy text="extensions" />;
 
 export function resolveRoutes({ router }) {
   if (router.route) {

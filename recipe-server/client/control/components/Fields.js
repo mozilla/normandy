@@ -204,10 +204,10 @@ export function FileInput({
     value: omitValue, // eslint-disable-line no-unused-vars
     onChange,
     onBlur,
-    ...inputProps,
+    ...inputProps
   },
   meta: omitMeta, // eslint-disable-line no-unused-vars
-  ...props,
+  ...props
 }) {
   return (
     <input
