@@ -236,12 +236,10 @@ export default class MultiPicker extends React.Component {
    * @param  {Array<string>}  selection   Array of selected values to apply
    */
   handleApplySelection(selection = []) {
-    const {
-      value = [],
-    } = this.props;
+    const val = this.props.value || [];
 
     // Get a set of unique selected values from existing values and those coming in
-    const uniqueSelections = new Set(value.concat(selection));
+    const uniqueSelections = new Set(val.concat(selection));
 
     // Convert the Set of unique values into an array.
     const newEnabled = Array.from(uniqueSelections);
