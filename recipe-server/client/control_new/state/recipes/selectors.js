@@ -5,7 +5,7 @@ import { getRevision } from 'control_new/state/revisions/selectors';
 
 
 export function getRecipe(state, id, defaultsTo = null) {
-  const recipe = state.newState.recipes.items.get(id);
+  const recipe = state.app.recipes.items.get(id);
 
   if (recipe) {
     const action = getAction(state, recipe.get('action_id'));
@@ -26,11 +26,11 @@ export function getRecipe(state, id, defaultsTo = null) {
 
 
 export function getRecipeHistory(state, id) {
-  const history = state.newState.recipes.history.get(id, new List([]));
+  const history = state.app.recipes.history.get(id, new List([]));
   return history.map(revisionId => getRevision(state, revisionId));
 }
 
 
 export function getRecipeFilters(state) {
-  return state.newState.recipes.filters;
+  return state.app.recipes.filters;
 }
