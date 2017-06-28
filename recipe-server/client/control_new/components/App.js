@@ -1,10 +1,9 @@
 import { Breadcrumb, Layout, LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
-import React, { PropTypes as pt } from 'react';
-
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const { Content, Header, Sider } = Layout;
-
 
 export default function App({ children }) {
   return (
@@ -37,5 +36,5 @@ export default function App({ children }) {
 }
 
 App.propTypes = {
-  children: pt.any,
+  children: PropTypes.any,
 };

@@ -1,4 +1,5 @@
-import React, { PropTypes as pt } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -7,8 +8,8 @@ import { fetchExtension } from 'control_new/state/extensions/actions';
 
 class QueryExtension extends React.Component {
   static propTypes = {
-    fetchExtension: pt.func,
-    pk: pt.number.isRequired,
+    fetchExtension: PropTypes.func,
+    pk: PropTypes.number.isRequired,
   }
 
   componentWillMount() {

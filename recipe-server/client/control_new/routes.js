@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { routerForBrowser } from 'redux-little-router';
 
 import App from 'control_new/components/App';
-import Dummy from 'control_new/components/Dummy';
-
+import Dummy from 'control_new/components/pages/Dummy';
+import Gateway from 'control_new/components/pages/Gateway';
 
 export const {
   reducer,
@@ -12,12 +12,18 @@ export const {
   enhancer,
 } = routerForBrowser({
   routes: {
-    '/': {},
+    '/': {
+      component: Gateway,
+    },
     '/recipes': {
       component: Dummy,
     },
-    '/recipes/:pk': {},
-    '/extensions': {},
+    '/recipes/:pk': {
+      component: Dummy,
+    },
+    '/extensions': {
+      component: Dummy,
+    },
     '/extensions/new': {
       component: Dummy,
     },
@@ -27,7 +33,6 @@ export const {
   },
   basename: '/control-new',
 });
-
 
 export function resolveRoutes({ router }) {
   if (router.route) {
