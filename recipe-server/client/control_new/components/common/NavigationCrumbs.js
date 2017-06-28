@@ -62,5 +62,4 @@ export default connect(
   state => ({
     router: state.router,
   }),
-  null,
 )(NavigationCrumbs);
