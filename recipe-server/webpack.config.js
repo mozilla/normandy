@@ -69,6 +69,11 @@ module.exports = [
         './client/control/sass/control.scss',
         './node_modules/font-awesome/scss/font-awesome.scss',
       ],
+      control_new: [
+        'babel-polyfill',
+        './client/control_new/index.js',
+        './client/control_new/less/main.less',
+      ],
     },
 
     output: {
@@ -105,7 +110,11 @@ module.exports = [
           loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap'),
         },
         {
-          test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+          test: /\.less$/,
+          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!less'),
+        },
+        {
+          test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
           loader: 'file-loader',
         },
       ],
@@ -117,6 +126,7 @@ module.exports = [
         actions: path.resolve(__dirname, './client/actions'),
         control: path.resolve(__dirname, './client/control'),
         tests: path.resolve(__dirname, './client/tests'),
+        control_new: path.resolve(__dirname, './client/control_new'),
       },
     },
   },

@@ -1,0 +1,29 @@
+{% load i18n %}
+{% load render_bundle from normandy_webpack_loader %}
+{% load logout_button from normandy_logout_button %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+
+<html
+  lang="{{ LANGUAGE_CODE|default:"en-us" }}"
+  data-csrf="{{csrf_token}}"
+  {% if request.user.is_authenticated %}data-current-user="{{ request.user.id }}"{% endif %}
+  data-peer-approval-enforced="{{ PEER_APPROVAL_ENFORCED|yesno:'true,false' }}"
+>
+  <head>
+    <title>SHIELD Control Panel</title>
+    {% render_bundle 'control_new' 'css' %}
+    <meta name="robots" content="NONE,NOARCHIVE" />
+  </head>
+
+  <body class="{% block bodyclass %}{% endblock %}">
+    {% block content %}
+      <div id="main"></div>
+    {% endblock %}
+
+    <!-- END Container -->
+    {% block javascript %}
+      {% render_bundle 'control_new' 'js' %}
+    {% endblock %}
+  </body>
+</html>

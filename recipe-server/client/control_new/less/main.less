@@ -1,0 +1,47 @@
+@import '~antd/dist/antd.less';
+@import 'ant-override';
+
+// Use locally-hosted icon font
+@icon-url: '~control_new/fonts/iconfont';
+
+body {
+  height: 100%;
+}
+
+.logo {
+  color: #333;
+  font-size: 22px;
+  padding-left: 48px;
+  position: relative;
+
+  &::before {
+    background: url('../img/logo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    content: '';
+    display: block;
+    height: 32px;
+    left: 0;
+    margin-top: -16px;
+    position: absolute;
+    top: 50%;
+    width: 32px;
+  }
+}
+
+.sidebar {
+  background: #FFF;
+}
+
+.content-wrapper {
+  padding: 0 24px 24px;
+}
+
+.content {
+  background: #FFF;
+  padding: 24px;
+}
+
+#main {
+  min-height: 100%;
+}
