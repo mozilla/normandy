@@ -7,7 +7,7 @@
   }
 
   .gw-col {
-    background: #E1F4CB;
+    background: @primary-1;
     cursor: pointer;
     margin: 1em auto;
     padding: 2em;
@@ -15,7 +15,7 @@
 
     a {
       bottom: 0;
-      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0);
+      box-shadow: inset 0 0 transparent;
       color: inherit;
       height: 100%;
       left: 0;
@@ -24,12 +24,12 @@
       right: 0;
       text-indent: -999px;
       top: 0;
-      transition: 0.2s box-shadow ease -0.1s;
+      transition: 0.2s box-shadow ease -0.05s;
       width: 100%;
 
       &:hover,
       &:focus {
-        box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.15);
+        box-shadow: inset @shadow-2;
       }
     }
   }
