@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
+
 import { HistoryItem, HistoryList } from 'control/components/RecipeHistory';
 import DraftStatus, { STATUS_MESSAGES } from 'control/components/DraftStatus';
 import DraftStatusIcon, { STATUS_ICONS } from 'control/components/DraftStatusIcon';

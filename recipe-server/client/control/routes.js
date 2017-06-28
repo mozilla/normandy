@@ -1,5 +1,6 @@
 import React from 'react';
 import { IndexRedirect, IndexRoute, Route } from 'react-router';
+
 import ControlApp from 'control/components/ControlApp';
 import ExtensionForm from 'control/components/ExtensionForm';
 import ExtensionList from 'control/components/ExtensionList';

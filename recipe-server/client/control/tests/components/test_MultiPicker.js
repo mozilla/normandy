@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+
 import MultiPicker from 'control/components/MultiPicker';
 
 const propFactory = props => ({
