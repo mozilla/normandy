@@ -5,7 +5,7 @@ echo "Linting Python files"
 bin/ci/docker-run.sh flake8 normandy/ contract-tests/
 
 echo "Linting JS files"
-bin/ci/docker-run.sh eslint normandy
+bin/ci/docker-run.sh npm run lint-js
 
 echo "Linting Style files"
-bin/ci/docker-run.sh stylelint normandy
+bin/ci/docker-run.sh npm run lint-css

@@ -11,8 +11,8 @@
     "build": "webpack --config ./webpack.config.js",
     "test": "NODE_ENV=production karma start",
     "lint": "npm run lint-js; npm run lint-css;",
-    "lint-js": "eslint normandy client webpack.config.js karma.conf.js --fix || true",
-    "lint-css": "stylelint 'client/**/*.s?(a|c)ss' --config .stylelintrc || true"
+    "lint-js": "eslint normandy client webpack.config.js karma.conf.js --fix",
+    "lint-css": "stylelint 'client/**/*.s?(a|c)ss' --config .stylelintrc"
   },
   "license": "MPL-2.0",
   "dependencies": {
