@@ -5,6 +5,7 @@ import { routerForBrowser } from 'redux-little-router';
 import App from 'control_new/components/App';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
+import MissingPage from 'control_new/components/pages/MissingPage';
 
 const routes = {
   '/': {
@@ -47,14 +48,13 @@ export const {
 });
 
 export function resolveRoutes({ router }) {
+  let content = <MissingPage />;
+
   if (router.route) {
-    return (
-      <App>
-        {router.result.component && <router.result.component />}
-      </App>
-    );
+    content = <router.result.component />;
   }
-  return <div>404</div>;
+
+  return (<App children={content} />);
 }
 
 resolveRoutes.propTypes = {
