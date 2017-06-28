@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -eu
+
+echo "Linting Python files"
+bin/ci/docker-run.sh flake8 normandy/ contract-tests/
+
+echo "Linting JS files"
+bin/ci/docker-run.sh eslint normandy
+
+echo "Linting Style files"
+bin/ci/docker-run.sh stylelint normandy
