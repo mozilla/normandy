@@ -17,11 +17,10 @@
   </head>
 
   <body class="{% block bodyclass %}{% endblock %}">
-    <div>
-      {% block content %}
-        <div id="main"></div>
-      {% endblock %}
-    </div>
+    {% block content %}
+      <div id="main"></div>
+    {% endblock %}
+
     <!-- END Container -->
     {% block javascript %}
       {% render_bundle 'control_new' 'js' %}
