@@ -38,22 +38,22 @@ jobs:
 
       - run:
           name: Build Docker images
-          working_directory: /normandy
+          working_directory: /normandy/recipe-server
           command: |
             docker info
             /normandy/recipe-server/bin/ci/dependencies
 
       - run:
           name: Run lints
-          working_directory: /normandy
+          working_directory: /normandy/recipe-server
           command: /normandy/recipe-server/bin/ci/lint
 
       - run:
           name: Run tests
-          working_directory: /normandy
+          working_directory: /normandy/recipe-server
           command: /normandy/recipe-server/bin/ci/test
 
       - run:
           name: Push to Dockerhub
-          working_directory: /normandy
+          working_directory: /normandy/recipe-server
           command: /normandy/recipe-server/bin/ci/deploy
