@@ -6,31 +6,43 @@ import App from 'control_new/components/App';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
 
+const routes = {
+  '/': {
+    component: Gateway,
+    crumb: 'Home',
+    '/recipes': {
+      component: Dummy,
+      crumb: 'Recipes Listing',
+      '/new': {
+        component: Dummy,
+        crumb: 'New Recipe',
+      },
+      '/:pk': {
+        component: Dummy,
+        crumb: 'View Recipe',
+      },
+    },
+    '/extensions': {
+      component: Dummy,
+      crumb: 'Extensions Listing',
+      '/new': {
+        component: Dummy,
+        crumb: 'New Extension',
+      },
+      '/:pk': {
+        component: Dummy,
+        crumb: 'View Extension',
+      },
+    },
+  },
+};
+
 export const {
   reducer,
   middleware,
   enhancer,
 } = routerForBrowser({
-  routes: {
-    '/': {
-      component: Gateway,
-    },
-    '/recipes': {
-      component: Dummy,
-    },
-    '/recipes/:pk': {
-      component: Dummy,
-    },
-    '/extensions': {
-      component: Dummy,
-    },
-    '/extensions/new': {
-      component: Dummy,
-    },
-    '/extensions/:pk': {
-      component: Dummy,
-    },
-  },
+  routes,
   basename: '/control-new',
 });
 
