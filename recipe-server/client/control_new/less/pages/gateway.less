@@ -8,16 +8,29 @@
 
   .gw-col {
     background: #E1F4CB;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0);
     cursor: pointer;
     margin: 1em auto;
     padding: 2em;
     text-align: center;
-    transition: 0.2s box-shadow ease -0.1s;
 
-    &:hover,
-    &:focus {
-      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.15);
+    a {
+      bottom: 0;
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0);
+      color: inherit;
+      height: 100%;
+      left: 0;
+      overflow: hidden;
+      position: absolute;
+      right: 0;
+      text-indent: -999px;
+      top: 0;
+      transition: 0.2s box-shadow ease -0.1s;
+      width: 100%;
+
+      &:hover,
+      &:focus {
+        box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.15);
+      }
     }
   }
 
