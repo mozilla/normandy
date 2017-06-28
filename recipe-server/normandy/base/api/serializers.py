@@ -17,3 +17,15 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
         ]
+
+
+class ServiceInfoSerializer(serializers.ModelSerializer):
+    user = UserSerializer();
+    peer_approval_enforced = serializers.BooleanField()
+
+    class Meta:
+        model = User
+        fields = [
+            'user',
+            'peer_approval_enforced',
+        ]
