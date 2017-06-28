@@ -1,7 +1,9 @@
-import { Breadcrumb, Layout, LocaleProvider } from 'antd';
+import { Layout, LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
 import PropTypes from 'prop-types';
 import React from 'react';
+
+import NavigationCrumbs from 'control_new/components/common/NavigationCrumbs';
 
 const { Content, Header, Sider } = Layout;
 
@@ -21,9 +23,7 @@ export default function App({ children }) {
           </Sider>
 
           <Layout className="content-wrapper">
-            <Breadcrumb>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-            </Breadcrumb>
+            <NavigationCrumbs />
 
             <Content className="content">
               {children}
