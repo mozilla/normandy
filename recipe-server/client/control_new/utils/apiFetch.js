@@ -36,5 +36,28 @@ export default async function apiFetch(url, options = {}) {
   }
 
   const response = await fetch(`${API_ROOT}${url}${queryString}`, settings);
+
+  // Throw if we get a non-200 response.
+  if (!response.ok) {
+    let message;
+    let data;
+
+    try {
+      data = await response.json();
+      message = data.detail || response.statusText;
+    } catch (error) {
+      message = error.message;
+    }
+
+    throw new ApiError(message, data);
+  }
   return response.json();
+}
+
+export class ApiError extends Error {
+  constructor(message, data) {
+    super(message);
+    this.name = 'ApiError';
+    this.data = data;
+  }
 }

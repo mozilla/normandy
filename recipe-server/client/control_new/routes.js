@@ -5,6 +5,8 @@ import { routerForBrowser } from 'redux-little-router';
 import App from 'control_new/components/App';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
+import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
+import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
 
 const routes = {
   '/': {
@@ -22,16 +24,16 @@ const routes = {
         crumb: 'View Recipe',
       },
     },
-    '/extensions': {
+    '/extension': {
       component: Dummy,
       crumb: 'Extensions Listing',
-      '/new': {
-        component: Dummy,
+      '/new/': {
+        component: CreateExtensionPage,
         crumb: 'New Extension',
       },
-      '/:pk': {
-        component: Dummy,
-        crumb: 'View Extension',
+      '/:pk/': {
+        component: EditExtensionPage,
+        crumb: 'Edit Extension',
       },
     },
   },

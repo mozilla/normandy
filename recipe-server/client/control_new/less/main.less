@@ -10,6 +10,14 @@ body {
   height: 100%;
 }
 
+.clearfix() {
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
 .logo {
   color: #333;
   font-size: 22px;
@@ -46,4 +54,26 @@ body {
 
 #main {
   min-height: 100%;
+}
+
+/* Buttons at the bottom of a form */
+.form-actions {
+  .clearfix();
+
+  background: #FBFBFB;
+  border: 1px solid #D9D9D9;
+  padding: 15px;
+
+  .primary {
+    float: right;
+  }
+
+  .secondary {
+    float: left;
+  }
+
+  .primary > * + *,
+  .secondary > * + * {
+    margin-left: 15px;
+  }
 }

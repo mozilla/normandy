@@ -56,6 +56,7 @@ export function createExtension(extensionData) {
       type: EXTENSION_RECEIVE,
       extension,
     });
+    return extension.id;
   };
 }
 
