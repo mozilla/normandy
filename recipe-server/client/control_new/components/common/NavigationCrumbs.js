@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import autobind from 'autobind-decorator';
-import { connect } from 'react-redux';
 import { Breadcrumb } from 'antd';
+import autobind from 'autobind-decorator';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
 @autobind
@@ -13,17 +13,32 @@ export class NavigationCrumbs extends React.Component {
   state = { breadcrumbs: [] };
 
   componentDidMount() {
-    this.updateBreadcrumbs(this.props.router);
+    this.gatherBreadcrumbs(this.props.router);
   }
 
   componentWillReceiveProps({ router }) {
-    this.updateBreadcrumbs(router || this.props.router);
+    this.gatherBreadcrumbs(router || this.props.router);
   }
 
-  // Given a router, gathers the steps leading down to the current route, to be
-  // displayed as breadcrumbs.
-  updateBreadcrumbs(router) {
-    const { result, pathname } = router;
+  // Given a route (e.g. `/hello/:id/there`), finds params that need to be
+  // populated (e.g. `:id`) and replaces the values in order to link correctly
+  // when displayed as a Breadcrumb.
+  replaceUrlVariables(url, params) {
+    let newUrl = url;
+    const urlParams = url.match(/:[a-z]+/gi);
+
+    if (urlParams) {
+      urlParams.forEach(piece => {
+        // Replace the found identifier with whatever the actual param is set to
+        newUrl = newUrl.replace(piece, params[piece.slice(1)]);
+      });
+    }
+
+    return newUrl;
+  }
+
+  gatherBreadcrumbs(router) {
+    const { result, pathname, params } = router;
 
     const crumbs = [];
     let currentRoute = result;
@@ -32,7 +47,7 @@ export class NavigationCrumbs extends React.Component {
     while (currentRoute) {
       crumbs.push({
         name: currentRoute.crumb,
-        link: currentRoute.route || pathname,
+        link: this.replaceUrlVariables(currentRoute.route || pathname, params),
       });
 
       currentRoute = currentRoute.parent;
