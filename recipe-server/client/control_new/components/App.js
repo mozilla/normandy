@@ -1,7 +1,7 @@
 import { Breadcrumb, Layout, LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 const { Content, Header, Sider } = Layout;
 
