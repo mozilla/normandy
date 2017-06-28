@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ServiceInfoSerializer(serializers.ModelSerializer):
-    user = UserSerializer();
+    user = UserSerializer()
     peer_approval_enforced = serializers.BooleanField()
 
     class Meta:
