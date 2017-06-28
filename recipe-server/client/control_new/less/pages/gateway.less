@@ -7,15 +7,22 @@
   }
 
   .gw-col {
-    background: @primary-1;
-    cursor: pointer;
-    margin: 1em auto;
-    padding: 2em;
     text-align: center;
+
+    &:hover,
+    &:focus {
+      .ant-card-head {
+        background: @primary-2;
+      }
+    }
+
+    .ant-card-head {
+      background: @primary-1;
+      transition: 0.3s background;
+    }
 
     a {
       bottom: 0;
-      box-shadow: inset 0 0 transparent;
       color: inherit;
       height: 100%;
       left: 0;
@@ -24,21 +31,11 @@
       right: 0;
       text-indent: -999px;
       top: 0;
-      transition: 0.2s box-shadow ease -0.05s;
       width: 100%;
-
-      &:hover,
-      &:focus {
-        box-shadow: inset @shadow-2;
-      }
     }
   }
 
   .ant-btn {
     margin-top: 1em;
-  }
-
-  .title {
-    margin-bottom: 0.5em;
   }
 }
