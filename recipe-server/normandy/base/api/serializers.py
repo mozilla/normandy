@@ -19,12 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class ServiceInfoSerializer(serializers.ModelSerializer):
+class ServiceInfoSerializer(serializers.Serializer):
+    """Data that frontend clients need to interact with the service."""
     user = UserSerializer()
     peer_approval_enforced = serializers.BooleanField()
 
     class Meta:
-        model = User
         fields = [
             'user',
             'peer_approval_enforced',
