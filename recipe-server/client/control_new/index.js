@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { initializeCurrentLocation } from 'redux-little-router';
-import logger from 'redux-logger';
+import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 
 import DevTools from 'control_new/components/devtools';
@@ -24,7 +24,12 @@ const reducers = combineReducers({
 
 const store = createStore(reducers, reducers(undefined, { type: 'initial' }), compose(
   applyMiddleware(
-    logger,
+    createLogger({
+      collapsed: true,
+      diff: true,
+      duration: true,
+      timestamp: true,
+    }),
     routerMiddleware,
     thunk
   ),
