@@ -17,7 +17,17 @@ jobs:
       - checkout:
           path: /normandy
 
-      # FIXME: should use an image w/ docker installed by default
+      - run:
+          name: Make __version__
+          working_directory: /normandy/recipe-server
+          command: |
+            # store version info in app directory, for Docker to pick up
+            mkdir -p __version__
+            git rev-parse HEAD > __version__/commit
+            git describe --tags --exact-match > __version__/tag || true # may fail if not on a tag
+            date '+%s' > __version__/build_time
+
+      # FIXME: should use an image w/ docker and docker-compose installed by default
       - run:
           name: Install Docker
           command: |
@@ -38,20 +48,20 @@ jobs:
 
       - run:
           name: Build Docker images
-          working_directory: /normandy/recipe-server
+          working_directory: /normandy/compose
           command: |
             docker info
-            /normandy/recipe-server/bin/ci/dependencies
+            docker-compose build normandy
 
       - run:
           name: Run lints
-          working_directory: /normandy/recipe-server
-          command: /normandy/recipe-server/bin/ci/lint
+          working_directory: /normandy/compose
+          command: docker-compose run normandy ./bin/ci/lint
 
       - run:
           name: Run tests
-          working_directory: /normandy/recipe-server
-          command: /normandy/recipe-server/bin/ci/test
+          working_directory: /normandy/compose
+          command: docker-compose run normandy ./bin/ci/test
 
       - run:
           name: Push to Dockerhub

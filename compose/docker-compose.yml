@@ -1,16 +1,29 @@
 version: '2'
 
 services:
-  database:
-    image: postgres:9.5.2
-
   normandy:
-    extends:
-      file: normandy-base.yml
-      service: normandy-base
+    build:
+      context: ../recipe-server
+      dockerfile: ../recipe-server/Dockerfile
+    image: mozilla/normandy:latest
+    environment:
+      PYTHONDONTWRITEBYTECODE: 1
+      DATABASE_URL: "postgres://postgres@database/postgres"
+      DJANGO_CONFIGURATION: ProductionInsecure
+      DJANGO_AUTOGRAPH_URL: http://autograph:8000/
+      # From etc/autograph.yaml
+      DJANGO_AUTOGRAPH_HAWK_ID: normandev
+      DJANGO_AUTOGRAPH_HAWK_SECRET_KEY: 3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
+      DJANGO_CAN_EDIT_ACTIONS_IN_USE: "true"
+      # Pulled from the local environment
+      DJANGO_API_CACHE_ENABLED:
+    stop_signal: SIGKILL
     links:
       - database
       - autograph
+
+  database:
+    image: postgres:9.5.2
 
   proxy:
     image: nginx:1.9.14
