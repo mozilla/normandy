@@ -54,7 +54,7 @@ export function resolveRoutes({ router }) {
     content = <router.result.component />;
   }
 
-  return (<App children={content} />);
+  return <App children={content} />;
 }
 
 resolveRoutes.propTypes = {
