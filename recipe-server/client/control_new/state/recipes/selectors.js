@@ -2,7 +2,7 @@ import { List } from 'immutable';
 
 import { getAction } from 'control_new/state/actions/selectors';
 import { getRevision } from 'control_new/state/revisions/selectors';
-
+import { getPk } from 'control_new/state/router/selectors';
 
 export function getRecipe(state, id, defaultsTo = null) {
   const recipe = state.app.recipes.items.get(id);
@@ -24,13 +24,16 @@ export function getRecipe(state, id, defaultsTo = null) {
   return defaultsTo;
 }
 
-
 export function getRecipeHistory(state, id) {
   const history = state.app.recipes.history.get(id, new List([]));
   return history.map(revisionId => getRevision(state, revisionId));
 }
 
-
 export function getRecipeFilters(state) {
   return state.app.recipes.filters;
+}
+
+export function getCurrentRecipe(state) {
+  const pk = getPk(state);
+  return getRecipe(state, pk);
 }
