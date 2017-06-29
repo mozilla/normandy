@@ -4,9 +4,6 @@
 @white: #FFF;
 @black: #000;
 
-// Colors
-@primary-color: #1C5253;
-
 // Component styles
 .ant-breadcrumb {
   margin: 12px 0;
@@ -14,6 +11,10 @@
 
 .ant-layout-header {
   background: @primary-3;
+
+  @media (max-width: @screen-xs) {
+    padding: 0 14vw;
+  }
 }
 
 .ant-menu-submenu-title {
