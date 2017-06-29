@@ -12,6 +12,6 @@ bin/ci/docker-run.sh npm run lint:css
 
 echo "Checking JS package security"
 # NSP doesn't deal well with unreliable networks, so it produces too
-  many false positives. This lets us run it, but not fail builds.
+# many false positives. This lets us run it, but not fail builds.
 # TODO: Detect network problems distinct from security errors.
 bin/ci/docker-run.sh npm run lint:js-security || true
