@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import NavigationCrumbs from 'control_new/components/common/NavigationCrumbs';
+import NavigationMenu from 'control_new/components/common/NavigationMenu';
 
 const { Content, Header, Sider } = Layout;
 
@@ -19,7 +20,7 @@ export default function App({ children }) {
 
         <Layout>
           <Sider width={200} className="sidebar">
-            Menu goes here.
+            <NavigationMenu />
           </Sider>
 
           <Layout className="content-wrapper">
