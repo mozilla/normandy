@@ -7,14 +7,16 @@ import CreateExtensionPage from 'control_new/components/extensions/CreateExtensi
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
+import RecipeListing from 'control_new/components/recipes/Listing';
 import MissingPage from 'control_new/components/pages/MissingPage';
+
 
 const routes = {
   '/': {
     component: Gateway,
     crumb: 'Home',
     '/recipes': {
-      component: Dummy,
+      component: RecipeListing,
       crumb: 'Recipes Listing',
       '/new': {
         component: Dummy,

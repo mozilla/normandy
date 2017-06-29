@@ -1,4 +1,5 @@
 import django_filters
+from rest_framework import filters
 
 
 class CaseInsensitiveBooleanFilter(django_filters.Filter):
@@ -15,3 +16,24 @@ class CaseInsensitiveBooleanFilter(django_filters.Filter):
                 value = False
             return qs.filter(**{self.name: value})
         return qs
+
+
+class AliasedOrderingFilter(filters.OrderingFilter):
+    aliases = {}
+
+    def get_valid_fields(self, *args, **kwargs):
+        valid_fields = super().get_valid_fields(*args, **kwargs)
+        return valid_fields + list(self.aliases.values())
+
+    def get_ordering(self, *args, **kwargs):
+        ordering = super().get_ordering(*args, **kwargs)
+        if ordering is not None:
+            return list(map(self.replace_alias, ordering))
+        return ordering
+
+    def replace_alias(self, term):
+        field = term.lstrip('-')
+        if field in self.aliases:
+            modifier = '-' if term.startswith('-') else ''
+            return modifier + self.aliases[field][0]
+        return term

@@ -1,4 +1,4 @@
-import { fromJS, Map } from 'immutable';
+import { fromJS, List, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
@@ -6,6 +6,8 @@ import {
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
+  RECIPES_LISTING_COLUMNS_CHANGE,
+  RECIPES_PAGE_RECEIVE,
 } from 'control_new/state/action-types';
 
 
@@ -60,8 +62,26 @@ function items(state = new Map(), action) {
 }
 
 
+function listing(state = new Map(), action) {
+  switch (action.type) {
+    case RECIPES_PAGE_RECEIVE:
+      return state
+        .set('count', action.recipes.count)
+        .set('pageNumber', action.pageNumber)
+        .set('results', fromJS(action.recipes.results.map(result => result.id)));
+
+    case RECIPES_LISTING_COLUMNS_CHANGE:
+      return state.set('columns', new List(action.columns));
+
+    default:
+      return state;
+  }
+}
+
+
 export default combineReducers({
   filters,
   history,
   items,
+  listing,
 });

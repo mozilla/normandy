@@ -100,6 +100,7 @@ class Core(Configuration):
             'normandy.base.api.renderers.CanonicalJSONRenderer',
             'normandy.base.api.renderers.CustomBrowsableAPIRenderer',
         ),
+        'PAGE_SIZE': 10,
         'EXCEPTION_HANDLER': 'normandy.base.api.views.exception_handler',
     }
 

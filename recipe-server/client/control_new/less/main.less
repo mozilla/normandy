@@ -5,6 +5,7 @@
 // Pages
 @import 'pages/404';
 @import 'pages/gateway';
+@import 'listing';
 
 // Common
 body {
@@ -26,6 +27,27 @@ body {
   display: flex;
   flex: 1;
   justify-content: flex-start;
+}
+
+.centered {
+  text-align: center;
+}
+
+.righted {
+  text-align: right;
+}
+
+.boolean-icon {
+  font-size: 16px;
+  font-weight: bold;
+
+  &.true {
+    color: #0c0;
+  }
+
+  &.false {
+    color: #c00;
+  }
 }
 
 .logo {
