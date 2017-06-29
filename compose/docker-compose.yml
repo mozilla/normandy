@@ -3,8 +3,8 @@ version: '2'
 services:
   normandy:
     build:
-      context: ../recipe-server
-      dockerfile: ../recipe-server/Dockerfile
+      context: normandy/recipe-server
+      dockerfile: normandy/recipe-server/Dockerfile
     image: mozilla/normandy:latest
     environment:
       PYTHONDONTWRITEBYTECODE: 1
