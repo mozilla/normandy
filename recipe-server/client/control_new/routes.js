@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import { routerForBrowser } from 'redux-little-router';
 
 import App from 'control_new/components/App';
-import Dummy from 'control_new/components/pages/Dummy';
-import Gateway from 'control_new/components/pages/Gateway';
 import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
+import Dummy from 'control_new/components/pages/Dummy';
+import Gateway from 'control_new/components/pages/Gateway';
 
 const routes = {
   '/': {
@@ -27,11 +27,11 @@ const routes = {
     '/extension': {
       component: Dummy,
       crumb: 'Extensions Listing',
-      '/new/': {
+      '/new': {
         component: CreateExtensionPage,
         crumb: 'New Extension',
       },
-      '/:pk/': {
+      '/:pk': {
         component: EditExtensionPage,
         crumb: 'Edit Extension',
       },

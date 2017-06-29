@@ -1,7 +1,8 @@
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
-import React, { PropTypes as pt } from 'react';
+import pt from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 
 import QueryExtension from 'control_new/components/data/QueryExtension';
@@ -19,12 +20,9 @@ export class _EditExtensionPage extends React.Component {
     extension: pt.instanceOf(Map),
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      formErrors: undefined,
-    };
-  }
+  state = {
+    formErrors: undefined,
+  };
 
   /**
    * Update the existing extension and display a message.
@@ -46,8 +44,9 @@ export class _EditExtensionPage extends React.Component {
 
   render() {
     const { extension, extensionPk } = this.props;
+    const Wrapper = extension ? 'div' : Spin;
     return (
-      <div>
+      <Wrapper>
         <h2>Edit Extension</h2>
         <QueryExtension pk={extensionPk} />
         {extension &&
@@ -57,7 +56,7 @@ export class _EditExtensionPage extends React.Component {
             errors={this.state.formErrors}
           />
         }
-      </div>
+      </Wrapper>
     );
   }
 }

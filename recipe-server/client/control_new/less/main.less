@@ -72,8 +72,8 @@ body {
     float: left;
   }
 
-  .primary > * + *,
-  .secondary > * + * {
+  .primary > :not(:last-child),
+  .secondary > :not(:last-child) {
     margin-left: 15px;
   }
 }

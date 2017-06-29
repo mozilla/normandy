@@ -1,12 +1,14 @@
-import autobind from 'autobind-decorator';
 import { Form, message } from 'antd';
-import React, { PropTypes as pt } from 'react';
+import autobind from 'autobind-decorator';
+import pt from 'prop-types';
+import React from 'react';
 
 
 /**
  * Base class for antd-based forms that handles displaying errors
  * from the API.
  */
+@autobind
 export default class BaseAntForm extends React.Component {
   static propTypes = {
     form: pt.object.isRequired,
@@ -14,13 +16,11 @@ export default class BaseAntForm extends React.Component {
     errors: pt.object,
   }
 
-  @autobind
   handleSubmit(event) {
     event.preventDefault();
     this.triggerSubmit();
   }
 
-  @autobind
   async triggerSubmit() {
     try {
       const values = await this.validateFields();
@@ -30,8 +30,7 @@ export default class BaseAntForm extends React.Component {
     }
   }
 
-  @autobind
-  validateFields() {
+  async validateFields() {
     return new Promise((resolve, reject) => {
       this.props.form.validateFields((error, values) => {
         if (error) {
@@ -60,7 +59,6 @@ export default class BaseAntForm extends React.Component {
    *   }
    * }
    */
-  @autobind
   FormItem({ children, name, initialValue, rules, config = {}, ...customItemProps }) {
     const { form, errors = {} } = this.props;
 

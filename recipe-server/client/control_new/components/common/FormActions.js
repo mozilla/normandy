@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes as pt } from 'react';
 
 
 /**
@@ -22,6 +22,9 @@ export default function FormActions({ children }) {
     </div>
   );
 }
+FormActions.propTypes = {
+  children: pt.node,
+};
 
 /**
  * Container for the primary actions (floated to the right).
@@ -31,6 +34,9 @@ FormActions.Primary = function FormActionsPrimary({ children }) {
     <div className="primary">{children}</div>
   );
 };
+FormActions.Primary.propTypes = {
+  children: pt.node,
+};
 
 /**
  * Container for the secondary actions (floated to the left).
@@ -39,4 +45,7 @@ FormActions.Secondary = function FormActionsSecondary({ children }) {
   return (
     <div className="secondary">{children}</div>
   );
+};
+FormActions.Secondary.propTypes = {
+  children: pt.node,
 };

@@ -1,3 +1,4 @@
+/* eslint import/prefer-default-export: "off" */
 /**
  * Get a named parameter for the current route.
  * @param {Object} state

@@ -1,6 +1,7 @@
 import { message } from 'antd';
 import autobind from 'autobind-decorator';
-import React, { PropTypes as pt } from 'react';
+import pt from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { push } from 'redux-little-router';
 
@@ -15,12 +16,9 @@ export class _CreateExtensionPage extends React.Component {
     push: pt.func.isRequired,
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      formErrors: undefined,
-    };
-  }
+  state = {
+    formErrors: undefined,
+  };
 
   /**
    * Create a new extension, display a message, and redirect to the edit page
@@ -30,7 +28,7 @@ export class _CreateExtensionPage extends React.Component {
     try {
       const extensionId = await this.props.createExtension(values);
       message.success('Extension saved');
-      this.props.push(`/extension/${extensionId}/`);
+      this.props.push(`/extension/${extensionId}`);
     } catch (error) {
       message.error(
         'Extension cannot be saved. Please correct any errors listed in the form below.',

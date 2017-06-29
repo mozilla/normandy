@@ -1,8 +1,8 @@
 import { Button, Form, Icon, Input, Upload } from 'antd';
 import autobind from 'autobind-decorator';
-import { Map } from 'immutable';
-import React, { PropTypes as pt } from 'react';
-import { isEqual } from 'underscore';
+import { is, Map } from 'immutable';
+import pt from 'prop-types';
+import React from 'react';
 
 import BaseAntForm from 'control_new/components/common/BaseAntForm';
 import FormActions from 'control_new/components/common/FormActions';
@@ -22,14 +22,11 @@ export class _ExtensionForm extends BaseAntForm {
     form: pt.object,
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      xpiName: null,
-      xpiUrl: null,
-      xpiFile: null,
-    };
-  }
+  state = {
+    xpiName: null,
+    xpiUrl: null,
+    xpiFile: null,
+  };
 
   componentWillMount() {
     const { extension } = this.props;
@@ -40,7 +37,7 @@ export class _ExtensionForm extends BaseAntForm {
 
   componentWillReceiveProps(newProps) {
     // Reset form if the extension changed
-    if (!isEqual(newProps.extension, this.props.extension)) {
+    if (!is(newProps.extension, this.props.extension)) {
       this.setInitialValues(newProps.extension);
     }
   }
@@ -53,10 +50,20 @@ export class _ExtensionForm extends BaseAntForm {
     // Initial values are mostly handled via props, but if the extension
     // changes, we need to reset the values stored in the state.
     this.props.form.resetFields();
-    this.setState({
-      xpiName: extension.get('xpi'),
-      xpiUrl: extension.get('xpi'),
-    });
+
+    let stateChange;
+    if (extension) {
+      stateChange = {
+        xpiName: extension.get('xpi'),
+        xpiUrl: extension.get('xpi'),
+      };
+    } else {
+      stateChange = {
+        xpiName: null,
+        xpiUrl: null,
+      };
+    }
+    this.setState(stateChange);
   }
 
   /**
@@ -77,15 +84,17 @@ export class _ExtensionForm extends BaseAntForm {
 
   getUploadFileList() {
     const { xpiName, xpiUrl } = this.state;
+    const fileList = [];
+
     if (xpiName) {
-      return [{
+      fileList.push({
         uid: -1,
         name: xpiName,
         url: xpiUrl,
-      }];
+      });
     }
 
-    return [];
+    return fileList;
   }
 
   /**

@@ -1,5 +1,13 @@
 const API_ROOT = '/api/';
 
+export class ApiError extends Error {
+  constructor(message, data) {
+    super(message);
+    this.name = 'ApiError';
+    this.data = data;
+  }
+}
+
 export default async function apiFetch(url, options = {}) {
   let queryString = '';
 
@@ -52,12 +60,4 @@ export default async function apiFetch(url, options = {}) {
     throw new ApiError(message, data);
   }
   return response.json();
-}
-
-export class ApiError extends Error {
-  constructor(message, data) {
-    super(message);
-    this.name = 'ApiError';
-    this.data = data;
-  }
 }
