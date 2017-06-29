@@ -9,8 +9,15 @@ import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
 import { createExtension } from 'control_new/state/extensions/actions';
 
 
+@connect(
+  null,
+  {
+    createExtension,
+    push,
+  },
+)
 @autobind
-export class _CreateExtensionPage extends React.Component {
+export default class CreateExtensionPage extends React.Component {
   static propTypes = {
     createExtension: pt.func.isRequired,
     push: pt.func.isRequired,
@@ -45,11 +52,3 @@ export class _CreateExtensionPage extends React.Component {
     );
   }
 }
-
-export default connect(
-  null,
-  {
-    createExtension,
-    push,
-  },
-)(_CreateExtensionPage);

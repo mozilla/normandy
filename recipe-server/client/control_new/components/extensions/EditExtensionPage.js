@@ -8,12 +8,20 @@ import { connect } from 'react-redux';
 import QueryExtension from 'control_new/components/data/QueryExtension';
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
 import { updateExtension } from 'control_new/state/extensions/actions';
-import { getExtension } from 'control_new/state/extensions/selectors';
-import { getRouterParam } from 'control_new/state/router/selectors';
+import { getCurrentExtension, getCurrentExtensionPk } from 'control_new/state/extensions/selectors';
 
 
+@connect(
+  state => ({
+    extensionPk: getCurrentExtensionPk(state),
+    extension: getCurrentExtension(state),
+  }),
+  {
+    updateExtension,
+  },
+)
 @autobind
-export class _EditExtensionPage extends React.Component {
+export default class EditExtensionPage extends React.Component {
   static propTypes = {
     updateExtension: pt.func.isRequired,
     extensionPk: pt.number,
@@ -60,16 +68,3 @@ export class _EditExtensionPage extends React.Component {
     );
   }
 }
-
-export default connect(
-  state => {
-    const extensionPk = Number.parseInt(getRouterParam(state, 'pk'), 10);
-    return {
-      extensionPk,
-      extension: getExtension(state, extensionPk),
-    };
-  },
-  {
-    updateExtension,
-  },
-)(_EditExtensionPage);

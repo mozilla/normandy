@@ -15,8 +15,9 @@ import FormActions from 'control_new/components/common/FormActions';
  * component works. Instead, the resulting file is stored in the form state and
  * appended to the form values after validation.
  */
+@Form.create({})
 @autobind
-export class _ExtensionForm extends BaseAntForm {
+export default class ExtensionForm extends BaseAntForm {
   static propTypes = {
     extension: pt.instanceOf(Map),
     form: pt.object,
@@ -145,5 +146,3 @@ export class _ExtensionForm extends BaseAntForm {
     );
   }
 }
-
-export default Form.create({})(_ExtensionForm);
