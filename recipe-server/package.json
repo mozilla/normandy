@@ -10,9 +10,9 @@
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
     "test": "NODE_ENV=production karma start",
-    "lint": "npm run lint-js; npm run lint-css;",
-    "lint-js": "eslint normandy client webpack.config.js karma.conf.js",
-    "lint-css": "stylelint 'client/**/*.s?(a|c)ss' --config .stylelintrc"
+    "lint:js": "eslint normandy client webpack.config.js karma.conf.js",
+    "lint:css": "stylelint 'client/**/*.s?(a|c)ss' --config .stylelintrc",
+    "lint:js-security": "nsp check ."
   },
   "license": "MPL-2.0",
   "dependencies": {
@@ -91,6 +91,7 @@
     "karma-webpack": "1.8.0",
     "less": "2.7.2",
     "less-loader": "4.0.4",
+    "nsp": "^2.6.3",
     "postcss-loader": "0.11.1",
     "react-addons-test-utils": "15.2.1",
     "react-tools": "0.13.3",

@@ -5,7 +5,13 @@ echo "Linting Python files"
 bin/ci/docker-run.sh flake8 normandy/ contract-tests/
 
 echo "Linting JS files"
-bin/ci/docker-run.sh npm run lint-js
+bin/ci/docker-run.sh npm run lint:js
 
 echo "Linting Style files"
-bin/ci/docker-run.sh npm run lint-css
+bin/ci/docker-run.sh npm run lint:css
+
+echo "Checking JS package security"
+# NSP doesn't deal well with unreliable networks, so it produces too
+  many false positives. This lets us run it, but not fail builds.
+# TODO: Detect network problems distinct from security errors.
+bin/ci/docker-run.sh npm run lint:js-security || true
