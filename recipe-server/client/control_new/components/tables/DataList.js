@@ -16,7 +16,6 @@ import {
 @connect(
   state => ({
     getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    ordering: getQueryParameter(state, 'ordering'),
   }),
   dispatch => (
     bindActionCreators(

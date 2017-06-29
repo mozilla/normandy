@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux';
 import { push, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipes from 'control_new/components/data/QueryRecipes';
 import ColumnSelector from 'control_new/components/tables/ColumnSelector';
 import DataList from 'control_new/components/tables/DataList';
@@ -212,7 +213,7 @@ export default class Listing extends React.Component {
   }
 
   render() {
-    const { columns, count, pageNumber, recipes } = this.props;
+    const { columns, count, ordering, pageNumber, recipes, status } = this.props;
 
     return (
       <div>
@@ -220,21 +221,24 @@ export default class Listing extends React.Component {
           pageNumber={pageNumber}
           filters={this.getFilters()}
         />
+        <LoadingOverlay>
+          <ActionBar />
 
-        <ActionBar />
+          <DataList
+            columns={columns}
+            columnRenderers={Listing.columnRenderers}
+            dataSource={recipes.toJS()}
+            ordering={ordering}
+            status={status}
+          />
 
-        <DataList
-          columns={columns}
-          columnRenderers={Listing.columnRenderers}
-          dataSource={recipes.toJS()}
-        />
-
-        <Pagination
-          current={pageNumber}
-          pageSize={10}
-          total={count}
-          onChange={this.handleChangePage}
-        />
+          <Pagination
+            current={pageNumber}
+            pageSize={10}
+            total={count}
+            onChange={this.handleChangePage}
+          />
+        </LoadingOverlay>
       </div>
     );
   }
