@@ -140,10 +140,8 @@ export class CheckboxGroup extends React.Component {
    * @param  {Event} onChange event object
    */
   handleChange({ target }) {
-    const {
-      value = [],
-      onChange,
-    } = this.props;
+    const { onChange } = this.props;
+    const value = this.props.value || [];
 
     let newValue = [];
 
@@ -204,10 +202,10 @@ export function FileInput({
     value: omitValue, // eslint-disable-line no-unused-vars
     onChange,
     onBlur,
-    ...inputProps,
+    ...inputProps
   },
   meta: omitMeta, // eslint-disable-line no-unused-vars
-  ...props,
+  ...props
 }) {
   return (
     <input
