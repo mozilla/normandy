@@ -6,6 +6,7 @@ import App from 'control_new/components/App';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
 import MissingPage from 'control_new/components/pages/MissingPage';
+import RecipeDetailPage from 'control_new/components/recipes/DetailPage';
 
 const routes = {
   '/': {
@@ -19,7 +20,7 @@ const routes = {
         crumb: 'New Recipe',
       },
       '/:pk': {
-        component: Dummy,
+        component: RecipeDetailPage,
         crumb: 'View Recipe',
       },
     },
