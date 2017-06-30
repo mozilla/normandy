@@ -3,24 +3,25 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 
-export default function ColumnSelector({ columns, onChange, options }) {
+export default function CheckboxMenu({ checkboxes, label, onChange, options }) {
   const menu = (
     <Checkbox.Group
       onChange={onChange}
       options={options}
-      defaultValue={columns}
+      defaultValue={checkboxes}
     />
   );
 
   return (
     <Dropdown overlay={menu}>
-      <Button icon="bars">Columns</Button>
+      <Button icon="bars">{label}</Button>
     </Dropdown>
   );
 }
 
-ColumnSelector.propTypes = {
-  columns: PropTypes.array,
+CheckboxMenu.propTypes = {
+  checkboxes: PropTypes.array,
+  label: PropTypes.string,
   onChange: PropTypes.func,
   options: PropTypes.array,
 };

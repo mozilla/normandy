@@ -5,17 +5,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { push, Link } from 'redux-little-router';
+import { push as pushAction, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipes from 'control_new/components/data/QueryRecipes';
-import ColumnSelector from 'control_new/components/tables/ColumnSelector';
+import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
-import {
-  fetchFilteredRecipesPage,
-  saveRecipeListingColumns,
-} from 'control_new/state/recipes/actions';
+import * as recipeActions from 'control_new/state/recipes/actions';
 import {
   getRecipeListingColumns,
   getRecipeListingCount,
@@ -30,87 +27,19 @@ import {
 @connect(
   state => ({
     columns: getRecipeListingColumns(state),
-    getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    searchText: getQueryParameter(state, 'searchText'),
-  }),
-  dispatch => (
-    bindActionCreators(
-      {
-        push,
-        saveRecipeListingColumns,
-      }, dispatch
-    )
-  )
-)
-@autobind
-class ActionBar extends React.Component {
-  static propTypes = {
-    columns: PropTypes.object,
-    getCurrentURL: PropTypes.func.isRequired,
-    push: PropTypes.func.isRequired,
-    saveRecipeListingColumns: PropTypes.func.isRequired,
-    searchText: PropTypes.string,
-  };
-
-  handleChangeSearch(value) {
-    this.props.push(
-      this.props.getCurrentURL({ searchText: value || undefined })
-    );
-  }
-
-  render() {
-    const { columns, searchText } = this.props;
-    return (
-      <Row gutter={16} className="list-action-bar">
-        <Col span={14}>
-          <Input.Search
-            className="search"
-            placeholder="Search..."
-            defaultValue={searchText}
-            onSearch={this.handleChangeSearch}
-          />
-        </Col>
-        <Col span={2}>
-          <ColumnSelector
-            columns={columns.toJS()}
-            onChange={this.props.saveRecipeListingColumns}
-            options={[
-              { label: 'Name', value: 'name' },
-              { label: 'Action', value: 'action' },
-              { label: 'Enabled', value: 'enabled' },
-              { label: 'Last Updated', value: 'lastUpdated' },
-            ]}
-          />
-        </Col>
-        <Col span={8} className="righted">
-          <Link href="/recipes/new">
-            <Button type="primary" icon="plus">New Recipe</Button>
-          </Link>
-        </Col>
-      </Row>
-    );
-  }
-}
-
-
-@connect(
-  state => ({
-    columns: getRecipeListingColumns(state),
     count: getRecipeListingCount(state),
     getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    ordering: getQueryParameter(state, 'ordering', '-last-updated'),
+    ordering: getQueryParameter(state, 'ordering', '-last_updated'),
     pageNumber: parseInt(getQueryParameter(state, 'page', 1), 10),
     recipes: getRecipeListingFlattenedAction(state),
     searchText: getQueryParameter(state, 'searchText'),
     status: getQueryParameter(state, 'status'),
   }),
   dispatch => (
-    bindActionCreators(
-      {
-        fetchFilteredRecipesPage,
-        push,
-      }, dispatch
-    )
+    bindActionCreators({
+      fetchFilteredRecipesPage: recipeActions.fetchFilteredRecipesPage,
+      push: pushAction,
+    }, dispatch)
   )
 )
 @autobind
@@ -222,7 +151,7 @@ export default class Listing extends React.Component {
           filters={this.getFilters()}
         />
         <LoadingOverlay>
-          <ActionBar />
+          <ListingActionBar />
 
           <DataList
             columns={columns}
