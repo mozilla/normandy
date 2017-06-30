@@ -44,7 +44,7 @@ class Detail extends React.Component {
     const { recipe } = this.props;
     return (
       <div>
-        <h1>Recipe</h1>
+        <h2>Recipe</h2>
 
         <dl className="detail">
           <dt>Name</dt>
@@ -53,16 +53,18 @@ class Detail extends React.Component {
           <dd>
             <pre><code>{recipe.get('extra_filter_expression')}</code></pre>
           </dd>
+          <dt>Action</dt>
+          <dd>{recipe.getIn(['action', 'name'])}</dd>
         </dl>
 
+        <h3>Action Arguments</h3>
+
         <dl className="detail">
-          <h1>Action Arguments</h1>
-          <h2>{recipe.getIn(['action', 'name'])}</h2>
-          {recipe.get('arguments').toSeq().map((key, value) => (
-             <span>
-                <dt key={`argument-key-${key}`}>{key}</dt>
-                <dd key={`argument-value-${key}`}>{value}</dd>
-             </span>
+          {recipe.get('arguments').toSeq().map((value, key) => (
+             [
+               <dt key={`argument-key-${key}`}>{key}</dt>,
+               <dd key={`argument-value-${key}`}>{value}</dd>,
+             ]
           ))}
         </dl>
 
