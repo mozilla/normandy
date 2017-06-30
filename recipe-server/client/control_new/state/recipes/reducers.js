@@ -9,6 +9,9 @@ import {
   RECIPES_LISTING_COLUMNS_CHANGE,
   RECIPES_PAGE_RECEIVE,
 } from 'control_new/state/action-types';
+import {
+  RECIPE_LISTING_COLUMNS,
+} from 'control_new/state/constants';
 
 
 function filters(state = new Map(), action) {
@@ -71,7 +74,9 @@ function listing(state = new Map(), action) {
         .set('results', fromJS(action.recipes.results.map(result => result.id)));
 
     case RECIPES_LISTING_COLUMNS_CHANGE:
-      return state.set('columns', new List(action.columns));
+      return state.set('columns', RECIPE_LISTING_COLUMNS.filter(column => (
+        action.columns.includes(column)
+      )));
 
     default:
       return state;

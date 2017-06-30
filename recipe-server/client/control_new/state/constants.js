@@ -7,6 +7,14 @@ export const DEFAULT_REQUEST = new Map({
 });
 
 
+export const RECIPE_LISTING_COLUMNS = new List([
+  'name',
+  'action',
+  'enabled',
+  'lastUpdated',
+]);
+
+
 export const DEFAULT_RECIPE_LISTING_COLUMNS = new List([
   'name',
   'action',
