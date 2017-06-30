@@ -32,6 +32,7 @@ export default class DataList extends React.Component {
     columns: PropTypes.object.isRequired,
     dataSource: PropTypes.array.isRequired,
     getCurrentURL: PropTypes.func.isRequired,
+    onRowClick: PropTypes.func,
     ordering: PropTypes.string,
     push: PropTypes.func.isRequired,
   }
@@ -61,7 +62,7 @@ export default class DataList extends React.Component {
   }
 
   render() {
-    const { columnRenderers, columns, dataSource } = this.props;
+    const { columnRenderers, columns, dataSource, onRowClick } = this.props;
 
     return (
       <Table
@@ -70,6 +71,7 @@ export default class DataList extends React.Component {
         pagination={false}
         rowKey="id"
         onChange={this.handleChangeSortFilters}
+        onRowClick={onRowClick}
         bordered
       >
         {columns.map(column => columnRenderers[column](this.props))}

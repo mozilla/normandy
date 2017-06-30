@@ -64,6 +64,7 @@ export default class Listing extends React.Component {
           title="Name"
           dataIndex="name"
           key="name"
+          render={Listing.renderLinkedText}
           sortOrder={DataList.getSortOrder('name', ordering)}
           sorter
         />
@@ -76,6 +77,7 @@ export default class Listing extends React.Component {
           title="Action"
           dataIndex="action"
           key="action"
+          render={Listing.renderLinkedText}
         />
       );
     },
@@ -105,9 +107,9 @@ export default class Listing extends React.Component {
           render={(text, record) => {
             const lastUpdated = moment(record.last_updated);
             return (
-              <span title={lastUpdated.format('LLLL')}>
+              <Link href={`/recipes/${record.id}`} title={lastUpdated.format('LLLL')}>
                 {lastUpdated.fromNow()}
-              </span>
+              </Link>
             );
           }}
           sortOrder={DataList.getSortOrder('last_updated', ordering)}
@@ -115,6 +117,10 @@ export default class Listing extends React.Component {
         />
       );
     },
+  }
+
+  static renderLinkedText(text, record) {
+    return <Link href={`/recipes/${record.id}`}>{text}</Link>;
   }
 
   getFilters() {
@@ -136,9 +142,13 @@ export default class Listing extends React.Component {
   }
 
   handleChangePage(page) {
-    this.props.push(
-      this.props.getCurrentURL({ page })
-    );
+    const { getCurrentURL, push } = this.props;
+    push(getCurrentURL({ page }));
+  }
+
+  handleRowClick(record) {
+    const { push } = this.props;
+    push(`recipes/${record.id}`);
   }
 
   render() {
@@ -158,6 +168,7 @@ export default class Listing extends React.Component {
             columnRenderers={Listing.columnRenderers}
             dataSource={recipes.toJS()}
             ordering={ordering}
+            onRowClick={this.handleRowClick}
             status={status}
           />
 

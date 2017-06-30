@@ -41,9 +41,7 @@ export default class ListingActionBar extends React.Component {
 
   handleChangeSearch(value) {
     const { getCurrentURL, push } = this.props;
-    push(
-      getCurrentURL({ searchText: value || undefined })
-    );
+    push(getCurrentURL({ searchText: value || undefined }));
   }
 
   render() {
