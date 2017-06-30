@@ -19,11 +19,21 @@ body {
   }
 }
 
+#main,
+#main > .ant-layout {
+  align-content: stretch;
+  align-items: stretch;
+  display: flex;
+  flex: 1;
+  justify-content: flex-start;
+}
+
 .logo {
   color: #333;
   font-size: 22px;
   padding-left: 48px;
   position: relative;
+  white-space: nowrap;
 
   &::before {
     background: url('../img/logo.png');
@@ -37,6 +47,11 @@ body {
     position: absolute;
     top: 50%;
     width: 32px;
+  }
+
+  @media (max-width: @screen-xs) {
+    font-size: 5.5vw;
+    padding-left: 38px;
   }
 }
 

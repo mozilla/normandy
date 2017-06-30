@@ -2,6 +2,7 @@ import { Layout, LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Link } from 'redux-little-router';
 
 import NavigationCrumbs from 'control_new/components/common/NavigationCrumbs';
 import NavigationMenu from 'control_new/components/common/NavigationMenu';
@@ -14,12 +15,16 @@ export default function App({ children }) {
       <Layout>
         <Header>
           <div className="logo">
-            SHIELD Control Panel
+            <Link href="/">SHIELD Control Panel</Link>
           </div>
         </Header>
 
         <Layout>
-          <Sider width={200} className="sidebar">
+          <Sider
+            className="sidebar"
+            breakpoint="sm"
+            collapsedWidth="0"
+          >
             <NavigationMenu />
           </Sider>
 
