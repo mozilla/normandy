@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { push } from 'redux-little-router';
+import { push as pushAction } from 'redux-little-router';
 import { isEmpty, mapObject } from 'underscore';
 
 import {
@@ -17,11 +17,9 @@ import {
     getCurrentURL: queryParams => getCurrentURL(state, queryParams),
   }),
   dispatch => (
-    bindActionCreators(
-      {
-        push,
-      }, dispatch
-    )
+    bindActionCreators({
+      push: pushAction,
+    }, dispatch)
   )
 )
 @autobind
@@ -44,6 +42,7 @@ export default class DataList extends React.Component {
   }
 
   handleChangeSortFilters(pagination, filters, sorter) {
+    const { getCurrentURL, push } = this.props;
     const filterParams = mapObject(filters, values => values.join(',') || undefined);
 
     let ordering;
@@ -52,12 +51,11 @@ export default class DataList extends React.Component {
       ordering = `${prefix}${sorter.field}`;
     }
 
-    this.props.push(
-      this.props.getCurrentURL({
-        ordering,
-        ...filterParams,
-      })
-    );
+    push(getCurrentURL({
+      page: undefined, // Return to the first page
+      ordering,
+      ...filterParams,
+    }));
   }
 
   render() {
