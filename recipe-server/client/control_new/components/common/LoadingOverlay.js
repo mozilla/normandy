@@ -8,7 +8,7 @@ import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
 
 @connect(
   state => ({
-    loading: areAnyRequestsInProgress(state) || false,
+    loading: areAnyRequestsInProgress(state),
   })
 )
 export default class LoadingOverlay extends React.Component {

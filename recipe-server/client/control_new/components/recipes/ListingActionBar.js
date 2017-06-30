@@ -13,14 +13,14 @@ import {
 } from 'control_new/state/recipes/selectors';
 import {
   getCurrentURL,
-  getQueryParameter,
+  getQueryParam,
 } from 'control_new/state/router/selectors';
 
 @connect(
   state => ({
     columns: getRecipeListingColumns(state),
     getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    searchText: getQueryParameter(state, 'searchText'),
+    searchText: getQueryParam(state, 'searchText'),
   }),
   dispatch => (
     bindActionCreators({

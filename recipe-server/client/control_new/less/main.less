@@ -29,6 +29,10 @@ body {
   display: flex;
   flex: 1;
   justify-content: flex-start;
+
+  .ant-layout-content {
+    flex: 0
+  }
 }
 
 .centered {
@@ -43,11 +47,11 @@ body {
   font-size: 16px;
   font-weight: bold;
 
-  &.true {
+  &.is-true {
     color: #0C0;
   }
 
-  &.false {
+  &.is-false {
     color: #C00;
   }
 }

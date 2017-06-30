@@ -9,7 +9,6 @@ import { isEmpty, mapObject } from 'underscore';
 
 import {
   getCurrentURL,
-  getQueryParameter,
 } from 'control_new/state/router/selectors';
 
 
@@ -50,7 +49,7 @@ export default class DataList extends React.Component {
     let ordering;
     if (!isEmpty(sorter)) {
       const prefix = sorter.order === 'ascend' ? '' : '-';
-      ordering = prefix + sorter.field;
+      ordering = `${prefix}${sorter.field}`;
     }
 
     this.props.push(

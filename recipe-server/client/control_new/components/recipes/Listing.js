@@ -20,7 +20,8 @@ import {
 } from 'control_new/state/recipes/selectors';
 import {
   getCurrentURL,
-  getQueryParameter,
+  getQueryParam,
+  getQueryParamAsInt,
 } from 'control_new/state/router/selectors';
 
 
@@ -29,11 +30,11 @@ import {
     columns: getRecipeListingColumns(state),
     count: getRecipeListingCount(state),
     getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    ordering: getQueryParameter(state, 'ordering', '-last_updated'),
-    pageNumber: parseInt(getQueryParameter(state, 'page', 1), 10),
+    ordering: getQueryParam(state, 'ordering', '-last_updated'),
+    pageNumber: getQueryParamAsInt(state, 'page', 1),
     recipes: getRecipeListingFlattenedAction(state),
-    searchText: getQueryParameter(state, 'searchText'),
-    status: getQueryParameter(state, 'status'),
+    searchText: getQueryParam(state, 'searchText'),
+    status: getQueryParam(state, 'status'),
   }),
   dispatch => (
     bindActionCreators({
@@ -146,9 +147,9 @@ export default class Listing extends React.Component {
     push(getCurrentURL({ page }));
   }
 
-  handleRowClick(record) {
+  handleRowClick(record, index, event) {
     const { push } = this.props;
-    push(`recipes/${record.id}`);
+    push(`/recipes/${record.id}`);
   }
 
   render() {

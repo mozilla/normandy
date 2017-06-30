@@ -16,14 +16,17 @@ export function isRequestInProgress(state, id) {
 
 
 export function areAnyRequestsInProgress(state) {
-  if (state.app.requests.size === 0) {
+  const { requests } = state.app;
+
+  if (requests.size === 0) {
     return false;
-  } else if (state.app.requests.size === 1) {
-    return state.app.requests.first().get('inProgress');
+  } else if (requests.size === 1) {
+    return requests.first().get('inProgress', false);
   }
 
-  return state.app.requests.reduce((reduced, value) => {
-    const boolValue = reduced instanceof Map ? reduced.get('inProgress') : reduced;
-    return boolValue || value.get('inProgress');
-  });
+  return requests
+    .reduce((reduced, value) => (
+      reduced.set('inProgress', reduced.get('inProgress') || value.get('inProgress'))
+    ))
+    .get('inProgress', false);
 }
