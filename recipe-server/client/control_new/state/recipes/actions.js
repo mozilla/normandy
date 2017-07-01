@@ -142,17 +142,17 @@ export function fetchRecipeHistory(pk) {
     const requestId = `fetch-recipe-history-${pk}`;
     const revisions = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/history/`));
 
-    dispatch({
-      type: RECIPE_HISTORY_RECEIVE,
-      recipeId: pk,
-      revisions,
-    });
-
     revisions.forEach(revision => {
       dispatch({
         type: REVISION_RECEIVE,
         revision,
       });
+    });
+
+    dispatch({
+      type: RECIPE_HISTORY_RECEIVE,
+      recipeId: pk,
+      revisions,
     });
   };
 }

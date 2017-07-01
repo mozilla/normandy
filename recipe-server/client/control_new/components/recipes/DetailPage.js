@@ -1,77 +1,62 @@
+import { Card, Col, Row } from 'antd';
+import { Map } from 'immutable';
+import PropTypes from 'prop-types';
 import React from 'react';
-import pt from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'redux-little-router';
-import { Row, Col, Spin, Card } from 'antd';
 
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
-import { getCurrentRecipe } from 'control_new/state/recipes/selectors';
+import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
+import Details from 'control_new/components/recipes/Details';
+import DetailsActionBar from 'control_new/components/recipes/DetailsActionBar';
+import HistoryTimeline from 'control_new/components/recipes/HistoryTimeline';
+import {
+  getLatestRevisionIdForRecipe,
+  getRecipeHistory,
+} from 'control_new/state/recipes/selectors';
+import { getRevision } from 'control_new/state/revisions/selectors';
+import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
+
 
 @connect(
-  state => ({
-    recipe: getCurrentRecipe(state),
-  })
+  state => {
+    const recipeId = getUrlParamAsInt(state, 'recipeId');
+    const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId);
+    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
+    const revision = getRevision(state, revisionId, new Map());
+
+    return {
+      history: getRecipeHistory(state, recipeId),
+      recipeId,
+      revision,
+      revisionId,
+    };
+  }
 )
 export default class DetailPage extends React.Component {
   static propTypes = {
-    recipe: pt.object,
+    history: PropTypes.object,
+    recipeId: PropTypes.number.isRequired,
+    revision: PropTypes.object,
+    revisionId: PropTypes.string,
   }
 
   render() {
-    const { recipe } = this.props;
+    const { history, recipeId, revision, revisionId } = this.props;
     return (
-      <div className="page-recipe-detail">
-        <QueryRecipe />
-        <Row>
+      <div className="page-recipe-details">
+        <QueryRecipe pk={recipeId} />
+        <QueryRecipeHistory pk={recipeId} />
+        <Row gutter={24}>
           <Col span={16}>
-            {recipe ? <Detail recipe={recipe} /> : <Spin />}
+            <DetailsActionBar />
+            <Details recipe={revision.get('recipe', new Map())} />
           </Col>
-          <Col span={8}>
-            History goes here
+          <Col span={8} className="recipe-history">
+            <Card title="History">
+              <HistoryTimeline history={history} selectedRevisionId={revisionId} />
+            </Card>
           </Col>
         </Row>
-      </div>
-    );
-  }
-}
-
-class Detail extends React.Component {
-  static propTypes = {
-    recipe: pt.object.isRequired,
-  }
-
-  render() {
-    const { recipe } = this.props;
-    return (
-      <div>
-        <h2>Recipe</h2>
-
-        <dl className="detail">
-          <dt>Name</dt>
-          <dd>{recipe.get('name')}</dd>
-          <dt>Filters</dt>
-          <dd>
-            <pre><code>{recipe.get('extra_filter_expression')}</code></pre>
-          </dd>
-          <dt>Action</dt>
-          <dd>{recipe.getIn(['action', 'name'])}</dd>
-        </dl>
-
-        <h3>Action Arguments</h3>
-
-        <dl className="detail">
-          {recipe.get('arguments').toSeq().map((value, key) => (
-             [
-               <dt key={`argument-key-${key}`}>{key}</dt>,
-               <dd key={`argument-value-${key}`}>{value}</dd>,
-             ]
-          ))}
-        </dl>
-
-        <hr />
-        <hr />
-
-        {recipe ? <pre><code>{JSON.stringify(recipe, null, 4)}</code></pre> : "Loading..."}
       </div>
     );
   }

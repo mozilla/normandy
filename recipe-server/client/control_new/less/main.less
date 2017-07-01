@@ -5,24 +5,43 @@
 // Pages
 @import 'pages/404';
 @import 'pages/gateway';
+@import 'pages/recipe-details';
 
 // Common
 body {
   height: 100%;
 }
 
-dl.detail {
+.clearfix() {
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
+dl.details {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  font-size: 14px;
+  grid-template-columns: 140px 1fr;
 
   dt, dd {
-    border-top: 1px solid #ccc;
-    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    padding: 16px 0;
+
+    &:first-of-type {
+      padding-top: 0;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
   }
 
   dt {
-    color: #888;
+    color: #999;
+    font-weight: bold;
+    text-transform: uppercase;
   }
 
   h1 {
@@ -62,10 +81,6 @@ dl.detail {
 .content {
   background: @white;
   padding: 24px;
-
-  a {
-    border-bottom: 1px dotted;
-  }
 }
 
 #main {

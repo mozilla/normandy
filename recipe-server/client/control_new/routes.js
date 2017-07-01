@@ -19,9 +19,13 @@ const routes = {
         component: Dummy,
         crumb: 'New Recipe',
       },
-      '/:pk': {
+      '/:recipeId': {
         component: RecipeDetailPage,
         crumb: 'View Recipe',
+        '/rev/:revisionId': {
+          component: RecipeDetailPage,
+          crumb: 'Revision',
+        },
       },
     },
     '/extensions': {

@@ -1,9 +1,7 @@
-import { List } from 'immutable';
-
-export function getUrlParam(state, name) {
-  return state.router.params[name];
+export function getUrlParam(state, name, defaultsTo) {
+  return state.router.params[name] || defaultsTo;
 }
 
-export function getPk(state) {
-  return parseInt(getUrlParam(state, 'pk'));
+export function getUrlParamAsInt(state, name, defaultsTo) {
+  return parseInt(getUrlParam(state, name, defaultsTo), 10);
 }

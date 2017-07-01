@@ -8,24 +8,24 @@ import * as recipeActions from 'control_new/state/recipes/actions';
 @connect(
   null,
   dispatch => (bindActionCreators({
-    fetchRecipe: recipeActions.fetchRecipe,
+    fetchRecipeHistory: recipeActions.fetchRecipeHistory,
   }, dispatch))
 )
-export default class QueryRecipe extends React.Component {
+export default class QueryRecipeHistory extends React.Component {
   static propTypes = {
-    fetchRecipe: PropTypes.func.isRequired,
+    fetchRecipeHistory: PropTypes.func.isRequired,
     pk: PropTypes.number.isRequired,
   }
 
   componentWillMount() {
-    const { fetchRecipe, pk } = this.props;
-    fetchRecipe(pk);
+    const { fetchRecipeHistory, pk } = this.props;
+    fetchRecipeHistory(pk);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { fetchRecipe, pk } = this.props;
+    const { fetchRecipeHistory, pk } = this.props;
     if (pk !== nextProps.pk) {
-      fetchRecipe(nextProps.pk);
+      fetchRecipeHistory(nextProps.pk);
     }
   }
 

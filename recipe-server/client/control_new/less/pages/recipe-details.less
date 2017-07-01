@@ -1,0 +1,44 @@
+.page-recipe-details {
+  .ant-card {
+    margin: 16px 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  > .ant-row {
+    position: relative;
+  }
+
+  .recipe-history {
+    bottom: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    > .ant-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      > .ant-card-body {
+        flex: 1;
+        overflow: auto;
+      }
+    }
+  }
+}
+
+.details-action-bar {
+  margin-bottom: 16px;
+
+  button {
+    float: right;
+    margin-left: 8px;
+  }
+}
