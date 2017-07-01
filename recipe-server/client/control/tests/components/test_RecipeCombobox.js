@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { mount } from 'enzyme';
-import { multiStubbedFilters } from 'control/tests/fixtures';
 
+import { multiStubbedFilters } from 'control/tests/fixtures';
 import RecipeCombobox from 'control/components/RecipeCombobox';
 
 const noop = () => {};

@@ -19,7 +19,7 @@ class QueryExtension extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { pk } = this.props;
-    if (pk !== nextProps.pk) {
+    if (nextProps.pk && pk !== nextProps.pk) {
       this.props.fetchExtension(nextProps.pk);
     }
   }

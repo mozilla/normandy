@@ -1,3 +1,5 @@
+import titleize from 'underscore.string/titleize';
+
 import makeApiRequest from 'control/api';
 
 import {
@@ -9,7 +11,6 @@ import {
   getFilterParamString,
 } from 'control/selectors/FiltersSelector';
 
-import titleize from 'underscore.string/titleize';
 
 export const SET_FILTER = 'SET_FILTER';
 export const SET_TEXT_FILTER = 'SET_TEXT_FILTER';

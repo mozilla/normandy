@@ -1,6 +1,7 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
 import { dismissNotification } from 'control/actions/NotificationActions';
 
 const notificationPropType = pt.shape({

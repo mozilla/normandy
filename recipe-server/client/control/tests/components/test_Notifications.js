@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+
 import { DisconnectedNotifications, Notification } from 'control/components/Notifications.js';
 
 describe('Notification components', () => {

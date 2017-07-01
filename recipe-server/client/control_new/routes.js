@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { routerForBrowser } from 'redux-little-router';
 
 import App from 'control_new/components/App';
+import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
+import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
 import MissingPage from 'control_new/components/pages/MissingPage';
@@ -28,16 +30,16 @@ const routes = {
         },
       },
     },
-    '/extensions': {
+    '/extension': {
       component: Dummy,
       crumb: 'Extensions Listing',
       '/new': {
-        component: Dummy,
+        component: CreateExtensionPage,
         crumb: 'New Extension',
       },
       '/:pk': {
-        component: Dummy,
-        crumb: 'View Extension',
+        component: EditExtensionPage,
+        crumb: 'Edit Extension',
       },
     },
   },

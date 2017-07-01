@@ -2,8 +2,8 @@ import { compose, createStore, applyMiddleware } from 'redux';
 import { browserHistory } from 'react-router';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
-import DevTools from 'control/components/DevTools.js';
 
+import DevTools from 'control/components/DevTools.js';
 import reducers from 'control/reducers';
 
 const reduxRouterMiddleware = routerMiddleware(browserHistory);

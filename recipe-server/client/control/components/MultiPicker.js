@@ -1,5 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import cx from 'classnames';
+
 import Frame from 'control/components/Frame';
 
 /**
