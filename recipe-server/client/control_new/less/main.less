@@ -5,6 +5,7 @@
 // Pages
 @import 'pages/404';
 @import 'pages/gateway';
+@import 'pages/recipe_form';
 @import 'listing';
 
 @primary-color: #1C5253;
@@ -31,7 +32,7 @@ body {
   justify-content: flex-start;
 
   .ant-layout-content {
-    flex: 0
+    flex: 0;
   }
 }
 
@@ -129,5 +130,14 @@ body {
   .primary > :not(:last-child),
   .secondary > :not(:last-child) {
     margin-left: 15px;
+  }
+}
+
+fieldset {
+  border: none;
+
+  legend {
+    color: #222;
+    font-weight: bold;
   }
 }
