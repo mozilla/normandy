@@ -350,6 +350,7 @@ class Development(Base):
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
     PEER_APPROVAL_ENFORCED = values.BooleanValue(False)
+    CSP_REPORT_URI = values.Value('')
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
