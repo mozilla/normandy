@@ -1,0 +1,41 @@
+.action-info {
+  background: #E9E9E9;
+  border-radius: @border-radius-base;
+  margin-bottom: @form-item-margin-bottom;
+  padding: 15px;
+}
+
+// Fix implicit input groups (like inputs with addonBefore) from not extending
+// to full width.
+.ant-input-group-wrapper {
+  display: block;
+}
+
+.branch-list {
+  // Force form fields in the branch listing to be displayed inline.
+  .ant-form-inline();
+
+  .branch {
+    background: #E9E9E9;
+    border-radius: @border-radius-base;
+    margin-bottom: @form-item-margin-bottom;
+    padding: 15px;
+  }
+
+  .branch-fields {
+    display: flex;
+    line-height: 30px; // Prevent form items from shifting down
+
+    .ant-form-item {
+      flex: 1;
+    }
+
+    .ant-form-item-label {
+      font-weight: bold;
+    }
+
+    .delete-btn {
+      flex: 0;
+    }
+  }
+}
