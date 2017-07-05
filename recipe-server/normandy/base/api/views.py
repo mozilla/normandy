@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView, exception_handler as original_exception_handler
 
-from normandy.base.api.serializers import UserSerializer
+from normandy.base.api.serializers import UserSerializer, ServiceInfoSerializer
 
 
 class APIRootView(APIView):
@@ -52,6 +52,19 @@ class CurrentUserView(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(UserSerializer(request.user).data)
+
+
+class ServiceInfoView(APIView):
+    def get(self, request):
+        if request.user.is_authenticated():
+            user = request.user
+        else:
+            user = None
+
+        return Response(ServiceInfoSerializer({
+            'user': user,
+            'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
+        }).data)
 
 
 def exception_handler(exc, context):
