@@ -16,6 +16,7 @@ import {
 } from 'control_new/state/app/recipes/selectors';
 import { getRevision } from 'control_new/state/app/revisions/selectors';
 import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
+import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
 
 
 @connect(
@@ -43,13 +44,21 @@ export default class RecipeDetailPage extends React.Component {
 
   render() {
     const { history, recipeId, revision, revisionId } = this.props;
+
     return (
       <div className="page-recipe-details">
         <QueryRecipe pk={recipeId} />
         <Row gutter={24}>
           <Col span={16}>
-            <DetailsActionBar />
-            <RevisionNotice revision={revision} />
+            <Row>
+              <Col span={4}>
+                <ShieldIdenticon seed={recipeId} letter={revision.getIn(['recipe', 'name'])} />
+              </Col>
+              <Col span={20}>
+                <DetailsActionBar />
+                <RevisionNotice revision={revision} />
+              </Col>
+            </Row>
             <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
               <RecipeDetails recipe={revision.get('recipe', new Map())} />
             </LoadingOverlay>

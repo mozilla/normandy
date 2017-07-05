@@ -26,6 +26,7 @@ import {
   getQueryParam,
   getQueryParamAsInt,
 } from 'control_new/state/router/selectors';
+import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
 
 
 @connect(
@@ -74,7 +75,14 @@ export default class RecipeListing extends React.Component {
           title="Name"
           dataIndex="name"
           key="name"
-          render={RecipeListing.renderLinkedText}
+          render={(text, record) => {
+            return (
+              <div className="recipe-listing-name">
+                <ShieldIdenticon seed={record.id} letter={text} size={24}/>
+                {RecipeListing.renderLinkedText(text, record)}
+              </div>
+            );
+          }}
           sortOrder={DataList.getSortOrder('name', ordering)}
           sorter
         />
@@ -170,7 +178,7 @@ export default class RecipeListing extends React.Component {
     const requestId = `fetch-filtered-recipes-page-${pageNumber}-${filterIds.join('-')}`;
 
     return (
-      <div>
+      <div className="page-recipe-listing">
         <QueryRecipeListingColumns />
         <QueryFilteredRecipes
           pageNumber={pageNumber}
