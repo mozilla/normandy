@@ -47,7 +47,7 @@ describe('Recipes reducer', () => {
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(RECIPE.id, fromJS(reducedRecipe))
+      INITIAL_STATE.items.set(RECIPE.id, fromJS(reducedRecipe)),
     );
   });
 

@@ -219,7 +219,7 @@ export default class ShowHeartbeatAction extends Action {
         // if a heartbeat has been shown in the past 24 hours
         await this.heartbeatShownRecently() ||
         // or this specific heartbeat has already ran
-        await this.heartbeatHasExecuted()
+        this.heartbeatHasExecuted()
       );
   }
 

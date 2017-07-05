@@ -148,7 +148,7 @@ class PickerControl extends React.Component {
 
     return (
       <option disabled className="option-label">
-       {filterText ? `No results found for "${filterText}"` : noneLabel}
+        {filterText ? `No results found for "${filterText}"` : noneLabel}
       </option>
     );
   }

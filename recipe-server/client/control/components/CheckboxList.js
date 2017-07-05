@@ -55,21 +55,19 @@ export default class CheckboxList extends React.Component {
     const { options } = this.props;
     return (
       <ul className="checkbox-list">
-        {
-          (options).map((option, index) =>
-            <li key={option.value + index}>
-              <label>
-                <input
-                  name={option.value}
-                  type="checkbox"
-                  defaultChecked={option.enabled}
-                  onChange={this.handleCheckboxChange(option.value)}
-                />
-                { option.label }
-              </label>
-            </li>
-          )
-        }
+        {options.map((option, index) => (
+          <li key={option.value + index}>
+            <label>
+              <input
+                name={option.value}
+                type="checkbox"
+                defaultChecked={option.enabled}
+                onChange={this.handleCheckboxChange(option.value)}
+              />
+              { option.label }
+            </label>
+          </li>
+        ))}
       </ul>
     );
   }

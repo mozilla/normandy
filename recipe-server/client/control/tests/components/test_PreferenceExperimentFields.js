@@ -40,7 +40,7 @@ describe('<PreferenceBranches>', () => {
 describe('<BranchFields>', () => {
   it('should render the remove button if it is not disabled', () => {
     const wrapper = shallow(
-      <BranchFields branch="branch" onClickDelete={() => {}} preferenceType="string" index={1} />
+      <BranchFields branch="branch" onClickDelete={() => {}} preferenceType="string" index={1} />,
     );
     expect(wrapper.find(RemoveBranchButton).length).toBe(1);
   });
@@ -53,7 +53,7 @@ describe('<BranchFields>', () => {
         preferenceType="string"
         index={1}
         disabled
-      />
+      />,
     );
     expect(wrapper.find(RemoveBranchButton).length).toBe(0);
   });

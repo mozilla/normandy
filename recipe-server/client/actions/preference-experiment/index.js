@@ -1,4 +1,3 @@
-/* globals normandy */
 import { Action, registerAction, registerAsyncCallback } from '../utils';
 
 let seenExperimentNames = [];
@@ -46,7 +45,7 @@ export default class PreferenceExperimentAction extends Action {
             preferenceValue: branch.value,
             preferenceBranchType,
             preferenceType,
-          })
+          }),
         );
       }
 

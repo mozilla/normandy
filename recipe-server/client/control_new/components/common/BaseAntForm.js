@@ -16,6 +16,10 @@ export default class BaseAntForm extends React.Component {
     errors: pt.object,
   }
 
+  static defaultProps = {
+    errors: null,
+  }
+
   handleSubmit(event) {
     event.preventDefault();
     this.triggerSubmit();
@@ -89,4 +93,11 @@ BaseAntForm.prototype.FormItem.propTypes = {
   initialValue: pt.any,
   rules: pt.arrayOf(pt.object),
   config: pt.object,
+};
+
+BaseAntForm.prototype.FormItem.defaultProps = {
+  children: null,
+  initialValue: null,
+  rules: null,
+  config: null,
 };
