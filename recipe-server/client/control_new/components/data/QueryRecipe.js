@@ -9,7 +9,7 @@ import * as recipeActions from 'control_new/state/recipes/actions';
   null,
   dispatch => (bindActionCreators({
     fetchRecipe: recipeActions.fetchRecipe,
-  }, dispatch))
+  }, dispatch)),
 )
 export default class QueryRecipe extends React.Component {
   static propTypes = {

@@ -17,14 +17,14 @@ import {
     isLive: isLiveRevision(state, revision.get('id')),
     isRejected: isRejectedRevision(state, revision.get('id')),
     isPendingApproval: isRevisionPendingApproval(state, revision.get('id')),
-  })
+  }),
 )
 export default class RevisionApprovalTag extends React.Component {
   static propTypes = {
-    isApproved: PropTypes.bool,
-    isLive: PropTypes.bool,
-    isRejected: PropTypes.bool,
-    isPendingApproval: PropTypes.bool,
+    isApproved: PropTypes.bool.isRequired,
+    isLive: PropTypes.bool.isRequired,
+    isRejected: PropTypes.bool.isRequired,
+    isPendingApproval: PropTypes.bool.isRequired,
     revision: PropTypes.object.isRequired,
   }
 

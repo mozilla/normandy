@@ -9,7 +9,7 @@ import * as recipeActions from 'control_new/state/recipes/actions';
   null,
   dispatch => (bindActionCreators({
     fetchRecipeHistory: recipeActions.fetchRecipeHistory,
-  }, dispatch))
+  }, dispatch)),
 )
 export default class QueryRecipeHistory extends React.Component {
   static propTypes = {

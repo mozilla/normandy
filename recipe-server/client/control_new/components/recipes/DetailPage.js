@@ -30,14 +30,14 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
       revision,
       revisionId,
     };
-  }
+  },
 )
 export default class DetailPage extends React.Component {
   static propTypes = {
-    history: PropTypes.object,
+    history: PropTypes.object.isRequired,
     recipeId: PropTypes.number.isRequired,
-    revision: PropTypes.object,
-    revisionId: PropTypes.string,
+    revision: PropTypes.object.isRequired,
+    revisionId: PropTypes.string.isRequired,
   }
 
   render() {

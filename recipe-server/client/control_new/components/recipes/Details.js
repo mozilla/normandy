@@ -44,5 +44,5 @@ export default function Details({ recipe }) {
 }
 
 Details.propTypes = {
-  recipe: PropTypes.object,
+  recipe: PropTypes.object.isRequired,
 };

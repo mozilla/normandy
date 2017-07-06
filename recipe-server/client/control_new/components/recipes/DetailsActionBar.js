@@ -25,10 +25,10 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
 )
 export default class DetailsActionBar extends React.Component {
   static propTypes = {
-    isLatestApproved: PropTypes.bool,
-    recipe: PropTypes.object,
-    recipeId: PropTypes.number,
-    revisionId: PropTypes.string,
+    isLatestApproved: PropTypes.bool.isRequired,
+    recipe: PropTypes.object.isRequired,
+    recipeId: PropTypes.number.isRequired,
+    revisionId: PropTypes.string.isRequired,
   };
 
   render() {

@@ -17,9 +17,9 @@ import * as revisionsSelectors from 'control_new/state/revisions/selectors';
 export default class HistoryTimeline extends React.Component {
   static propTypes = {
     getRecipeIdForRevision: PropTypes.func.isRequired,
-    history: PropTypes.object,
+    history: PropTypes.object.isRequired,
     isLatestRevision: PropTypes.func.isRequired,
-    selectedRevisionId: PropTypes.string,
+    selectedRevisionId: PropTypes.string.isRequired,
   }
 
   render() {
