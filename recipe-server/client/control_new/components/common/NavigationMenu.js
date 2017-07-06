@@ -18,17 +18,17 @@ export function NavigationMenu({ router }) {
       <Item key="/"><Link href="/">Home</Link></Item>
 
       <SubMenu title="Recipes" key="Recipes">
-        <Item key="/recipes">
-          <Link href="/recipes">View All</Link>
+        <Item key="/recipe">
+          <Link href="/recipe">View All</Link>
         </Item>
-        <Item key="/recipes?hearbeat">
-          <Link href="/recipes?hearbeat">Heartbeat</Link>
+        <Item key="/recipe?hearbeat">
+          <Link href="/recipe?hearbeat">Heartbeat</Link>
         </Item>
-        <Item key="/recipes?console-log">
-          <Link href="/recipes?console-log">console-log</Link>
+        <Item key="/recipe?console-log">
+          <Link href="/recipe?console-log">console-log</Link>
         </Item>
-        <Item key="/recipes?pref-study">
-          <Link href="/recipes?pref-study">Preference Study</Link>
+        <Item key="/recipe?pref-study">
+          <Link href="/recipe?pref-study">Preference Study</Link>
         </Item>
       </SubMenu>
 
