@@ -1,6 +1,3 @@
-/* eslint import/prefer-default-export: "off" */
-import { Map } from 'immutable';
-
 import { DEFAULT_REQUEST } from 'control_new/state/constants';
 
 

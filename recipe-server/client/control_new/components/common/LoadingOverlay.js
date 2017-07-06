@@ -9,12 +9,16 @@ import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
 @connect(
   state => ({
     loading: areAnyRequestsInProgress(state),
-  })
+  }),
 )
 export default class LoadingOverlay extends React.Component {
   static propTypes = {
     children: PropTypes.any,
     loading: PropTypes.bool.isRequired,
+  }
+
+  static defaultProps = {
+    children: null,
   }
 
   render() {

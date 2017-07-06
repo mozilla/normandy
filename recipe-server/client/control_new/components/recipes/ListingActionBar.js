@@ -1,4 +1,4 @@
-import { Button, Col, Input, Row } from 'antd'
+import { Button, Col, Input, Row } from 'antd';
 import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -11,23 +11,20 @@ import * as recipeActions from 'control_new/state/recipes/actions';
 import {
   getRecipeListingColumns,
 } from 'control_new/state/recipes/selectors';
-import {
-  getCurrentURL,
-  getQueryParam,
-} from 'control_new/state/router/selectors';
+import * as routerSelectors from 'control_new/state/router/selectors';
 
 @connect(
   state => ({
     columns: getRecipeListingColumns(state),
-    getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    searchText: getQueryParam(state, 'searchText'),
+    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
+    searchText: routerSelectors.getQueryParam(state, 'searchText'),
   }),
   dispatch => (
     bindActionCreators({
       push: pushAction,
       saveRecipeListingColumns: recipeActions.saveRecipeListingColumns,
     }, dispatch)
-  )
+  ),
 )
 @autobind
 export default class ListingActionBar extends React.Component {
@@ -38,6 +35,11 @@ export default class ListingActionBar extends React.Component {
     saveRecipeListingColumns: PropTypes.func.isRequired,
     searchText: PropTypes.string,
   };
+
+  static defaultProps = {
+    columns: null,
+    searchText: null,
+  }
 
   handleChangeSearch(value) {
     const { getCurrentURL, push } = this.props;

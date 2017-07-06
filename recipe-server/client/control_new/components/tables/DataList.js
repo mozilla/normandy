@@ -7,20 +7,18 @@ import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 import { isEmpty, mapObject } from 'underscore';
 
-import {
-  getCurrentURL,
-} from 'control_new/state/router/selectors';
+import * as routerSelectors from 'control_new/state/router/selectors';
 
 
 @connect(
   state => ({
-    getCurrentURL: queryParams => getCurrentURL(state, queryParams),
+    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
   }),
   dispatch => (
     bindActionCreators({
       push: pushAction,
     }, dispatch)
-  )
+  ),
 )
 @autobind
 export default class DataList extends React.Component {
@@ -29,9 +27,14 @@ export default class DataList extends React.Component {
     columns: PropTypes.object.isRequired,
     dataSource: PropTypes.array.isRequired,
     getCurrentURL: PropTypes.func.isRequired,
-    onRowClick: PropTypes.func,
     ordering: PropTypes.string,
+    onRowClick: PropTypes.func,
     push: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    ordering: null,
+    onRowClick: null,
   }
 
   static getSortOrder = (field, ordering) => {

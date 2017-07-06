@@ -1,4 +1,4 @@
-import { Button, Col, Input, Pagination, Row, Table } from 'antd';
+import { Pagination, Table } from 'antd';
 import autobind from 'autobind-decorator';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -18,30 +18,26 @@ import {
   getRecipeListingCount,
   getRecipeListingFlattenedAction,
 } from 'control_new/state/recipes/selectors';
-import {
-  getCurrentURL,
-  getQueryParam,
-  getQueryParamAsInt,
-} from 'control_new/state/router/selectors';
+import * as routerSelectors from 'control_new/state/router/selectors';
 
 
 @connect(
   state => ({
     columns: getRecipeListingColumns(state),
     count: getRecipeListingCount(state),
-    getCurrentURL: queryParams => getCurrentURL(state, queryParams),
-    ordering: getQueryParam(state, 'ordering', '-last_updated'),
-    pageNumber: getQueryParamAsInt(state, 'page', 1),
+    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
+    ordering: routerSelectors.getQueryParam(state, 'ordering', '-last_updated'),
+    pageNumber: routerSelectors.getQueryParamAsInt(state, 'page', 1),
     recipes: getRecipeListingFlattenedAction(state),
-    searchText: getQueryParam(state, 'searchText'),
-    status: getQueryParam(state, 'status'),
+    searchText: routerSelectors.getQueryParam(state, 'searchText'),
+    status: routerSelectors.getQueryParam(state, 'status'),
   }),
   dispatch => (
     bindActionCreators({
       fetchFilteredRecipesPage: recipeActions.fetchFilteredRecipesPage,
       push: pushAction,
     }, dispatch)
-  )
+  ),
 )
 @autobind
 export default class Listing extends React.Component {
@@ -57,6 +53,15 @@ export default class Listing extends React.Component {
     searchText: PropTypes.string,
     status: PropTypes.string,
   };
+
+  static defaultProps = {
+    columns: null,
+    count: null,
+    ordering: null,
+    pageNumber: null,
+    searchText: null,
+    status: null,
+  }
 
   static columnRenderers = {
     name({ ordering }) {
@@ -147,7 +152,7 @@ export default class Listing extends React.Component {
     push(getCurrentURL({ page }));
   }
 
-  handleRowClick(record, index, event) {
+  handleRowClick(record) {
     const { push } = this.props;
     push(`/recipes/${record.id}`);
   }

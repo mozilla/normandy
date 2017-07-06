@@ -14,6 +14,12 @@ class QueryRecipes extends React.Component {
     pageNumber: PropTypes.number,
   }
 
+  static defaultProps = {
+    fetchFilteredRecipesPage: null,
+    filters: null,
+    pageNumber: null,
+  }
+
   componentWillMount() {
     const { filters, pageNumber } = this.props;
     this.props.fetchFilteredRecipesPage(pageNumber, filters);

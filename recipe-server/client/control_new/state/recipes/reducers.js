@@ -1,4 +1,4 @@
-import { fromJS, List, Map } from 'immutable';
+import { fromJS, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {

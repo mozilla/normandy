@@ -1,5 +1,4 @@
-import { fromJS, List } from 'immutable';
-import * as localForage from 'localforage';
+import { List } from 'immutable';
 
 import { getAction } from 'control_new/state/actions/selectors';
 import { DEFAULT_RECIPE_LISTING_COLUMNS } from 'control_new/state/constants';

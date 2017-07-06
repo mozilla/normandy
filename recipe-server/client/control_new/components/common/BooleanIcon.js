@@ -10,5 +10,5 @@ export default function BooleanIcon({ value }) {
 }
 
 BooleanIcon.propTypes = {
-  value: PropTypes.bool,
+  value: PropTypes.bool.isRequired,
 };

@@ -25,3 +25,10 @@ CheckboxMenu.propTypes = {
   onChange: PropTypes.func,
   options: PropTypes.array,
 };
+
+CheckboxMenu.defaultProps = {
+  checkboxes: null,
+  label: null,
+  onChange: null,
+  options: null,
+};

@@ -1,4 +1,3 @@
-/* eslint import/prefer-default-export: "off" */
 /**
  * Get a named parameter for the current route.
  * @param {Object} state
@@ -13,7 +12,7 @@ export function getQueryParam(state, key, defaultsTo) {
 }
 
 export function getQueryParamAsInt(state, key, defaultsTo) {
-  return parseInt(getQueryParam(state, key, defaultsTo));
+  return parseInt(getQueryParam(state, key, defaultsTo), 10);
 }
 
 export function getCurrentURL(state, queryParams) {
@@ -23,5 +22,5 @@ export function getCurrentURL(state, queryParams) {
       ...state.router.query,
       ...queryParams,
     },
-  }
+  };
 }
