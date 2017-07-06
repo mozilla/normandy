@@ -24,8 +24,12 @@ import { getCurrentRecipe, getCurrentRecipePk } from 'control_new/state/recipes/
 export default class EditRecipePage extends React.Component {
   static propTypes = {
     updateRecipe: pt.func.isRequired,
-    recipePk: pt.number,
+    recipePk: pt.number.isRequired,
     recipe: pt.instanceOf(Map),
+  }
+
+  static defaultProps = {
+    recipe: null,
   }
 
   state = {

@@ -63,6 +63,10 @@ export function createForm({ validateFields, ...formConfig }) {
         errors: pt.object,
       }
 
+      static defaultProps = {
+        errors: {},
+      }
+
       // FormItem and connectFormProps access the form instance and errors via
       // the context.
       static childContextTypes = {
@@ -71,7 +75,7 @@ export function createForm({ validateFields, ...formConfig }) {
       }
 
       getChildContext() {
-        const { form, errors = {} } = this.props;
+        const { form, errors } = this.props;
         return {
           form,
           formErrors: errors,
@@ -139,7 +143,7 @@ export function createForm({ validateFields, ...formConfig }) {
 export class FormItem extends React.Component {
   static propTypes = {
     // The input component used to enter data for this field.
-    children: pt.node,
+    children: pt.node.isRequired,
 
     // Extra config arguments to pass to form.getFieldDecorator.
     config: pt.object,
@@ -149,8 +153,8 @@ export class FormItem extends React.Component {
     connectToForm: pt.bool,
 
     // From connectFormProps
-    form: pt.object,
-    formErrors: pt.object,
+    form: pt.object.isRequired,
+    formErrors: pt.object.isRequired,
 
     // Convenience alias for initialValue argument to form.getFieldDecorator.
     initialValue: pt.any,
@@ -163,11 +167,19 @@ export class FormItem extends React.Component {
     rules: pt.arrayOf(pt.object),
   }
 
+  static defaultProps = {
+    config: {},
+    connectToForm: true,
+    initialValue: null,
+    name: null,
+    rules: null,
+  }
+
   render() {
     const {
       children,
-      config = {},
-      connectToForm = true,
+      config,
+      connectToForm,
       form,
       formErrors,
       initialValue,

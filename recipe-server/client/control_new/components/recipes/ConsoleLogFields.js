@@ -8,7 +8,7 @@ import { FormItem } from 'control_new/components/common/forms';
 
 export default class ConsoleLogFields extends React.Component {
   static propTypes = {
-    recipeArguments: pt.instanceOf(Map),
+    recipeArguments: pt.instanceOf(Map).isRequired,
   };
 
 

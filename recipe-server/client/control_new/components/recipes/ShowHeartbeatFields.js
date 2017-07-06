@@ -10,7 +10,7 @@ import { connectFormProps, FormItem } from 'control_new/components/common/forms'
 export default class ShowHeartbeatFields extends React.Component {
   static propTypes = {
     form: pt.object.isRequired,
-    recipeArguments: pt.instanceOf(Map),
+    recipeArguments: pt.instanceOf(Map).isRequired,
   };
 
 

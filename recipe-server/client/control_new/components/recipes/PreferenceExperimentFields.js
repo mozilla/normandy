@@ -84,6 +84,10 @@ export class DocumentUrlInput extends React.Component {
     value: pt.string,
   }
 
+  static defaultProps = {
+    value: '',
+  }
+
   render() {
     const { value, ...props } = this.props;
     let addonBefore = <span><Icon type="link" /> View</span>;
@@ -113,8 +117,12 @@ export class DocumentUrlInput extends React.Component {
 export class PreferenceBranchSelect extends React.Component {
   static propTypes = {
     form: pt.object.isRequired,
-    onChange: pt.func,
+    onChange: pt.func.isRequired,
     value: pt.any,
+  }
+
+  static defaultProps = {
+    value: 'default',
   }
 
   render() {
