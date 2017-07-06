@@ -3,27 +3,38 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { fetchAllExtensions } from 'control_new/state/extensions/actions';
+import * as extensionActions from 'control_new/state/extensions/actions';
 
 
-class QueryExtensions extends React.Component {
+@connect(
+  null,
+  dispatch => (bindActionCreators({
+    fetchExtensionsPage: extensionActions.fetchExtensionsPage,
+  }, dispatch)),
+)
+export default class QueryExtensions extends React.Component {
   static propTypes = {
-    fetchAllExtensions: PropTypes.func.isRequired,
+    fetchExtensionsPage: PropTypes.func.isRequired,
+    pageNumber: PropTypes.number,
+  }
+
+  static defaultProps = {
+    pageNumber: null,
   }
 
   componentWillMount() {
-    this.props.fetchAllExtensions();
+    const { fetchExtensionsPage, pageNumber } = this.props;
+    fetchExtensionsPage(pageNumber);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { fetchExtensionsPage, pageNumber } = this.props;
+    if (pageNumber !== nextProps.pageNumber) {
+      fetchExtensionsPage(nextProps.pageNumber);
+    }
   }
 
   render() {
     return null;
   }
 }
-
-
-export default connect(
-  null,
-  dispatch => (bindActionCreators({
-    fetchAllExtensions,
-  }, dispatch)),
-)(QueryExtensions);

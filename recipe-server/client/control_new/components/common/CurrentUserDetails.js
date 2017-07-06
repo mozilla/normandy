@@ -8,7 +8,7 @@ import { getCurrentUser } from 'control_new/state/serviceInfo/selectors';
 
 @connect(
   state => ({
-    user: getCurrentUser(state),
+    user: getCurrentUser(state, new Map()),
   }),
 )
 export default class CurrentUserDetails extends React.Component {
@@ -28,7 +28,7 @@ export default class CurrentUserDetails extends React.Component {
         <span className="email">{user.get('email')}</span>
 
         <a href="/control/logout/">
-          <Button type="primary" icon="logout" ghost>
+          <Button type="primary" icon="logout" size="small" ghost>
             Log out
           </Button>
         </a>

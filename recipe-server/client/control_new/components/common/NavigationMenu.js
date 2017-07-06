@@ -33,11 +33,11 @@ export function NavigationMenu({ router }) {
       </SubMenu>
 
       <SubMenu title="Extensions" key="Extensions">
-        <Item key="/extension">
-          <Link href="/extension">View All</Link>
+        <Item key="/extensions">
+          <Link href="/extensions">View All</Link>
         </Item>
-        <Item key="/extension?pref-study">
-          <Link href="/extension?pref-study">Preference Study</Link>
+        <Item key="/extensions?pref-study">
+          <Link href="/extensions?pref-study">Preference Study</Link>
         </Item>
       </SubMenu>
     </Menu>
