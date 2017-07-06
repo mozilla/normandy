@@ -81,11 +81,11 @@ export default class PreferenceExperimentFields extends React.Component {
  */
 export class DocumentUrlInput extends React.Component {
   static propTypes = {
+    // rc-form warns if the component already has a value prop, but doesn't
+    // initially provide it. So we can't have a default, and also can't require
+    // it.
+    // eslint-disable-next-line react/require-default-props
     value: pt.string,
-  }
-
-  static defaultProps = {
-    value: '',
   }
 
   render() {
