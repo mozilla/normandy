@@ -8,7 +8,7 @@ import { fetchAllActions } from 'control_new/state/actions/actions';
 
 class QueryActions extends React.Component {
   static propTypes = {
-    fetchAllActions: PropTypes.func,
+    fetchAllActions: PropTypes.func.isRequired,
   }
 
   componentWillMount() {

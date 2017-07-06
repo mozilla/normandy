@@ -32,8 +32,12 @@ import FormActions from 'control_new/components/common/FormActions';
 export default class ExtensionForm extends React.Component {
   static propTypes = {
     extension: pt.instanceOf(Map),
-    form: pt.object,
-    onSubmit: pt.func,
+    form: pt.object.isRequired,
+    onSubmit: pt.func.isRequired,
+  }
+
+  static defaultProps = {
+    extension: new Map(),
   }
 
   state = {
@@ -112,7 +116,7 @@ export default class ExtensionForm extends React.Component {
   }
 
   render() {
-    const { extension = new Map(), onSubmit } = this.props;
+    const { extension, onSubmit } = this.props;
     return (
       <Form onSubmit={onSubmit}>
         <FormItem

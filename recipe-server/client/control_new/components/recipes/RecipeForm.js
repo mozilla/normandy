@@ -29,10 +29,10 @@ import { getAction, getAllActions } from 'control_new/state/actions/selectors';
 @autobind
 export default class RecipeForm extends React.Component {
   static propTypes = {
-    recipe: pt.instanceOf(Map),
-    form: pt.object,
-    onSubmit: pt.func,
-    selectedAction: pt.instanceOf(Map),
+    recipe: pt.instanceOf(Map).isRequired,
+    form: pt.object.isRequired,
+    onSubmit: pt.func.isRequired,
+    selectedAction: pt.instanceOf(Map).isRequired,
   }
 
   static argumentsFields = {
@@ -105,6 +105,10 @@ class ActionSelect extends React.Component {
     value: pt.string,
   }
 
+  static defaultProps = {
+    value: null,
+  }
+
   render() {
     const { actions, value, ...props } = this.props;
 
@@ -113,11 +117,11 @@ class ActionSelect extends React.Component {
 
     return (
       <Select placeholder="Select an action..." value={stringValue} {...props}>
-        {actions.toList().map(action =>
+        {actions.toList().map(action => (
           <Select.Option key={action.get('id')} value={action.get('id').toString(10)}>
             {action.get('name')}
           </Select.Option>
-        )}
+        ))}
       </Select>
     );
   }
