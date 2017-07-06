@@ -5,7 +5,7 @@ export default function MissingPage() {
     <div className="page-404">
       <h1>404</h1>
       <p>Page not found.</p>
-      <a onClick={() => window.history.back()}>Go back.</a>
+      <button onClick={() => window.history.back()}>Go back.</button>
     </div>
   );
 }

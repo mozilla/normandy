@@ -13,7 +13,7 @@ describe('Recipe history components', () => {
       const revision2 = { id: 2 };
       const dispatch = () => null;
       const wrapper = shallow(
-        <HistoryList dispatch={dispatch} recipe={recipe} revisions={[revision1, revision2]} />
+        <HistoryList dispatch={dispatch} recipe={recipe} revisions={[revision1, revision2]} />,
       );
 
       const items = wrapper.find(HistoryItem);
@@ -39,7 +39,7 @@ describe('Recipe history components', () => {
       };
 
       const wrapper = shallow(
-        <HistoryItem revision={revision} recipe={recipe} dispatch={dispatch} />
+        <HistoryItem revision={revision} recipe={recipe} dispatch={dispatch} />,
       );
 
       it('should render the revision number', () =>

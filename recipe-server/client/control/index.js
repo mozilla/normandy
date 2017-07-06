@@ -6,5 +6,5 @@ import { createApp } from 'control/app';
 const app = createApp();
 ReactDOM.render(
   app.rootComponent,
-  document.querySelector('#page-container')
+  document.querySelector('#page-container'),
 );

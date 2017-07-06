@@ -42,5 +42,9 @@ export default function App({ children }) {
 }
 
 App.propTypes = {
-  children: PropTypes.any,
+  children: PropTypes.node,
+};
+
+App.defaultProps = {
+  children: null,
 };

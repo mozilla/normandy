@@ -95,7 +95,7 @@ export function mockNormandy() {
       return Promise.resolve(this.mock.location);
     },
     log() {
-      return;
+
     },
     createStorage() {
       return this.mock.storage;

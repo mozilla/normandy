@@ -102,7 +102,7 @@ describe('getRecipeHistory', () => {
         ...INITIAL_STATE.newState.recipes,
         history: INITIAL_STATE.newState.recipes.history.set(
           REVISION.recipe.id,
-          fromJS([REVISION.id])
+          fromJS([REVISION.id]),
         ),
       },
       revisions: revisionsReducer(undefined, {

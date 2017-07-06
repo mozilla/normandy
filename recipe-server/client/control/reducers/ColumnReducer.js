@@ -83,7 +83,7 @@ function columnReducer(state = initialState, action) {
       // outdated columns from localStorage
       slugsMatch = isEqual(
         state.map(option => option.slug + option.label),
-        action.columns.map(option => option.slug + option.label)
+        action.columns.map(option => option.slug + option.label),
       );
 
       if (slugsMatch) {

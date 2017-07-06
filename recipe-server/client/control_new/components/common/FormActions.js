@@ -26,6 +26,9 @@ export default function FormActions({ children }) {
 FormActions.propTypes = {
   children: pt.node,
 };
+FormActions.defaultProps = {
+  children: null,
+};
 
 /**
  * Container for the primary actions (floated to the right).
@@ -38,6 +41,9 @@ FormActions.Primary = function FormActionsPrimary({ children }) {
 FormActions.Primary.propTypes = {
   children: pt.node,
 };
+FormActions.Primary.defaultProps = {
+  children: null,
+};
 
 /**
  * Container for the secondary actions (floated to the left).
@@ -49,4 +55,7 @@ FormActions.Secondary = function FormActionsSecondary({ children }) {
 };
 FormActions.Secondary.propTypes = {
   children: pt.node,
+};
+FormActions.Secondary.defaultProps = {
+  children: null,
 };

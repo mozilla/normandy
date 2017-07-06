@@ -108,7 +108,7 @@ export class PreferenceExperimentFields extends ActionFields {
 export default connect(
   state => ({
     preferenceBranchType: formSelector(state, 'arguments.preferenceBranchType') || 'default',
-  })
+  }),
 )(PreferenceExperimentFields);
 
 export class PreferenceBranches extends React.Component {
@@ -233,7 +233,7 @@ RemoveBranchButton.propTypes = {
 export const ConnectedBranchFields = connect(
   state => ({
     preferenceType: formSelector(state, 'arguments.preferenceType'),
-  })
+  }),
 )(BranchFields);
 
 export function StringPreferenceField(props) {

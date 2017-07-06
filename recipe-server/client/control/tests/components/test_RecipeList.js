@@ -43,7 +43,7 @@ describe('<RecipeList>', () => {
     });
 
     const wrapper = shallow(
-      <RecipeList {...propFactory({ recipes: store.recipes })} />
+      <RecipeList {...propFactory({ recipes: store.recipes })} />,
     );
 
     expect(wrapper.find(Tr).length).toBe(1);

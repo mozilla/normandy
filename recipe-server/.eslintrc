@@ -19,6 +19,7 @@ globals:
 rules:
   arrow-parens: [warn, as-needed]
   comma-dangle: [warn]
+  class-methods-use-this: [off]
   no-console: [off]
   no-continue: [off]
   no-mixed-operators: [warn, { allowSamePrecedence: true }]
@@ -29,6 +30,8 @@ rules:
   no-underscore-dangle: [off]
   no-use-before-define: [warn, { functions: false, classes: false }]
   prefer-const: [warn]
+  no-plusplus: [off]
+  no-await-in-loop: [off]
 
   import/no-extraneous-dependencies: [error, {devDependencies: true}]
   import/no-mutable-exports: [off]
@@ -49,6 +52,9 @@ rules:
   react/no-danger-with-children: [error]
   react/require-extension: [off]  # deprecated
   react/self-closing-comp: [warn]
+  react/forbid-prop-types: [off]
+  react/no-unused-prop-types: [off]
+  react/no-array-index-key: [off]
   jsx-a11y/label-has-for: [off]
 
   generator-star-spacing: [warn]
