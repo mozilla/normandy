@@ -5,6 +5,9 @@
 // Pages
 @import 'pages/404';
 @import 'pages/gateway';
+@import 'listing';
+
+@primary-color: #1C5253;
 
 // Common
 body {
@@ -26,6 +29,31 @@ body {
   display: flex;
   flex: 1;
   justify-content: flex-start;
+
+  .ant-layout-content {
+    flex: 0
+  }
+}
+
+.centered {
+  text-align: center;
+}
+
+.righted {
+  text-align: right;
+}
+
+.boolean-icon {
+  font-size: 16px;
+  font-weight: bold;
+
+  &.is-true {
+    color: #0C0;
+  }
+
+  &.is-false {
+    color: #C00;
+  }
 }
 
 .logo {
@@ -66,10 +94,6 @@ body {
 .content {
   background: @white;
   padding: 24px;
-
-  a {
-    border-bottom: 1px dotted;
-  }
 }
 
 #main {

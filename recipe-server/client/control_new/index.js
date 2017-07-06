@@ -24,14 +24,14 @@ const reducers = combineReducers({
 
 const store = createStore(reducers, reducers(undefined, { type: 'initial' }), compose(
   applyMiddleware(
+    routerMiddleware,
+    thunk,
     createLogger({
       collapsed: true,
       diff: true,
       duration: true,
       timestamp: true,
     }),
-    routerMiddleware,
-    thunk,
   ),
   routerEnhancer,
   DEVELOPMENT ? DevTools.instrument() : x => x,

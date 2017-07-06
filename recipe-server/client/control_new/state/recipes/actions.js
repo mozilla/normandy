@@ -1,12 +1,15 @@
+import * as localForage from 'localforage';
+
 import {
   ACTION_RECEIVE,
   RECIPE_DELETE,
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
+  RECIPES_LISTING_COLUMNS_CHANGE,
+  RECIPES_PAGE_RECEIVE,
   REVISION_RECEIVE,
 } from 'control_new/state/action-types';
-
 import {
   makeApiRequest,
 } from 'control_new/state/requests/actions';
@@ -48,28 +51,45 @@ export function fetchRecipe(pk) {
 }
 
 
-export function fetchAllRecipes() {
+export function fetchRecipesPage(pageNumber = 1) {
   return async dispatch => {
-    const requestId = 'fetch-all-recipes';
-    const recipes = await dispatch(makeApiRequest(requestId, 'v2/recipe/'));
+    const requestId = `fetch-recipes-page-${pageNumber}`;
+    const recipes = await dispatch(makeApiRequest(requestId, 'v2/recipe/', {
+      data: { page: pageNumber },
+    }));
 
-    recipes.forEach(recipe => {
+    recipes.results.forEach(recipe => {
       dispatch(recipeReceived(recipe));
+    });
+
+    dispatch({
+      type: RECIPES_PAGE_RECEIVE,
+      pageNumber,
+      recipes,
     });
   };
 }
 
 
-export function fetchFilteredRecipes(filters) {
+export function fetchFilteredRecipesPage(pageNumber = 1, filters = {}) {
   return async dispatch => {
     const filterIds = Object.keys(filters).map(key => `${key}-${filters[key]}`);
-    const requestId = `fetch-filtered-recipes-${filterIds.join('-')}`;
+    const requestId = `fetch-filtered-recipes-page-${pageNumber}-${filterIds.join('-')}`;
     const recipes = await dispatch(makeApiRequest(requestId, 'v2/recipe/', {
-      data: filters,
+      data: {
+        ...filters,
+        page: pageNumber,
+      },
     }));
 
-    recipes.forEach(recipe => {
+    recipes.results.forEach(recipe => {
       dispatch(recipeReceived(recipe));
+    });
+
+    dispatch({
+      type: RECIPES_PAGE_RECEIVE,
+      pageNumber,
+      recipes,
     });
   };
 }
@@ -166,6 +186,18 @@ export function fetchRecipeFilters() {
     dispatch({
       type: RECIPE_FILTERS_RECEIVE,
       filters,
+    });
+  };
+}
+
+
+export function saveRecipeListingColumns(columns) {
+  return async dispatch => {
+    await localForage.setItem('recipe_listing_columns', columns);
+
+    dispatch({
+      type: RECIPES_LISTING_COLUMNS_CHANGE,
+      columns,
     });
   };
 }
