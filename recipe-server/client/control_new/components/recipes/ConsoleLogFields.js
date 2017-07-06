@@ -20,7 +20,7 @@ export default class ConsoleLogFields extends React.Component {
         <FormItem
           name="arguments.message"
           label="Message"
-          initialValue={recipeArguments.get('message')}
+          initialValue={recipeArguments.get('message', '')}
         >
           <Input />
         </FormItem>
