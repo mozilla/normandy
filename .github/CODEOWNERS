@@ -4,7 +4,7 @@
 # Later rules override earlier rules
 
 # As a fallback, ping the team
-* @mozilla/normandy-comitters
+* @mozilla/normandy-owners
 
 # add-on work needs to be reviewed by both a Firefox Peer and a comitter
-* @mozilla/normandy-comitters @mozilla/normandy-firefox-peers
+recipe-client-addon/* @mozilla/normandy-owners @mozilla/normandy-firefox-peers
