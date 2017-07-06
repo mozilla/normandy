@@ -22,7 +22,7 @@ export default class PreferenceExperimentFields extends React.Component {
         <FormItem
           label="Experiment Name"
           name="arguments.slug"
-          initialValue={recipeArguments.get('slug')}
+          initialValue={recipeArguments.get('slug', '')}
         >
           <Input />
         </FormItem>
@@ -30,7 +30,7 @@ export default class PreferenceExperimentFields extends React.Component {
         <FormItem
           label="Experiment Document URL"
           name="arguments.experimentDocumentUrl"
-          initialValue={recipeArguments.get('experimentDocumentUrl')}
+          initialValue={recipeArguments.get('experimentDocumentUrl', '')}
         >
           <DocumentUrlInput />
         </FormItem>
@@ -38,7 +38,7 @@ export default class PreferenceExperimentFields extends React.Component {
         <FormItem
           label="Preference Name"
           name="arguments.preferenceName"
-          initialValue={recipeArguments.get('preferenceName')}
+          initialValue={recipeArguments.get('preferenceName', '')}
         >
           <Input />
         </FormItem>
@@ -309,7 +309,7 @@ export class ExperimentBranchFields extends React.Component {
           name={`${fieldName}.slug`}
           connectToForm={false}
         >
-          <Input value={branch.get('slug')} onChange={this.handleChangeSlug} />
+          <Input value={branch.get('slug', '')} onChange={this.handleChangeSlug} />
         </FormItem>
         <FormItem
           label="Preference Value"
@@ -323,7 +323,7 @@ export class ExperimentBranchFields extends React.Component {
           name={`${fieldName}.ratio`}
           connectToForm={false}
         >
-          <InputNumber value={branch.get('ratio')} onChange={this.handleChangeRatio} />
+          <InputNumber value={branch.get('ratio', '')} onChange={this.handleChangeRatio} />
         </FormItem>
         <Button type="danger" icon="close" className="delete-btn" onClick={this.handleClickDelete}>
           Delete Branch

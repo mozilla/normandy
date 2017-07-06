@@ -22,49 +22,49 @@ export default class ShowHeartbeatFields extends React.Component {
         <FormItem
           label="Survey ID"
           name="arguments.surveyId"
-          initialValue={recipeArguments.get('surveyId')}
+          initialValue={recipeArguments.get('surveyId', '')}
         >
           <Input />
         </FormItem>
         <FormItem
           label="Message"
           name="arguments.message"
-          initialValue={recipeArguments.get('message')}
+          initialValue={recipeArguments.get('message', '')}
         >
           <Input />
         </FormItem>
         <FormItem
           label="Engagement Button Label"
           name="arguments.engagementButtonLabel"
-          initialValue={recipeArguments.get('engagementButtonLabel')}
+          initialValue={recipeArguments.get('engagementButtonLabel', '')}
         >
           <Input />
         </FormItem>
         <FormItem
           label="Thanks Message"
           name="arguments.thanksMessage"
-          initialValue={recipeArguments.get('thanksMessage')}
+          initialValue={recipeArguments.get('thanksMessage', '')}
         >
           <Input />
         </FormItem>
         <FormItem
           label="Post-Answer URL"
           name="arguments.postAnswerUrl"
-          initialValue={recipeArguments.get('postAnswerUrl')}
+          initialValue={recipeArguments.get('postAnswerUrl', '')}
         >
           <Input />
         </FormItem>
         <FormItem
           label="Learn More Message"
           name="arguments.learnMoreMessage"
-          initialValue={recipeArguments.get('learnMoreMessage')}
+          initialValue={recipeArguments.get('learnMoreMessage', '')}
         >
           <Input />
         </FormItem>
         <FormItem
           label="Learn More URL"
           name="arguments.learnMoreUrl"
-          initialValue={recipeArguments.get('learnMoreUrl')}
+          initialValue={recipeArguments.get('learnMoreUrl', '')}
         >
           <Input />
         </FormItem>
@@ -92,7 +92,7 @@ export default class ShowHeartbeatFields extends React.Component {
           <FormItem
             label="Days before user is re-prompted"
             name="arguments.repeatEvery"
-            initialValue={recipeArguments.get('repeatEvery')}
+            initialValue={recipeArguments.get('repeatEvery', 'once')}
           >
             <InputNumber />
           </FormItem>
