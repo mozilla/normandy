@@ -6,6 +6,7 @@ import extensions from 'control_new/state/extensions/reducers';
 import recipes from 'control_new/state/recipes/reducers';
 import requests from 'control_new/state/requests/reducers';
 import revisions from 'control_new/state/revisions/reducers';
+import serviceInfo from 'control_new/state/serviceInfo/reducers';
 
 
 const reducer = combineReducers({
@@ -15,6 +16,7 @@ const reducer = combineReducers({
   recipes,
   requests,
   revisions,
+  serviceInfo,
 });
 
 export default reducer;
