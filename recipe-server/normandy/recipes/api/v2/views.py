@@ -4,7 +4,6 @@ from django.db.models import Q
 import django_filters
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import detail_route
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from normandy.base.api import UpdateOrCreateModelViewSet
@@ -30,6 +29,7 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     """Viewset for viewing recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+    pagination_class = None
 
 
 class RecipeFilters(django_filters.FilterSet):
@@ -53,13 +53,13 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     serializer_class = RecipeSerializer
     filter_class = RecipeFilters
     filter_backends = [
+        django_filters.rest_framework.DjangoFilterBackend,
         RecipeOrderingFilter,
     ]
     permission_classes = [
         permissions.DjangoModelPermissionsOrAnonReadOnly,
         AdminEnabledOrReadOnly,
     ]
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         queryset = self.queryset
@@ -131,6 +131,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None
 
     @detail_route(methods=['POST'])
     def request_approval(self, request, pk=None):
@@ -153,6 +154,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None
 
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):

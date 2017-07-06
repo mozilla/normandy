@@ -77,14 +77,14 @@ class TestRecipeAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get('/api/v2/recipe/')
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data['results'] == []
 
     def test_it_serves_recipes(self, api_client):
         recipe = RecipeFactory()
 
         res = api_client.get('/api/v2/recipe/')
         assert res.status_code == 200
-        assert res.data[0]['name'] == recipe.name
+        assert res.data['results'][0]['name'] == recipe.name
 
     def test_it_can_create_recipes(self, api_client):
         action = ActionFactory()
@@ -204,7 +204,7 @@ class TestRecipeAPI(object):
         settings.ADMIN_ENABLED = True
         res = api_client.get('/api/v2/recipe/')
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data['results'] == []
 
     def test_readonly_if_admin_disabled(self, api_client, settings):
         settings.ADMIN_ENABLED = False
@@ -261,7 +261,7 @@ class TestRecipeAPI(object):
 
         res = api_client.get('/api/v2/recipe/?enabled=true')
         assert res.status_code == 200
-        assert [r['id'] for r in res.data] == [r1.id]
+        assert [r['id'] for r in res.data['results']] == [r1.id]
 
     def test_filtering_by_enabled_fuzz(self, api_client):
         """
@@ -310,13 +310,15 @@ class TestRecipeAPI(object):
 
         res = api_client.get('/api/v2/recipe/?status=enabled')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r2.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r2.id
 
         res = api_client.get('/api/v2/recipe/?status=disabled')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r1.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r1.id
 
     def test_list_filter_channels(self, api_client):
         r1 = RecipeFactory(channels=[ChannelFactory(slug='beta')])
@@ -324,13 +326,15 @@ class TestRecipeAPI(object):
 
         res = api_client.get('/api/v2/recipe/?channels=beta')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r1.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r1.id
 
         res = api_client.get('/api/v2/recipe/?channels=beta,release')
         assert res.status_code == 200
-        assert len(res.data) == 2
-        for recipe in res.data:
+        results = res.data['results']
+        assert len(results) == 2
+        for recipe in results:
             assert recipe['id'] in [r1.id, r2.id]
 
     def test_list_filter_countries(self, api_client):
@@ -339,13 +343,15 @@ class TestRecipeAPI(object):
 
         res = api_client.get('/api/v2/recipe/?countries=US')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r1.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r1.id
 
         res = api_client.get('/api/v2/recipe/?countries=US,CA')
         assert res.status_code == 200
-        assert len(res.data) == 2
-        for recipe in res.data:
+        results = res.data['results']
+        assert len(results) == 2
+        for recipe in results:
             assert recipe['id'] in [r1.id, r2.id]
 
     def test_list_filter_locales(self, api_client):
@@ -354,13 +360,15 @@ class TestRecipeAPI(object):
 
         res = api_client.get('/api/v2/recipe/?locales=en-US')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r1.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r1.id
 
         res = api_client.get('/api/v2/recipe/?locales=en-US,fr-CA')
         assert res.status_code == 200
-        assert len(res.data) == 2
-        for recipe in res.data:
+        results = res.data['results']
+        assert len(results) == 2
+        for recipe in results:
             assert recipe['id'] in [r1.id, r2.id]
 
     def test_list_filter_text(self, api_client):
@@ -369,18 +377,21 @@ class TestRecipeAPI(object):
 
         res = api_client.get('/api/v2/recipe/?text=first')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r1.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r1.id
 
         res = api_client.get('/api/v2/recipe/?text=one')
         assert res.status_code == 200
-        assert len(res.data) == 1
-        assert res.data[0]['id'] == r2.id
+        results = res.data['results']
+        assert len(results) == 1
+        assert results[0]['id'] == r2.id
 
         res = api_client.get('/api/v2/recipe/?text=t')
         assert res.status_code == 200
-        assert len(res.data) == 2
-        for recipe in res.data:
+        results = res.data['results']
+        assert len(results) == 2
+        for recipe in results:
             assert recipe['id'] in [r1.id, r2.id]
 
     def test_update_recipe_action(self, api_client):

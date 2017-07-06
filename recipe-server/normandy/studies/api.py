@@ -22,3 +22,4 @@ class ExtensionViewSet(CachingViewsetMixin, viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None

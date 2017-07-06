@@ -38,6 +38,7 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     """Viewset for viewing recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+    pagination_class = None
 
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
@@ -53,6 +54,7 @@ class ActionImplementationView(generics.RetrieveAPIView):
 
     permission_classes = []
     renderer_classes = [JavaScriptRenderer]
+    pagination_class = None
 
     @api_cache_control(max_age=settings.ACTION_IMPLEMENTATION_CACHE_TIME)
     def retrieve(self, request, name, impl_hash):
@@ -80,6 +82,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         permissions.DjangoModelPermissionsOrAnonReadOnly,
         AdminEnabledOrReadOnly,
     ]
+    pagination_class = None
 
     def get_queryset(self):
         queryset = self.queryset
@@ -158,6 +161,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None
 
     @detail_route(methods=['POST'])
     def request_approval(self, request, pk=None):
@@ -180,6 +184,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None
 
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
