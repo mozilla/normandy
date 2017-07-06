@@ -11,7 +11,7 @@ import { getCurrentUser } from 'control_new/state/serviceInfo/selectors';
     user: getCurrentUser(state),
   }),
 )
-export default class CurrentUser extends React.Component {
+export default class CurrentUserDetails extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
   }
