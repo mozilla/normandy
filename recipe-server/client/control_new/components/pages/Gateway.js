@@ -10,7 +10,7 @@ export default function Gateway() {
         <Card title="Recipes">
           <Icon type="book" />
           <p>Basic SHIELD recipes</p>
-          <Link href="/recipes">Go to Recipes</Link>
+          <Link href="/recipe">Go to Recipes</Link>
         </Card>
       </Col>
       <Col className="gw-col" xs={24} sm={10} md={8}>
