@@ -187,10 +187,7 @@ export class DisconnectedRecipeList extends React.Component {
         <div className="fluid-8">
           {
             !noResults && recipeListNeedsFetch &&
-              <div
-                className="loading callout"
-                children={'Loading...'}
-              />
+              <div className="loading callout">Loading...</div>
           }
 
           <Table
@@ -202,24 +199,24 @@ export class DisconnectedRecipeList extends React.Component {
             <Thead>
               {
                 displayedColumns.map((col, index) =>
-                  <Th
+                  (<Th
                     key={col.slug + index}
                     column={col.slug}
                   >
                     <span>{col.label}</span>
-                  </Th>
+                  </Th>),
                 )
               }
             </Thead>
             {filteredRecipes.map(recipe =>
-              <Tr
+              (<Tr
                 key={recipe.id}
                 onClick={this.handleViewRecipe(recipe)}
               >
                 {
                   displayedColumns.map(this.renderTableCell(recipe))
                 }
-              </Tr>
+              </Tr>),
             )}
           </Table>
         </div>
@@ -237,5 +234,5 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 export default connect(
-  mapStateToProps
+  mapStateToProps,
 )(DisconnectedRecipeList);

@@ -54,7 +54,7 @@ export default class ActiveFilters extends React.Component {
 
     return (
       <div className={displayedClass}>
-        { selectedFilters.map(filter =>
+        { selectedFilters.map(filter => (
           <div
             key={filter.value}
             className="filter-group"
@@ -63,23 +63,26 @@ export default class ActiveFilters extends React.Component {
               { filter.label }
             </span>
             { filter.options
-                .filter(option => option.selected)
-                .map((option, index) =>
-                  <div
-                    key={option.value + index}
-                    className="filter-option"
-                    onClick={this.handleFilterSelect(filter, option)}
-                    children={option.label || option.value}
-                  />)
+              .filter(option => option.selected)
+              .map((option, index) =>
+                (<div
+                  key={option.value + index}
+                  className="filter-option"
+                  onClick={this.handleFilterSelect(filter, option)}
+                >
+                  {option.label || option.value }
+                </div>),
+              )
             }
-          </div>)
-        }
+          </div>
+        ))}
         { selectedFilters.length &&
           <div
             className="filter-button reset"
             onClick={onResetFilters}
-            children={'Reset Filters'}
-          />
+          >
+            Reset Filters
+          </div>
         }
       </div>
     );

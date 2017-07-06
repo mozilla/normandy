@@ -56,13 +56,13 @@ export function HistoryList({ recipe, revisions, dispatch }) {
       <table>
         <tbody>
           {revisions.map(revision =>
-            <HistoryItem
+            (<HistoryItem
               key={revision.id}
               revision={revision}
               recipe={recipe}
               dispatch={dispatch}
               approvedId={lastApprovedId}
-            />
+            />),
           )}
         </tbody>
       </table>
@@ -125,7 +125,7 @@ export class HistoryItem extends React.Component {
           {moment(revision.date_created).format('MMM Do YYYY - h:mmA')}
         </td>
         <td className="revision-comment">
-        {
+          {
           !!revision.comment &&
             <span>
               <span className="label">Comment:</span>

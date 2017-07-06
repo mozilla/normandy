@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from rest_framework.test import APIClient
 
 from django.conf.urls import url
 from django.contrib.auth.models import User
@@ -128,8 +129,8 @@ class TestMixedViewRouter(object):
 @pytest.mark.django_db
 class TestCurrentUserView(object):
     def test_it_works(self, api_client):
-        res = api_client.get('/api/v1/user/me/')
         user = User.objects.first()  # Get the default user
+        res = api_client.get('/api/v1/user/me/')
         assert res.status_code == 200
         assert res.data == {
             'id': user.id,
@@ -142,3 +143,31 @@ class TestCurrentUserView(object):
         res = api_client.logout()
         res = api_client.get('/api/v1/user/me/')
         assert res.status_code == 401
+
+
+@pytest.mark.django_db
+class TestServiceInfoView(object):
+    def test_it_works(self, api_client, settings):
+        user = User.objects.first()  # Get the default user
+
+        res = api_client.get('/api/v2/service_info/')
+        assert res.status_code == 200
+        assert res.data == {
+            'user': {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+            },
+            'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
+        }
+
+    def test_logged_out(self, settings):
+        client = APIClient()
+
+        res = client.get('/api/v2/service_info/')
+        assert res.status_code == 200
+        assert res.data == {
+            'user': None,
+            'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
+        }

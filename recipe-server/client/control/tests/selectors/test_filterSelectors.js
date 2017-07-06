@@ -20,7 +20,7 @@ const cloneFilters = multi =>
         // since we alter some filter options in the tests,
         // we want to make fresh copies of the objects
         options: [...filter.options].map(option => ({ ...option })),
-      })
+      }),
     );
 /**
  * Alias for the multi-version of `cloneFilters`

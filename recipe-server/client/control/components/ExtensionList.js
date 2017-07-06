@@ -25,13 +25,7 @@ class ExtensionList extends React.Component {
       <div>
         <QueryExtensions />
         <div className="fluid-8">
-          {
-            isLoading &&
-              <div
-                className="loading callout"
-                children={'Loading...'}
-              />
-          }
+          {isLoading && <div className="loading callout">Loading...</div>}
 
           <Table
             className="recipe-list"
@@ -43,12 +37,12 @@ class ExtensionList extends React.Component {
               </Th>
             </Thead>
             {extensions.map(extension =>
-              <Tr
+              (<Tr
                 key={extension.get('id')}
                 onClick={() => this.showDetails(extension)}
               >
                 <Td column="name">{extension.get('name')}</Td>
-              </Tr>
+              </Tr>),
             )}
           </Table>
         </div>

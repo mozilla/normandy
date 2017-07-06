@@ -1,12 +1,7 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
-export default function Dummy({ text = 'world' }) {
+export default function Dummy() {
   return (
-    <div>Hello {text}.</div>
+    <div>Hello world!</div>
   );
 }
-
-Dummy.propTypes = {
-  text: PropTypes.string,
-};
