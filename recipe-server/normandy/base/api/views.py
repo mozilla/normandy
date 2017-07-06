@@ -64,6 +64,7 @@ class ServiceInfoView(APIView):
         return Response(ServiceInfoSerializer({
             'user': user,
             'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
+            'logout_url': settings.OIDC_LOGOUT_URL or '/control/logout',
         }).data)
 
 
