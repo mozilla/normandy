@@ -64,9 +64,9 @@ export class NavigationCrumbs extends React.Component {
     return (
       <Breadcrumb>
         {breadcrumbs.map((crumb, idx) =>
-          <Breadcrumb.Item key={idx}>
+          (<Breadcrumb.Item key={idx}>
             <Link href={crumb.link}>{ crumb.name }</Link>
-          </Breadcrumb.Item>
+          </Breadcrumb.Item>),
         )}
       </Breadcrumb>
     );

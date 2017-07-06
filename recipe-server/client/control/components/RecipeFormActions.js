@@ -25,11 +25,12 @@ export const FormButton = ({
     <Element
       className={cx('button', className)}
       onClick={onClick}
-      children={label}
       type={type}
       key={label + className}
       {...props}
-    />
+    >
+      {label}
+    </Element>
   );
 };
 
@@ -99,6 +100,7 @@ export default class RecipeFormActions extends React.Component {
     return [
       // delete
       <FormButton
+        key="delete"
         display={isAlreadySaved && !isCloning}
         disabled={isFormDisabled}
         className="action-delete delete"
@@ -108,6 +110,7 @@ export default class RecipeFormActions extends React.Component {
       />,
       // save
       <FormButton
+        key="save"
         disabled={isFormPristine}
         display={isAlreadySaved && !isCloning}
         className="action-save submit"
@@ -116,6 +119,7 @@ export default class RecipeFormActions extends React.Component {
       />,
       // new
       <FormButton
+        key="new"
         disabled={isFormPristine}
         display={!isAlreadySaved || isCloning}
         className="action-new submit"
@@ -124,6 +128,7 @@ export default class RecipeFormActions extends React.Component {
       />,
       // enable
       <FormButton
+        key="enable"
         display={isRecipeApproved && isViewingLatestApproved && !isEnabled}
         className="action-enable submit"
         label="Enable"
@@ -132,6 +137,7 @@ export default class RecipeFormActions extends React.Component {
       />,
       // disable
       <FormButton
+        key="disable"
         display={!isUserViewingOutdated && isEnabled}
         className="action-disable submit delete"
         label="Disable"
@@ -140,6 +146,7 @@ export default class RecipeFormActions extends React.Component {
       />,
       // cancel
       <FormButton
+        key="cancel"
         display={!isUserViewingOutdated && isPendingApproval}
         className="action-cancel submit delete"
         onClick={this.createActionEmitter('cancel')}
@@ -147,6 +154,7 @@ export default class RecipeFormActions extends React.Component {
       />,
       // approve
       <DropdownMenu
+        key="approve"
         display={!isUserViewingOutdated && isPendingApproval && !isCloning}
         pinTop
         pinRight
@@ -181,6 +189,7 @@ export default class RecipeFormActions extends React.Component {
       </DropdownMenu>,
       // reject
       <DropdownMenu
+        key="reject"
         display={!isUserViewingOutdated && isPendingApproval && !isCloning}
         pinTop
         pinRight
@@ -215,6 +224,7 @@ export default class RecipeFormActions extends React.Component {
       </DropdownMenu>,
       // request
       <FormButton
+        key="request"
         display={!isUserViewingOutdated && !hasApprovalRequest
           && !isPendingApproval && isAlreadySaved && !isCloning}
         disabled={!isFormPristine}
@@ -245,7 +255,7 @@ export default class RecipeFormActions extends React.Component {
       <div className="form-actions">
         {this.getActions(this.props).map((Action, idx) =>
           // Need to key the action buttons to satisfy a React warning
-          React.cloneElement(Action, { key: idx })
+          React.cloneElement(Action, { key: idx }), // eslint-disable-line react/no-array-index-key
         )}
       </div>
     );

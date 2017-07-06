@@ -69,7 +69,7 @@ describe('<GroupMenu>', () => {
       {...propFactory({
         data: stubbedData,
       })}
-    />
+    />,
     );
 
     expect(wrapper.find('.group-label').length).toBe(2);
@@ -99,7 +99,7 @@ describe('<GroupMenu>', () => {
             data: [stubbedGroup],
             onItemSelect: onSelectTest,
           })}
-        />
+        />,
       );
 
       wrapper.find('.menu-item').at(0).simulate('click');
@@ -122,7 +122,7 @@ describe('<GroupMenu>', () => {
           {...propFactory({
             data: stubbedData,
           })}
-        />
+        />,
       );
 
       expect(wrapper.find('.view-more').length).toBe(1);
@@ -134,7 +134,7 @@ describe('<GroupMenu>', () => {
           {...propFactory({
             data: stubbedData,
           })}
-        />
+        />,
       );
 
       // no text filter = cap limit at 5
@@ -151,7 +151,7 @@ describe('<GroupMenu>', () => {
           {...propFactory({
             data: stubbedData,
           })}
-        />
+        />,
       );
 
       expect(wrapper.find('.menu-item').length).toBe(8);
@@ -166,7 +166,7 @@ describe('<GroupMenu>', () => {
         {...propFactory({
           data: [stubbedGroup],
         })}
-      />
+      />,
     );
 
 
@@ -180,7 +180,7 @@ describe('<GroupMenu>', () => {
     expect(wrapper
         .find('.group-menu .text')
         .find('.menu-item')
-        .first().text()
+        .first().text(),
       ).toBe('test');
   });
 });

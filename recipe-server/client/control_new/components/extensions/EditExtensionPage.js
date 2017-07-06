@@ -24,8 +24,8 @@ import { getCurrentExtension, getCurrentExtensionPk } from 'control_new/state/ex
 export default class EditExtensionPage extends React.Component {
   static propTypes = {
     updateExtension: pt.func.isRequired,
-    extensionPk: pt.number,
-    extension: pt.instanceOf(Map),
+    extensionPk: pt.number.isRequired,
+    extension: pt.instanceOf(Map).isRequired,
   }
 
   state = {

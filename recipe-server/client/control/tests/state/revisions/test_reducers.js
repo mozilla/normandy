@@ -39,7 +39,7 @@ describe('Revisions reducer', () => {
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(REVISION.id, fromJS(reducedRevision))
+      INITIAL_STATE.items.set(REVISION.id, fromJS(reducedRevision)),
     );
   });
 

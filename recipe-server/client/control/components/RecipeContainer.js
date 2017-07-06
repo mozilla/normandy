@@ -89,15 +89,17 @@ export default function composeRecipeContainer(Component) {
   }
 
   const mapStateToProps = (state, props) => ({
+    /* eslint-disable react/prop-types */
     dispatch: props.dispatch,
     recipeId: state.recipes.selectedRecipe || parseInt(props.params.id, 10) || null,
       // Get selected recipe + revision data
     ...getSelectedRevision(state),
+    /* eslint-enable react/prop-types */
   });
 
   ComposedRecipeContainer.propTypes = { ...RecipeContainer.propTypes };
 
   return connect(
-    mapStateToProps
+    mapStateToProps,
   )(ComposedRecipeContainer);
 }

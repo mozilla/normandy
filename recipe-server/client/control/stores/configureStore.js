@@ -3,7 +3,7 @@ import { browserHistory } from 'react-router';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
 
-import DevTools from 'control/components/DevTools.js';
+import DevTools from 'control/components/DevTools';
 import reducers from 'control/reducers';
 
 const reduxRouterMiddleware = routerMiddleware(browserHistory);
@@ -12,7 +12,7 @@ const reduxRouterMiddleware = routerMiddleware(browserHistory);
 const enhancer = compose(
   applyMiddleware(
     reduxRouterMiddleware,
-    thunk
+    thunk,
   ),
   // Only include DevTools in development mode
   DEVELOPMENT ? DevTools.instrument() : x => x,

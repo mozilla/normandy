@@ -36,7 +36,7 @@ class DisableRecipe extends React.Component {
     return (
       <div className="fluid-8">
         <form action="" className="crud-form">
-          <p>Are you sure you want to disable "{recipe.name}"?</p>
+          <p>Are you sure you want to disable &quote;{recipe.name}&quote;?</p>
           <div className="form-action-buttons">
             <div className="fluid-2 float-right">
               <input

@@ -50,7 +50,7 @@ describe('Notification reducer', () => {
         appReducer(startState, {
           type: actions.DISMISS_NOTIFICATION,
           notificationId: notification1.id,
-        })
+        }),
       ).toEqual({
         ...initialState,
         notifications: [notification2],
@@ -62,7 +62,7 @@ describe('Notification reducer', () => {
         appReducer(startState, {
           type: actions.DISMISS_NOTIFICATION,
           id: 99999,
-        })
+        }),
       ).toEqual({
         ...initialState,
         notifications: [notification1, notification2],

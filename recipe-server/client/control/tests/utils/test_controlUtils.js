@@ -45,7 +45,7 @@ describe('controlApp Utils', () => {
             </div>
           </span>
         </div>,
-        document.createElement('body')
+        document.createElement('body'),
       );
     });
   });

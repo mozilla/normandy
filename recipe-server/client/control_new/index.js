@@ -31,7 +31,7 @@ const store = createStore(reducers, reducers(undefined, { type: 'initial' }), co
       timestamp: true,
     }),
     routerMiddleware,
-    thunk
+    thunk,
   ),
   routerEnhancer,
   DEVELOPMENT ? DevTools.instrument() : x => x,

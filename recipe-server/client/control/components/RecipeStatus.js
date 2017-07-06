@@ -1,9 +1,6 @@
 import React, { PropTypes as pt } from 'react';
 import cx from 'classnames';
 
-const displayFlavorText = (flav, index) =>
-  <div key={index} children={flav} />;
-
 export default function RecipeStatus(props) {
   const {
     icon,
@@ -20,7 +17,7 @@ export default function RecipeStatus(props) {
         {
           !!flavorText.length &&
             <div className="flavor-text">
-              { flavorText.map(displayFlavorText) }
+              { flavorText.map((flav, index) => <div key={index}>{flav}</div>) }
             </div>
         }
       </div>
