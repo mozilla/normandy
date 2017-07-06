@@ -139,7 +139,7 @@ export default class Listing extends React.Component {
     };
 
     Object.keys(filters).forEach(key => {
-      if (filters[key] === undefined) {
+      if ([undefined, null].includes(filters[key])) {
         delete filters[key];
       }
     });
@@ -166,9 +166,10 @@ export default class Listing extends React.Component {
           pageNumber={pageNumber}
           filters={this.getFilters()}
         />
-        <LoadingOverlay>
-          <ListingActionBar />
 
+        <ListingActionBar />
+
+        <LoadingOverlay>
           <DataList
             columns={columns}
             columnRenderers={Listing.columnRenderers}
@@ -177,14 +178,14 @@ export default class Listing extends React.Component {
             onRowClick={this.handleRowClick}
             status={status}
           />
-
-          <Pagination
-            current={pageNumber}
-            pageSize={10}
-            total={count}
-            onChange={this.handleChangePage}
-          />
         </LoadingOverlay>
+
+        <Pagination
+          current={pageNumber}
+          pageSize={10}
+          total={count}
+          onChange={this.handleChangePage}
+        />
       </div>
     );
   }
