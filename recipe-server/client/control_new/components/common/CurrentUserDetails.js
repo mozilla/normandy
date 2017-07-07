@@ -3,21 +3,26 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { getCurrentUser } from 'control_new/state/serviceInfo/selectors';
+import {
+  getCurrentUser,
+  getLogoutUrl,
+} from 'control_new/state/serviceInfo/selectors';
 
 
 @connect(
   state => ({
-    user: getCurrentUser(state, new Map()),
-  }),
+    user: getCurrentUser(state),
+    logoutUrl: getLogoutUrl(state),
+  })
 )
 export default class CurrentUserDetails extends React.Component {
   static propTypes = {
+    logoutUrl: PropTypes.string.isRequired,
     user: PropTypes.object.isRequired,
   }
 
   render() {
-    const { user } = this.props;
+    const { logoutUrl, user } = this.props;
 
     if (!user) {
       return null;
@@ -27,7 +32,7 @@ export default class CurrentUserDetails extends React.Component {
       <div className="current-user">
         <span className="email">{user.get('email')}</span>
 
-        <a href="/control/logout/">
+        <a href={logoutUrl}>
           <Button type="primary" icon="logout" size="small" ghost>
             Log out
           </Button>

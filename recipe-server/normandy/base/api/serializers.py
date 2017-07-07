@@ -23,9 +23,11 @@ class ServiceInfoSerializer(serializers.Serializer):
     """Data that frontend clients need to interact with the service."""
     user = UserSerializer()
     peer_approval_enforced = serializers.BooleanField()
+    logout_url = serializers.CharField()
 
     class Meta:
         fields = [
             'user',
             'peer_approval_enforced',
+            'logout_url',
         ]

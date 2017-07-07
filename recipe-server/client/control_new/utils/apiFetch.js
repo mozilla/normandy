@@ -1,3 +1,5 @@
+import * as Cookie from 'js-cookie';
+
 const API_ROOT = '/api/';
 
 export class ApiError extends Error {
@@ -16,7 +18,7 @@ export default async function apiFetch(url, options = {}) {
   if (!(options.body && options.body instanceof FormData)) {
     headers.append('Content-Type', 'application/json');
   }
-  headers.append('X-CSRFToken', document.getElementsByTagName('html')[0].dataset.csrf);
+  headers.append('X-CSRFToken', Cookie.get('csrftoken-20170707'));
 
   const settings = {
     headers,
