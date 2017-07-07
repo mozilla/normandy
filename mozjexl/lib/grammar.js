@@ -44,10 +44,10 @@ exports.elements = {
     eval(left, right) { return Math.pow(left, right); } },
   '==': { type: 'binaryOp',
     precedence: 20,
-    eval(left, right) { return left == right; } },
+    eval(left, right) { return left == right; } }, // eslint-disable-line eqeqeq
   '!=': { type: 'binaryOp',
     precedence: 20,
-    eval(left, right) { return left != right; } },
+    eval(left, right) { return left != right; } }, // eslint-disable-line eqeqeq
   '>': { type: 'binaryOp',
     precedence: 20,
     eval(left, right) { return left > right; } },
@@ -71,7 +71,7 @@ exports.elements = {
     eval(left, right) {
       if (typeof right === 'string') { return right.indexOf(left) !== -1; }
       if (Array.isArray(right)) {
-        return right.some((elem) => elem == left);
+        return right.some((elem) => elem === left);
       }
       return false;
     } },

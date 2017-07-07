@@ -13,3 +13,5 @@ rules:
   no-restricted-syntax: [off]
   no-mixed-operators: [off]
   strict: [error, "global"]
+  prefer-spread: [off]
+  no-param-reassign: [off]
