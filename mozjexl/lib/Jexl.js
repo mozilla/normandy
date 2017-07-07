@@ -4,10 +4,10 @@
  */
 'use strict';
 
-var Evaluator = require('./evaluator/Evaluator'),
-	Lexer = require('./Lexer'),
-	Parser = require('./parser/Parser'),
-	defaultGrammar = require('./grammar').elements;
+let Evaluator = require('./evaluator/Evaluator'),
+  Lexer = require('./Lexer'),
+  Parser = require('./parser/Parser'),
+  defaultGrammar = require('./grammar').elements;
 
 /**
  * Jexl is the Javascript Expression Language, capable of parsing and
@@ -16,9 +16,9 @@ var Evaluator = require('./evaluator/Evaluator'),
  * @constructor
  */
 function Jexl() {
-	this._customGrammar = null;
-	this._lexer = null;
-	this._transforms = {};
+  this._customGrammar = null;
+  this._lexer = null;
+  this._transforms = {};
 }
 
 /**
@@ -37,12 +37,12 @@ function Jexl() {
  *      on either side of the operator. It should return either the resulting
  *      value, or a Promise that resolves with the resulting value.
  */
-Jexl.prototype.addBinaryOp = function(operator, precedence, fn) {
-	this._addGrammarElement(operator, {
-		type: 'binaryOp',
-		precedence: precedence,
-		eval: fn
-	});
+Jexl.prototype.addBinaryOp = function (operator, precedence, fn) {
+  this._addGrammarElement(operator, {
+    type: 'binaryOp',
+    precedence,
+    eval: fn,
+  });
 };
 
 /**
@@ -54,12 +54,12 @@ Jexl.prototype.addBinaryOp = function(operator, precedence, fn) {
  *      operator. It should return either the resulting value, or a Promise
  *      that resolves with the resulting value.
  */
-Jexl.prototype.addUnaryOp = function(operator, fn) {
-	this._addGrammarElement(operator, {
-		type: 'unaryOp',
-		weight: Infinity,
-		eval: fn
-	});
+Jexl.prototype.addUnaryOp = function (operator, fn) {
+  this._addGrammarElement(operator, {
+    type: 'unaryOp',
+    weight: Infinity,
+    eval: fn,
+  });
 };
 
 /**
@@ -74,8 +74,8 @@ Jexl.prototype.addUnaryOp = function(operator, fn) {
  *            if the transform fails, or a null first argument and the
  *            transformed value as the second argument on success.
  */
-Jexl.prototype.addTransform = function(name, fn) {
-	this._transforms[name] = fn;
+Jexl.prototype.addTransform = function (name, fn) {
+  this._transforms[name] = fn;
 };
 
 /**
@@ -83,11 +83,10 @@ Jexl.prototype.addTransform = function(name, fn) {
  * accepts a map of one or more transform names to their transform function.
  * @param {{}} map A map of transform names to transform functions
  */
-Jexl.prototype.addTransforms = function(map) {
-	for (var key in map) {
-		if (map.hasOwnProperty(key))
-			this._transforms[key] = map[key];
-	}
+Jexl.prototype.addTransforms = function (map) {
+  for (const key in map) {
+    if (map.hasOwnProperty(key)) { this._transforms[key] = map[key]; }
+  }
 };
 
 /**
@@ -95,8 +94,8 @@ Jexl.prototype.addTransforms = function(map) {
  * @param {string} name The name of the transform function
  * @returns {function} The transform function
  */
-Jexl.prototype.getTransform = function(name) {
-	return this._transforms[name];
+Jexl.prototype.getTransform = function (name) {
+  return this._transforms[name];
 };
 
 /**
@@ -112,40 +111,37 @@ Jexl.prototype.getTransform = function(name) {
  *      if a callback is supplied, the returned promise will already have
  *      a '.catch' attached to it in order to pass the error to the callback.
  */
-Jexl.prototype.eval = function(expression, context, cb) {
-	if (typeof context === 'function') {
-		cb = context;
-		context = {};
-	}
-	else if (!context)
-		context = {};
-	var valPromise = this._eval(expression, context);
-	if (cb) {
+Jexl.prototype.eval = function (expression, context, cb) {
+  if (typeof context === 'function') {
+    cb = context;
+    context = {};
+  }	else if (!context) { context = {}; }
+  const valPromise = this._eval(expression, context);
+  if (cb) {
 		// setTimeout is used for the callback to break out of the Promise's
 		// try/catch in case the callback throws.
-		var called = false;
-		return valPromise.then(function(val) {
-			called = true;
-			setTimeout(cb.bind(null, null, val), 0);
-		}).catch(function(err) {
-			if (!called)
-				setTimeout(cb.bind(null, err), 0);
-		});
-	}
-	return valPromise;
+    let called = false;
+    return valPromise.then((val) => {
+      called = true;
+      setTimeout(cb.bind(null, null, val), 0);
+    }).catch((err) => {
+      if (!called) { setTimeout(cb.bind(null, err), 0); }
+    });
+  }
+  return valPromise;
 };
 
 /**
  * Removes a binary or unary operator from the Jexl grammar.
  * @param {string} operator The operator string to be removed
  */
-Jexl.prototype.removeOp = function(operator) {
-	var grammar = this._getCustomGrammar();
-	if (grammar[operator] && (grammar[operator].type == 'binaryOp' ||
+Jexl.prototype.removeOp = function (operator) {
+  const grammar = this._getCustomGrammar();
+  if (grammar[operator] && (grammar[operator].type == 'binaryOp' ||
 			grammar[operator].type == 'unaryOp')) {
-		delete grammar[operator];
-		this._lexer = null;
-	}
+    delete grammar[operator];
+    this._lexer = null;
+  }
 };
 
 /**
@@ -156,10 +152,10 @@ Jexl.prototype.removeOp = function(operator) {
  *      grammar element
  * @private
  */
-Jexl.prototype._addGrammarElement = function(str, obj) {
-	var grammar = this._getCustomGrammar();
-	grammar[str] = obj;
-	this._lexer = null;
+Jexl.prototype._addGrammarElement = function (str, obj) {
+  const grammar = this._getCustomGrammar();
+  grammar[str] = obj;
+  this._lexer = null;
 };
 
 /**
@@ -170,15 +166,15 @@ Jexl.prototype._addGrammarElement = function(str, obj) {
  * @returns {Promise<*>} resolves with the result of the evaluation.
  * @private
  */
-Jexl.prototype._eval = function(exp, context) {
-	var self = this,
-		grammar = this._getGrammar(),
-		parser = new Parser(grammar),
-		evaluator = new Evaluator(grammar, this._transforms, context);
-	return Promise.resolve().then(function() {
-		parser.addTokens(self._getLexer().tokenize(exp));
-		return evaluator.eval(parser.complete());
-	});
+Jexl.prototype._eval = function (exp, context) {
+  let self = this,
+    grammar = this._getGrammar(),
+    parser = new Parser(grammar),
+    evaluator = new Evaluator(grammar, this._transforms, context);
+  return Promise.resolve().then(() => {
+    parser.addTokens(self._getLexer().tokenize(exp));
+    return evaluator.eval(parser.complete());
+  });
 };
 
 /**
@@ -188,15 +184,14 @@ Jexl.prototype._eval = function(exp, context) {
  * @returns {{}} a customizable grammar map.
  * @private
  */
-Jexl.prototype._getCustomGrammar = function() {
-	if (!this._customGrammar) {
-		this._customGrammar = {};
-		for (var key in defaultGrammar) {
-			if (defaultGrammar.hasOwnProperty(key))
-				this._customGrammar[key] = defaultGrammar[key];
-		}
-	}
-	return this._customGrammar;
+Jexl.prototype._getCustomGrammar = function () {
+  if (!this._customGrammar) {
+    this._customGrammar = {};
+    for (const key in defaultGrammar) {
+      if (defaultGrammar.hasOwnProperty(key)) { this._customGrammar[key] = defaultGrammar[key]; }
+    }
+  }
+  return this._customGrammar;
 };
 
 /**
@@ -206,8 +201,8 @@ Jexl.prototype._getCustomGrammar = function() {
  * @returns {{}} the grammar map currently in use.
  * @private
  */
-Jexl.prototype._getGrammar = function() {
-	return this._customGrammar || defaultGrammar;
+Jexl.prototype._getGrammar = function () {
+  return this._customGrammar || defaultGrammar;
 };
 
 /**
@@ -216,10 +211,9 @@ Jexl.prototype._getGrammar = function() {
  *      appropriate to this Jexl instance.
  * @private
  */
-Jexl.prototype._getLexer = function() {
-	if (!this._lexer)
-		this._lexer = new Lexer(this._getGrammar());
-	return this._lexer;
+Jexl.prototype._getLexer = function () {
+  if (!this._lexer) { this._lexer = new Lexer(this._getGrammar()); }
+  return this._lexer;
 };
 
 module.exports = new Jexl();
