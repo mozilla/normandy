@@ -151,6 +151,10 @@ class Core(Configuration):
         'DOC_EXPANSION': 'list',
     }
 
+    # We changed the CSRF cookie from http-only to non http-only and need to override existing
+    # cookies. The easiest way is just change the cookie name when such changes happen.
+    CSRF_COOKIE_NAME = 'csrftoken-20170707'
+
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
@@ -401,6 +405,7 @@ class ProductionInsecure(Production):
         'security.W009',  # Secret key length
         'security.W012',  # Check session cookie secure
         'security.W016',  # Check CSRF cookie secure
+        'security.W017',  # Check CSRF cookie http only
     ])
 
 

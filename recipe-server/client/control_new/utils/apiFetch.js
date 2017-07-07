@@ -18,7 +18,7 @@ export default async function apiFetch(url, options = {}) {
   if (!(options.body && options.body instanceof FormData)) {
     headers.append('Content-Type', 'application/json');
   }
-  headers.append('X-CSRFToken', Cookie.get('csrftoken'));
+  headers.append('X-CSRFToken', Cookie.get('csrftoken-20170707'));
 
   const settings = {
     headers,
