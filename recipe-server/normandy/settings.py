@@ -151,6 +151,10 @@ class Core(Configuration):
         'DOC_EXPANSION': 'list',
     }
 
+    # We changed the CSRF cookie from http-only to non http-only and need to override existing
+    # cookies. The easiest way is just change the cookie name when such changes happen.
+    CSRF_COOKIE_NAME = 'csrftoken-20170707'
+
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
@@ -280,7 +284,7 @@ class Base(Core):
     SECURE_PROXY_SSL_HEADER = values.TupleValue()
     SECURE_HSTS_SECONDS = values.IntegerValue(3600)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
-    CSRF_COOKIE_HTTPONLY = values.BooleanValue(True)
+    CSRF_COOKIE_HTTPONLY = values.BooleanValue(False)
     CSRF_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_SSL_REDIRECT = values.BooleanValue(True)
     SECURE_REDIRECT_EXEMPT = values.ListValue([])
@@ -401,6 +405,7 @@ class ProductionInsecure(Production):
         'security.W009',  # Secret key length
         'security.W012',  # Check session cookie secure
         'security.W016',  # Check CSRF cookie secure
+        'security.W017',  # Check CSRF cookie http only
     ])
 
 
