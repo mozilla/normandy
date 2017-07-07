@@ -3,8 +3,12 @@
  * @param {Object} state
  * @param {String} paramName
  */
-export function getRouterParam(state, paramName) {
-  return state.router.params[paramName];
+export function getRouterParam(state, key, defaultsTo) {
+  return state.router.params[key] || defaultsTo;
+}
+
+export function getRouterParamAsInt(state, key, defaultsTo) {
+  return parseInt(getRouterParam(state, key, defaultsTo), 10);
 }
 
 export function getQueryParam(state, key, defaultsTo) {

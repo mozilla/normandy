@@ -35,7 +35,7 @@ const routes = {
         component: CreateExtensionPage,
         crumb: 'New Extension',
       },
-      '/:pk': {
+      '/:extensionId': {
         component: EditExtensionPage,
         crumb: 'Edit Extension',
       },

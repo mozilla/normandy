@@ -1,30 +1,31 @@
 import { message } from 'antd';
 import autobind from 'autobind-decorator';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { push } from 'redux-little-router';
+import { bindActionCreators } from 'redux';
+import { push as pushAction } from 'redux-little-router';
 
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
-import { createExtension } from 'control_new/state/extensions/actions';
+import * as extensionActions from 'control_new/state/extensions/actions';
 
 
 @connect(
   null,
-  {
-    createExtension,
-    push,
-  },
+  dispatch => (bindActionCreators({
+    createExtension: extensionActions.createExtension,
+    push: pushAction,
+  }, dispatch)),
 )
 @autobind
 export default class CreateExtensionPage extends React.Component {
   static propTypes = {
-    createExtension: pt.func.isRequired,
-    push: pt.func.isRequired,
+    createExtension: PropTypes.func.isRequired,
+    push: PropTypes.func.isRequired,
   }
 
   state = {
-    formErrors: undefined,
+    formErrors: {},
   };
 
   /**
@@ -32,10 +33,11 @@ export default class CreateExtensionPage extends React.Component {
    * for the new extension.
    */
   async handleSubmit(values) {
+    const { createExtension, push } = this.props;
     try {
-      const extensionId = await this.props.createExtension(values);
+      const extensionId = await createExtension(values);
       message.success('Extension saved');
-      this.props.push(`/extension/${extensionId}`);
+      push(`/extension/${extensionId}`);
     } catch (error) {
       message.error(
         'Extension cannot be saved. Please correct any errors listed in the form below.',
@@ -47,8 +49,9 @@ export default class CreateExtensionPage extends React.Component {
   }
 
   render() {
+    const { formErrors } = this.state;
     return (
-      <ExtensionForm onSubmit={this.handleSubmit} errors={this.state.formErrors} />
+      <ExtensionForm onSubmit={this.handleSubmit} errors={formErrors} />
     );
   }
 }
