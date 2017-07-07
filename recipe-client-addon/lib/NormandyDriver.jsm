@@ -156,38 +156,63 @@ this.NormandyDriver = function(sandboxManager) {
       sandboxManager.removeHold(`setTimeout-${token}`);
     },
 
-    /*
-     * Return a promise that resolves to an Addon ID if installation is successful.
-     */
-    installAddon: sandboxManager.wrapAsync(async function installAddon(installUrl) {
-      const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
-      const result = new Promise((resolve, reject) => installObj.addListener({
-        onInstallEnded(addonInstall, addon) {
-          resolve(addon.id);
-        },
-        onInstallFailed(addonInstall) {
-          reject(`AddonInstall error code: [${addonInstall.error}]`);
-        },
-        onDownloadFailed() {
-          reject(`Download failed: [${installUrl}]`);
-        },
-      }));
-      installObj.install();
-      return result;
-    }),
+    addons: {
+      /**
+       * Get information about an installed add-on by ID.
+       *
+       * @param {string} addonId
+       * @returns {Object} Object containing id, installDate,
+       *                   isActive, name, type, and version of addon.
+       */
+      get: sandboxManager.wrapAsync(async function get(addonId) {
+        const addon = await AddonManager.getAddonByID(addonId);
 
-    /*
-     * Return a promise that resolves to a success messsage if
-     * addon uninstall is successful.
-     */
-    uninstallAddon: sandboxManager.wrapAsync(async function uninstallAddon(addonId) {
-      const addon = await AddonManager.getAddonByID(addonId);
-      if (addon === null) {
-        throw new Error(`No addon with ID [${addonId}] found.`);
-      }
-      addon.uninstall();
-      return null;
-    }),
+        if (!addon) {
+          return null;
+        }
+        return {
+          id: addon.id,
+          installDate: new Date(addon.installDate),
+          isActive: true,
+          name: addon.name,
+          type: addon.type,
+          version: addon.version,
+        };
+      }, {cloneInto: true}),
+
+      /*
+      * Return a promise that resolves to an Addon ID if installation is successful.
+      */
+      install: sandboxManager.wrapAsync(async function install(installUrl) {
+        const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
+        const result = new Promise((resolve, reject) => installObj.addListener({
+          onInstallEnded(addonInstall, addon) {
+            resolve(addon.id);
+          },
+          onInstallFailed(addonInstall) {
+            reject(`AddonInstall error code: [${addonInstall.error}]`);
+          },
+          onDownloadFailed() {
+            reject(`Download failed: [${installUrl}]`);
+          },
+        }));
+        installObj.install();
+        return result;
+      }),
+
+      /*
+      * Return a promise that resolves to a success messsage if
+      * addon uninstall is successful.
+      */
+      uninstall: sandboxManager.wrapAsync(async function uninstall(addonId) {
+        const addon = await AddonManager.getAddonByID(addonId);
+        if (addon === null) {
+          throw new Error(`No addon with ID [${addonId}] found.`);
+        }
+        addon.uninstall();
+        return null;
+      }),
+    },
 
     // Sampling
     ratioSample: sandboxManager.wrapAsync(Sampling.ratioSample),

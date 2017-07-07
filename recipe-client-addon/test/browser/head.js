@@ -43,7 +43,7 @@ this.withSandboxManager = function(Assert, testFunction) {
 this.withDriver = function(Assert, testFunction) {
   return withSandboxManager(Assert, async function inner(sandboxManager) {
     const driver = new NormandyDriver(sandboxManager);
-    await testFunction(driver);
+    await testFunction(driver, sandboxManager);
   });
 };
 
