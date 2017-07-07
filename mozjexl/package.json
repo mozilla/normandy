@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "istanbul cover _mocha -- -R spec --recursive test",
+    "lint": "eslint lib test",
     "prepublish": "gulp"
   },
   "repository": {
@@ -35,6 +36,9 @@
     "browserify": "=9.0.3",
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.7.0",
     "gulp": "=3.8.11",
     "gulp-istanbul": "^0.6.0",
     "gulp-istanbul-enforcer": "^1.0.3",

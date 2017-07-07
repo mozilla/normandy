@@ -1,0 +1,6 @@
+env:
+  es6: false
+extends:
+  - airbnb
+rules:
+  react/require-extension: [off]
