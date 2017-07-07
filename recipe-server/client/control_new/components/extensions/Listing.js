@@ -55,7 +55,7 @@ export default class Listing extends React.Component {
   }
 
   static columnRenderers = {
-    name({ ordering }) {
+    name() {
       return (
         <Table.Column
           title="Name"
@@ -66,7 +66,7 @@ export default class Listing extends React.Component {
       );
     },
 
-    xpi({ ordering }) {
+    xpi() {
       return (
         <Table.Column
           title="XPI URL"
