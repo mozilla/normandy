@@ -12,8 +12,8 @@
  * @returns {Promise.<[]>} resolves to a map contained evaluated values.
  * @private
  */
-exports.ArrayLiteral = function(ast) {
-	return this.evalArray(ast.value);
+exports.ArrayLiteral = function (ast) {
+  return this.evalArray(ast.value);
 };
 
 /**
@@ -25,14 +25,12 @@ exports.ArrayLiteral = function(ast) {
  * @returns {Promise<*>} resolves with the value of the BinaryExpression.
  * @private
  */
-exports.BinaryExpression = function(ast) {
-	var self = this;
-	return Promise.all([
-		this.eval(ast.left),
-		this.eval(ast.right)
-	]).then(function(arr) {
-		return self._grammar[ast.operator].eval(arr[0], arr[1]);
-	});
+exports.BinaryExpression = function (ast) {
+  const self = this;
+  return Promise.all([
+    this.eval(ast.left),
+    this.eval(ast.right),
+  ]).then((arr) => self._grammar[ast.operator].eval(arr[0], arr[1]));
 };
 
 /**
@@ -45,16 +43,15 @@ exports.BinaryExpression = function(ast) {
  *      the top node
  * @private
  */
-exports.ConditionalExpression = function(ast) {
-	var self = this;
-	return this.eval(ast.test).then(function(res) {
-		if (res) {
-			if (ast.consequent)
-				return self.eval(ast.consequent);
-			return res;
-		}
-		return self.eval(ast.alternate);
-	});
+exports.ConditionalExpression = function (ast) {
+  const self = this;
+  return this.eval(ast.test).then((res) => {
+    if (res) {
+      if (ast.consequent) { return self.eval(ast.consequent); }
+      return res;
+    }
+    return self.eval(ast.alternate);
+  });
 };
 
 /**
@@ -65,13 +62,12 @@ exports.ConditionalExpression = function(ast) {
  * @returns {Promise<*>} resolves with the value of the FilterExpression.
  * @private
  */
-exports.FilterExpression = function(ast) {
-	var self = this;
-	return this.eval(ast.subject).then(function(subject) {
-		if (ast.relative)
-			return self._filterRelative(subject, ast.expr);
-		return self._filterStatic(subject, ast.expr);
-	});
+exports.FilterExpression = function (ast) {
+  const self = this;
+  return this.eval(ast.subject).then((subject) => {
+    if (ast.relative) { return self._filterRelative(subject, ast.expr); }
+    return self._filterStatic(subject, ast.expr);
+  });
 };
 
 /**
@@ -84,20 +80,17 @@ exports.FilterExpression = function(ast) {
  *      will resolve with the identifier's value.
  * @private
  */
-exports.Identifier = function(ast) {
-	if (ast.from) {
-		return this.eval(ast.from).then(function(context) {
-			if (context === undefined)
-				return undefined;
-			if (Array.isArray(context))
-				context = context[0];
-			return context[ast.value];
-		});
-	}
-	else {
-		return ast.relative ? this._relContext[ast.value] :
+exports.Identifier = function (ast) {
+  if (ast.from) {
+    return this.eval(ast.from).then((context) => {
+      if (context === undefined) { return undefined; }
+      if (Array.isArray(context)) { context = context[0]; }
+      return context[ast.value];
+    });
+  }
+
+  return ast.relative ? this._relContext[ast.value] :
 			this._context[ast.value];
-	}
 };
 
 /**
@@ -107,8 +100,8 @@ exports.Identifier = function(ast) {
  * @returns {string|number|boolean} The value of the Literal node
  * @private
  */
-exports.Literal = function(ast) {
-	return ast.value;
+exports.Literal = function (ast) {
+  return ast.value;
 };
 
 /**
@@ -119,8 +112,8 @@ exports.Literal = function(ast) {
  * @returns {Promise<{}>} resolves to a map contained evaluated values.
  * @private
  */
-exports.ObjectLiteral = function(ast) {
-	return this.evalMap(ast.value);
+exports.ObjectLiteral = function (ast) {
+  return this.evalMap(ast.value);
 };
 
 /**
@@ -132,16 +125,13 @@ exports.ObjectLiteral = function(ast) {
  *      will resolve with the transformed value.
  * @private
  */
-exports.Transform = function(ast) {
-	var transform = this._transforms[ast.name];
-	if (!transform)
-		throw new Error("Transform '" + ast.name + "' is not defined.");
-	return Promise.all([
-		this.eval(ast.subject),
-		this.evalArray(ast.args || [])
-	]).then(function(arr) {
-		return transform.apply(null, [arr[0]].concat(arr[1]));
-	});
+exports.Transform = function (ast) {
+  const transform = this._transforms[ast.name];
+  if (!transform) { throw new Error(`Transform '${ast.name}' is not defined.`); }
+  return Promise.all([
+    this.eval(ast.subject),
+    this.evalArray(ast.args || []),
+  ]).then((arr) => transform.apply(null, [arr[0]].concat(arr[1])));
 };
 
 /**
@@ -152,9 +142,7 @@ exports.Transform = function(ast) {
  * @returns {Promise<*>} resolves with the value of the UnaryExpression.
  * @constructor
  */
-exports.UnaryExpression = function(ast) {
-	var self = this;
-	return this.eval(ast.right).then(function(right) {
-		return self._grammar[ast.operator].eval(right);
-	});
+exports.UnaryExpression = function (ast) {
+  const self = this;
+  return this.eval(ast.right).then((right) => self._grammar[ast.operator].eval(right));
 };

@@ -4,8 +4,8 @@
  */
 'use strict';
 
-var handlers = require('./handlers'),
-	states = require('./states').states;
+let handlers = require('./handlers'),
+  states = require('./states').states;
 
 /**
  * The Parser is a state machine that converts tokens from the {@link Lexer}
@@ -26,12 +26,12 @@ var handlers = require('./handlers'),
  * @constructor
  */
 function Parser(grammar, prefix, stopMap) {
-	this._grammar = grammar;
-	this._state = 'expectOperand';
-	this._tree = null;
-	this._exprStr = prefix || '';
-	this._relative = false;
-	this._stopMap = stopMap || {};
+  this._grammar = grammar;
+  this._state = 'expectOperand';
+  this._tree = null;
+  this._exprStr = prefix || '';
+  this._relative = false;
+  this._stopMap = stopMap || {};
 }
 
 /**
@@ -44,40 +44,30 @@ function Parser(grammar, prefix, stopMap) {
  * @returns {boolean|*} the stopState value if this parser encountered a token
  *      in the stopState mapb; false if tokens can continue.
  */
-Parser.prototype.addToken = function(token) {
-	if (this._state == 'complete')
-		throw new Error('Cannot add a new token to a completed Parser');
-	var state = states[this._state],
-		startExpr = this._exprStr;
-	this._exprStr += token.raw;
-	if (state.subHandler) {
-		if (!this._subParser)
-			this._startSubExpression(startExpr);
-		var stopState = this._subParser.addToken(token);
-		if (stopState) {
-			this._endSubExpression();
-			if (this._parentStop)
-				return stopState;
-			this._state = stopState;
-		}
-	}
-	else if (state.tokenTypes[token.type]) {
-		var typeOpts = state.tokenTypes[token.type],
-			handleFunc = handlers[token.type];
-		if (typeOpts.handler)
-			handleFunc = typeOpts.handler;
-		if (handleFunc)
-			handleFunc.call(this, token);
-		if (typeOpts.toState)
-			this._state = typeOpts.toState;
-	}
-	else if (this._stopMap[token.type])
-		return this._stopMap[token.type];
-	else {
-		throw new Error('Token ' + token.raw + ' (' + token.type +
-			') unexpected in expression: ' + this._exprStr);
-	}
-	return false;
+Parser.prototype.addToken = function (token) {
+  if (this._state == 'complete') { throw new Error('Cannot add a new token to a completed Parser'); }
+  let state = states[this._state],
+    startExpr = this._exprStr;
+  this._exprStr += token.raw;
+  if (state.subHandler) {
+    if (!this._subParser) { this._startSubExpression(startExpr); }
+    const stopState = this._subParser.addToken(token);
+    if (stopState) {
+      this._endSubExpression();
+      if (this._parentStop) { return stopState; }
+      this._state = stopState;
+    }
+  }	else if (state.tokenTypes[token.type]) {
+    let typeOpts = state.tokenTypes[token.type],
+      handleFunc = handlers[token.type];
+    if (typeOpts.handler) { handleFunc = typeOpts.handler; }
+    if (handleFunc) { handleFunc.call(this, token); }
+    if (typeOpts.toState) { this._state = typeOpts.toState; }
+  }	else if (this._stopMap[token.type]) { return this._stopMap[token.type]; } else {
+    throw new Error(`Token ${token.raw} (${token.type
+			}) unexpected in expression: ${this._exprStr}`);
+  }
+  return false;
 };
 
 /**
@@ -86,8 +76,8 @@ Parser.prototype.addToken = function(token) {
  * @param {Array<{type: <string>}>} tokens An array of tokens, as provided by
  *      the {@link Lexer#tokenize} function.
  */
-Parser.prototype.addTokens = function(tokens) {
-	tokens.forEach(this.addToken, this);
+Parser.prototype.addTokens = function (tokens) {
+  tokens.forEach(this.addToken, this);
 };
 
 /**
@@ -98,21 +88,19 @@ Parser.prototype.addTokens = function(tokens) {
  * @throws {Error} if the parser is not in a state where it's legal to end
  *      the expression, indicating that the expression is incomplete
  */
-Parser.prototype.complete = function() {
-	if (this._cursor && !states[this._state].completable)
-		throw new Error('Unexpected end of expression: ' + this._exprStr);
-	if (this._subParser)
-		this._endSubExpression();
-	this._state = 'complete';
-	return this._cursor ? this._tree : null;
+Parser.prototype.complete = function () {
+  if (this._cursor && !states[this._state].completable) { throw new Error(`Unexpected end of expression: ${this._exprStr}`); }
+  if (this._subParser) { this._endSubExpression(); }
+  this._state = 'complete';
+  return this._cursor ? this._tree : null;
 };
 
 /**
  * Indicates whether the expression tree contains a relative path identifier.
  * @returns {boolean} true if a relative identifier exists; false otherwise.
  */
-Parser.prototype.isRelative = function() {
-	return this._relative;
+Parser.prototype.isRelative = function () {
+  return this._relative;
 };
 
 /**
@@ -120,9 +108,9 @@ Parser.prototype.isRelative = function() {
  * to the subHandler configured in the current state.
  * @private
  */
-Parser.prototype._endSubExpression = function() {
-	states[this._state].subHandler.call(this, this._subParser.complete());
-	this._subParser = null;
+Parser.prototype._endSubExpression = function () {
+  states[this._state].subHandler.call(this, this._subParser.complete());
+  this._subParser = null;
 };
 
 /**
@@ -132,14 +120,12 @@ Parser.prototype._endSubExpression = function() {
  * @param {{type: <string>}} node A node to be added to the AST
  * @private
  */
-Parser.prototype._placeAtCursor = function(node) {
-	if (!this._cursor)
-		this._tree = node;
-	else {
-		this._cursor.right = node;
-		this._setParent(node, this._cursor);
-	}
-	this._cursor = node;
+Parser.prototype._placeAtCursor = function (node) {
+  if (!this._cursor) { this._tree = node; } else {
+    this._cursor.right = node;
+    this._setParent(node, this._cursor);
+  }
+  this._cursor = node;
 };
 
 /**
@@ -150,9 +136,9 @@ Parser.prototype._placeAtCursor = function(node) {
  * @param {{type: <string>}} node A node to be added to the AST
  * @private
  */
-Parser.prototype._placeBeforeCursor = function(node) {
-	this._cursor = this._cursor._parent;
-	this._placeAtCursor(node);
+Parser.prototype._placeBeforeCursor = function (node) {
+  this._cursor = this._cursor._parent;
+  this._placeAtCursor(node);
 };
 
 /**
@@ -164,11 +150,11 @@ Parser.prototype._placeBeforeCursor = function(node) {
  *      parent of the new node
  * @private
  */
-Parser.prototype._setParent = function(node, parent) {
-	Object.defineProperty(node, '_parent', {
-		value: parent,
-		writable: true
-	});
+Parser.prototype._setParent = function (node, parent) {
+  Object.defineProperty(node, '_parent', {
+    value: parent,
+    writable: true,
+  });
 };
 
 /**
@@ -177,13 +163,13 @@ Parser.prototype._setParent = function(node, parent) {
  * @param {string} [exprStr] The expression string to prefix to the new Parser
  * @private
  */
-Parser.prototype._startSubExpression = function(exprStr) {
-	var endStates = states[this._state].endStates;
-	if (!endStates) {
-		this._parentStop = true;
-		endStates = this._stopMap;
-	}
-	this._subParser = new Parser(this._grammar, exprStr, endStates);
+Parser.prototype._startSubExpression = function (exprStr) {
+  let endStates = states[this._state].endStates;
+  if (!endStates) {
+    this._parentStop = true;
+    endStates = this._stopMap;
+  }
+  this._subParser = new Parser(this._grammar, exprStr, endStates);
 };
 
 module.exports = Parser;

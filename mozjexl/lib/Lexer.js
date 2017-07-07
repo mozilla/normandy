@@ -4,27 +4,27 @@
  */
 'use strict';
 
-var numericRegex = /^-?(?:(?:[0-9]*\.[0-9]+)|[0-9]+)$/,
-	identRegex = /^[a-zA-Z_\$][a-zA-Z0-9_\$]*$/,
-	escEscRegex = /\\\\/,
-	preOpRegexElems = [
+let numericRegex = /^-?(?:(?:[0-9]*\.[0-9]+)|[0-9]+)$/,
+  identRegex = /^[a-zA-Z_\$][a-zA-Z0-9_\$]*$/,
+  escEscRegex = /\\\\/,
+  preOpRegexElems = [
 		// Strings
-		"'(?:(?:\\\\')?[^'])*'",
-		'"(?:(?:\\\\")?[^"])*"',
+    "'(?:(?:\\\\')?[^'])*'",
+    '"(?:(?:\\\\")?[^"])*"',
 		// Whitespace
-		'\\s+',
+    '\\s+',
 		// Booleans
-		'\\btrue\\b',
-		'\\bfalse\\b'
-	],
-	postOpRegexElems = [
+    '\\btrue\\b',
+    '\\bfalse\\b',
+  ],
+  postOpRegexElems = [
 		// Identifiers
-		'\\b[a-zA-Z_\\$][a-zA-Z0-9_\\$]*\\b',
+    '\\b[a-zA-Z_\\$][a-zA-Z0-9_\\$]*\\b',
 		// Numerics (without negative symbol)
-		'(?:(?:[0-9]*\\.[0-9]+)|[0-9]+)'
-	],
-	minusNegatesAfter = ['binaryOp', 'unaryOp', 'openParen', 'openBracket',
-		'question', 'colon'];
+    '(?:(?:[0-9]*\\.[0-9]+)|[0-9]+)',
+  ],
+  minusNegatesAfter = ['binaryOp', 'unaryOp', 'openParen', 'openBracket',
+    'question', 'colon'];
 
 /**
  * Lexer is a collection of stateless, statically-accessed functions for the
@@ -37,7 +37,7 @@ var numericRegex = /^-?(?:(?:[0-9]*\.[0-9]+)|[0-9]+)$/,
  * @type {{}}
  */
 function Lexer(grammar) {
-	this._grammar = grammar;
+  this._grammar = grammar;
 }
 
 /**
@@ -46,12 +46,11 @@ function Lexer(grammar) {
  * @returns {Array<string>} An array of substrings defining the functional
  *      elements of the expression.
  */
-Lexer.prototype.getElements = function(str) {
-	var regex = this._getSplitRegex();
-	return str.split(regex).filter(function(elem) {
+Lexer.prototype.getElements = function (str) {
+  const regex = this._getSplitRegex();
+  return str.split(regex).filter((elem) =>
 		// Remove empty strings
-		return elem;
-	});
+   elem);
 };
 
 /**
@@ -64,28 +63,23 @@ Lexer.prototype.getElements = function(str) {
  *      converted to tokens
  * @returns {Array<{type, value, raw}>} an array of token objects.
  */
-Lexer.prototype.getTokens = function(elements) {
-	var tokens = [],
-		negate = false;
-	for (var i = 0; i < elements.length; i++) {
-		if (this._isWhitespace(elements[i])) {
-			if (tokens.length)
-				tokens[tokens.length - 1].raw += elements[i];
-		}
-		else if (elements[i] === '-' && this._isNegative(tokens))
-			negate = true;
-		else {
-			if (negate) {
-				elements[i] = '-' + elements[i];
-				negate = false;
-			}
-			tokens.push(this._createToken(elements[i]));
-		}
-	}
+Lexer.prototype.getTokens = function (elements) {
+  let tokens = [],
+    negate = false;
+  for (let i = 0; i < elements.length; i++) {
+    if (this._isWhitespace(elements[i])) {
+      if (tokens.length) { tokens[tokens.length - 1].raw += elements[i]; }
+    }		else if (elements[i] === '-' && this._isNegative(tokens)) { negate = true; } else {
+      if (negate) {
+        elements[i] = `-${elements[i]}`;
+        negate = false;
+      }
+      tokens.push(this._createToken(elements[i]));
+    }
+  }
 	// Catch a - at the end of the string. Let the parser handle that issue.
-	if (negate)
-		tokens.push(this._createToken('-'));
-	return tokens;
+  if (negate) { tokens.push(this._createToken('-')); }
+  return tokens;
 };
 
 /**
@@ -116,9 +110,9 @@ Lexer.prototype.getTokens = function(elements) {
  * @returns {Array<{type, value, raw}>} an array of token objects.
  * @throws {Error} if the provided string contains an invalid token.
  */
-Lexer.prototype.tokenize = function(str) {
-	var elements = this.getElements(str);
-	return this.getTokens(elements);
+Lexer.prototype.tokenize = function (str) {
+  const elements = this.getElements(str);
+  return this.getTokens(elements);
 };
 
 /**
@@ -130,25 +124,14 @@ Lexer.prototype.tokenize = function(str) {
  * @throws {Error} if the provided string is not a valid expression element.
  * @private
  */
-Lexer.prototype._createToken = function(element) {
-	var token = {
-		type: 'literal',
-		value: element,
-		raw: element
-	};
-	if (element[0] == '"' || element[0] == "'")
-		token.value = this._unquote(element);
-	else if (element.match(numericRegex))
-		token.value = parseFloat(element);
-	else if (element === 'true' || element === 'false')
-		token.value = element === 'true';
-	else if (this._grammar[element])
-		token.type = this._grammar[element].type;
-	else if (element.match(identRegex))
-		token.type = 'identifier';
-	else
-		throw new Error("Invalid expression token: " + element);
-	return token;
+Lexer.prototype._createToken = function (element) {
+  const token = {
+    type: 'literal',
+    value: element,
+    raw: element,
+  };
+  if (element[0] == '"' || element[0] == "'") { token.value = this._unquote(element); } else if (element.match(numericRegex)) { token.value = parseFloat(element); } else if (element === 'true' || element === 'false') { token.value = element === 'true'; } else if (this._grammar[element]) { token.type = this._grammar[element].type; } else if (element.match(identRegex)) { token.type = 'identifier'; } else		{ throw new Error(`Invalid expression token: ${element}`); }
+  return token;
 };
 
 /**
@@ -159,11 +142,10 @@ Lexer.prototype._createToken = function(element) {
  * @see https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
  * @private
  */
-Lexer.prototype._escapeRegExp = function(str) {
-	str = str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-	if (str.match(identRegex))
-		str = '\\b' + str + '\\b';
-	return str;
+Lexer.prototype._escapeRegExp = function (str) {
+  str = str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (str.match(identRegex)) { str = `\\b${str}\\b`; }
+  return str;
 };
 
 /**
@@ -172,22 +154,20 @@ Lexer.prototype._escapeRegExp = function(str) {
  * @returns {RegExp} An element-splitting RegExp object
  * @private
  */
-Lexer.prototype._getSplitRegex = function() {
-	if (!this._splitRegex) {
-		var elemArray = Object.keys(this._grammar);
+Lexer.prototype._getSplitRegex = function () {
+  if (!this._splitRegex) {
+    let elemArray = Object.keys(this._grammar);
 		// Sort by most characters to least, then regex escape each
-		elemArray = elemArray.sort(function(a ,b) {
-			return b.length - a.length;
-		}).map(function(elem) {
-			return this._escapeRegExp(elem);
-		}, this);
-		this._splitRegex = new RegExp('(' + [
-			preOpRegexElems.join('|'),
-			elemArray.join('|'),
-			postOpRegexElems.join('|')
-		].join('|') + ')');
-	}
-	return this._splitRegex;
+    elemArray = elemArray.sort((a, b) => b.length - a.length).map(function (elem) {
+      return this._escapeRegExp(elem);
+    }, this);
+    this._splitRegex = new RegExp(`(${[
+      preOpRegexElems.join('|'),
+      elemArray.join('|'),
+      postOpRegexElems.join('|'),
+    ].join('|')})`);
+  }
+  return this._splitRegex;
 };
 
 /**
@@ -199,12 +179,9 @@ Lexer.prototype._getSplitRegex = function() {
  *      symbol; false otherwise
  * @private
  */
-Lexer.prototype._isNegative = function(tokens) {
-	if (!tokens.length)
-		return true;
-	return minusNegatesAfter.some(function(type) {
-		return type === tokens[tokens.length - 1].type;
-	});
+Lexer.prototype._isNegative = function (tokens) {
+  if (!tokens.length) { return true; }
+  return minusNegatesAfter.some((type) => type === tokens[tokens.length - 1].type);
 };
 
 /**
@@ -215,9 +192,9 @@ Lexer.prototype._isNegative = function(tokens) {
  *      false otherwise.
  * @private
  */
-var _whitespaceRegex = /^\s*$/;
-Lexer.prototype._isWhitespace = function(str) {
-	return _whitespaceRegex.test(str);
+const _whitespaceRegex = /^\s*$/;
+Lexer.prototype._isWhitespace = function (str) {
+  return _whitespaceRegex.test(str);
 };
 
 /**
@@ -231,10 +208,10 @@ Lexer.prototype._isWhitespace = function(str) {
  *      properly processed.
  * @private
  */
-Lexer.prototype._unquote = function(str) {
-	var quote = str[0],
-		escQuoteRegex = new RegExp('\\\\' + quote, 'g');
-	return str.substr(1, str.length - 2)
+Lexer.prototype._unquote = function (str) {
+  let quote = str[0],
+    escQuoteRegex = new RegExp(`\\\\${quote}`, 'g');
+  return str.substr(1, str.length - 2)
 		.replace(escQuoteRegex, quote)
 		.replace(escEscRegex, '\\');
 };
