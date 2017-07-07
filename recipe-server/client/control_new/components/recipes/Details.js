@@ -1,4 +1,4 @@
-import { Card, Tag } from 'antd';
+import { Card } from 'antd';
 import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -11,13 +11,6 @@ export default function Details({ recipe }) {
         <dl className="details">
           <dt>Name</dt>
           <dd>{recipe.get('name')}</dd>
-
-          <dt>Enabled</dt>
-          <dd>
-            <Tag color={recipe.get('enabled') ? 'green' : 'red'}>
-              {recipe.get('enabled') ? 'Yes' : 'No'}
-            </Tag>
-          </dd>
 
           <dt>Filters</dt>
           <dd>
@@ -33,8 +26,12 @@ export default function Details({ recipe }) {
 
           {
             recipe.get('arguments', new Map()).map((value, key) => ([
-              <dt key={`dt-${key}`}>{key}</dt>,
-              <dd key={`dd-${key}`}>{value}</dd>,
+              <dt key={`dt-${key}`}>
+                {key}
+              </dt>,
+              <dd key={`dd-${key}`}>
+                {value}
+              </dd>,
             ])).toArray()
           }
         </dl>

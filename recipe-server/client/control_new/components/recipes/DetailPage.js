@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
 import Details from 'control_new/components/recipes/Details';
@@ -20,7 +21,7 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
 @connect(
   state => {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
-    const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId);
+    const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
     const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
     const revision = getRevision(state, revisionId, new Map());
 
@@ -49,11 +50,15 @@ export default class DetailPage extends React.Component {
         <Row gutter={24}>
           <Col span={16}>
             <DetailsActionBar />
-            <Details recipe={revision.get('recipe', new Map())} />
+            <LoadingOverlay>
+              <Details recipe={revision.get('recipe', new Map())} />
+            </LoadingOverlay>
           </Col>
           <Col span={8} className="recipe-history">
             <Card title="History">
-              <HistoryTimeline history={history} selectedRevisionId={revisionId} />
+              <LoadingOverlay>
+                <HistoryTimeline history={history} selectedRevisionId={revisionId} />
+              </LoadingOverlay>
             </Card>
           </Col>
         </Row>

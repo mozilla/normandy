@@ -32,7 +32,7 @@ function recipeReceived(recipe) {
       revision: recipe.latest_revision,
     });
 
-    if (recipe.approved_revision) {
+    if (recipe.approved_revision && recipe.approved_revision.id !== recipe.latest_revision.id) {
       dispatch({
         type: REVISION_RECEIVE,
         revision: recipe.approved_revision,

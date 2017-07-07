@@ -5,19 +5,31 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
-import { getRecipe } from 'control_new/state/recipes/selectors';
-import { isLatestApprovedRevision } from 'control_new/state/revisions/selectors';
-import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
+import {
+  getLatestRevisionIdForRecipe,
+  getRecipe,
+} from 'control_new/state/recipes/selectors';
+import {
+  isLatestApprovedRevision,
+  isLatestRevision,
+} from 'control_new/state/revisions/selectors';
+import {
+  getUrlParam,
+  getUrlParamAsInt,
+} from 'control_new/state/router/selectors';
 
 
 @connect(
   state => {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
-    const revisionId = getUrlParam(state, 'revisionId');
+    const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
+    const recipe = getRecipe(state, recipeId, new Map());
+    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
 
     return {
+      isLatest: isLatestRevision(state, revisionId),
       isLatestApproved: isLatestApprovedRevision(state, revisionId),
-      recipe: getRecipe(state, recipeId, new Map()),
+      recipe,
       recipeId,
       revisionId,
     };
@@ -25,6 +37,7 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
 )
 export default class DetailsActionBar extends React.Component {
   static propTypes = {
+    isLatest: PropTypes.bool.isRequired,
     isLatestApproved: PropTypes.bool.isRequired,
     recipe: PropTypes.object.isRequired,
     recipeId: PropTypes.number.isRequired,
@@ -32,7 +45,7 @@ export default class DetailsActionBar extends React.Component {
   };
 
   render() {
-    const { isLatestApproved, recipe, recipeId, revisionId } = this.props;
+    const { isLatest, isLatestApproved, recipe, recipeId, revisionId } = this.props;
 
     let cloneUrl = `/recipes/${recipeId}`;
     if (revisionId) {
@@ -47,7 +60,7 @@ export default class DetailsActionBar extends React.Component {
         </Link>
 
         {
-          !revisionId &&
+          isLatest &&
             <Link href={`/recipes/${recipeId}/edit`}>
               <Button icon="edit" type="primary">Edit</Button>
             </Link>
@@ -56,6 +69,11 @@ export default class DetailsActionBar extends React.Component {
         {
           isLatestApproved && recipe.get('enabled') &&
             <Button icon="close-circle" type="danger">Disable</Button>
+        }
+
+        {
+          isLatestApproved && !recipe.get('enabled') &&
+            <Button icon="check-circle" type="primary">Publish</Button>
         }
       </div>
     );

@@ -1,4 +1,4 @@
-import { Tag, Timeline } from 'antd';
+import { Icon, Tag, Timeline } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -36,13 +36,19 @@ export default class HistoryTimeline extends React.Component {
           history.map((revision, index) => {
             const recipeId = getRecipeIdForRevision(revision.get('id'));
 
+            const icon = <Icon type="circle-left" style={{ fontSize: '16px' }} />;
+
             let url = `/recipes/${recipeId}`;
             if (!isLatestRevision(revision.get('id'))) {
               url += `/rev/${revision.get('id')}`;
             }
 
             return (
-              <Timeline.Item color="grey" key={revision.get('id')}>
+              <Timeline.Item
+                color="grey"
+                dot={revision.get('id') === selectedRevisionId ? icon : null}
+                key={revision.get('id')}
+              >
                 <Link href={url}>
                   <Tag color={revision.get('id') === selectedRevisionId ? 'blue' : null}>
                     {`Revision ${history.size - index}`}
