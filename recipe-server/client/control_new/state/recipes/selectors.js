@@ -1,7 +1,9 @@
 import { List, Map } from 'immutable';
 
 import { getAction } from 'control_new/state/actions/selectors';
+import { DEFAULT_RECIPE_LISTING_COLUMNS } from 'control_new/state/constants';
 import { getRevision } from 'control_new/state/revisions/selectors';
+
 
 export function getRecipe(state, id, defaultsTo = null) {
   const recipe = state.app.recipes.items.get(id);
@@ -21,6 +23,28 @@ export function getRecipe(state, id, defaultsTo = null) {
   }
 
   return defaultsTo;
+}
+
+export function getRecipeListingCount(state) {
+  return state.app.recipes.listing.get('count');
+}
+
+export function getRecipeListing(state) {
+  const recipes = state.app.recipes.listing.get('results', new List([]));
+  return recipes.map(id => getRecipe(state, id));
+}
+
+export function getRecipeListingFlattenedAction(state) {
+  const recipes = getRecipeListing(state);
+  return recipes.map(item => item.set('action', item.getIn(['action', 'name'])));
+}
+
+export function getRecipeListingPageNumber(state) {
+  return state.app.recipes.listing.get('pageNumber');
+}
+
+export function getRecipeListingColumns(state, defaultsTo = DEFAULT_RECIPE_LISTING_COLUMNS) {
+  return state.app.recipes.listing.get('columns', defaultsTo);
 }
 
 export function getRecipeHistory(state, id) {

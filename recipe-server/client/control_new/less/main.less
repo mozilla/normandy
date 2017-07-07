@@ -6,6 +6,7 @@
 @import 'pages/404';
 @import 'pages/gateway';
 @import 'pages/recipe-details';
+@import 'listing';
 
 // Common
 body {
@@ -56,6 +57,41 @@ dl.details {
   display: flex;
   flex: 1;
   justify-content: flex-start;
+
+  .ant-layout-content {
+    flex: 0
+  }
+}
+
+.centered {
+  text-align: center;
+}
+
+.righted {
+  text-align: right;
+}
+
+.boolean-icon {
+  font-size: 16px;
+  font-weight: bold;
+
+  &.is-true {
+    color: #0C0;
+  }
+
+  &.is-false {
+    color: #C00;
+  }
+}
+
+.current-user {
+  float: right;
+  position: relative;
+  z-index: 1;
+
+  .email {
+    margin-right: 16px;
+  }
 }
 
 .logo {

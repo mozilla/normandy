@@ -6,7 +6,12 @@ import {
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
+  RECIPES_LISTING_COLUMNS_CHANGE,
+  RECIPES_PAGE_RECEIVE,
 } from 'control_new/state/action-types';
+import {
+  RECIPE_LISTING_COLUMNS,
+} from 'control_new/state/constants';
 
 
 function filters(state = new Map(), action) {
@@ -60,8 +65,28 @@ function items(state = new Map(), action) {
 }
 
 
+function listing(state = new Map(), action) {
+  switch (action.type) {
+    case RECIPES_PAGE_RECEIVE:
+      return state
+        .set('count', action.recipes.count)
+        .set('pageNumber', action.pageNumber)
+        .set('results', fromJS(action.recipes.results.map(result => result.id)));
+
+    case RECIPES_LISTING_COLUMNS_CHANGE:
+      return state.set('columns', RECIPE_LISTING_COLUMNS.filter(column => (
+        action.columns.includes(column)
+      )));
+
+    default:
+      return state;
+  }
+}
+
+
 export default combineReducers({
   filters,
   history,
   items,
+  listing,
 });
