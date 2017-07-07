@@ -72,7 +72,7 @@ export default class ListingActionBar extends React.Component {
           />
         </Col>
         <Col span={8} className="righted">
-          <Link href="/recipes/new">
+          <Link href="/recipe/new">
             <Button type="primary" icon="plus">New Recipe</Button>
           </Link>
         </Col>

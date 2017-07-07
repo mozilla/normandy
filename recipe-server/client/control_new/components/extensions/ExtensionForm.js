@@ -4,7 +4,7 @@ import { is, Map } from 'immutable';
 import pt from 'prop-types';
 import React from 'react';
 
-import BaseAntForm from 'control_new/components/common/BaseAntForm';
+import { createForm, FormItem } from 'control_new/components/common/forms';
 import FormActions from 'control_new/components/common/FormActions';
 
 
@@ -15,12 +15,29 @@ import FormActions from 'control_new/components/common/FormActions';
  * component works. Instead, the resulting file is stored in the form state and
  * appended to the form values after validation.
  */
-@Form.create({})
+@createForm({
+  /**
+   * Add the XPI file to the form values since it is handled outside of the
+   * rest of the form.
+   */
+  validateFields(values) {
+    const { xpiFile } = this.state;
+    if (xpiFile) {
+      values.xpi = xpiFile;
+    }
+    return values;
+  },
+})
 @autobind
-export default class ExtensionForm extends BaseAntForm {
+export default class ExtensionForm extends React.Component {
   static propTypes = {
     extension: pt.instanceOf(Map),
-    form: pt.object,
+    form: pt.object.isRequired,
+    onSubmit: pt.func.isRequired,
+  }
+
+  static defaultProps = {
+    extension: new Map(),
   }
 
   state = {
@@ -67,22 +84,6 @@ export default class ExtensionForm extends BaseAntForm {
     this.setState(stateChange);
   }
 
-  /**
-   * Handle selection of an XPI file before ant tries to upload it.
-   * @param  {File} file
-   */
-  beforeUpload(file) {
-    this.setState({
-      xpiName: file.name,
-      xpiFile: file,
-      xpiUrl: null,
-    });
-
-    // Returning false stops the Upload component from trying to send
-    // the file to the server itself.
-    return false;
-  }
-
   getUploadFileList() {
     const { xpiName, xpiUrl } = this.state;
     const fileList = [];
@@ -99,24 +100,26 @@ export default class ExtensionForm extends BaseAntForm {
   }
 
   /**
-   * Add the XPI file to the form values since it is handled outside of the
-   * rest of the form.
-   * @return {Promise}
+   * Handle selection of an XPI file before ant tries to upload it.
+   * @param  {File} file
    */
-  async validateFields() {
-    const values = await super.validateFields();
-    const { xpiFile } = this.state;
-    if (xpiFile) {
-      values.xpi = xpiFile;
-    }
-    return values;
+  beforeUpload(file) {
+    this.setState({
+      xpiName: file.name,
+      xpiFile: file,
+      xpiUrl: null,
+    });
+
+    // Returning false stops the Upload component from trying to send
+    // the file to the server itself.
+    return false;
   }
 
   render() {
-    const { extension = new Map() } = this.props;
+    const { extension, onSubmit } = this.props;
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <this.FormItem
+      <Form onSubmit={onSubmit}>
+        <FormItem
           name="name"
           label="Name"
           initialValue={extension.get('name')}
@@ -125,8 +128,8 @@ export default class ExtensionForm extends BaseAntForm {
           ]}
         >
           <Input />
-        </this.FormItem>
-        <Form.Item label="Extension (XPI)">
+        </FormItem>
+        <FormItem label="Extension (XPI)">
           <Upload
             beforeUpload={this.beforeUpload}
             accept=".xpi"
@@ -136,7 +139,7 @@ export default class ExtensionForm extends BaseAntForm {
               <Icon type="upload" /> Upload XPI
             </Button>
           </Upload>
-        </Form.Item>
+        </FormItem>
         <FormActions>
           <FormActions.Primary>
             <Button type="primary" htmlType="submit">Save</Button>
