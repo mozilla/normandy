@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+'use strict';
 
 var Evaluator = require('./evaluator/Evaluator'),
 	Lexer = require('./Lexer'),

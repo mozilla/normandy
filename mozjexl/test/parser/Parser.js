@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+'use strict';
 
 var should = require('chai').should(),
 	Lexer = require('../../lib/Lexer'),
