@@ -4,18 +4,20 @@
  */
 'use strict';
 
-let should = require('chai').should(),
-  Lexer = require('../../lib/Lexer'),
-  Parser = require('../../lib/parser/Parser'),
-  grammar = require('../../lib/grammar').elements;
+const Lexer = require('../../lib/Lexer');
+const Parser = require('../../lib/parser/Parser');
+const grammar = require('../../lib/grammar').elements;
 
-let inst,
-  lexer = new Lexer(grammar);
 
 describe('Parser', () => {
+  let inst;
+  let lexer;
+
   beforeEach(() => {
     inst = new Parser(grammar);
+    lexer = new Lexer(grammar);
   });
+
   it('should construct an AST for 1+2', () => {
     inst.addTokens(lexer.tokenize('1+2'));
     inst.complete().should.deep.equal({
@@ -25,6 +27,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 2 },
     });
   });
+
   it('should add heavier operations to the right for 2+3*4', () => {
     inst.addTokens(lexer.tokenize('2+3*4'));
     inst.complete().should.deep.equal({
@@ -39,6 +42,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should encapsulate for lighter operation in 2*3+4', () => {
     inst.addTokens(lexer.tokenize('2*3+4'));
     inst.complete().should.deep.equal({
@@ -53,6 +57,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 4 },
     });
   });
+
   it('should handle encapsulation of subtree in 2+3*4==5/6-7', () => {
     inst.addTokens(lexer.tokenize('2+3*4==5/6-7'));
     inst.complete().should.deep.equal({
@@ -82,6 +87,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should handle a unary operator', () => {
     inst.addTokens(lexer.tokenize('1*!!true-2'));
     inst.complete().should.deep.equal({
@@ -104,6 +110,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 2 },
     });
   });
+
   it('should handle a subexpression', () => {
     inst.addTokens(lexer.tokenize('(2+3)*4'));
     inst.complete().should.deep.equal({
@@ -118,6 +125,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 4 },
     });
   });
+
   it('should handle nested subexpressions', () => {
     inst.addTokens(lexer.tokenize('(4*(2+3))/5'));
     inst.complete().should.deep.equal({
@@ -137,6 +145,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 5 },
     });
   });
+
   it('should handle whitespace in an expression', () => {
     inst.addTokens(lexer.tokenize('\t2\r\n+\n\r3\n\n'));
     inst.complete().should.deep.equal({
@@ -146,6 +155,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 3 },
     });
   });
+
   it('should handle object literals', () => {
     inst.addTokens(lexer.tokenize('{foo: "bar", tek: 1+2}'));
     inst.complete().should.deep.equal({
@@ -161,6 +171,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should handle nested object literals', () => {
     inst.addTokens(lexer.tokenize('{foo: {bar: "tek"}}'));
     inst.complete().should.deep.equal({
@@ -175,6 +186,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should handle empty object literals', () => {
     inst.addTokens(lexer.tokenize('{}'));
     inst.complete().should.deep.equal({
@@ -182,6 +194,7 @@ describe('Parser', () => {
       value: {},
     });
   });
+
   it('should handle array literals', () => {
     inst.addTokens(lexer.tokenize('["foo", 1+2]'));
     inst.complete().should.deep.equal({
@@ -197,6 +210,7 @@ describe('Parser', () => {
       ],
     });
   });
+
   it('should handle nested array literals', () => {
     inst.addTokens(lexer.tokenize('["foo", ["bar", "tek"]]'));
     inst.complete().should.deep.equal({
@@ -213,6 +227,7 @@ describe('Parser', () => {
       ],
     });
   });
+
   it('should handle empty array literals', () => {
     inst.addTokens(lexer.tokenize('[]'));
     inst.complete().should.deep.equal({
@@ -220,6 +235,7 @@ describe('Parser', () => {
       value: [],
     });
   });
+
   it('should chain traversed identifiers', () => {
     inst.addTokens(lexer.tokenize('foo.bar.baz + 1'));
     inst.complete().should.deep.equal({
@@ -240,6 +256,7 @@ describe('Parser', () => {
       right: { type: 'Literal', value: 1 },
     });
   });
+
   it('should apply transforms and arguments', () => {
     inst.addTokens(lexer.tokenize('foo|tr1|tr2.baz|tr3({bar:"tek"})'));
     inst.complete().should.deep.equal({
@@ -271,6 +288,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should handle multiple arguments in transforms', () => {
     inst.addTokens(lexer.tokenize('foo|bar("tek", 5, true)'));
     inst.complete().should.deep.equal({
@@ -284,6 +302,7 @@ describe('Parser', () => {
       subject: { type: 'Identifier', value: 'foo' },
     });
   });
+
   it('should apply filters to identifiers', () => {
     inst.addTokens(lexer.tokenize('foo[1][.bar[0]=="tek"].baz'));
     inst.complete().should.deep.equal({
@@ -316,6 +335,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should allow dot notation for all operands', () => {
     inst.addTokens(lexer.tokenize('"foo".length + {foo: "bar"}.foo'));
     inst.complete().should.deep.equal({
@@ -338,6 +358,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should allow dot notation on subexpressions', () => {
     inst.addTokens(lexer.tokenize('("foo" + "bar").length'));
     inst.complete().should.deep.equal({
@@ -351,6 +372,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should allow dot notation on arrays', () => {
     inst.addTokens(lexer.tokenize('["foo", "bar"].length'));
     inst.complete().should.deep.equal({
@@ -365,6 +387,7 @@ describe('Parser', () => {
       },
     });
   });
+
   it('should handle a ternary expression', () => {
     inst.addTokens(lexer.tokenize('foo ? 1 : 0'));
     inst.complete().should.deep.equal({
@@ -374,6 +397,7 @@ describe('Parser', () => {
       alternate: { type: 'Literal', value: 0 },
     });
   });
+
   it('should handle nested and grouped ternary expressions', () => {
     inst.addTokens(lexer.tokenize('foo ? (bar ? 1 : 2) : 3'));
     inst.complete().should.deep.equal({
@@ -388,6 +412,7 @@ describe('Parser', () => {
       alternate: { type: 'Literal', value: 3 },
     });
   });
+
   it('should handle nested, non-grouped ternary expressions', () => {
     inst.addTokens(lexer.tokenize('foo ? bar ? 1 : 2 : 3'));
     inst.complete().should.deep.equal({
@@ -402,6 +427,7 @@ describe('Parser', () => {
       alternate: { type: 'Literal', value: 3 },
     });
   });
+
   it('should handle ternary expression with objects', () => {
     inst.addTokens(lexer.tokenize('foo ? {bar: "tek"} : "baz"'));
     inst.complete().should.deep.equal({
@@ -416,6 +442,7 @@ describe('Parser', () => {
       alternate: { type: 'Literal', value: 'baz' },
     });
   });
+
   it('should correctly balance a binary op between complex identifiers', () => {
     inst.addTokens(lexer.tokenize('a.b == c.d'));
     inst.complete().should.deep.equal({

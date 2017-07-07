@@ -4,9 +4,8 @@
  */
 'use strict';
 
-let should = require('chai').should(),
-  Lexer = require('../lib/Lexer'),
-  grammar = require('../lib/grammar').elements;
+const Lexer = require('../lib/Lexer');
+const grammar = require('../lib/grammar').elements;
 
 let inst;
 
@@ -14,39 +13,45 @@ describe('Lexer', () => {
   beforeEach(() => {
     inst = new Lexer(grammar);
   });
+
   describe('Elements', () => {
     it('should count a string as one element', () => {
-      let str = '"foo"',
-        elems = inst.getElements(str);
+      const str = '"foo"';
+      const elems = inst.getElements(str);
       elems.should.have.length(1);
       elems[0].should.equal(str);
     });
+
     it('should support single-quote strings', () => {
-      let str = "'foo'",
-        elems = inst.getElements(str);
+      const str = "'foo'";
+      const elems = inst.getElements(str);
       elems.should.have.length(1);
       elems[0].should.equal(str);
     });
+
     it('should support escaping double-quotes', () => {
-      let str = '"f\\"oo"',
-        elems = inst.getElements(str);
+      const str = '"f\\"oo"';
+      const elems = inst.getElements(str);
       elems.should.have.length(1);
       elems[0].should.equal(str);
     });
+
     it('should support escaping single-quotes', () => {
-      let str = "'f\\'oo'",
-        elems = inst.getElements(str);
+      const str = "'f\\'oo'";
+      const elems = inst.getElements(str);
       elems.should.have.length(1);
       elems[0].should.equal(str);
     });
+
     it('should count an identifier as one element', () => {
-      let str = 'alpha12345',
-        elems = inst.getElements(str);
+      const str = 'alpha12345';
+      const elems = inst.getElements(str);
       elems.should.deep.equal([str]);
     });
+
     it('should not split grammar elements out of transforms', () => {
-      let str = 'inString',
-        elems = inst.getElements(str);
+      const str = 'inString';
+      const elems = inst.getElements(str);
       elems.should.deep.equal([str]);
     });
   });
@@ -59,6 +64,7 @@ describe('Lexer', () => {
         raw: '"foo \\"bar\\\\"',
       }]);
     });
+
     it('should recognize booleans', () => {
       const tokens = inst.getTokens(['true', 'false']);
       tokens.should.deep.equal([
@@ -74,6 +80,7 @@ describe('Lexer', () => {
         },
       ]);
     });
+
     it('should recognize numerics', () => {
       const tokens = inst.getTokens(['-7.6', '20']);
       tokens.should.deep.equal([
@@ -89,6 +96,7 @@ describe('Lexer', () => {
         },
       ]);
     });
+
     it('should recognize binary operators', () => {
       const tokens = inst.getTokens(['+']);
       tokens.should.deep.equal([{
@@ -97,6 +105,7 @@ describe('Lexer', () => {
         raw: '+',
       }]);
     });
+
     it('should recognize unary operators', () => {
       const tokens = inst.getTokens(['!']);
       tokens.should.deep.equal([{
@@ -105,6 +114,7 @@ describe('Lexer', () => {
         raw: '!',
       }]);
     });
+
     it('should recognize control characters', () => {
       const tokens = inst.getTokens(['(']);
       tokens.should.deep.equal([{
@@ -113,6 +123,7 @@ describe('Lexer', () => {
         raw: '(',
       }]);
     });
+
     it('should recognize identifiers', () => {
       const tokens = inst.getTokens(['_foo9_bar']);
       tokens.should.deep.equal([{
@@ -121,11 +132,13 @@ describe('Lexer', () => {
         raw: '_foo9_bar',
       }]);
     });
+
     it('should throw on invalid token', () => {
       const fn = inst.getTokens.bind(Lexer, ['9foo']);
       fn.should.throw();
     });
   });
+
   it('should tokenize a full expression', () => {
     const tokens = inst.tokenize('6+x -  -17.55*y<= !foo.bar["baz\\"foz"]');
     tokens.should.deep.equal([
@@ -146,6 +159,7 @@ describe('Lexer', () => {
 			{ type: 'closeBracket', value: ']', raw: ']' },
     ]);
   });
+
   it('should consider minus to be negative appropriately', () => {
     inst.tokenize('-1?-2:-3').should.deep.equal([
 			{ type: 'literal', value: -1, raw: '-1' },
