@@ -14,12 +14,12 @@ import { getCurrentUser, getLogoutUrl } from 'control_new/state/serviceInfo/sele
 )
 export default class CurrentUserDetails extends React.Component {
   static propTypes = {
-    user: PropTypes.object.isRequired,
     logoutUrl: PropTypes.string.isRequired,
+    user: PropTypes.object.isRequired,
   }
 
   render() {
-    const { user, logoutUrl } = this.props;
+    const { logoutUrl, user } = this.props;
 
     if (!user) {
       return null;
