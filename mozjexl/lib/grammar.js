@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+'use strict';
 
 /**
  * A map of all expression elements to their properties. Note that changes

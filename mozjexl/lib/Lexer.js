@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+'use strict';
 
 var numericRegex = /^-?(?:(?:[0-9]*\.[0-9]+)|[0-9]+)$/,
 	identRegex = /^[a-zA-Z_\$][a-zA-Z0-9_\$]*$/,

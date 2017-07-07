@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+'use strict';
 
 /**
  * Handles a subexpression that's used to define a transform argument's value.

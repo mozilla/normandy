@@ -1,6 +1,15 @@
 env:
-  es6: false
+  es6: true
+  node: true
 extends:
   - airbnb
+parserOptions:
+  sourceType: script
+  impliedStrict: false
 rules:
-  react/require-extension: [off]
+  no-underscore-dangle: [off]
+  func-names: [error, "as-needed"]
+  react/require-extension: [off]  # strange deprecation error
+  no-restricted-syntax: [off]
+  no-mixed-operators: [off]
+  strict: [error, "global"]
