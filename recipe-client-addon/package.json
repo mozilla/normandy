@@ -5,15 +5,20 @@
   "main": "index.js",
   "author": "Mike Cooper <mcooper@mozilla.com>",
   "repository": "https://github.com/mozilla/normandy-addon",
-  "scripts": {
-  },
+  "scripts": {},
   "license": "MPL-2.0",
+  "scripts": {
+    "watch-vendor": "webpack --config ./webpack.config.js --watch",
+    "build-bendor": "webpack --config ./webpack.config.js",
+    "build": "webpack --config ./webpack.config.js && ./bin/make-xpi.sh"
+  },
   "devDependencies": {
     "babel-eslint": "7.2.3",
-    "eslint": "^3.19.0",
+    "eslint": "3.19.0",
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-babel": "4.1.1",
-    "eslint-plugin-mozilla": "0.3.2"
+    "eslint-plugin-mozilla": "0.3.2",
+    "webpack": "3.1.0"
   },
   "dependencies": {
     "mozjexl": "1.1.5"
