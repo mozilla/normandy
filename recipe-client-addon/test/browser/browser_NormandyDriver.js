@@ -2,6 +2,7 @@
 
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 const testXpiUrl = (function() {
   const dir = getChromeDir(getResolvedURI(gTestPath));
@@ -180,4 +181,38 @@ add_task(withSandboxManager(Assert, async function testAddonsGetWorksInSandbox(s
   `);
 
   await driver.addons.uninstall(ADDON_ID);
+}));
+
+add_task(withSandboxManager(Assert, async function testStudyStorage(sandboxManager) {
+  const driver = new NormandyDriver(sandboxManager);
+  sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+
+  // Assertion helpers
+  sandboxManager.addGlobal("is", is);
+  sandboxManager.addGlobal("ok", ok);
+
+  await sandboxManager.evalInSandbox(`
+    (async function sandboxTest() {
+      await driver.studies.create({
+        name: "test-study",
+        addonId: "test@example.com",
+        addonVersion: "1.0",
+        description: "fake",
+        studyStartDate: new Date().toJSON(),
+      });
+
+      const hasStudy = await driver.studies.has("test-study");
+      ok(hasStudy, "studies.create creates studies from within a sandbox.");
+
+      let study = await driver.studies.get("test-study");
+      is(study.addonVersion, "1.0", "studies.get fetches studies from within a sandbox.");
+
+      await driver.studies.update("test-study", {addonVersion: "2.0"});
+      study = await driver.studies.get("test-study");
+      is(study.addonVersion, "2.0", "studies.update can update stored studies.");
+    })();
+  `);
+
+  await StudyStorage.clear();
+  await StudyStorage.close();
 }));

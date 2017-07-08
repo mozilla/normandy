@@ -6,6 +6,7 @@ Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 add_task(async function getFilterContext() {
   const recipe = {id: 17, arguments: {foo: "bar"}, unrelated: false};
@@ -117,6 +118,8 @@ async function withMockActionSandboxManagers(actions, testFunction) {
 }
 
 add_task(withMockNormandyApi(async function testRun(mockApi) {
+  const closeSpy = sinon.spy(StudyStorage, "close");
+
   const matchAction = {name: "matchAction"};
   const noMatchAction = {name: "noMatchAction"};
   mockApi.actions = [matchAction, noMatchAction];
@@ -145,9 +148,15 @@ add_task(withMockNormandyApi(async function testRun(mockApi) {
 
     // missing is never called at all due to no matching action/manager.
   });
+
+  // Ensure storage is closed after the run.
+  sinon.assert.calledOnce(closeSpy);
+  closeSpy.restore();
 }));
 
 add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
+  const closeSpy = sinon.spy(StudyStorage, "close");
+
   const action = {name: "action"};
   mockApi.actions = [action];
   mockApi.fetchRecipes.rejects(new Error("Signature not valid"));
@@ -159,9 +168,16 @@ add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
     // If the recipe fetch failed, do not run anything.
     sinon.assert.notCalled(manager.runAsyncCallback);
   });
+
+  // If the recipe fetch failed, we don't need to call close since nothing
+  // opened a connection in the first place.
+  sinon.assert.notCalled(closeSpy);
+  closeSpy.restore();
 }));
 
 add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) {
+  const closeSpy = sinon.spy(StudyStorage, "close");
+
   const passAction = {name: "passAction"};
   const failAction = {name: "failAction"};
   mockApi.actions = [passAction, failAction];
@@ -187,6 +203,10 @@ add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) 
     sinon.assert.neverCalledWith(failManager.runAsyncCallback, "action", failRecipe);
     sinon.assert.neverCalledWith(failManager.runAsyncCallback, "postExecution");
   });
+
+  // Ensure storage is closed after the run, despite the failures.
+  sinon.assert.calledOnce(closeSpy);
+  closeSpy.restore();
 }));
 
 add_task(withMockNormandyApi(async function testLoadActionSandboxManagers(mockApi) {

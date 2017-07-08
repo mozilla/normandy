@@ -6,6 +6,7 @@ var LicenseWebpackPlugin = require("license-webpack-plugin");
 module.exports = {
   context: __dirname,
   entry: {
+    ajv: "./node_modules/ajv/",
     mozjexl: "./node_modules/mozjexl/",
   },
   output: {

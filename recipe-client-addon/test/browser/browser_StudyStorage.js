@@ -1,5 +1,6 @@
 "use strict";
 
+Cu.import("resource://gre/modules/IndexedDB.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 function withStudyStorage(testFn) {
@@ -7,109 +8,157 @@ function withStudyStorage(testFn) {
     try {
       await testFn(StudyStorage);
     } finally {
-      await StudyStorage.clearAllData();
-      await StudyStorage.closeConnection();
+      await StudyStorage.clear();
+      await StudyStorage.close();
     }
   };
 }
 
-add_task(withStudyStorage(async function checkSaveStudy(storage) {
-  await storage.saveStudy({
+function studyFactory(attrs) {
+  return Object.assign({
     name: "Test study",
-    version: "2.0.0",
+    addonId: "foo@example.com",
+    addonVersion: "2.0.0",
     description: "fake",
-    addonId: "12345"
-  });
+    studyStartDate: new Date().toJSON(),
+  }, attrs);
+}
+
+add_task(withStudyStorage(async function testGetMissing(storage) {
+  await Assert.rejects(
+    storage.get("does-not-exist"),
+    /Could not find/,
+    "get rejects when the requested study is not stored",
+  );
 }));
 
-// Test looking up study data
-add_task(withStudyStorage(async function checkGetStudy(storage) {
-  const mockStudy = {
-    name: "Test",
-    version: "2.0.0",
-    description: "fake",
-    addonId: "12345"
-  };
+add_task(withStudyStorage(async function testCreateGet(storage) {
+  const study = studyFactory({name: "test-study"});
+  await storage.create(study);
 
-  await storage.saveStudy(mockStudy);
-
-  const study = await storage.getStudy("Test");
-
-  is(study.name, mockStudy.name, "StudyStorage loaded name successfully using `getStudyData`.");
-  is(study.version, mockStudy.version,
-    "StudyStorage loaded version successfully using `getStudyData`.");
+  const storedStudy = await storage.get("test-study");
+  Assert.deepEqual(study, storedStudy, "Create saved a new study to the storage.");
+  is(storedStudy.studyEndDate, null, "Create defaults the study end date to null.");
+  ok(storedStudy.active, "Create defaults the study to active.");
 }));
 
-// Test looking up nonexistant data
-add_task(withStudyStorage(async function checkGetMissingStudy(storage) {
-  const study = await storage.getStudy("Test");
-
-  is(study, null, "StudyStorage correctly returned `null` for a missing study.");
-}));
-
-
-// Test saving different data with the same `id`
-add_task(withStudyStorage(async function checkUpdateStudy(storage) {
-
-  await storage.saveStudy({
-    name: "Test Study",
-    version: "1.0.0",
-    description: "fake",
-    addonId: "12345"
-  });
-
-  await storage.updateStudy("Test Study", {
-    version: "123.0.0",
-    description: "test",
-    addonId: "456"
-  });
-
-  const savedStudy = await storage.getStudy("Test Study");
-
-  ok(savedStudy, "saveStudyData correctly saved the study.");
-  is(savedStudy.name, "Test Study", "saveStudyData correctly updated the study name.");
-  is(savedStudy.version, "123.0.0", "saveStudyData correctly updated the study version");
-  is(savedStudy.addonId, "456", "saveStudyData correctly updated the study addon ID");
-}));
-
-// Test updating with incomplete data
-add_task(withStudyStorage(async function checkUpdateIncompleteStudy(storage) {
-  const mockStudy = {
-    name: "Test Study",
-    version: "500.0.0",
-    description: "fake",
-    addonId: "12345"
-  };
-
-  await storage.saveStudy(mockStudy);
-
-  await storage.updateStudy("Test Study", { description: "test" });
-
-  const savedStudy = await storage.getStudy("Test Study");
-
-  ok(savedStudy, "saveStudyData correctly saved the study.");
-  is(savedStudy.name, mockStudy.name, "saveStudyData correctly updated the study name.");
-  is(savedStudy.version, mockStudy.version, "saveStudyData correctly updated the study version.");
-  is(savedStudy.addonId, mockStudy.addonId, "saveStudyData correctly updated the study addonId.");
-  is(savedStudy.description, "test", "saveStudyData correctly updated the study description.");
-}));
-
-
-// Test creating with incorrect schema
-add_task(withStudyStorage(async function checkCreateInvalidSchema(storage) {
-  const mockStudy = {
-    name: 12345,
-    version: 500,
-    description: true,
-    addonId: new Map()
-  };
-
-  let didThrow = false;
-  try {
-    await storage.saveStudy(mockStudy);
-  } catch (e) {
-    didThrow = true;
+add_task(withStudyStorage(async function testCreateSchema(storage) {
+  const requiredFields = ["name", "addonId", "addonVersion", "description", "studyStartDate"];
+  for (const requiredField of requiredFields) {
+    const study = studyFactory({ [requiredField]: undefined });
+    const msg = `create threw an error due to missing required field ${requiredField}`;
+    await Assert.rejects(storage.create(study), new RegExp(requiredField), msg);
   }
 
-  ok(didThrow, "Invalid schema correctly threw errors.");
+  let study = studyFactory({studyStartDate: "invalid-datetime"});
+  await Assert.rejects(
+    storage.create(study),
+    /studyStartDate/,
+    "create rejected due to an invalid start date",
+  );
+
+  study = studyFactory({studyEndDate: "invalid-datetime"});
+  await Assert.rejects(
+    storage.create(study),
+    /studyEndDate/,
+    "create rejected due to an invalid end date",
+  );
+
+  study = studyFactory({active: "not a boolean"});
+  await Assert.rejects(
+    storage.create(study),
+    /active/,
+    "create rejected due to an invalid active status",
+  );
+}));
+
+add_task(withStudyStorage(async function testCreateHas(storage) {
+  let hasStudy = await storage.has("test-study");
+  ok(!hasStudy, "has returns false before the study has been created.");
+
+  const study = studyFactory({name: "test-study"});
+  await storage.create(study);
+
+  hasStudy = await storage.has("test-study");
+  ok(hasStudy, "has returns true after the study has been created");
+}));
+
+add_task(withStudyStorage(async function testCreateUpdate(storage) {
+  const study = studyFactory({name: "test-study", addonVersion: "1.0", addonId: "foo@example.com"});
+  await storage.create(study);
+  await storage.update("test-study", {addonVersion: "2.0"});
+
+  const storedStudy = await storage.get("test-study");
+  is(storedStudy.addonVersion, "2.0", "update modified the stored study.");
+  is(storedStudy.addonId, "foo@example.com", "update did not modify unspecified fields");
+}));
+
+add_task(withStudyStorage(async function testUpdateSchema(storage) {
+  const study = studyFactory({name: "test-study"});
+  await storage.create(study);
+
+  await Assert.rejects(
+    storage.update("test-study", {studyStartDate: "invalid-datetime"}),
+    /studyStartDate/,
+    "update rejected due to an invalid start date",
+  );
+
+  await Assert.rejects(
+    storage.update("test-study", {studyEndDate: "invalid-datetime"}),
+    /studyEndDate/,
+    "update rejected due to an invalid end date",
+  );
+
+  await Assert.rejects(
+    storage.update("test-study", {active: "not a boolean"}),
+    /active/,
+    "update rejected due to an invalid active status",
+  );
+}));
+
+add_task(withStudyStorage(async function testUpdateMissing(storage) {
+  await Assert.rejects(
+    storage.update("does-not-exist", {addonVersion: "2.0"}),
+    /could not find/,
+    "update rejects when the requested study is not stored",
+  );
+}));
+
+add_task(withStudyStorage(async function testUpdateMissing(storage) {
+  await Assert.rejects(
+    storage.update("does-not-exist", {addonVersion: "2.0"}),
+    /could not find/,
+    "update rejects when the requested study is not stored",
+  );
+}));
+
+add_task(withStudyStorage(async function testCloseDatabase(storage) {
+  const openSpy = sinon.spy(IndexedDB, "open");
+  sinon.assert.notCalled(openSpy);
+
+  // Using storage at all should open the database, but only once.
+  await storage.has("foo");
+  await storage.create(studyFactory({name: "test-study"}));
+  sinon.assert.calledOnce(openSpy);
+
+  // close can be called multiple times
+  await storage.close();
+  await storage.close();
+
+  // After being closed, new operations cause the database to be opened again
+  await storage.has("test-study");
+  sinon.assert.calledTwice(openSpy);
+
+  openSpy.restore();
+}));
+
+add_task(withStudyStorage(async function testClear(storage) {
+  await storage.create(studyFactory({name: "test-study1"}));
+  await storage.create(studyFactory({name: "test-study2"}));
+  const hasAll = (await storage.has("test-study1")) && (await storage.has("test-study2"));
+  ok(hasAll, "Before calling clear, both studies are in the storage.");
+
+  await storage.clear();
+  const hasAny = (await storage.has("test-study1")) || (await storage.has("test-study2"));
+  ok(!hasAny, "After calling clear, all studies are removed from storage.");
 }));
