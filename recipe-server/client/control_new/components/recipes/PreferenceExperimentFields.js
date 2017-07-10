@@ -11,11 +11,21 @@ import { connectFormProps, FormItem } from 'control_new/components/common/forms'
 @connectFormProps
 export default class PreferenceExperimentFields extends React.Component {
   static propTypes = {
-    recipeArguments: PropTypes.instanceOf(Map).isRequired,
-  }
+    disabled: PropTypes.bool,
+    recipeArguments: PropTypes.instanceOf(Map),
+  };
+
+  static defaultProps = {
+    disabled: false,
+    recipeArguments: new Map(),
+  };
 
   render() {
-    const { recipeArguments = new Map() } = this.props;
+    const {
+      recipeArguments,
+      disabled,
+    } = this.props;
+
     return (
       <div>
         <p className="action-info">Run a feature experiment activated by a preference.</p>
@@ -24,7 +34,7 @@ export default class PreferenceExperimentFields extends React.Component {
           name="arguments.slug"
           initialValue={recipeArguments.get('slug', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
 
         <FormItem
@@ -32,7 +42,7 @@ export default class PreferenceExperimentFields extends React.Component {
           name="arguments.experimentDocumentUrl"
           initialValue={recipeArguments.get('experimentDocumentUrl', '')}
         >
-          <DocumentUrlInput />
+          <DocumentUrlInput disabled={disabled} />
         </FormItem>
 
         <FormItem
@@ -40,7 +50,7 @@ export default class PreferenceExperimentFields extends React.Component {
           name="arguments.preferenceName"
           initialValue={recipeArguments.get('preferenceName', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
 
         <FormItem
@@ -48,7 +58,7 @@ export default class PreferenceExperimentFields extends React.Component {
           name="arguments.preferenceType"
           initialValue={recipeArguments.get('preferenceType', 'boolean')}
         >
-          <Select>
+          <Select disabled={disabled}>
             <Select.Option value="boolean">Boolean</Select.Option>
             <Select.Option value="integer">Integer</Select.Option>
             <Select.Option value="string">String</Select.Option>
@@ -60,7 +70,7 @@ export default class PreferenceExperimentFields extends React.Component {
           name="arguments.preferenceBranchType"
           initialValue={recipeArguments.get('preferenceBranchType', 'default')}
         >
-          <PreferenceBranchSelect />
+          <PreferenceBranchSelect disabled={disabled} />
         </FormItem>
 
         <FormItem
@@ -69,7 +79,7 @@ export default class PreferenceExperimentFields extends React.Component {
           initialValue={recipeArguments.get('branches', new List())}
           config={{ valuePropName: 'branches' }}
         >
-          <ExperimentBranches />
+          <ExperimentBranches disabled={disabled} />
         </FormItem>
       </div>
     );
@@ -81,15 +91,20 @@ export default class PreferenceExperimentFields extends React.Component {
  */
 export class DocumentUrlInput extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     // rc-form warns if the component already has a value prop, but doesn't
     // initially provide it. So we can't have a default, and also can't require
     // it.
     // eslint-disable-next-line react/require-default-props
     value: PropTypes.string,
-  }
+  };
+
+  static defaultProps = {
+    disabled: false,
+  };
 
   render() {
-    const { value, ...props } = this.props;
+    const { value, disabled, ...props } = this.props;
     let addonBefore = <span><Icon type="link" /> View</span>;
     if (value) {
       addonBefore = (
@@ -101,6 +116,7 @@ export class DocumentUrlInput extends React.Component {
 
     return (
       <Input
+        disabled={disabled}
         type="url"
         addonBefore={addonBefore}
         value={value}
@@ -116,20 +132,22 @@ export class DocumentUrlInput extends React.Component {
 @connectFormProps
 export class PreferenceBranchSelect extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     form: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     value: PropTypes.any,
-  }
+  };
 
   static defaultProps = {
+    disabled: false,
     value: 'default',
-  }
+  };
 
   render() {
-    const { form, onChange, value } = this.props;
+    const { form, onChange, value, disabled } = this.props;
     return (
       <div>
-        <Select onChange={onChange} value={value}>
+        <Select disabled={disabled} onChange={onChange} value={value}>
           <Select.Option value="default">Default</Select.Option>
           <Select.Option value="user">User</Select.Option>
         </Select>
@@ -164,9 +182,14 @@ export class PreferenceBranchSelect extends React.Component {
 @autobind
 export class ExperimentBranches extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     branches: PropTypes.instanceOf(List).isRequired,
-  }
+  };
+
+  static defaultProps = {
+    disabled: false,
+  };
 
   handleClickDelete(index) {
     const { branches, onChange } = this.props;
@@ -189,13 +212,14 @@ export class ExperimentBranches extends React.Component {
   }
 
   render() {
-    const { branches } = this.props;
+    const { branches, disabled } = this.props;
     return (
       <div>
         <ul className="branch-list">
           {branches.map((branch, index) => (
             <li key={index} className="branch">
               <ExperimentBranchFields
+                disabled={disabled}
                 branch={branch}
                 fieldName={`arguments.branches[${index}]`}
                 index={index}
@@ -205,7 +229,7 @@ export class ExperimentBranches extends React.Component {
             </li>
           ))}
         </ul>
-        <Button type="default" icon="plus" onClick={this.handleClickAdd}>
+        <Button disabled={disabled} type="default" icon="plus" onClick={this.handleClickAdd}>
           Add Branch
         </Button>
       </div>
@@ -253,18 +277,23 @@ export class IntegerPreferenceField extends React.Component {
 export class ExperimentBranchFields extends React.Component {
   static propTypes = {
     branch: PropTypes.instanceOf(Map).isRequired,
+    disabled: PropTypes.bool,
     fieldName: PropTypes.string.isRequired,
     form: PropTypes.object.isRequired,
     index: PropTypes.number.isRequired,
     onChange: PropTypes.func.isRequired,
     onClickDelete: PropTypes.func.isRequired,
-  }
+  };
+
+  static defaultProps = {
+    disabled: false,
+  };
 
   static VALUE_FIELDS = {
     string: StringPreferenceField,
     integer: IntegerPreferenceField,
     boolean: BooleanPreferenceField,
-  }
+  };
 
   handleClickDelete() {
     const { index, onClickDelete } = this.props;
@@ -299,7 +328,7 @@ export class ExperimentBranchFields extends React.Component {
   }
 
   render() {
-    const { branch, fieldName, form } = this.props;
+    const { branch, fieldName, form, disabled } = this.props;
     const preferenceType = form.getFieldValue('arguments.preferenceType');
     const ValueField = ExperimentBranchFields.VALUE_FIELDS[preferenceType];
     return (
@@ -309,23 +338,29 @@ export class ExperimentBranchFields extends React.Component {
           name={`${fieldName}.slug`}
           connectToForm={false}
         >
-          <Input value={branch.get('slug', '')} onChange={this.handleChangeSlug} />
+          <Input disabled={disabled} value={branch.get('slug', '')} onChange={this.handleChangeSlug} />
         </FormItem>
         <FormItem
           label="Preference Value"
           name={`${fieldName}.value`}
           connectToForm={false}
         >
-          <ValueField value={branch.get('value')} onChange={this.handleChangeValue} />
+          <ValueField disabled={disabled} value={branch.get('value')} onChange={this.handleChangeValue} />
         </FormItem>
         <FormItem
           label="Ratio"
           name={`${fieldName}.ratio`}
           connectToForm={false}
         >
-          <InputNumber value={branch.get('ratio', '')} onChange={this.handleChangeRatio} />
+          <InputNumber disabled={disabled} value={branch.get('ratio', '')} onChange={this.handleChangeRatio} />
         </FormItem>
-        <Button type="danger" icon="close" className="delete-btn" onClick={this.handleClickDelete}>
+        <Button
+          disabled={disabled}
+          type="danger"
+          icon="close"
+          className="delete-btn"
+          onClick={this.handleClickDelete}
+        >
           Delete Branch
         </Button>
       </div>

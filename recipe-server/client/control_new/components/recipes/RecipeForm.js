@@ -29,10 +29,16 @@ import { getAction, getAllActions } from 'control_new/state/actions/selectors';
 @autobind
 export default class RecipeForm extends React.Component {
   static propTypes = {
-    recipe: PropTypes.instanceOf(Map).isRequired,
+    recipe: PropTypes.instanceOf(Map),
     form: PropTypes.object.isRequired,
+    isProcessing: PropTypes.bool,
     onSubmit: PropTypes.func.isRequired,
     selectedAction: PropTypes.instanceOf(Map).isRequired,
+  };
+
+  static defaultProps = {
+    recipe: new Map(),
+    isProcessing: false,
   };
 
   static argumentsFields = {
@@ -50,7 +56,13 @@ export default class RecipeForm extends React.Component {
   }
 
   render() {
-    const { onSubmit, recipe = new Map(), selectedAction } = this.props;
+    const {
+      isProcessing,
+      onSubmit,
+      recipe,
+      selectedAction,
+    } = this.props;
+
     const ArgumentsFields = RecipeForm.argumentsFields[selectedAction.get('name')];
 
     return (
@@ -60,31 +72,32 @@ export default class RecipeForm extends React.Component {
           label="Name"
           initialValue={recipe.get('name')}
         >
-          <Input />
+          <Input disabled={isProcessing} />
         </FormItem>
         <FormItem
           name="extra_filter_expression"
           label="Filter Expression"
           initialValue={recipe.get('extra_filter_expression')}
         >
-          <Input type="textarea" rows="4" />
+          <Input disabled={isProcessing} type="textarea" rows="4" />
         </FormItem>
         <FormItem
           name="action_id"
           label="Action"
           initialValue={recipe.getIn(['action', 'id'])}
         >
-          <ActionSelect />
+          <ActionSelect disabled={isProcessing} />
         </FormItem>
         {ArgumentsFields && (
           <fieldset>
             <legend>Arguments</legend>
             <ArgumentsFields
+              disabled={isProcessing}
               recipeArguments={recipe.get('arguments')}
             />
           </fieldset>
         )}
-        <FormActions>
+        <FormActions isLoading={isProcessing}>
           <FormActions.Primary>
             <Button type="primary" htmlType="submit">Save</Button>
           </FormActions.Primary>

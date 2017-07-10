@@ -190,8 +190,11 @@ export class FormItem extends React.Component {
 
     const defaultItemProps = {};
     const error = get(formErrors, name);
-    if (error && typeof error === 'string') {
-      defaultItemProps.help = error;
+
+    if (error) {
+      const errorString = error instanceof Array ? error.join(' ') : error;
+
+      defaultItemProps.help = errorString;
       defaultItemProps.validateStatus = 'error';
     }
     const itemProps = { ...defaultItemProps, ...customItemProps };
@@ -206,7 +209,7 @@ export class FormItem extends React.Component {
     }
 
     return (
-      <Form.Item {...itemProps}>
+      <Form.Item {...itemProps} colon={false}>
         {field}
       </Form.Item>
     );

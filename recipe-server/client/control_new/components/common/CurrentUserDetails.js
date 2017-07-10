@@ -18,8 +18,12 @@ import {
 export default class CurrentUserDetails extends React.Component {
   static propTypes = {
     logoutUrl: PropTypes.string.isRequired,
-    user: PropTypes.object.isRequired,
-  }
+    user: PropTypes.object,
+  };
+
+  static defaultProps = {
+    user: null,
+  };
 
   render() {
     const { logoutUrl, user } = this.props;

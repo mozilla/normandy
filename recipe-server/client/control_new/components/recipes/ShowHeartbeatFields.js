@@ -9,13 +9,22 @@ import { connectFormProps, FormItem } from 'control_new/components/common/forms'
 @connectFormProps
 export default class ShowHeartbeatFields extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     form: PropTypes.object.isRequired,
     recipeArguments: PropTypes.instanceOf(Map).isRequired,
   };
 
+  static defaultProps = {
+    disabled: false,
+    recipeArguments: new Map(),
+  };
 
   render() {
-    const { form, recipeArguments = new Map() } = this.props;
+    const {
+      form,
+      recipeArguments,
+      disabled,
+    } = this.props;
     return (
       <div>
         <p className="action-info">Shows a single message or survey prompt to the user.</p>
@@ -24,56 +33,56 @@ export default class ShowHeartbeatFields extends React.Component {
           name="arguments.surveyId"
           initialValue={recipeArguments.get('surveyId', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="Message"
           name="arguments.message"
           initialValue={recipeArguments.get('message', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="Engagement Button Label"
           name="arguments.engagementButtonLabel"
           initialValue={recipeArguments.get('engagementButtonLabel', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="Thanks Message"
           name="arguments.thanksMessage"
           initialValue={recipeArguments.get('thanksMessage', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="Post-Answer URL"
           name="arguments.postAnswerUrl"
           initialValue={recipeArguments.get('postAnswerUrl', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="Learn More Message"
           name="arguments.learnMoreMessage"
           initialValue={recipeArguments.get('learnMoreMessage', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="Learn More URL"
           name="arguments.learnMoreUrl"
           initialValue={recipeArguments.get('learnMoreUrl', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
         <FormItem
           label="How often should the prompt be shown?"
           name="arguments.repeatOption"
           initialValue={recipeArguments.get('repeatOption', 'once')}
         >
-          <Select>
+          <Select disabled={disabled}>
             <Select.Option value="once">
               Do not show this prompt to users more than once.
             </Select.Option>
@@ -94,7 +103,7 @@ export default class ShowHeartbeatFields extends React.Component {
             name="arguments.repeatEvery"
             initialValue={recipeArguments.get('repeatEvery', 'once')}
           >
-            <InputNumber />
+            <InputNumber disabled={disabled} />
           </FormItem>
         }
         <FormItem
@@ -102,7 +111,7 @@ export default class ShowHeartbeatFields extends React.Component {
           initialValue={recipeArguments.get('includeTelemetryUUID', false)}
           config={{ valuePropName: 'checked' }}
         >
-          <Checkbox>
+          <Checkbox disabled={disabled}>
             Include unique user ID in Post-Answer URL (and Telemetry)
           </Checkbox>
         </FormItem>

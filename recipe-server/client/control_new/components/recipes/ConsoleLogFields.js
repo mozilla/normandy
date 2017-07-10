@@ -8,12 +8,22 @@ import { FormItem } from 'control_new/components/common/forms';
 
 export default class ConsoleLogFields extends React.Component {
   static propTypes = {
-    recipeArguments: PropTypes.instanceOf(Map).isRequired,
+    disabled: PropTypes.bool,
+    recipeArguments: PropTypes.instanceOf(Map),
+  };
+
+  static defaultProps = {
+    disabled: false,
+    recipeArguments: new Map(),
   };
 
 
   render() {
-    const { recipeArguments = new Map() } = this.props;
+    const {
+      disabled,
+      recipeArguments,
+    } = this.props;
+
     return (
       <div>
         <p className="action-info">Log a message to the console.</p>
@@ -22,7 +32,7 @@ export default class ConsoleLogFields extends React.Component {
           label="Message"
           initialValue={recipeArguments.get('message', '')}
         >
-          <Input />
+          <Input disabled={disabled} />
         </FormItem>
       </div>
     );
