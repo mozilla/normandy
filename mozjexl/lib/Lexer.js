@@ -15,8 +15,8 @@ var numericRegex = /^-?(?:(?:[0-9]*\.[0-9]+)|[0-9]+)$/,
 		// Booleans
 		'\\btrue\\b',
 		'\\bfalse\\b',
-		// Octothorpe comments #861
-		'#.*[\\n\\r]?'
+		// comments
+		'//.*[\\n\\r]?'
 	],
 	postOpRegexElems = [
 		// Identifiers
@@ -224,13 +224,13 @@ Lexer.prototype._isWhitespace = function(str) {
 };
 
 /**
- * A utility function to determine if a string is an octothorpe comment
+ * A utility function to determine if a string is a comment
  * @param {string} str A string to be tested
  * @returns {boolean} true if the string is a comment, false otherwise.
  * @private
  */
 Lexer.prototype._isComment = function(str) {
-	return str.startsWith('#');
+	return str.startsWith('//');
 };
 
 /**

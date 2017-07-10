@@ -126,16 +126,16 @@ describe('Lexer', function() {
 		});
 	});
 	describe('Comments', function() {
-	 	it("should handle a complex mix of octothrope comments in single, multiline and value contexts", function () {
+	 	it("should handle a complex mix of comments in single, multiline and value contexts", function () {
 	 		var expression = [
-				'6+x -  -17.55*y #end comment',
-				'<= !foo.bar["baz\\"foz"] # with space',
-				'&& b=="not a #comment" # is a comment',
-		 		"# comment # 2nd comment"
+				'6+x -  -17.55*y //end comment',
+				'<= !foo.bar["baz\\"foz"] // with space',
+				'&& b=="not a //comment" // is a comment',
+		 		"// comment // 2nd comment"
 		 	].join("\n");
 	 		var tokens = inst.tokenize(expression);
 	 		var ans = [
-				{ type: 'literal', value: 6, raw: '6' },
+			  { type: 'literal', value: 6, raw: '6' },
 			  { type: 'binaryOp', value: '+', raw: '+' },
 			  { type: 'identifier', value: 'x', raw: 'x ' },
 			  { type: 'binaryOp', value: '-', raw: '-  ' },
@@ -154,8 +154,8 @@ describe('Lexer', function() {
 			  { type: 'identifier', value: 'b', raw: 'b' },
 			  { type: 'binaryOp', value: '==', raw: '==' },
 			  { type: 'literal',
-			    value: 'not a #comment',
-			    raw: '"not a #comment" ' }
+			    value: 'not a //comment',
+			    raw: '"not a //comment" ' }
 			];
 			tokens.should.deep.equal(ans);
 	 	});

@@ -107,10 +107,6 @@ describe('Evaluator', function() {
 		var e = new Evaluator(grammar);
 		return e.eval(toTree('"hello"|world')).should.reject;
 	});
-	it('should apply the DivFloor operator', function() {
-		var e = new Evaluator(grammar);
-		return e.eval(toTree('7 // 2')).should.become(3);
-	});
 	it('should evaluate an object literal', function() {
 		var e = new Evaluator(grammar);
 		return e.eval(toTree('{foo: {bar: "tek"}}'))

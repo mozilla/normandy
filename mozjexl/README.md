@@ -118,7 +118,6 @@ Access Jexl the same way, backend or front:
 | Subtract         |         -        |
 | Multiply         |         *        |
 | Divide           |         /        |
-| Divide and floor |        //        |
 | Modulus          |         %        |
 | Power of         |         ^        |
 | Logical AND      |        &&        |
