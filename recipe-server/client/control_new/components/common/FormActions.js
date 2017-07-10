@@ -1,3 +1,4 @@
+import { Spin } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -16,18 +17,23 @@ import React from 'react';
  *   </FormActions.Secondary>
  * </FormActions>
  */
-export default function FormActions({ children }) {
+export default function FormActions({ children, isLoading }) {
+  const Wrapper = isLoading ? Spin : 'span';
   return (
     <div className="form-actions">
-      {children}
+      <Wrapper>
+        {children}
+      </Wrapper>
     </div>
   );
 }
 FormActions.propTypes = {
   children: PropTypes.node,
+  isLoading: PropTypes.bool,
 };
 FormActions.defaultProps = {
   children: null,
+  isLoading: false,
 };
 
 /**
