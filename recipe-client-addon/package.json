@@ -5,11 +5,10 @@
   "main": "index.js",
   "author": "Mike Cooper <mcooper@mozilla.com>",
   "repository": "https://github.com/mozilla/normandy-addon",
-  "scripts": {},
   "license": "MPL-2.0",
   "scripts": {
     "watch-vendor": "webpack --config ./webpack.config.js --watch",
-    "build-bendor": "webpack --config ./webpack.config.js",
+    "build-vendor": "webpack --config ./webpack.config.js",
     "build": "webpack --config ./webpack.config.js && ./bin/make-xpi.sh"
   },
   "devDependencies": {
