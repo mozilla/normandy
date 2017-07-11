@@ -87,9 +87,22 @@ export function updateExtension(pk, extensionData) {
   };
 }
 
-export function saveExtensionListingColumns(columns) {
+export function loadExtensionListingColumns() {
   return async dispatch => {
-    await localForage.setItem('extension_listing_columns', columns);
+    const columns = await localForage.getItem('extension_listing_columns');
+
+    if (columns) {
+      dispatch({
+        type: EXTENSIONS_LISTING_COLUMNS_CHANGE,
+        columns,
+      });
+    }
+  };
+}
+
+export function saveExtensionListingColumns(columns) {
+  return dispatch => {
+    localForage.setItem('extension_listing_columns', columns);
 
     dispatch({
       type: EXTENSIONS_LISTING_COLUMNS_CHANGE,

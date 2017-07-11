@@ -12,15 +12,15 @@ import * as extensionActions from 'control_new/state/extensions/actions';
     fetchExtensionsPage: extensionActions.fetchExtensionsPage,
   }, dispatch)),
 )
-export default class QueryExtensions extends React.Component {
+export default class QueryMultipleExtensions extends React.Component {
   static propTypes = {
     fetchExtensionsPage: PropTypes.func.isRequired,
     pageNumber: PropTypes.number,
-  }
+  };
 
   static defaultProps = {
     pageNumber: null,
-  }
+  };
 
   componentWillMount() {
     const { fetchExtensionsPage, pageNumber } = this.props;

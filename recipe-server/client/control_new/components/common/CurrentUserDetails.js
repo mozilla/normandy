@@ -13,7 +13,7 @@ import {
   state => ({
     user: getCurrentUser(state),
     logoutUrl: getLogoutUrl(state),
-  })
+  }),
 )
 export default class CurrentUserDetails extends React.Component {
   static propTypes = {

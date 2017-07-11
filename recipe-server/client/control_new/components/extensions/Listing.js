@@ -7,7 +7,8 @@ import { bindActionCreators } from 'redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
-import QueryExtensions from 'control_new/components/data/QueryExtensions';
+import QueryExtensionListingColumns from 'control_new/components/data/QueryExtensionListingColumns';
+import QueryMultipleExtensions from 'control_new/components/data/QueryMultipleExtensions';
 import ListingActionBar from 'control_new/components/extensions/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
 import {
@@ -113,7 +114,8 @@ export default class Listing extends React.Component {
 
     return (
       <div>
-        <QueryExtensions pageNumber={pageNumber} />
+        <QueryExtensionListingColumns />
+        <QueryMultipleExtensions pageNumber={pageNumber} />
 
         <ListingActionBar />
 
