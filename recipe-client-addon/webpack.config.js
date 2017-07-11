@@ -25,6 +25,7 @@ module.exports = {
         for (const libraryName in compilation.entrypoints) {
           const assetName = `${libraryName}.js`; // Matches output.filename
           compilation.assets[assetName] = new ConcatSource(
+            "/* eslint-disable */", // Disable linting
             compilation.assets[assetName],
             `this.EXPORTED_SYMBOLS = ["${libraryName}"];` // Matches output.library
           );
