@@ -64,7 +64,6 @@ class Autographer(object):
             # Convert to bytes, and then back.
             encoded_implementation = base64.b64encode(item).decode('utf8')
             signing_request.append({
-                'template': 'content-signature',
                 'input': encoded_implementation,
             })
 
