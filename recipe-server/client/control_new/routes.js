@@ -24,7 +24,7 @@ const routes = {
         component: Dummy,
         crumb: 'New Recipe',
       },
-      '/:pk': {
+      '/:recipeId': {
         component: Dummy,
         crumb: 'View Recipe',
         '/edit': {

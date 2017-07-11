@@ -8,14 +8,19 @@ import { connect } from 'react-redux';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import { updateRecipe } from 'control_new/state/recipes/actions';
-import { getCurrentRecipe, getCurrentRecipePk } from 'control_new/state/recipes/selectors';
+import { getRecipe } from 'control_new/state/recipes/selectors';
+import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 
 @connect(
-  state => ({
-    recipePk: getCurrentRecipePk(state),
-    recipe: getCurrentRecipe(state),
-  }),
+  state => {
+    const recipeId = getUrlParamAsInt(state, 'recipeId');
+
+    return {
+      recipeId,
+      recipe: getRecipe(state, recipeId, new Map()),
+    };
+  },
   {
     updateRecipe,
   },
@@ -24,7 +29,7 @@ import { getCurrentRecipe, getCurrentRecipePk } from 'control_new/state/recipes/
 export default class EditRecipePage extends React.Component {
   static propTypes = {
     updateRecipe: pt.func.isRequired,
-    recipePk: pt.number.isRequired,
+    recipeId: pt.number.isRequired,
     recipe: pt.instanceOf(Map),
   }
 
@@ -40,9 +45,9 @@ export default class EditRecipePage extends React.Component {
    * Update the existing recipe and display a message.
    */
   async handleSubmit(values) {
-    const { recipePk } = this.props;
+    const { recipeId } = this.props;
     try {
-      await this.props.updateRecipe(recipePk, values);
+      await this.props.updateRecipe(recipeId, values);
       message.success('Recipe saved');
       this.setState({ formErrors: undefined });
     } catch (error) {
@@ -56,12 +61,13 @@ export default class EditRecipePage extends React.Component {
   }
 
   render() {
-    const { recipe, recipePk } = this.props;
+    const { recipe, recipeId } = this.props;
     const Wrapper = recipe ? 'div' : Spin;
+
     return (
       <Wrapper>
         <h2>Edit Recipe</h2>
-        <QueryRecipe pk={recipePk} />
+        <QueryRecipe pk={recipeId} />
         {recipe &&
           <RecipeForm
             recipe={recipe}

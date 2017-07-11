@@ -3,8 +3,6 @@ import { List } from 'immutable';
 import { getAction } from 'control_new/state/actions/selectors';
 import { DEFAULT_RECIPE_LISTING_COLUMNS } from 'control_new/state/constants';
 import { getRevision } from 'control_new/state/revisions/selectors';
-import { getRouterParam } from 'control_new/state/router/selectors';
-
 
 export function getRecipe(state, id, defaultsTo = null) {
   const recipe = state.app.recipes.items.get(id);
@@ -24,15 +22,6 @@ export function getRecipe(state, id, defaultsTo = null) {
   }
 
   return defaultsTo;
-}
-
-export function getCurrentRecipePk(state) {
-  return Number.parseInt(getRouterParam(state, 'pk'), 10);
-}
-
-export function getCurrentRecipe(state, defaultsTo = null) {
-  const pk = getCurrentRecipePk(state);
-  return getRecipe(state, pk, defaultsTo);
 }
 
 export function getRecipeListingCount(state) {
