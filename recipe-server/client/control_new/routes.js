@@ -28,7 +28,7 @@ const routes = {
         crumb: 'View Recipe',
       },
     },
-    '/extensions': {
+    '/extension': {
       component: ExtensionListing,
       crumb: 'Extensions Listing',
       '/new': {

@@ -17,7 +17,7 @@ export default function Gateway() {
         <Card title="Extensions">
           <Icon type="code" />
           <p>SHIELD WebExtensions</p>
-          <Link href="/extensions">Go to Extensions</Link>
+          <Link href="/extension">Go to Extensions</Link>
         </Card>
       </Col>
     </Row>

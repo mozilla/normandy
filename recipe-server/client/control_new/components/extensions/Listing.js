@@ -80,7 +80,7 @@ export default class Listing extends React.Component {
   }
 
   static renderLinkedText(text, record) {
-    return <Link href={`/extensions/${record.id}`}>{text}</Link>;
+    return <Link href={`/extension/${record.id}`}>{text}</Link>;
   }
 
   getFilters() {
@@ -106,7 +106,7 @@ export default class Listing extends React.Component {
 
   handleRowClick(record) {
     const { push } = this.props;
-    push(`/extensions/${record.id}`);
+    push(`/extension/${record.id}`);
   }
 
   render() {
