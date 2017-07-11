@@ -1,4 +1,5 @@
 import { Button } from 'antd';
+import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -8,7 +9,7 @@ import { getCurrentUser } from 'control_new/state/serviceInfo/selectors';
 
 @connect(
   state => ({
-    user: getCurrentUser(state),
+    user: getCurrentUser(state, Map()),
   }),
 )
 export default class CurrentUserDetails extends React.Component {
