@@ -15,6 +15,27 @@ These docs assume a Unix-like operating system.
 .. _Git: https://git-scm.com/
 .. _Node.js: https://nodejs.org/en/
 
+Installation
+------------
+1. Clone this repository or your fork_:
+
+   .. code-block:: bash
+
+      git clone https://github.com/mozilla/normandy.git
+      cd normandy
+
+2. Install dependencies and build them using npm:
+
+   .. code-block:: bash
+
+      npm install
+      npm run build
+
+Once you've finished these steps, you should be ready to build an XPI or copy
+your checkout to mozilla-central.
+
+.. _fork: http://help.github.com/fork-a-repo/
+
 Building an XPI
 ---------------
 The easiest way to build and run the system add-on is to build an XPI file and

@@ -9,21 +9,12 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceFilters.jsm");
 
+XPCOMUtils.defineLazyModuleGetter(this, "mozjexl", "resource://shield-recipe-client/vendor/mozjexl.js");
+
 this.EXPORTED_SYMBOLS = ["FilterExpressions"];
 
-XPCOMUtils.defineLazyGetter(this, "nodeRequire", () => {
-  const {Loader, Require} = Cu.import("resource://gre/modules/commonjs/toolkit/loader.js", {});
-  const loader = new Loader({
-    paths: {
-      "": "resource://shield-recipe-client/node_modules/",
-    },
-  });
-  return new Require(loader, {});
-});
-
 XPCOMUtils.defineLazyGetter(this, "jexl", () => {
-  const {Jexl} = nodeRequire("mozjexl/lib/Jexl.js");
-  const jexl = new Jexl();
+  const jexl = new mozjexl.Jexl();
   jexl.addTransforms({
     date: dateString => new Date(dateString),
     stableSample: Sampling.stableSample,
