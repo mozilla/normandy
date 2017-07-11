@@ -17,6 +17,7 @@
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-babel": "4.1.1",
     "eslint-plugin-mozilla": "0.3.2",
+    "license-webpack-plugin": "^0.5.1",
     "webpack": "3.1.0"
   },
   "dependencies": {

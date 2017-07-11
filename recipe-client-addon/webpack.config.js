@@ -1,6 +1,7 @@
 /* eslint-env node */
 var path = require("path");
 var ConcatSource = require("webpack-sources").ConcatSource;
+var LicenseWebpackPlugin = require("license-webpack-plugin");
 
 /**
  * Create a webpack config object for a library. The compiled library will be
@@ -40,6 +41,10 @@ function libraryConfig(name, entryPoint) {
           callback();
         });
       },
+      new LicenseWebpackPlugin({
+        pattern: /^(MIT|ISC|MPL.*|Apache.*|BSD.*)$/,
+        filename: `${name}_LICENSE`,
+      }),
     ],
   };
 }
