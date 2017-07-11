@@ -1,44 +1,51 @@
-import { message, Spin } from 'antd';
+import { message } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryExtension from 'control_new/components/data/QueryExtension';
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
-import { updateExtension } from 'control_new/state/extensions/actions';
-import { getCurrentExtension, getCurrentExtensionPk } from 'control_new/state/extensions/selectors';
+import * as extensionActions from 'control_new/state/extensions/actions';
+import { getExtension } from 'control_new/state/extensions/selectors';
+import { getRouterParamAsInt } from 'control_new/state/router/selectors';
 
 
 @connect(
-  state => ({
-    extensionPk: getCurrentExtensionPk(state),
-    extension: getCurrentExtension(state),
-  }),
-  {
-    updateExtension,
+  state => {
+    const extensionId = getRouterParamAsInt(state, 'extensionId');
+    const extension = getExtension(state, extensionId, new Map());
+    return {
+      extension,
+      extensionId,
+    };
   },
+  dispatch => (bindActionCreators({
+    updateExtension: extensionActions.updateExtension,
+  }, dispatch)),
 )
 @autobind
 export default class EditExtensionPage extends React.Component {
   static propTypes = {
-    updateExtension: pt.func.isRequired,
-    extensionPk: pt.number.isRequired,
-    extension: pt.instanceOf(Map).isRequired,
+    extension: PropTypes.instanceOf(Map).isRequired,
+    extensionId: PropTypes.number.isRequired,
+    updateExtension: PropTypes.func.isRequired,
   }
 
   state = {
-    formErrors: undefined,
+    formErrors: {},
   };
 
   /**
    * Update the existing extension and display a message.
    */
   async handleSubmit(values) {
-    const { extensionPk } = this.props;
+    const { extensionId, updateExtension } = this.props;
     try {
-      await this.props.updateExtension(extensionPk, values);
+      await updateExtension(extensionId, values);
       message.success('Extension saved');
     } catch (error) {
       message.error(
@@ -51,20 +58,22 @@ export default class EditExtensionPage extends React.Component {
   }
 
   render() {
-    const { extension, extensionPk } = this.props;
-    const Wrapper = extension ? 'div' : Spin;
+    const { extension, extensionId } = this.props;
+    const { formErrors } = this.state;
     return (
-      <Wrapper>
+      <div>
+        <QueryExtension pk={extensionId} />
+
         <h2>Edit Extension</h2>
-        <QueryExtension pk={extensionPk} />
-        {extension &&
+
+        <LoadingOverlay>
           <ExtensionForm
             extension={extension}
             onSubmit={this.handleSubmit}
-            errors={this.state.formErrors}
+            errors={formErrors}
           />
-        }
-      </Wrapper>
+        </LoadingOverlay>
+      </div>
     );
   }
 }
