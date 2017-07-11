@@ -1,9 +1,9 @@
 import * as localForage from 'localforage';
 
 import {
+  EXTENSION_LISTING_COLUMNS_CHANGE,
+  EXTENSION_PAGE_RECEIVE,
   EXTENSION_RECEIVE,
-  EXTENSIONS_LISTING_COLUMNS_CHANGE,
-  EXTENSIONS_PAGE_RECEIVE,
 } from 'control_new/state/action-types';
 import {
   makeApiRequest,
@@ -38,7 +38,7 @@ export function fetchExtensionsPage(pageNumber = 1) {
     });
 
     dispatch({
-      type: EXTENSIONS_PAGE_RECEIVE,
+      type: EXTENSION_PAGE_RECEIVE,
       pageNumber,
       extensions,
     });
@@ -93,7 +93,7 @@ export function loadExtensionListingColumns() {
 
     if (columns) {
       dispatch({
-        type: EXTENSIONS_LISTING_COLUMNS_CHANGE,
+        type: EXTENSION_LISTING_COLUMNS_CHANGE,
         columns,
       });
     }
@@ -105,7 +105,7 @@ export function saveExtensionListingColumns(columns) {
     localForage.setItem('extension_listing_columns', columns);
 
     dispatch({
-      type: EXTENSIONS_LISTING_COLUMNS_CHANGE,
+      type: EXTENSION_LISTING_COLUMNS_CHANGE,
       columns,
     });
   };

@@ -9,6 +9,7 @@ import { push as pushAction, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
+import QueryRecipeListingColumns from 'control_new/components/data/QueryRecipeListingColumns';
 import QueryRecipes from 'control_new/components/data/QueryRecipes';
 import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
@@ -162,6 +163,7 @@ export default class Listing extends React.Component {
 
     return (
       <div>
+        <QueryRecipeListingColumns />
         <QueryRecipes
           pageNumber={pageNumber}
           filters={this.getFilters()}
