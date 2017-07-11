@@ -4,6 +4,61 @@ The following is a list of things you'll probably need to do at some point while
 working on the recipe client. The majority of these steps assume that you have
 a working :ref:`mozilla-central checkout <build-moz-central>`.
 
+Building and Using Dependencies
+-------------------------------
+Before building an XPI or syncing changes to mozilla-central, you must first
+install and build the latest dependencies:
+
+.. code-block:: bash
+
+   cd recipe-client-addon
+   npm install
+   npm run build
+
+This will create a ``vendor`` directory containing a ``.js`` for each
+third-party library that the add-on uses. They can be imported like other
+JavaScript files:
+
+.. code-block:: javascript
+
+   Cu.import("resource://shield-recipe-client/vendor/mozjexl.js");
+   const jexl = new mozjexl.Jexl();
+
+Adding New Dependencies
+-----------------------
+To add a dependency:
+
+1. Install the dependency and add it to ``package.json``:
+
+   .. code-block:: bash
+
+      npm install --save ajv@5.2.2
+
+   Version numbers in ``package.json`` must be set to an exact match to avoid
+   bugs from downloading newer versions of libraries that we haven't tested
+   the add-on against yet.
+
+2. Add the dependency to ``recipe-client-addon/webpack.config.js`` using the
+   ``libraryConfig`` function:
+
+   .. code-block:: javascript
+
+      module.exports = [
+        // First argument is the name to export the library under
+        // Second argument is a path to the library's folder in node_modules
+        libraryConfig("ajv", "./node_modules/ajv"),
+      ];
+
+3. Re-build the vendor directory via ``npm run build``. Ensure that a
+   ``libraryName_LICENSE`` file was generated withing ``vendor`` so that we have
+   licensing information for our dependencies.
+
+.. note::
+
+   Currently, we do not expose certain browser globals (such as ``fetch``) that
+   libraries may depend on. Be sure to test that libraries you add will work
+   properly in a chrome environment that they may not have been built for.
+
 Building an XPI
 ---------------
 The ``make-xpi.sh`` script builds an XPI file from the current recipe-client
