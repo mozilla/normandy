@@ -38,20 +38,22 @@ To add a dependency:
    bugs from downloading newer versions of libraries that we haven't tested
    the add-on against yet.
 
-2. Add the dependency to ``recipe-client-addon/webpack.config.js`` using the
-   ``libraryConfig`` function:
+2. Add the dependency to ``recipe-client-addon/webpack.config.js`` as an entry
+   point:
 
    .. code-block:: javascript
 
-      module.exports = [
-        // First argument is the name to export the library under
-        // Second argument is a path to the library's folder in node_modules
-        libraryConfig("ajv", "./node_modules/ajv"),
-      ];
+      module.exports = {
+        entry: {
+          // The key is the name to export the library under
+          // The value is the path to the library's folder in node_modules
+          ajv: "./node_modules/ajv",
+        },
+      };
 
-3. Re-build the vendor directory via ``npm run build``. Ensure that a
-   ``libraryName_LICENSE`` file was generated withing ``vendor`` so that we have
-   licensing information for our dependencies.
+3. Re-build the vendor directory via ``npm run build``. Ensure that licensing
+   info for the library was added to the ``LICENSE_THIRDPARTY`` file generated
+   within ``vendor`` so that we have licensing information for our dependencies.
 
 .. note::
 
