@@ -3,6 +3,8 @@
 Cu.import("resource://gre/modules/IndexedDB.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
+const REQUIRED_FIELDS = ["name", "addonId", "addonVersion", "description", "studyStartDate"];
+
 function withStudyStorage(testFn) {
   return async () => {
     try {
@@ -42,11 +44,27 @@ add_task(withStudyStorage(async function testCreateGet(storage) {
   ok(storedStudy.active, "Create defaults the study to active.");
 }));
 
+add_task(withStudyStorage(async function testCreateExists(storage) {
+  const study = studyFactory({name: "test-study"});
+  await storage.create(study);
+
+  const dupeStudy = studyFactory({name: "test-study"});
+  Assert.rejects(
+    storage.create(dupeStudy),
+    /test-study/,
+    "create throws when a study exists with the given name already",
+  );
+}));
+
 add_task(withStudyStorage(async function testCreateSchema(storage) {
-  const requiredFields = ["name", "addonId", "addonVersion", "description", "studyStartDate"];
-  for (const requiredField of requiredFields) {
-    const study = studyFactory({ [requiredField]: undefined });
-    const msg = `create threw an error due to missing required field ${requiredField}`;
+  for (const requiredField of REQUIRED_FIELDS) {
+    let study = studyFactory({ [requiredField]: undefined });
+    let msg = `create threw an error due to missing required field ${requiredField}`;
+    await Assert.rejects(storage.create(study), new RegExp(requiredField), msg);
+
+    // Blank values are not allowed for required fields either
+    study = studyFactory({ [requiredField]: "" });
+    msg = `create threw an error due to blank required field ${requiredField}`;
     await Assert.rejects(storage.create(study), new RegExp(requiredField), msg);
   }
 
@@ -96,6 +114,16 @@ add_task(withStudyStorage(async function testCreateUpdate(storage) {
 add_task(withStudyStorage(async function testUpdateSchema(storage) {
   const study = studyFactory({name: "test-study"});
   await storage.create(study);
+
+  // Required fields must not be blank if they're specified
+  for (const requiredField of REQUIRED_FIELDS) {
+    const msg = `update threw an error due to blank required field ${requiredField}`;
+    await Assert.rejects(
+      storage.update("test-study", { [requiredField]: "" }),
+      new RegExp(requiredField),
+      msg,
+    );
+  }
 
   await Assert.rejects(
     storage.update("test-study", {studyStartDate: "invalid-datetime"}),

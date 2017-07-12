@@ -41,22 +41,28 @@ const DB_SCHEMA = {
   properties: {
     name: {
       type: "string",
+      minLength: 1,
     },
     addonId: {
       type: "string",
+      minLength: 1,
     },
     addonVersion: {
       type: "string",
+      minLength: 1,
     },
     description: {
       type: "string",
+      minLength: 1,
     },
     studyStartDate: {
       type: "string",
+      minLength: 1,
       format: "date-time",
     },
     studyEndDate: {
       type: ["string", "null"],
+      minLength: 1,
       format: "date-time",
       default: null,
     },
@@ -150,6 +156,12 @@ this.StudyStorage = {
     }
 
     const db = await getDatabase();
+    if (getStore(db).get(study.name)) {
+      throw new Error(
+        `Cannot create study with name ${study.name}: a study exists with that name already.`,
+      );
+    }
+
     return getStore(db).add(study);
   },
 
@@ -158,7 +170,9 @@ this.StudyStorage = {
     const savedStudy = await getStore(db).get(studyName);
     if (!savedStudy) {
       throw new Error(`Cannot update study ${studyName}: could not find study.`);
-    } else if (!validateUpdate(data)) {
+    }
+
+    if (!validateUpdate(data)) {
       throw new Error(`
         Cannot update study ${studyName}: validation failed:
         ${ajvInstance.errorsText(validateUpdate.errors)}
