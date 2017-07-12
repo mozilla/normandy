@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const handlers = require('./handlers');
@@ -110,7 +111,7 @@ class Evaluator {
     }
     const promises = [];
     if (!Array.isArray(subject)) { subject = [subject]; }
-    subject.forEach(elem => {
+    subject.forEach((elem) => {
       const evalInst = new Evaluator(this._grammar, this._transforms,
                           this._context, elem);
       promises.push(evalInst.eval(expr));

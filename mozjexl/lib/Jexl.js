@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const Evaluator = require('./evaluator/Evaluator');
@@ -116,7 +117,7 @@ class Jexl {
     if (typeof context === 'function') {
       cb = context;
       context = {};
-    }	else if (!context) { context = {}; }
+    } else if (!context) { context = {}; }
     const valPromise = this._eval(expression, context);
     if (cb) {
                   // setTimeout is used for the callback to break out of the Promise's

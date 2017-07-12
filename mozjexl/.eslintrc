@@ -2,7 +2,7 @@ env:
   es6: true
   node: true
 extends:
-  - airbnb
+  - airbnb-base
 parserOptions:
   sourceType: script
   impliedStrict: false
@@ -15,3 +15,6 @@ rules:
   strict: [error, "global"]
   prefer-spread: [off]
   no-param-reassign: [off]
+  no-restricted-properties: [off]
+  no-plusplus: [off]
+  class-methods-use-this: [off]

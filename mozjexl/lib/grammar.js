@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 /**
@@ -71,7 +72,7 @@ exports.elements = {
     eval(left, right) {
       if (typeof right === 'string') { return right.indexOf(left) !== -1; }
       if (Array.isArray(right)) {
-        return right.some((elem) => elem === left);
+        return right.some(elem => elem === left);
       }
       return false;
     } },

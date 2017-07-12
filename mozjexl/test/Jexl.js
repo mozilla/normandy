@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const chai = require('chai');
@@ -43,7 +44,7 @@ describe('Jexl', () => {
       return val.toLowerCase();
     });
     return inst.eval('"hello"|toCase({case:"upper"})')
-			.should.become('HELLO');
+      .should.become('HELLO');
   });
 
   it('should allow transforms to be retrieved', () => {
@@ -78,7 +79,7 @@ describe('Jexl', () => {
   });
 
   it('should allow unaryOps to be defined', () => {
-    inst.addUnaryOp('~', (right) => Math.floor(right));
+    inst.addUnaryOp('~', right => Math.floor(right));
     return inst.eval('~5.7 + 5').should.become(10);
   });
 

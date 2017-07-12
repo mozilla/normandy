@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const numericRegex = /^-?(?:(?:[0-9]*\.[0-9]+)|[0-9]+)$/;
@@ -48,7 +49,7 @@ module.exports = class Lexer {
    */
   getElements(str) {
     const regex = this._getSplitRegex();
-    return str.split(regex).filter((elem) =>
+    return str.split(regex).filter(elem =>
                   // Remove empty strings
     elem);
   }
@@ -69,7 +70,7 @@ module.exports = class Lexer {
     for (let i = 0; i < elements.length; i++) {
       if (this._isWhitespace(elements[i])) {
         if (tokens.length) { tokens[tokens.length - 1].raw += elements[i]; }
-      }		else if (elements[i] === '-' && this._isNegative(tokens)) { negate = true; } else {
+      } else if (elements[i] === '-' && this._isNegative(tokens)) { negate = true; } else {
         if (negate) {
           elements[i] = `-${elements[i]}`;
           negate = false;
@@ -192,7 +193,7 @@ module.exports = class Lexer {
    */
   _isNegative(tokens) {
     if (!tokens.length) { return true; }
-    return minusNegatesAfter.some((type) => type === tokens[tokens.length - 1].type);
+    return minusNegatesAfter.some(type => type === tokens[tokens.length - 1].type);
   }
 
   /**

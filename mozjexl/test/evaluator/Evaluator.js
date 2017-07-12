@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const chai = require('chai');
@@ -30,7 +31,7 @@ describe('Evaluator', () => {
   it('should evaluate a string concat', () => {
     const e = new Evaluator(grammar);
     return e.eval(toTree('"Hello" + (4+4) + "Wo\\"rld"'))
-			.should.become('Hello8Wo"rld');
+      .should.become('Hello8Wo"rld');
   });
 
   it('should evaluate a true comparison expression', () => {
@@ -46,14 +47,14 @@ describe('Evaluator', () => {
   it('should evaluate a complex expression', () => {
     const e = new Evaluator(grammar);
     return e.eval(toTree('"foo" && 6 >= 6 && 0 + 1 && true'))
-			.should.become(true);
+      .should.become(true);
   });
 
   it('should evaluate an identifier chain', () => {
     const context = { foo: { baz: { bar: 'tek' } } };
     const e = new Evaluator(grammar, null, context);
     return e.eval(toTree('foo.baz.bar'))
-			.should.become(context.foo.baz.bar);
+      .should.become(context.foo.baz.bar);
   });
 
   it('should apply transforms', () => {
@@ -70,7 +71,7 @@ describe('Evaluator', () => {
     };
     const e = new Evaluator(grammar, null, context);
     return e.eval(toTree('foo.bar[.tek == "baz"]'))
-			.should.eventually.deep.equal([{ tek: 'baz' }]);
+      .should.eventually.deep.equal([{ tek: 'baz' }]);
   });
 
   it('should assume array index 0 when traversing', () => {
@@ -97,21 +98,21 @@ describe('Evaluator', () => {
     const context = { foo: { baz: { bar: 'tek' } } };
     const e = new Evaluator(grammar, null, context);
     return e.eval(toTree('foo["ba" + "z"].bar'))
-			.should.become(context.foo.baz.bar);
+      .should.become(context.foo.baz.bar);
   });
 
   it('should allow simple filters on undefined objects', () => {
     const context = { foo: {} };
     const e = new Evaluator(grammar, null, context);
     return e.eval(toTree('foo.bar["baz"].tok'))
-			.should.become(undefined);
+      .should.become(undefined);
   });
 
   it('should allow complex filters on undefined objects', () => {
     const context = { foo: {} };
     const e = new Evaluator(grammar, null, context);
     return e.eval(toTree('foo.bar[.size > 1].baz'))
-			.should.become(undefined);
+      .should.become(undefined);
   });
 
   it('should throw when transform does not exist', () => {
@@ -127,13 +128,13 @@ describe('Evaluator', () => {
   it('should evaluate an object literal', () => {
     const e = new Evaluator(grammar);
     return e.eval(toTree('{foo: {bar: "tek"}}'))
-			.should.eventually.deep.equal({ foo: { bar: 'tek' } });
+      .should.eventually.deep.equal({ foo: { bar: 'tek' } });
   });
 
   it('should evaluate an empty object literal', () => {
     const e = new Evaluator(grammar);
     return e.eval(toTree('{}'))
-			.should.eventually.deep.equal({});
+      .should.eventually.deep.equal({});
   });
 
   it('should evaluate a transform with multiple args', () => {
@@ -143,7 +144,7 @@ describe('Evaluator', () => {
       },
     });
     return e.eval(toTree('"foo"|concat("baz", "bar", "tek")'))
-			.should.become('foo: bazbartek');
+      .should.become('foo: bazbartek');
   });
 
   it('should evaluate dot notation for object literals', () => {
@@ -159,7 +160,7 @@ describe('Evaluator', () => {
   it('should evaluate array literals', () => {
     const e = new Evaluator(grammar);
     return e.eval(toTree('["foo", 1+2]'))
-			.should.eventually.deep.equal(['foo', 3]);
+      .should.eventually.deep.equal(['foo', 3]);
   });
 
   it('should apply the "in" operator to strings', () => {

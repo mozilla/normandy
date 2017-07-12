@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 module.exports = {
@@ -31,7 +32,7 @@ module.exports = {
     return Promise.all([
       this.eval(ast.left),
       this.eval(ast.right),
-    ]).then((arr) => self._grammar[ast.operator].eval(arr[0], arr[1]));
+    ]).then(arr => self._grammar[ast.operator].eval(arr[0], arr[1]));
   },
 
   /**
@@ -83,7 +84,7 @@ module.exports = {
    */
   Identifier(ast) {
     if (ast.from) {
-      return this.eval(ast.from).then(context => {
+      return this.eval(ast.from).then((context) => {
         if (context === undefined) { return undefined; }
         if (Array.isArray(context)) { context = context[0]; }
         return context[ast.value];
@@ -91,7 +92,7 @@ module.exports = {
     }
 
     return ast.relative ? this._relContext[ast.value] :
-			this._context[ast.value];
+      this._context[ast.value];
   },
 
   /**
@@ -132,7 +133,7 @@ module.exports = {
     return Promise.all([
       this.eval(ast.subject),
       this.evalArray(ast.args || []),
-    ]).then((arr) => transform.apply(null, [arr[0]].concat(arr[1])));
+    ]).then(arr => transform.apply(null, [arr[0]].concat(arr[1])));
   },
 
   /**
@@ -145,6 +146,6 @@ module.exports = {
    */
   UnaryExpression(ast) {
     const self = this;
-    return this.eval(ast.right).then((right) => self._grammar[ast.operator].eval(right));
+    return this.eval(ast.right).then(right => self._grammar[ast.operator].eval(right));
   },
 };

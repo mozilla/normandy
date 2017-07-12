@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const Lexer = require('../lib/Lexer');
@@ -142,31 +143,31 @@ describe('Lexer', () => {
   it('should tokenize a full expression', () => {
     const tokens = inst.tokenize('6+x -  -17.55*y<= !foo.bar["baz\\"foz"]');
     tokens.should.deep.equal([
-			{ type: 'literal', value: 6, raw: '6' },
-			{ type: 'binaryOp', value: '+', raw: '+' },
-			{ type: 'identifier', value: 'x', raw: 'x ' },
-			{ type: 'binaryOp', value: '-', raw: '-  ' },
-			{ type: 'literal', value: -17.55, raw: '-17.55' },
-			{ type: 'binaryOp', value: '*', raw: '*' },
-			{ type: 'identifier', value: 'y', raw: 'y' },
-			{ type: 'binaryOp', value: '<=', raw: '<= ' },
-			{ type: 'unaryOp', value: '!', raw: '!' },
-			{ type: 'identifier', value: 'foo', raw: 'foo' },
-			{ type: 'dot', value: '.', raw: '.' },
-			{ type: 'identifier', value: 'bar', raw: 'bar' },
-			{ type: 'openBracket', value: '[', raw: '[' },
-			{ type: 'literal', value: 'baz"foz', raw: '"baz\\"foz"' },
-			{ type: 'closeBracket', value: ']', raw: ']' },
+      { type: 'literal', value: 6, raw: '6' },
+      { type: 'binaryOp', value: '+', raw: '+' },
+      { type: 'identifier', value: 'x', raw: 'x ' },
+      { type: 'binaryOp', value: '-', raw: '-  ' },
+      { type: 'literal', value: -17.55, raw: '-17.55' },
+      { type: 'binaryOp', value: '*', raw: '*' },
+      { type: 'identifier', value: 'y', raw: 'y' },
+      { type: 'binaryOp', value: '<=', raw: '<= ' },
+      { type: 'unaryOp', value: '!', raw: '!' },
+      { type: 'identifier', value: 'foo', raw: 'foo' },
+      { type: 'dot', value: '.', raw: '.' },
+      { type: 'identifier', value: 'bar', raw: 'bar' },
+      { type: 'openBracket', value: '[', raw: '[' },
+      { type: 'literal', value: 'baz"foz', raw: '"baz\\"foz"' },
+      { type: 'closeBracket', value: ']', raw: ']' },
     ]);
   });
 
   it('should consider minus to be negative appropriately', () => {
     inst.tokenize('-1?-2:-3').should.deep.equal([
-			{ type: 'literal', value: -1, raw: '-1' },
-			{ type: 'question', value: '?', raw: '?' },
-			{ type: 'literal', value: -2, raw: '-2' },
-			{ type: 'colon', value: ':', raw: ':' },
-			{ type: 'literal', value: -3, raw: '-3' },
+      { type: 'literal', value: -1, raw: '-1' },
+      { type: 'question', value: '?', raw: '?' },
+      { type: 'literal', value: -2, raw: '-2' },
+      { type: 'colon', value: ':', raw: ':' },
+      { type: 'literal', value: -3, raw: '-3' },
     ]);
   });
 });

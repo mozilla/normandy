@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const handlers = require('./handlers');
@@ -61,7 +62,7 @@ class Parser {
         if (this._parentStop) { return stopState; }
         this._state = stopState;
       }
-    }	else if (state.tokenTypes[token.type]) {
+    } else if (state.tokenTypes[token.type]) {
       const typeOpts = state.tokenTypes[token.type];
       let handleFunc = handlers[token.type];
       if (typeOpts.handler) {
@@ -69,7 +70,7 @@ class Parser {
       }
       if (handleFunc) { handleFunc.call(this, token); }
       if (typeOpts.toState) { this._state = typeOpts.toState; }
-    }	else if (this._stopMap[token.type]) { return this._stopMap[token.type]; } else {
+    } else if (this._stopMap[token.type]) { return this._stopMap[token.type]; } else {
       throw new Error(`Token ${token.raw} (${token.type
                           }) unexpected in expression: ${this._exprStr}`);
     }

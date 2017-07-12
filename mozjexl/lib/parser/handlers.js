@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 module.exports = {
@@ -97,7 +98,7 @@ module.exports = {
       node.from = this._cursor;
       this._placeBeforeCursor(node);
       this._nextIdentEncapsulate = false;
-    }	else {
+    } else {
       if (this._nextIdentRelative) { node.relative = true; }
       this._placeAtCursor(node);
     }

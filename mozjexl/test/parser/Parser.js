@@ -2,6 +2,7 @@
  * Jexl
  * Copyright (c) 2015 TechnologyAdvice
  */
+
 'use strict';
 
 const Lexer = require('../../lib/Lexer');
@@ -200,7 +201,7 @@ describe('Parser', () => {
     inst.complete().should.deep.equal({
       type: 'ArrayLiteral',
       value: [
-				{ type: 'Literal', value: 'foo' },
+        { type: 'Literal', value: 'foo' },
         {
           type: 'BinaryExpression',
           operator: '+',
@@ -216,12 +217,12 @@ describe('Parser', () => {
     inst.complete().should.deep.equal({
       type: 'ArrayLiteral',
       value: [
-				{ type: 'Literal', value: 'foo' },
+        { type: 'Literal', value: 'foo' },
         {
           type: 'ArrayLiteral',
           value: [
-						{ type: 'Literal', value: 'bar' },
-						{ type: 'Literal', value: 'tek' },
+            { type: 'Literal', value: 'bar' },
+            { type: 'Literal', value: 'tek' },
           ],
         },
       ],
@@ -295,9 +296,9 @@ describe('Parser', () => {
       type: 'Transform',
       name: 'bar',
       args: [
-				{ type: 'Literal', value: 'tek' },
-				{ type: 'Literal', value: 5 },
-				{ type: 'Literal', value: true },
+        { type: 'Literal', value: 'tek' },
+        { type: 'Literal', value: 5 },
+        { type: 'Literal', value: true },
       ],
       subject: { type: 'Identifier', value: 'foo' },
     });
@@ -381,8 +382,8 @@ describe('Parser', () => {
       from: {
         type: 'ArrayLiteral',
         value: [
-					{ type: 'Literal', value: 'foo' },
-					{ type: 'Literal', value: 'bar' },
+          { type: 'Literal', value: 'foo' },
+          { type: 'Literal', value: 'bar' },
         ],
       },
     });
