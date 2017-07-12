@@ -2,7 +2,7 @@
 import { Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { connectFormProps, FormItem } from 'control_new/components/common/forms';
@@ -11,7 +11,7 @@ import { connectFormProps, FormItem } from 'control_new/components/common/forms'
 @connectFormProps
 export default class PreferenceExperimentFields extends React.Component {
   static propTypes = {
-    recipeArguments: pt.instanceOf(Map).isRequired,
+    recipeArguments: PropTypes.instanceOf(Map).isRequired,
   }
 
   render() {
@@ -85,7 +85,7 @@ export class DocumentUrlInput extends React.Component {
     // initially provide it. So we can't have a default, and also can't require
     // it.
     // eslint-disable-next-line react/require-default-props
-    value: pt.string,
+    value: PropTypes.string,
   }
 
   render() {
@@ -116,9 +116,9 @@ export class DocumentUrlInput extends React.Component {
 @connectFormProps
 export class PreferenceBranchSelect extends React.Component {
   static propTypes = {
-    form: pt.object.isRequired,
-    onChange: pt.func.isRequired,
-    value: pt.any,
+    form: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.any,
   }
 
   static defaultProps = {
@@ -164,8 +164,8 @@ export class PreferenceBranchSelect extends React.Component {
 @autobind
 export class ExperimentBranches extends React.Component {
   static propTypes = {
-    onChange: pt.func.isRequired,
-    branches: pt.instanceOf(List).isRequired,
+    onChange: PropTypes.func.isRequired,
+    branches: PropTypes.instanceOf(List).isRequired,
   }
 
   handleClickDelete(index) {
@@ -223,7 +223,7 @@ export class StringPreferenceField extends React.Component {
 
 export class BooleanPreferenceField extends React.Component {
   static propTypes = {
-    value: pt.any,
+    value: PropTypes.any,
   }
 
   render() {
@@ -252,12 +252,12 @@ export class IntegerPreferenceField extends React.Component {
 @autobind
 export class ExperimentBranchFields extends React.Component {
   static propTypes = {
-    branch: pt.instanceOf(Map).isRequired,
-    fieldName: pt.string.isRequired,
-    form: pt.object.isRequired,
-    index: pt.number.isRequired,
-    onChange: pt.func.isRequired,
-    onClickDelete: pt.func.isRequired,
+    branch: PropTypes.instanceOf(Map).isRequired,
+    fieldName: PropTypes.string.isRequired,
+    form: PropTypes.object.isRequired,
+    index: PropTypes.number.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onClickDelete: PropTypes.func.isRequired,
   }
 
   static VALUE_FIELDS = {

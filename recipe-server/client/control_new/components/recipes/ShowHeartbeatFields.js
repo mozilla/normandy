@@ -1,6 +1,6 @@
 import { Checkbox, Input, InputNumber, Select } from 'antd';
 import { Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { connectFormProps, FormItem } from 'control_new/components/common/forms';
@@ -9,8 +9,8 @@ import { connectFormProps, FormItem } from 'control_new/components/common/forms'
 @connectFormProps
 export default class ShowHeartbeatFields extends React.Component {
   static propTypes = {
-    form: pt.object.isRequired,
-    recipeArguments: pt.instanceOf(Map).isRequired,
+    form: PropTypes.object.isRequired,
+    recipeArguments: PropTypes.instanceOf(Map).isRequired,
   };
 
 

@@ -1,4 +1,5 @@
-import React, { PropTypes as pt } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { routerForBrowser } from 'redux-little-router';
 
@@ -68,7 +69,7 @@ export function resolveRoutes({ router }) {
 }
 
 resolveRoutes.propTypes = {
-  router: pt.object.isRequired,
+  router: PropTypes.object.isRequired,
 };
 
 export const Router = connect(state => ({

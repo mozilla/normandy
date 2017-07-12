@@ -1,6 +1,6 @@
 import { Input } from 'antd';
 import { Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { FormItem } from 'control_new/components/common/forms';
@@ -8,7 +8,7 @@ import { FormItem } from 'control_new/components/common/forms';
 
 export default class ConsoleLogFields extends React.Component {
   static propTypes = {
-    recipeArguments: pt.instanceOf(Map).isRequired,
+    recipeArguments: PropTypes.instanceOf(Map).isRequired,
   };
 
 

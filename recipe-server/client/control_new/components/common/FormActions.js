@@ -1,4 +1,4 @@
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 
@@ -24,7 +24,7 @@ export default function FormActions({ children }) {
   );
 }
 FormActions.propTypes = {
-  children: pt.node,
+  children: PropTypes.node,
 };
 FormActions.defaultProps = {
   children: null,
@@ -39,7 +39,7 @@ FormActions.Primary = function FormActionsPrimary({ children }) {
   );
 };
 FormActions.Primary.propTypes = {
-  children: pt.node,
+  children: PropTypes.node,
 };
 FormActions.Primary.defaultProps = {
   children: null,
@@ -54,7 +54,7 @@ FormActions.Secondary = function FormActionsSecondary({ children }) {
   );
 };
 FormActions.Secondary.propTypes = {
-  children: pt.node,
+  children: PropTypes.node,
 };
 FormActions.Secondary.defaultProps = {
   children: null,

@@ -1,7 +1,7 @@
 import { Button, Form, Icon, Input, Upload } from 'antd';
 import autobind from 'autobind-decorator';
 import { is, Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { createForm, FormItem } from 'control_new/components/common/forms';
@@ -31,9 +31,9 @@ import FormActions from 'control_new/components/common/FormActions';
 @autobind
 export default class ExtensionForm extends React.Component {
   static propTypes = {
-    extension: pt.instanceOf(Map),
-    form: pt.object.isRequired,
-    onSubmit: pt.func.isRequired,
+    extension: PropTypes.instanceOf(Map),
+    form: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   }
 
   static defaultProps = {

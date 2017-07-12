@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
@@ -30,9 +30,9 @@ import { getRouterParamAsInt } from 'control_new/state/router/selectors';
 @autobind
 export default class EditRecipePage extends React.Component {
   static propTypes = {
-    updateRecipe: pt.func.isRequired,
-    recipeId: pt.number.isRequired,
-    recipe: pt.instanceOf(Map),
+    updateRecipe: PropTypes.func.isRequired,
+    recipeId: PropTypes.number.isRequired,
+    recipe: PropTypes.instanceOf(Map),
   };
 
   static defaultProps = {

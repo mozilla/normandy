@@ -1,7 +1,7 @@
 import { Form, message } from 'antd';
 import autobind from 'autobind-decorator';
 import get from 'lodash.get';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 
@@ -51,16 +51,16 @@ export function createForm({ validateFields, ...formConfig }) {
     class WrappedForm extends React.Component {
       static propTypes = {
         // Form object injected by Form.create.
-        form: pt.object.isRequired,
+        form: PropTypes.object.isRequired,
 
         // Function to call when the form is submitted. Passed an object
         // containing post-validation field values.
-        onSubmit: pt.func.isRequired,
+        onSubmit: PropTypes.func.isRequired,
 
         // An object containing validation errors to be shown to the user.
         // The object is shaped like the field values, but with error strings
         // instead of field values.
-        errors: pt.object,
+        errors: PropTypes.object,
       };
 
       static defaultProps = {
@@ -70,8 +70,8 @@ export function createForm({ validateFields, ...formConfig }) {
       // FormItem and connectFormProps access the form instance and errors via
       // the context.
       static childContextTypes = {
-        form: pt.object,
-        formErrors: pt.object,
+        form: PropTypes.object,
+        formErrors: PropTypes.object,
       };
 
       getChildContext() {
@@ -143,28 +143,28 @@ export function createForm({ validateFields, ...formConfig }) {
 export class FormItem extends React.Component {
   static propTypes = {
     // The input component used to enter data for this field.
-    children: pt.node.isRequired,
+    children: PropTypes.node.isRequired,
 
     // Extra config arguments to pass to form.getFieldDecorator.
-    config: pt.object,
+    config: PropTypes.object,
 
     // If false, do not wrap the input component with form.getFieldDecorator.
     // Defaults to true.
-    connectToForm: pt.bool,
+    connectToForm: PropTypes.bool,
 
     // From connectFormProps
-    form: pt.object.isRequired,
-    formErrors: pt.object.isRequired,
+    form: PropTypes.object.isRequired,
+    formErrors: PropTypes.object.isRequired,
 
     // Convenience alias for initialValue argument to form.getFieldDecorator.
-    initialValue: pt.any,
+    initialValue: PropTypes.any,
 
     // The field name where data for this field is stored (passed to
     // form.getfieldDecorator).
-    name: pt.string,
+    name: PropTypes.string,
 
     // List of validation rules (passed to form.getFieldDecorator).
-    rules: pt.arrayOf(pt.object),
+    rules: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {
@@ -225,8 +225,8 @@ export class FormItem extends React.Component {
 export function connectFormProps(Component) {
   return class Wrapper extends React.Component {
     static contextTypes = {
-      form: pt.object,
-      formErrors: pt.object,
+      form: PropTypes.object,
+      formErrors: PropTypes.object,
     };
 
     render() {
