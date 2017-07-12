@@ -1,20 +1,22 @@
-import { message, Spin } from 'antd';
+import { message } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import pt from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import QueryRecipe from 'control_new/components/data/QueryRecipe';
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
+import QueryRecipe from 'control_new/components/data/QueryRecipe';
+
 import { updateRecipe } from 'control_new/state/recipes/actions';
 import { getRecipe } from 'control_new/state/recipes/selectors';
-import { getUrlParamAsInt } from 'control_new/state/router/selectors';
+import { getRouterParamAsInt } from 'control_new/state/router/selectors';
 
 
 @connect(
   state => {
-    const recipeId = getUrlParamAsInt(state, 'recipeId');
+    const recipeId = getRouterParamAsInt(state, 'recipeId');
 
     return {
       recipeId,
@@ -31,11 +33,11 @@ export default class EditRecipePage extends React.Component {
     updateRecipe: pt.func.isRequired,
     recipeId: pt.number.isRequired,
     recipe: pt.instanceOf(Map),
-  }
+  };
 
   static defaultProps = {
     recipe: null,
-  }
+  };
 
   state = {
     formErrors: undefined,
@@ -62,20 +64,19 @@ export default class EditRecipePage extends React.Component {
 
   render() {
     const { recipe, recipeId } = this.props;
-    const Wrapper = recipe ? 'div' : Spin;
 
     return (
-      <Wrapper>
-        <h2>Edit Recipe</h2>
+      <div>
         <QueryRecipe pk={recipeId} />
-        {recipe &&
+        <LoadingOverlay>
+          <h2>Edit Recipe</h2>
           <RecipeForm
             recipe={recipe}
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
           />
-        }
-      </Wrapper>
+        </LoadingOverlay>
+      </div>
     );
   }
 }

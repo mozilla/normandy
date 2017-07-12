@@ -61,18 +61,18 @@ export function createForm({ validateFields, ...formConfig }) {
         // The object is shaped like the field values, but with error strings
         // instead of field values.
         errors: pt.object,
-      }
+      };
 
       static defaultProps = {
         errors: {},
-      }
+      };
 
       // FormItem and connectFormProps access the form instance and errors via
       // the context.
       static childContextTypes = {
         form: pt.object,
         formErrors: pt.object,
-      }
+      };
 
       getChildContext() {
         const { form, errors } = this.props;
@@ -165,7 +165,7 @@ export class FormItem extends React.Component {
 
     // List of validation rules (passed to form.getFieldDecorator).
     rules: pt.arrayOf(pt.object),
-  }
+  };
 
   static defaultProps = {
     config: {},
@@ -173,7 +173,7 @@ export class FormItem extends React.Component {
     initialValue: null,
     name: null,
     rules: null,
-  }
+  };
 
   render() {
     const {
@@ -227,7 +227,7 @@ export function connectFormProps(Component) {
     static contextTypes = {
       form: pt.object,
       formErrors: pt.object,
-    }
+    };
 
     render() {
       return (

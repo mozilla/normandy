@@ -1,7 +1,7 @@
 import { Button, Form, Input, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { is, Map } from 'immutable';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
@@ -29,11 +29,11 @@ import { getAction, getAllActions } from 'control_new/state/actions/selectors';
 @autobind
 export default class RecipeForm extends React.Component {
   static propTypes = {
-    recipe: pt.instanceOf(Map).isRequired,
-    form: pt.object.isRequired,
-    onSubmit: pt.func.isRequired,
-    selectedAction: pt.instanceOf(Map).isRequired,
-  }
+    recipe: PropTypes.instanceOf(Map).isRequired,
+    form: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    selectedAction: PropTypes.instanceOf(Map).isRequired,
+  };
 
   static argumentsFields = {
     'console-log': ConsoleLogFields,
@@ -72,7 +72,7 @@ export default class RecipeForm extends React.Component {
         <FormItem
           name="action_id"
           label="Action"
-          initialValue={recipe.getIn(['action', 'id']).toString(10)}
+          initialValue={recipe.getIn(['action', 'id'])}
         >
           <ActionSelect />
         </FormItem>
@@ -101,13 +101,13 @@ export default class RecipeForm extends React.Component {
 )
 class ActionSelect extends React.Component {
   static propTypes = {
-    actions: pt.instanceOf(Map).isRequired,
-    value: pt.string,
-  }
+    actions: PropTypes.instanceOf(Map).isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  };
 
   static defaultProps = {
     value: null,
-  }
+  };
 
   render() {
     const { actions, value, ...props } = this.props;
