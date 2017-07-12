@@ -15,11 +15,11 @@ export default class LoadingOverlay extends React.Component {
   static propTypes = {
     children: PropTypes.any,
     loading: PropTypes.bool.isRequired,
-  }
+  };
 
   static defaultProps = {
     children: null,
-  }
+  };
 
   render() {
     const { children, loading } = this.props;

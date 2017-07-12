@@ -28,7 +28,7 @@ const store = createStore(reducers, reducers(undefined, { type: 'initial' }), co
     thunk,
     createLogger({
       collapsed: true,
-      diff: true,
+      diff: false,
       duration: true,
       timestamp: true,
     }),

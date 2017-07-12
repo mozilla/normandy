@@ -1,10 +1,12 @@
-import React, { PropTypes as pt } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { routerForBrowser } from 'redux-little-router';
 
 import App from 'control_new/components/App';
 import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
+import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
 import ExtensionListing from 'control_new/components/extensions/Listing';
 import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
@@ -16,16 +18,20 @@ const routes = {
   '/': {
     component: Gateway,
     crumb: 'Home',
-    '/recipes': {
+    '/recipe': {
       component: RecipeListing,
       crumb: 'Recipes Listing',
       '/new': {
         component: Dummy,
         crumb: 'New Recipe',
       },
-      '/:pk': {
+      '/:recipeId': {
         component: Dummy,
         crumb: 'View Recipe',
+        '/edit': {
+          component: EditRecipePage,
+          crumb: 'Edit Recipe',
+        },
       },
     },
     '/extension': {
@@ -63,7 +69,7 @@ export function resolveRoutes({ router }) {
 }
 
 resolveRoutes.propTypes = {
-  router: pt.object.isRequired,
+  router: PropTypes.object.isRequired,
 };
 
 export const Router = connect(state => ({

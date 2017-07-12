@@ -114,7 +114,7 @@ export default class Listing extends React.Component {
           render={(text, record) => {
             const lastUpdated = moment(record.last_updated);
             return (
-              <Link href={`/recipes/${record.id}`} title={lastUpdated.format('LLLL')}>
+              <Link href={`/recipe/${record.id}`} title={lastUpdated.format('LLLL')}>
                 {lastUpdated.fromNow()}
               </Link>
             );
@@ -127,7 +127,7 @@ export default class Listing extends React.Component {
   }
 
   static renderLinkedText(text, record) {
-    return <Link href={`/recipes/${record.id}`}>{text}</Link>;
+    return <Link href={`/recipe/${record.id}`}>{text}</Link>;
   }
 
   getFilters() {
@@ -155,7 +155,7 @@ export default class Listing extends React.Component {
 
   handleRowClick(record) {
     const { push } = this.props;
-    push(`/recipes/${record.id}`);
+    push(`/recipe/${record.id}`);
   }
 
   render() {
