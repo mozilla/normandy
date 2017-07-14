@@ -8,6 +8,7 @@ import CreateExtensionPage from 'control_new/components/extensions/CreateExtensi
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
 import ApprovalHistoryPage from 'control_new/components/recipes/ApprovalHistoryPage';
 import CreateRecipePage from 'control_new/components/recipes/CreateRecipePage';
+import CloneRecipePage from 'control_new/components/recipes/CloneRecipePage';
 import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
 import ExtensionListing from 'control_new/components/extensions/Listing';
 import Gateway from 'control_new/components/pages/Gateway';
@@ -41,6 +42,10 @@ const routes = {
         '/approval_history': {
           component: ApprovalHistoryPage,
           crumb: 'Approval History',
+        },
+        '/clone': {
+          component: CloneRecipePage,
+          crumb: 'Clone Recipe',
         },
       },
     },
