@@ -22,5 +22,6 @@ module.exports = {
     "no-unused-vars": "error",
     "prefer-const": "warn",
     "semi": ["error", "always"],
+    "no-return-await": ["error"],
   },
 };
