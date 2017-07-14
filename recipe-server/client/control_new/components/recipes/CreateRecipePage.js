@@ -24,7 +24,6 @@ export default class CreateRecipePage extends React.Component {
 
   state = {
     formErrors: undefined,
-    isProcessing: false,
   };
 
   /**
@@ -36,9 +35,6 @@ export default class CreateRecipePage extends React.Component {
       push,
     } = this.props;
 
-    this.setState({
-      isProcessing: true,
-    });
 
     try {
       const newId = await createRecipe(values);
@@ -51,10 +47,12 @@ export default class CreateRecipePage extends React.Component {
       message.error(
         'Recipe cannot be created. Please correct any errors listed in the form below.',
       );
-      this.setState({
-        formErrors: error && error.data ? error.data : this.state.formErrors,
-        isProcessing: false,
-      });
+
+      if (error) {
+        this.setState({
+          formErrors: error.data || error,
+        });
+      }
     }
   }
 
@@ -63,7 +61,6 @@ export default class CreateRecipePage extends React.Component {
       <div>
         <h2>Create New Recipe</h2>
         <RecipeForm
-          isProcessing={this.state.isProcessing}
           onSubmit={this.handleSubmit}
           errors={this.state.formErrors}
         />

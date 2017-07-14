@@ -11,7 +11,7 @@ import ConsoleLogFields from 'control_new/components/recipes/ConsoleLogFields';
 import PreferenceExperimentFields from 'control_new/components/recipes/PreferenceExperimentFields';
 import ShowHeartbeatFields from 'control_new/components/recipes/ShowHeartbeatFields';
 import { getAction, getAllActions } from 'control_new/state/actions/selectors';
-
+import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
 
 /**
  * Form for editing recipes.
@@ -24,21 +24,22 @@ import { getAction, getAllActions } from 'control_new/state/actions/selectors';
       props.form.getFieldValue('action_id'),
       new Map(),
     ),
+    isLoading: areAnyRequestsInProgress(state),
   }),
 )
 @autobind
 export default class RecipeForm extends React.Component {
   static propTypes = {
-    recipe: PropTypes.instanceOf(Map),
     form: PropTypes.object.isRequired,
-    isProcessing: PropTypes.bool,
+    isLoading: PropTypes.bool,
     onSubmit: PropTypes.func.isRequired,
+    recipe: PropTypes.instanceOf(Map),
     selectedAction: PropTypes.instanceOf(Map).isRequired,
   };
 
   static defaultProps = {
+    isLoading: false,
     recipe: new Map(),
-    isProcessing: false,
   };
 
   static argumentsFields = {
@@ -57,7 +58,7 @@ export default class RecipeForm extends React.Component {
 
   render() {
     const {
-      isProcessing,
+      isLoading,
       onSubmit,
       recipe,
       selectedAction,
@@ -72,34 +73,34 @@ export default class RecipeForm extends React.Component {
           label="Name"
           initialValue={recipe.get('name')}
         >
-          <Input disabled={isProcessing} />
+          <Input disabled={isLoading} />
         </FormItem>
         <FormItem
           name="extra_filter_expression"
           label="Filter Expression"
           initialValue={recipe.get('extra_filter_expression')}
         >
-          <Input disabled={isProcessing} type="textarea" rows="4" />
+          <Input disabled={isLoading} type="textarea" rows="4" />
         </FormItem>
         <FormItem
           name="action_id"
           label="Action"
           initialValue={recipe.getIn(['action', 'id'])}
         >
-          <ActionSelect disabled={isProcessing} />
+          <ActionSelect disabled={isLoading} />
         </FormItem>
         {ArgumentsFields && (
           <fieldset>
             <legend>Arguments</legend>
             <ArgumentsFields
-              disabled={isProcessing}
               recipeArguments={recipe.get('arguments')}
+              disabled={isLoading}
             />
           </fieldset>
         )}
-        <FormActions isLoading={isProcessing}>
+        <FormActions>
           <FormActions.Primary>
-            <Button type="primary" htmlType="submit">Save</Button>
+            <Button type="primary" htmlType="submit" disabled={isLoading}>Save</Button>
           </FormActions.Primary>
         </FormActions>
       </Form>

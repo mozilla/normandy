@@ -74,7 +74,7 @@ export default class EditRecipePage extends React.Component {
     return (
       <div>
         <QueryRecipe pk={recipeId} />
-        <LoadingOverlay>
+        <LoadingOverlay useCondition condition={!recipe.get('name')}>
           <h2>Edit Recipe</h2>
           <RecipeForm
             recipe={recipe}

@@ -22,8 +22,8 @@ export default class PreferenceExperimentFields extends React.Component {
 
   render() {
     const {
-      recipeArguments,
       disabled,
+      recipeArguments,
     } = this.props;
 
     return (
@@ -104,7 +104,7 @@ export class DocumentUrlInput extends React.Component {
   };
 
   render() {
-    const { value, disabled, ...props } = this.props;
+    const { disabled, value, ...props } = this.props;
     let addonBefore = <span><Icon type="link" /> View</span>;
     if (value) {
       addonBefore = (
@@ -144,7 +144,7 @@ export class PreferenceBranchSelect extends React.Component {
   };
 
   render() {
-    const { form, onChange, value, disabled } = this.props;
+    const { disabled, form, onChange, value } = this.props;
     return (
       <div>
         <Select disabled={disabled} onChange={onChange} value={value}>
@@ -328,7 +328,7 @@ export class ExperimentBranchFields extends React.Component {
   }
 
   render() {
-    const { branch, fieldName, form, disabled } = this.props;
+    const { branch, disabled, fieldName, form } = this.props;
     const preferenceType = form.getFieldValue('arguments.preferenceType');
     const ValueField = ExperimentBranchFields.VALUE_FIELDS[preferenceType];
     return (
@@ -355,10 +355,10 @@ export class ExperimentBranchFields extends React.Component {
           <InputNumber disabled={disabled} value={branch.get('ratio', '')} onChange={this.handleChangeRatio} />
         </FormItem>
         <Button
+          className="delete-btn"
           disabled={disabled}
           type="danger"
           icon="close"
-          className="delete-btn"
           onClick={this.handleClickDelete}
         >
           Delete Branch
