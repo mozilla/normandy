@@ -6,6 +6,7 @@ import { routerForBrowser } from 'redux-little-router';
 import App from 'control_new/components/App';
 import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
+import CreateRecipePage from 'control_new/components/recipes/CreateRecipePage';
 import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
 import ExtensionListing from 'control_new/components/extensions/Listing';
 import Dummy from 'control_new/components/pages/Dummy';
@@ -22,7 +23,7 @@ const routes = {
       component: RecipeListing,
       crumb: 'Recipes Listing',
       '/new': {
-        component: Dummy,
+        component: CreateRecipePage,
         crumb: 'New Recipe',
       },
       '/:recipeId': {

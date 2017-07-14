@@ -103,6 +103,8 @@ export function createRecipe(recipeData) {
       data: recipeData,
     }));
     dispatch(recipeReceived(recipe));
+
+    return recipe.id;
   };
 }
 

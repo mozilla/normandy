@@ -34,11 +34,11 @@ export default class ExtensionForm extends React.Component {
     extension: PropTypes.instanceOf(Map),
     form: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
-  }
+  };
 
   static defaultProps = {
     extension: new Map(),
-  }
+  };
 
   state = {
     xpiName: null,
