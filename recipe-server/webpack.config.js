@@ -1,5 +1,5 @@
 /* eslint-env node */
-/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
+/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template, comma-dangle */
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');

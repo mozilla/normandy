@@ -1,11 +1,14 @@
-import React, { PropTypes as pt } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import { routerForBrowser } from 'redux-little-router';
 
 import App from 'control_new/components/App';
 import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
-import Dummy from 'control_new/components/pages/Dummy';
+import CreateRecipePage from 'control_new/components/recipes/CreateRecipePage';
+import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
+import ExtensionListing from 'control_new/components/extensions/Listing';
 import Gateway from 'control_new/components/pages/Gateway';
 import RecipeListing from 'control_new/components/recipes/Listing';
 import MissingPage from 'control_new/components/pages/MissingPage';
@@ -16,11 +19,11 @@ const routes = {
   '/': {
     component: Gateway,
     crumb: 'Home',
-    '/recipes': {
+    '/recipe': {
       component: RecipeListing,
       crumb: 'Recipes Listing',
       '/new': {
-        component: Dummy,
+        component: CreateRecipePage,
         crumb: 'New Recipe',
       },
       '/:recipeId': {
@@ -30,16 +33,20 @@ const routes = {
           component: RecipeDetailPage,
           crumb: 'Revision',
         },
+        '/edit': {
+          component: EditRecipePage,
+          crumb: 'Edit Recipe',
+        },
       },
     },
     '/extension': {
-      component: Dummy,
+      component: ExtensionListing,
       crumb: 'Extensions Listing',
       '/new': {
         component: CreateExtensionPage,
         crumb: 'New Extension',
       },
-      '/:pk': {
+      '/:extensionId': {
         component: EditExtensionPage,
         crumb: 'Edit Extension',
       },
@@ -67,7 +74,7 @@ export function resolveRoutes({ router }) {
 }
 
 resolveRoutes.propTypes = {
-  router: pt.object.isRequired,
+  router: PropTypes.object.isRequired,
 };
 
 export const Router = connect(state => ({

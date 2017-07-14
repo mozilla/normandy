@@ -55,6 +55,7 @@ rules:
   react/forbid-prop-types: [off]
   react/no-unused-prop-types: [off]
   react/no-array-index-key: [off]
+  react/prefer-stateless-function: [off]
   jsx-a11y/label-has-for: [off]
 
   generator-star-spacing: [warn]

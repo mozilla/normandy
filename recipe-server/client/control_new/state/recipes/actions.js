@@ -3,11 +3,11 @@ import * as localForage from 'localforage';
 import {
   ACTION_RECEIVE,
   RECIPE_DELETE,
+  RECIPE_LISTING_COLUMNS_CHANGE,
+  RECIPE_PAGE_RECEIVE,
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
-  RECIPES_LISTING_COLUMNS_CHANGE,
-  RECIPES_PAGE_RECEIVE,
   REVISION_RECEIVE,
 } from 'control_new/state/action-types';
 import {
@@ -63,7 +63,7 @@ export function fetchRecipesPage(pageNumber = 1) {
     });
 
     dispatch({
-      type: RECIPES_PAGE_RECEIVE,
+      type: RECIPE_PAGE_RECEIVE,
       pageNumber,
       recipes,
     });
@@ -87,7 +87,7 @@ export function fetchFilteredRecipesPage(pageNumber = 1, filters = {}) {
     });
 
     dispatch({
-      type: RECIPES_PAGE_RECEIVE,
+      type: RECIPE_PAGE_RECEIVE,
       pageNumber,
       recipes,
     });
@@ -103,6 +103,8 @@ export function createRecipe(recipeData) {
       data: recipeData,
     }));
     dispatch(recipeReceived(recipe));
+
+    return recipe.id;
   };
 }
 
@@ -191,12 +193,26 @@ export function fetchRecipeFilters() {
 }
 
 
-export function saveRecipeListingColumns(columns) {
+export function loadRecipeListingColumns() {
   return async dispatch => {
-    await localForage.setItem('recipe_listing_columns', columns);
+    const columns = await localForage.getItem('recipe_listing_columns');
+
+    if (columns) {
+      dispatch({
+        type: RECIPE_LISTING_COLUMNS_CHANGE,
+        columns,
+      });
+    }
+  };
+}
+
+
+export function saveRecipeListingColumns(columns) {
+  return dispatch => {
+    localForage.setItem('recipe_listing_columns', columns);
 
     dispatch({
-      type: RECIPES_LISTING_COLUMNS_CHANGE,
+      type: RECIPE_LISTING_COLUMNS_CHANGE,
       columns,
     });
   };

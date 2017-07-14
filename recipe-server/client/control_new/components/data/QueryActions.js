@@ -3,16 +3,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { fetchAllExtensions } from 'control_new/state/extensions/actions';
+import { fetchAllActions } from 'control_new/state/actions/actions';
 
 
-class QueryExtensions extends React.Component {
+class QueryActions extends React.Component {
   static propTypes = {
-    fetchAllExtensions: PropTypes.func.isRequired,
+    fetchAllActions: PropTypes.func.isRequired,
   }
 
   componentWillMount() {
-    this.props.fetchAllExtensions();
+    this.props.fetchAllActions();
   }
 
   render() {
@@ -24,6 +24,6 @@ class QueryExtensions extends React.Component {
 export default connect(
   null,
   dispatch => (bindActionCreators({
-    fetchAllExtensions,
+    fetchAllActions,
   }, dispatch)),
-)(QueryExtensions);
+)(QueryActions);

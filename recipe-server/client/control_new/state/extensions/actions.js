@@ -1,4 +1,8 @@
+import * as localForage from 'localforage';
+
 import {
+  EXTENSION_LISTING_COLUMNS_CHANGE,
+  EXTENSION_PAGE_RECEIVE,
   EXTENSION_RECEIVE,
 } from 'control_new/state/action-types';
 import {
@@ -19,16 +23,24 @@ export function fetchExtension(pk) {
 }
 
 
-export function fetchAllExtensions() {
+export function fetchExtensionsPage(pageNumber = 1) {
   return async dispatch => {
-    const requestId = 'fetch-all-extensions';
-    const extensions = await dispatch(makeApiRequest(requestId, 'v2/extension/'));
+    const requestId = `fetch-extensions-page-${pageNumber}`;
+    const extensions = await dispatch(makeApiRequest(requestId, 'v2/extension/', {
+      data: { page: pageNumber },
+    }));
 
-    extensions.forEach(extension => {
+    extensions.results.forEach(extension => {
       dispatch({
         type: EXTENSION_RECEIVE,
         extension,
       });
+    });
+
+    dispatch({
+      type: EXTENSION_PAGE_RECEIVE,
+      pageNumber,
+      extensions,
     });
   };
 }
@@ -74,3 +86,28 @@ export function updateExtension(pk, extensionData) {
     });
   };
 }
+
+export function loadExtensionListingColumns() {
+  return async dispatch => {
+    const columns = await localForage.getItem('extension_listing_columns');
+
+    if (columns) {
+      dispatch({
+        type: EXTENSION_LISTING_COLUMNS_CHANGE,
+        columns,
+      });
+    }
+  };
+}
+
+export function saveExtensionListingColumns(columns) {
+  return dispatch => {
+    localForage.setItem('extension_listing_columns', columns);
+
+    dispatch({
+      type: EXTENSION_LISTING_COLUMNS_CHANGE,
+      columns,
+    });
+  };
+}
+

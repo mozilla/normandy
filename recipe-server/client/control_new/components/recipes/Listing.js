@@ -9,6 +9,7 @@ import { push as pushAction, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
+import QueryRecipeListingColumns from 'control_new/components/data/QueryRecipeListingColumns';
 import QueryRecipes from 'control_new/components/data/QueryRecipes';
 import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
@@ -113,7 +114,7 @@ export default class Listing extends React.Component {
           render={(text, record) => {
             const lastUpdated = moment(record.last_updated);
             return (
-              <Link href={`/recipes/${record.id}`} title={lastUpdated.format('LLLL')}>
+              <Link href={`/recipe/${record.id}`} title={lastUpdated.format('LLLL')}>
                 {lastUpdated.fromNow()}
               </Link>
             );
@@ -126,7 +127,7 @@ export default class Listing extends React.Component {
   }
 
   static renderLinkedText(text, record) {
-    return <Link href={`/recipes/${record.id}`}>{text}</Link>;
+    return <Link href={`/recipe/${record.id}`}>{text}</Link>;
   }
 
   getFilters() {
@@ -154,7 +155,7 @@ export default class Listing extends React.Component {
 
   handleRowClick(record) {
     const { push } = this.props;
-    push(`/recipes/${record.id}`);
+    push(`/recipe/${record.id}`);
   }
 
   render() {
@@ -162,6 +163,7 @@ export default class Listing extends React.Component {
 
     return (
       <div>
+        <QueryRecipeListingColumns />
         <QueryRecipes
           pageNumber={pageNumber}
           filters={this.getFilters()}
