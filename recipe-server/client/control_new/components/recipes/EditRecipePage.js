@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
+import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
@@ -74,14 +74,14 @@ export default class EditRecipePage extends React.Component {
     return (
       <div>
         <QueryRecipe pk={recipeId} />
-        <LoadingOverlay useCondition condition={!recipe.get('name')}>
+        <SimpleLoadingOverlay condition={!recipe.get('name')}>
           <h2>Edit Recipe</h2>
           <RecipeForm
             recipe={recipe}
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
           />
-        </LoadingOverlay>
+        </SimpleLoadingOverlay>
       </div>
     );
   }

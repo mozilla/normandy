@@ -6,6 +6,34 @@ import { connect } from 'react-redux';
 import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
 
 
+export class SimpleLoadingOverlay extends React.Component {
+  static propTypes = {
+    children: PropTypes.any,
+    condition: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    children: null,
+    condition: false,
+  };
+
+  render() {
+    const {
+      children,
+      condition,
+    } = this.props;
+
+    const Wrapper = condition ? Spin : 'div';
+
+    return (
+      <Wrapper>
+        {children}
+      </Wrapper>
+    );
+  }
+}
+
+
 @connect(
   state => ({
     loading: areAnyRequestsInProgress(state),
@@ -13,35 +41,12 @@ import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
 )
 export default class LoadingOverlay extends React.Component {
   static propTypes = {
-    children: PropTypes.any,
-    condition: PropTypes.bool,
     loading: PropTypes.bool.isRequired,
-    useCondition: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    children: null,
-    condition: false,
-    useCondition: false,
   };
 
   render() {
-    const {
-      children,
-      condition,
-      loading,
-      useCondition,
-    } = this.props;
-
-    // We can use a conditional expression instead of the global request state.
-    const isCurrentlyLoading = useCondition ? condition : loading;
-
-    const Wrapper = isCurrentlyLoading ? Spin : 'div';
-
     return (
-      <Wrapper>
-        {children}
-      </Wrapper>
+      <SimpleLoadingOverlay condition={this.props.loading} {...this.props} />
     );
   }
 }
