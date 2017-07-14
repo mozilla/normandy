@@ -113,11 +113,11 @@ body {
 
 /* Buttons at the bottom of a form */
 .form-actions {
-  .clearfix();
-
   background: #FBFBFB;
   border: 1px solid #D9D9D9;
   padding: 15px;
+
+  .clearfix();
 
   .primary {
     float: right;
@@ -127,9 +127,11 @@ body {
     float: left;
   }
 
-  .primary > :not(:last-child),
-  .secondary > :not(:last-child) {
-    margin-left: 15px;
+  .primary,
+  .secondary {
+    & > *:not(:last-child) {
+      margin-left: 15px;
+    }
   }
 }
 
