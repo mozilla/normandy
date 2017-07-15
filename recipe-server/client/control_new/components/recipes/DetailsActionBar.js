@@ -47,7 +47,7 @@ export default class DetailsActionBar extends React.Component {
   render() {
     const { isLatest, isLatestApproved, recipe, recipeId, revisionId } = this.props;
 
-    let cloneUrl = `/recipes/${recipeId}`;
+    let cloneUrl = `/recipe/${recipeId}`;
     if (revisionId) {
       cloneUrl += `/rev/${revisionId}`;
     }
@@ -61,7 +61,7 @@ export default class DetailsActionBar extends React.Component {
 
         {
           isLatest &&
-            <Link href={`/recipes/${recipeId}/edit`}>
+            <Link href={`/recipe/${recipeId}/edit`}>
               <Button icon="edit" type="primary">Edit</Button>
             </Link>
         }

@@ -38,7 +38,7 @@ export default class HistoryTimeline extends React.Component {
 
             const icon = <Icon type="circle-left" style={{ fontSize: '16px' }} />;
 
-            let url = `/recipes/${recipeId}`;
+            let url = `/recipe/${recipeId}`;
             if (!isLatestRevision(revision.get('id'))) {
               url += `/rev/${revision.get('id')}`;
             }
