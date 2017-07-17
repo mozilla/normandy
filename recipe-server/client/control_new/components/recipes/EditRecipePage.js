@@ -83,7 +83,7 @@ export default class EditRecipePage extends React.Component {
     return (
       <div className="edit-page">
         <QueryRecipe pk={recipeId} />
-        <SimpleLoadingOverlay condition={!recipeName}>
+        <SimpleLoadingOverlay visible={!recipeName}>
           <h2>Edit Recipe</h2>
 
           {

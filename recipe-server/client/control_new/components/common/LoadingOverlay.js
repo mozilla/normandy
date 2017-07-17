@@ -9,21 +9,21 @@ import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
 export class SimpleLoadingOverlay extends React.Component {
   static propTypes = {
     children: PropTypes.any,
-    condition: PropTypes.bool,
+    visible: PropTypes.bool,
   };
 
   static defaultProps = {
     children: null,
-    condition: false,
+    visible: false,
   };
 
   render() {
     const {
       children,
-      condition,
+      visible,
     } = this.props;
 
-    const Wrapper = condition ? Spin : 'div';
+    const Wrapper = visible ? Spin : 'div';
 
     return (
       <Wrapper>
@@ -46,7 +46,7 @@ export default class LoadingOverlay extends React.Component {
 
   render() {
     return (
-      <SimpleLoadingOverlay condition={this.props.loading} {...this.props} />
+      <SimpleLoadingOverlay visible={this.props.loading} {...this.props} />
     );
   }
 }
