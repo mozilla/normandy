@@ -13,7 +13,7 @@ import {
 @connect(
   state => ({
     user: getCurrentUser(state, Map()),
-    logoutUrl: getLogoutUrl(state),
+    logoutUrl: getLogoutUrl(state, ''),
   }),
 )
 export default class CurrentUserDetails extends React.Component {

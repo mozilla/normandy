@@ -1,10 +1,13 @@
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
+import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
+import * as recipeActions from 'control_new/state/recipes/actions';
+import * as revisionActions from 'control_new/state/revisions/actions';
 import {
   getLatestRevisionIdForRecipe,
   getRecipe,
@@ -12,6 +15,7 @@ import {
 import {
   isLatestApprovedRevision,
   isLatestRevision,
+  isApprovableRevision,
 } from 'control_new/state/revisions/selectors';
 import {
   getUrlParam,
@@ -29,23 +33,66 @@ import {
     return {
       isLatest: isLatestRevision(state, revisionId),
       isLatestApproved: isLatestApprovedRevision(state, revisionId),
+      isApprovable: isApprovableRevision(state, revisionId),
       recipe,
       recipeId,
       revisionId,
     };
   },
+  {
+    disableRecipe: recipeActions.disableRecipe,
+    enableRecipe: recipeActions.enableRecipe,
+    requestRevisionApproval: revisionActions.requestRevisionApproval,
+  },
 )
+@autobind
 export default class DetailsActionBar extends React.Component {
   static propTypes = {
+    disableRecipe: PropTypes.func.isRequired,
+    enableRecipe: PropTypes.func.isRequired,
     isLatest: PropTypes.bool.isRequired,
     isLatestApproved: PropTypes.bool.isRequired,
+    isApprovable: PropTypes.bool.isRequired,
     recipe: PropTypes.object.isRequired,
     recipeId: PropTypes.number.isRequired,
+    requestRevisionApproval: PropTypes.func.isRequired,
     revisionId: PropTypes.string.isRequired,
   };
 
+  handleDisableClick() {
+    const { disableRecipe, recipeId } = this.props;
+    Modal.confirm({
+      title: 'Are you sure you want to disable this recipe?',
+      onOk() {
+        disableRecipe(recipeId);
+      },
+    });
+  }
+
+  handlePublishClick() {
+    const { enableRecipe, recipeId } = this.props;
+    Modal.confirm({
+      title: 'Are you sure you want to publish this recipe?',
+      onOk() {
+        enableRecipe(recipeId);
+      },
+    });
+  }
+
+  handleRequestClick() {
+    const { requestRevisionApproval, revisionId } = this.props;
+    requestRevisionApproval(revisionId);
+  }
+
   render() {
-    const { isLatest, isLatestApproved, recipe, recipeId, revisionId } = this.props;
+    const {
+      isLatest,
+      isLatestApproved,
+      isApprovable,
+      recipe,
+      recipeId,
+      revisionId,
+    } = this.props;
 
     let cloneUrl = `/recipe/${recipeId}`;
     if (revisionId) {
@@ -67,13 +114,24 @@ export default class DetailsActionBar extends React.Component {
         }
 
         {
+          isApprovable &&
+            <Button icon="question-circle" type="primary" onClick={this.handleRequestClick}>
+              Request Approval
+            </Button>
+        }
+
+        {
           isLatestApproved && recipe.get('enabled') &&
-            <Button icon="close-circle" type="danger">Disable</Button>
+            <Button icon="close-circle" type="danger" onClick={this.handleDisableClick}>
+              Disable
+            </Button>
         }
 
         {
           isLatestApproved && !recipe.get('enabled') &&
-            <Button icon="check-circle" type="primary">Publish</Button>
+            <Button icon="check-circle" type="primary" onClick={this.handlePublishClick}>
+              Publish
+            </Button>
         }
       </div>
     );

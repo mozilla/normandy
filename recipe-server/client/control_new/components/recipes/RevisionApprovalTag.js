@@ -4,54 +4,61 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  isApprovedRevision,
-  isLiveRevision,
-  isRejectedRevision,
-  isRevisionPendingApproval,
+  REVISION_APPROVED,
+  REVISION_DISABLED,
+  REVISION_LIVE,
+  REVISION_PENDING_APPROVAL,
+  REVISION_REJECTED,
+} from 'control_new/state/constants';
+import {
+  getRevisionStatus,
 } from 'control_new/state/revisions/selectors';
 
 
 @connect(
   (state, { revision }) => ({
-    isApproved: isApprovedRevision(state, revision.get('id')),
-    isLive: isLiveRevision(state, revision.get('id')),
-    isRejected: isRejectedRevision(state, revision.get('id')),
-    isPendingApproval: isRevisionPendingApproval(state, revision.get('id')),
+    status: getRevisionStatus(state, revision.get('id')),
   }),
 )
 export default class RevisionApprovalTag extends React.Component {
   static propTypes = {
-    isApproved: PropTypes.bool.isRequired,
-    isLive: PropTypes.bool.isRequired,
-    isRejected: PropTypes.bool.isRequired,
-    isPendingApproval: PropTypes.bool.isRequired,
     revision: PropTypes.object.isRequired,
+    status: PropTypes.string,
+  }
+
+  static defaultProps = {
+    status: null,
   }
 
   render() {
-    const { isApproved, isLive, isRejected, isPendingApproval, revision } = this.props;
+    const { revision, status } = this.props;
+
+    const email = revision.getIn(['approval_request', 'creator', 'email'])
 
     let color;
     let label;
     let popoverContent;
 
-    if (isLive) {
+    if (status === REVISION_LIVE) {
       color = 'green';
       label = 'Live';
-    } else if (isApproved) {
+    } else if (status === REVISION_DISABLED) {
+      color = 'red';
+      label = 'Disabled';
+    } else if (status === REVISION_APPROVED) {
       color = 'green';
       label = 'Approved';
-    } else if (isRejected) {
+    } else if (status === REVISION_REJECTED) {
       color = 'red';
       label = 'Rejected';
-    } else if (isPendingApproval) {
+    } else if (status === REVISION_PENDING_APPROVAL) {
       color = 'yellow';
       label = 'Pending Approval';
     } else {
       return null;
     }
 
-    if (isLive || isApproved || isRejected) {
+    if ([REVISION_LIVE, REVISION_DISABLED, REVISION_APPROVED, REVISION_REJECTED].includes(status)) {
       popoverContent = (
         <div>
           <div><strong>&quot;{revision.getIn(['approval_request', 'comment'])}&quot;</strong></div>
@@ -59,7 +66,7 @@ export default class RevisionApprovalTag extends React.Component {
         </div>
       );
     } else {
-      popoverContent = `Approval requested by ${revision.getIn(['approval_request', 'creator', 'email'])}`;
+      popoverContent = `Approval requested by ${email}`;
     }
 
     return (

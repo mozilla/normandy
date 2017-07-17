@@ -10,6 +10,7 @@ import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
 import Details from 'control_new/components/recipes/Details';
 import DetailsActionBar from 'control_new/components/recipes/DetailsActionBar';
 import HistoryTimeline from 'control_new/components/recipes/HistoryTimeline';
+import RevisionNotice from 'control_new/components/recipes/RevisionNotice';
 import {
   getLatestRevisionIdForRecipe,
   getRecipeHistory,
@@ -50,6 +51,7 @@ export default class DetailPage extends React.Component {
         <Row gutter={24}>
           <Col span={16}>
             <DetailsActionBar />
+            <RevisionNotice revision={revision} />
             <LoadingOverlay>
               <Details recipe={revision.get('recipe', new Map())} />
             </LoadingOverlay>

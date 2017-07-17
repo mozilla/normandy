@@ -60,7 +60,28 @@ export function isRecipeEnabled(state, id, defaultsTo = false) {
   return recipe.get('enabled', defaultsTo);
 }
 
-export function getLatestRevisionIdForRecipe(state, id, defaultsTo) {
+export function getLatestRevisionForRecipe(state, id, defaultsTo = null) {
   const recipe = getRecipe(state, id, new Map());
-  return recipe.getIn(['latest_revision', 'id'], defaultsTo);
+  return recipe.get('latest_revision', defaultsTo);
+}
+
+export function getLatestRevisionIdForRecipe(state, id, defaultsTo = null) {
+  const revision = getLatestRevisionForRecipe(state, id, new Map());
+  if (revision) {
+    return revision.get('id', defaultsTo);
+  }
+  return defaultsTo;
+}
+
+export function getApprovedRevisionForRecipe(state, id, defaultsTo = null) {
+  const recipe = getRecipe(state, id, new Map());
+  return recipe.get('approved_revision', defaultsTo);
+}
+
+export function getApprovedRevisionIdForRecipe(state, id, defaultsTo = null) {
+  const revision = getApprovedRevisionForRecipe(state, id, new Map());
+  if (revision) {
+    return revision.get('id', defaultsTo);
+  }
+  return defaultsTo;
 }
