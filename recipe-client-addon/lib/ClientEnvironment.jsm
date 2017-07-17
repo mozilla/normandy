@@ -40,7 +40,7 @@ this.ClientEnvironment = {
     if (!_classifyRequest) {
       _classifyRequest = NormandyApi.classifyClient();
     }
-    return await _classifyRequest;
+    return _classifyRequest;
   },
 
   clearClassifyCache() {
