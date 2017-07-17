@@ -18,6 +18,9 @@ function Jexl() {
 	this._customGrammar = null;
 	this._lexer = null;
 	this._transforms = {};
+	this.Lexer = Lexer;
+	this.Parser = Parser;
+	this.defaultGrammar = defaultGrammar;
 }
 
 /**
