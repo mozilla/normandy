@@ -33,8 +33,9 @@ this.Addons = {
    *
    * @param {string} addonId
    * @returns {SafeAddon?} Add-on with given ID, or null if not found.
+   * @throws If addonId is not specified or not a string.
    */
-  get: async function get(addonId) {
+  async get(addonId) {
     const addon = await AddonManager.getAddonByID(addonId);
     if (!addon) {
       return null;
@@ -47,9 +48,9 @@ this.Addons = {
    * @async
    * @returns {Array<SafeAddon>}
    */
-  getAll: async function get(addonId) {
+  async getAll(addonId) {
     const addons = await AddonManager.getAllAddons();
-    return addons.map(Addons.serializeForSandbox);
+    return addons.map(Addons.serializeForSandbox.bind(this));
   },
 
   /**
@@ -59,7 +60,7 @@ this.Addons = {
    * @returns {string} Add-on ID that was installed
    * @throws {string} If the add-on can not be installed.
    */
-  install: async function install(installUrl) {
+  async install(installUrl) {
     const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
     const result = new Promise((resolve, reject) => installObj.addListener({
       onInstallEnded(addonInstall, addon) {
@@ -82,7 +83,7 @@ this.Addons = {
    * @async
    * @throws If no add-on with `addonId` is installed.
    */
-  uninstall: async function uninstall(addonId) {
+  async uninstall(addonId) {
     const addon = await AddonManager.getAddonByID(addonId);
     if (addon === null) {
       throw new Error(`No addon with ID [${addonId}] found.`);

@@ -16,10 +16,10 @@ XPCOMUtils.defineLazyModuleGetter(this, "NormandyApi", "resource://shield-recipe
 XPCOMUtils.defineLazyModuleGetter(
     this,
     "PreferenceExperiments",
-    "resource://shield-recipe-client/lib/PreferenceExperiments.jsm",
+    "resource://shield-recipe-client/lib/PreferenceExperiments.jsm"
 );
 XPCOMUtils.defineLazyModuleGetter(this, "Utils", "resource://shield-recipe-client/lib/Utils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Addons", "resource://shield-recipe-client/lib/Addons.jsm",);
+XPCOMUtils.defineLazyModuleGetter(this, "Addons", "resource://shield-recipe-client/lib/Addons.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 

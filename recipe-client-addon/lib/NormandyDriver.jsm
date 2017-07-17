@@ -158,9 +158,9 @@ this.NormandyDriver = function(sandboxManager) {
     },
 
     addons: {
-      get: sandboxManager.wrapAsync(Addons.get, {cloneInto: true}),
-      install: sandboxManager.wrapAsync(Addons.get),
-      uninstall: sandboxManager.wrapAsync(Addons.get),
+      get: sandboxManager.wrapAsync(Addons.get.bind(Addons), {cloneInto: true}),
+      install: sandboxManager.wrapAsync(Addons.install.bind(Addons)),
+      uninstall: sandboxManager.wrapAsync(Addons.uninstall.bind(Addons)),
     },
 
     // Sampling

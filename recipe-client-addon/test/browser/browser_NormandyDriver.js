@@ -124,7 +124,7 @@ add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
   let addon = await driver.addons.get(ADDON_ID);
   Assert.equal(addon, null, "Add-on is not yet installed");
 
-  await driver.addons.install(testXpiUrl);
+  await driver.addons.install(TEST_XPI_URL);
   addon = await driver.addons.get(ADDON_ID);
 
   Assert.notEqual(addon, null, "Add-on object was returned");
@@ -155,7 +155,7 @@ add_task(withSandboxManager(Assert, async function testAddonsGetWorksInSandbox(s
 
   const ADDON_ID = "normandydriver@example.com";
 
-  await driver.addons.install(testXpiUrl);
+  await driver.addons.install(TEST_XPI_URL);
 
   await sandboxManager.evalInSandbox(`
     (async function sandboxTest() {
