@@ -1,18 +1,18 @@
-import { message, Button, Icon, Dropdown, Menu } from 'antd';
+import { message } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link, push as pushAction } from 'redux-little-router';
 
 import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
-import { updateRecipe } from 'control_new/state/recipes/actions';
+import { createRecipe as createAction } from 'control_new/state/recipes/actions';
 import { getRecipe } from 'control_new/state/recipes/selectors';
 import { getRouterParamAsInt } from 'control_new/state/router/selectors';
-
 
 @connect(
   state => {
@@ -24,13 +24,14 @@ import { getRouterParamAsInt } from 'control_new/state/router/selectors';
     };
   },
   {
-    updateRecipe,
+    push: pushAction,
+    createRecipe: createAction,
   },
 )
 @autobind
-export default class EditRecipePage extends React.Component {
+export default class CloneRecipePage extends React.Component {
   static propTypes = {
-    updateRecipe: PropTypes.func.isRequired,
+    createRecipe: PropTypes.func.isRequired,
     recipeId: PropTypes.number.isRequired,
     recipe: PropTypes.instanceOf(Map),
   };
@@ -38,14 +39,6 @@ export default class EditRecipePage extends React.Component {
   static defaultProps = {
     recipe: null,
   };
-
-  static ActionMenu = (
-    <Menu>
-      <Menu.Item>
-        <a href="clone">Clone Recipe</a>
-      </Menu.Item>
-    </Menu>
-  );
 
   state = {
     formErrors: undefined,
@@ -55,46 +48,49 @@ export default class EditRecipePage extends React.Component {
    * Update the existing recipe and display a message.
    */
   async handleSubmit(values) {
-    const { recipeId } = this.props;
+    const { push } = this.props;
 
     try {
-      await this.props.updateRecipe(recipeId, values);
+      const newId = await this.props.createRecipe(values);
+
       message.success('Recipe saved');
       this.setState({
         formErrors: undefined,
       });
+
+      push(`/recipe/${newId}`);
     } catch (error) {
       message.error(
         'Recipe cannot be saved. Please correct any errors listed in the form below.',
       );
 
-      if (error) {
-        this.setState({
-          formErrors: error.data || error,
-        });
-      }
+      this.setState({
+        formErrors: error.data || error,
+      });
     }
   }
 
   render() {
     const { recipe, recipeId } = this.props;
+
     const recipeName = recipe.get('name');
 
+    // Remove the 'name' field value.
+    const displayedRecipe = recipe.set('name');
+
     return (
-      <div className="edit-page">
+      <div className="clone-page">
         <QueryRecipe pk={recipeId} />
         <SimpleLoadingOverlay isVisible={!recipeName}>
-          <h2>Edit Recipe</h2>
-
-          {
-            recipeName &&
-            <Dropdown overlay={EditRecipePage.ActionMenu} placement="bottomRight" trigger={['click']}>
-              <Button className="action-button"><Icon type="setting" /></Button>
-            </Dropdown>
+          <h2>New Recipe</h2>
+          { recipeName &&
+            <h3>
+              Cloning recipe values from <Link href={`/recipe/${recipeId}`}>&quot;{ recipeName }&quot;</Link>
+            </h3>
           }
 
           <RecipeForm
-            recipe={recipe}
+            recipe={displayedRecipe}
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
           />
