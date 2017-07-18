@@ -23,3 +23,7 @@ export function getCurrentURL(state, queryParams) {
     },
   };
 }
+
+export function getRouterPath(state) {
+  return state.router.pathname;
+}

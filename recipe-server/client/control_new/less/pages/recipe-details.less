@@ -1,3 +1,38 @@
+dl.details {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+
+  &.narrow {
+    grid-template-columns: 120px 1fr;
+  }
+
+  dt,
+  dd {
+    border-bottom: 1px solid #EEE;
+    padding: 16px 0;
+
+    &:first-of-type {
+      padding-top: 0;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  dt {
+    color: #999;
+    font-weight: bold;
+    padding-right: 16px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    grid-column: span 2;
+  }
+}
+
 .page-recipe-details {
   height: 100%;
 
@@ -54,7 +89,7 @@
 }
 
 .approval-history-details {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #EEE;
   margin-bottom: 24px;
   padding-bottom: 24px;
 
@@ -72,7 +107,7 @@
 }
 
 .approval-details {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #EEE;
   margin-top: 16px;
   padding-top: 16px;
 }

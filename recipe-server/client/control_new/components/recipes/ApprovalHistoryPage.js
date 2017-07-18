@@ -1,3 +1,4 @@
+import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -24,7 +25,7 @@ import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 )
 export default class ApprovalHistoryPage extends React.Component {
   static propTypes = {
-    history: PropTypes.object.isRequired,
+    history: PropTypes.instanceOf(List).isRequired,
     recipeId: PropTypes.number.isRequired,
   };
 

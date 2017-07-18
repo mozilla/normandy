@@ -19,6 +19,7 @@ import {
   isRevisionPendingApproval,
 } from 'control_new/state/revisions/selectors';
 import {
+  getRouterPath,
   getUrlParam,
   getUrlParamAsInt,
 } from 'control_new/state/router/selectors';
@@ -36,6 +37,7 @@ import {
       isLatestApproved: isLatestApprovedRevision(state, revisionId),
       isPendingApproval: isRevisionPendingApproval(state, revisionId),
       isApprovable: isApprovableRevision(state, revisionId),
+      routerPath: getRouterPath(state),
       recipe,
       recipeId,
       revisionId,
@@ -56,10 +58,11 @@ export default class DetailsActionBar extends React.Component {
     isLatest: PropTypes.bool.isRequired,
     isLatestApproved: PropTypes.bool.isRequired,
     isPendingApproval: PropTypes.bool.isRequired,
-    recipe: PropTypes.object.isRequired,
+    recipe: PropTypes.instanceOf(Map).isRequired,
     recipeId: PropTypes.number.isRequired,
     requestRevisionApproval: PropTypes.func.isRequired,
     revisionId: PropTypes.string.isRequired,
+    routerPath: PropTypes.string.isRequired,
   };
 
   handleDisableClick() {
@@ -95,18 +98,12 @@ export default class DetailsActionBar extends React.Component {
       isPendingApproval,
       recipe,
       recipeId,
-      revisionId,
+      routerPath,
     } = this.props;
-
-    let cloneUrl = `/recipe/${recipeId}`;
-    if (revisionId) {
-      cloneUrl += `/rev/${revisionId}`;
-    }
-    cloneUrl += '/clone';
 
     return (
       <div className="details-action-bar clearfix">
-        <Link href={cloneUrl}>
+        <Link href={`${routerPath}/clone`}>
           <Button icon="swap" type="primary">Clone</Button>
         </Link>
 

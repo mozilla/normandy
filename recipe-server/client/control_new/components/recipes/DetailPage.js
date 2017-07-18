@@ -1,14 +1,13 @@
 import { Card, Col, Row } from 'antd';
-import { Map } from 'immutable';
+import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
-import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
-import Details from 'control_new/components/recipes/Details';
 import DetailsActionBar from 'control_new/components/recipes/DetailsActionBar';
+import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
 import HistoryTimeline from 'control_new/components/recipes/HistoryTimeline';
 import RevisionNotice from 'control_new/components/recipes/RevisionNotice';
 import {
@@ -27,7 +26,7 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
     const revision = getRevision(state, revisionId, new Map());
 
     return {
-      history: getRecipeHistory(state, recipeId),
+      history: getRecipeHistory(state, recipeId, new List()),
       recipeId,
       revision,
       revisionId,
@@ -36,9 +35,9 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
 )
 export default class DetailPage extends React.Component {
   static propTypes = {
-    history: PropTypes.object.isRequired,
+    history: PropTypes.instanceOf(List).isRequired,
     recipeId: PropTypes.number.isRequired,
-    revision: PropTypes.object.isRequired,
+    revision: PropTypes.instanceOf(Map).isRequired,
     revisionId: PropTypes.string.isRequired,
   }
 
@@ -47,20 +46,21 @@ export default class DetailPage extends React.Component {
     return (
       <div className="page-recipe-details">
         <QueryRecipe pk={recipeId} />
-        <QueryRecipeHistory pk={recipeId} />
         <Row gutter={24}>
           <Col span={16}>
             <DetailsActionBar />
             <RevisionNotice revision={revision} />
             <LoadingOverlay>
-              <Details recipe={revision.get('recipe', new Map())} />
+              <RecipeDetails recipe={revision.get('recipe', new Map())} />
             </LoadingOverlay>
           </Col>
           <Col span={8} className="recipe-history">
             <Card title="History">
-              <LoadingOverlay>
-                <HistoryTimeline history={history} selectedRevisionId={revisionId} />
-              </LoadingOverlay>
+              <HistoryTimeline
+                history={history}
+                recipeId={recipeId}
+                selectedRevisionId={revisionId}
+              />
             </Card>
           </Col>
         </Row>

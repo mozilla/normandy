@@ -1,9 +1,12 @@
 import { Icon, Tag, Timeline } from 'antd';
+import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
+import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
 import RevisionApprovalTag from 'control_new/components/recipes/RevisionApprovalTag';
 import * as revisionsSelectors from 'control_new/state/revisions/selectors';
 
@@ -16,51 +19,54 @@ import * as revisionsSelectors from 'control_new/state/revisions/selectors';
 )
 export default class HistoryTimeline extends React.Component {
   static propTypes = {
-    getRecipeIdForRevision: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
+    history: PropTypes.instanceOf(List).isRequired,
     isLatestRevision: PropTypes.func.isRequired,
+    recipeId: PropTypes.number.isRequired,
     selectedRevisionId: PropTypes.string.isRequired,
   }
 
   render() {
     const {
-      getRecipeIdForRevision,
       history,
       isLatestRevision,
+      recipeId,
       selectedRevisionId,
     } = this.props;
 
     return (
-      <Timeline>
-        {
-          history.map((revision, index) => {
-            const recipeId = getRecipeIdForRevision(revision.get('id'));
+      <div>
+        <QueryRecipeHistory pk={recipeId} />
+        <LoadingOverlay>
+          <Timeline>
+            {
+              history.map((revision, index) => {
+                const icon = <Icon type="circle-left" style={{ fontSize: '16px' }} />;
 
-            const icon = <Icon type="circle-left" style={{ fontSize: '16px' }} />;
+                let url = `/recipe/${recipeId}`;
+                if (!isLatestRevision(revision.get('id'))) {
+                  url += `/rev/${revision.get('id')}`;
+                }
 
-            let url = `/recipe/${recipeId}`;
-            if (!isLatestRevision(revision.get('id'))) {
-              url += `/rev/${revision.get('id')}`;
+                return (
+                  <Timeline.Item
+                    color="grey"
+                    dot={revision.get('id') === selectedRevisionId ? icon : null}
+                    key={revision.get('id')}
+                  >
+                    <Link href={url}>
+                      <Tag color={revision.get('id') === selectedRevisionId ? 'blue' : null}>
+                        {`Revision ${history.size - index}`}
+                      </Tag>
+                    </Link>
+
+                    <RevisionApprovalTag revision={revision} />
+                  </Timeline.Item>
+                );
+              }).toArray()
             }
-
-            return (
-              <Timeline.Item
-                color="grey"
-                dot={revision.get('id') === selectedRevisionId ? icon : null}
-                key={revision.get('id')}
-              >
-                <Link href={url}>
-                  <Tag color={revision.get('id') === selectedRevisionId ? 'blue' : null}>
-                    {`Revision ${history.size - index}`}
-                  </Tag>
-                </Link>
-
-                <RevisionApprovalTag revision={revision} />
-              </Timeline.Item>
-            );
-          }).toArray()
-        }
-      </Timeline>
+          </Timeline>
+        </LoadingOverlay>
+      </div>
     );
   }
 }

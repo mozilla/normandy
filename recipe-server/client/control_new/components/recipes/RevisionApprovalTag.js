@@ -1,4 +1,5 @@
 import { Popover, Tag } from 'antd';
+import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -23,7 +24,7 @@ import {
 )
 export default class RevisionApprovalTag extends React.Component {
   static propTypes = {
-    revision: PropTypes.object.isRequired,
+    revision: PropTypes.instanceOf(Map).isRequired,
     status: PropTypes.string,
   }
 
@@ -40,23 +41,34 @@ export default class RevisionApprovalTag extends React.Component {
     let label;
     let popoverContent;
 
-    if (status === REVISION_LIVE) {
-      color = 'green';
-      label = 'Live';
-    } else if (status === REVISION_DISABLED) {
-      color = 'red';
-      label = 'Disabled';
-    } else if (status === REVISION_APPROVED) {
-      color = 'green';
-      label = 'Approved';
-    } else if (status === REVISION_REJECTED) {
-      color = 'red';
-      label = 'Rejected';
-    } else if (status === REVISION_PENDING_APPROVAL) {
-      color = 'yellow';
-      label = 'Pending Approval';
-    } else {
-      return null;
+    switch (status) {
+      case REVISION_LIVE:
+        color = 'green';
+        label = 'Live';
+        break;
+
+      case REVISION_DISABLED:
+        color = 'red';
+        label = 'Disabled';
+        break;
+
+      case REVISION_APPROVED:
+        color = 'green';
+        label = 'Approved';
+        break;
+
+      case REVISION_REJECTED:
+        color = 'red';
+        label = 'Rejected';
+        break;
+
+      case REVISION_PENDING_APPROVAL:
+        color = 'yellow';
+        label = 'Pending Approval';
+        break;
+
+      default:
+        return null;
     }
 
     if ([REVISION_LIVE, REVISION_DISABLED, REVISION_APPROVED, REVISION_REJECTED].includes(status)) {

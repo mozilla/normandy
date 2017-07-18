@@ -1,20 +1,27 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Modal } from 'antd';
 import autobind from 'autobind-decorator';
+import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { connect } from 'react-redux';
 
 import FormActions from 'control_new/components/common/FormActions';
 import { createForm, FormItem } from 'control_new/components/common/forms';
+import * as approvalRequestActions from 'control_new/state/approvalRequests/actions';
 
-@createForm({
-  validateFields(values) {
-    return values;
+
+@connect(
+  null,
+  {
+    closeApprovalRequest: approvalRequestActions.closeApprovalRequest,
   },
-})
+)
+@createForm({})
 @autobind
 export default class ApprovalForm extends React.Component {
   static propTypes = {
-    approvalRequest: PropTypes.object.isRequired,
+    approvalRequest: PropTypes.instanceOf(Map).isRequired,
+    closeApprovalRequest: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
   }
 
@@ -26,23 +33,34 @@ export default class ApprovalForm extends React.Component {
     this.props.onSubmit(event, { approved: false });
   }
 
-  render() {
-    const { onSubmit } = this.props;
+  handleCloseButtonClick() {
+    const { approvalRequest, closeApprovalRequest } = this.props;
+    Modal.confirm({
+      title: 'Are you sure you want to close this approval request?',
+      onOk() {
+        closeApprovalRequest(approvalRequest.get('id'));
+      },
+    });
+  }
 
+  render() {
     return (
-      <Form onSubmit={onSubmit}>
+      <Form>
         <FormItem name="comment">
           <Input placeholder="Comment" />
         </FormItem>
         <FormActions>
           <FormActions.Primary>
-            <Button onClick={this.handleApproveClick} type="primary">
+            <Button icon="dislike" onClick={this.handleRejectClick} type="danger">
+                Reject
+              </Button>
+            <Button icon="like" onClick={this.handleApproveClick} type="primary">
               Approve
             </Button>
           </FormActions.Primary>
           <FormActions.Secondary>
-            <Button onClick={this.handleRejectClick} type="primary">
-              Reject
+            <Button icon="close-circle" onClick={this.handleCloseButtonClick}>
+              Close
             </Button>
           </FormActions.Secondary>
         </FormActions>

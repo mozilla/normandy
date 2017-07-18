@@ -1,4 +1,4 @@
-import { Button, Card, Col, message, Modal, Row, Tag } from 'antd';
+import { Card, Col, message, Row, Tag } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import moment from 'moment';
@@ -7,7 +7,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import ApprovalForm from 'control_new/components/recipes/ApprovalForm';
-import Details from 'control_new/components/recipes/Details';
+import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
 import * as approvalRequestActions from 'control_new/state/approvalRequests/actions';
 import {
   getRecipeForRevision,
@@ -23,35 +23,23 @@ import {
   }),
   {
     approveApprovalRequest: approvalRequestActions.approveApprovalRequest,
-    closeApprovalRequest: approvalRequestActions.closeApprovalRequest,
     rejectApprovalRequest: approvalRequestActions.rejectApprovalRequest,
   },
 )
 @autobind
 export default class ApprovalRequest extends React.Component {
   static propTypes = {
-    approvalRequest: PropTypes.object.isRequired,
+    approvalRequest: PropTypes.instanceOf(Map).isRequired,
     approveApprovalRequest: PropTypes.func.isRequired,
-    closeApprovalRequest: PropTypes.func.isRequired,
     isPendingApproval: PropTypes.bool.isRequired,
-    recipe: PropTypes.object.isRequired,
+    recipe: PropTypes.instanceOf(Map).isRequired,
     rejectApprovalRequest: PropTypes.func.isRequired,
-    revision: PropTypes.object.isRequired,
+    revision: PropTypes.instanceOf(Map).isRequired,
   };
 
   state = {
     formErrors: {},
   };
-
-  handleCloseButtonClick() {
-    const { approvalRequest, closeApprovalRequest } = this.props;
-    Modal.confirm({
-      title: 'Are you sure you want to close this approval request?',
-      onOk() {
-        closeApprovalRequest(approvalRequest.get('id'));
-      },
-    });
-  }
 
   async handleSubmit(values, context) {
     const {
@@ -63,32 +51,27 @@ export default class ApprovalRequest extends React.Component {
     let action;
     let successMessage;
 
-    // The form submits if the user hits enter in the comment field. To ensure we are only
-    // submitting an approval or rejection when one of the buttons is explicitly clicked we
-    // do a strict comparison to the expected boolean values.
-    if (context.approved === true) {
+    if (context.approved) {
       action = approveApprovalRequest;
       successMessage = 'Request approved';
-    } else if (context.approved === false) {
+    } else {
       action = rejectApprovalRequest;
       successMessage = 'Request rejected';
     }
 
-    if (action) {
-      try {
-        await action(approvalRequest.get('id'), values);
-        message.success(successMessage);
-      } catch (error) {
-        if (error.data.error) {
-          message.error(error.data.error);
-        } else {
-          message.error(
-            'Approval could not be submitted. Please correct any errors listed in the form below.',
-          );
-        }
-        if (error.data) {
-          this.setState({ formErrors: error.data });
-        }
+    try {
+      await action(approvalRequest.get('id'), values);
+      message.success(successMessage);
+    } catch (error) {
+      if (error.data.error) {
+        message.error(error.data.error);
+      } else {
+        message.error(
+          'Approval could not be submitted. Please correct any errors listed in the form below.',
+        );
+      }
+      if (error.data) {
+        this.setState({ formErrors: error.data });
       }
     }
   }
@@ -105,8 +88,10 @@ export default class ApprovalRequest extends React.Component {
           {approvalRequest.getIn(['approver', 'email'])}
         </dd>
 
-        <dt>Response Date</dt>
-        <dd>{moment(approvalRequest.get('created')).format('MMMM Do YYYY, h:mm a')}</dd>
+        <dt>Responsed</dt>
+        <dd title={moment(approvalRequest.get('created')).format('MMMM Do YYYY, h:mm a')}>
+          {moment(approvalRequest.get('created')).fromNow()}
+        </dd>
 
         <dt>Comment</dt>
         <dd>{approvalRequest.get('comment')}</dd>
@@ -116,15 +101,12 @@ export default class ApprovalRequest extends React.Component {
 
   render() {
     const { approvalRequest, isPendingApproval, recipe } = this.props;
+    const errors = this.state.formErrors;
 
     let extra;
 
     if (isPendingApproval) {
-      extra = (
-        <Button icon="close-circle" size="small" onClick={this.handleCloseButtonClick}>
-          Close
-        </Button>
-      );
+      extra = <Tag color="yellow">Pending</Tag>;
     } else if (approvalRequest.get('approved')) {
       extra = <Tag color="green">Approved</Tag>;
     } else {
@@ -135,7 +117,7 @@ export default class ApprovalRequest extends React.Component {
       <div className="approval-history-details">
         <Row gutter={24}>
           <Col span={16}>
-            <Details recipe={recipe} />
+            <RecipeDetails recipe={recipe} />
           </Col>
           <Col span={8}>
             <Card title="Approval Request" extra={extra}>
@@ -144,8 +126,10 @@ export default class ApprovalRequest extends React.Component {
                   <dt>Requested by</dt>
                   <dd>{approvalRequest.getIn(['creator', 'email'])}</dd>
 
-                  <dt>Request Date</dt>
-                  <dd>{moment(approvalRequest.get('created')).format('MMMM Do YYYY, h:mm a')}</dd>
+                  <dt>Requested</dt>
+                  <dd title={moment(approvalRequest.get('created')).format('MMMM Do YYYY, h:mm a')}>
+                    {moment(approvalRequest.get('created')).fromNow()}
+                  </dd>
                 </dl>
               </div>
 
@@ -155,7 +139,7 @@ export default class ApprovalRequest extends React.Component {
                     <ApprovalForm
                       approvalRequest={approvalRequest}
                       onSubmit={this.handleSubmit}
-                      errors={this.state.formErrors}
+                      errors={errors}
                     />
                     : this.renderRequestDetails()
                 }

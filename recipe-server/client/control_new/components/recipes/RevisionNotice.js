@@ -34,17 +34,23 @@ export default class RevisionNotice extends React.Component {
     let message;
     let type;
 
-    if (status === REVISION_DRAFT) {
-      message = 'You are viewing a draft.';
-      type = 'warning';
-    } else if (status === REVISION_OUTDATED) {
-      message = 'You are viewing an outdated version.';
-      type = 'warning';
-    } else if (enabled) {
-      message = 'This is the published version.';
-      type = 'success';
-    } else {
-      return null;
+    switch (status) {
+      case REVISION_DRAFT:
+        message = 'You are viewing a draft.';
+        type = 'warning';
+        break;
+
+      case REVISION_OUTDATED:
+        message = 'You are viewing an outdated version.';
+        type = 'warning';
+        break;
+
+      default:
+        if (!enabled) {
+          return null;
+        }
+        message = 'This is the published version.';
+        type = 'success';
     }
 
     return (

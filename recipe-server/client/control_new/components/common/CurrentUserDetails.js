@@ -12,14 +12,14 @@ import {
 
 @connect(
   state => ({
-    user: getCurrentUser(state, Map()),
+    user: getCurrentUser(state, new Map()),
     logoutUrl: getLogoutUrl(state, ''),
   }),
 )
 export default class CurrentUserDetails extends React.Component {
   static propTypes = {
     logoutUrl: PropTypes.string.isRequired,
-    user: PropTypes.object.isRequired,
+    user: PropTypes.instanceOf(Map).isRequired,
   };
 
   render() {
