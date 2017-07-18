@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, push as pushAction } from 'redux-little-router';
 
-import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
+import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
@@ -64,11 +64,9 @@ export default class CloneRecipePage extends React.Component {
         'Recipe cannot be saved. Please correct any errors listed in the form below.',
       );
 
-      if (error) {
-        this.setState({
-          formErrors: error.data || error,
-        });
-      }
+      this.setState({
+        formErrors: error.data || error,
+      });
     }
   }
 
@@ -83,7 +81,7 @@ export default class CloneRecipePage extends React.Component {
     return (
       <div className="clone-page">
         <QueryRecipe pk={recipeId} />
-        <LoadingOverlay useCondition condition={!recipeName}>
+        <SimpleLoadingOverlay isVisible={!recipeName}>
           <h2>New Recipe</h2>
           { recipeName &&
             <h3>
@@ -96,7 +94,7 @@ export default class CloneRecipePage extends React.Component {
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
           />
-        </LoadingOverlay>
+        </SimpleLoadingOverlay>
       </div>
     );
   }
