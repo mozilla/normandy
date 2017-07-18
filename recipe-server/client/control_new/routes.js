@@ -68,20 +68,25 @@ export const {
   basename: '/control-new',
 });
 
-export function resolveRoutes({ router }) {
-  let content = <MissingPage />;
-
-  if (router.route) {
-    content = <router.result.component />;
-  }
-
-  return <App>{content}</App>;
-}
-
-resolveRoutes.propTypes = {
-  router: PropTypes.object.isRequired,
-};
-
-export const Router = connect(state => ({
+@connect(state => ({
   router: state.router,
-}))(resolveRoutes);
+}))
+export default class Router extends React.Component {
+  static propTypes = {
+    router: PropTypes.object.isRequired,
+  };
+
+  render() {
+    const { router } = this.props;
+
+    return (
+      <App>
+        {
+          router.route ?
+            <router.result.component />
+            : <MissingPage />
+        }
+      </App>
+    );
+  }
+}

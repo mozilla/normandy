@@ -1,12 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import { fetchExtension } from 'control_new/state/extensions/actions';
 
 
-class QueryExtension extends React.Component {
+@connect(
+  null,
+  {
+    fetchExtension,
+  },
+)
+export default class QueryExtension extends React.Component {
   static propTypes = {
     fetchExtension: PropTypes.func.isRequired,
     pk: PropTypes.number.isRequired,
@@ -28,11 +33,3 @@ class QueryExtension extends React.Component {
     return null;
   }
 }
-
-
-export default connect(
-  null,
-  dispatch => (bindActionCreators({
-    fetchExtension,
-  }, dispatch)),
-)(QueryExtension);

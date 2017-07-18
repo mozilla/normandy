@@ -3,7 +3,6 @@ import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { push as pushAction } from 'redux-little-router';
 
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
@@ -12,10 +11,10 @@ import * as extensionActions from 'control_new/state/extensions/actions';
 
 @connect(
   null,
-  dispatch => (bindActionCreators({
+  {
     createExtension: extensionActions.createExtension,
     push: pushAction,
-  }, dispatch)),
+  },
 )
 @autobind
 export default class CreateExtensionPage extends React.Component {

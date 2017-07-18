@@ -5,8 +5,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
+@connect(
+  state => ({
+    router: state.router,
+  }),
+)
 @autobind
-export class NavigationCrumbs extends React.Component {
+export default class NavigationCrumbs extends React.Component {
   static propTypes = {
     router: PropTypes.object.isRequired,
   };
@@ -72,9 +77,3 @@ export class NavigationCrumbs extends React.Component {
     );
   }
 }
-
-export default connect(
-  state => ({
-    router: state.router,
-  }),
-)(NavigationCrumbs);

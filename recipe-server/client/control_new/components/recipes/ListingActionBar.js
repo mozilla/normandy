@@ -3,7 +3,6 @@ import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
 import CheckboxMenu from 'control_new/components/common/CheckboxMenu';
@@ -19,12 +18,10 @@ import * as routerSelectors from 'control_new/state/router/selectors';
     getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
     searchText: routerSelectors.getQueryParam(state, 'searchText'),
   }),
-  dispatch => (
-    bindActionCreators({
-      push: pushAction,
-      saveRecipeListingColumns: recipeActions.saveRecipeListingColumns,
-    }, dispatch)
-  ),
+  {
+    push: pushAction,
+    saveRecipeListingColumns: recipeActions.saveRecipeListingColumns,
+  },
 )
 @autobind
 export default class ListingActionBar extends React.Component {

@@ -4,7 +4,6 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
@@ -33,12 +32,10 @@ import * as routerSelectors from 'control_new/state/router/selectors';
     searchText: routerSelectors.getQueryParam(state, 'searchText'),
     status: routerSelectors.getQueryParam(state, 'status'),
   }),
-  dispatch => (
-    bindActionCreators({
-      fetchFilteredRecipesPage: recipeActions.fetchFilteredRecipesPage,
-      push: pushAction,
-    }, dispatch)
-  ),
+  {
+    fetchFilteredRecipesPage: recipeActions.fetchFilteredRecipesPage,
+    push: pushAction,
+  },
 )
 @autobind
 export default class Listing extends React.Component {

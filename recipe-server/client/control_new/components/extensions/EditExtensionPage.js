@@ -4,7 +4,6 @@ import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryExtension from 'control_new/components/data/QueryExtension';
@@ -23,9 +22,9 @@ import { getUrlParamAsInt } from 'control_new/state/router/selectors';
       extensionId,
     };
   },
-  dispatch => (bindActionCreators({
+  {
     updateExtension: extensionActions.updateExtension,
-  }, dispatch)),
+  },
 )
 @autobind
 export default class EditExtensionPage extends React.Component {

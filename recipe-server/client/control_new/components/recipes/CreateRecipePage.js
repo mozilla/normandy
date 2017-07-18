@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import autobind from 'autobind-decorator';
-import pt from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
@@ -19,7 +19,7 @@ import { createRecipe as createAction } from 'control_new/state/recipes/actions'
 @autobind
 export default class CreateRecipePage extends React.Component {
   static propTypes = {
-    createRecipe: pt.func.isRequired,
+    createRecipe: PropTypes.func.isRequired,
   };
 
   state = {

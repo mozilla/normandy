@@ -3,7 +3,6 @@ import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
@@ -28,11 +27,9 @@ import * as routerSelectors from 'control_new/state/router/selectors';
     ordering: routerSelectors.getQueryParam(state, 'ordering', '-last_updated'),
     pageNumber: routerSelectors.getQueryParamAsInt(state, 'page', 1),
   }),
-  dispatch => (
-    bindActionCreators({
-      push: pushAction,
-    }, dispatch)
-  ),
+  {
+    push: pushAction,
+  },
 )
 @autobind
 export default class Listing extends React.Component {

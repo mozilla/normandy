@@ -2,7 +2,6 @@ import { Table } from 'antd';
 import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 import { isEmpty, mapObject } from 'underscore';
@@ -14,11 +13,9 @@ import * as routerSelectors from 'control_new/state/router/selectors';
   state => ({
     getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
   }),
-  dispatch => (
-    bindActionCreators({
-      push: pushAction,
-    }, dispatch)
-  ),
+  {
+    push: pushAction,
+  },
 )
 @autobind
 export default class DataList extends React.Component {
