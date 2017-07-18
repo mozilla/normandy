@@ -14,11 +14,13 @@ import {
 
 @connect(
   (state, { revision }) => ({
+    enabled: revision.getIn(['recipe', 'enabled'], false),
     status: getRevisionDraftStatus(state, revision.get('id')),
   }),
 )
 export default class RevisionNotice extends React.Component {
   static propTypes = {
+    enabled: PropTypes.bool.isRequired,
     status: PropTypes.string,
   };
 
@@ -27,29 +29,28 @@ export default class RevisionNotice extends React.Component {
   }
 
   render() {
-    const { status } = this.props;
+    const { enabled, status } = this.props;
 
     let message;
+    let type;
 
     if (status === REVISION_DRAFT) {
       message = 'You are viewing a draft.';
+      type = 'warning';
     } else if (status === REVISION_OUTDATED) {
       message = 'You are viewing an outdated version.';
+      type = 'warning';
+    } else if (enabled) {
+      message = 'This is the published version.';
+      type = 'success';
     } else {
-      return (
-        <Alert
-          className="revision-notice"
-          type="success"
-          message="This is the published version."
-          showIcon
-        />
-      );
+      return null;
     }
 
     return (
       <Alert
         className="revision-notice"
-        type="warning"
+        type={type}
         message={message}
         showIcon
       />
