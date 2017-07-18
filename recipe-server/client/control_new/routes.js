@@ -41,7 +41,7 @@ const routes = {
         '/approval_history': {
           component: ApprovalHistoryPage,
           crumb: 'Approval History',
-        }
+        },
       },
     },
     '/extension': {

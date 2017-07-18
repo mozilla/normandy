@@ -8,7 +8,6 @@ import {
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
-  REVISION_RECEIVE,
 } from 'control_new/state/action-types';
 import {
   makeApiRequest,
