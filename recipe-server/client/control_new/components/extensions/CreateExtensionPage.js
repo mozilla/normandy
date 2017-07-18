@@ -6,13 +6,15 @@ import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
-import * as extensionActions from 'control_new/state/extensions/actions';
+import {
+  createExtension as createExtensionAction,
+} from 'control_new/state/extensions/actions';
 
 
 @connect(
   null,
   {
-    createExtension: extensionActions.createExtension,
+    createExtension: createExtensionAction,
     push: pushAction,
   },
 )

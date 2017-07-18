@@ -6,8 +6,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
-import * as recipeActions from 'control_new/state/recipes/actions';
-import * as revisionActions from 'control_new/state/revisions/actions';
+import {
+  disableRecipe as disableRecipeAction,
+  enableRecipe as enableRecipeAction,
+} from 'control_new/state/recipes/actions';
+import {
+  requestRevisionApproval as requestRevisionApprovalAction,
+} from 'control_new/state/revisions/actions';
 import {
   getLatestRevisionIdForRecipe,
   getRecipe,
@@ -44,9 +49,9 @@ import {
     };
   },
   {
-    disableRecipe: recipeActions.disableRecipe,
-    enableRecipe: recipeActions.enableRecipe,
-    requestRevisionApproval: revisionActions.requestRevisionApproval,
+    disableRecipe: disableRecipeAction,
+    enableRecipe: enableRecipeAction,
+    requestRevisionApproval: requestRevisionApprovalAction,
   },
 )
 @autobind

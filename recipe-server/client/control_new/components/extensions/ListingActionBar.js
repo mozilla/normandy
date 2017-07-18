@@ -1,31 +1,36 @@
 import { Button, Col, Row } from 'antd';
 import autobind from 'autobind-decorator';
+import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
 import CheckboxMenu from 'control_new/components/common/CheckboxMenu';
-import * as recipeActions from 'control_new/state/extensions/actions';
+import {
+  saveExtensionListingColumns as saveExtensionListingColumnsAction,
+} from 'control_new/state/extensions/actions';
 import {
   getExtensionListingColumns,
 } from 'control_new/state/extensions/selectors';
-import * as routerSelectors from 'control_new/state/router/selectors';
+import {
+  getCurrentURL as getCurrentURLSelector,
+} from 'control_new/state/router/selectors';
 
 @connect(
   state => ({
     columns: getExtensionListingColumns(state),
-    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
+    getCurrentURL: queryParams => getCurrentURLSelector(state, queryParams),
   }),
   {
     push: pushAction,
-    saveExtensionListingColumns: recipeActions.saveExtensionListingColumns,
+    saveExtensionListingColumns: saveExtensionListingColumnsAction,
   },
 )
 @autobind
 export default class ListingActionBar extends React.Component {
   static propTypes = {
-    columns: PropTypes.object.isRequired,
+    columns: PropTypes.instanceOf(List).isRequired,
     getCurrentURL: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
     saveExtensionListingColumns: PropTypes.func.isRequired,

@@ -1,5 +1,6 @@
 import { Pagination, Table } from 'antd';
 import autobind from 'autobind-decorator';
+import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -15,7 +16,11 @@ import {
   getExtensionListingCount,
   getExtensionListing,
 } from 'control_new/state/extensions/selectors';
-import * as routerSelectors from 'control_new/state/router/selectors';
+import {
+  getCurrentURL as getCurrentURLSelector,
+  getQueryParam,
+  getQueryParamAsInt,
+} from 'control_new/state/router/selectors';
 
 
 @connect(
@@ -23,9 +28,9 @@ import * as routerSelectors from 'control_new/state/router/selectors';
     columns: getExtensionListingColumns(state),
     count: getExtensionListingCount(state),
     extensions: getExtensionListing(state),
-    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
-    ordering: routerSelectors.getQueryParam(state, 'ordering', '-last_updated'),
-    pageNumber: routerSelectors.getQueryParamAsInt(state, 'page', 1),
+    getCurrentURL: queryParams => getCurrentURLSelector(state, queryParams),
+    ordering: getQueryParam(state, 'ordering', '-last_updated'),
+    pageNumber: getQueryParamAsInt(state, 'page', 1),
   }),
   {
     push: pushAction,
@@ -34,9 +39,9 @@ import * as routerSelectors from 'control_new/state/router/selectors';
 @autobind
 export default class Listing extends React.Component {
   static propTypes = {
-    columns: PropTypes.object,
+    columns: PropTypes.instanceOf(List).isRequired,
     count: PropTypes.number,
-    extensions: PropTypes.object.isRequired,
+    extensions: PropTypes.instanceOf(List).isRequired,
     getCurrentURL: PropTypes.func.isRequired,
     ordering: PropTypes.string,
     pageNumber: PropTypes.number,
@@ -44,7 +49,6 @@ export default class Listing extends React.Component {
   };
 
   static defaultProps = {
-    columns: null,
     count: null,
     ordering: null,
     pageNumber: null,

@@ -78,15 +78,7 @@ export default class Router extends React.Component {
 
   render() {
     const { router } = this.props;
-
-    return (
-      <App>
-        {
-          router.route ?
-            <router.result.component />
-            : <MissingPage />
-        }
-      </App>
-    );
+    const content = router.route ? <router.result.component /> : <MissingPage />;
+    return <App>{content}</App>
   }
 }

@@ -2,12 +2,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import * as recipeActions from 'control_new/state/recipes/actions';
+import {
+  fetchRecipeHistory as fetchRecipeHistoryAction,
+} from 'control_new/state/recipes/actions';
 
 @connect(
   null,
   {
-    fetchRecipeHistory: recipeActions.fetchRecipeHistory,
+    fetchRecipeHistory: fetchRecipeHistoryAction,
   },
 )
 export default class QueryRecipeHistory extends React.Component {

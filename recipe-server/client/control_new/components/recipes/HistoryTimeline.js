@@ -8,13 +8,16 @@ import { Link } from 'redux-little-router';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
 import RevisionApprovalTag from 'control_new/components/recipes/RevisionApprovalTag';
-import * as revisionsSelectors from 'control_new/state/revisions/selectors';
+import {
+  getRecipeIdForRevision as getRecipeIdForRevisionSelector,
+  isLatestRevision as isLatestRevisionSelector,
+} from 'control_new/state/revisions/selectors';
 
 
 @connect(
   state => ({
-    getRecipeIdForRevision: id => revisionsSelectors.getRecipeIdForRevision(state, id),
-    isLatestRevision: id => revisionsSelectors.isLatestRevision(state, id),
+    getRecipeIdForRevision: id => getRecipeIdForRevisionSelector(state, id),
+    isLatestRevision: id => isLatestRevisionSelector(state, id),
   }),
 )
 export default class HistoryTimeline extends React.Component {

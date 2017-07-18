@@ -7,13 +7,15 @@ import { connect } from 'react-redux';
 
 import FormActions from 'control_new/components/common/FormActions';
 import { createForm, FormItem } from 'control_new/components/common/forms';
-import * as approvalRequestActions from 'control_new/state/approvalRequests/actions';
+import {
+  closeApprovalRequest as closeApprovalRequestAction,
+} from 'control_new/state/approvalRequests/actions';
 
 
 @connect(
   null,
   {
-    closeApprovalRequest: approvalRequestActions.closeApprovalRequest,
+    closeApprovalRequest: closeApprovalRequestAction,
   },
 )
 @createForm({})

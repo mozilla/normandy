@@ -2,13 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import * as extensionActions from 'control_new/state/extensions/actions';
+import {
+  fetchExtensionsPage as fetchExtensionsPageAction,
+} from 'control_new/state/extensions/actions';
 
 
 @connect(
   null,
   {
-    fetchExtensionsPage: extensionActions.fetchExtensionsPage,
+    fetchExtensionsPage: fetchExtensionsPageAction,
   },
 )
 export default class QueryMultipleExtensions extends React.Component {

@@ -8,7 +8,9 @@ import { connect } from 'react-redux';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryExtension from 'control_new/components/data/QueryExtension';
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
-import * as extensionActions from 'control_new/state/extensions/actions';
+import {
+  updateExtension as updateExtensionAction,
+} from 'control_new/state/extensions/actions';
 import { getExtension } from 'control_new/state/extensions/selectors';
 import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
@@ -23,7 +25,7 @@ import { getUrlParamAsInt } from 'control_new/state/router/selectors';
     };
   },
   {
-    updateExtension: extensionActions.updateExtension,
+    updateExtension: updateExtensionAction,
   },
 )
 @autobind
