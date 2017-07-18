@@ -2,6 +2,7 @@ import { Popover, Tag } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'redux-little-router';
 
 import {
   REVISION_APPROVED,
@@ -33,7 +34,7 @@ export default class RevisionApprovalTag extends React.Component {
   render() {
     const { revision, status } = this.props;
 
-    const email = revision.getIn(['approval_request', 'creator', 'email'])
+    const email = revision.getIn(['approval_request', 'creator', 'email']);
 
     let color;
     let label;
@@ -71,9 +72,11 @@ export default class RevisionApprovalTag extends React.Component {
 
     return (
       <Popover content={popoverContent}>
-        <Tag color={color}>
-          {label}
-        </Tag>
+        <Link href={`/recipe/${revision.getIn(['recipe', 'id'])}/approval_history`}>
+          <Tag color={color}>
+            {label}
+          </Tag>
+        </Link>
       </Popover>
     );
   }

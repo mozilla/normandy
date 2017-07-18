@@ -1,18 +1,6 @@
 .page-recipe-details {
   height: 100%;
 
-  .ant-card {
-    margin: 16px 0;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
   > .ant-row {
     height: 100%;
     position: relative;
@@ -47,6 +35,44 @@
   }
 }
 
+.recipe-details {
+  .ant-card {
+    margin: 16px 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
 .revision-notice {
   margin-bottom: 16px;
+}
+
+.approval-history-details {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+
+  &:last-child {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ant-card-extra {
+    .ant-tag {
+      margin-right: 0;
+    }
+  }
+}
+
+.approval-details {
+  border-top: 1px solid #eee;
+  margin-top: 16px;
+  padding-top: 16px;
 }

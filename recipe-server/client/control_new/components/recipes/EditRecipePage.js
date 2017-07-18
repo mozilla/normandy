@@ -11,16 +11,18 @@ import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
 import { updateRecipe } from 'control_new/state/recipes/actions';
 import { getRecipe } from 'control_new/state/recipes/selectors';
+import { getRecipeForRevision } from 'control_new/state/revisions/selectors';
 import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 
 @connect(
   state => {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
+    const recipe = getRecipe(state, recipeId, new Map());
 
     return {
       recipeId,
-      recipe: getRecipe(state, recipeId, new Map()),
+      recipe: getRecipeForRevision(state, recipe.getIn(['latest_revision', 'id']), new Map()),
     };
   },
   {

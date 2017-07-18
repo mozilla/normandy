@@ -6,6 +6,7 @@ import { routerForBrowser } from 'redux-little-router';
 import App from 'control_new/components/App';
 import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
+import ApprovalHistoryPage from 'control_new/components/recipes/ApprovalHistoryPage';
 import CreateRecipePage from 'control_new/components/recipes/CreateRecipePage';
 import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
 import ExtensionListing from 'control_new/components/extensions/Listing';
@@ -37,6 +38,10 @@ const routes = {
           component: EditRecipePage,
           crumb: 'Edit Recipe',
         },
+        '/approval_history': {
+          component: ApprovalHistoryPage,
+          crumb: 'Approval History',
+        }
       },
     },
     '/extension': {

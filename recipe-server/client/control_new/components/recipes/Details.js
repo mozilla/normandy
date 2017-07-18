@@ -6,7 +6,7 @@ import React from 'react';
 
 export default function Details({ recipe }) {
   return (
-    <div>
+    <div className="recipe-details">
       <Card key="recipe-details" title="Recipe">
         <dl className="details">
           <dt>Name</dt>

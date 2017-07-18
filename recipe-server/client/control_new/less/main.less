@@ -26,6 +26,10 @@ dl.details {
   display: grid;
   grid-template-columns: 200px 1fr;
 
+  &.narrow {
+    grid-template-columns: 120px 1fr;
+  }
+
   dt, dd {
     border-bottom: 1px solid #eee;
     padding: 16px 0;
@@ -43,6 +47,7 @@ dl.details {
   dt {
     color: #999;
     font-weight: bold;
+    padding-right: 16px;
     text-transform: uppercase;
   }
 
@@ -150,9 +155,8 @@ dl.details {
 
 /* Buttons at the bottom of a form */
 .form-actions {
-  background: #FBFBFB;
-  border: 1px solid #D9D9D9;
-  padding: 15px;
+  border-top: 1px solid #eee;
+  padding-top: 24px;
 
   .clearfix();
 

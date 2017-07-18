@@ -85,3 +85,8 @@ export function getApprovedRevisionIdForRecipe(state, id, defaultsTo = null) {
   }
   return defaultsTo;
 }
+
+export function getRecipeApprovalHistory(state, id) {
+  const history = getRecipeHistory(state, id);
+  return history.filter(revision => revision.get('approval_request'));
+}

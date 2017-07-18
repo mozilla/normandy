@@ -13,9 +13,10 @@ import {
   getRecipe,
 } from 'control_new/state/recipes/selectors';
 import {
+  isApprovableRevision,
   isLatestApprovedRevision,
   isLatestRevision,
-  isApprovableRevision,
+  isRevisionPendingApproval,
 } from 'control_new/state/revisions/selectors';
 import {
   getUrlParam,
@@ -33,6 +34,7 @@ import {
     return {
       isLatest: isLatestRevision(state, revisionId),
       isLatestApproved: isLatestApprovedRevision(state, revisionId),
+      isPendingApproval: isRevisionPendingApproval(state, revisionId),
       isApprovable: isApprovableRevision(state, revisionId),
       recipe,
       recipeId,
@@ -50,9 +52,10 @@ export default class DetailsActionBar extends React.Component {
   static propTypes = {
     disableRecipe: PropTypes.func.isRequired,
     enableRecipe: PropTypes.func.isRequired,
+    isApprovable: PropTypes.bool.isRequired,
     isLatest: PropTypes.bool.isRequired,
     isLatestApproved: PropTypes.bool.isRequired,
-    isApprovable: PropTypes.bool.isRequired,
+    isPendingApproval: PropTypes.bool.isRequired,
     recipe: PropTypes.object.isRequired,
     recipeId: PropTypes.number.isRequired,
     requestRevisionApproval: PropTypes.func.isRequired,
@@ -86,9 +89,10 @@ export default class DetailsActionBar extends React.Component {
 
   render() {
     const {
+      isApprovable,
       isLatest,
       isLatestApproved,
-      isApprovable,
+      isPendingApproval,
       recipe,
       recipeId,
       revisionId,
@@ -118,6 +122,13 @@ export default class DetailsActionBar extends React.Component {
             <Button icon="question-circle" type="primary" onClick={this.handleRequestClick}>
               Request Approval
             </Button>
+        }
+
+        {
+          isPendingApproval &&
+            <Link href={`/recipe/${recipeId}/approval_history`}>
+              <Button icon="message" type="primary">Approval Request</Button>
+            </Link>
         }
 
         {
