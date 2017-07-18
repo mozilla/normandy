@@ -46,7 +46,12 @@ export default class DataList extends React.Component {
 
   handleChangeSortFilters(pagination, filters, sorter) {
     const { getCurrentURL, push } = this.props;
-    const filterParams = mapObject(filters, values => values.join(',') || undefined);
+    const filterParams = mapObject(filters, values => {
+      if (values) {
+        return values.join(',');
+      }
+      return undefined;
+    });
 
     let ordering;
     if (!isEmpty(sorter)) {
