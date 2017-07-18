@@ -330,7 +330,13 @@ add_task(async function testStartup() {
   const updateRunIntervalStub = sinon.stub(RecipeRunner, "updateRunInterval");
 
   // in dev mode
-  await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.dev_mode", true]]});
+  await SpecialPowers.pushPrefEnv({
+    set: [
+      ["extensions.shield-recipe-client.dev_mode", true],
+      ["extensions.shield-recipe-client.first_run", false],
+    ],
+  });
+
   RecipeRunner.init();
   ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
   ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
@@ -341,7 +347,13 @@ add_task(async function testStartup() {
   updateRunIntervalStub.reset();
 
   // not in dev mode
-  await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.dev_mode", false]]});
+  await SpecialPowers.pushPrefEnv({
+    set: [
+      ["extensions.shield-recipe-client.dev_mode", false],
+      ["extensions.shield-recipe-client.first_run", false],
+    ],
+  });
+
   RecipeRunner.init();
   ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
   ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");
