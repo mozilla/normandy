@@ -63,6 +63,9 @@ export default class ApprovalRequest extends React.Component {
     let action;
     let successMessage;
 
+    // The form submits if the user hits enter in the comment field. To ensure we are only
+    // submitting an approval or rejection when one of the buttons is explicitly clicked we
+    // do a strict comparison to the expected boolean values.
     if (context.approved === true) {
       action = approveApprovalRequest;
       successMessage = 'Request approved';
