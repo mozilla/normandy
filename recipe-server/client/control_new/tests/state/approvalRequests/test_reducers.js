@@ -4,7 +4,7 @@ import {
   APPROVAL_REQUEST_DELETE,
   APPROVAL_REQUEST_RECEIVE,
 } from 'control_new/state/action-types';
-import approvalRequestsReducer from 'control_new/state/approvalRequests/reducers';
+import approvalRequestsReducer from 'control_new/state/app/approvalRequests/reducers';
 
 import {
   INITIAL_STATE,

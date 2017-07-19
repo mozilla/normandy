@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { loadRecipeListingColumns } from 'control_new/state/recipes/actions';
+import { loadRecipeListingColumns } from 'control_new/state/app/recipes/actions';
 
 
 @connect(

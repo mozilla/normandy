@@ -1,6 +1,6 @@
 /* eslint import/prefer-default-export: "off" */
 
-import { getRequest } from 'control_new/state/requests/selectors';
+import { getRequest } from 'control_new/state/app/requests/selectors';
 
 import {
   REQUEST_FAILURE,

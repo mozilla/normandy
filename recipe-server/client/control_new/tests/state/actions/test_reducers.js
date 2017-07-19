@@ -1,13 +1,11 @@
-import { fromJS } from 'immutable';
-
 import {
   ACTION_RECEIVE,
 } from 'control_new/state/action-types';
-import actionsReducer from 'control_new/state/actions/reducers';
+import actionsReducer from 'control_new/state/app/actions/reducers';
 
 import {
   INITIAL_STATE,
-  ACTION,
+  ActionFactory,
 } from '.';
 
 
@@ -17,12 +15,14 @@ describe('Actions reducer', () => {
   });
 
   it('should handle ACTION_RECEIVE', () => {
+    const action = new ActionFactory();
+
     expect(actionsReducer(undefined, {
       type: ACTION_RECEIVE,
-      action: ACTION,
+      action: action.toObject(),
     })).toEqual({
       ...INITIAL_STATE,
-      items: INITIAL_STATE.items.set(ACTION.id, fromJS(ACTION)),
+      items: INITIAL_STATE.items.set(action.id, action.toImmutable()),
     });
   });
 });

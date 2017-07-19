@@ -10,7 +10,7 @@ import {
 import {
   isRevisionPendingApproval,
   getRevisionDraftStatus,
-} from 'control_new/state/revisions/selectors';
+} from 'control_new/state/app/revisions/selectors';
 
 
 @connect(

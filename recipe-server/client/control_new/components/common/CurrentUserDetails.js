@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import {
   getCurrentUser,
   getLogoutUrl,
-} from 'control_new/state/serviceInfo/selectors';
+} from 'control_new/state/app/serviceInfo/selectors';
 
 
 @connect(

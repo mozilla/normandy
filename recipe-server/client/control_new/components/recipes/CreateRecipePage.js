@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
-import { createRecipe as createAction } from 'control_new/state/recipes/actions';
+import { createRecipe as createAction } from 'control_new/state/app/recipes/actions';
 
 
 @connect(

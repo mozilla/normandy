@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { isEqual } from 'underscore';
 
-import { fetchFilteredRecipesPage } from 'control_new/state/recipes/actions';
+import { fetchFilteredRecipesPage } from 'control_new/state/app/recipes/actions';
 
 
 @connect(

@@ -10,8 +10,8 @@ import FormActions from 'control_new/components/forms/FormActions';
 import ConsoleLogFields from 'control_new/components/recipes/ConsoleLogFields';
 import PreferenceExperimentFields from 'control_new/components/recipes/PreferenceExperimentFields';
 import ShowHeartbeatFields from 'control_new/components/recipes/ShowHeartbeatFields';
-import { getAction, getAllActions } from 'control_new/state/actions/selectors';
-import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
+import { getAction, getAllActions } from 'control_new/state/app/actions/selectors';
+import { areAnyRequestsInProgress } from 'control_new/state/app/requests/selectors';
 import { createForm } from 'control_new/utils/forms';
 
 

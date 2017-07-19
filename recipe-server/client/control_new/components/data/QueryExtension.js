@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchExtension } from 'control_new/state/extensions/actions';
+import { fetchExtension } from 'control_new/state/app/extensions/actions';
 
 
 @connect(

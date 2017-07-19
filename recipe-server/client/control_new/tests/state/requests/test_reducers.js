@@ -9,7 +9,7 @@ import {
 import {
   DEFAULT_REQUEST,
 } from 'control_new/state/constants';
-import requestsReducer from 'control_new/state/requests/reducers';
+import requestsReducer from 'control_new/state/app/requests/reducers';
 
 import {
   INITIAL_STATE,

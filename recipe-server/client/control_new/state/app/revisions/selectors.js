@@ -1,8 +1,8 @@
 import { Map } from 'immutable';
 import moment from 'moment';
 
-import { getAction } from 'control_new/state/actions/selectors';
-import { getApprovalRequest } from 'control_new/state/approvalRequests/selectors';
+import { getAction } from 'control_new/state/app/actions/selectors';
+import { getApprovalRequest } from 'control_new/state/app/approvalRequests/selectors';
 import {
   REVISION_APPROVED,
   REVISION_DISABLED,
@@ -17,7 +17,7 @@ import {
   getApprovedRevisionIdForRecipe,
   getLatestRevisionIdForRecipe,
   isRecipeEnabled,
-} from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/recipes/selectors';
 
 
 export function getRevision(state, id, defaultsTo = null) {

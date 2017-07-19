@@ -7,7 +7,7 @@ import {
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
 } from 'control_new/state/action-types';
-import recipesReducer from 'control_new/state/recipes/reducers';
+import recipesReducer from 'control_new/state/app/recipes/reducers';
 
 import {
   FILTERS,

@@ -7,7 +7,7 @@ import {
 } from 'control_new/state/action-types';
 import {
   makeApiRequest,
-} from 'control_new/state/requests/actions';
+} from 'control_new/state/app/requests/actions';
 
 
 export function fetchExtension(pk) {

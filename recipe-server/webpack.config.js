@@ -129,6 +129,10 @@ module.exports = [
         control_new: path.resolve(__dirname, './client/control_new'),
       },
     },
+
+    node: {
+      fs: 'empty',
+    },
   },
   {
     devtool: production ? undefined : 'cheap-module-source-map',

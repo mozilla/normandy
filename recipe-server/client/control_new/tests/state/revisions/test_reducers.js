@@ -5,7 +5,7 @@ import {
   RECIPE_DELETE,
   REVISION_RECEIVE,
 } from 'control_new/state/action-types';
-import revisionsReducer from 'control_new/state/revisions/reducers';
+import revisionsReducer from 'control_new/state/app/revisions/reducers';
 
 import {
   INITIAL_STATE,

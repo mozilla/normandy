@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 
-import { getApprovalRequest } from 'control_new/state/approvalRequests/selectors';
+import { getApprovalRequest } from 'control_new/state/app/approvalRequests/selectors';
 
 import {
   APPROVAL_REQUEST,

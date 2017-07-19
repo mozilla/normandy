@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchAllActions } from 'control_new/state/actions/actions';
+import { fetchAllActions } from 'control_new/state/app/actions/actions';
 
 @connect(
   null,

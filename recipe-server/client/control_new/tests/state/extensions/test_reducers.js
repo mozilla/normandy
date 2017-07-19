@@ -3,7 +3,7 @@ import { fromJS } from 'immutable';
 import {
   EXTENSION_RECEIVE,
 } from 'control_new/state/action-types';
-import extensionsReducer from 'control_new/state/extensions/reducers';
+import extensionsReducer from 'control_new/state/app/extensions/reducers';
 
 import {
   INITIAL_STATE,

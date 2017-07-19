@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import {
   fetchExtensionsPage as fetchExtensionsPageAction,
-} from 'control_new/state/extensions/actions';
+} from 'control_new/state/app/extensions/actions';
 
 
 @connect(

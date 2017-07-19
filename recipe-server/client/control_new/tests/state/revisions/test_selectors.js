@@ -5,9 +5,9 @@ import {
   ACTION_RECEIVE,
   REVISION_RECEIVE,
 } from 'control_new/state/action-types';
-import actionsReducer from 'control_new/state/actions/reducers';
-import revisionsReducer from 'control_new/state/revisions/reducers';
-import { getRevision } from 'control_new/state/revisions/selectors';
+import actionsReducer from 'control_new/state/app/actions/reducers';
+import revisionsReducer from 'control_new/state/app/revisions/reducers';
+import { getRevision } from 'control_new/state/app/revisions/selectors';
 
 import {
   REVISION,

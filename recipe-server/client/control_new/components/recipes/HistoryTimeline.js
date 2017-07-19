@@ -11,7 +11,7 @@ import RevisionApprovalTag from 'control_new/components/recipes/RevisionApproval
 import {
   getRecipeIdForRevision as getRecipeIdForRevisionSelector,
   isLatestRevision as isLatestRevisionSelector,
-} from 'control_new/state/revisions/selectors';
+} from 'control_new/state/app/revisions/selectors';
 
 
 @connect(

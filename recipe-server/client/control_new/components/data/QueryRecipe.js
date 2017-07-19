@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import {
   fetchRecipe as fetchRecipeAction,
-} from 'control_new/state/recipes/actions';
+} from 'control_new/state/app/recipes/actions';
 
 
 @connect(

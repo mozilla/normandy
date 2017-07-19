@@ -10,8 +10,8 @@ import QueryExtension from 'control_new/components/data/QueryExtension';
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
 import {
   updateExtension as updateExtensionAction,
-} from 'control_new/state/extensions/actions';
-import { getExtension } from 'control_new/state/extensions/selectors';
+} from 'control_new/state/app/extensions/actions';
+import { getExtension } from 'control_new/state/app/extensions/selectors';
 import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 

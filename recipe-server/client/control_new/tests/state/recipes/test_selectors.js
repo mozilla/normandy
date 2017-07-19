@@ -6,14 +6,14 @@ import {
   RECIPE_RECEIVE,
   REVISION_RECEIVE,
 } from 'control_new/state/action-types';
-import actionsReducer from 'control_new/state/actions/reducers';
-import recipesReducer from 'control_new/state/recipes/reducers';
-import revisionsReducer from 'control_new/state/revisions/reducers';
+import actionsReducer from 'control_new/state/app/actions/reducers';
+import recipesReducer from 'control_new/state/app/recipes/reducers';
+import revisionsReducer from 'control_new/state/app/revisions/reducers';
 import {
   getRecipe,
   getRecipeFilters,
   getRecipeHistory,
-} from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/recipes/selectors';
 
 import {
   FILTERS,

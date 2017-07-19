@@ -9,7 +9,7 @@ import FormActions from 'control_new/components/forms/FormActions';
 import FormItem from 'control_new/components/forms/FormItem';
 import {
   closeApprovalRequest as closeApprovalRequestAction,
-} from 'control_new/state/approvalRequests/actions';
+} from 'control_new/state/app/approvalRequests/actions';
 import { createForm } from 'control_new/utils/forms';
 
 

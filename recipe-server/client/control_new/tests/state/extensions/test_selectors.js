@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 
-import { getExtension } from 'control_new/state/extensions/selectors';
+import { getExtension } from 'control_new/state/app/extensions/selectors';
 
 import {
   EXTENSION,

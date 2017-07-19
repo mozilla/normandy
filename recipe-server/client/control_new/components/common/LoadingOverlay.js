@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { areAnyRequestsInProgress } from 'control_new/state/requests/selectors';
+import { areAnyRequestsInProgress } from 'control_new/state/app/requests/selectors';
 
 
 export class SimpleLoadingOverlay extends React.Component {

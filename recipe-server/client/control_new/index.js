@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
+import { applyMiddleware, compose, createStore } from 'redux';
 import { initializeCurrentLocation } from 'redux-little-router';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
@@ -10,15 +10,8 @@ import DevTools from 'control_new/components/devtools';
 import Router, {
   enhancer as routerEnhancer,
   middleware as routerMiddleware,
-  reducer as routerReducer,
 } from 'control_new/routes';
-import applicationState from 'control_new/state';
-
-
-const reducers = combineReducers({
-  app: applicationState,
-  router: routerReducer,
-});
+import reducers from 'control_new/state';
 
 
 const store = createStore(reducers, reducers(undefined, { type: 'initial' }), compose(

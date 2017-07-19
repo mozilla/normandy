@@ -1,7 +1,7 @@
 import * as matchers from 'jasmine-immutable-matchers';
 
 import { DEFAULT_REQUEST } from 'control_new/state/constants';
-import { getRequest } from 'control_new/state/requests/selectors';
+import { getRequest } from 'control_new/state/app/requests/selectors';
 
 import {
   INITIAL_STATE,

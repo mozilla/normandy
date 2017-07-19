@@ -9,7 +9,7 @@ import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
 import ApprovalRequest from 'control_new/components/recipes/ApprovalRequest';
 import {
   getRecipeApprovalHistory,
-} from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/recipes/selectors';
 import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 
