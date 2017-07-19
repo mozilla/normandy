@@ -160,7 +160,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     def approve(self, request, pk=None):
         approval_request = self.get_object()
 
-        if 'comment' not in request.data:
+        if not request.data.get('comment'):
             return Response({'comment': 'This field is required.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -181,7 +181,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     def reject(self, request, pk=None):
         approval_request = self.get_object()
 
-        if 'comment' not in request.data:
+        if not request.data.get('comment'):
             return Response({'comment': 'This field is required.'},
                             status=status.HTTP_400_BAD_REQUEST)
 

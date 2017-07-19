@@ -82,21 +82,21 @@ export function createForm({ validateFields, ...formConfig }) {
         };
       }
 
-      handleSubmit(event) {
+      handleSubmit(event, context = {}) {
         event.preventDefault();
-        this.triggerSubmit();
+        this.triggerSubmit(context);
       }
 
       /**
        * Run validation (both rule-based and custom validation) and pass the
        * results to the onSubmit prop.
        */
-      async triggerSubmit() {
+      async triggerSubmit(context) {
         const customValidateFields = validateFields || (values => values);
         try {
           const defaultValues = await this.defaultValidateFields();
           const values = await customValidateFields.call(this.formComponent, defaultValues);
-          this.props.onSubmit(values);
+          this.props.onSubmit(values, context);
         } catch (error) {
           message.error('Could not validate form. Please correct the errors below.');
         }

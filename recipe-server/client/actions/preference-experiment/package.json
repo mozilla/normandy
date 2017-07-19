@@ -39,7 +39,7 @@
                     "default": "boolean"
                 },
                 "preferenceBranchType": {
-                    "descript": "Controls whether the default or user value of the preference is modified",
+                    "description": "Controls whether the default or user value of the preference is modified",
                     "type": "string",
                     "enum": ["user", "default"],
                     "default": "default"

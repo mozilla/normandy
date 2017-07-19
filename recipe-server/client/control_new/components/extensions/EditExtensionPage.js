@@ -11,12 +11,12 @@ import QueryExtension from 'control_new/components/data/QueryExtension';
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
 import * as extensionActions from 'control_new/state/extensions/actions';
 import { getExtension } from 'control_new/state/extensions/selectors';
-import { getRouterParamAsInt } from 'control_new/state/router/selectors';
+import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 
 @connect(
   state => {
-    const extensionId = getRouterParamAsInt(state, 'extensionId');
+    const extensionId = getUrlParamAsInt(state, 'extensionId');
     const extension = getExtension(state, extensionId, new Map());
     return {
       extension,

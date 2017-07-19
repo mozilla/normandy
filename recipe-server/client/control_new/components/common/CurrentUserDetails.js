@@ -1,4 +1,5 @@
 import { Button } from 'antd';
+import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -11,18 +12,14 @@ import {
 
 @connect(
   state => ({
-    user: getCurrentUser(state),
-    logoutUrl: getLogoutUrl(state),
+    user: getCurrentUser(state, new Map()),
+    logoutUrl: getLogoutUrl(state, ''),
   }),
 )
 export default class CurrentUserDetails extends React.Component {
   static propTypes = {
     logoutUrl: PropTypes.string.isRequired,
-    user: PropTypes.object,
-  };
-
-  static defaultProps = {
-    user: null,
+    user: PropTypes.instanceOf(Map).isRequired,
   };
 
   render() {

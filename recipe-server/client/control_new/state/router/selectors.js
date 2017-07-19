@@ -1,14 +1,9 @@
-/**
- * Get a named parameter for the current route.
- * @param {Object} state
- * @param {String} paramName
- */
-export function getRouterParam(state, key, defaultsTo) {
-  return state.router.params[key] || defaultsTo;
+export function getUrlParam(state, name, defaultsTo) {
+  return state.router.params[name] || defaultsTo;
 }
 
-export function getRouterParamAsInt(state, key, defaultsTo) {
-  return parseInt(getRouterParam(state, key, defaultsTo), 10);
+export function getUrlParamAsInt(state, name, defaultsTo) {
+  return parseInt(getUrlParam(state, name, defaultsTo), 10);
 }
 
 export function getQueryParam(state, key, defaultsTo) {
@@ -27,4 +22,8 @@ export function getCurrentURL(state, queryParams) {
       ...queryParams,
     },
   };
+}
+
+export function getRouterPath(state) {
+  return state.router.pathname;
 }

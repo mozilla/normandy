@@ -8,14 +8,16 @@ import {
   RECIPE_RECEIVE,
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
-  REVISION_RECEIVE,
 } from 'control_new/state/action-types';
 import {
   makeApiRequest,
 } from 'control_new/state/requests/actions';
+import {
+  revisionReceived,
+} from 'control_new/state/revisions/actions';
 
 
-function recipeReceived(recipe) {
+export function recipeReceived(recipe) {
   return dispatch => {
     dispatch({
       type: RECIPE_RECEIVE,
@@ -27,16 +29,10 @@ function recipeReceived(recipe) {
       action: recipe.action,
     });
 
-    dispatch({
-      type: REVISION_RECEIVE,
-      revision: recipe.latest_revision,
-    });
+    dispatch(revisionReceived(recipe.latest_revision));
 
-    if (recipe.approved_revision) {
-      dispatch({
-        type: REVISION_RECEIVE,
-        revision: recipe.approved_revision,
-      });
+    if (recipe.approved_revision && recipe.approved_revision.id !== recipe.latest_revision.id) {
+      dispatch(revisionReceived(recipe.approved_revision));
     }
   };
 }
@@ -164,17 +160,14 @@ export function fetchRecipeHistory(pk) {
     const requestId = `fetch-recipe-history-${pk}`;
     const revisions = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/history/`));
 
+    revisions.forEach(revision => {
+      dispatch(revisionReceived(revision));
+    });
+
     dispatch({
       type: RECIPE_HISTORY_RECEIVE,
       recipeId: pk,
       revisions,
-    });
-
-    revisions.forEach(revision => {
-      dispatch({
-        type: REVISION_RECEIVE,
-        revision,
-      });
     });
   };
 }

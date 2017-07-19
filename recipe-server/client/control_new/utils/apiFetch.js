@@ -61,5 +61,10 @@ export default async function apiFetch(url, options = {}) {
 
     throw new ApiError(message, data);
   }
-  return response.json();
+
+  if (response.status !== 204) {
+    return response.json();
+  }
+
+  return null;
 }

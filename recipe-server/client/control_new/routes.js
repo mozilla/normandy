@@ -6,13 +6,14 @@ import { routerForBrowser } from 'redux-little-router';
 import App from 'control_new/components/App';
 import CreateExtensionPage from 'control_new/components/extensions/CreateExtensionPage';
 import EditExtensionPage from 'control_new/components/extensions/EditExtensionPage';
+import ApprovalHistoryPage from 'control_new/components/recipes/ApprovalHistoryPage';
 import CreateRecipePage from 'control_new/components/recipes/CreateRecipePage';
 import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
 import ExtensionListing from 'control_new/components/extensions/Listing';
-import Dummy from 'control_new/components/pages/Dummy';
 import Gateway from 'control_new/components/pages/Gateway';
 import RecipeListing from 'control_new/components/recipes/Listing';
 import MissingPage from 'control_new/components/pages/MissingPage';
+import RecipeDetailPage from 'control_new/components/recipes/DetailPage';
 
 
 const routes = {
@@ -27,11 +28,19 @@ const routes = {
         crumb: 'New Recipe',
       },
       '/:recipeId': {
-        component: Dummy,
+        component: RecipeDetailPage,
         crumb: 'View Recipe',
+        '/rev/:revisionId': {
+          component: RecipeDetailPage,
+          crumb: 'Revision',
+        },
         '/edit': {
           component: EditRecipePage,
           crumb: 'Edit Recipe',
+        },
+        '/approval_history': {
+          component: ApprovalHistoryPage,
+          crumb: 'Approval History',
         },
       },
     },

@@ -5,10 +5,9 @@
 // Pages
 @import 'pages/404';
 @import 'pages/gateway';
-@import 'pages/recipe_form';
+@import 'pages/recipe-details';
+@import 'pages/recipe-form';
 @import 'listing';
-
-@primary-color: #1C5253;
 
 // Common
 body {
@@ -96,6 +95,14 @@ body {
 
 .sidebar {
   background: @white;
+
+  > .ant-layout-sider-children {
+    height: 100%;
+
+    > .ant-menu {
+      height: 100%;
+    }
+  }
 }
 
 .content-wrapper {
@@ -104,6 +111,7 @@ body {
 
 .content {
   background: @white;
+  height: 100%;
   padding: 24px;
 }
 
@@ -113,9 +121,8 @@ body {
 
 /* Buttons at the bottom of a form */
 .form-actions {
-  background: #FBFBFB;
-  border: 1px solid #D9D9D9;
-  padding: 15px;
+  border-top: 1px solid #EEE;
+  padding-top: 24px;
 
   .clearfix();
 
@@ -129,7 +136,7 @@ body {
 
   .primary,
   .secondary {
-    & > *:not(:last-child) {
+    & > *:not(:first-child) {
       margin-left: 15px;
     }
   }

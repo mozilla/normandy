@@ -37,12 +37,13 @@ export function fetchAllApprovalRequests() {
 }
 
 
-export function approveApprovalRequest(pk) {
+export function approveApprovalRequest(pk, data) {
   return async dispatch => {
     const requestId = `approve-approval-request-${pk}`;
     const approvalRequest = await dispatch(
       makeApiRequest(requestId, `v2/approval_request/${pk}/approve/`, {
         method: 'POST',
+        data,
       }));
 
     dispatch({
@@ -53,12 +54,13 @@ export function approveApprovalRequest(pk) {
 }
 
 
-export function rejectApprovalRequest(pk) {
+export function rejectApprovalRequest(pk, data) {
   return async dispatch => {
     const requestId = `reject-approval-request-${pk}`;
     const approvalRequest = await dispatch(
       makeApiRequest(requestId, `v2/approval_request/${pk}/reject/`, {
         method: 'POST',
+        data,
       }));
 
     dispatch({

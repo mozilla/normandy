@@ -51,6 +51,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
     comment = serializers.CharField(read_only=True)
     date_created = serializers.DateTimeField(source='created', read_only=True)
     recipe = serializers.SerializerMethodField(read_only=True)
+    user = UserSerializer()
 
     class Meta:
         model = RecipeRevision
@@ -60,6 +61,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             'date_created',
             'id',
             'recipe',
+            'user'
         ]
 
     def get_recipe(self, instance):

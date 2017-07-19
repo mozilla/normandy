@@ -2,13 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchRecipe } from 'control_new/state/recipes/actions';
+import * as recipeActions from 'control_new/state/recipes/actions';
 
 
 @connect(
   null,
   {
-    fetchRecipe,
+    fetchRecipe: recipeActions.fetchRecipe,
   },
 )
 export default class QueryRecipe extends React.Component {
@@ -18,14 +18,14 @@ export default class QueryRecipe extends React.Component {
   }
 
   componentWillMount() {
-    const { pk } = this.props;
-    this.props.fetchRecipe(pk);
+    const { fetchRecipe, pk } = this.props;
+    fetchRecipe(pk);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { pk } = this.props;
-    if (nextProps.pk && pk !== nextProps.pk) {
-      this.props.fetchRecipe(nextProps.pk);
+    const { fetchRecipe, pk } = this.props;
+    if (pk !== nextProps.pk) {
+      fetchRecipe(nextProps.pk);
     }
   }
 
