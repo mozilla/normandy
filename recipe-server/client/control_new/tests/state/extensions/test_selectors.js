@@ -1,9 +1,7 @@
-import { fromJS } from 'immutable';
-
 import { getExtension } from 'control_new/state/app/extensions/selectors';
 
 import {
-  EXTENSION,
+  ExtensionFactory,
 } from '.';
 
 import {
@@ -12,19 +10,20 @@ import {
 
 
 describe('getExtension', () => {
+  const extension = new ExtensionFactory();
   const STATE = {
     ...INITIAL_STATE,
     app: {
       ...INITIAL_STATE.app,
       extensions: {
         ...INITIAL_STATE.app.extensions,
-        items: INITIAL_STATE.app.extensions.items.set(EXTENSION.id, fromJS(EXTENSION)),
+        items: INITIAL_STATE.app.extensions.items.set(extension.id, extension.toImmutable()),
       },
     },
   };
 
   it('should return the extension', () => {
-    expect(getExtension(STATE, EXTENSION.id)).toEqual(fromJS(EXTENSION));
+    expect(getExtension(STATE, extension.id)).toEqual(extension.toImmutable());
   });
 
   it('should return `null` for invalid ID', () => {

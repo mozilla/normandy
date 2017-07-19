@@ -1,5 +1,8 @@
 import { Map } from 'immutable';
 
+import Factory from 'control_new/tests/factory';
+import { EXTENSION_SCHEMA } from 'control_new/tests/schemas';
+
 
 export const INITIAL_STATE = {
   items: new Map(),
@@ -7,8 +10,8 @@ export const INITIAL_STATE = {
 };
 
 
-export const EXTENSION = {
-  id: 1,
-  name: 'test-extension',
-  xpi: 'http://path.to/addon.xpi',
-};
+export class ExtensionFactory extends Factory {
+  constructor(defaults = {}) {
+    super(EXTENSION_SCHEMA, defaults);
+  }
+}

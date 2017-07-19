@@ -1,9 +1,7 @@
-import { fromJS } from 'immutable';
-
 import { getApprovalRequest } from 'control_new/state/app/approvalRequests/selectors';
 
 import {
-  APPROVAL_REQUEST,
+  ApprovalRequestFactory,
 } from '.';
 
 import {
@@ -12,6 +10,8 @@ import {
 
 
 describe('getApprovalRequest', () => {
+  const approvalRequest = new ApprovalRequestFactory();
+
   const STATE = {
     ...INITIAL_STATE,
     app: {
@@ -19,14 +19,14 @@ describe('getApprovalRequest', () => {
       approvalRequests: {
         ...INITIAL_STATE.app.approvalRequests,
         items: INITIAL_STATE.app.approvalRequests.items.set(
-          APPROVAL_REQUEST.id, fromJS(APPROVAL_REQUEST),
+          approvalRequest.id, approvalRequest.toImmutable(),
         ),
       },
     },
   };
 
   it('should return the approval request', () => {
-    expect(getApprovalRequest(STATE, APPROVAL_REQUEST.id)).toEqual(fromJS(APPROVAL_REQUEST));
+    expect(getApprovalRequest(STATE, approvalRequest.id)).toEqual(approvalRequest.toImmutable());
   });
 
   it('should return `null` for invalid ID', () => {

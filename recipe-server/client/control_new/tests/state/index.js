@@ -1,4 +1,5 @@
-/* eslint import/prefer-default-export: "off" */
+import Factory from 'control_new/tests/factory';
+import { USER_SCHEMA } from 'control_new/tests/schemas';
 
 import { INITIAL_STATE as actions } from './actions';
 import { INITIAL_STATE as approvalRequests } from './approvalRequests';
@@ -18,3 +19,10 @@ export const INITIAL_STATE = {
     revisions,
   },
 };
+
+
+export class UserFactory extends Factory {
+  constructor(defaults = {}) {
+    super(USER_SCHEMA, defaults);
+  }
+}

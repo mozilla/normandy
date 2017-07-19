@@ -6,6 +6,9 @@ import jsf from 'json-schema-faker';
 jsf.extend('faker', () => faker);
 
 
+jsf.format('iso8601_date', () => faker.date.past(5).toISOString());
+
+
 export default class Factory {
   constructor(schema, defaults = {}) {
     const generated = jsf(schema);
@@ -20,6 +23,10 @@ export default class Factory {
     this._keys.forEach(key => {
       this[key] = data[key];
     });
+
+    if (this.postGeneration) {
+      this.postGeneration();
+    }
   }
 
   toObject() {

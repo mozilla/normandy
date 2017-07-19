@@ -1,5 +1,3 @@
-import { fromJS } from 'immutable';
-
 import {
   EXTENSION_RECEIVE,
 } from 'control_new/state/action-types';
@@ -7,11 +5,13 @@ import extensionsReducer from 'control_new/state/app/extensions/reducers';
 
 import {
   INITIAL_STATE,
-  EXTENSION,
+  ExtensionFactory,
 } from '.';
 
 
 describe('Extensions reducer', () => {
+  const extension = new ExtensionFactory();
+
   it('should return initial state by default', () => {
     expect(extensionsReducer(undefined, {})).toEqual(INITIAL_STATE);
   });
@@ -19,10 +19,10 @@ describe('Extensions reducer', () => {
   it('should handle EXTENSION_RECEIVE', () => {
     expect(extensionsReducer(undefined, {
       type: EXTENSION_RECEIVE,
-      extension: EXTENSION,
+      extension: extension.toObject(),
     })).toEqual({
       ...INITIAL_STATE,
-      items: INITIAL_STATE.items.set(EXTENSION.id, fromJS(EXTENSION)),
+      items: INITIAL_STATE.items.set(extension.id, extension.toImmutable()),
     });
   });
 });
