@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 
 export const INITIAL_STATE = {
   items: new Map(),
+  listing: new Map(),
 };
 
 

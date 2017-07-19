@@ -5,6 +5,7 @@ export const INITIAL_STATE = {
   filters: new Map(),
   history: new Map(),
   items: new Map(),
+  listing: new Map(),
 };
 
 
@@ -23,6 +24,7 @@ export const RECIPE = {
         name: 'test-action',
       },
     },
+    approval_request: null,
   },
   approved_revision: null,
 };

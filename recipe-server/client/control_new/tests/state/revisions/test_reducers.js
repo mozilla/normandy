@@ -29,9 +29,11 @@ describe('Revisions reducer', () => {
         ...REVISION.recipe,
         action_id: REVISION.recipe.action.id,
       },
+      approval_request_id: null,
     };
 
     delete reducedRevision.recipe.action;
+    delete reducedRevision.approval_request;
 
     const updatedState = revisionsReducer(undefined, {
       type: REVISION_RECEIVE,

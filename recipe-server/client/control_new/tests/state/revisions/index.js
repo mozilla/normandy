@@ -15,4 +15,5 @@ export const REVISION = {
       name: 'test-action',
     },
   },
+  approval_request: null,
 };
