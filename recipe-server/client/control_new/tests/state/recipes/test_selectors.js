@@ -17,7 +17,7 @@ import {
 
 import {
   FILTERS,
-  RECIPE,
+  RecipeFactory,
 } from '.';
 
 import {
@@ -25,26 +25,28 @@ import {
 } from '..';
 
 import {
-  REVISION,
+  RevisionFactory,
 } from '../revisions';
 
 
 describe('getRecipe', () => {
+  const recipe = new RecipeFactory();
+
   const STATE = {
     ...INITIAL_STATE,
     app: {
       ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: RECIPE.action,
+        action: recipe.action,
       }),
       recipes: recipesReducer(undefined, {
         type: RECIPE_RECEIVE,
-        recipe: RECIPE,
+        recipe: recipe.toObject(),
       }),
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: RECIPE.latest_revision,
+        revision: recipe.latest_revision,
       }),
     },
   };
@@ -54,7 +56,7 @@ describe('getRecipe', () => {
   });
 
   it('should return the recipe', () => {
-    expect(getRecipe(STATE, RECIPE.id)).toEqualImmutable(fromJS(RECIPE));
+    expect(getRecipe(STATE, recipe.id)).toEqualImmutable(recipe.toImmutable());
   });
 
   it('should return `null` for invalid ID', () => {
@@ -90,24 +92,27 @@ describe('getRecipeFilters', () => {
 
 
 describe('getRecipeHistory', () => {
+  const recipe = new RecipeFactory();
+  const revision = new RevisionFactory();
+
   const STATE = {
     ...INITIAL_STATE,
     app: {
       ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: REVISION.recipe.action,
+        action: revision.recipe.action,
       }),
       recipes: {
         ...INITIAL_STATE.app.recipes,
         history: INITIAL_STATE.app.recipes.history.set(
-          REVISION.recipe.id,
-          fromJS([REVISION.id]),
+          revision.recipe.id,
+          revision.toImmutable(),
         ),
       },
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: RECIPE.latest_revision,
+        revision: recipe.latest_revision,
       }),
     },
   };
@@ -117,6 +122,6 @@ describe('getRecipeHistory', () => {
   });
 
   it('should return the list of revisions', () => {
-    expect(getRecipeHistory(STATE, REVISION.recipe.id)).toEqualImmutable(fromJS([REVISION]));
+    expect(getRecipeHistory(STATE, revision.recipe.id)).toEqualImmutable(revision.toImmutable());
   });
 });

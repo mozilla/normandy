@@ -9,13 +9,19 @@ import revisionsReducer from 'control_new/state/app/revisions/reducers';
 
 import {
   INITIAL_STATE,
-  REVISION,
+  RevisionFactory,
 } from '.';
 
 
 describe('Revisions reducer', () => {
+  const revision = new RevisionFactory();
+
   beforeEach(() => {
     jasmine.addMatchers(matchers);
+  });
+
+  it('should', () => {
+    expect(revision.toObject()).toEqual({});
   });
 
   it('should return initial state by default', () => {
@@ -24,10 +30,10 @@ describe('Revisions reducer', () => {
 
   it('should handle REVISION_RECEIVE', () => {
     const reducedRevision = {
-      ...REVISION,
+      ...revision.toObject(),
       recipe: {
-        ...REVISION.recipe,
-        action_id: REVISION.recipe.action.id,
+        ...revision.recipe,
+        action_id: revision.recipe.action.id,
       },
       approval_request_id: null,
     };
@@ -37,23 +43,23 @@ describe('Revisions reducer', () => {
 
     const updatedState = revisionsReducer(undefined, {
       type: REVISION_RECEIVE,
-      revision: REVISION,
+      revision: revision.toObject(),
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(REVISION.id, fromJS(reducedRevision)),
+      INITIAL_STATE.items.set(revision.id, revision.toImmutable()),
     );
   });
 
   it('should handle RECIPE_DELETE', () => {
     const state = revisionsReducer(undefined, {
       type: REVISION_RECEIVE,
-      revision: REVISION,
+      revision: revision.toObject(),
     });
 
     const updatedState = revisionsReducer(state, {
       type: RECIPE_DELETE,
-      recipeId: REVISION.recipe.id,
+      recipeId: revision.recipe.id,
     });
 
     expect(updatedState).toEqual(INITIAL_STATE);

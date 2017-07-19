@@ -28,10 +28,9 @@ export const DEFAULT_ARGUMENT_SCHEMA = {
 
 export class ActionFactory extends Factory {
   constructor(defaults = {}) {
-    const data = {
+    super(ACTION_SCHEMA, {
       argument_schema: DEFAULT_ARGUMENT_SCHEMA,
       ...defaults,
-    };
-    super(ACTION_SCHEMA, data);
+    });
   }
 }

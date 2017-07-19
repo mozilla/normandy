@@ -1,5 +1,8 @@
 import { Map } from 'immutable';
 
+import Factory from 'control_new/tests/factory';
+import { RECIPE_SCHEMA } from 'control_new/tests/schemas';
+
 
 export const INITIAL_STATE = {
   filters: new Map(),
@@ -8,26 +11,6 @@ export const INITIAL_STATE = {
   listing: new Map(),
 };
 
-
-export const RECIPE = {
-  id: 1,
-  action: {
-    id: 1,
-    name: 'test-action',
-  },
-  latest_revision: {
-    id: '9f86d081',
-    recipe: {
-      id: 1,
-      action: {
-        id: 1,
-        name: 'test-action',
-      },
-    },
-    approval_request: null,
-  },
-  approved_revision: null,
-};
 
 export const FILTERS = {
   status: [
@@ -41,3 +24,17 @@ export const FILTERS = {
     },
   ],
 };
+
+
+export class RecipeFactory extends Factory {
+  constructor(defaults = {}) {
+    super(RECIPE_SCHEMA, defaults);
+  }
+
+  postGeneration() {
+    if (!this.is_approved) {
+      this.approved_revision = null;
+      this.enabled = false;
+    }
+  }
+}

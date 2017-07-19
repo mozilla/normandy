@@ -10,7 +10,7 @@ import revisionsReducer from 'control_new/state/app/revisions/reducers';
 import { getRevision } from 'control_new/state/app/revisions/selectors';
 
 import {
-  REVISION,
+  RevisionFactory,
 } from '.';
 
 import {
@@ -19,17 +19,19 @@ import {
 
 
 describe('getRevision', () => {
+  const revision = new RevisionFactory();
+
   const STATE = {
     ...INITIAL_STATE,
     app: {
       ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: REVISION.recipe.action,
+        action: revision.recipe.action,
       }),
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: REVISION,
+        revision: revision.toObject(),
       }),
     },
   };
@@ -39,7 +41,7 @@ describe('getRevision', () => {
   });
 
   it('should return the revision', () => {
-    expect(getRevision(STATE, REVISION.id)).toEqualImmutable(fromJS(REVISION));
+    expect(getRevision(STATE, revision.id)).toEqualImmutable(revision.toImmutable());
   });
 
   it('should return `null` for invalid ID', () => {

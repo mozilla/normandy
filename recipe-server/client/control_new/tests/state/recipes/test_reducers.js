@@ -12,15 +12,18 @@ import recipesReducer from 'control_new/state/app/recipes/reducers';
 import {
   FILTERS,
   INITIAL_STATE,
-  RECIPE,
+  RecipeFactory,
 } from '.';
 
 import {
-  REVISION,
+  RevisionFactory,
 } from '../revisions';
 
 
 describe('Recipes reducer', () => {
+  const recipe = new RecipeFactory();
+  const revision = new RevisionFactory();
+
   beforeEach(() => {
     jasmine.addMatchers(matchers);
   });
@@ -31,10 +34,10 @@ describe('Recipes reducer', () => {
 
   it('should handle RECIPE_RECEIVE', () => {
     const reducedRecipe = {
-      ...RECIPE,
-      action_id: RECIPE.action.id,
-      latest_revision_id: RECIPE.latest_revision.id,
-      approved_revision_id: null,
+      ...recipe.toObject(),
+      action_id: recipe.action.id,
+      latest_revision_id: recipe.latest_revision.id,
+      approved_revision_id: recipe.approved_revision ? recipe.approved_revision.id : null,
     };
 
     delete reducedRecipe.action;
@@ -43,23 +46,23 @@ describe('Recipes reducer', () => {
 
     const updatedState = recipesReducer(undefined, {
       type: RECIPE_RECEIVE,
-      recipe: RECIPE,
+      recipe: recipe.toObject(),
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(RECIPE.id, fromJS(reducedRecipe)),
+      INITIAL_STATE.items.set(recipe.id, recipe.toImmutable()),
     );
   });
 
   it('should handle RECIPE_DELETE', () => {
     const state = recipesReducer(undefined, {
       type: RECIPE_RECEIVE,
-      recipe: RECIPE,
+      recipe: recipe.toObject(),
     });
 
     const updateState = recipesReducer(state, {
       type: RECIPE_DELETE,
-      recipeId: RECIPE.id,
+      recipeId: recipe.id,
     });
 
     expect(updateState).toEqual(INITIAL_STATE);
@@ -78,11 +81,11 @@ describe('Recipes reducer', () => {
   it('should handle RECIPE_HISTORY_RECEIVE', () => {
     expect(recipesReducer(undefined, {
       type: RECIPE_HISTORY_RECEIVE,
-      recipeId: RECIPE.id,
-      revisions: [REVISION],
+      recipeId: recipe.id,
+      revisions: [revision],
     })).toEqual({
       ...INITIAL_STATE,
-      history: INITIAL_STATE.history.set(RECIPE.id, new List([REVISION.id])),
+      history: INITIAL_STATE.history.set(recipe.id, new List([revision.id])),
     });
   });
 });
