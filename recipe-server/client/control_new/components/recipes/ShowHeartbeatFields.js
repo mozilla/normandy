@@ -3,7 +3,8 @@ import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { connectFormProps, FormItem } from 'control_new/components/common/forms';
+import FormItem from 'control_new/components/forms/FormItem';
+import { connectFormProps } from 'control_new/utils/forms';
 
 
 @connectFormProps

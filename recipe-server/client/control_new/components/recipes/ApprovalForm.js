@@ -5,11 +5,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import FormActions from 'control_new/components/common/FormActions';
-import { createForm, FormItem } from 'control_new/components/common/forms';
+import FormActions from 'control_new/components/forms/FormActions';
+import FormItem from 'control_new/components/forms/FormItem';
 import {
   closeApprovalRequest as closeApprovalRequestAction,
 } from 'control_new/state/approvalRequests/actions';
+import { createForm } from 'control_new/utils/forms';
 
 
 @connect(

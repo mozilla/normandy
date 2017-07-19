@@ -3,7 +3,7 @@ import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { FormItem } from 'control_new/components/common/forms';
+import FormItem from 'control_new/components/forms/FormItem';
 
 
 export default class ConsoleLogFields extends React.Component {
