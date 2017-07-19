@@ -12,6 +12,6 @@ export default class BooleanIcon extends React.Component {
     const { value } = this.props;
     const type = value ? 'check' : 'close';
     const booleanClass = value ? 'is-true' : 'is-false';
-    return <Icon className={`boolean-icon ${booleanClass}`} type={type}/>;
+    return <Icon className={`boolean-icon ${booleanClass}`} type={type} />;
   }
 }
