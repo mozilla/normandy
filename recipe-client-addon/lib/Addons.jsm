@@ -40,7 +40,7 @@ this.Addons = {
     if (!addon) {
       return null;
     }
-    return Addons.serializeForSandbox(addon);
+    return this.serializeForSandbox(addon);
   },
 
   /**
@@ -50,7 +50,7 @@ this.Addons = {
    */
   async getAll(addonId) {
     const addons = await AddonManager.getAllAddons();
-    return addons.map(Addons.serializeForSandbox.bind(this));
+    return addons.map(this.serializeForSandbox.bind(this));
   },
 
   /**
