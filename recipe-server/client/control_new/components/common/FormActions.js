@@ -1,6 +1,7 @@
-import { Spin } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
+
+import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
 
 
 /**
@@ -18,12 +19,11 @@ import React from 'react';
  * </FormActions>
  */
 export default function FormActions({ children, isLoading }) {
-  const Wrapper = isLoading ? Spin : 'span';
   return (
     <div className="form-actions">
-      <Wrapper>
+      <SimpleLoadingOverlay isVisible={isLoading}>
         {children}
-      </Wrapper>
+      </SimpleLoadingOverlay>
     </div>
   );
 }

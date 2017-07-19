@@ -1,4 +1,4 @@
-import { message, Button, Icon, Dropdown, Menu } from 'antd';
+import { message } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -41,14 +41,6 @@ export default class EditRecipePage extends React.Component {
     recipe: null,
   };
 
-  static ActionMenu = (
-    <Menu>
-      <Menu.Item>
-        <a href="clone">Clone Recipe</a>
-      </Menu.Item>
-    </Menu>
-  );
-
   state = {
     formErrors: undefined,
   };
@@ -87,13 +79,6 @@ export default class EditRecipePage extends React.Component {
         <QueryRecipe pk={recipeId} />
         <SimpleLoadingOverlay isVisible={!recipeName}>
           <h2>Edit Recipe</h2>
-
-          {
-            recipeName &&
-            <Dropdown overlay={EditRecipePage.ActionMenu} placement="bottomRight" trigger={['click']}>
-              <Button className="action-button"><Icon type="setting" /></Button>
-            </Dropdown>
-          }
 
           <RecipeForm
             recipe={recipe}

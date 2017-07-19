@@ -34,6 +34,10 @@ const routes = {
         '/rev/:revisionId': {
           component: RecipeDetailPage,
           crumb: 'Revision',
+          '/clone': {
+            component: CloneRecipePage,
+            crumb: 'Clone Revision',
+          },
         },
         '/edit': {
           component: EditRecipePage,

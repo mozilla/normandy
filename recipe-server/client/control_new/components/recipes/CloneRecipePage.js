@@ -11,16 +11,22 @@ import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
 import { createRecipe as createAction } from 'control_new/state/recipes/actions';
-import { getRecipe } from 'control_new/state/recipes/selectors';
-import { getRouterParamAsInt } from 'control_new/state/router/selectors';
+import { getRecipeFromURL } from 'control_new/state/recipes/selectors';
 
 @connect(
   state => {
-    const recipeId = getRouterParamAsInt(state, 'recipeId');
+    const {
+      isLatestRevision,
+      recipe,
+      recipeId,
+      revisionId,
+    } = getRecipeFromURL(state);
 
     return {
+      isLatestRevision,
+      recipe,
       recipeId,
-      recipe: getRecipe(state, recipeId, new Map()),
+      revisionId,
     };
   },
   {
@@ -32,12 +38,15 @@ import { getRouterParamAsInt } from 'control_new/state/router/selectors';
 export default class CloneRecipePage extends React.Component {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
+    isLatestRevision: PropTypes.bool,
     recipeId: PropTypes.number.isRequired,
     recipe: PropTypes.instanceOf(Map),
+    revisionId: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
     recipe: null,
+    isLatestRevision: false,
   };
 
   state = {
@@ -71,12 +80,18 @@ export default class CloneRecipePage extends React.Component {
   }
 
   render() {
-    const { recipe, recipeId } = this.props;
-
+    const { recipe, recipeId, isLatestRevision, revisionId } = this.props;
     const recipeName = recipe.get('name');
 
     // Remove the 'name' field value.
     const displayedRecipe = recipe.set('name');
+
+    // URL and text for the "Cloning this from [a recipe]" link
+    const originalRecipeURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}`;
+
+    // Only display revision hash if we're _not_ on the latest version.
+    const revisionAddendum = isLatestRevision ? '' : `(revision ${revisionId.slice(0, 7)}...)`;
+    const originalRecipeText = `"${recipeName}" ${revisionAddendum}`;
 
     return (
       <div className="clone-page">
@@ -85,7 +100,8 @@ export default class CloneRecipePage extends React.Component {
           <h2>New Recipe</h2>
           { recipeName &&
             <h3>
-              Cloning recipe values from <Link href={`/recipe/${recipeId}`}>&quot;{ recipeName }&quot;</Link>
+              {'Cloning recipe values from '}
+              <Link href={originalRecipeURL}>{originalRecipeText}</Link>
             </h3>
           }
 

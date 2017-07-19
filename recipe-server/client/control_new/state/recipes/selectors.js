@@ -2,7 +2,8 @@ import { List, Map } from 'immutable';
 
 import { getAction } from 'control_new/state/actions/selectors';
 import { DEFAULT_RECIPE_LISTING_COLUMNS } from 'control_new/state/constants';
-import { getRevision } from 'control_new/state/revisions/selectors';
+import { getRevision, getRecipeForRevision } from 'control_new/state/revisions/selectors';
+import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 export function getRecipe(state, id, defaultsTo = null) {
   const recipe = state.app.recipes.items.get(id);
@@ -89,4 +90,31 @@ export function getApprovedRevisionIdForRecipe(state, id, defaultsTo = null) {
 export function getRecipeApprovalHistory(state, id) {
   const history = getRecipeHistory(state, id);
   return history.filter(revision => revision.get('approval_request'));
+}
+
+export function getRecipeFromURL(state) {
+  // Get recipe.
+  const recipeId = getUrlParamAsInt(state, 'recipeId');
+  const storedRecipe = getRecipe(state, recipeId, new Map());
+
+  // Get revision id, if provided.
+  const revisionParam = getUrlParam(state, 'revisionId', null);
+  const hasRevisionParam = revisionParam !== null;
+  const latestRevisionId = storedRecipe.getIn(['latest_revision', 'id']);
+
+  // If a revision id was given, use that, else use the `latest_revision.id` from the recipe.
+  const selectedRevisionId = hasRevisionParam ? revisionParam : latestRevisionId;
+
+  // Get the actual recipe values for returning.
+  const recipe = getRecipeForRevision(state, selectedRevisionId, new Map());
+
+  // Utility boolean.
+  const isLatestRevision = !hasRevisionParam || selectedRevisionId === latestRevisionId;
+
+  return {
+    isLatestRevision,
+    revisionId: selectedRevisionId,
+    recipeId,
+    recipe,
+  };
 }
