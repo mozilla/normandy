@@ -22,6 +22,9 @@ window.InfoBox = class InfoBox extends React.Component {
     );
   }
 };
+InfoBox.propTypes = {
+  children: PropTypes.node,
+};
 
 /**
  * Button using in-product styling.
@@ -36,6 +39,9 @@ window.FxButton = class FxButton extends React.Component {
       )
     );
   }
+};
+FxButton.propTypes = {
+  children: PropTypes.node,
 };
 
 /**

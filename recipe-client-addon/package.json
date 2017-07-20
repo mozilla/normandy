@@ -9,6 +9,8 @@
   "scripts": {
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
+    "lint": "npm run lint-js; npm run lint-css;",
+    "lint-js": "eslint lib content bootstrap.js webpack.config.js || true",
     "lint-css": "stylelint '**/*.css' --config .stylelintrc || true"
   },
   "devDependencies": {
@@ -16,6 +18,7 @@
     "eslint": "3.19.0",
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-mozilla": "0.3.2",
+    "eslint-plugin-react": "^7.1.0",
     "license-webpack-plugin": "0.5.1",
     "stylelint": "7.6.0",
     "stylelint-config-standard": "15.0.0",

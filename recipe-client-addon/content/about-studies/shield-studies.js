@@ -124,3 +124,10 @@ class StudyListItem extends React.Component {
     );
   }
 }
+StudyListItem.propTypes = {
+  study: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    active: PropTypes.boolean,
+    description: PropTypes.string.isRequired,
+  }).isRequired,
+};

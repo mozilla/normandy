@@ -82,6 +82,9 @@ class Sidebar extends React.Component {
     return r("ul", {id: "categories"}, this.props.children);
   }
 }
+Sidebar.propTypes = {
+  children: PropTypes.node,
+};
 
 class SidebarItem extends React.Component {
   constructor(props) {
@@ -106,6 +109,14 @@ class SidebarItem extends React.Component {
     );
   }
 }
+SidebarItem.propTypes = {
+  pageId: PropTypes.string.isRequired,
+  page: PropTypes.shape({
+    icon: PropTypes.string,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  selected: PropTypes.bool,
+};
 
 class Content extends React.Component {
   render() {
@@ -118,6 +129,9 @@ class Content extends React.Component {
     );
   }
 }
+Content.propTypes = {
+  children: PropTypes.node,
+};
 
 ReactDOM.render(
   r(AboutStudies),

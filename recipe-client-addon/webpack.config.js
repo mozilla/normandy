@@ -11,7 +11,7 @@ module.exports = {
     ajv: "./node_modules/ajv/",
     classnames: "./node_modules/classnames/",
     mozjexl: "./node_modules/mozjexl/",
-    "prop-types": "./node_modules/prop-types/",
+    PropTypes: "./node_modules/prop-types/",
     React: "./node_modules/react/",
     ReactDOM: "./node_modules/react-dom/",
   },
