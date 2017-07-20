@@ -29,6 +29,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
                                   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ActionSandboxManager",
                                   "resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "StudyStorage",
+                                  "resource://shield-recipe-client/lib/StudyStorage.jsm");
 
 Cu.importGlobalProperties(["fetch"]);
 
@@ -181,6 +183,9 @@ this.RecipeRunner = {
 
     // Nuke sandboxes
     Object.values(actionSandboxManagers).forEach(manager => manager.removeHold("recipeRunner"));
+
+    // Close storage connections
+    await StudyStorage.close();
   },
 
   async loadActionSandboxManagers() {
