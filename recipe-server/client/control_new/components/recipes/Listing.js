@@ -1,10 +1,10 @@
 import { Pagination, Table } from 'antd';
 import autobind from 'autobind-decorator';
+import { List } from 'immutable';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
@@ -13,50 +13,53 @@ import QueryRecipeListingColumns from 'control_new/components/data/QueryRecipeLi
 import QueryRecipes from 'control_new/components/data/QueryRecipes';
 import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
-import * as recipeActions from 'control_new/state/recipes/actions';
+import {
+  fetchFilteredRecipesPage as fetchFilteredRecipesPageAction,
+} from 'control_new/state/recipes/actions';
 import {
   getRecipeListingColumns,
   getRecipeListingCount,
   getRecipeListingFlattenedAction,
 } from 'control_new/state/recipes/selectors';
-import * as routerSelectors from 'control_new/state/router/selectors';
+import {
+  getCurrentURL as getCurrentURLSelector,
+  getQueryParam,
+  getQueryParamAsInt,
+} from 'control_new/state/router/selectors';
 
 
 @connect(
   state => ({
     columns: getRecipeListingColumns(state),
     count: getRecipeListingCount(state),
-    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
-    ordering: routerSelectors.getQueryParam(state, 'ordering', '-last_updated'),
-    pageNumber: routerSelectors.getQueryParamAsInt(state, 'page', 1),
+    getCurrentURL: queryParams => getCurrentURLSelector(state, queryParams),
+    ordering: getQueryParam(state, 'ordering', '-last_updated'),
+    pageNumber: getQueryParamAsInt(state, 'page', 1),
     recipes: getRecipeListingFlattenedAction(state),
-    searchText: routerSelectors.getQueryParam(state, 'searchText'),
-    status: routerSelectors.getQueryParam(state, 'status'),
+    searchText: getQueryParam(state, 'searchText'),
+    status: getQueryParam(state, 'status'),
   }),
-  dispatch => (
-    bindActionCreators({
-      fetchFilteredRecipesPage: recipeActions.fetchFilteredRecipesPage,
-      push: pushAction,
-    }, dispatch)
-  ),
+  {
+    fetchFilteredRecipesPage: fetchFilteredRecipesPageAction,
+    push: pushAction,
+  },
 )
 @autobind
 export default class Listing extends React.Component {
   static propTypes = {
-    columns: PropTypes.object,
+    columns: PropTypes.instanceOf(List).isRequired,
     count: PropTypes.number,
     fetchFilteredRecipesPage: PropTypes.func.isRequired,
     getCurrentURL: PropTypes.func.isRequired,
     ordering: PropTypes.string,
     pageNumber: PropTypes.number,
     push: PropTypes.func.isRequired,
-    recipes: PropTypes.object.isRequired,
+    recipes: PropTypes.instanceOf(List).isRequired,
     searchText: PropTypes.string,
     status: PropTypes.string,
   };
 
   static defaultProps = {
-    columns: null,
     count: null,
     ordering: null,
     pageNumber: null,

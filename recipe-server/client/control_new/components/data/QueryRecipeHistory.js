@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
-import * as recipeActions from 'control_new/state/recipes/actions';
+import {
+  fetchRecipeHistory as fetchRecipeHistoryAction,
+} from 'control_new/state/recipes/actions';
 
 @connect(
   null,
-  dispatch => (bindActionCreators({
-    fetchRecipeHistory: recipeActions.fetchRecipeHistory,
-  }, dispatch)),
+  {
+    fetchRecipeHistory: fetchRecipeHistoryAction,
+  },
 )
 export default class QueryRecipeHistory extends React.Component {
   static propTypes = {

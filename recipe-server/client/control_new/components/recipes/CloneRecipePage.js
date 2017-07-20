@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { Alert, message } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -9,6 +9,7 @@ import { Link, push as pushAction } from 'redux-little-router';
 import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
+import QueryRevision from 'control_new/components/data/QueryRevision';
 
 import { createRecipe as createAction } from 'control_new/state/recipes/actions';
 
@@ -86,23 +87,23 @@ export default class CloneRecipePage extends React.Component {
     // Remove the 'name' field value.
     const displayedRecipe = recipe.set('name');
 
-    // URL and text for the "Cloning this from [a recipe]" link
-    const originalRecipeURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}`;
+    const recipeDetailsURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}`;
 
     // Only display revision hash if we're _not_ on the latest version.
-    const revisionAddendum = isLatestRevision ? '' : `(revision ${revisionId.slice(0, 7)}...)`;
-    const originalRecipeText = `"${recipeName}" ${revisionAddendum}`;
+    const revisionAddendum = isLatestRevision ? '' : `(Revision: ${revisionId.slice(0, 7)})`;
+    const cloningMessage = `Cloning recipe values from "${recipeName}" ${revisionAddendum}`;
 
     return (
       <div className="clone-page">
         <QueryRecipe pk={recipeId} />
+        <QueryRevision pk={revisionId} />
+
         <SimpleLoadingOverlay isVisible={!recipeName}>
           <h2>Clone Recipe</h2>
           { recipeName &&
-            <h3>
-              {'Cloning recipe values from '}
-              <Link href={originalRecipeURL}>{originalRecipeText}</Link>
-            </h3>
+            <Link href={recipeDetailsURL}>
+              <Alert message={cloningMessage} type="info" showIcon />
+            </Link>
           }
 
           <RecipeForm

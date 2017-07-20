@@ -7,11 +7,10 @@ import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 
 import DevTools from 'control_new/components/devtools';
-import {
+import Router, {
   enhancer as routerEnhancer,
   middleware as routerMiddleware,
   reducer as routerReducer,
-  Router,
 } from 'control_new/routes';
 import applicationState from 'control_new/state';
 

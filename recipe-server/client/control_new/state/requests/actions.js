@@ -8,11 +8,12 @@ import {
   REQUEST_SUCCESS,
 } from 'control_new/state/action-types';
 
-import apiFetch from 'control_new/utils/apiFetch';
+import APIClient from 'control_new/utils/api';
 
 
 export function makeApiRequest(requestId, endpoint, options = {}) {
   return async (dispatch, getState) => {
+    const api = new APIClient();
     const request = getRequest(getState(), requestId);
 
     if (request.inProgress) { return true; }
@@ -25,7 +26,7 @@ export function makeApiRequest(requestId, endpoint, options = {}) {
     let data;
 
     try {
-      data = await apiFetch(endpoint, options);
+      data = await api.fetch(endpoint, options);
     } catch (error) {
       dispatch({
         type: REQUEST_FAILURE,

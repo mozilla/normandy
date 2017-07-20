@@ -1,16 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
-import * as extensionActions from 'control_new/state/extensions/actions';
+import {
+  fetchExtensionsPage as fetchExtensionsPageAction,
+} from 'control_new/state/extensions/actions';
 
 
 @connect(
   null,
-  dispatch => (bindActionCreators({
-    fetchExtensionsPage: extensionActions.fetchExtensionsPage,
-  }, dispatch)),
+  {
+    fetchExtensionsPage: fetchExtensionsPageAction,
+  },
 )
 export default class QueryMultipleExtensions extends React.Component {
   static propTypes = {

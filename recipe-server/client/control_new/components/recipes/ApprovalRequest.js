@@ -8,7 +8,10 @@ import { connect } from 'react-redux';
 
 import ApprovalForm from 'control_new/components/recipes/ApprovalForm';
 import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
-import * as approvalRequestActions from 'control_new/state/approvalRequests/actions';
+import {
+  approvalApprovalRequest as approveApprovalRequestAction,
+  rejectApprovalRequest as rejectApprovalRequestAction,
+} from 'control_new/state/approvalRequests/actions';
 import {
   getRecipeForRevision,
   isRevisionPendingApproval,
@@ -22,8 +25,8 @@ import {
     isPendingApproval: isRevisionPendingApproval(state, revision.get('id')),
   }),
   {
-    approveApprovalRequest: approvalRequestActions.approveApprovalRequest,
-    rejectApprovalRequest: approvalRequestActions.rejectApprovalRequest,
+    approveApprovalRequest: approveApprovalRequestAction,
+    rejectApprovalRequest: rejectApprovalRequestAction,
   },
 )
 @autobind

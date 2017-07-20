@@ -1,30 +1,30 @@
 import { Table } from 'antd';
 import autobind from 'autobind-decorator';
+import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 import { isEmpty, mapObject } from 'underscore';
 
-import * as routerSelectors from 'control_new/state/router/selectors';
+import {
+  getCurrentURL as getCurrentURLSelector,
+} from 'control_new/state/router/selectors';
 
 
 @connect(
   state => ({
-    getCurrentURL: queryParams => routerSelectors.getCurrentURL(state, queryParams),
+    getCurrentURL: queryParams => getCurrentURLSelector(state, queryParams),
   }),
-  dispatch => (
-    bindActionCreators({
-      push: pushAction,
-    }, dispatch)
-  ),
+  {
+    push: pushAction,
+  },
 )
 @autobind
 export default class DataList extends React.Component {
   static propTypes = {
     columnRenderers: PropTypes.object.isRequired,
-    columns: PropTypes.object.isRequired,
+    columns: PropTypes.instanceOf(List).isRequired,
     dataSource: PropTypes.array.isRequired,
     getCurrentURL: PropTypes.func.isRequired,
     ordering: PropTypes.string,
