@@ -62,9 +62,9 @@ export default class EditRecipePage extends React.Component {
         'Recipe cannot be saved. Please correct any errors listed in the form below.',
       );
 
-      if (error && error.data) {
+      if (error) {
         this.setState({
-          formErrors: error.data,
+          formErrors: error.data || error,
         });
       }
     }
@@ -72,12 +72,14 @@ export default class EditRecipePage extends React.Component {
 
   render() {
     const { recipe, recipeId } = this.props;
+    const recipeName = recipe.get('name');
 
     return (
-      <div>
+      <div className="edit-page">
         <QueryRecipe pk={recipeId} />
-        <SimpleLoadingOverlay condition={!recipe.get('name')}>
+        <SimpleLoadingOverlay isVisible={!recipeName}>
           <h2>Edit Recipe</h2>
+
           <RecipeForm
             recipe={recipe}
             onSubmit={this.handleSubmit}

@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
+
 
 /**
  * Container for buttons displayed at the bottom of a form.
@@ -16,18 +18,22 @@ import React from 'react';
  *   </FormActions.Secondary>
  * </FormActions>
  */
-export default function FormActions({ children }) {
+export default function FormActions({ children, isLoading }) {
   return (
     <div className="form-actions">
-      {children}
+      <SimpleLoadingOverlay isVisible={isLoading}>
+        {children}
+      </SimpleLoadingOverlay>
     </div>
   );
 }
 FormActions.propTypes = {
   children: PropTypes.node,
+  isLoading: PropTypes.bool,
 };
 FormActions.defaultProps = {
   children: null,
+  isLoading: false,
 };
 
 /**
