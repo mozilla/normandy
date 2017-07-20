@@ -102,7 +102,7 @@ export default class CloneRecipePage extends React.Component {
           <h2>Clone Recipe</h2>
           { recipeName &&
             <Link href={recipeDetailsURL}>
-              <Alert message={cloningMessage} type="info" />
+              <Alert message={cloningMessage} type="info" showIcon />
             </Link>
           }
 
