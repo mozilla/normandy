@@ -24,7 +24,7 @@ export default class QueryExtension extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { pk } = this.props;
-    if (nextProps.pk && pk !== nextProps.pk) {
+    if (pk !== nextProps.pk) {
       this.props.fetchExtension(nextProps.pk);
     }
   }
