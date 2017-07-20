@@ -149,6 +149,11 @@ this.StudyStorage = {
     return study;
   },
 
+  async getAll() {
+    const db = await getDatabase();
+    return getStore(db).getAll();
+  },
+
   async create(study) {
     if (!validateCreate(study)) {
       throw new Error(

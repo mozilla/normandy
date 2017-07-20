@@ -3,3 +3,4 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 resource shield-recipe-client .
+content shield-recipe-client ./content/ contentaccessible=yes

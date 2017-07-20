@@ -24,6 +24,11 @@
   },
   "dependencies": {
     "ajv": "5.2.1",
-    "mozjexl": "1.1.5"
+    "mozjexl": "1.1.5",
+    "classnames": "2.2.5",
+    "mozjexl": "1.1.5",
+    "prop-types": "15.5.10",
+    "react": "15.6.1",
+    "react-dom": "15.6.1"
   }
 }

@@ -17,6 +17,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
   "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AboutPages",
+  "chrome://shield-recipe-client/content/AboutPages.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -62,6 +64,12 @@ this.ShieldRecipeClient = {
       () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure),
     );
     log = LogManager.getLogger("bootstrap");
+
+    try {
+      await AboutPages.init();
+    } catch (err) {
+      log.error("Failed to initialize about pages:", err);
+    }
 
     // Initialize experiments first to avoid a race between initializing prefs
     // and recipes rolling back pref changes when experiments end.
