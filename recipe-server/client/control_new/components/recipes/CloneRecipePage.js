@@ -11,16 +11,21 @@ import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
 import { createRecipe as createAction } from 'control_new/state/recipes/actions';
-import { getRecipeFromURL } from 'control_new/state/recipes/selectors';
+
+import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
+import {
+  getRecipeForRevision,
+  isLatestRevision as isLatestRevisionSelector,
+} from 'control_new/state/revisions/selectors';
+import { getLatestRevisionIdForRecipe } from 'control_new/state/recipes/selectors';
 
 @connect(
   state => {
-    const {
-      isLatestRevision,
-      recipe,
-      recipeId,
-      revisionId,
-    } = getRecipeFromURL(state);
+    const recipeId = getUrlParamAsInt(state, 'recipeId');
+    const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
+    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
+    const recipe = getRecipeForRevision(state, revisionId, new Map());
+    const isLatestRevision = isLatestRevisionSelector(state, revisionId);
 
     return {
       isLatestRevision,
@@ -38,15 +43,10 @@ import { getRecipeFromURL } from 'control_new/state/recipes/selectors';
 export default class CloneRecipePage extends React.Component {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
-    isLatestRevision: PropTypes.bool,
+    isLatestRevision: PropTypes.bool.isRequired,
     recipeId: PropTypes.number.isRequired,
-    recipe: PropTypes.instanceOf(Map),
+    recipe: PropTypes.instanceOf(Map).isRequired,
     revisionId: PropTypes.string.isRequired,
-  };
-
-  static defaultProps = {
-    recipe: null,
-    isLatestRevision: false,
   };
 
   state = {
@@ -97,7 +97,7 @@ export default class CloneRecipePage extends React.Component {
       <div className="clone-page">
         <QueryRecipe pk={recipeId} />
         <SimpleLoadingOverlay isVisible={!recipeName}>
-          <h2>New Recipe</h2>
+          <h2>Clone Recipe</h2>
           { recipeName &&
             <h3>
               {'Cloning recipe values from '}
