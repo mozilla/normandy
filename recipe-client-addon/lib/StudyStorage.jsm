@@ -126,9 +126,10 @@ this.StudyStorage = {
 
   async close() {
     if (databasePromise) {
-      const db = await databasePromise;
-      await db.close();
+      const promise = databasePromise;
       databasePromise = null;
+      const db = await promise;
+      await db.close();
     }
   },
 
@@ -156,7 +157,7 @@ this.StudyStorage = {
     }
 
     const db = await getDatabase();
-    if (getStore(db).get(study.name)) {
+    if (await getStore(db).get(study.name)) {
       throw new Error(
         `Cannot create study with name ${study.name}: a study exists with that name already.`,
       );
