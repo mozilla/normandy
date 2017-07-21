@@ -23,8 +23,7 @@ this.shutdown = function(data, reason) {
   // Unload add-on modules. We don't do this in ShieldRecipeClient so that
   // modules are not unloaded accidentally during tests.
   const log = LogManager.getLogger("bootstrap");
-  const modules = [
-    "content/AboutPages.jsm",
+  let modules = [
     "lib/ActionSandboxManager.jsm",
     "lib/CleanupManager.jsm",
     "lib/ClientEnvironment.jsm",
@@ -44,10 +43,14 @@ this.shutdown = function(data, reason) {
     "lib/Uptake.jsm",
     "lib/Utils.jsm",
     "vendor/mozjexl.js",
-  ];
+  ].map(m => `resource://shield-recipe-client/${m}`);
+  modules = modules.concat([
+    "AboutPages.jsm",
+  ].map(m => `resource://shield-recipe-client-content/${m}`));
+
   for (const module of modules) {
     log.debug(`Unloading ${module}`);
-    Cu.unload(`resource://shield-recipe-client/${module}`);
+    Cu.unload(module);
   }
 };
 
