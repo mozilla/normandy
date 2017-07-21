@@ -20,7 +20,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
-  this, "AboutPages", "chrome://shield-recipe-client/content/AboutPages.jsm",
+  this, "AboutPages", "resource://shield-recipe-client/content/AboutPages.jsm",
 );
 
 /**

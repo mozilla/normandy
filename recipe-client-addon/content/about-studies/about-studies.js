@@ -14,7 +14,7 @@ const PAGES = new Map([
   ["shieldStudies", {
     name: "Shield Studies",
     component: ShieldStudies,
-    icon: "chrome://shield-recipe-client/content/about-studies/img/shield-logo.png",
+    icon: "resource://shield-recipe-client/content/about-studies/img/shield-logo.png",
   }],
 ]);
 

@@ -19,10 +19,10 @@ this.EXPORTED_SYMBOLS = ["AboutPages"];
 // Due to bug 1051238 frame scripts are cached forever, so we can't update them
 // as a restartless add-on. The Math.random() is the work around for this.
 const PROCESS_SCRIPT = (
-  `chrome://shield-recipe-client/content/shield-content-process.js?${Math.random()}`
+  `resource://shield-recipe-client/content/shield-content-process.js?${Math.random()}`
 );
 const FRAME_SCRIPT = (
-  `chrome://shield-recipe-client/content/shield-content-frame.js?${Math.random()}`
+  `resource://shield-recipe-client/content/shield-content-frame.js?${Math.random()}`
 );
 
 /**
@@ -121,7 +121,7 @@ this.AboutPages = {
  */
 XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
   const aboutStudies = new AboutPage({
-    chromeUrl: "chrome://shield-recipe-client/content/about-studies/about-studies.html",
+    chromeUrl: "resource://shield-recipe-client/content/about-studies/about-studies.html",
     aboutHost: "studies",
     classId: "{6ab96943-a163-482c-9622-4faedc0e827f}",
     description: "Shield Study Listing",
