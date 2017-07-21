@@ -34,6 +34,20 @@ add_task(withStudyStorage(async function testCreateGet(storage) {
   ok(storedStudy.active, "Create defaults the study to active.");
 }));
 
+add_task(withStudyStorage(async function testCreateGetAll(storage) {
+  const study1 = studyFactory({name: "test-study1"});
+  const study2 = studyFactory({name: "test-study2"});
+  await storage.create(study1);
+  await storage.create(study2);
+
+  const storedStudies = await storage.getAll();
+  Assert.deepEqual(
+    new Set(storedStudies),
+    new Set([study1, study2]),
+    "StudyStorage.getAll returns every stored study.",
+  );
+}));
+
 add_task(withStudyStorage(async function testCreateExists(storage) {
   const study = studyFactory({name: "test-study"});
   await storage.create(study);
