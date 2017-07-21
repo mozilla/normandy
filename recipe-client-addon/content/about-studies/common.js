@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
+/* global PropTypes React */
 
 /**
  * Shorthand for creating elements (to avoid using a JSX preprocessor)
@@ -22,7 +23,7 @@ window.InfoBox = class InfoBox extends React.Component {
     );
   }
 };
-InfoBox.propTypes = {
+window.InfoBox.propTypes = {
   children: PropTypes.node,
 };
 
@@ -40,7 +41,7 @@ window.FxButton = class FxButton extends React.Component {
     );
   }
 };
-FxButton.propTypes = {
+window.FxButton.propTypes = {
   children: PropTypes.node,
 };
 

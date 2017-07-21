@@ -8,4 +8,5 @@
   data/ (./data/*)
   skin/  (skin/*)
   vendor/ (./vendor/*)
+% resource shield-recipe-client-content %content/
   content/ (./content/*)

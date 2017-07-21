@@ -16,11 +16,15 @@
 /* global content addMessageListener removeMessageListener sendAsyncMessage */
 
 const { utils: Cu } = Components;
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
+const frameGlobal = {};
 XPCOMUtils.defineLazyModuleGetter(
-  this, "AboutPages", "resource://shield-recipe-client/content/AboutPages.jsm",
+  frameGlobal, "AboutPages", "resource://shield-recipe-client-content/AboutPages.jsm",
 );
+
+const USE_OLD_PREF_ORGANIZATION_PREF = "browser.preferences.useOldOrganization";
 
 /**
  * Handles incoming events from the parent process and about:studies.
@@ -34,8 +38,8 @@ class ShieldFrameListener {
       return;
     }
 
-    // Delay registering message listeners until after we've received an event
-    // from about:studies to save resources for tabs that don't ever load it.
+    // We waited until after we received an event to register message listeners
+    // in order to save resources for tabs that don't ever load about:studies.
     addMessageListener("Shield:ShuttingDown", this);
     addMessageListener("Shield:ReceiveStudyList", this);
 
@@ -47,16 +51,15 @@ class ShieldFrameListener {
       case "RemoveStudy":
         sendAsyncMessage("Shield:RemoveStudy", event.detail.data);
         break;
-
       // Actions that can be performed in the content process
       case "GetRemoteValue:ShieldLearnMoreHref":
         this.triggerPageCallback(
           "ReceiveRemoteValue:ShieldLearnMoreHref",
-          AboutPages.aboutStudies.getShieldLearnMoreHref()
+          frameGlobal.AboutPages.aboutStudies.getShieldLearnMoreHref()
         );
         break;
       case "NavigateToDataPreferences":
-        content.location = "about:preferences#privacy-reports";
+        this.navigateToDataPreferences();
         break;
     }
   }
@@ -108,6 +111,19 @@ class ShieldFrameListener {
     removeMessageListener("Shield:SendStudyList", this);
     removeMessageListener("Shield:ShuttingDown", this);
     removeEventListener("Shield", this);
+  }
+
+  navigateToDataPreferences() {
+    if (Services.prefs.getBoolPref(USE_OLD_PREF_ORGANIZATION_PREF)) {
+      content.location = "about:preferences#advanced";
+      addEventListener("load", () => {
+        const tabbox = content.document.getElementById("advancedPrefs");
+        const tab = content.document.getElementById("dataChoicesTab");
+        tabbox.selectedTab = tab;
+      }, {once: true});
+    } else {
+      content.location = "about:preferences#privacy-reports";
+    }
   }
 }
 

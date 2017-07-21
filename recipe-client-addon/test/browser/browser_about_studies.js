@@ -1,16 +1,13 @@
 "use strict";
 
-Cu.import("resource://shield-recipe-client/content/AboutPages.jsm", this);
+Cu.import("resource://shield-recipe-client-content/AboutPages.jsm", this);
 
 function withAboutStudies(testFunc) {
-  return async function inner(...args) {
-    return BrowserTestUtils.withNewTab(
-      {gBrowser, url: "about:studies"},
-      async function newTabInner(browser) {
-        return testFunc(...args, browser);
-      }
-    );
-  };
+  return async (...args) => (
+    BrowserTestUtils.withNewTab("about:studies", async browser => (
+      testFunc(...args, browser)
+    ))
+  );
 }
 
 function getStudyRow(doc, studyName) {
@@ -44,8 +41,11 @@ compose_task(
 );
 
 compose_task(
+  withPrefEnv({
+    set: [["browser.preferences.useOldOrganization", false]],
+  }),
   withAboutStudies,
-  async function testUpdatePreferences(browser) {
+  async function testUpdatePreferencesNewOrganization(browser) {
     browser.contentDocument.getElementById("shield-studies-update-preferences").click();
     await BrowserTestUtils.waitForLocationChange(gBrowser);
 
@@ -53,7 +53,32 @@ compose_task(
     is(
       location,
       "about:preferences#privacy-reports",
-      "Clicking Update Preferences opens the privacy section of about:prefernces.",
+      "Clicking Update Preferences opens the privacy section of the new about:prefernces.",
+    );
+  }
+);
+
+compose_task(
+  withPrefEnv({
+    set: [["browser.preferences.useOldOrganization", true]],
+  }),
+  withAboutStudies,
+  async function testUpdatePreferencesOldOrganization(browser) {
+    browser.contentDocument.getElementById("shield-studies-update-preferences").click();
+    await BrowserTestUtils.waitForLocationChange(gBrowser);
+    await BrowserTestUtils.waitForEvent(browser.contentWindow, "load");
+
+    const location = browser.contentWindow.location.href;
+    is(
+      location,
+      "about:preferences#advanced",
+      "Clicking Update Preferences opens the advanced section of the old about:prefernces.",
+    );
+
+    const dataChoicesTab = browser.contentDocument.getElementById("dataChoicesTab");
+    ok(
+      dataChoicesTab.selected,
+      "Click Update preferences selects the Data Choices tab in the old about:preferences."
     );
   }
 );
@@ -85,7 +110,7 @@ compose_task(
     await storage.create(study2);
     await storage.create(study3);
 
-    await BrowserTestUtils.withNewTab({gBrowser, url: "about:studies"}, async browser => {
+    await BrowserTestUtils.withNewTab("about:studies", async browser => {
       const doc = browser.contentDocument;
 
       await BrowserTestUtils.waitForCondition(() => doc.querySelectorAll(".study-list .study").length);

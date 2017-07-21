@@ -21,10 +21,10 @@ const SHIELD_LEARN_MORE_URL_PREF = "extensions.shield-recipe-client.shieldLearnM
 // Due to bug 1051238 frame scripts are cached forever, so we can't update them
 // as a restartless add-on. The Math.random() is the work around for this.
 const PROCESS_SCRIPT = (
-  `resource://shield-recipe-client/content/shield-content-process.js?${Math.random()}`
+  `resource://shield-recipe-client-content/shield-content-process.js?${Math.random()}`
 );
 const FRAME_SCRIPT = (
-  `resource://shield-recipe-client/content/shield-content-frame.js?${Math.random()}`
+  `resource://shield-recipe-client-content/shield-content-frame.js?${Math.random()}`
 );
 
 /**
@@ -123,7 +123,7 @@ this.AboutPages = {
  */
 XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
   const aboutStudies = new AboutPage({
-    chromeUrl: "resource://shield-recipe-client/content/about-studies/about-studies.html",
+    chromeUrl: "resource://shield-recipe-client-content/about-studies/about-studies.html",
     aboutHost: "studies",
     classId: "{6ab96943-a163-482c-9622-4faedc0e827f}",
     description: "Shield Study Listing",
@@ -198,9 +198,7 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
     },
 
     getShieldLearnMoreHref() {
-      return Services.urlFormatter.formatURL(
-        Services.prefs.getCharPref(SHIELD_LEARN_MORE_URL_PREF)
-      );
+      return Services.urlFormatter.formatURLPref(SHIELD_LEARN_MORE_URL_PREF);
     },
   });
 

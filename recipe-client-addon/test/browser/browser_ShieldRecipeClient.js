@@ -1,9 +1,9 @@
 "use strict";
 
-Cu.import("resource://shield-recipe-client/lib/AboutPages.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ShieldRecipeClient.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm", this);
+Cu.import("resource://shield-recipe-client-content/AboutPages.jsm", this);
 
 add_task(async function testStartup() {
   sinon.stub(RecipeRunner, "init");

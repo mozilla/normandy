@@ -14,7 +14,7 @@
 const { utils: Cu } = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://shield-recipe-client/content/AboutPages.jsm");
+Cu.import("resource://shield-recipe-client-content/AboutPages.jsm");
 
 class ShieldChildListener {
   onStartup() {
@@ -28,7 +28,7 @@ class ShieldChildListener {
 
     // Unload AboutPages.jsm in case the add-on is reinstalled and we need to
     // load a new version of it.
-    Cu.unload("resource://shield-recipe-client/content/AboutPages.jsm");
+    Cu.unload("resource://shield-recipe-client-content/AboutPages.jsm");
   }
 
   receiveMessage(message) {

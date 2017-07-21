@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
+/* global classnames PropTypes r React ReactDOM ShieldStudies */
 
 /**
  * Mapping of pages displayed on the sidebar. Keys are the value used in the
@@ -14,7 +15,7 @@ const PAGES = new Map([
   ["shieldStudies", {
     name: "Shield Studies",
     component: ShieldStudies,
-    icon: "resource://shield-recipe-client/content/about-studies/img/shield-logo.png",
+    icon: "resource://shield-recipe-client-content/about-studies/img/shield-logo.png",
   }],
 ]);
 

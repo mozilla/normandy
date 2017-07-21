@@ -18,7 +18,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
 XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
   "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "AboutPages",
-  "resource://shield-recipe-client/content/AboutPages.jsm");
+  "resource://shield-recipe-client-content/AboutPages.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
