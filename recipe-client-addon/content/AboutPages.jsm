@@ -16,6 +16,8 @@ XPCOMUtils.defineLazyModuleGetter(
 
 this.EXPORTED_SYMBOLS = ["AboutPages"];
 
+const SHIELD_LEARN_MORE_URL_PREF = "extensions.shield-recipe-client.shieldLearnMoreUrl";
+
 // Due to bug 1051238 frame scripts are cached forever, so we can't update them
 // as a restartless add-on. The Math.random() is the work around for this.
 const PROCESS_SCRIPT = (
@@ -193,6 +195,12 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
       Services.mm.broadcastAsyncMessage("Shield:ReceiveStudyList", {
         studies: await StudyStorage.getAll(),
       });
+    },
+
+    getShieldLearnMoreHref() {
+      return Services.urlFormatter.formatURL(
+        Services.prefs.getCharPref(SHIELD_LEARN_MORE_URL_PREF)
+      );
     },
   });
 

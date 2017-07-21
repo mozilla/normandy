@@ -16,7 +16,6 @@
 /* global content addMessageListener removeMessageListener sendAsyncMessage */
 
 const { utils: Cu } = Components;
-Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
@@ -53,7 +52,7 @@ class ShieldFrameListener {
       case "GetRemoteValue:ShieldLearnMoreHref":
         this.triggerPageCallback(
           "ReceiveRemoteValue:ShieldLearnMoreHref",
-          this.getShieldLearnMoreHref()
+          AboutPages.aboutStudies.getShieldLearnMoreHref()
         );
         break;
       case "NavigateToDataPreferences":
@@ -109,12 +108,6 @@ class ShieldFrameListener {
     removeMessageListener("Shield:SendStudyList", this);
     removeMessageListener("Shield:ShuttingDown", this);
     removeEventListener("Shield", this);
-  }
-
-  getShieldLearnMoreHref() {
-    return Services.urlFormatter.formatURL(
-      "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield"
-    );
   }
 }
 

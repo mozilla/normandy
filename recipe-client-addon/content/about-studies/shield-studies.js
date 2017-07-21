@@ -9,8 +9,6 @@ window.ShieldStudies = class ShieldStudies extends React.Component {
     this.state = {
       learnMoreHref: null,
     };
-
-    this.handleClickUpdatePreferences = this.handleClickUpdatePreferences.bind(this);
   }
 
   componentDidMount() {
@@ -27,23 +25,40 @@ window.ShieldStudies = class ShieldStudies extends React.Component {
     });
   }
 
-  handleClickUpdatePreferences() {
-    sendPageEvent("NavigateToDataPreferences");
-  }
-
   render() {
     return (
       r("div", {},
         r(InfoBox, {},
           r("span", {}, "What's this? Firefox may install and run studies from time to time."),
-          r("a", {href: this.state.learnMoreHref}, "Learn more"),
-          r(FxButton, {onClick: this.handleClickUpdatePreferences}, "Update Preferences"),
+          r("a", {id: "shield-studies-learn-more", href: this.state.learnMoreHref}, "Learn more"),
+          r(UpdatePreferencesButton, {}, "Update Preferences"),
         ),
         r(StudyList),
       )
     );
   }
 };
+
+class UpdatePreferencesButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    sendPageEvent("NavigateToDataPreferences");
+  }
+
+  render() {
+    return r(
+      FxButton,
+      Object.assign({
+        id: "shield-studies-update-preferences",
+        onClick: this.handleClick,
+      }, this.props),
+    );
+  }
+}
 
 class StudyList extends React.Component {
   constructor(props) {
@@ -69,12 +84,12 @@ class StudyList extends React.Component {
       return study;
     });
 
-    // Sort by active status, then by start date.
+    // Sort by active status, then by start date descending.
     studies.sort((a, b) => {
       if (a.active !== b.active) {
         return a.active ? -1 : 1;
       }
-      return a.studyStartDate - b.studyStartDate;
+      return b.studyStartDate - a.studyStartDate;
     });
 
     this.setState({studies});
@@ -104,7 +119,10 @@ class StudyListItem extends React.Component {
   render() {
     const study = this.props.study;
     return (
-      r("li", {className: classnames("study", {disabled: !study.active})},
+      r("li", {
+        className: classnames("study", {disabled: !study.active}),
+        "data-study-name": study.name,
+      },
         r("div", {className: "study-icon"},
           study.name.slice(0, 1)
         ),
@@ -118,7 +136,7 @@ class StudyListItem extends React.Component {
         ),
         r("div", {className: "study-actions"},
           study.active &&
-            r(FxButton, {onClick: this.handleClickRemove}, "Remove"),
+            r(FxButton, {className: "remove-button", onClick: this.handleClickRemove}, "Remove"),
         ),
       )
     );

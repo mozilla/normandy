@@ -42,6 +42,7 @@ const DEFAULT_PREFS = {
   user_id: "",
   run_interval_seconds: 86400, // 24 hours
   first_run: true,
+  shieldLearnMoreUrl: "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
 };
 const PREF_DEV_MODE = "extensions.shield-recipe-client.dev_mode";
 const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";

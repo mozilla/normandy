@@ -16,16 +16,6 @@ function withStudyStorage(testFn) {
   };
 }
 
-function studyFactory(attrs) {
-  return Object.assign({
-    name: "Test study",
-    addonId: "foo@example.com",
-    addonVersion: "2.0.0",
-    description: "fake",
-    studyStartDate: new Date().toJSON(),
-  }, attrs);
-}
-
 add_task(withStudyStorage(async function testGetMissing(storage) {
   await Assert.rejects(
     storage.get("does-not-exist"),
