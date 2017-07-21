@@ -8,16 +8,14 @@ import {
   RECIPE_HISTORY_RECEIVE,
 } from 'control_new/state/action-types';
 import recipesReducer from 'control_new/state/app/recipes/reducers';
-
 import {
   FILTERS,
   INITIAL_STATE,
   RecipeFactory,
-} from '.';
-
+} from 'control_new/tests/state/recipes';
 import {
   RevisionFactory,
-} from '../revisions';
+} from 'control_new/tests/state/revisions';
 
 
 describe('Recipes reducer', () => {

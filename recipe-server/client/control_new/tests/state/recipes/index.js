@@ -1,7 +1,15 @@
+import faker from 'faker';
 import { Map } from 'immutable';
 
-import Factory from 'control_new/tests/factory';
-import { RECIPE_SCHEMA } from 'control_new/tests/schemas';
+import {
+  AutoIncrementField,
+  DateField,
+  Factory,
+  Field,
+  SubFactory,
+} from 'control_new/tests/factory';
+import { ActionFactory } from 'control_new/tests/state/actions';
+import { RevisionFactory } from 'control_new/tests/state/revisions';
 
 
 export const INITIAL_STATE = {
@@ -26,15 +34,59 @@ export const FILTERS = {
 };
 
 
-export class RecipeFactory extends Factory {
-  constructor(defaults = {}) {
-    super(RECIPE_SCHEMA, defaults);
+export class SimpleRecipeFactory extends Factory {
+  static fields = {
+    id: new AutoIncrementField(),
+    action: new SubFactory(ActionFactory),
+    arguments: {},
+    channels: [],
+    countries: [],
+    enabled: false,
+    extra_filter_expression: 'true',
+    filter_expression: 'true',
+    is_approved: false,
+    locales: [],
+    last_updated: new DateField(),
+    name: new Field(faker.lorem.slug),
   }
 
   postGeneration() {
-    if (!this.is_approved) {
-      this.approved_revision = null;
-      this.enabled = false;
+    const options = this._options;
+
+    this.is_approved = options.isEnabled || options.isApproved;
+    this.enabled = options.isEnabled;
+
+    if (typeof this.extraPostGeneration === 'function') {
+      this.extraPostGeneration();
+    }
+  }
+}
+
+
+export class RecipeFactory extends SimpleRecipeFactory {
+  static fields = {
+    ...SimpleRecipeFactory.fields,
+    approved_revision: null,
+    latest_revision: null,
+  }
+
+  extraPostGeneration() {
+    const options = this._options;
+
+    if (options.isEnabled || options.isApproved) {
+      if (!this.approved_revision) {
+        this.approved_revision = new RevisionFactory({
+          recipe: SimpleRecipeFactory(this),
+        });
+      }
+
+      if (!this.latest_revision) {
+        this.latest_revision = new RevisionFactory(this.approved_revision);
+      }
+    } else if (!this.latest_revision) {
+      this.latest_revision = new RevisionFactory({
+        recipe: SimpleRecipeFactory(this),
+      });
     }
   }
 }

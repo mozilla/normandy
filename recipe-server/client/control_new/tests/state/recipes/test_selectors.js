@@ -14,19 +14,16 @@ import {
   getRecipeFilters,
   getRecipeHistory,
 } from 'control_new/state/app/recipes/selectors';
-
+import {
+  INITIAL_STATE,
+} from 'control_new/tests/state';
 import {
   FILTERS,
   RecipeFactory,
-} from '.';
-
-import {
-  INITIAL_STATE,
-} from '..';
-
+} from 'control_new/tests/state/recipes';
 import {
   RevisionFactory,
-} from '../revisions';
+} from 'control_new/tests/state/revisions';
 
 
 describe('getRecipe', () => {

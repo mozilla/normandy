@@ -8,14 +8,12 @@ import {
 import actionsReducer from 'control_new/state/app/actions/reducers';
 import revisionsReducer from 'control_new/state/app/revisions/reducers';
 import { getRevision } from 'control_new/state/app/revisions/selectors';
-
-import {
-  RevisionFactory,
-} from '.';
-
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control_new/tests/state';
+import {
+  RevisionFactory,
+} from 'control_new/tests/state/revisions';
 
 
 describe('getRevision', () => {

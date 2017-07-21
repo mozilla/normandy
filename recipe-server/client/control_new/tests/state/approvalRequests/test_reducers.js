@@ -1,13 +1,14 @@
+import { fromJS } from 'immutable';
+
 import {
   APPROVAL_REQUEST_DELETE,
   APPROVAL_REQUEST_RECEIVE,
 } from 'control_new/state/action-types';
 import approvalRequestsReducer from 'control_new/state/app/approvalRequests/reducers';
-
 import {
   INITIAL_STATE,
   ApprovalRequestFactory,
-} from '.';
+} from 'control_new/tests/state/approvalRequests';
 
 
 describe('Approval requests reducer', () => {
@@ -20,17 +21,17 @@ describe('Approval requests reducer', () => {
   it('should handle APPROVAL_REQUEST_RECEIVE', () => {
     expect(approvalRequestsReducer(undefined, {
       type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest: approvalRequest.toObject(),
+      approvalRequest,
     })).toEqual({
       ...INITIAL_STATE,
-      items: INITIAL_STATE.items.set(approvalRequest.id, approvalRequest.toImmutable()),
+      items: INITIAL_STATE.items.set(approvalRequest.id, fromJS(approvalRequest)),
     });
   });
 
   it('should handle APPROVAL_REQUEST_DELETE', () => {
     const state = approvalRequestsReducer(undefined, {
       type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest: approvalRequest.toObject(),
+      approvalRequest,
     });
 
     const updatedState = approvalRequestsReducer(state, {

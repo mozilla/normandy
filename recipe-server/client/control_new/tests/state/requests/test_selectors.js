@@ -2,10 +2,9 @@ import * as matchers from 'jasmine-immutable-matchers';
 
 import { DEFAULT_REQUEST } from 'control_new/state/constants';
 import { getRequest } from 'control_new/state/app/requests/selectors';
-
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control_new/tests/state';
 
 
 describe('getRequest', () => {

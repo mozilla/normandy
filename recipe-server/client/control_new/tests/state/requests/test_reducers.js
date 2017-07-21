@@ -10,10 +10,9 @@ import {
   DEFAULT_REQUEST,
 } from 'control_new/state/constants';
 import requestsReducer from 'control_new/state/app/requests/reducers';
-
 import {
   INITIAL_STATE,
-} from '.';
+} from 'control_new/tests/state/requests';
 
 
 describe('Requests reducer', () => {

@@ -1,7 +1,7 @@
+import faker from 'faker';
 import { Map } from 'immutable';
 
-import Factory from 'control_new/tests/factory';
-import { EXTENSION_SCHEMA } from 'control_new/tests/schemas';
+import { AutoIncrementField, Factory, Field } from 'control_new/tests/factory';
 
 
 export const INITIAL_STATE = {
@@ -11,7 +11,10 @@ export const INITIAL_STATE = {
 
 
 export class ExtensionFactory extends Factory {
-  constructor(defaults = {}) {
-    super(EXTENSION_SCHEMA, defaults);
-  }
+  static fields = {
+    id: new AutoIncrementField(),
+    name: new Field(faker.lorem.slug),
+    xpi: new Field(faker.internet.url),
+  };
 }
+

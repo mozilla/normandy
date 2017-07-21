@@ -1,58 +1,91 @@
 import faker from 'faker';
-import { fromJS } from 'immutable';
-import jsf from 'json-schema-faker';
 
 
-jsf.extend('faker', () => faker);
+let autoIncrementIndex = 0;
 
 
-jsf.format('iso8601_date', () => faker.date.past(5).toISOString());
-jsf.format('sha256_hash', () => jsf.utils.randexp('[0-9a-f]{64}'));
+export class Field {
+  constructor(generator, ...options) {
+    this.generator = generator;
+    this.options = options;
+  }
 
+  generate() {
+    return this.generator(...this.options);
+  }
 
-function deepCopy(from, to, schema) {
-  Object.keys(schema).forEach(key => {
-    let value = from[key];
-
-    if (typeof value === 'object') {
-      const nestedValue = {};
-      deepCopy(value, nestedValue, schema[key]);
-      value = nestedValue;
+  value() {
+    if (this._value === undefined) {
+      this._value = this.generate();
     }
-
-    to[key] = value;
-  });
+    return this._value;
+  }
 }
 
 
-export default class Factory {
-  constructor(schema, defaults = {}) {
-    const generated = jsf(schema);
-
-    this._schema = schema;
-    this._keys = Object.keys(generated);
-
-    const data = {
-      ...generated,
-      ...defaults,
+export class AutoIncrementField extends Field {
+  constructor() {
+    const generator = () => {
+      autoIncrementIndex += 1;
+      return autoIncrementIndex;
     };
 
-    deepCopy(data, this, generated);
+    super(generator);
+  }
+}
 
-    if (this.postGeneration) {
+
+export class DateField extends Field {
+  constructor() {
+    super(() => faker.date.past().toISOString());
+  }
+}
+
+
+export class SubFactory extends Field {
+  constructor(factory, defaults = {}, options = {}) {
+    super(factory);
+    this.defaults = defaults;
+    this.options = options;
+  }
+
+  generate() {
+    const Generator = this.generator;
+    return new Generator(this.defaults, this.options);
+  }
+}
+
+
+export class Factory {
+  static fields = {}
+
+  constructor(defaults = {}, options = {}) {
+    Object.defineProperty(this, '_options', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: options,
+    });
+
+    Object.defineProperty(this, '_fields', {
+      enumerable: false,
+      configurable: false,
+      writeable: false,
+      value: this.constructor.fields,
+    });
+
+    Object.keys(this._fields).forEach(key => {
+      if (defaults[key]) {
+        this[key] = defaults[key];
+      } else if (this._fields[key] instanceof Field) {
+        this[key] = this._fields[key].value();
+      } else {
+        this[key] = this._fields[key];
+      }
+    });
+
+    if (typeof this.postGeneration === 'function') {
       this.postGeneration();
     }
-  }
-
-  toObject() {
-    const obj = {};
-    this._keys.forEach(key => {
-      obj[key] = this[key];
-    });
-    return obj;
-  }
-
-  toImmutable() {
-    return fromJS(this.toObject());
   }
 }

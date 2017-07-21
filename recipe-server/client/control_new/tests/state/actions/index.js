@@ -1,7 +1,7 @@
+import faker from 'faker';
 import { Map } from 'immutable';
 
-import Factory from 'control_new/tests/factory';
-import { ACTION_SCHEMA } from 'control_new/tests/schemas';
+import { AutoIncrementField, Factory, Field } from 'control_new/tests/factory';
 
 
 export const INITIAL_STATE = {
@@ -9,28 +9,11 @@ export const INITIAL_STATE = {
 };
 
 
-export const DEFAULT_ARGUMENT_SCHEMA = {
-  $schema: 'http://json-schema.org/draft-04/schema#',
-  title: 'Log a message to the console',
-  type: 'object',
-  required: [
-    'message',
-  ],
-  properties: {
-    message: {
-      description: 'Message to log to the console',
-      type: 'string',
-      default: '',
-    },
-  },
-};
-
-
 export class ActionFactory extends Factory {
-  constructor(defaults = {}) {
-    super(ACTION_SCHEMA, {
-      argument_schema: DEFAULT_ARGUMENT_SCHEMA,
-      ...defaults,
-    });
-  }
+  static fields = {
+    id: new AutoIncrementField(),
+    argument_schema: {},
+    implementation_url: new Field(faker.internet.url),
+    name: new Field(faker.lorem.slug),
+  };
 }

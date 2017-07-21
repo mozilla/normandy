@@ -1,8 +1,10 @@
+import faker from 'faker';
 import { Map } from 'immutable';
+import { randexp } from 'randexp';
 
-import Factory from 'control_new/tests/factory';
-import { REVISION_SCHEMA } from 'control_new/tests/schemas';
-import { ActionFactory } from 'control_new/tests/state/actions';
+import { DateField, Factory, Field, SubFactory } from 'control_new/tests/factory';
+import { UserFactory } from 'control_new/tests/state';
+import { SimpleRecipeFactory } from 'control_new/tests/state/recipes';
 
 
 export const INITIAL_STATE = {
@@ -11,10 +13,12 @@ export const INITIAL_STATE = {
 
 
 export class RevisionFactory extends Factory {
-  constructor(defaults = {}) {
-    super(REVISION_SCHEMA, {
-      action: new ActionFactory(),
-      ...defaults,
-    });
+  static fields = {
+    id: new Field(randexp, /[0-9a-f]{64}/),
+    approval_request: null,
+    comment: new Field(faker.lorem.sentence),
+    date_created: new DateField(),
+    recipe: new SubFactory(SimpleRecipeFactory),
+    user: new SubFactory(UserFactory),
   }
 }

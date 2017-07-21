@@ -1,4 +1,3 @@
-import { fromJS } from 'immutable';
 import * as matchers from 'jasmine-immutable-matchers';
 
 import {

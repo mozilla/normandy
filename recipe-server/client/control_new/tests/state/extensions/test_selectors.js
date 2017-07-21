@@ -1,29 +1,30 @@
+import { fromJS } from 'immutable';
+
 import { getExtension } from 'control_new/state/app/extensions/selectors';
-
-import {
-  ExtensionFactory,
-} from '.';
-
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control_new/tests/state';
+import {
+  ExtensionFactory,
+} from 'control_new/tests/state/extensions';
 
 
 describe('getExtension', () => {
   const extension = new ExtensionFactory();
+
   const STATE = {
     ...INITIAL_STATE,
     app: {
       ...INITIAL_STATE.app,
       extensions: {
         ...INITIAL_STATE.app.extensions,
-        items: INITIAL_STATE.app.extensions.items.set(extension.id, extension.toImmutable()),
+        items: INITIAL_STATE.app.extensions.items.set(extension.id, fromJS(extension)),
       },
     },
   };
 
   it('should return the extension', () => {
-    expect(getExtension(STATE, extension.id)).toEqual(extension.toImmutable());
+    expect(getExtension(STATE, extension.id)).toEqual(fromJS(extension));
   });
 
   it('should return `null` for invalid ID', () => {

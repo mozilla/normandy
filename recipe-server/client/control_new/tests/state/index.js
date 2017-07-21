@@ -1,12 +1,12 @@
-import Factory from 'control_new/tests/factory';
-import { USER_SCHEMA } from 'control_new/tests/schemas';
+import faker from 'faker';
 
-import { INITIAL_STATE as actions } from './actions';
-import { INITIAL_STATE as approvalRequests } from './approvalRequests';
-import { INITIAL_STATE as extensions } from './extensions';
-import { INITIAL_STATE as recipes } from './recipes';
-import { INITIAL_STATE as requests } from './requests';
-import { INITIAL_STATE as revisions } from './revisions';
+import { AutoIncrementField, Factory, Field } from 'control_new/tests/factory';
+import { INITIAL_STATE as actions } from 'control_new/tests/state/actions';
+import { INITIAL_STATE as approvalRequests } from 'control_new/tests/state/approvalRequests';
+import { INITIAL_STATE as extensions } from 'control_new/tests/state/extensions';
+import { INITIAL_STATE as recipes } from 'control_new/tests/state/recipes';
+import { INITIAL_STATE as requests } from 'control_new/tests/state/requests';
+import { INITIAL_STATE as revisions } from 'control_new/tests/state/revisions';
 
 
 export const INITIAL_STATE = {
@@ -22,7 +22,10 @@ export const INITIAL_STATE = {
 
 
 export class UserFactory extends Factory {
-  constructor(defaults = {}) {
-    super(USER_SCHEMA, defaults);
+  static fields = {
+    id: new AutoIncrementField(),
+    email: new Field(faker.internet.email),
+    first_name: new Field(faker.name.firstName),
+    last_name: new Field(faker.name.lastName),
   }
 }

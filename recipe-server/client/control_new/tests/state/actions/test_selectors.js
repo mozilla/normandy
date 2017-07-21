@@ -1,12 +1,12 @@
+import { fromJS } from 'immutable';
+
 import { getAction } from 'control_new/state/app/actions/selectors';
-
-import {
-  ActionFactory,
-} from '.';
-
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control_new/tests/state';
+import {
+  ActionFactory,
+} from 'control_new/tests/state/actions';
 
 
 describe('getAction', () => {
@@ -18,13 +18,13 @@ describe('getAction', () => {
       ...INITIAL_STATE.app,
       actions: {
         ...INITIAL_STATE.app.actions,
-        items: INITIAL_STATE.app.actions.items.set(action.id, action.toImmutable()),
+        items: INITIAL_STATE.app.actions.items.set(action.id, fromJS(action)),
       },
     },
   };
 
   it('should return the action', () => {
-    expect(getAction(STATE, action.id)).toEqual(action.toImmutable());
+    expect(getAction(STATE, action.id)).toEqual(fromJS(action));
   });
 
   it('should return `null` for invalid ID', () => {
