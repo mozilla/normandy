@@ -6,14 +6,10 @@ Uptake
 ------
 Shield monitors the execution of :ref:`recipes <recipes>` and reports to
 `Firefox Telemetry`_ the amount of successful and failed runs. This data is
-reported as a `main-ping histogram`_ under the
-``UPTAKE_REMOTE_CONTENT_RESULT_1`` key. The type and format of this histogram
-is described in `Histograms.json`_.
-
+reported using `Uptake Telemetry`_ under the ``shield-recipe-client`` namespace.
 
 .. _Firefox Telemetry: https://wiki.mozilla.org/Telemetry
-.. _main-ping histogram: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/main-ping.html
-.. _Histograms.json: https://dxr.mozilla.org/mozilla-central/source/toolkit/components/telemetry/Histograms.json
+.. _Uptake Telemetry: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/collection/uptake.html
 
 Runner Status
 ^^^^^^^^^^^^^
