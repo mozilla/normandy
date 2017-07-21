@@ -3,6 +3,7 @@ var path = require("path");
 var webpack = require("webpack");
 var ConcatSource = require("webpack-sources").ConcatSource;
 var LicenseWebpackPlugin = require("license-webpack-plugin");
+var BabiliPlugin = require("babili-webpack-plugin");
 
 module.exports = {
   context: __dirname,
@@ -22,6 +23,7 @@ module.exports = {
         NODE_ENV: JSON.stringify("production"),
       },
     }),
+    new BabiliPlugin(),
     /**
      * Plugin that appends "this.EXPORTED_SYMBOLS = ["libname"]" to assets
      * output by webpack. This allows built assets to be imported using
