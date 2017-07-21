@@ -12,15 +12,16 @@
   },
   "devDependencies": {
     "babel-eslint": "7.2.3",
+    "babili-webpack-plugin": "0.1.2",
     "eslint": "3.19.0",
     "eslint-config-normandy": "1.0.0",
     "eslint-plugin-babel": "4.1.1",
     "eslint-plugin-mozilla": "0.3.2",
-    "license-webpack-plugin": "^0.5.1",
+    "license-webpack-plugin": "0.5.1",
     "webpack": "3.1.0"
   },
   "dependencies": {
-    "ajv": "^5.2.1",
+    "ajv": "5.2.1",
     "mozjexl": "1.1.5"
   }
 }
