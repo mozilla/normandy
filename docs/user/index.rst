@@ -9,3 +9,4 @@ configure recipes with the control interface.
    filter_expressions
    peer_approval
    actions/index
+   data_collection

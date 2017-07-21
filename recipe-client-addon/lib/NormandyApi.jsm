@@ -6,9 +6,12 @@
 
 const {utils: Cu, classes: Cc, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/CanonicalJSON.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
-Cu.import("resource://shield-recipe-client/lib/Utils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(
+  this, "CanonicalJSON", "resource://gre/modules/CanonicalJSON.jsm");
+
 Cu.importGlobalProperties(["fetch", "URL"]); /* globals fetch, URL */
 
 this.EXPORTED_SYMBOLS = ["NormandyApi"];
@@ -19,6 +22,8 @@ const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 let indexPromise = null;
 
 this.NormandyApi = {
+  InvalidSignatureError: class InvalidSignatureError extends Error {},
+
   clearIndexCache() {
     indexPromise = null;
   },
@@ -63,7 +68,7 @@ this.NormandyApi = {
 
   async getApiUrl(name) {
     if (!indexPromise) {
-      let apiBase = new URL(prefs.getCharPref("api_url"));
+      const apiBase = new URL(prefs.getCharPref("api_url"));
       if (!apiBase.pathname.endsWith("/")) {
         apiBase.pathname += "/";
       }
@@ -89,25 +94,32 @@ this.NormandyApi = {
       const serialized = CanonicalJSON.stringify(recipe);
       if (!rawText.includes(serialized)) {
         log.debug(rawText, serialized);
-        throw new Error("Canonical recipe serialization does not match!");
+        throw new NormandyApi.InvalidSignatureError("Canonical recipe serialization does not match!");
       }
 
-      const certChainResponse = await fetch(this.absolutify(x5u));
+      const certChainResponse = await this.get(this.absolutify(x5u));
       const certChain = await certChainResponse.text();
       const builtSignature = `p384ecdsa=${signature}`;
 
       const verifier = Cc["@mozilla.org/security/contentsignatureverifier;1"]
         .createInstance(Ci.nsIContentSignatureVerifier);
 
-      const valid = verifier.verifyContentSignature(
-        serialized,
-        builtSignature,
-        certChain,
-        "normandy.content-signature.mozilla.org"
-      );
-      if (!valid) {
-        throw new Error("Recipe signature is not valid");
+      let valid;
+      try {
+        valid = verifier.verifyContentSignature(
+          serialized,
+          builtSignature,
+          certChain,
+          "normandy.content-signature.mozilla.org"
+        );
+      } catch (err) {
+        throw new NormandyApi.InvalidSignatureError(`Recipe signature validation failed: ${err}`);
       }
+
+      if (!valid) {
+        throw new NormandyApi.InvalidSignatureError("Recipe signature is not valid");
+      }
+
       verifiedRecipes.push(recipe);
     }
 
