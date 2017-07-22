@@ -17,7 +17,7 @@ import {
 
 
 describe('getRevision', () => {
-  const revision = new RevisionFactory();
+  const revision = RevisionFactory.build();
 
   const STATE = {
     ...INITIAL_STATE,
@@ -29,7 +29,7 @@ describe('getRevision', () => {
       }),
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: revision.toObject(),
+        revision,
       }),
     },
   };
@@ -39,7 +39,7 @@ describe('getRevision', () => {
   });
 
   it('should return the revision', () => {
-    expect(getRevision(STATE, revision.id)).toEqualImmutable(revision.toImmutable());
+    expect(getRevision(STATE, revision.id)).toEqualImmutable(fromJS(revision));
   });
 
   it('should return `null` for invalid ID', () => {

@@ -10,7 +10,7 @@ import {
 
 
 describe('getApprovalRequest', () => {
-  const approvalRequest = new ApprovalRequestFactory();
+  const approvalRequest = ApprovalRequestFactory.build();
 
   const STATE = {
     ...INITIAL_STATE,

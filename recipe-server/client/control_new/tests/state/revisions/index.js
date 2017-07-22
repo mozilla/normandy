@@ -13,12 +13,14 @@ export const INITIAL_STATE = {
 
 
 export class RevisionFactory extends Factory {
-  static fields = {
-    id: new Field(randexp, /[0-9a-f]{64}/),
-    approval_request: null,
-    comment: new Field(faker.lorem.sentence),
-    date_created: new DateField(),
-    recipe: new SubFactory(SimpleRecipeFactory),
-    user: new SubFactory(UserFactory),
+  getFields() {
+    return {
+      id: new Field(randexp, /[0-9a-f]{64}/),
+      approval_request: null,
+      comment: new Field(faker.lorem.sentence),
+      date_created: new DateField(),
+      recipe: new SubFactory(SimpleRecipeFactory),
+      user: new SubFactory(UserFactory),
+    };
   }
 }

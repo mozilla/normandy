@@ -11,10 +11,12 @@ export const INITIAL_STATE = {
 
 
 export class ExtensionFactory extends Factory {
-  static fields = {
-    id: new AutoIncrementField(),
-    name: new Field(faker.lorem.slug),
-    xpi: new Field(faker.internet.url),
-  };
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      name: new Field(faker.lorem.slug),
+      xpi: new Field(faker.internet.url),
+    };
+  }
 }
 

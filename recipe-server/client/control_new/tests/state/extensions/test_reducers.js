@@ -11,7 +11,7 @@ import {
 
 
 describe('Extensions reducer', () => {
-  const extension = new ExtensionFactory();
+  const extension = ExtensionFactory.build();
 
   it('should return initial state by default', () => {
     expect(extensionsReducer(undefined, {})).toEqual(INITIAL_STATE);

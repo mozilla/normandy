@@ -10,10 +10,12 @@ export const INITIAL_STATE = {
 
 
 export class ActionFactory extends Factory {
-  static fields = {
-    id: new AutoIncrementField(),
-    argument_schema: {},
-    implementation_url: new Field(faker.internet.url),
-    name: new Field(faker.lorem.slug),
-  };
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      argument_schema: {},
+      implementation_url: new Field(faker.internet.url),
+      name: new Field(faker.lorem.slug),
+    };
+  }
 }

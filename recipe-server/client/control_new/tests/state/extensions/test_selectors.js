@@ -10,7 +10,7 @@ import {
 
 
 describe('getExtension', () => {
-  const extension = new ExtensionFactory();
+  const extension = ExtensionFactory.build();
 
   const STATE = {
     ...INITIAL_STATE,

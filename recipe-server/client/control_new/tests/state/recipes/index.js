@@ -35,57 +35,61 @@ export const FILTERS = {
 
 
 export class SimpleRecipeFactory extends Factory {
-  static fields = {
-    id: new AutoIncrementField(),
-    action: new SubFactory(ActionFactory),
-    arguments: {},
-    channels: [],
-    countries: [],
-    enabled: false,
-    extra_filter_expression: 'true',
-    filter_expression: 'true',
-    is_approved: false,
-    locales: [],
-    last_updated: new DateField(),
-    name: new Field(faker.lorem.slug),
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      action: new SubFactory(ActionFactory),
+      arguments: {},
+      channels: [],
+      countries: [],
+      enabled: false,
+      extra_filter_expression: 'true',
+      filter_expression: 'true',
+      is_approved: false,
+      locales: [],
+      last_updated: new DateField(),
+      name: new Field(faker.lorem.slug),
+    };
   }
 
   postGeneration() {
-    const options = this._options;
+    const { isApproved, isEnabled } = this.options;
 
-    this.is_approved = options.isEnabled || options.isApproved;
-    this.enabled = options.isEnabled;
-
-    if (typeof this.extraPostGeneration === 'function') {
-      this.extraPostGeneration();
-    }
+    this.data.is_approved = !!(isEnabled || isApproved);
+    this.data.enabled = !!isEnabled;
   }
 }
 
 
 export class RecipeFactory extends SimpleRecipeFactory {
-  static fields = {
-    ...SimpleRecipeFactory.fields,
-    approved_revision: null,
-    latest_revision: null,
+  getFields() {
+    return {
+      ...super.getFields(),
+      approved_revision: null,
+      latest_revision: null,
+    };
   }
 
-  extraPostGeneration() {
-    const options = this._options;
+  postGeneration() {
+    super.postGeneration();
 
-    if (options.isEnabled || options.isApproved) {
-      if (!this.approved_revision) {
-        this.approved_revision = new RevisionFactory({
-          recipe: SimpleRecipeFactory(this),
+    const { isApproved, isEnabled } = this.options;
+
+    if (isEnabled || isApproved) {
+      if (this.data.approved_revision) {
+        this.data.approved_revision = RevisionFactory.build({
+          recipe: SimpleRecipeFactory.build(this.data),
         });
       }
 
-      if (!this.latest_revision) {
-        this.latest_revision = new RevisionFactory(this.approved_revision);
+      if (this.data.latest_revision === null) {
+        this.data.latest_revision = RevisionFactory.build(this.data.approved_revision);
       }
-    } else if (!this.latest_revision) {
-      this.latest_revision = new RevisionFactory({
-        recipe: SimpleRecipeFactory(this),
+    }
+
+    if (this.data.latest_revision === null) {
+      this.data.latest_revision = RevisionFactory.build({
+        recipe: SimpleRecipeFactory.build(this.data),
       });
     }
   }

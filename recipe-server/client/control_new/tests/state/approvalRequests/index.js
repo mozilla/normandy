@@ -11,22 +11,24 @@ export const INITIAL_STATE = {
 
 
 export class ApprovalRequestFactory extends Factory {
-  static fields = {
-    id: new AutoIncrementField(),
-    approved: null,
-    approver: null,
-    comment: null,
-    created: new DateField(),
-    creator: new SubFactory(UserFactory),
-  };
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      approved: null,
+      approver: null,
+      comment: null,
+      created: new DateField(),
+      creator: new SubFactory(UserFactory),
+    };
+  }
 
   postGeneration() {
-    const options = this._options;
+    const { isApproved, isRejected } = this.options;
 
-    if (options.isApproved || options.isRejected) {
-      this.approved = Boolean(options.isApproved);
-      this.approver = new UserFactory();
-      this.comment = faker.lorem.sentence();
+    if (isApproved || isRejected) {
+      this.data.approved = Boolean(isApproved);
+      this.data.approver = UserFactory.build();
+      this.data.comment = faker.lorem.sentence();
     }
   }
 }

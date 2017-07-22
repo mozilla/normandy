@@ -13,14 +13,10 @@ import {
   INITIAL_STATE,
   RecipeFactory,
 } from 'control_new/tests/state/recipes';
-import {
-  RevisionFactory,
-} from 'control_new/tests/state/revisions';
 
 
 describe('Recipes reducer', () => {
-  const recipe = new RecipeFactory();
-  const revision = new RevisionFactory();
+  const recipe = RecipeFactory.build();
 
   beforeEach(() => {
     jasmine.addMatchers(matchers);
@@ -32,7 +28,7 @@ describe('Recipes reducer', () => {
 
   it('should handle RECIPE_RECEIVE', () => {
     const reducedRecipe = {
-      ...recipe.toObject(),
+      ...recipe,
       action_id: recipe.action.id,
       latest_revision_id: recipe.latest_revision.id,
       approved_revision_id: recipe.approved_revision ? recipe.approved_revision.id : null,
@@ -44,18 +40,18 @@ describe('Recipes reducer', () => {
 
     const updatedState = recipesReducer(undefined, {
       type: RECIPE_RECEIVE,
-      recipe: recipe.toObject(),
+      recipe,
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(recipe.id, recipe.toImmutable()),
+      INITIAL_STATE.items.set(recipe.id, fromJS(reducedRecipe)),
     );
   });
 
   it('should handle RECIPE_DELETE', () => {
     const state = recipesReducer(undefined, {
       type: RECIPE_RECEIVE,
-      recipe: recipe.toObject(),
+      recipe,
     });
 
     const updateState = recipesReducer(state, {
@@ -80,10 +76,10 @@ describe('Recipes reducer', () => {
     expect(recipesReducer(undefined, {
       type: RECIPE_HISTORY_RECEIVE,
       recipeId: recipe.id,
-      revisions: [revision],
+      revisions: [recipe.latest_revision],
     })).toEqual({
       ...INITIAL_STATE,
-      history: INITIAL_STATE.history.set(recipe.id, new List([revision.id])),
+      history: INITIAL_STATE.history.set(recipe.id, new List([recipe.latest_revision.id])),
     });
   });
 });

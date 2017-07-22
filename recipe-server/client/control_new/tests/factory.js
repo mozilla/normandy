@@ -44,48 +44,36 @@ export class DateField extends Field {
 
 export class SubFactory extends Field {
   constructor(factory, defaults = {}, options = {}) {
-    super(factory);
-    this.defaults = defaults;
-    this.options = options;
-  }
-
-  generate() {
-    const Generator = this.generator;
-    return new Generator(this.defaults, this.options);
+    const generator = (...args) => factory.build(...args);
+    super(generator, defaults, options);
   }
 }
 
 
 export class Factory {
-  static fields = {}
-
   constructor(defaults = {}, options = {}) {
-    Object.defineProperty(this, '_options', {
-      enumerable: false,
-      configurable: false,
-      writable: false,
-      value: options,
-    });
+    this.options = options;
+    this.data = {};
 
-    Object.defineProperty(this, '_fields', {
-      enumerable: false,
-      configurable: false,
-      writeable: false,
-      value: this.constructor.fields,
-    });
+    const fields = (typeof this.getFields === 'function') ? this.getFields() : {};
 
-    Object.keys(this._fields).forEach(key => {
+    Object.keys(fields).forEach(key => {
       if (defaults[key]) {
-        this[key] = defaults[key];
-      } else if (this._fields[key] instanceof Field) {
-        this[key] = this._fields[key].value();
+        this.data[key] = defaults[key];
+      } else if (fields[key] instanceof Field) {
+        this.data[key] = fields[key].value();
       } else {
-        this[key] = this._fields[key];
+        this.data[key] = fields[key];
       }
     });
 
     if (typeof this.postGeneration === 'function') {
       this.postGeneration();
     }
+  }
+
+  static build(...args) {
+    const product = new this(...args);
+    return product.data;
   }
 }

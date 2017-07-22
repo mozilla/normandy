@@ -1,3 +1,4 @@
+import { fromJS } from 'immutable';
 import * as matchers from 'jasmine-immutable-matchers';
 
 import {
@@ -13,14 +14,10 @@ import {
 
 
 describe('Revisions reducer', () => {
-  const revision = new RevisionFactory();
+  const revision = RevisionFactory.build();
 
   beforeEach(() => {
     jasmine.addMatchers(matchers);
-  });
-
-  it('should', () => {
-    expect(revision.toObject()).toEqual({});
   });
 
   it('should return initial state by default', () => {
@@ -29,7 +26,7 @@ describe('Revisions reducer', () => {
 
   it('should handle REVISION_RECEIVE', () => {
     const reducedRevision = {
-      ...revision.toObject(),
+      ...revision,
       recipe: {
         ...revision.recipe,
         action_id: revision.recipe.action.id,
@@ -42,18 +39,18 @@ describe('Revisions reducer', () => {
 
     const updatedState = revisionsReducer(undefined, {
       type: REVISION_RECEIVE,
-      revision: revision.toObject(),
+      revision,
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(revision.id, revision.toImmutable()),
+      INITIAL_STATE.items.set(revision.id, fromJS(reducedRevision)),
     );
   });
 
   it('should handle RECIPE_DELETE', () => {
     const state = revisionsReducer(undefined, {
       type: REVISION_RECEIVE,
-      revision: revision.toObject(),
+      revision,
     });
 
     const updatedState = revisionsReducer(state, {

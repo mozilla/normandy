@@ -12,7 +12,7 @@ import {
 
 
 describe('Approval requests reducer', () => {
-  const approvalRequest = new ApprovalRequestFactory();
+  const approvalRequest = ApprovalRequestFactory.build();
 
   it('should return initial state by default', () => {
     expect(approvalRequestsReducer(undefined, {})).toEqual(INITIAL_STATE);

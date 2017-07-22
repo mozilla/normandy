@@ -16,7 +16,7 @@ describe('Actions reducer', () => {
   });
 
   it('should handle ACTION_RECEIVE', () => {
-    const action = new ActionFactory();
+    const action = ActionFactory.build();
 
     expect(actionsReducer(undefined, {
       type: ACTION_RECEIVE,

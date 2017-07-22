@@ -10,7 +10,7 @@ import {
 
 
 describe('getAction', () => {
-  const action = new ActionFactory();
+  const action = ActionFactory.build();
 
   const STATE = {
     ...INITIAL_STATE,

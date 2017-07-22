@@ -22,10 +22,12 @@ export const INITIAL_STATE = {
 
 
 export class UserFactory extends Factory {
-  static fields = {
-    id: new AutoIncrementField(),
-    email: new Field(faker.internet.email),
-    first_name: new Field(faker.name.firstName),
-    last_name: new Field(faker.name.lastName),
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      email: new Field(faker.internet.email),
+      first_name: new Field(faker.name.firstName),
+      last_name: new Field(faker.name.lastName),
+    };
   }
 }

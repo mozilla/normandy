@@ -21,13 +21,10 @@ import {
   FILTERS,
   RecipeFactory,
 } from 'control_new/tests/state/recipes';
-import {
-  RevisionFactory,
-} from 'control_new/tests/state/revisions';
 
 
 describe('getRecipe', () => {
-  const recipe = new RecipeFactory();
+  const recipe = RecipeFactory.build();
 
   const STATE = {
     ...INITIAL_STATE,
@@ -39,7 +36,7 @@ describe('getRecipe', () => {
       }),
       recipes: recipesReducer(undefined, {
         type: RECIPE_RECEIVE,
-        recipe: recipe.toObject(),
+        recipe,
       }),
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
@@ -53,7 +50,7 @@ describe('getRecipe', () => {
   });
 
   it('should return the recipe', () => {
-    expect(getRecipe(STATE, recipe.id)).toEqualImmutable(recipe.toImmutable());
+    expect(getRecipe(STATE, recipe.id)).toEqualImmutable(fromJS(recipe));
   });
 
   it('should return `null` for invalid ID', () => {
@@ -89,8 +86,8 @@ describe('getRecipeFilters', () => {
 
 
 describe('getRecipeHistory', () => {
-  const recipe = new RecipeFactory();
-  const revision = new RevisionFactory();
+  const recipe = RecipeFactory.build();
+  console.log(recipe);
 
   const STATE = {
     ...INITIAL_STATE,
@@ -98,13 +95,13 @@ describe('getRecipeHistory', () => {
       ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: revision.recipe.action,
+        action: recipe.action,
       }),
       recipes: {
         ...INITIAL_STATE.app.recipes,
         history: INITIAL_STATE.app.recipes.history.set(
-          revision.recipe.id,
-          revision.toImmutable(),
+          recipe.id,
+          fromJS([recipe.latest_revision.id]),
         ),
       },
       revisions: revisionsReducer(undefined, {
@@ -119,6 +116,6 @@ describe('getRecipeHistory', () => {
   });
 
   it('should return the list of revisions', () => {
-    expect(getRecipeHistory(STATE, revision.recipe.id)).toEqualImmutable(revision.toImmutable());
+    expect(getRecipeHistory(STATE, recipe.id)).toEqualImmutable(fromJS([recipe.latest_revision]));
   });
 });
