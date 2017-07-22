@@ -4,13 +4,6 @@ Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
-const testXpiUrl = (function() {
-  const dir = getChromeDir(getResolvedURI(gTestPath));
-  dir.append("fixtures");
-  dir.append("normandy.xpi");
-  return Services.io.newFileURI(dir).spec;
-})();
-
 add_task(withDriver(Assert, async function uuids(driver) {
   // Test that it is a UUID
   const uuid1 = driver.uuid();
@@ -26,7 +19,7 @@ add_task(withDriver(Assert, async function installXpi(driver) {
   // Create before install so that the listener is added before startup completes.
   const startupPromise = AddonTestUtils.promiseWebExtensionStartup("normandydriver@example.com");
 
-  var addonId = await driver.addons.install(testXpiUrl);
+  var addonId = await driver.addons.install(TEST_XPI_URL);
   is(addonId, "normandydriver@example.com", "Expected test addon was installed");
   isnot(addonId, null, "Addon install was successful");
 
@@ -41,7 +34,7 @@ add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
   const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
   try {
     await driver.addons.uninstall(invalidAddonId);
-    ok(false, `Uninstalling an invalid XPI should fail.  uninstallAddon resolved successfully though.`);
+    ok(false, `Uninstalling an invalid XPI should fail. addons.uninstall resolved successfully though.`);
   } catch (e) {
     ok(true, `This is the expected failure`);
   }
@@ -132,7 +125,7 @@ add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
   let addon = await driver.addons.get(ADDON_ID);
   Assert.equal(addon, null, "Add-on is not yet installed");
 
-  await driver.addons.install(testXpiUrl);
+  await driver.addons.install(TEST_XPI_URL);
   addon = await driver.addons.get(ADDON_ID);
 
   Assert.notEqual(addon, null, "Add-on object was returned");
@@ -163,7 +156,7 @@ add_task(withSandboxManager(Assert, async function testAddonsGetWorksInSandbox(s
 
   const ADDON_ID = "normandydriver@example.com";
 
-  await driver.addons.install(testXpiUrl);
+  await driver.addons.install(TEST_XPI_URL);
 
   await sandboxManager.evalInSandbox(`
     (async function sandboxTest() {

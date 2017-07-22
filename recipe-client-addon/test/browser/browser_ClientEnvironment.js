@@ -3,6 +3,8 @@
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/TelemetryController.jsm", this);
+Cu.import("resource://gre/modules/AddonManager.jsm", this);
+Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm", this);
 
@@ -112,3 +114,23 @@ add_task(async function testExperiments() {
 
   getAll.restore();
 });
+
+add_task(withDriver(Assert, async function testAddonsInContext(driver) {
+  // Create before install so that the listener is added before startup completes.
+  const startupPromise = AddonTestUtils.promiseWebExtensionStartup("normandydriver@example.com");
+  const addonId = await driver.addons.install(TEST_XPI_URL);
+  await startupPromise;
+
+  const environment = ClientEnvironment.getEnvironment();
+  const addons = await environment.addons;
+  Assert.deepEqual(addons[addonId], {
+    id: [addonId],
+    name: "normandy_fixture",
+    version: "1.0",
+    installDate: addons[addonId].installDate,
+    isActive: true,
+    type: "extension",
+  }, "addons should be available in context");
+
+  await driver.addons.uninstall(addonId);
+}));

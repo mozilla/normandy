@@ -12,6 +12,7 @@ Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource:///modules/ShellService.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
+Cu.import("resource://shield-recipe-client/lib/Addons.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
@@ -161,61 +162,9 @@ this.NormandyDriver = function(sandboxManager) {
     },
 
     addons: {
-      /**
-       * Get information about an installed add-on by ID.
-       *
-       * @param {string} addonId
-       * @returns {Object} Object containing id, installDate,
-       *                   isActive, name, type, and version of addon.
-       */
-      get: sandboxManager.wrapAsync(async function get(addonId) {
-        const addon = await AddonManager.getAddonByID(addonId);
-
-        if (!addon) {
-          return null;
-        }
-        return {
-          id: addon.id,
-          installDate: new Date(addon.installDate),
-          isActive: true,
-          name: addon.name,
-          type: addon.type,
-          version: addon.version,
-        };
-      }, {cloneInto: true}),
-
-      /*
-      * Return a promise that resolves to an Addon ID if installation is successful.
-      */
-      install: sandboxManager.wrapAsync(async function install(installUrl) {
-        const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
-        const result = new Promise((resolve, reject) => installObj.addListener({
-          onInstallEnded(addonInstall, addon) {
-            resolve(addon.id);
-          },
-          onInstallFailed(addonInstall) {
-            reject(`AddonInstall error code: [${addonInstall.error}]`);
-          },
-          onDownloadFailed() {
-            reject(`Download failed: [${installUrl}]`);
-          },
-        }));
-        installObj.install();
-        return result;
-      }),
-
-      /*
-      * Return a promise that resolves to a success messsage if
-      * addon uninstall is successful.
-      */
-      uninstall: sandboxManager.wrapAsync(async function uninstall(addonId) {
-        const addon = await AddonManager.getAddonByID(addonId);
-        if (addon === null) {
-          throw new Error(`No addon with ID [${addonId}] found.`);
-        }
-        addon.uninstall();
-        return null;
-      }),
+      get: sandboxManager.wrapAsync(Addons.get.bind(Addons), {cloneInto: true}),
+      install: sandboxManager.wrapAsync(Addons.install.bind(Addons)),
+      uninstall: sandboxManager.wrapAsync(Addons.uninstall.bind(Addons)),
     },
 
     // Sampling
