@@ -87,7 +87,6 @@ describe('getRecipeFilters', () => {
 
 describe('getRecipeHistory', () => {
   const recipe = RecipeFactory.build();
-  console.log(recipe);
 
   const STATE = {
     ...INITIAL_STATE,

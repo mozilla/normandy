@@ -25,10 +25,6 @@ export default class CurrentUserDetails extends React.Component {
   render() {
     const { logoutUrl, user } = this.props;
 
-    if (!user) {
-      return null;
-    }
-
     return (
       <div className="current-user">
         <span className="email">{user.get('email')}</span>
