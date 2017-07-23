@@ -15,7 +15,7 @@ describe('Approval requests reducer', () => {
   const approvalRequest = ApprovalRequestFactory.build();
 
   it('should return initial state by default', () => {
-    expect(approvalRequestsReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(approvalRequestsReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle APPROVAL_REQUEST_RECEIVE', () => {

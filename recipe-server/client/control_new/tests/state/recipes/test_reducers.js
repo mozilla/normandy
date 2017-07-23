@@ -23,7 +23,7 @@ describe('Recipes reducer', () => {
   });
 
   it('should return initial state by default', () => {
-    expect(recipesReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(recipesReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle RECIPE_RECEIVE', () => {

@@ -12,7 +12,7 @@ import {
 
 describe('Actions reducer', () => {
   it('should return initial state by default', () => {
-    expect(actionsReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(actionsReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle ACTION_RECEIVE', () => {

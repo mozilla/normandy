@@ -21,7 +21,7 @@ describe('Requests reducer', () => {
   });
 
   it('should return initial state by default', () => {
-    expect(requestsReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(requestsReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle REQUEST_SEND', () => {

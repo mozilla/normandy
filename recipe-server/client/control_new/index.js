@@ -14,7 +14,7 @@ import Router, {
 import reducers from 'control_new/state';
 
 
-const store = createStore(reducers, reducers(undefined, { type: 'initial' }), compose(
+const store = createStore(reducers, reducers(undefined, { type: 'INITIAL' }), compose(
   applyMiddleware(
     routerMiddleware,
     thunk,
