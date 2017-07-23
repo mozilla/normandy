@@ -205,7 +205,8 @@ this.RecipeRunner = {
             await manager.runAsyncCallback("action", recipe);
             status = Uptake.RECIPE_SUCCESS;
           } catch (e) {
-            log.error(`Could not execute recipe ${recipe.name}:`, e);
+            log.error(`Could not execute recipe ${recipe.name}:`);
+            Cu.reportError(e);
             status = Uptake.RECIPE_EXECUTION_ERROR;
           }
         }

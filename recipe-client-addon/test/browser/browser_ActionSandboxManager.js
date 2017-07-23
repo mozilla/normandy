@@ -79,7 +79,7 @@ add_task(async function testError() {
       await manager.runAsyncCallback("testCallback");
       ok(false, "runAsnycCallbackFromScript throws errors when raised by the sandbox");
     } catch (err) {
-      is(err.message, "WHY", "runAsnycCallbackFromScript clones error messages");
+      is(err.message, "WHY", "runAsnycCallbackFromScript throws errors when raised by the sandbox");
     }
   });
 });
