@@ -10,15 +10,13 @@ import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverl
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 import QueryRevision from 'control_new/components/data/QueryRevision';
-
-import { createRecipe as createAction } from 'control_new/state/recipes/actions';
-
+import { createRecipe as createAction } from 'control_new/state/app/recipes/actions';
 import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
 import {
   getRecipeForRevision,
   isLatestRevision as isLatestRevisionSelector,
-} from 'control_new/state/revisions/selectors';
-import { getLatestRevisionIdForRecipe } from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/revisions/selectors';
+import { getLatestRevisionIdForRecipe } from 'control_new/state/app/recipes/selectors';
 
 @connect(
   state => {
