@@ -18,6 +18,11 @@ fi
 
 rm -rf "${dest}"/*
 
+# Build vendor files
+pushd $baseDir
+npm run build
+popd
+
 while read -r line || [[ -n "${line}" ]]; do
   mkdir -p "$(dirname "${dest}/${line}")"
   cp -r "${baseDir}/${line}" "$(dirname "${dest}/${line}")"

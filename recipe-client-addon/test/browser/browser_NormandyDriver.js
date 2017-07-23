@@ -2,6 +2,7 @@
 
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 add_task(withDriver(Assert, async function uuids(driver) {
   // Test that it is a UUID
@@ -15,30 +16,25 @@ add_task(withDriver(Assert, async function uuids(driver) {
 
 add_task(withDriver(Assert, async function installXpi(driver) {
   // Test that we can install an XPI from any URL
-  const dir = getChromeDir(getResolvedURI(gTestPath));
-  dir.append("fixtures");
-  dir.append("normandy.xpi");
-  const xpiUrl = Services.io.newFileURI(dir).spec;
-
   // Create before install so that the listener is added before startup completes.
   const startupPromise = AddonTestUtils.promiseWebExtensionStartup("normandydriver@example.com");
 
-  var addonId = await driver.installAddon(xpiUrl);
+  var addonId = await driver.addons.install(TEST_XPI_URL);
   is(addonId, "normandydriver@example.com", "Expected test addon was installed");
   isnot(addonId, null, "Addon install was successful");
 
   // Wait until the add-on is fully started up to uninstall it.
   await startupPromise;
 
-  const uninstallMsg = await driver.uninstallAddon(addonId);
+  const uninstallMsg = await driver.addons.uninstall(addonId);
   is(uninstallMsg, null, `Uninstall returned an unexpected message [${uninstallMsg}]`);
 }));
 
 add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
   const invalidAddonId = "not_a_valid_xpi_id@foo.bar";
   try {
-    await driver.uninstallAddon(invalidAddonId);
-    ok(false, `Uninstalling an invalid XPI should fail.  uninstallAddon resolved successfully though.`);
+    await driver.addons.uninstall(invalidAddonId);
+    ok(false, `Uninstalling an invalid XPI should fail. addons.uninstall resolved successfully though.`);
   } catch (e) {
     ok(true, `This is the expected failure`);
   }
@@ -48,7 +44,7 @@ add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
 add_task(withDriver(Assert, async function installXpiBadURL(driver) {
   const xpiUrl = "file:///tmp/invalid_xpi.xpi";
   try {
-    await driver.installAddon(xpiUrl);
+    await driver.addons.install(xpiUrl);
     ok(false, "Installation succeeded on an XPI that doesn't exist");
   } catch (reason) {
     ok(true, `Installation was rejected: [${reason}]`);
@@ -122,4 +118,94 @@ add_task(withSandboxManager(Assert, async function testCreateStorage(sandboxMana
       is('prefix' in store, false, "createStorage doesn't expose non-whitelist attributes");
     })();
   `);
+}));
+
+add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
+  const ADDON_ID = "normandydriver@example.com";
+  let addon = await driver.addons.get(ADDON_ID);
+  Assert.equal(addon, null, "Add-on is not yet installed");
+
+  await driver.addons.install(TEST_XPI_URL);
+  addon = await driver.addons.get(ADDON_ID);
+
+  Assert.notEqual(addon, null, "Add-on object was returned");
+  ok(addon.installDate instanceof sandboxManager.sandbox.Date, "installDate should be a Date object");
+
+  Assert.deepEqual(addon, {
+    id: "normandydriver@example.com",
+    name: "normandy_fixture",
+    version: "1.0",
+    installDate: addon.installDate,
+    isActive: true,
+    type: "extension",
+  }, "Add-on is installed");
+
+  await driver.addons.uninstall(ADDON_ID);
+  addon = await driver.addons.get(ADDON_ID);
+
+  Assert.equal(addon, null, "Add-on has been uninstalled");
+}));
+
+add_task(withSandboxManager(Assert, async function testAddonsGetWorksInSandbox(sandboxManager) {
+  const driver = new NormandyDriver(sandboxManager);
+  sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+
+  // Assertion helpers
+  sandboxManager.addGlobal("is", is);
+  sandboxManager.addGlobal("deepEqual", (...args) => Assert.deepEqual(...args));
+
+  const ADDON_ID = "normandydriver@example.com";
+
+  await driver.addons.install(TEST_XPI_URL);
+
+  await sandboxManager.evalInSandbox(`
+    (async function sandboxTest() {
+      const addon = await driver.addons.get("${ADDON_ID}");
+
+      deepEqual(addon, {
+        id: "${ADDON_ID}",
+        name: "normandy_fixture",
+        version: "1.0",
+        installDate: addon.installDate,
+        isActive: true,
+        type: "extension",
+      }, "Add-on is accesible in the driver");
+    })();
+  `);
+
+  await driver.addons.uninstall(ADDON_ID);
+}));
+
+add_task(withSandboxManager(Assert, async function testStudyStorage(sandboxManager) {
+  const driver = new NormandyDriver(sandboxManager);
+  sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+
+  // Assertion helpers
+  sandboxManager.addGlobal("is", is);
+  sandboxManager.addGlobal("ok", ok);
+
+  await sandboxManager.evalInSandbox(`
+    (async function sandboxTest() {
+      await driver.studies.create({
+        name: "test-study",
+        addonId: "test@example.com",
+        addonVersion: "1.0",
+        description: "fake",
+        studyStartDate: new Date().toJSON(),
+      });
+
+      const hasStudy = await driver.studies.has("test-study");
+      ok(hasStudy, "studies.create creates studies from within a sandbox.");
+
+      let study = await driver.studies.get("test-study");
+      is(study.addonVersion, "1.0", "studies.get fetches studies from within a sandbox.");
+
+      await driver.studies.update("test-study", {addonVersion: "2.0"});
+      study = await driver.studies.get("test-study");
+      is(study.addonVersion, "2.0", "studies.update can update stored studies.");
+    })();
+  `);
+
+  await StudyStorage.clear();
+  await StudyStorage.close();
 }));

@@ -6,11 +6,13 @@
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource:///modules/ShellService.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Timer.jsm");
+Cu.import("resource://shield-recipe-client/lib/Addons.jsm");
 Cu.import("resource://shield-recipe-client/lib/LogManager.jsm");
 Cu.import("resource://shield-recipe-client/lib/Storage.jsm");
 Cu.import("resource://shield-recipe-client/lib/Heartbeat.jsm");
@@ -18,6 +20,9 @@ Cu.import("resource://shield-recipe-client/lib/FilterExpressions.jsm");
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(
+  this, "StudyStorage", "resource://shield-recipe-client/lib/StudyStorage.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -156,38 +161,11 @@ this.NormandyDriver = function(sandboxManager) {
       sandboxManager.removeHold(`setTimeout-${token}`);
     },
 
-    /*
-     * Return a promise that resolves to an Addon ID if installation is successful.
-     */
-    installAddon: sandboxManager.wrapAsync(async function installAddon(installUrl) {
-      const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
-      const result = new Promise((resolve, reject) => installObj.addListener({
-        onInstallEnded(addonInstall, addon) {
-          resolve(addon.id);
-        },
-        onInstallFailed(addonInstall) {
-          reject(`AddonInstall error code: [${addonInstall.error}]`);
-        },
-        onDownloadFailed() {
-          reject(`Download failed: [${installUrl}]`);
-        },
-      }));
-      installObj.install();
-      return result;
-    }),
-
-    /*
-     * Return a promise that resolves to a success messsage if
-     * addon uninstall is successful.
-     */
-    uninstallAddon: sandboxManager.wrapAsync(async function uninstallAddon(addonId) {
-      const addon = await AddonManager.getAddonByID(addonId);
-      if (addon === null) {
-        throw new Error(`No addon with ID [${addonId}] found.`);
-      }
-      addon.uninstall();
-      return null;
-    }),
+    addons: {
+      get: sandboxManager.wrapAsync(Addons.get.bind(Addons), {cloneInto: true}),
+      install: sandboxManager.wrapAsync(Addons.install.bind(Addons)),
+      uninstall: sandboxManager.wrapAsync(Addons.uninstall.bind(Addons)),
+    },
 
     // Sampling
     ratioSample: sandboxManager.wrapAsync(Sampling.ratioSample),
@@ -200,6 +178,14 @@ this.NormandyDriver = function(sandboxManager) {
       get: sandboxManager.wrapAsync(PreferenceExperiments.get, {cloneInto: true}),
       getAllActive: sandboxManager.wrapAsync(PreferenceExperiments.getAllActive, {cloneInto: true}),
       has: sandboxManager.wrapAsync(PreferenceExperiments.has),
+    },
+
+    // Study storage API
+    studies: {
+      create: sandboxManager.wrapAsync(StudyStorage.create, {cloneArguments: true}),
+      update: sandboxManager.wrapAsync(StudyStorage.update, {cloneArguments: true}),
+      get: sandboxManager.wrapAsync(StudyStorage.get, {cloneInto: true}),
+      has: sandboxManager.wrapAsync(StudyStorage.has),
     },
   };
 };

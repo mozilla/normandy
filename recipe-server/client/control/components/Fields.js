@@ -140,10 +140,8 @@ export class CheckboxGroup extends React.Component {
    * @param  {Event} onChange event object
    */
   handleChange({ target }) {
-    const {
-      value = [],
-      onChange,
-    } = this.props;
+    const { onChange } = this.props;
+    const value = this.props.value || [];
 
     let newValue = [];
 

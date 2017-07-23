@@ -28,8 +28,6 @@ exports.elements = {
 		eval: function(left, right) { return left * right; }},
 	'/': {type: 'binaryOp', precedence: 40,
 		eval: function(left, right) { return left / right; }},
-	'//': {type: 'binaryOp', precedence: 40,
-		eval: function(left, right) { return Math.floor(left / right); }},
 	'%': {type: 'binaryOp', precedence: 50,
 		eval: function(left, right) { return left % right; }},
 	'^': {type: 'binaryOp', precedence: 50,
