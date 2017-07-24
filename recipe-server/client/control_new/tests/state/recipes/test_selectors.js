@@ -5,10 +5,12 @@ import {
   ACTION_RECEIVE,
   RECIPE_RECEIVE,
   REVISION_RECEIVE,
+  USER_RECEIVE,
 } from 'control_new/state/action-types';
 import actionsReducer from 'control_new/state/app/actions/reducers';
 import recipesReducer from 'control_new/state/app/recipes/reducers';
 import revisionsReducer from 'control_new/state/app/revisions/reducers';
+import usersReducer from 'control_new/state/app/users/reducers';
 import {
   getRecipe,
   getRecipeFilters,
@@ -41,6 +43,10 @@ describe('getRecipe', () => {
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
         revision: recipe.latest_revision,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: recipe.latest_revision.user,
       }),
     },
   };
@@ -106,6 +112,10 @@ describe('getRecipeHistory', () => {
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
         revision: recipe.latest_revision,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: recipe.latest_revision.user,
       }),
     },
   };

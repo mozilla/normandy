@@ -2,7 +2,7 @@ import faker from 'faker';
 import { Map } from 'immutable';
 
 import { AutoIncrementField, DateField, Factory, SubFactory } from 'control_new/tests/factory';
-import { UserFactory } from 'control_new/tests/state';
+import { UserFactory } from 'control_new/tests/state/users';
 
 
 export const INITIAL_STATE = {

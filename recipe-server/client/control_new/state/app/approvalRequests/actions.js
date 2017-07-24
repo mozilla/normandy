@@ -1,11 +1,34 @@
 import {
   APPROVAL_REQUEST_DELETE,
   APPROVAL_REQUEST_RECEIVE,
+  USER_RECEIVE,
 } from 'control_new/state/action-types';
 
 import {
   makeApiRequest,
 } from 'control_new/state/app/requests/actions';
+
+
+export function approvalRequestReceived(approvalRequest) {
+  return dispatch => {
+    dispatch({
+      type: APPROVAL_REQUEST_RECEIVE,
+      approvalRequest,
+    });
+
+    dispatch({
+      type: USER_RECEIVE,
+      user: approvalRequest.creator,
+    });
+
+    if (approvalRequest.approver) {
+      dispatch({
+        type: USER_RECEIVE,
+        user: approvalRequest.approver,
+      });
+    }
+  };
+}
 
 
 export function fetchApprovalRequest(pk) {
@@ -14,10 +37,7 @@ export function fetchApprovalRequest(pk) {
     const response = dispatch(makeApiRequest(requestId, `v2/approval_request/${pk}/`));
     const approvalRequest = await response;
 
-    dispatch({
-      type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest,
-    });
+    dispatch(approvalRequestReceived(approvalRequest));
   };
 }
 
@@ -28,10 +48,7 @@ export function fetchAllApprovalRequests() {
     const approvalRequests = await dispatch(makeApiRequest(requestId, 'v2/approval_request/'));
 
     approvalRequests.forEach(approvalRequest => {
-      dispatch({
-        type: APPROVAL_REQUEST_RECEIVE,
-        approvalRequest,
-      });
+      dispatch(approvalRequestReceived(approvalRequest));
     });
   };
 }
@@ -46,10 +63,7 @@ export function approveApprovalRequest(pk, data) {
         data,
       }));
 
-    dispatch({
-      type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest,
-    });
+    dispatch(approvalRequestReceived(approvalRequest));
   };
 }
 
@@ -63,10 +77,7 @@ export function rejectApprovalRequest(pk, data) {
         data,
       }));
 
-    dispatch({
-      type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest,
-    });
+    dispatch(approvalRequestReceived(approvalRequest));
   };
 }
 

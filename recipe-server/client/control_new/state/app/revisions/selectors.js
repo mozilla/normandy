@@ -18,6 +18,9 @@ import {
   getLatestRevisionIdForRecipe,
   isRecipeEnabled,
 } from 'control_new/state/app/recipes/selectors';
+import {
+  getUser,
+} from 'control_new/state/app/users/selectors';
 
 
 export function getRevision(state, id, defaultsTo = null) {
@@ -26,12 +29,15 @@ export function getRevision(state, id, defaultsTo = null) {
   if (revision) {
     const action = getAction(state, revision.getIn(['recipe', 'action_id']));
     const approvalRequest = getApprovalRequest(state, revision.get('approval_request_id'));
+    const user = getUser(state, revision.get('user_id'));
 
     return revision
       .setIn(['recipe', 'action'], action)
       .removeIn(['recipe', 'action_id'])
       .set('approval_request', approvalRequest)
-      .remove('approval_request_id');
+      .remove('approval_request_id')
+      .set('user', user)
+      .remove('user_id');
   }
 
   return defaultsTo;

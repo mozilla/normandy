@@ -1,4 +1,5 @@
 import { fromJS } from 'immutable';
+import * as matchers from 'jasmine-immutable-matchers';
 
 import {
   APPROVAL_REQUEST_DELETE,
@@ -14,18 +15,32 @@ import {
 describe('Approval requests reducer', () => {
   const approvalRequest = ApprovalRequestFactory.build();
 
+  beforeEach(() => {
+    jasmine.addMatchers(matchers);
+  });
+
   it('should return initial state by default', () => {
     expect(approvalRequestsReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle APPROVAL_REQUEST_RECEIVE', () => {
-    expect(approvalRequestsReducer(undefined, {
+    const reducedApprovalRequest = {
+      ...approvalRequest,
+      approver_id: approvalRequest.approver ? approvalRequest.approver.id : null,
+      creator_id: approvalRequest.creator.id,
+    };
+
+    delete reducedApprovalRequest.approver;
+    delete reducedApprovalRequest.creator;
+
+    const updatedState = approvalRequestsReducer(undefined, {
       type: APPROVAL_REQUEST_RECEIVE,
       approvalRequest,
-    })).toEqual({
-      ...INITIAL_STATE,
-      items: INITIAL_STATE.items.set(approvalRequest.id, fromJS(approvalRequest)),
     });
+
+    expect(updatedState.items).toEqualImmutable(
+      INITIAL_STATE.items.set(approvalRequest.id, fromJS(reducedApprovalRequest)),
+    );
   });
 
   it('should handle APPROVAL_REQUEST_DELETE', () => {

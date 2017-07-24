@@ -2,6 +2,7 @@
 
 import {
   SERVICE_INFO_RECEIVE,
+  USER_RECEIVE,
 } from 'control_new/state/action-types';
 import {
   makeApiRequest,
@@ -16,6 +17,11 @@ export function fetchServiceInfo() {
     dispatch({
       type: SERVICE_INFO_RECEIVE,
       serviceInfo,
+    });
+
+    dispatch({
+      type: USER_RECEIVE,
+      user: serviceInfo.user,
     });
   };
 }

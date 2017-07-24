@@ -19,7 +19,9 @@ function items(state = new Map(), action) {
         .setIn(['recipe', 'action_id'], revision.getIn(['recipe', 'action', 'id'], null))
         .removeIn(['recipe', 'action'])
         .set('approval_request_id', revision.getIn(['approval_request', 'id'], null))
-        .remove('approval_request');
+        .remove('approval_request')
+        .set('user_id', revision.getIn(['user', 'id'], null))
+        .remove('user');
 
       return state.set(action.revision.id, revision);
 

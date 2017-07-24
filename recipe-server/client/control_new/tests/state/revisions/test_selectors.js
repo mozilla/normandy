@@ -4,9 +4,11 @@ import * as matchers from 'jasmine-immutable-matchers';
 import {
   ACTION_RECEIVE,
   REVISION_RECEIVE,
+  USER_RECEIVE,
 } from 'control_new/state/action-types';
 import actionsReducer from 'control_new/state/app/actions/reducers';
 import revisionsReducer from 'control_new/state/app/revisions/reducers';
+import usersReducer from 'control_new/state/app/users/reducers';
 import { getRevision } from 'control_new/state/app/revisions/selectors';
 import {
   INITIAL_STATE,
@@ -30,6 +32,10 @@ describe('getRevision', () => {
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
         revision,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: revision.user,
       }),
     },
   };

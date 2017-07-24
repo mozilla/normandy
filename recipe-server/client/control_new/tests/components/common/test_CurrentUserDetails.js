@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import CurrentUserDetailsWrapper from 'control_new/components/common/CurrentUserDetails';
-import { UserFactory } from 'control_new/tests/state';
+import { UserFactory } from 'control_new/tests/state/users';
 
 
 // Unwrap the connected component

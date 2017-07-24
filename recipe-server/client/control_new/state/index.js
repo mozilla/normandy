@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
 import app from 'control_new/state/app/reducer';
-import router from 'control_new/state/router/reducer';
+import { reducer as router } from 'control_new/routes';
 
 
 const reducer = combineReducers({

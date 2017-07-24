@@ -1,9 +1,12 @@
 import {
   ACTION_RECEIVE,
   APPROVAL_REQUEST_CREATE,
-  APPROVAL_REQUEST_RECEIVE,
   REVISION_RECEIVE,
+  USER_RECEIVE,
 } from 'control_new/state/action-types';
+import {
+  approvalRequestReceived,
+} from 'control_new/state/app/approvalRequests/actions';
 import {
   makeApiRequest,
 } from 'control_new/state/app/requests/actions';
@@ -22,9 +25,13 @@ export function revisionReceived(revision) {
     });
 
     if (revision.approval_request) {
+      dispatch(approvalRequestReceived(revision.approval_request));
+    }
+
+    if (revision.user) {
       dispatch({
-        type: APPROVAL_REQUEST_RECEIVE,
-        approvalRequest: revision.approval_request,
+        type: USER_RECEIVE,
+        user: revision.user,
       });
     }
   };
@@ -60,10 +67,7 @@ export function requestRevisionApproval(pk) {
         method: 'POST',
       }));
 
-    dispatch({
-      type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest,
-    });
+    dispatch(approvalRequestReceived(approvalRequest));
 
     dispatch({
       type: APPROVAL_REQUEST_CREATE,

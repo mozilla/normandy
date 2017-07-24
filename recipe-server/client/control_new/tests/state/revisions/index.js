@@ -3,7 +3,7 @@ import { Map } from 'immutable';
 import { randexp } from 'randexp';
 
 import { DateField, Factory, Field, SubFactory } from 'control_new/tests/factory';
-import { UserFactory } from 'control_new/tests/state';
+import { UserFactory } from 'control_new/tests/state/users';
 import { SimpleRecipeFactory } from 'control_new/tests/state/recipes';
 
 
