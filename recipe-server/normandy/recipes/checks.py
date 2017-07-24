@@ -84,5 +84,6 @@ def recipe_signatures_use_good_certificates(app_configs, **kwargs):
 
 def register():
     register_check(actions_have_consistent_hashes)
-    register_check(recipe_signatures_are_correct)
+    # Temporarily disabled, see Issue #900.
+    # register_check(recipe_signatures_are_correct)
     register_check(recipe_signatures_use_good_certificates)

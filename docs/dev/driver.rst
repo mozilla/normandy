@@ -162,6 +162,27 @@ The driver object contains the following attributes:
       String containing the distribution ID of Firefox. This value is
       ``undefined`` on Firefox versions older than 48.0.
 
+.. js:function:: addons.get(addonId)
+
+   Retrieves information about an installed add-on.
+
+   :returns: Promise that resolves with an add-on object.
+
+   The add-on object includes the following fields:
+
+
+   id
+      String containing the add-on's ID.
+   name
+      String containing the add-on's name.
+   version
+      String containing the version of the add-on.
+   installDate
+      A Date object of when the add-on was installed.
+   isActive
+      Boolean specifying whether is the add-on is active (true) or
+      disabled (false).
+
 Plugins
 -------
 .. js:class:: Plugin

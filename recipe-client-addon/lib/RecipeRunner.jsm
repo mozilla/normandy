@@ -29,6 +29,10 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
                                   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ActionSandboxManager",
                                   "resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "StudyStorage",
+                                  "resource://shield-recipe-client/lib/StudyStorage.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Uptake",
+                                  "resource://shield-recipe-client/lib/Uptake.jsm");
 
 Cu.importGlobalProperties(["fetch"]);
 
@@ -102,7 +106,12 @@ this.RecipeRunner = {
     this.clearCaches();
     // Unless lazy classification is enabled, prep the classify cache.
     if (!Preferences.get("extensions.shield-recipe-client.experiments.lazy_classify", false)) {
-      await ClientEnvironment.getClientClassification();
+      try {
+        await ClientEnvironment.getClientClassification();
+      } catch (err) {
+        // Try to go on without this data; the filter expressions will
+        // gracefully fail without this info if they need it.
+      }
     }
 
     // Fetch recipes before execution in case we fail and exit early.
@@ -112,6 +121,14 @@ this.RecipeRunner = {
     } catch (e) {
       const apiUrl = prefs.getCharPref("api_url");
       log.error(`Could not fetch recipes from ${apiUrl}: "${e}"`);
+
+      let status = Uptake.RUNNER_SERVER_ERROR;
+      if (/NetworkError/.test(e)) {
+        status = Uptake.RUNNER_NETWORK_ERROR;
+      } else if (e instanceof NormandyApi.InvalidSignatureError) {
+        status = Uptake.RUNNER_INVALID_SIGNATURE;
+      }
+      Uptake.reportRunner(status);
       return;
     }
 
@@ -127,6 +144,7 @@ this.RecipeRunner = {
       } catch (err) {
         log.error(`Could not run pre-execution hook for ${actionName}:`, err.message);
         manager.disabled = true;
+        Uptake.reportAction(actionName, Uptake.ACTION_PRE_EXECUTION_ERROR);
       }
     }
 
@@ -144,23 +162,30 @@ this.RecipeRunner = {
     } else {
       for (const recipe of recipesToRun) {
         const manager = actionSandboxManagers[recipe.action];
+        let status;
         if (!manager) {
           log.error(
             `Could not execute recipe ${recipe.name}:`,
             `Action ${recipe.action} is either missing or invalid.`
           );
+          status = Uptake.RECIPE_INVALID_ACTION;
         } else if (manager.disabled) {
           log.warn(
             `Skipping recipe ${recipe.name} because ${recipe.action} failed during pre-execution.`
           );
+          status = Uptake.RECIPE_ACTION_DISABLED;
         } else {
           try {
             log.info(`Executing recipe "${recipe.name}" (action=${recipe.action})`);
             await manager.runAsyncCallback("action", recipe);
+            status = Uptake.RECIPE_SUCCESS;
           } catch (e) {
             log.error(`Could not execute recipe ${recipe.name}:`, e);
+            status = Uptake.RECIPE_EXECUTION_ERROR;
           }
         }
+
+        Uptake.reportRecipe(recipe.id, status);
       }
     }
 
@@ -174,13 +199,20 @@ this.RecipeRunner = {
 
       try {
         await manager.runAsyncCallback("postExecution");
+        Uptake.reportAction(actionName, Uptake.ACTION_SUCCESS);
       } catch (err) {
         log.info(`Could not run post-execution hook for ${actionName}:`, err.message);
+        Uptake.reportAction(actionName, Uptake.ACTION_POST_EXECUTION_ERROR);
       }
     }
 
     // Nuke sandboxes
     Object.values(actionSandboxManagers).forEach(manager => manager.removeHold("recipeRunner"));
+
+    // Close storage connections
+    await StudyStorage.close();
+
+    Uptake.reportRunner(Uptake.RUNNER_SUCCESS);
   },
 
   async loadActionSandboxManagers() {
@@ -192,6 +224,12 @@ this.RecipeRunner = {
         actionSandboxManagers[action.name] = new ActionSandboxManager(implementation);
       } catch (err) {
         log.warn(`Could not fetch implementation for ${action.name}:`, err);
+
+        let status = Uptake.ACTION_SERVER_ERROR;
+        if (/NetworkError/.test(err)) {
+          status = Uptake.ACTION_NETWORK_ERROR;
+        }
+        Uptake.reportAction(action.name, status);
       }
     }
     return actionSandboxManagers;

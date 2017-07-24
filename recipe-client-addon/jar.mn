@@ -6,5 +6,5 @@
 % resource shield-recipe-client %content/
   content/lib/ (./lib/*)
   content/data/ (./data/*)
-  content/node_modules/mozjexl/ (./node_modules/mozjexl/*)
   content/skin/  (skin/*)
+  content/vendor/ (./vendor/*)

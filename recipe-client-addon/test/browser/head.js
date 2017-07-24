@@ -26,6 +26,13 @@ registerCleanupFunction(async function() {
 
 this.UUID_REGEX = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/;
 
+this.TEST_XPI_URL = (function() {
+  const dir = getChromeDir(getResolvedURI(gTestPath));
+  dir.append("fixtures");
+  dir.append("normandy.xpi");
+  return Services.io.newFileURI(dir).spec;
+})();
+
 this.withSandboxManager = function(Assert, testFunction) {
   return async function inner() {
     const sandboxManager = new SandboxManager();
@@ -43,7 +50,7 @@ this.withSandboxManager = function(Assert, testFunction) {
 this.withDriver = function(Assert, testFunction) {
   return withSandboxManager(Assert, async function inner(sandboxManager) {
     const driver = new NormandyDriver(sandboxManager);
-    await testFunction(driver);
+    await testFunction(driver, sandboxManager);
   });
 };
 

@@ -14,6 +14,11 @@ function cleanup {
 }
 trap cleanup EXIT
 
+# Build vendor files
+pushd $BASE_DIR
+npm run build
+popd
+
 while read -r LINE || [[ -n "${LINE}" ]]; do
   mkdir -p "$(dirname "${DEST}/${LINE}")"
   cp -r "${BASE_DIR}/${LINE}" "$(dirname "${DEST}/${LINE}")"
