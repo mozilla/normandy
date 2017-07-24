@@ -13,11 +13,6 @@ import Router, {
 import reducers from 'control_new/state';
 
 
-const reducers = combineReducers({
-  app: applicationState,
-  router: routerReducer,
-});
-
 const middleware = [
   routerMiddleware,
   thunk,

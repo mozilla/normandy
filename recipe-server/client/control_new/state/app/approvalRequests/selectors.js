@@ -3,7 +3,7 @@ import { getUser } from 'control_new/state/app/users/selectors';
 
 
 export function getApprovalRequest(state, id, defaultsTo = null) {
-  let approvalRequest = state.app.approvalRequests.items.get(id);
+  const approvalRequest = state.app.approvalRequests.items.get(id);
 
   if (approvalRequest) {
     const creator = getUser(state, approvalRequest.get('creator_id'));

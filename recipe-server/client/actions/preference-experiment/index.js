@@ -38,7 +38,7 @@ export default class PreferenceExperimentAction extends Action {
       if (hasConflicts) {
         this.normandy.log(
           `Experiment ${slug} ignored; another active experiment is already using the
-          ${preferenceName} preference.`, 'warn'
+          ${preferenceName} preference.`, 'warn',
         );
         return;
       }
