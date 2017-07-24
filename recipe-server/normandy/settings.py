@@ -333,6 +333,7 @@ class Base(Core):
     AWS_ACCESS_KEY_ID = values.Value()
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
+    AWS_QUERYSTRING_AUTH = values.BooleanValue(False)
 
 
 class Development(Base):
