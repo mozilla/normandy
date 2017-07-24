@@ -39,7 +39,9 @@ this.shutdown = function(data, reason) {
     "lib/SandboxManager.jsm",
     "lib/ShieldRecipeClient.jsm",
     "lib/Storage.jsm",
+    "lib/Uptake.jsm",
     "lib/Utils.jsm",
+    "vendor/mozjexl.js",
   ];
   for (const module of modules) {
     log.debug(`Unloading ${module}`);

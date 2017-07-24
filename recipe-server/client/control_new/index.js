@@ -6,7 +6,6 @@ import { initializeCurrentLocation } from 'redux-little-router';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 
-import DevTools from 'control_new/components/devtools';
 import Router, {
   enhancer as routerEnhancer,
   middleware as routerMiddleware,
@@ -14,19 +13,30 @@ import Router, {
 import reducers from 'control_new/state';
 
 
-const store = createStore(reducers, reducers(undefined, { type: 'INITIAL' }), compose(
-  applyMiddleware(
-    routerMiddleware,
-    thunk,
+const reducers = combineReducers({
+  app: applicationState,
+  router: routerReducer,
+});
+
+const middleware = [
+  routerMiddleware,
+  thunk,
+];
+
+if (DEVELOPMENT) {
+  middleware.push(
     createLogger({
       collapsed: true,
       diff: false,
       duration: true,
       timestamp: true,
     }),
-  ),
+  );
+}
+
+const store = createStore(reducers, reducers(undefined, { type: 'initial' }), compose(
+  applyMiddleware(...middleware),
   routerEnhancer,
-  DEVELOPMENT ? DevTools.instrument() : x => x,
 ));
 
 const initialLocation = store.getState().router;
@@ -34,12 +44,14 @@ if (initialLocation) {
   store.dispatch(initializeCurrentLocation(initialLocation));
 }
 
-function Root() {
-  return (
-    <Provider store={store}>
-      <Router />
-    </Provider>
-  );
+class Root extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Router />
+      </Provider>
+    );
+  }
 }
 
 
