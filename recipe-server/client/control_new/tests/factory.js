@@ -7,8 +7,8 @@ let autoIncrementIndex = 0;
 /* Class representing a generated field on a factory */
 export class Field {
   /**
-   * Creates a new generated field. These are lazy and will not be generated until .value() is
-   * called.
+   * Creates a new generated field. These are lazy and will not be generated until the getter
+   * for `value` is called.
    *
    * @param generator  A function that accepts will generate the value of the field.
    * @param options  The arguments to be passed through to the generator.
@@ -19,13 +19,12 @@ export class Field {
   }
 
   /**
-   * Checks if a value exists and if so returns it. If not it is generated and then returned.
+   * A getter method `value` which replaces itself with a static value after the first time it
+   * is called.
    */
-  value() {
-    if (this._value === undefined) {
-      this._value = this.generator(...this.options);
-    }
-    return this._value;
+  get value() {
+    Object.defineProperty(this, 'value', { value: this.generator(...this.options) });
+    return this.value;
   }
 }
 
