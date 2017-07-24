@@ -85,6 +85,9 @@ add_task(async function testError() {
 });
 
 add_task(async function testDriver() {
+  // The value returned by runAsyncCallback is cloned without the cloneFunctions
+  // option, so we can't inspect the driver itself since its methods will not be
+  // present. Instead, we inspect the properties on it available to the sandbox.
   const script = `
     registerAsyncCallback("testCallback", async function(normandy) {
       return Object.keys(normandy);
