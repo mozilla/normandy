@@ -93,7 +93,7 @@ export class Factory {
       if (defaults[key]) {
         this.data[key] = defaults[key];
       } else if (fields[key] instanceof Field) {
-        this.data[key] = fields[key].value();
+        this.data[key] = fields[key].value;
       } else {
         this.data[key] = fields[key];
       }
