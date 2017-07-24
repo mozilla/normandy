@@ -10,7 +10,7 @@ export class Field {
    * Creates a new generated field. These are lazy and will not be generated until the getter
    * for `value` is called.
    *
-   * @param generator  A function that accepts will generate the value of the field.
+   * @param generator  A function that will generate the value of the field.
    * @param options  The arguments to be passed through to the generator.
    */
   constructor(generator, ...options) {
@@ -74,7 +74,7 @@ export class SubFactory extends Field {
  *
  * Additionally a postGeneration function may be provided. This is always called after the data
  * has been generated and stored in this.data. This function can be used to manipulate generated
- * data or generate additional data based on the options provided at initialization.s
+ * data or generate additional data based on the options provided at initialization.
  */
 export class Factory {
   /**
@@ -87,8 +87,7 @@ export class Factory {
     this.options = options;
     this.data = {};
 
-    // Check if a getFields function exists and call it or return an empty object.
-    const fields = (typeof this.getFields === 'function') ? this.getFields() : {};
+    const fields = this.getFields();
 
     Object.keys(fields).forEach(key => {
       if (defaults[key]) {
@@ -100,10 +99,16 @@ export class Factory {
       }
     });
 
-    // Check if there is a postGeneration function and if so call it.
-    if (typeof this.postGeneration === 'function') {
-      this.postGeneration();
-    }
+    // Call the post generation hook.
+    this.postGeneration();
+  }
+
+  getFields() {
+    throw Error('The getFields method was not implemented.');
+  }
+
+  postGeneration() {
+    // No-op
   }
 
   static build(...args) {
