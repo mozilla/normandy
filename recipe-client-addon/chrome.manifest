@@ -4,3 +4,4 @@
 
 resource shield-recipe-client .
 resource shield-recipe-client-content content/
+resource shield-recipe-client-vendor vendor/

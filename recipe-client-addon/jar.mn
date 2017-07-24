@@ -7,6 +7,7 @@
   lib/ (./lib/*)
   data/ (./data/*)
   skin/  (skin/*)
-  vendor/ (./vendor/*)
 % resource shield-recipe-client-content %content/
   content/ (./content/*)
+% resource shield-recipe-client-vendor %vendor/
+  vendor/ (./vendor/*)

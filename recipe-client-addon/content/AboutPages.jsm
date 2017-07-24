@@ -130,7 +130,7 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
     uriFlags: (
       Ci.nsIAboutModule.ALLOW_SCRIPT
       | Ci.nsIAboutModule.URI_SAFE_FOR_UNTRUSTED_CONTENT
-      | Ci.nsIAboutModule.URI_MUST_RUN_IN_CHILD
+      | Ci.nsIAboutModule.URI_MUST_LOAD_IN_CHILD
     ),
   });
 
@@ -142,6 +142,7 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
     registerParentListeners() {
       Services.mm.addMessageListener("Shield:GetStudyList", this);
       Services.mm.addMessageListener("Shield:RemoveStudy", this);
+      Services.mm.addMessageListener("Shield:OpenOldDataPreferences", this);
     },
 
     /**
@@ -150,6 +151,7 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
     unregisterParentListeners() {
       Services.mm.removeMessageListener("Shield:GetStudyList", this);
       Services.mm.removeMessageListener("Shield:RemoveStudy", this);
+      Services.mm.removeMessageListener("Shield:OpenOldDataPreferences", this);
     },
 
     /**
@@ -164,6 +166,9 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
           break;
         case "Shield:RemoveStudy":
           this.removeStudy(message.data);
+          break;
+        case "Shield:OpenOldDataPreferences":
+          this.openOldDataPreferences();
           break;
       }
     },
@@ -195,6 +200,11 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
       Services.mm.broadcastAsyncMessage("Shield:ReceiveStudyList", {
         studies: await StudyStorage.getAll(),
       });
+    },
+
+    openOldDataPreferences() {
+      const browserWindow = Services.wm.getMostRecentWindow("navigator:browser");
+      browserWindow.openAdvancedPreferences("dataChoicesTab", {origin: "aboutStudies"});
     },
 
     getShieldLearnMoreHref() {

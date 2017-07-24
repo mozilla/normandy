@@ -42,11 +42,14 @@ this.shutdown = function(data, reason) {
     "lib/StudyStorage.jsm",
     "lib/Uptake.jsm",
     "lib/Utils.jsm",
-    "vendor/mozjexl.js",
   ].map(m => `resource://shield-recipe-client/${m}`);
   modules = modules.concat([
     "AboutPages.jsm",
   ].map(m => `resource://shield-recipe-client-content/${m}`));
+  modules = modules.concat([
+    "ajv.js",
+    "mozjexl.js",
+  ].map(m => `resource://shield-recipe-client-vendor/${m}`));
 
   for (const module of modules) {
     log.debug(`Unloading ${module}`);

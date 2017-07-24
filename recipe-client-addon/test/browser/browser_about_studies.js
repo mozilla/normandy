@@ -64,22 +64,27 @@ compose_task(
   }),
   withAboutStudies,
   async function testUpdatePreferencesOldOrganization(browser) {
-    browser.contentDocument.getElementById("shield-studies-update-preferences").click();
-    await BrowserTestUtils.waitForLocationChange(gBrowser);
-    await BrowserTestUtils.waitForEvent(browser.contentWindow, "load");
+    // We have to use gBrowser instead of browser in most spots since we're
+    // dealing with a new tab outside of the about:studies tab.
+    const tab = await BrowserTestUtils.switchTab(gBrowser, () => {
+      browser.contentDocument.getElementById("shield-studies-update-preferences").click();
+    });
+    await BrowserTestUtils.waitForEvent(gBrowser.contentWindow, "load");
 
-    const location = browser.contentWindow.location.href;
+    const location = gBrowser.contentWindow.location.href;
     is(
       location,
       "about:preferences#advanced",
       "Clicking Update Preferences opens the advanced section of the old about:prefernces.",
     );
 
-    const dataChoicesTab = browser.contentDocument.getElementById("dataChoicesTab");
+    const dataChoicesTab = gBrowser.contentDocument.getElementById("dataChoicesTab");
     ok(
       dataChoicesTab.selected,
       "Click Update preferences selects the Data Choices tab in the old about:preferences."
     );
+
+    await BrowserTestUtils.removeTab(tab);
   }
 );
 

@@ -9,7 +9,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 Cu.import("resource://shield-recipe-client/lib/PreferenceFilters.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "mozjexl", "resource://shield-recipe-client/vendor/mozjexl.js");
+XPCOMUtils.defineLazyModuleGetter(this, "mozjexl", "resource://shield-recipe-client-vendor/mozjexl.js");
 
 this.EXPORTED_SYMBOLS = ["FilterExpressions"];
 
