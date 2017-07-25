@@ -10,19 +10,26 @@
             "title": "Enroll a user in an opt-out SHIELD study",
             "type": "object",
             "required": [
-                "message",
-                "extension"
+                "name",
+                "description",
+                "addonUrl"
             ],
             "properties": {
-                "message": {
-                    "description": "Message to log to the console",
+                "name": {
+                    "description": "User-facing name of the study",
                     "type": "string",
-                    "default": ""
+                    "minLength": 1
                 },
-                "extension": {
-                    "description": "URL of the extension XPI",
+                "description": {
+                    "description": "User-facing description of the study",
                     "type": "string",
-                    "format": "uri"
+                    "minLength": 1
+                },
+                "addonUrl": {
+                    "description": "URL of the add-on XPI file",
+                    "type": "string",
+                    "format": "uri",
+                    "minLength": 1
                 }
             }
         }

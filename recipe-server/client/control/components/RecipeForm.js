@@ -51,6 +51,7 @@ import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
 import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
 import PreferenceExperimentFields from
   'control/components/action_fields/PreferenceExperimentFields';
+import OptOutStudyFields from 'control/components/action_fields/OptOutStudyFields';
 
 import MultiPicker from 'control/components/MultiPicker';
 import Frame from 'control/components/Frame';
@@ -101,6 +102,7 @@ export class RecipeForm extends React.Component {
     'console-log': ConsoleLogFields,
     'show-heartbeat': HeartbeatFields,
     'preference-experiment': PreferenceExperimentFields,
+    'opt-out-study': OptOutStudyFields,
   };
 
   static LoadingSpinner = (
@@ -463,6 +465,7 @@ export class RecipeForm extends React.Component {
             <option value="console-log">Log to Console</option>
             <option value="show-heartbeat">Heartbeat Prompt</option>
             <option value="preference-experiment">Preference Experiment</option>
+            <option value="opt-out-study">Opt-out Study</option>
           </ControlField>
 
           <ArgumentsFields disabled={isFormDisabled} fields={recipeArguments} />
