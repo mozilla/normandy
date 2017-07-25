@@ -2,12 +2,11 @@ import { fromJS } from 'immutable';
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import CurrentUserDetailsWrapper from 'control_new/components/common/CurrentUserDetails';
 import { UserFactory } from 'control_new/tests/state/users';
 
+import TestComponent from 'control_new/components/common/CurrentUserDetails';
+const { WrappedComponent as CurrentUserDetails } = TestComponent;
 
-// Unwrap the connected component
-const CurrentUserDetails = CurrentUserDetailsWrapper.WrappedComponent;
 
 
 describe('<CurrentUserDetails>', () => {

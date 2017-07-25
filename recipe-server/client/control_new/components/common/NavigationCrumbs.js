@@ -17,18 +17,10 @@ export default class NavigationCrumbs extends React.Component {
   };
   state = { breadcrumbs: [] };
 
-  componentDidMount() {
-    this.gatherBreadcrumbs(this.props.router);
-  }
-
-  componentWillReceiveProps({ router }) {
-    this.gatherBreadcrumbs(router || this.props.router);
-  }
-
   // Given a route (e.g. `/hello/:id/there`), finds params that need to be
   // populated (e.g. `:id`) and replaces the values in order to link correctly
   // when displayed as a Breadcrumb.
-  replaceUrlVariables(url, params) {
+  static replaceUrlVariables(url, params) {
     let newUrl = url;
     const urlParams = url.match(/:[a-z]+/gi);
 
@@ -40,6 +32,14 @@ export default class NavigationCrumbs extends React.Component {
     }
 
     return newUrl;
+  };
+
+  componentDidMount() {
+    this.gatherBreadcrumbs(this.props.router);
+  }
+
+  componentWillReceiveProps({ router }) {
+    this.gatherBreadcrumbs(router || this.props.router);
   }
 
   gatherBreadcrumbs(router) {
@@ -52,7 +52,7 @@ export default class NavigationCrumbs extends React.Component {
     while (currentRoute) {
       crumbs.push({
         name: currentRoute.crumb,
-        link: this.replaceUrlVariables(currentRoute.route || pathname, params),
+        link: NavigationCrumbs.replaceUrlVariables(currentRoute.route || pathname, params),
       });
 
       currentRoute = currentRoute.parent;
