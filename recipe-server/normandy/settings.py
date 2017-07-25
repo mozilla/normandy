@@ -340,6 +340,12 @@ class Base(Core):
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
 
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        # Check CSRF cookie http only. disabled because we read the
+        # CSRF cookie in JS for forms in React.
+        'security.W017',
+    ])
+
 
 class Development(Base):
     """Settings for local development."""
