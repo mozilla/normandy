@@ -11,7 +11,7 @@ XPCOMUtils.defineLazyModuleGetter(
   this, "CleanupManager", "resource://shield-recipe-client/lib/CleanupManager.jsm",
 );
 XPCOMUtils.defineLazyModuleGetter(
-  this, "StudyStorage", "resource://shield-recipe-client/lib/StudyStorage.jsm",
+  this, "AddonStudies", "resource://shield-recipe-client/lib/AddonStudies.jsm",
 );
 
 this.EXPORTED_SYMBOLS = ["AboutPages"];
@@ -182,7 +182,7 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
      */
     async sendStudyList(target) {
       target.messageManager.sendAsyncMessage("Shield:ReceiveStudyList", {
-        studies: await StudyStorage.getAll(),
+        studies: await AddonStudies.getAll(),
       });
     },
 
@@ -190,15 +190,12 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
      * Disable an active study and remove its add-on.
      * @param {String} studyName
      */
-    async removeStudy(studyName) {
-      await StudyStorage.update(studyName, {
-        active: false,
-        studyEndDate: new Date().toJSON(),
-      });
+    async removeStudy(recipeId) {
+      await AddonStudies.stop(recipeId);
 
       // Update any open tabs with the new study list now that it has changed.
       Services.mm.broadcastAsyncMessage("Shield:ReceiveStudyList", {
-        studies: await StudyStorage.getAll(),
+        studies: await AddonStudies.getAll(),
       });
     },
 

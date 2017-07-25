@@ -8,7 +8,6 @@ var BabiliPlugin = require("babili-webpack-plugin");
 module.exports = {
   context: __dirname,
   entry: {
-    ajv: "./node_modules/ajv/",
     classnames: "./node_modules/classnames/",
     mozjexl: "./node_modules/mozjexl/",
     PropTypes: "./node_modules/prop-types/",

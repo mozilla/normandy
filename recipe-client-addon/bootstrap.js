@@ -25,6 +25,8 @@ this.shutdown = function(data, reason) {
   const log = LogManager.getLogger("bootstrap");
   let modules = [
     "lib/ActionSandboxManager.jsm",
+    "lib/Addons.jsm",
+    "lib/AddonStudies.jsm",
     "lib/CleanupManager.jsm",
     "lib/ClientEnvironment.jsm",
     "lib/FilterExpressions.jsm",

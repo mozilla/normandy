@@ -2,11 +2,11 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 
 Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Utils.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 // Load mocking/stubbing library, sinon
 // docs: http://sinonjs.org/docs/
@@ -34,24 +34,63 @@ this.TEST_XPI_URL = (function() {
   return Services.io.newFileURI(dir).spec;
 })();
 
-this.withSandboxManager = function(Assert, testFunction) {
-  return async function inner() {
-    const sandboxManager = new SandboxManager();
-    sandboxManager.addHold("test running");
+this.withWebExtension = function(manifestOverrides = {}) {
+  return function wrapper(testFunction) {
+    return async function wrappedTestFunction(...args) {
+      const random = Math.random().toString(36).replace(/0./, "").substr(-3);
+      let id = `normandydriver_${random}@example.com`;
+      if ("id" in manifestOverrides) {
+        id = manifestOverrides.id;
+        delete manifestOverrides.id;
+      }
 
-    await testFunction(sandboxManager);
+      const manifest = Object.assign({
+        manifest_version: 2,
+        name: "normandy_fixture",
+        version: "1.0",
+        description: "Dummy test fixture that's a webextension",
+        applications: {
+          gecko: { id },
+        },
+      }, manifestOverrides);
 
-    sandboxManager.removeHold("test running");
-    await sandboxManager.isNuked()
-      .then(() => Assert.ok(true, "sandbox is nuked"))
-      .catch(e => Assert.ok(false, "sandbox is nuked", e));
+      const file = AddonTestUtils.createTempWebExtensionFile({manifest});
+
+      // Workaround: Add-on files are cached by URL, and
+      // createTempWebExtensionFile re-uses filenames if the previous file has
+      // been deleted. So we need to flush the cache to avoid it.
+      Services.obs.notifyObservers(file, "flush-cache-entry");
+
+      try {
+        await testFunction(...args, [id, file]);
+      } finally {
+        file.remove(true);
+      }
+    };
+  };
+};
+
+this.withSandboxManager = function(Assert) {
+  return function wrapper(testFunction) {
+    return async function wrappedTestFunction(...args) {
+      const sandboxManager = new SandboxManager();
+      sandboxManager.addHold("test running");
+
+      await testFunction(...args, sandboxManager);
+
+      sandboxManager.removeHold("test running");
+      await sandboxManager.isNuked()
+        .then(() => Assert.ok(true, "sandbox is nuked"))
+        .catch(e => Assert.ok(false, "sandbox is nuked", e));
+    };
   };
 };
 
 this.withDriver = function(Assert, testFunction) {
-  return withSandboxManager(Assert, async function inner(sandboxManager) {
+  return withSandboxManager(Assert)(async function inner(...args) {
+    const sandboxManager = args[args.length - 1];
     const driver = new NormandyDriver(sandboxManager);
-    await testFunction(driver, sandboxManager);
+    await testFunction(driver, ...args);
   });
 };
 
@@ -173,23 +212,29 @@ this.compose_task = function(...args) {
   return add_task(testFunc);
 };
 
-this.studyFactory = function studyFactory(attrs) {
+let _studyFactoryId = 0;
+this.studyFactory = function(attrs) {
   return Object.assign({
+    recipeId: _studyFactoryId++,
     name: "Test study",
-    addonId: "foo@example.com",
-    addonVersion: "2.0.0",
     description: "fake",
-    studyStartDate: new Date().toJSON(),
+    active: true,
+    addonId: "fake@example.com",
+    addonUrl: "http://test/addon.xpi",
+    addonVersion: "1.0.0",
+    studyStartDate: new Date(),
   }, attrs);
 };
 
-this.withStudyStorage = function withStudyStorage(testFn) {
-  return async () => {
-    try {
-      await testFn(StudyStorage);
-    } finally {
-      await StudyStorage.clear();
-      await StudyStorage.close();
-    }
+this.withStub = function(...stubArgs) {
+  return function wrapper(testFunction) {
+    return async function wrappedTestFunction(...args) {
+      const stub = sinon.stub(...stubArgs);
+      try {
+        await testFunction(...args, stub);
+      } finally {
+        stub.restore();
+      }
+    };
   };
 };

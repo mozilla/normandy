@@ -8,6 +8,10 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "AddonManager", "resource://gre/modules/AddonManager.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Extension", "resource://gre/modules/Extension.jsm");
+XPCOMUtils.defineLazyModuleGetter(
+  this, "CleanupManager", "resource://shield-recipe-client/lib/CleanupManager.jsm"
+);
 
 this.EXPORTED_SYMBOLS = ["Addons"];
 
@@ -55,31 +59,52 @@ this.Addons = {
 
   /**
    * Installs an add-on
-   * @prop installUrl {string} Url to download the .xpi for the add-on from.
+   *
+   * @param {string} addonUrl
+   *   Url to download the .xpi for the add-on from.
+   * @param {boolean} update=false
+   *   If true, will update an existing installed add-on with the same ID.
    * @async
-   * @returns {string} Add-on ID that was installed
-   * @throws {string} If the add-on can not be installed.
+   * @returns {string}
+   *   Add-on ID that was installed
+   * @throws {string}
+   *   If the add-on can not be installed, or overwriting is disabled and an
+   *   add-on with a matching ID is already installed.
    */
-  async install(installUrl) {
-    const installObj = await AddonManager.getInstallForURL(installUrl, null, "application/x-xpinstall");
-    const result = new Promise((resolve, reject) => installObj.addListener({
-      onInstallEnded(addonInstall, addon) {
+  async install(addonUrl, update = false) {
+    const installObj = await AddonManager.getInstallForURL(addonUrl, null, "application/x-xpinstall");
+    return this.applyInstall(installObj, update);
+  },
+
+  async applyInstall(addonInstall, update = false) {
+    const result = new Promise((resolve, reject) => addonInstall.addListener({
+      onInstallStarted(cbInstall) {
+        if (cbInstall.existingAddon && !update) {
+          reject(new Error(`
+            Cannot install add-on ${cbInstall.addon.id}; an existing add-on
+            with the same ID exists and updating is disabled.
+          `));
+          return false;
+        }
+        return true;
+      },
+      onInstallEnded(cbInstall, addon) {
         resolve(addon.id);
       },
-      onInstallFailed(addonInstall) {
-        reject(`AddonInstall error code: [${addonInstall.error}]`);
+      onInstallFailed(cbInstall) {
+        reject(new Error(`AddonInstall error code: [${cbInstall.error}]`));
       },
-      onDownloadFailed() {
-        reject(`Download failed: [${installUrl}]`);
+      onDownloadFailed(cbInstall) {
+        reject(new Error(`Download failed: [${cbInstall.sourceURI}]`));
       },
     }));
-    installObj.install();
+    addonInstall.install();
     return result;
   },
 
   /**
    * Uninstalls an add-on by ID.
-   * @prop addonId {string} Add-on ID to uninstall.
+   * @param addonId {string} Add-on ID to uninstall.
    * @async
    * @throws If no add-on with `addonId` is installed.
    */
