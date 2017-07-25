@@ -2,7 +2,7 @@ import { getUser } from 'control_new/state/app/users/selectors';
 
 
 export function getCurrentUser(state, defaultsTo = null) {
-  return getUser(state.app.serviceInfo.get('user_id'), defaultsTo);
+  return getUser(state, state.app.serviceInfo.get('user_id'), defaultsTo);
 }
 
 export function isPeerApprovalEnforced(state) {
