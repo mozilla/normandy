@@ -1,15 +1,10 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import configureMockStore from 'redux-mock-store';
-import { Provider } from 'react-redux';
+import { shallow } from 'enzyme';
 
 import QueryExtension from 'control_new/components/data/QueryExtension';
 import TestComponent from 'control_new/components/extensions/EditExtensionPage';
 
 const { WrappedComponent: EditExtensionPage } = TestComponent;
-
-
-const mockStore = configureMockStore([])({});
 
 describe('<EditExtensionPage>', () => {
   const props = {

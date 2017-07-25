@@ -1,4 +1,3 @@
-import { fromJS } from 'immutable';
 import React from 'react';
 import { shallow } from 'enzyme';
 
@@ -8,7 +7,7 @@ describe('<CheckboxMenu>', () => {
   const props = {
     checkboxes: [],
     label: '',
-    onChange: ()=>{},
+    onChange: () => {},
     options: [],
   };
 

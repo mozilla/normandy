@@ -1,6 +1,5 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { Link } from 'redux-little-router';
 
 import Gateway from 'control_new/components/pages/Gateway';
 

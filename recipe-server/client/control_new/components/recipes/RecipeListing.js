@@ -10,7 +10,7 @@ import { push as pushAction, Link } from 'redux-little-router';
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipeListingColumns from 'control_new/components/data/QueryRecipeListingColumns';
-import QueryRecipes from 'control_new/components/data/QueryRecipes';
+import QueryMultipleRecipes from 'control_new/components/data/QueryMultipleRecipes';
 import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
 import {
@@ -74,7 +74,7 @@ export default class RecipeListing extends React.Component {
           title="Name"
           dataIndex="name"
           key="name"
-          render={Listing.renderLinkedText}
+          render={RecipeListing.renderLinkedText}
           sortOrder={DataList.getSortOrder('name', ordering)}
           sorter
         />
@@ -87,7 +87,7 @@ export default class RecipeListing extends React.Component {
           title="Action"
           dataIndex="action"
           key="action"
-          render={Listing.renderLinkedText}
+          render={RecipeListing.renderLinkedText}
         />
       );
     },
@@ -167,7 +167,7 @@ export default class RecipeListing extends React.Component {
     return (
       <div>
         <QueryRecipeListingColumns />
-        <QueryRecipes
+        <QueryMultipleRecipes
           pageNumber={pageNumber}
           filters={this.getFilters()}
         />
@@ -177,7 +177,7 @@ export default class RecipeListing extends React.Component {
         <LoadingOverlay>
           <DataList
             columns={columns}
-            columnRenderers={Listing.columnRenderers}
+            columnRenderers={RecipeListing.columnRenderers}
             dataSource={recipes.toJS()}
             ordering={ordering}
             onRowClick={this.handleRowClick}

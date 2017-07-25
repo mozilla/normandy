@@ -1,8 +1,8 @@
-import { fromJS } from 'immutable';
 import React from 'react';
 import { shallow } from 'enzyme';
 
 import TestComponent from 'control_new/components/common/NavigationCrumbs';
+
 const { WrappedComponent: NavigationCrumbs } = TestComponent;
 
 describe('<NavigationCrumbs>', () => {
@@ -17,8 +17,8 @@ describe('<NavigationCrumbs>', () => {
     expect(wrapper).not.toThrow();
   });
 
-  describe('replaceUrlVariables', ()=>{
-    it('should handle strings without variables', ()=>{
+  describe('replaceUrlVariables', () => {
+    it('should handle strings without variables', () => {
       let url = NavigationCrumbs.replaceUrlVariables('/hey/ron', {});
       expect(url).toBe('/hey/ron');
 
@@ -27,7 +27,7 @@ describe('<NavigationCrumbs>', () => {
       expect(url).toBe('/hey/ron/');
     });
 
-    it('should replace variables in strings', ()=>{
+    it('should replace variables in strings', () => {
       let url = NavigationCrumbs.replaceUrlVariables('/hey/:name', { name: 'billy' });
       expect(url).toBe('/hey/billy');
 
@@ -36,7 +36,7 @@ describe('<NavigationCrumbs>', () => {
       expect(url).toBe('/hey/billy/');
     });
 
-    it('should replace multiple variables', ()=>{
+    it('should replace multiple variables', () => {
       let url = NavigationCrumbs.replaceUrlVariables('/:one/:two', {
         one: 'that',
         two: 'hurt',

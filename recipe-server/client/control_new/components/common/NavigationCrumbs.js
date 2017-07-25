@@ -15,7 +15,6 @@ export default class NavigationCrumbs extends React.Component {
   static propTypes = {
     router: PropTypes.object.isRequired,
   };
-  state = { breadcrumbs: [] };
 
   // Given a route (e.g. `/hello/:id/there`), finds params that need to be
   // populated (e.g. `:id`) and replaces the values in order to link correctly
@@ -32,7 +31,9 @@ export default class NavigationCrumbs extends React.Component {
     }
 
     return newUrl;
-  };
+  }
+
+  state = { breadcrumbs: [] };
 
   componentDidMount() {
     this.gatherBreadcrumbs(this.props.router);

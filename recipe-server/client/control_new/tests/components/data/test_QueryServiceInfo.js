@@ -1,25 +1,25 @@
-import { fromJS } from 'immutable';
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 
 import TestComponent from 'control_new/components/data/QueryServiceInfo';
+
 const { WrappedComponent: QueryServiceInfo } = TestComponent;
 
 describe('<QueryServiceInfo>', () => {
   const props = {
-    fetchServiceInfo: ()=>{},
+    fetchServiceInfo: () => {},
   };
 
   it('should work', () => {
     const wrapper = () =>
-      shallow(<QueryServiceInfo {...props}  />);
+      shallow(<QueryServiceInfo {...props} />);
 
     expect(wrapper).not.toThrow();
   });
 
   it('should call fetchServiceInfo on mount', () => {
     let called = false;
-    const wrapper = shallow(<QueryServiceInfo fetchServiceInfo={()=>{called = true;}} />);
+    shallow(<QueryServiceInfo fetchServiceInfo={() => { called = true; }} />);
 
     expect(called).toBe(true);
   });
@@ -28,8 +28,8 @@ describe('<QueryServiceInfo>', () => {
     let callCount = 0;
     const wrapper = mount(
       <div fakeProp={1}>
-        <QueryServiceInfo fetchServiceInfo={()=>{callCount += 1;}} />
-      </div>
+        <QueryServiceInfo fetchServiceInfo={() => { callCount += 1; }} />
+      </div>,
     );
 
     wrapper.setProps({ fakeProp: 2 });
@@ -39,7 +39,7 @@ describe('<QueryServiceInfo>', () => {
     expect(callCount).toBe(1);
   });
 
-  it('should not render anything', ()=>{
+  it('should not render anything', () => {
     const wrapper = shallow(<QueryServiceInfo {...props} />);
     expect(wrapper.children().length).toBe(0);
   });

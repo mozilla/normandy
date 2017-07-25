@@ -2,33 +2,38 @@ import { Map } from 'immutable';
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 
-import TestComponent from 'control_new/components/data/QueryRecipes';
-const { WrappedComponent: QueryRecipes } = TestComponent;
+import TestComponent from 'control_new/components/data/QueryMultipleRecipes';
 
-describe('<QueryRecipes>', () => {
+const { WrappedComponent: QueryMultipleRecipes } = TestComponent;
+
+describe('<QueryMultipleRecipes>', () => {
   const props = {
-    fetchFilteredRecipesPage: ()=>{},
+    fetchFilteredRecipesPage: () => {},
     filters: new Map(),
     pageNumber: 1,
   };
 
   it('should work', () => {
     const wrapper = () =>
-      shallow(<QueryRecipes {...props}  />);
+      shallow(<QueryMultipleRecipes {...props} />);
 
     expect(wrapper).not.toThrow();
   });
 
   it('should call fetchFilteredRecipesPage on mount', () => {
     let called = false;
-    const wrapper = mount(<QueryRecipes {...props} fetchFilteredRecipesPage={()=>{called = true;}} />);
+    mount(
+      <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { called = true; }} />,
+    );
 
     expect(called).toBe(true);
   });
 
   it('should call fetchFilteredRecipesPage if the `pageNumber` changes', () => {
     let callCount = 0;
-    const wrapper = shallow(<QueryRecipes {...props} fetchFilteredRecipesPage={()=>{callCount += 1;}} />);
+    const wrapper = shallow(
+      <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />,
+    );
     expect(callCount).toBe(1);
 
     wrapper.setProps({ pageNumber: 2 });
@@ -46,16 +51,18 @@ describe('<QueryRecipes>', () => {
 
   it('should call fetchFilteredRecipesPage if the `filters` change', () => {
     let callCount = 0;
-    const wrapper = shallow(<QueryRecipes {...props} fetchFilteredRecipesPage={()=>{callCount += 1;}} />);
+    const wrapper = shallow(
+      <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />,
+    );
     expect(callCount).toBe(1);
 
-    wrapper.setProps({ filters: new Map() });
+    wrapper.setProps({ filters: new Map({ fake: 'data' }) });
     expect(callCount).toBe(2);
 
     wrapper.setProps({ irrelevant: true });
     expect(callCount).toBe(2);
 
-    wrapper.setProps({ filters: new Map() });
+    wrapper.setProps({ filters: new Map({ more: 'fake data' }) });
     expect(callCount).toBe(3);
   });
 
@@ -63,8 +70,8 @@ describe('<QueryRecipes>', () => {
     let callCount = 0;
     const wrapper = mount(
       <div fakeProp={1}>
-        <QueryRecipes  {...props} fetchFilteredRecipesPage={()=>{callCount += 1;}} />
-      </div>
+        <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />
+      </div>,
     );
     expect(callCount).toBe(1);
 
@@ -75,8 +82,8 @@ describe('<QueryRecipes>', () => {
     expect(callCount).toBe(1);
   });
 
-  it('should not render anything', ()=>{
-    const wrapper = shallow(<QueryRecipes {...props} />);
+  it('should not render anything', () => {
+    const wrapper = shallow(<QueryMultipleRecipes {...props} />);
     expect(wrapper.children().length).toBe(0);
   });
 });
