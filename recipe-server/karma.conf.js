@@ -1,6 +1,7 @@
 /* eslint-env node */
 /* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
 // Karma configuration
+const webpack = require('webpack');
 const WEBPACK_CONFIG = require('./webpack.config.js');
 
 module.exports = function (config) {
@@ -28,6 +29,10 @@ module.exports = function (config) {
     // The first config is for the control interface. It is only coincidence
     // that this config works for the action code/tests as well.
     webpack: Object.assign(WEBPACK_CONFIG[0], {
+      plugins: WEBPACK_CONFIG[0].plugins.filter(
+        // karma-webpack is not compatible with CommonsChunkPlugin, so exclude it
+        p => !(p instanceof webpack.optimize.CommonsChunkPlugin)
+      ),
       entry: undefined,
       devtool: undefined,
     }),

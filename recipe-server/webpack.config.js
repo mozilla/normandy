@@ -23,7 +23,6 @@ var plugins = [
     // Once we update to webpack2, we can update this plugin and remove this.
     awaitAnywhere: true,
   }),
-  new webpack.optimize.OccurrenceOrderPlugin(true),
   // Note: This matches Django's idea of what a hashed url looks like. Be careful when changing it!
   new ExtractTextPlugin(cssNamePattern),
   new webpack.DefinePlugin({
@@ -35,11 +34,15 @@ var plugins = [
       },
     },
   }),
+  // Put libraries in a separate bundle
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    minChunks: module => /node_modules/.test(module.resource),
+  }),
 ];
 
 if (production) {
   plugins = plugins.concat([
-    new webpack.optimize.DedupePlugin(),
     new BabiliPlugin(
       { // babiliOptions
         evaluate: false, // mozilla/normandy#827
@@ -53,7 +56,7 @@ if (production) {
   ]);
 } else {
   plugins = plugins.concat([
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
   ]);
 }
 
@@ -95,23 +98,32 @@ module.exports = [
       // ignore localforage parsing
       // (removes warning in console)
       noParse: /node_modules\/localforage\/dist\/localforage.js/,
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
         },
         {
-          test: /\.json$/,
-          loader: 'json-loader',
-        },
-        {
           test: /\.scss$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap'),
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: [
+              'css-loader?sourceMap',
+              'postcss-loader',
+              'sass-loader?sourceMap',
+            ],
+          }),
         },
         {
           test: /\.less$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!less'),
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: [
+              'css-loader?sourceMap',
+              'less-loader',
+            ],
+          }),
         },
         {
           test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
