@@ -149,6 +149,8 @@ class Core(Configuration):
         'DOC_EXPANSION': 'list',
     }
 
+    AWS_QUERYSTRING_AUTH = False
+
 
 class Base(Core):
     """Settings that may change per-environment, some with defaults."""
