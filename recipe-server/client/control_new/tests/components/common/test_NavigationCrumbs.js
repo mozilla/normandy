@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import TestComponent from 'control_new/components/common/NavigationCrumbs';
-const { WrappedComponent as NavigationCrumbs } = TestComponent;
+const { WrappedComponent: NavigationCrumbs } = TestComponent;
 
 describe('<NavigationCrumbs>', () => {
   const props = {

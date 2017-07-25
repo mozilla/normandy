@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import TestComponent from 'control_new/components/common/NavigationMenu';
-const { WrappedComponent as NavigationMenu } = TestComponent;
+const { WrappedComponent: NavigationMenu } = TestComponent;
 
 describe('<NavigationMenu>', () => {
   const props = {
