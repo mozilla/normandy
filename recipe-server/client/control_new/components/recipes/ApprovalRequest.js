@@ -11,11 +11,11 @@ import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
 import {
   approvalApprovalRequest as approveApprovalRequestAction,
   rejectApprovalRequest as rejectApprovalRequestAction,
-} from 'control_new/state/approvalRequests/actions';
+} from 'control_new/state/app/approvalRequests/actions';
 import {
   getRecipeForRevision,
   isRevisionPendingApproval,
-} from 'control_new/state/revisions/selectors';
+} from 'control_new/state/app/revisions/selectors';
 
 
 @connect(

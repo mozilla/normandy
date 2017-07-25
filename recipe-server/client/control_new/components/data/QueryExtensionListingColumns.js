@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { loadExtensionListingColumns } from 'control_new/state/extensions/actions';
+import { loadExtensionListingColumns } from 'control_new/state/app/extensions/actions';
 
 
 @connect(

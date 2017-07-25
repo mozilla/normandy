@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import {
   fetchRevision as fetchRevisionAction,
-} from 'control_new/state/revisions/actions';
+} from 'control_new/state/app/revisions/actions';
 
 
 @connect(

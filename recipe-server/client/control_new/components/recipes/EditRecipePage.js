@@ -9,9 +9,9 @@ import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverl
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
-import { updateRecipe } from 'control_new/state/recipes/actions';
-import { getRecipe } from 'control_new/state/recipes/selectors';
-import { getRecipeForRevision } from 'control_new/state/revisions/selectors';
+import { updateRecipe } from 'control_new/state/app/recipes/actions';
+import { getRecipe } from 'control_new/state/app/recipes/selectors';
+import { getRecipeForRevision } from 'control_new/state/app/revisions/selectors';
 import { getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 

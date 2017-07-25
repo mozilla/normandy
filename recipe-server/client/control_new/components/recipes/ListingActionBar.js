@@ -9,10 +9,10 @@ import { push as pushAction, Link } from 'redux-little-router';
 import CheckboxMenu from 'control_new/components/common/CheckboxMenu';
 import {
   saveRecipeListingColumns as saveRecipeListingColumnsAction,
-} from 'control_new/state/recipes/actions';
+} from 'control_new/state/app/recipes/actions';
 import {
   getRecipeListingColumns,
-} from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/recipes/selectors';
 import {
   getCurrentURL as getCurrentURLSelector,
   getQueryParam,

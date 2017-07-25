@@ -15,12 +15,12 @@ import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
 import {
   fetchFilteredRecipesPage as fetchFilteredRecipesPageAction,
-} from 'control_new/state/recipes/actions';
+} from 'control_new/state/app/recipes/actions';
 import {
   getRecipeListingColumns,
   getRecipeListingCount,
   getRecipeListingFlattenedAction,
-} from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/recipes/selectors';
 import {
   getCurrentURL as getCurrentURLSelector,
   getQueryParam,

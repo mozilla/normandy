@@ -8,7 +8,7 @@ import { push as pushAction } from 'redux-little-router';
 import ExtensionForm from 'control_new/components/extensions/ExtensionForm';
 import {
   createExtension as createExtensionAction,
-} from 'control_new/state/extensions/actions';
+} from 'control_new/state/app/extensions/actions';
 
 
 @connect(

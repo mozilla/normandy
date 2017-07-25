@@ -15,7 +15,7 @@ import {
   getExtensionListingColumns,
   getExtensionListingCount,
   getExtensionListing,
-} from 'control_new/state/extensions/selectors';
+} from 'control_new/state/app/extensions/selectors';
 import {
   getCurrentURL as getCurrentURLSelector,
   getQueryParam,

@@ -14,7 +14,7 @@ import {
 } from 'control_new/state/constants';
 import {
   getRevisionStatus,
-} from 'control_new/state/revisions/selectors';
+} from 'control_new/state/app/revisions/selectors';
 
 
 @connect(

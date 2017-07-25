@@ -9,20 +9,20 @@ import { Link } from 'redux-little-router';
 import {
   disableRecipe as disableRecipeAction,
   enableRecipe as enableRecipeAction,
-} from 'control_new/state/recipes/actions';
+} from 'control_new/state/app/recipes/actions';
 import {
   requestRevisionApproval as requestRevisionApprovalAction,
-} from 'control_new/state/revisions/actions';
+} from 'control_new/state/app/revisions/actions';
 import {
   getLatestRevisionIdForRecipe,
   getRecipe,
-} from 'control_new/state/recipes/selectors';
+} from 'control_new/state/app/recipes/selectors';
 import {
   isApprovableRevision,
   isLatestApprovedRevision,
   isLatestRevision,
   isRevisionPendingApproval,
-} from 'control_new/state/revisions/selectors';
+} from 'control_new/state/app/revisions/selectors';
 import {
   getRouterPath,
   getUrlParam,

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { fetchServiceInfo } from 'control_new/state/serviceInfo/actions';
+import { fetchServiceInfo } from 'control_new/state/app/serviceInfo/actions';
 
 
 @connect(

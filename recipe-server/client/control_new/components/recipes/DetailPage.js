@@ -13,8 +13,8 @@ import RevisionNotice from 'control_new/components/recipes/RevisionNotice';
 import {
   getLatestRevisionIdForRecipe,
   getRecipeHistory,
-} from 'control_new/state/recipes/selectors';
-import { getRevision } from 'control_new/state/revisions/selectors';
+} from 'control_new/state/app/recipes/selectors';
+import { getRevision } from 'control_new/state/app/revisions/selectors';
 import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selectors';
 
 
