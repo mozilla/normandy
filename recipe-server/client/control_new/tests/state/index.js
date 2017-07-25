@@ -5,6 +5,7 @@ import { INITIAL_STATE as extensions } from 'control_new/tests/state/extensions'
 import { INITIAL_STATE as recipes } from 'control_new/tests/state/recipes';
 import { INITIAL_STATE as requests } from 'control_new/tests/state/requests';
 import { INITIAL_STATE as revisions } from 'control_new/tests/state/revisions';
+import { INITIAL_STATE as serviceInfo } from 'control_new/tests/state/serviceInfo';
 import { INITIAL_STATE as users } from 'control_new/tests/state/users';
 
 
@@ -16,6 +17,7 @@ export const INITIAL_STATE = {
     recipes,
     requests,
     revisions,
+    serviceInfo,
     users,
   },
 };
