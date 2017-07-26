@@ -203,6 +203,10 @@ this.ClientEnvironment = {
       return Utils.keyBy(addons, "id");
     });
 
+    XPCOMUtils.defineLazyGetter(environment, "isFirstRun", () => {
+      return Preferences.get("extensions.shield-recipe-client.first_run");
+    });
+
     return environment;
   },
 };
