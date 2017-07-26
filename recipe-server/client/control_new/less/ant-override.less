@@ -20,3 +20,10 @@
 .ant-menu-submenu-title {
   background: rgba(0, 0, 0, 0.025);
 }
+
+// ant Card's `noHovering` doesn't seem to do anything, so this class makes up for it.
+.card-no-hover:hover,
+.card-no-hover:focus {
+  border-color: @border-color-split;
+  box-shadow: none;
+}
