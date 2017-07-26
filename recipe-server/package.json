@@ -10,7 +10,7 @@
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "npm run build:vendor && npm run build:app;",
     "build:app": "webpack --config ./webpack.config.js",
-    "build:vendor": "webpack --config ./vendors.webpack.config.js",
+    "build:vendor": "webpack --config ./vendor.webpack.config.js",
     "test": "NODE_ENV=production karma start",
     "lint:js": "eslint normandy client karma.conf.js webpack.config.js *.webpack.config.js",
     "lint:css": "stylelint 'client/**/*.less' --config .stylelintrc",
@@ -119,6 +119,7 @@
     "uglifyjs-webpack-plugin": "0.4.6",
     "webpack": "3.4.0",
     "webpack-async-await": "1.0.4",
+    "webpack-bundle-tracker": "0.2.0",
     "yargs": "5.0.0"
   }
 }

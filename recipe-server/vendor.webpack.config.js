@@ -1,8 +1,9 @@
 /* eslint-env node */
 /* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template, comma-dangle */
-var webpack = require('webpack');
+var BundleTracker = require('webpack-bundle-tracker');
 var path = require('path');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+var webpack = require('webpack');
 
 var settings = require('./package.json');
 
@@ -26,6 +27,7 @@ module.exports = {
     library: 'vendorDLL',
   },
   plugins: [
+    new BundleTracker({ filename: './webpack-stats-vendor.json' }),
     // Compress the resulting bundled file via simple UglifyJS settings.
     new UglifyJSPlugin({
       parallel: {
