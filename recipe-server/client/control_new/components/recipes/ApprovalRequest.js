@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import ApprovalForm from 'control_new/components/recipes/ApprovalForm';
 import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
 import {
-  approvalApprovalRequest as approveApprovalRequestAction,
+  approveApprovalRequest as approveApprovalRequestAction,
   rejectApprovalRequest as rejectApprovalRequestAction,
 } from 'control_new/state/app/approvalRequests/actions';
 import {
@@ -42,6 +42,7 @@ export default class ApprovalRequest extends React.Component {
 
   state = {
     formErrors: {},
+    isSubmitting: false,
   };
 
   async handleSubmit(values, context) {
@@ -50,6 +51,10 @@ export default class ApprovalRequest extends React.Component {
       approveApprovalRequest,
       rejectApprovalRequest,
     } = this.props;
+
+    this.setState({
+      isSubmitting: true,
+    });
 
     let action;
     let successMessage;
@@ -66,43 +71,26 @@ export default class ApprovalRequest extends React.Component {
       await action(approvalRequest.get('id'), values);
       message.success(successMessage);
     } catch (error) {
-      if (error.data.error) {
-        message.error(error.data.error);
+      if (error.data) {
+        this.setState({ formErrors: error.data });
+
+        // `error.data` is an object of invalid fields and the corresponding error
+        // message. `join`ing them here will produce a single error for the toast.
+        message.error(Object.values(error.data).join(' '));
       } else {
         message.error(
           'Approval could not be submitted. Please correct any errors listed in the form below.',
         );
       }
-      if (error.data) {
-        this.setState({ formErrors: error.data });
-      }
+    } finally {
+      this.setState({
+        isSubmitting: false,
+      });
     }
   }
 
-  renderRequestDetails() {
-    const { approvalRequest } = this.props;
-
-    return (
-      <dl className="details narrow">
-        <dt>
-          {approvalRequest.get('approved') ? 'Approved' : 'Rejected'} by
-        </dt>
-        <dd>
-          {approvalRequest.getIn(['approver', 'email'])}
-        </dd>
-
-        <dt>Responsed</dt>
-        <dd title={moment(approvalRequest.get('created')).format('MMMM Do YYYY, h:mm a')}>
-          {moment(approvalRequest.get('created')).fromNow()}
-        </dd>
-
-        <dt>Comment</dt>
-        <dd>{approvalRequest.get('comment')}</dd>
-      </dl>
-    );
-  }
-
   render() {
+    const { isSubmitting } = this.state;
     const { approvalRequest, isPendingApproval, recipe } = this.props;
     const errors = this.state.formErrors;
 
@@ -115,6 +103,15 @@ export default class ApprovalRequest extends React.Component {
     } else {
       extra = <Tag color="red">Rejected</Tag>;
     }
+
+    const detailSection = isPendingApproval ?
+      (<ApprovalForm
+        approvalRequest={approvalRequest}
+        isSubmitting={isSubmitting}
+        onSubmit={this.handleSubmit}
+        errors={errors}
+      />)
+      : <RequestDetails request={approvalRequest} />;
 
     return (
       <div className="approval-history-details">
@@ -137,20 +134,41 @@ export default class ApprovalRequest extends React.Component {
               </div>
 
               <div className="approval-details">
-                {
-                  isPendingApproval ?
-                    <ApprovalForm
-                      approvalRequest={approvalRequest}
-                      onSubmit={this.handleSubmit}
-                      errors={errors}
-                    />
-                    : this.renderRequestDetails()
-                }
+                { detailSection }
               </div>
             </Card>
           </Col>
         </Row>
       </div>
+    );
+  }
+}
+
+class RequestDetails extends React.PureComponent {
+  static propTypes = {
+    request: PropTypes.instanceOf(Map).isRequired,
+  };
+
+  render() {
+    const { request } = this.props;
+
+    return (
+      <dl className="details narrow">
+        <dt>
+          {request.get('approved') ? 'Approved' : 'Rejected'} by
+        </dt>
+        <dd>
+          {request.getIn(['approver', 'email'])}
+        </dd>
+
+        <dt>Responsed</dt>
+        <dd title={moment(request.get('created')).format('MMMM Do YYYY, h:mm a')}>
+          {moment(request.get('created')).fromNow()}
+        </dd>
+
+        <dt>Comment</dt>
+        <dd>{request.get('comment')}</dd>
+      </dl>
     );
   }
 }
