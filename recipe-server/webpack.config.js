@@ -24,7 +24,10 @@ var plugins = [
     awaitAnywhere: true,
   }),
   // Note: This matches Django's idea of what a hashed url looks like. Be careful when changing it!
-  new ExtractTextPlugin(cssNamePattern),
+  new ExtractTextPlugin({
+    allChunks: true,
+    filename: cssNamePattern,
+  }),
   new webpack.DefinePlugin({
     PRODUCTION: production,
     DEVELOPMENT: !production,
@@ -34,11 +37,10 @@ var plugins = [
       },
     },
   }),
-  // Put libraries in a separate bundle
-  new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    minChunks: module => /node_modules/.test(module.resource),
-  }),
+  new webpack.DllReferencePlugin({
+    context: '.',
+    manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
+  })
 ];
 
 if (production) {
@@ -63,7 +65,7 @@ if (production) {
 module.exports = [
   {
     context: __dirname,
-    devtool: production ? undefined : 'cheap-module-source-map',
+    devtool: production ? undefined : 'cheap-eval-source-map',
 
     entry: {
       control: [
@@ -95,9 +97,6 @@ module.exports = [
     ]),
 
     module: {
-      // ignore localforage parsing
-      // (removes warning in console)
-      noParse: /node_modules\/localforage\/dist\/localforage.js/,
       rules: [
         {
           test: /\.js$/,
@@ -107,6 +106,7 @@ module.exports = [
         {
           test: /\.scss$/,
           use: ExtractTextPlugin.extract({
+            allChunks: true,
             fallback: 'style-loader',
             use: [
               'css-loader?sourceMap',
@@ -117,7 +117,9 @@ module.exports = [
         },
         {
           test: /\.less$/,
+          exclude: /node_modules/,
           use: ExtractTextPlugin.extract({
+            allChunks: true,
             fallback: 'style-loader',
             use: [
               'css-loader?sourceMap',
@@ -147,7 +149,7 @@ module.exports = [
     },
   },
   {
-    devtool: production ? undefined : 'cheap-module-source-map',
+    devtool: production ? undefined : 'cheap-eval-source-map',
 
     entry: {
       'console-log': './client/actions/console-log/index',
@@ -184,7 +186,7 @@ module.exports = [
     },
 
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           exclude: /node_modules/,
