@@ -70,7 +70,7 @@ def main():
                 'deadline': fromNow('1 day'),
                 'expires': fromNow('365 days'),
                 'payload': {
-                    'image': 'mozilla/normandy-taskcluster:2017-06-12',
+                    'image': 'mozilla/normandy-taskcluster:2017-07-26',
                     'command': [
                         '/bin/bash',
                         '-c',
