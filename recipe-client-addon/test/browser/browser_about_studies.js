@@ -1,6 +1,5 @@
 "use strict";
 
-Cu.import("resource://testing-common/ContentTask.jsm", this);
 Cu.import("resource://shield-recipe-client-content/AboutPages.jsm", this);
 
 function withAboutStudies(testFunc) {
@@ -122,8 +121,6 @@ compose_task(
 
     await BrowserTestUtils.withNewTab("about:studies", async browser => {
       await ContentTask.spawn(browser, [study1, study2, study3], async ([cStudy1, cStudy2, cStudy3]) => {
-        Components.utils.import("resource://testing-common/ContentTaskUtils.jsm");
-
         const doc = content.document;
 
         function getStudyRow(docElem, studyName) {
