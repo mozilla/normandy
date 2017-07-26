@@ -13,6 +13,18 @@ services:
     links:
       - database
       - autograph
+    volumes:
+      - ../recipe-server:/app
+    environment:
+      DJANGO_CONFIGURATION: Development
+
+  watcher:
+    extends:
+      file: normandy-base.yml
+      service: normandy-base
+    volumes:
+      - ../recipe-server:/app
+    command: npm run watch
 
   proxy:
     extends:
