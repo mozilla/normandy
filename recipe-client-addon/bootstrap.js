@@ -4,6 +4,8 @@
 "use strict";
 
 const {utils: Cu} = Components;
+Cu.import("resource://gre/modules/Log.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "LogManager",
@@ -11,10 +13,42 @@ XPCOMUtils.defineLazyModuleGetter(this, "LogManager",
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldRecipeClient",
   "resource://shield-recipe-client/lib/ShieldRecipeClient.jsm");
 
+const DEFAULT_PREFS = {
+  "extensions.shield-recipe-client.api_url": ["char", "https://normandy.cdn.mozilla.net/api/v1"],
+  "extensions.shield-recipe-client.dev_mode": ["bool", false],
+  "extensions.shield-recipe-client.enabled": ["bool", true],
+  "extensions.shield-recipe-client.startup_delay_seconds": ["int", 300],
+  "extensions.shield-recipe-client.logging.level": ["int", Log.Level.Warn],
+  "extensions.shield-recipe-client.user_id": ["char", ""],
+  "extensions.shield-recipe-client.run_interval_seconds": ["int", 86400], // 24 hours
+  "extensions.shield-recipe-client.first_run": ["bool", true],
+  "extensions.shield-recipe-client.shieldLearnMoreUrl": [
+    "char", "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
+  ],
+};
+
 this.install = function() {};
 
-this.startup = async function() {
-  await ShieldRecipeClient.startup();
+this.startup = function() {
+  // Initialize preference defaults before anything else happens.
+  const prefBranch = Services.prefs.getDefaultBranch("");
+  for (const [name, [type, value]] of Object.entries(DEFAULT_PREFS)) {
+    switch (type) {
+      case "char":
+        prefBranch.setCharPref(name, value);
+        break;
+      case "int":
+        prefBranch.setIntPref(name, value);
+        break;
+      case "bool":
+        prefBranch.setBoolPref(name, value);
+        break;
+      default:
+        throw new Error(`Invalid default preference type ${type}`);
+    }
+  }
+
+  ShieldRecipeClient.startup();
 };
 
 this.shutdown = function(data, reason) {

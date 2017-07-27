@@ -32,20 +32,8 @@ const REASONS = {
   ADDON_UPGRADE: 7,    // The add-on is being upgraded.
   ADDON_DOWNGRADE: 8,  // The add-on is being downgraded.
 };
-const PREF_BRANCH = "extensions.shield-recipe-client.";
-const DEFAULT_PREFS = {
-  api_url: "https://normandy.cdn.mozilla.net/api/v1",
-  dev_mode: false,
-  enabled: true,
-  startup_delay_seconds: 300,
-  "logging.level": Log.Level.Warn,
-  user_id: "",
-  run_interval_seconds: 86400, // 24 hours
-  first_run: true,
-  shieldLearnMoreUrl: "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
-};
 const PREF_DEV_MODE = "extensions.shield-recipe-client.dev_mode";
-const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
+const PREF_LOGGING_LEVEL = "extensions.shield-recipe-client.logging.level";
 
 let log = null;
 
@@ -56,8 +44,6 @@ let log = null;
  */
 this.ShieldRecipeClient = {
   async startup() {
-    ShieldRecipeClient.setDefaultPrefs();
-
     // Setup logging and listen for changes to logging prefs
     LogManager.configure(Services.prefs.getIntPref(PREF_LOGGING_LEVEL));
     Preferences.observe(PREF_LOGGING_LEVEL, LogManager.configure);
@@ -85,15 +71,5 @@ this.ShieldRecipeClient = {
 
   shutdown(reason) {
     CleanupManager.cleanup();
-  },
-
-  setDefaultPrefs() {
-    for (const [key, val] of Object.entries(DEFAULT_PREFS)) {
-      const fullKey = PREF_BRANCH + key;
-      // If someone beat us to setting a default, don't overwrite it.
-      if (!Preferences.isSet(fullKey)) {
-        Preferences.set(fullKey, val);
-      }
-    }
   },
 };
