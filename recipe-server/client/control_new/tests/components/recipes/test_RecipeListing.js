@@ -8,16 +8,16 @@ const { WrappedComponent: RecipeListing } = TestComponent;
 
 describe('<RecipeListing>', () => {
   const props = {
-    // columns: new List(),
-    // count: null,
-    // fetchFilteredRecipesPage: () => {},
-    // getCurrentURL: () => {},
-    // ordering: null,
-    // pageNumber: null,
-    // push: () => {},
-    // recipes: new List(),
-    // searchText: null,
-    // status: null,
+    columns: new List(),
+    count: null,
+    fetchFilteredRecipesPage: () => {},
+    getCurrentURL: () => {},
+    ordering: null,
+    pageNumber: null,
+    push: () => {},
+    recipes: new List(),
+    searchText: null,
+    status: null,
   };
 
   it('should work', () => {

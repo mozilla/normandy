@@ -1,4 +1,3 @@
-import { Form } from 'antd';
 import React from 'react';
 import { shallow } from 'enzyme';
 

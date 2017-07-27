@@ -2,18 +2,18 @@ import { Map } from 'immutable';
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import TestComponent from 'control_new/components/recipes/RecipeListing';
+import TestComponent from 'control_new/components/recipes/RevisionApprovalTag';
 
-const { WrappedComponent: RecipeListing } = TestComponent;
+const { WrappedComponent: RevisionApprovalTag } = TestComponent;
 
-describe('<RecipeListing>', () => {
+describe('<RevisionApprovalTag>', () => {
   const props = {
     revision: new Map(),
     status: null,
   };
 
   it('should work', () => {
-    const wrapper = () => shallow(<RecipeListing {...props} />);
+    const wrapper = () => shallow(<RevisionApprovalTag {...props} />);
 
     expect(wrapper).not.toThrow();
   });

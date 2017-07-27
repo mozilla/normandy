@@ -2,11 +2,11 @@ import { List, Map } from 'immutable';
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import TestComponent from 'control_new/components/recipes/DetailPage';
+import TestComponent from 'control_new/components/recipes/RecipeDetailPage';
 
-const { WrappedComponent: DetailPage } = TestComponent;
+const { WrappedComponent: RecipeDetailPage } = TestComponent;
 
-describe('<DetailPage>', () => {
+describe('<RecipeDetailPage>', () => {
   const props = {
     history: new List(),
     recipeId: 123,
@@ -15,7 +15,7 @@ describe('<DetailPage>', () => {
   };
 
   it('should work', () => {
-    const wrapper = () => shallow(<DetailPage {...props} />);
+    const wrapper = () => shallow(<RecipeDetailPage {...props} />);
 
     expect(wrapper).not.toThrow();
   });
