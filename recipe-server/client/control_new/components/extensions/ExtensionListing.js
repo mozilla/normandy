@@ -63,7 +63,7 @@ export default class ExtensionListing extends React.Component {
           title="Name"
           dataIndex="name"
           key="name"
-          render={Listing.renderLinkedText}
+          render={ExtensionListing.renderLinkedText}
         />
       );
     },
@@ -74,7 +74,7 @@ export default class ExtensionListing extends React.Component {
           title="XPI URL"
           dataIndex="xpi"
           key="xpi"
-          render={Listing.renderLinkedText}
+          render={ExtensionListing.renderLinkedText}
         />
       );
     },
@@ -123,7 +123,7 @@ export default class ExtensionListing extends React.Component {
         <LoadingOverlay>
           <DataList
             columns={columns}
-            columnRenderers={Listing.columnRenderers}
+            columnRenderers={ExtensionListing.columnRenderers}
             dataSource={extensions.toJS()}
             ordering={ordering}
             onRowClick={this.handleRowClick}
