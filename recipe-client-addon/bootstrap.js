@@ -25,6 +25,7 @@ const DEFAULT_PREFS = {
   "extensions.shield-recipe-client.shieldLearnMoreUrl": [
     "char", "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
   ],
+  "app.shield.optoutstudies.enabled": ["bool", true],
 };
 
 this.install = function() {};
@@ -73,6 +74,7 @@ this.shutdown = function(data, reason) {
     "lib/RecipeRunner.jsm",
     "lib/Sampling.jsm",
     "lib/SandboxManager.jsm",
+    "lib/ShieldPreferences.jsm",
     "lib/ShieldRecipeClient.jsm",
     "lib/Storage.jsm",
     "lib/Uptake.jsm",

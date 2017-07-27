@@ -19,6 +19,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
   "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "AboutPages",
   "resource://shield-recipe-client-content/AboutPages.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ShieldPreferences",
+  "resource://shield-recipe-client/lib/ShieldPreferences.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -64,6 +66,12 @@ this.ShieldRecipeClient = {
       await PreferenceExperiments.init();
     } catch (err) {
       log.error("Failed to initialize preference experiments:", err);
+    }
+
+    try {
+      await ShieldPreferences.init();
+    } catch (err) {
+      log.error("Failed to initialize preferences UI:", err);
     }
 
     await RecipeRunner.init();
