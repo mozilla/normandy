@@ -75,8 +75,8 @@ export default class ListingActionBar extends React.Component {
           />
         </Col>
         <Col span={8} className="righted">
-          <Link href="/recipe/new">
-            <Button type="primary" icon="plus">New Recipe</Button>
+          <Link href="/recipe/new" id="lab-recipe-link">
+            <Button type="primary" icon="plus" id="lab-recipe-button">New Recipe</Button>
           </Link>
         </Col>
       </Row>
