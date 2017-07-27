@@ -37,7 +37,7 @@ import {
   },
 )
 @autobind
-export default class Listing extends React.Component {
+export default class ExtensionListing extends React.Component {
   static propTypes = {
     columns: PropTypes.instanceOf(List).isRequired,
     count: PropTypes.number,

@@ -10,11 +10,11 @@ import ApprovalHistoryPage from 'control_new/components/recipes/ApprovalHistoryP
 import CreateRecipePage from 'control_new/components/recipes/CreateRecipePage';
 import CloneRecipePage from 'control_new/components/recipes/CloneRecipePage';
 import EditRecipePage from 'control_new/components/recipes/EditRecipePage';
-import ExtensionListing from 'control_new/components/extensions/Listing';
+import ExtensionListing from 'control_new/components/extensions/ExtensionListing';
 import Gateway from 'control_new/components/pages/Gateway';
-import RecipeListing from 'control_new/components/recipes/Listing';
+import RecipeListing from 'control_new/components/recipes/RecipeListing';
 import MissingPage from 'control_new/components/pages/MissingPage';
-import RecipeDetailPage from 'control_new/components/recipes/DetailPage';
+import RecipeDetailPage from 'control_new/components/recipes/RecipeDetailPage';
 
 
 const routes = {
