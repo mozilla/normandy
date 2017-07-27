@@ -342,9 +342,9 @@ in other Django projects.
 
     :default: None
 
-    The hostname (with protocol but not trailing slash) of the Experimenter
-    (https://github.com/mozilla/experimenter) deployment that a deployment
-    of Normandy will communicate with to receive experiment definitions.
+    The hostname (with protocol but not trailing slash) of the Experimenter_
+    deployment that a deployment of Normandy will communicate with to
+    receive experiment definitions.
 
     Examples:
 
@@ -352,6 +352,8 @@ in other Django projects.
     Stage: https://experimenter.stage.mozaws.net
     Dev: https://experimenter.dev.mozaws.net
     Local dev: https://localhost:<local experimenter port>
+
+    .. _Experimenter: https://github.com/mozilla/experimenter
 
 Gunicorn settings
 -----------------

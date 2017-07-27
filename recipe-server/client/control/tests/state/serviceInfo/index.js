@@ -13,6 +13,7 @@ export class ServiceInfoFactory extends Factory {
       user: new SubFactory(UserFactory),
       peer_approval_enforced: true,
       logout_url: '/logout/',
+      experimenter_api_url: 'https://example.com/api/v1',
     };
   }
 }

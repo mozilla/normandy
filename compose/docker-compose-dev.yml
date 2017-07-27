@@ -17,6 +17,7 @@ services:
       - ../recipe-server:/app
     environment:
       DJANGO_CONFIGURATION: Development
+      DJANGO_EXPERIMENTER_HOST: https://localhost
 
   watcher:
     extends:
