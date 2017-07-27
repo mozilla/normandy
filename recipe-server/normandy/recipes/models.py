@@ -13,7 +13,6 @@ from django.utils.functional import cached_property
 from dirtyfields import DirtyFieldsMixin
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from reversion import revisions as reversion
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip
@@ -25,6 +24,7 @@ from normandy.recipes.validators import validate_json
 
 INFO_REQUESTING_RECIPE_SIGNATURES = 'normandy.recipes.I001'
 INFO_CREATE_REVISION = 'normandy.recipes.I002'
+INFO_REQUESTING_ACTION_SIGNATURES = 'normandy.recipes.I003'
 WARNING_BYPASSING_PEER_APPROVAL = 'normandy.recipes.W001'
 
 
@@ -72,6 +72,7 @@ class Signature(models.Model):
 
 
 class RecipeQuerySet(models.QuerySet):
+    @transaction.atomic
     def update_signatures(self):
         """
         Update the signatures on all Recipes in the queryset.
@@ -113,8 +114,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
                                           related_name='approved_for_recipe')
 
     enabled = models.BooleanField(default=False)
-    signature = models.OneToOneField(Signature, related_name='recipe_revision', null=True,
-                                     blank=True)
+    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
 
     class Meta:
         ordering = ['-enabled', '-latest_revision__updated']
@@ -201,7 +201,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
             return
 
         logger.info(
-            f'Requesting signatures for recipes with ids [{self.id}] from Autograph',
+            f'Requesting signature for recipe with id {self.id} from Autograph',
             extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': [self.id]}
         )
 
@@ -477,15 +477,48 @@ class ApprovalRequest(models.Model):
         recipe.save()
 
 
-@reversion.register()
-class Action(models.Model):
-    """A single executable action that can take arguments."""
-    name = models.SlugField(max_length=255, unique=True)
+class ActionQuerySet(models.QuerySet):
+    @transaction.atomic
+    def update_signatures(self):
+        """
+        Update the signatures on all Actions in the queryset.
+        """
+        # Convert to a list because order must be preserved
+        actions = list(self)
 
+        try:
+            autographer = Autographer()
+        except ImproperlyConfigured:
+            for action in actions:
+                action.signature = None
+                action.save()
+            return
+
+        action_names = [a.name for a in actions]
+        logger.info(
+            f'Requesting signatures for actions named [{action_names}] from Autograph',
+            extra={'code': INFO_REQUESTING_ACTION_SIGNATURES, 'action_names': action_names}
+        )
+
+        canonical_jsons = [a.canonical_json() for a in actions]
+        signatures_data = autographer.sign_data(canonical_jsons)
+
+        for action, sig_data in zip(actions, signatures_data):
+            signature = Signature(**sig_data)
+            signature.save()
+            action.signature = signature
+            action.save()
+
+
+class Action(DirtyFieldsMixin, models.Model):
+    """A single executable action that can take arguments."""
+    objects = ActionQuerySet.as_manager()
+
+    name = models.SlugField(max_length=255, unique=True)
     implementation = models.TextField()
     implementation_hash = models.CharField(max_length=40, editable=False)
-
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
+    signature = models.OneToOneField(Signature, related_name='action', null=True, blank=True)
 
     errors = {
         'duplicate_branch_slug': (
@@ -517,19 +550,55 @@ class Action(models.Model):
     def __str__(self):
         return self.name
 
+    def canonical_json(self):
+        # Avoid circular import
+        from normandy.recipes.api.v1.serializers import ActionSerializer
+        data = ActionSerializer(self).data
+        return CanonicalJSONRenderer().render(data)
+
     def get_absolute_url(self):
         return reverse('action-detail', args=[self.name])
 
     def compute_implementation_hash(self):
         return hashlib.sha1(self.implementation.encode()).hexdigest()
 
-    def save(self, *args, **kwargs):
-        # Save first so the upload is available.
-        super().save(*args, **kwargs)
+    def update_signature(self):
+        try:
+            autographer = Autographer()
+        except ImproperlyConfigured:
+            self.signature = None
+            return
 
-        # Update hash
-        self.implementation_hash = self.compute_implementation_hash()
-        super().save(update_fields=['implementation_hash'])
+        logger.info(
+            f'Requesting signature for action named {self.name} from Autograph',
+            extra={'code': INFO_REQUESTING_ACTION_SIGNATURES, 'action_names': [self.name]}
+        )
+
+        signature_data = autographer.sign_data([self.canonical_json()])[0]
+        signature = Signature(**signature_data)
+        signature.save()
+        self.signature = signature
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+            dirty_field_names = list(dirty_fields.keys())
+
+            if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
+                    and self.signature is not None):
+                # Setting the signature while also changing something else is probably
+                # going to make the signature immediately invalid. Don't allow it.
+                raise ValidationError('Signatures must change alone')
+
+            if dirty_field_names != ['signature']:
+                super().save(*args, **kwargs)
+                kwargs['force_insert'] = False
+
+                self.implementation_hash = self.compute_implementation_hash()
+                self.update_signature()
+
+        super().save(*args, **kwargs)
 
     def validate_arguments(self, arguments, old_arguments=None):
         """

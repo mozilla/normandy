@@ -11,9 +11,11 @@ from normandy.recipes import signing
 
 INFO_COULD_NOT_RETRIEVE_ACTIONS = 'normandy.recipes.I001'
 INFO_COULD_NOT_RETRIEVE_RECIPES = 'normandy.recipes.I002'
+INFO_COULD_NOT_RETRIEVE_SIGNATURES = 'normandy.recipes.I003'
 WARNING_MISMATCHED_ACTION_HASH = 'normandy.recipes.W001'
 WARNING_INVALID_RECIPE_SIGNATURE = 'normandy.recipes.W002'
 WARNING_BAD_SIGNING_CERTIFICATE = 'normandy.recipes.W003'
+WARNING_INVALID_ACTION_SIGNATURE = 'normandy.recipes.W004'
 
 
 def actions_have_consistent_hashes(app_configs, **kwargs):
@@ -21,8 +23,8 @@ def actions_have_consistent_hashes(app_configs, **kwargs):
     try:
         Action = apps.get_model('recipes', 'Action')
         actions = list(Action.objects.all())
-    except (ProgrammingError, OperationalError, ImproperlyConfigured):
-        errors.append(Info('Could not retrieve actions', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
+    except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
+        errors.append(Info(f'Could not retrieve actions: {e}', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
     else:
         for action in actions:
             if action.compute_implementation_hash() != action.implementation_hash:
@@ -38,8 +40,8 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
     try:
         Recipe = apps.get_model('recipes', 'Recipe')
         signed_recipes = list(Recipe.objects.exclude(signature=None))
-    except (ProgrammingError, OperationalError, ImproperlyConfigured):
-        errors.append(Info('Could not retrieve recipes', id=INFO_COULD_NOT_RETRIEVE_RECIPES))
+    except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
+        errors.append(Info(f'Could not retrieve recipes: {e}', id=INFO_COULD_NOT_RETRIEVE_RECIPES))
     else:
         for recipe in signed_recipes:
             data = recipe.canonical_json()
@@ -55,28 +57,54 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
     return errors
 
 
-def recipe_signatures_use_good_certificates(app_configs, **kwargs):
+def action_signatures_are_correct(app_configs, **kwargs):
+    errors = []
+    try:
+        Action = apps.get_model('recipes', 'Action')
+        signed_actions = list(Action.objects.exclude(signature=None))
+    except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
+        errors.append(Info(f'Could not retrieve actions: f{e}', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
+    else:
+        for action in signed_actions:
+            data = action.canonical_json()
+            signature = action.signature.signature
+            pubkey = action.signature.public_key
+            try:
+                signing.verify_signature(data, signature, pubkey)
+            except signing.BadSignature as e:
+                msg = f"Action '{action}' (id={action.id}) has a bad signature: {e.detail}"
+                errors.append(Warning(msg, id=WARNING_INVALID_ACTION_SIGNATURE))
+
+    return errors
+
+
+def signatures_use_good_certificates(app_configs, **kwargs):
     errors = []
     expire_early = None
     if settings.CERTIFICATES_EXPIRE_EARLY_DAYS:
         expire_early = timedelta(days=settings.CERTIFICATES_EXPIRE_EARLY_DAYS)
 
     try:
+        Signature = apps.get_model('recipes', 'Signature')
         Recipe = apps.get_model('recipes', 'Recipe')
-        signed_recipes = list(Recipe.objects.exclude(signature=None))
-    except (ProgrammingError, OperationalError, ImproperlyConfigured):
-        errors.append(Info('Could not retrieve recipes', id=INFO_COULD_NOT_RETRIEVE_RECIPES))
+        Action = apps.get_model('recipes', 'Action')
+        signatures = list(Signature.objects.all())
+    except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
+        errors.append(Info(f'Could not retrieve signatures: {e}', id=INFO_COULD_NOT_RETRIEVE_SIGNATURES))
     else:
-        urls = set(r.signature.x5u for r in signed_recipes)
+        urls = set(s.x5u for s in signatures)
         for url in urls:
             try:
                 signing.verify_x5u(url, expire_early)
             except signing.BadCertificate as exc:
                 matching_recipes = Recipe.objects.filter(signature__x5u=url)
-                count = matching_recipes.count()
-                ids = ', '.join(str(r.id) for r in matching_recipes)
-                msg = (f'{count} recipes (ids {ids}) are signed with a bad cert. {exc.detail}. '
-                       f'Certificate url is {url}')
+                matching_actions = Action.objects.filter(signature__x5u=url)
+                bad_objects = list(matching_recipes) + list(matching_actions)
+
+                count = len(bad_objects)
+                object_names = ', '.join(bad_objects)
+                msg = (f'{len(bad_objects)} objects are signed with a bad cert: {objects_names}. '
+                       f'{exc.detail}. Certificate url is {url}. ')
                 errors.append(Warning(msg, id=WARNING_BAD_SIGNING_CERTIFICATE))
 
     return errors
@@ -86,4 +114,5 @@ def register():
     register_check(actions_have_consistent_hashes)
     # Temporarily disabled, see Issue #900.
     # register_check(recipe_signatures_are_correct)
-    register_check(recipe_signatures_use_good_certificates)
+    # register_check(action_signatures_are_correct)
+    register_check(signatures_use_good_certificates)

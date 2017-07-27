@@ -114,6 +114,24 @@ class TestUpdateActions(object):
         assert version.revision.comment == 'Updating actions.'
 
 
+class TestUpdateSignatures(object):
+    @pytest.mark.django_db
+    def test_it_works(self, mocker):
+        """
+        Verify that the update_recipe_signatures command doesn't throw an error.
+        """
+        call_command('update_signatures')
+
+    def test_it_calls_other_update_signature_commands(self, mocker):
+        prefix = 'normandy.recipes.management.commands'
+        update_recipe_signatures = mocker.patch(f'{prefix}.update_recipe_signatures.Command')
+        update_action_signatures = mocker.patch(f'{prefix}.update_action_signatures.Command')
+
+        call_command('update_signatures')
+        update_action_signatures.return_value.execute.assert_called_once()
+        update_recipe_signatures.return_value.execute.assert_called_once()
+
+
 @pytest.mark.django_db
 class TestUpdateRecipeSignatures(object):
     def test_it_works(self):
@@ -158,3 +176,51 @@ class TestUpdateRecipeSignatures(object):
         call_command('update_recipe_signatures', '--force')
         r.refresh_from_db()
         assert r.signature.signature is not 'old signature'
+
+    def test_it_does_not_resign_up_to_date_recipes(self, settings, mocked_autograph):
+        r = RecipeFactory(approver=UserFactory(), enabled=True, signed=True)
+        r.signature.signature = 'original signature'
+        r.signature.save()
+        call_command('update_recipe_signatures')
+        r.refresh_from_db()
+        assert r.signature.signature == 'original signature'
+
+
+@pytest.mark.django_db
+class TestUpdateActionSignatures(object):
+    def test_it_works(self):
+        """
+        Verify that the update_action_signatures command doesn't throw an error.
+        """
+        call_command('update_action_signatures')
+
+    def test_it_signs_unsigned_actions(self, mocked_autograph):
+        a = ActionFactory(signed=False)
+        call_command('update_action_signatures')
+        a.refresh_from_db()
+        assert a.signature is not None
+
+    def test_it_signs_out_of_date_actions(self, settings, mocked_autograph):
+        a = ActionFactory(signed=True)
+        a.signature.timestamp -= timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE * 2)
+        a.signature.signature = 'old signature'
+        a.signature.save()
+        call_command('update_action_signatures')
+        a.refresh_from_db()
+        assert a.signature.signature is not 'old signature'
+
+    def test_it_resigns_signed_actions_with_force(self, mocked_autograph):
+        a = ActionFactory(signed=True)
+        a.signature.signature = 'old signature'
+        a.signature.save()
+        call_command('update_action_signatures', '--force')
+        a.refresh_from_db()
+        assert a.signature.signature != 'old signature'
+
+    def test_it_does_not_resign_up_to_date_actions(self, settings, mocked_autograph):
+        a = ActionFactory(signed=True)
+        a.signature.signature = 'original signature'
+        a.signature.save()
+        call_command('update_action_signatures')
+        a.refresh_from_db()
+        assert a.signature.signature == 'original signature'

@@ -21,6 +21,7 @@ class TestApiRoot(object):
             'recipe-list': 'http://testserver/api/v1/recipe/',
             'recipe-signed': 'http://testserver/api/v1/recipe/signed/',
             'action-list': 'http://testserver/api/v1/action/',
+            'action-signed': 'http://testserver/api/v1/action/signed/',
             'reciperevision-list': 'http://testserver/api/v1/recipe_revision/',
             'classify-client': 'http://testserver/api/v1/classify_client/',
             'approvalrequest-list': 'http://testserver/api/v1/approval_request/',

@@ -31,7 +31,7 @@ class Command(BaseCommand):
         if count == 0:
             self.stdout.write('No out of date recipes to sign')
         else:
-            self.stdout.write('Signing {} recipes:'.format(count))
+            self.stdout.write(f'Signing {count} recipes:')
             for recipe in recipes_to_update:
                 self.stdout.write(' * ' + recipe.name)
             recipes_to_update.update_signatures()
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         if count == 0:
             self.stdout.write('No disabled recipes to unsign')
         else:
-            self.stdout.write('Unsigning {} disabled recipes:'.format(count))
+            self.stdout.write(f'Unsigning {count} disabled recipes:')
             for recipe in recipes_to_unsign:
                 self.stdout.write(' * ' + recipe.name)
                 sig = recipe.signature

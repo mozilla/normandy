@@ -50,6 +50,19 @@ class ActionFactory(factory.DjangoModelFactory):
     def implementation_hash(action):
         return hashlib.sha1(action.implementation.encode()).hexdigest()
 
+    # It is important that the signature be based on the actual data, and not
+    # some static value so that tests can make assertions against what data was
+    # signed.
+
+    @factory.post_generation
+    def signed(self, create, extracted=False, **kwargs):
+        if extracted:
+            self.signature = SignatureFactory(data=self.canonical_json())
+            self.signature.save()
+            self.save()
+        else:
+            return None
+
 
 class RecipeFactory(factory.DjangoModelFactory):
     class Meta:

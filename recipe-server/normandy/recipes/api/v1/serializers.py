@@ -21,6 +21,30 @@ from normandy.recipes.models import (
 from normandy.recipes.validators import JSONSchemaValidator
 
 
+class SignatureSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(read_only=True)
+    signature = serializers.ReadOnlyField()
+    x5u = serializers.SerializerMethodField()
+    public_key = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Signature
+        fields = ['timestamp', 'signature', 'x5u', 'public_key']
+
+    def get_x5u(self, signature):
+        x5u = signature.x5u
+
+        # Add cachebust parameter to x5u URL.
+        if x5u is not None and settings.AUTOGRAPH_X5U_CACHE_BUST is not None:
+            url_parts = list(urlparse.urlparse(x5u))
+            query = urlparse.parse_qs(url_parts[4])
+            query['cachebust'] = settings.AUTOGRAPH_X5U_CACHE_BUST
+            url_parts[4] = urlencode(query)
+            return urlparse.urlunparse(url_parts)
+
+        return x5u
+
+
 class ActionSerializer(serializers.ModelSerializer):
     arguments_schema = serializers.JSONField()
     implementation_url = ActionImplementationHyperlinkField()
@@ -32,6 +56,19 @@ class ActionSerializer(serializers.ModelSerializer):
             'implementation_url',
             'arguments_schema',
         ]
+
+
+class SignedActionSerializer(serializers.ModelSerializer):
+    signature = SignatureSerializer()
+    action = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Recipe
+        fields = ['signature', 'action']
+
+    def get_action(self, action):
+        # `action` here is the main object for the serializer.
+        return ActionSerializer(action).data
 
 
 class ApprovalRequestSerializer(serializers.ModelSerializer):
@@ -205,30 +242,6 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.Serializer):
     country = serializers.CharField()
     request_time = serializers.DateTimeField()
-
-
-class SignatureSerializer(serializers.ModelSerializer):
-    timestamp = serializers.DateTimeField(read_only=True)
-    signature = serializers.ReadOnlyField()
-    x5u = serializers.SerializerMethodField()
-    public_key = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Signature
-        fields = ['timestamp', 'signature', 'x5u', 'public_key']
-
-    def get_x5u(self, signature):
-        x5u = signature.x5u
-
-        # Add cachebust parameter to x5u URL.
-        if x5u is not None and settings.AUTOGRAPH_X5U_CACHE_BUST is not None:
-            url_parts = list(urlparse.urlparse(x5u))
-            query = urlparse.parse_qs(url_parts[4])
-            query['cachebust'] = settings.AUTOGRAPH_X5U_CACHE_BUST
-            url_parts[4] = urlencode(query)
-            return urlparse.urlunparse(url_parts)
-
-        return x5u
 
 
 class SignedRecipeSerializer(serializers.ModelSerializer):

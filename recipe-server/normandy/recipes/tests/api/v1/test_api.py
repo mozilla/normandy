@@ -85,6 +85,32 @@ class TestActionAPI(object):
         assert res.status_code == 200
         assert res.client.cookies == {}
 
+    def test_signed_listing_works(self, api_client):
+        a1 = ActionFactory(signed=True)
+        res = api_client.get('/api/v1/action/signed/')
+        assert res.status_code == 200
+        assert len(res.data) == 1
+        assert res.data[0]['action']['name'] == a1.name
+        assert res.data[0]['signature']['signature'] == a1.signature.signature
+
+    def test_signed_only_lists_signed_actions(self, api_client):
+        # Names must be alphabetical, so the API response can be
+        # sorted by name later, since actions don't expose an ID in
+        # the API.
+        a1 = ActionFactory(name='a', signed=True)
+        a2 = ActionFactory(name='b', signed=True)
+        ActionFactory(signed=False)
+        res = api_client.get('/api/v1/action/signed/')
+        assert res.status_code == 200
+        assert len(res.data) == 2
+
+        res.data.sort(key=lambda r: r['action']['name'])
+
+        assert res.data[0]['action']['name'] == a1.name
+        assert res.data[0]['signature']['signature'] == a1.signature.signature
+        assert res.data[1]['action']['name'] == a2.name
+        assert res.data[1]['signature']['signature'] == a2.signature.signature
+
 
 @pytest.mark.django_db
 class TestImplementationAPI(object):

@@ -8,10 +8,12 @@ from rest_framework import serializers
 
 from normandy.base.tests import UserFactory, Whatever
 from normandy.recipes.models import (
+    Action,
     ApprovalRequest,
     Client,
     INFO_CREATE_REVISION,
     INFO_REQUESTING_RECIPE_SIGNATURES,
+    INFO_REQUESTING_ACTION_SIGNATURES,
     Recipe,
     RecipeRevision,
     WARNING_BYPASSING_PEER_APPROVAL,
@@ -49,6 +51,39 @@ class TestAction(object):
         action = ActionFactory()
         RecipeFactory.create_batch(2, action=action, enabled=False)
         assert list(action.recipes_used_by) == []
+
+    def test_update_signature(self, mocker, mock_logger):
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = [
+            {'signature': 'fake signature'},
+        ]
+
+        action = ActionFactory(signed=False)
+        action.update_signature()
+        mock_logger.info.assert_called_with(
+            Whatever.contains(action.name),
+            extra={'code': INFO_REQUESTING_ACTION_SIGNATURES, 'action_names': [action.name]}
+        )
+
+        action.save()
+        assert action.signature is not None
+        assert action.signature.signature == 'fake signature'
+
+    def test_canonical_json(self):
+        action = ActionFactory(name='test-action', implementation='console.log(true)')
+        # Yes, this is ugly, but it needs to compare an exact byte
+        # sequence, since this is used for hashing and signing
+        expected = (
+            '{'
+            '"arguments_schema":{},'
+            '"implementation_url":"/api/v1/action/test-action/implementation'
+            '/2201e6aba1faf53e9371afbd1b682254b76e059a/",'
+            '"name":"test-action"'
+            '}'
+        )
+        expected = expected.encode()
+        assert action.canonical_json() == expected
 
 
 @pytest.mark.django_db
@@ -620,6 +655,39 @@ class TestRecipeQueryset(object):
         assert mock_autograph.called
         assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
         signatures = list(Recipe.objects.all().values_list('signature__signature', flat=True))
+        assert signatures == ['fake signature 1', 'fake signature 2']
+
+
+@pytest.mark.django_db
+class TestActionQueryset(object):
+    def test_update_signatures(self, mocker, mock_logger):
+        # Make sure the test environment is clean. This test is invalid otherwise.
+        assert Action.objects.all().count() == 0
+
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = [
+            {'signature': 'fake signature 1'},
+            {'signature': 'fake signature 2'},
+        ]
+
+        # Make and sign two actions
+        (action1, action2) = ActionFactory.create_batch(2)
+        Action.objects.all().update_signatures()
+
+        # Assert that the signature update is logged.
+        mock_logger.info.assert_called_with(
+            Whatever.contains(action1.name, action2.name),
+            extra={
+                'code': INFO_REQUESTING_ACTION_SIGNATURES,
+                'action_names': Whatever.contains(action1.name, action2.name),
+            }
+        )
+
+        # Assert the autographer was used as expected
+        assert mock_autograph.called
+        assert mock_autograph.return_value.sign_data.called_with([Whatever(), Whatever()])
+        signatures = list(Action.objects.all().values_list('signature__signature', flat=True))
         assert signatures == ['fake signature 1', 'fake signature 2']
 
 

@@ -42,3 +42,11 @@ class ActionImplementationHyperlinkField(HyperlinkedIdentityField):
             url = reverse(view_name, kwargs=kwargs, request=request, format=format)
             assert url[0] == '/'
             return settings.CDN_URL + url[1:]
+
+    def to_representation(self, value):
+        # HyperlinkedIdentityField demands a request when creating
+        # urls, but one is not always available. Instead of erroring
+        # out hard, fake it.
+        if 'request' not in self.context:
+            self.context['request'] = None
+        return super().to_representation(value)
