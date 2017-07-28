@@ -175,7 +175,7 @@ compose_task(
       );
     });
 
-    const updatedStudy1 = await AddonStudies.get(study1.name);
+    const updatedStudy1 = await AddonStudies.get(study1.recipeId);
     ok(
       !updatedStudy1.active,
       "Clicking the remove button marks the study as inactive in storage."

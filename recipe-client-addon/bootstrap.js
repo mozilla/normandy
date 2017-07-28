@@ -41,7 +41,6 @@ this.shutdown = function(data, reason) {
     "lib/SandboxManager.jsm",
     "lib/ShieldRecipeClient.jsm",
     "lib/Storage.jsm",
-    "lib/StudyStorage.jsm",
     "lib/Uptake.jsm",
     "lib/Utils.jsm",
   ].map(m => `resource://shield-recipe-client/${m}`);

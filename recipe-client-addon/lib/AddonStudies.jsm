@@ -81,6 +81,11 @@ this.AddonStudies = {
   /**
    * Test wrapper that temporarily replaces the stored studies with the given
    * ones. The original stored studies are restored upon completion.
+   *
+   * This is defined here instead of in test code since it needs to access the
+   * getDatabase, which we don't expose to avoid outside modules relying on the
+   * type of storage used for studies.
+   *
    * @param {Array} [studies=[]]
    */
   withStudies(studies = []) {
@@ -200,7 +205,7 @@ this.AddonStudies = {
       await getStore(db).delete(recipeId);
       throw err;
     } finally {
-      addonFile.remove(true);
+      await OS.File.remove(addonFile.path);
     }
   },
 
@@ -216,19 +221,18 @@ this.AddonStudies = {
     }
 
     // Create temporary file to store add-on.
-    const file = FileUtils.getDir(KEY_TEMPDIR, []);
-    const random = Math.random().toString(36).replace(/0./, "").substr(-3);
-    const filename = `tmp-${random}.xpi`;
-    file.append(filename);
-    file.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, FileUtils.PERMS_FILE);
+    const path = FileUtils.getFile(KEY_TEMPDIR, ["study.xpi"]).path;
+    const {file, path: uniquePath} = await OS.File.openUnique(path);
 
     // Write the add-on to the file
-    const xpiArrayBufferView = new Uint8Array(await response.arrayBuffer());
-    await OS.File.writeAtomic(file.path, xpiArrayBufferView, {
-      tmpPath: `${filename}.tmp`,
-    });
+    try {
+      const xpiArrayBufferView = new Uint8Array(await response.arrayBuffer());
+      await file.write(xpiArrayBufferView);
+    } finally {
+      await file.close();
+    }
 
-    return file;
+    return new FileUtils.File(uniquePath);
   },
 
   /**
@@ -243,7 +247,8 @@ this.AddonStudies = {
     const study = await getStore(db).get(recipeId);
     if (!study) {
       throw new Error(`No study found for recipe ${recipeId}`);
-    } else if (!study.active) {
+    }
+    if (!study.active) {
       throw new Error(`Cannot stop study for recipe ${recipeId}; it is already inactive.`);
     }
 
