@@ -7,6 +7,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import ApprovalForm from 'control_new/components/recipes/ApprovalForm';
+import ApprovalDetails from 'control_new/components/recipes/ApprovalDetails';
 import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
 import {
   approveApprovalRequest as approveApprovalRequestAction,
@@ -111,7 +112,7 @@ export default class ApprovalRequest extends React.Component {
         onSubmit={this.handleSubmit}
         errors={errors}
       />)
-      : <RequestDetails request={approvalRequest} />;
+      : <ApprovalDetails request={approvalRequest} />;
 
     return (
       <div className="approval-history-details">
@@ -140,35 +141,6 @@ export default class ApprovalRequest extends React.Component {
           </Col>
         </Row>
       </div>
-    );
-  }
-}
-
-class RequestDetails extends React.PureComponent {
-  static propTypes = {
-    request: PropTypes.instanceOf(Map).isRequired,
-  };
-
-  render() {
-    const { request } = this.props;
-
-    return (
-      <dl className="details narrow">
-        <dt>
-          {request.get('approved') ? 'Approved' : 'Rejected'} by
-        </dt>
-        <dd>
-          {request.getIn(['approver', 'email'])}
-        </dd>
-
-        <dt>Responsed</dt>
-        <dd title={moment(request.get('created')).format('MMMM Do YYYY, h:mm a')}>
-          {moment(request.get('created')).fromNow()}
-        </dd>
-
-        <dt>Comment</dt>
-        <dd>{request.get('comment')}</dd>
-      </dl>
     );
   }
 }
