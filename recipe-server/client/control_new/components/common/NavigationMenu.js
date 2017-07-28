@@ -32,23 +32,11 @@ export default class NavigationMenu extends React.Component {
           <Item key="/recipe">
             <Link href="/recipe">View All</Link>
           </Item>
-          <Item key="/recipe?hearbeat">
-            <Link href="/recipe?hearbeat">Heartbeat</Link>
-          </Item>
-          <Item key="/recipe?console-log">
-            <Link href="/recipe?console-log">console-log</Link>
-          </Item>
-          <Item key="/recipe?pref-study">
-            <Link href="/recipe?pref-study">Preference Study</Link>
-          </Item>
         </SubMenu>
 
         <SubMenu title="Extensions" key="Extensions">
           <Item key="/extension">
             <Link href="/extension">View All</Link>
-          </Item>
-          <Item key="/extension?pref-study">
-            <Link href="/extension?pref-study">Preference Study</Link>
           </Item>
         </SubMenu>
       </Menu>
