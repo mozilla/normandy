@@ -6,6 +6,7 @@ Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Utils.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 // Load mocking/stubbing library, sinon
 // docs: http://sinonjs.org/docs/
@@ -130,3 +131,65 @@ class MockPreferences {
     }
   }
 }
+
+this.withPrefEnv = function(inPrefs) {
+  return function wrapper(testFunc) {
+    return async function inner(...args) {
+      await SpecialPowers.pushPrefEnv(inPrefs);
+      try {
+        await testFunc(...args);
+      } finally {
+        await SpecialPowers.popPrefEnv();
+      }
+    };
+  };
+};
+
+/**
+ * Wrapper around add_task for declaring tests that use several with-style
+ * wrappers. The last argument should be your test function; all other arguments
+ * should be functions that accept a single test function argument.
+ *
+ * The arguments are composed together and passed to add_task as a single test
+ * function.
+ *
+ * @param {[Function]} args
+ * @example
+ *   compose_task(
+ *     withMockPreferences,
+ *     withMockNormandyApi,
+ *     async function myTest(mockPreferences, mockApi) {
+ *       // Do a test
+ *     }
+ *   );
+ */
+this.compose_task = function(...args) {
+  const funcs = Array.from(args);
+  let testFunc = funcs.pop();
+  funcs.reverse();
+  for (const func of funcs) {
+    testFunc = func(testFunc);
+  }
+  return add_task(testFunc);
+};
+
+this.studyFactory = function studyFactory(attrs) {
+  return Object.assign({
+    name: "Test study",
+    addonId: "foo@example.com",
+    addonVersion: "2.0.0",
+    description: "fake",
+    studyStartDate: new Date().toJSON(),
+  }, attrs);
+};
+
+this.withStudyStorage = function withStudyStorage(testFn) {
+  return async () => {
+    try {
+      await testFn(StudyStorage);
+    } finally {
+      await StudyStorage.clear();
+      await StudyStorage.close();
+    }
+  };
+};

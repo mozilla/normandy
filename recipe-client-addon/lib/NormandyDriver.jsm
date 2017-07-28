@@ -185,6 +185,7 @@ this.NormandyDriver = function(sandboxManager) {
       create: sandboxManager.wrapAsync(StudyStorage.create, {cloneArguments: true}),
       update: sandboxManager.wrapAsync(StudyStorage.update, {cloneArguments: true}),
       get: sandboxManager.wrapAsync(StudyStorage.get, {cloneInto: true}),
+      getAll: sandboxManager.wrapAsync(StudyStorage.getAll, {cloneInto: true}),
       has: sandboxManager.wrapAsync(StudyStorage.has),
     },
   };

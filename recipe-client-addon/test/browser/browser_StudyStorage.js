@@ -16,16 +16,6 @@ function withStudyStorage(testFn) {
   };
 }
 
-function studyFactory(attrs) {
-  return Object.assign({
-    name: "Test study",
-    addonId: "foo@example.com",
-    addonVersion: "2.0.0",
-    description: "fake",
-    studyStartDate: new Date().toJSON(),
-  }, attrs);
-}
-
 add_task(withStudyStorage(async function testGetMissing(storage) {
   await Assert.rejects(
     storage.get("does-not-exist"),
@@ -42,6 +32,20 @@ add_task(withStudyStorage(async function testCreateGet(storage) {
   Assert.deepEqual(study, storedStudy, "Create saved a new study to the storage.");
   is(storedStudy.studyEndDate, null, "Create defaults the study end date to null.");
   ok(storedStudy.active, "Create defaults the study to active.");
+}));
+
+add_task(withStudyStorage(async function testCreateGetAll(storage) {
+  const study1 = studyFactory({name: "test-study1"});
+  const study2 = studyFactory({name: "test-study2"});
+  await storage.create(study1);
+  await storage.create(study2);
+
+  const storedStudies = await storage.getAll();
+  Assert.deepEqual(
+    new Set(storedStudies),
+    new Set([study1, study2]),
+    "StudyStorage.getAll returns every stored study.",
+  );
 }));
 
 add_task(withStudyStorage(async function testCreateExists(storage) {

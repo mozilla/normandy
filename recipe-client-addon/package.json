@@ -8,20 +8,30 @@
   "license": "MPL-2.0",
   "scripts": {
     "watch": "webpack --config ./webpack.config.js --watch",
-    "build": "webpack --config ./webpack.config.js"
+    "build": "webpack --config ./webpack.config.js",
+    "lint": "npm run lint-js; npm run lint-css;",
+    "lint-js": "eslint lib content bootstrap.js webpack.config.js || true",
+    "lint-css": "stylelint '**/*.css' --config .stylelintrc || true"
   },
   "devDependencies": {
-    "babel-eslint": "7.2.3",
     "babili-webpack-plugin": "0.1.2",
     "eslint": "3.19.0",
     "eslint-config-normandy": "1.0.0",
-    "eslint-plugin-babel": "4.1.1",
     "eslint-plugin-mozilla": "0.3.2",
+    "eslint-plugin-react": "^7.1.0",
     "license-webpack-plugin": "0.5.1",
+    "stylelint": "7.6.0",
+    "stylelint-config-standard": "15.0.0",
+    "stylelint-order": "0.2.2",
     "webpack": "3.1.0"
   },
   "dependencies": {
     "ajv": "5.2.1",
-    "mozjexl": "1.1.5"
+    "mozjexl": "1.1.5",
+    "classnames": "2.2.5",
+    "mozjexl": "1.1.5",
+    "prop-types": "15.5.10",
+    "react": "15.6.1",
+    "react-dom": "15.6.1"
   }
 }

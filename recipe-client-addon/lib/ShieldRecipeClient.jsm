@@ -17,6 +17,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
   "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AboutPages",
+  "resource://shield-recipe-client-content/AboutPages.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -40,6 +42,7 @@ const DEFAULT_PREFS = {
   user_id: "",
   run_interval_seconds: 86400, // 24 hours
   first_run: true,
+  shieldLearnMoreUrl: "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
 };
 const PREF_DEV_MODE = "extensions.shield-recipe-client.dev_mode";
 const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
@@ -62,6 +65,12 @@ this.ShieldRecipeClient = {
       () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure),
     );
     log = LogManager.getLogger("bootstrap");
+
+    try {
+      await AboutPages.init();
+    } catch (err) {
+      log.error("Failed to initialize about pages:", err);
+    }
 
     // Initialize experiments first to avoid a race between initializing prefs
     // and recipes rolling back pref changes when experiments end.

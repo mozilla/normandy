@@ -26,7 +26,7 @@ const {utils: Cu} = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "IndexedDB", "resource://gre/modules/IndexedDB.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ajv", "resource://shield-recipe-client/vendor/ajv.js");
+XPCOMUtils.defineLazyModuleGetter(this, "ajv", "resource://shield-recipe-client-vendor/ajv.js");
 
 this.EXPORTED_SYMBOLS = ["StudyStorage"];
 
@@ -147,6 +147,11 @@ this.StudyStorage = {
     }
 
     return study;
+  },
+
+  async getAll() {
+    const db = await getDatabase();
+    return getStore(db).getAll();
   },
 
   async create(study) {
