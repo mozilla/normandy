@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 import DetailsActionBar from 'control_new/components/recipes/DetailsActionBar';
 import RecipeDetails from 'control_new/components/recipes/RecipeDetails';
@@ -50,9 +50,9 @@ export default class RecipeDetailPage extends React.Component {
           <Col span={16}>
             <DetailsActionBar />
             <RevisionNotice revision={revision} />
-            <SimpleLoadingOverlay isVisible={!revision.get('recipe')}>
+            <LoadingOverlay requests={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
               <RecipeDetails recipe={revision.get('recipe', new Map())} />
-            </SimpleLoadingOverlay>
+            </LoadingOverlay>
           </Col>
           <Col span={8} className="recipe-history">
             <Card className="card-no-hover" title="History">

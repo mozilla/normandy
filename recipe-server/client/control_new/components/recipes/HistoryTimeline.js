@@ -5,7 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
-import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
 import RevisionApprovalTag from 'control_new/components/recipes/RevisionApprovalTag';
 import {
@@ -39,7 +39,7 @@ export default class HistoryTimeline extends React.Component {
     return (
       <div>
         <QueryRecipeHistory pk={recipeId} />
-        <SimpleLoadingOverlay isVisible={history.size === 0}>
+        <LoadingOverlay requests={`fetch-recipe-history-${recipeId}`}>
           <Timeline>
             {
               history.map((revision, index) => {
@@ -68,7 +68,7 @@ export default class HistoryTimeline extends React.Component {
               }).toArray()
             }
           </Timeline>
-        </SimpleLoadingOverlay>
+        </LoadingOverlay>
       </div>
     );
   }

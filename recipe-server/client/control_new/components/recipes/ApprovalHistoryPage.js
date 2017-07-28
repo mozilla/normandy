@@ -37,7 +37,7 @@ export default class ApprovalHistoryPage extends React.Component {
         <QueryRecipe pk={recipeId} />
         <QueryRecipeHistory pk={recipeId} />
 
-        <LoadingOverlay>
+        <LoadingOverlay requests={`fetch-recipe-history-${recipeId}`}>
           {
             history.map(revision => (
               <ApprovalRequest key={revision.get('id')} revision={revision} />
