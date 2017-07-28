@@ -1,17 +1,26 @@
 This project holds all the bits to get a prod-like Normandy running using
 [Docker Compose][].
 
+# Setup
 1.  Install [Docker][] and Docker Compose, and start the Docker daemon.
-2.  Clone this repo, and `cd` into it.
-3.  `./bin/genkeys.sh` to create keys for HTTPS.
-4.  `docker-compose up -d` to download Docker images, and run them in the background.
-5.  `docker-compose run normandy ./manage.py migrate` to create the needed database tables.
-6.  `docker-compose run normandy ./manage.py createsuperuser` to create a user you can log in with.
-7.  `docker-compose run normandy ./manage.py update_actions` to load the action code into the database.
-8.  `docker-compose run normandy ./manage.py update_product_details` to update the Mozilla product details.
-9.  `docker-compose run normandy ./manage.py initial_data` to load the initial channel and country data.
-10.  Open `http://localhost:8000` in your browser. Accept the self-signed certificate.
-11.  Later, run `docker-compose stop` to shut everything down.
+1.  Clone this repo and cd into it
+1.  cd compose
+1.  `./bin/genkeys.sh` to create keys for HTTPS.
+1.  `docker-compose up -d` to download Docker images, and run them in the background.
+1.  `docker-compose run normandy ./manage.py migrate` to create the needed database tables.
+1.  `docker-compose run normandy ./manage.py createsuperuser` to create a user you can log in with.
+1.  `docker-compose run normandy ./manage.py update_actions` to load the action code into the database.
+1.  `docker-compose run normandy ./manage.py update_product_details` to update the Mozilla product details.
+1.  `docker-compose run normandy ./manage.py initial_data` to load the initial channel and country data.
+1.  Open `http://localhost:8000` in your browser. Accept the self-signed certificate.
+1.  Later, run `docker-compose stop` to shut everything down.
+
+# Local Development
+To create an environment for local development, follow all of the above steps and then execute the following command:
+
+1.  `docker-compose -f docker-compose-dev.yml up`
+
+This will create a development environment that hosts your local copy of the Normandy service.
 
 [Docker Compose]: https://docs.docker.com/compose/
 [Docker]: https://docker.io
