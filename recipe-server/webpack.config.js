@@ -65,7 +65,7 @@ if (production) {
 module.exports = [
   {
     context: __dirname,
-    devtool: production ? undefined : 'cheap-eval-source-map',
+    devtool: production ? undefined : 'cheap-module-source-map',
 
     entry: {
       control: [
@@ -149,7 +149,7 @@ module.exports = [
     },
   },
   {
-    devtool: production ? undefined : 'cheap-eval-source-map',
+    devtool: production ? undefined : 'cheap-module-source-map',
 
     entry: {
       'console-log': './client/actions/console-log/index',
