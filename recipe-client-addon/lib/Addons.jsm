@@ -62,7 +62,8 @@ this.Addons = {
    *
    * @param {string} addonUrl
    *   Url to download the .xpi for the add-on from.
-   * @param {boolean} update=false
+   * @param {object} options
+   * @param {boolean} options.update=false
    *   If true, will update an existing installed add-on with the same ID.
    * @async
    * @returns {string}
@@ -71,12 +72,12 @@ this.Addons = {
    *   If the add-on can not be installed, or overwriting is disabled and an
    *   add-on with a matching ID is already installed.
    */
-  async install(addonUrl, update = false) {
+  async install(addonUrl, options) {
     const installObj = await AddonManager.getInstallForURL(addonUrl, null, "application/x-xpinstall");
-    return this.applyInstall(installObj, update);
+    return this.applyInstall(installObj, options);
   },
 
-  async applyInstall(addonInstall, update = false) {
+  async applyInstall(addonInstall, {update = false} = {}) {
     const result = new Promise((resolve, reject) => addonInstall.addListener({
       onInstallStarted(cbInstall) {
         if (cbInstall.existingAddon && !update) {

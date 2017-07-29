@@ -40,7 +40,6 @@ Cu.importGlobalProperties(["fetch"]); /* globals fetch */
 
 this.EXPORTED_SYMBOLS = ["AddonStudies"];
 
-const KEY_TEMPDIR = "TmpD";
 const DB_NAME = "shield";
 const STORE_NAME = "addon-studies";
 const DB_OPTIONS = {
@@ -221,7 +220,7 @@ this.AddonStudies = {
     }
 
     // Create temporary file to store add-on.
-    const path = FileUtils.getFile(KEY_TEMPDIR, ["study.xpi"]).path;
+    const path = OS.Path.join(OS.Constants.Path.tmpDir, "study.xpi");
     const {file, path: uniquePath} = await OS.File.openUnique(path);
 
     // Write the add-on to the file

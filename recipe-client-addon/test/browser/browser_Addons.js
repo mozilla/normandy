@@ -21,14 +21,14 @@ compose_task(
     // Fail to install the 2.0 add-on without updating enabled
     const newAddonUrl = Services.io.newFileURI(addonFile2).spec;
     await Assert.rejects(
-      Addons.install(newAddonUrl, false),
+      Addons.install(newAddonUrl, {update: false}),
       /updating is disabled/,
       "install rejects when the study add-on is already installed and updating is disabled"
     );
 
     // Install the new add-on with updating enabled
     startupPromise = AddonTestUtils.promiseWebExtensionStartup(testInstallId);
-    await Addons.install(newAddonUrl, true);
+    await Addons.install(newAddonUrl, {update: true});
 
     const addon = await startupPromise;
     is(

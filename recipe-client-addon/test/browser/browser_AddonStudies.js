@@ -122,7 +122,7 @@ add_task(async function testStartRequiredArguments() {
     Assert.rejects(
       AddonStudies.start(args),
       /Required arguments/,
-      "start rejects when missing required arguments."
+      `start rejects when missing required argument ${key}.`
     );
   }
 });
