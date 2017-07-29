@@ -5,8 +5,6 @@ Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Addons.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 
-const REQUIRED_FIELDS = ["name", "addonId", "addonVersion", "description", "studyStartDate"];
-
 // Initialize test utils
 AddonTestUtils.initMochitest(this);
 
