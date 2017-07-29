@@ -96,7 +96,7 @@ this.Addons = {
         reject(new Error(`AddonInstall error code: [${cbInstall.error}]`));
       },
       onDownloadFailed(cbInstall) {
-        reject(new Error(`Download failed: [${cbInstall.sourceURI}]`));
+        reject(new Error(`Download failed: [${cbInstall.sourceURI.spec}]`));
       },
     }));
     addonInstall.install();

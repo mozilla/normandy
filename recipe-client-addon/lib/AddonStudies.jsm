@@ -28,6 +28,7 @@
 
 const {utils: Cu, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/osfile.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(this, "FileUtils", "resource://gre/modules/FileUtils.jsm");
@@ -204,6 +205,7 @@ this.AddonStudies = {
       await getStore(db).delete(recipeId);
       throw err;
     } finally {
+      Services.obs.notifyObservers(addonFile, "flush-cache-entry");
       await OS.File.remove(addonFile.path);
     }
   },
