@@ -3,6 +3,7 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/Preferences.jsm", this);
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/Addons.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/SandboxManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
@@ -67,6 +68,28 @@ this.withWebExtension = function(manifestOverrides = {}) {
         file.remove(true);
       }
     };
+  };
+};
+
+this.withInstalledWebExtension = function(manifestOverrides = {}) {
+  return function wrapper(testFunction) {
+    return compose(
+      withWebExtension(manifestOverrides),
+      async function wrappedTestFunction(...args) {
+        const [id, file] = args[args.length - 1];
+        const startupPromise = AddonTestUtils.promiseWebExtensionStartup(id);
+        const url = Services.io.newFileURI(file).spec;
+        await Addons.install(url);
+        await startupPromise;
+        try {
+          await testFunction(...args);
+        } finally {
+          if (await Addons.get(id)) {
+            await Addons.uninstall(id);
+          }
+        }
+      }
+    );
   };
 };
 
@@ -184,6 +207,16 @@ this.withPrefEnv = function(inPrefs) {
   };
 };
 
+this.compose = function(...args) {
+  const funcs = Array.from(args);
+  let composed = funcs.pop();
+  funcs.reverse();
+  for (const func of funcs) {
+    composed = func(composed);
+  }
+  return composed;
+};
+
 /**
  * Wrapper around add_task for declaring tests that use several with-style
  * wrappers. The last argument should be your test function; all other arguments
@@ -203,13 +236,7 @@ this.withPrefEnv = function(inPrefs) {
  *   );
  */
 this.compose_task = function(...args) {
-  const funcs = Array.from(args);
-  let testFunc = funcs.pop();
-  funcs.reverse();
-  for (const func of funcs) {
-    testFunc = func(testFunc);
-  }
-  return add_task(testFunc);
+  return add_task(compose(...args));
 };
 
 let _studyFactoryId = 0;
