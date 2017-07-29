@@ -87,6 +87,7 @@ Parser.prototype.addToken = function(token) {
  */
 Parser.prototype.addTokens = function(tokens) {
 	tokens.forEach(this.addToken, this);
+	return this;
 };
 
 /**
