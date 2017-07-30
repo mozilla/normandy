@@ -5,11 +5,9 @@ var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var AsyncAwaitPlugin = require('webpack-async-await');
-var BabiliPlugin = require('babili-webpack-plugin');
 var argv = require('yargs').argv;
 var childProcess = require('child_process');
-var babiliPreset = require('babel-preset-babili');
-var babelCore = require('babel-core');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
@@ -23,9 +21,11 @@ var plugins = [
     // Once we update to webpack2, we can update this plugin and remove this.
     awaitAnywhere: true,
   }),
-  new webpack.optimize.OccurrenceOrderPlugin(true),
   // Note: This matches Django's idea of what a hashed url looks like. Be careful when changing it!
-  new ExtractTextPlugin(cssNamePattern),
+  new ExtractTextPlugin({
+    allChunks: true,
+    filename: cssNamePattern,
+  }),
   new webpack.DefinePlugin({
     PRODUCTION: production,
     DEVELOPMENT: !production,
@@ -35,25 +35,33 @@ var plugins = [
       },
     },
   }),
+  new webpack.DllReferencePlugin({
+    context: '.',
+    manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
+  })
 ];
 
 if (production) {
   plugins = plugins.concat([
-    new webpack.optimize.DedupePlugin(),
-    new BabiliPlugin(
-      { // babiliOptions
-        evaluate: false, // mozilla/normandy#827
+    new UglifyJSPlugin({
+      parallel: {
+        cache: true,
       },
-      { // overrides
-        // Use our own pinned versions of babel and babili in case deduplication fails
-        babel: babelCore,
-        babili: babiliPreset,
+      uglifyOptions: {
+        ie8: false,
+        ecma: 5,
+        mangle: true,
+        output: {
+          comments: false,
+          beautify: false,
+        },
+        warnings: false
       }
-    ),
+    }),
   ]);
 } else {
   plugins = plugins.concat([
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
   ]);
 }
 
@@ -63,12 +71,12 @@ module.exports = [
     devtool: production ? undefined : 'cheap-module-source-map',
 
     entry: {
-      control: [
-        'babel-polyfill',
-        './client/control/index.js',
-        './client/control/sass/control.scss',
-        './node_modules/font-awesome/scss/font-awesome.scss',
-      ],
+      // control: [
+      //   'babel-polyfill',
+      //   './client/control/index.js',
+      //   './client/control/sass/control.scss',
+      //   './node_modules/font-awesome/scss/font-awesome.scss',
+      // ],
       control_new: [
         'babel-polyfill',
         './client/control_new/index.js',
@@ -92,26 +100,35 @@ module.exports = [
     ]),
 
     module: {
-      // ignore localforage parsing
-      // (removes warning in console)
-      noParse: /node_modules\/localforage\/dist\/localforage.js/,
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
         },
         {
-          test: /\.json$/,
-          loader: 'json-loader',
-        },
-        {
           test: /\.scss$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap'),
+          use: ExtractTextPlugin.extract({
+            allChunks: true,
+            fallback: 'style-loader',
+            use: [
+              'css-loader?sourceMap',
+              'postcss-loader',
+              'sass-loader?sourceMap',
+            ],
+          }),
         },
         {
           test: /\.less$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!less'),
+          exclude: /node_modules/,
+          use: ExtractTextPlugin.extract({
+            allChunks: true,
+            fallback: 'style-loader',
+            use: [
+              'css-loader?sourceMap',
+              'less-loader',
+            ],
+          }),
         },
         {
           test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
@@ -172,7 +189,7 @@ module.exports = [
     },
 
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           exclude: /node_modules/,

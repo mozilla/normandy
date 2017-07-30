@@ -10,7 +10,7 @@ import { push as pushAction, Link } from 'redux-little-router';
 import BooleanIcon from 'control_new/components/common/BooleanIcon';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import QueryRecipeListingColumns from 'control_new/components/data/QueryRecipeListingColumns';
-import QueryRecipes from 'control_new/components/data/QueryRecipes';
+import QueryMultipleRecipes from 'control_new/components/data/QueryMultipleRecipes';
 import ListingActionBar from 'control_new/components/recipes/ListingActionBar';
 import DataList from 'control_new/components/tables/DataList';
 import {
@@ -65,7 +65,7 @@ export default class RecipeListing extends React.Component {
     pageNumber: null,
     searchText: null,
     status: null,
-  }
+  };
 
   static columnRenderers = {
     name({ ordering }) {
@@ -127,7 +127,7 @@ export default class RecipeListing extends React.Component {
         />
       );
     },
-  }
+  };
 
   static renderLinkedText(text, record) {
     return <Link href={`/recipe/${record.id}`}>{text}</Link>;
@@ -167,7 +167,7 @@ export default class RecipeListing extends React.Component {
     return (
       <div>
         <QueryRecipeListingColumns />
-        <QueryRecipes
+        <QueryMultipleRecipes
           pageNumber={pageNumber}
           filters={this.getFilters()}
         />
