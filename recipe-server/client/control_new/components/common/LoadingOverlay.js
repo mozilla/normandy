@@ -9,24 +9,27 @@ import { areAnyRequestsInProgress } from 'control_new/state/app/requests/selecto
 export class SimpleLoadingOverlay extends React.Component {
   static propTypes = {
     children: PropTypes.any,
+    className: PropTypes.string,
     isVisible: PropTypes.bool,
   };
 
   static defaultProps = {
     children: null,
+    className: null,
     isVisible: false,
   };
 
   render() {
     const {
       children,
+      className,
       isVisible,
     } = this.props;
 
     const Wrapper = isVisible ? Spin : 'div';
 
     return (
-      <Wrapper>
+      <Wrapper className={className}>
         {children}
       </Wrapper>
     );

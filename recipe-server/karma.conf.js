@@ -1,6 +1,9 @@
 /* eslint-env node */
 /* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
+
 // Karma configuration
+
+
 const WEBPACK_CONFIG = require('./webpack.config.js');
 
 module.exports = function (config) {
@@ -16,6 +19,7 @@ module.exports = function (config) {
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/jasmine-promises/dist/jasmine-promises.js',
+      'assets/bundles/vendor.bundle.js',
       'client/**/tests/index.js',
     ],
 
