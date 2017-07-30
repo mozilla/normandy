@@ -5,11 +5,9 @@ var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var AsyncAwaitPlugin = require('webpack-async-await');
-var BabiliPlugin = require('babili-webpack-plugin');
 var argv = require('yargs').argv;
 var childProcess = require('child_process');
-var babiliPreset = require('babel-preset-babili');
-var babelCore = require('babel-core');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
@@ -45,16 +43,21 @@ var plugins = [
 
 if (production) {
   plugins = plugins.concat([
-    new BabiliPlugin(
-      { // babiliOptions
-        evaluate: false, // mozilla/normandy#827
+    new UglifyJSPlugin({
+      parallel: {
+        cache: true,
       },
-      { // overrides
-        // Use our own pinned versions of babel and babili in case deduplication fails
-        babel: babelCore,
-        babili: babiliPreset,
+      uglifyOptions: {
+        ie8: false,
+        ecma: 5,
+        mangle: true,
+        output: {
+          comments: false,
+          beautify: false,
+        },
+        warnings: false
       }
-    ),
+    }),
   ]);
 } else {
   plugins = plugins.concat([
