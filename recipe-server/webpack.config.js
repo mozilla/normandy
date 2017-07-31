@@ -23,9 +23,11 @@ var plugins = [
     // Once we update to webpack2, we can update this plugin and remove this.
     awaitAnywhere: true,
   }),
-  new webpack.optimize.OccurrenceOrderPlugin(true),
   // Note: This matches Django's idea of what a hashed url looks like. Be careful when changing it!
-  new ExtractTextPlugin(cssNamePattern),
+  new ExtractTextPlugin({
+    allChunks: true,
+    filename: cssNamePattern,
+  }),
   new webpack.DefinePlugin({
     PRODUCTION: production,
     DEVELOPMENT: !production,
@@ -35,11 +37,14 @@ var plugins = [
       },
     },
   }),
+  new webpack.DllReferencePlugin({
+    context: '.',
+    manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
+  })
 ];
 
 if (production) {
   plugins = plugins.concat([
-    new webpack.optimize.DedupePlugin(),
     new BabiliPlugin(
       { // babiliOptions
         evaluate: false, // mozilla/normandy#827
@@ -53,7 +58,7 @@ if (production) {
   ]);
 } else {
   plugins = plugins.concat([
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
   ]);
 }
 
@@ -92,26 +97,35 @@ module.exports = [
     ]),
 
     module: {
-      // ignore localforage parsing
-      // (removes warning in console)
-      noParse: /node_modules\/localforage\/dist\/localforage.js/,
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
         },
         {
-          test: /\.json$/,
-          loader: 'json-loader',
-        },
-        {
           test: /\.scss$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap'),
+          use: ExtractTextPlugin.extract({
+            allChunks: true,
+            fallback: 'style-loader',
+            use: [
+              'css-loader?sourceMap',
+              'postcss-loader',
+              'sass-loader?sourceMap',
+            ],
+          }),
         },
         {
           test: /\.less$/,
-          loader: ExtractTextPlugin.extract('style', 'css?sourceMap!less'),
+          exclude: /node_modules/,
+          use: ExtractTextPlugin.extract({
+            allChunks: true,
+            fallback: 'style-loader',
+            use: [
+              'css-loader?sourceMap',
+              'less-loader',
+            ],
+          }),
         },
         {
           test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
@@ -172,7 +186,7 @@ module.exports = [
     },
 
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           exclude: /node_modules/,
