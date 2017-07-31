@@ -26,16 +26,24 @@ const OPT_OUT_STUDIES_ENABLED_PREF = "app.shield.optoutstudies.enabled";
  */
 this.ShieldPreferences = {
   async init() {
+    // If the FHR pref was disabled since our last run, disable opt-out as well.
+    if (!Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF)) {
+      Services.prefs.setBoolPref(OPT_OUT_STUDIES_ENABLED_PREF, false);
+    }
+
+    // Watch for changes to the FHR pref
+    Services.prefs.addObserver(FHR_UPLOAD_ENABLED_PREF, this);
+    CleanupManager.addCleanupHandler(() => {
+      Services.prefs.removeObserver(FHR_UPLOAD_ENABLED_PREF, this);
+    });
+
     // Disabled outside of en-* locales temporarily (bug 1377192).
     // Disabled when MOZ_DATA_REPORTING is false since the FHR UI is also hidden
     // when data reporting is false.
     if (AppConstants.MOZ_DATA_REPORTING && Services.locale.getAppLocaleAsLangTag().startsWith("en")) {
       Services.obs.addObserver(this, "advanced-pane-loaded");
-      Services.prefs.addObserver(FHR_UPLOAD_ENABLED_PREF, this);
-
       CleanupManager.addCleanupHandler(() => {
         Services.obs.removeObserver(this, "advanced-pane-loaded");
-        Services.prefs.removeObserver(FHR_UPLOAD_ENABLED_PREF, this);
       });
     }
   },
@@ -79,15 +87,15 @@ this.ShieldPreferences = {
       checkbox.setAttribute("id", "optOutStudiesEnabled");
       checkbox.setAttribute("label", "Allow Firefox to install and run studies");
       checkbox.setAttribute("preference", OPT_OUT_STUDIES_ENABLED_PREF);
-      checkbox.setAttribute("checked", Services.prefs.getBoolPref(OPT_OUT_STUDIES_ENABLED_PREF));
       checkbox.setAttribute("disabled", !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF));
       hContainer.appendChild(checkbox);
 
       const viewStudies = this.refs.viewStudies = document.createElementNS(XUL_NS, "label");
       viewStudies.setAttribute("id", "viewShieldStudies");
+      viewStudies.setAttribute("href", "about:studies");
+      viewStudies.setAttribute("useoriginprincipal", true);
       viewStudies.textContent = "View Firefox Studies";
       viewStudies.classList.add("learnMore", "text-link");
-      viewStudies.addEventListener("click", this);
       hContainer.appendChild(viewStudies);
 
       // <prefrence> elements for prefs that we need to monitor while the page is open.
@@ -113,16 +121,8 @@ this.ShieldPreferences = {
       preferences.appendChild(this.refs.fhrPref);
     }
 
-    remove() {
-      this.refs.container.remove();
-    }
-
     handleEvent(event) {
       switch (event.target.id) {
-        // Open about:studies when the "View Firefox Studies" link is clicked
-        case "viewShieldStudies":
-          this.document.location = "about:studies";
-          break;
         // Disable/enable the checkbox when the FHR pref changes.
         case FHR_UPLOAD_ENABLED_PREF:
           this.refs.checkbox.disabled = !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF);

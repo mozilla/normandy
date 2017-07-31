@@ -4,6 +4,7 @@
 "use strict";
 
 const {utils: Cu} = Components;
+Cu.import("resource://gre/modules/AppConstants.jsm");
 Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -25,7 +26,7 @@ const DEFAULT_PREFS = {
   "extensions.shield-recipe-client.shieldLearnMoreUrl": [
     "char", "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
   ],
-  "app.shield.optoutstudies.enabled": ["bool", true],
+  "app.shield.optoutstudies.enabled": ["bool", AppConstants.MOZ_DATA_REPORTING],
 };
 
 this.install = function() {};
