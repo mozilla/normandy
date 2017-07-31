@@ -88,6 +88,18 @@ function getStore(db) {
   return db.objectStore(STORE_NAME, "readwrite");
 }
 
+/**
+ * Mark a study object as having ended. Modifies the study in-place.
+ * @param {IDBDatabase} db
+ * @param {Study} study
+ */
+async function markAsEnded(db, study) {
+  study.active = false;
+  study.studyEndDate = new Date();
+  await getStore(db).put(study);
+  Services.obs.notifyObservers(study, STUDY_ENDED_TOPIC);
+}
+
 this.AddonStudies = {
   /**
    * Test wrapper that temporarily replaces the stored studies with the given
@@ -132,9 +144,7 @@ this.AddonStudies = {
     for (const study of activeStudies) {
       const addon = await AddonManager.getAddonByID(study.addonId);
       if (!addon) {
-        this.markAsEnded(study);
-        await getStore(db).put(study);
-        Services.obs.notifyObservers(study, STUDY_ENDED_TOPIC);
+        await markAsEnded(db, study);
       }
     }
     await this.close();
@@ -157,10 +167,8 @@ this.AddonStudies = {
       // Use a dedicated DB connection instead of the shared one so that we can
       // close it without fear of affecting other users of the shared connection.
       const db = await openDatabase();
-      await this.markAsEnded(matchingStudy);
-      await getStore(db).put(matchingStudy);
+      await markAsEnded(db, matchingStudy);
       await db.close();
-      Services.obs.notifyObservers(matchingStudy, STUDY_ENDED_TOPIC);
     }
   },
 
@@ -305,24 +313,12 @@ this.AddonStudies = {
       throw new Error(`Cannot stop study for recipe ${recipeId}; it is already inactive.`);
     }
 
-    this.markAsEnded(study);
-    await getStore(db).put(study);
+    await markAsEnded(db, study);
 
     try {
       await Addons.uninstall(study.addonId);
     } catch (err) {
       log.warn(`Could not uninstall addon ${study.addonId} for recipe ${study.recipeId}:`, err);
     }
-
-    Services.obs.notifyObservers(study, STUDY_ENDED_TOPIC);
-  },
-
-  /**
-   * Mark a study object as having ended. Modifies the study in-place.
-   * @param {Study} study
-   */
-  markAsEnded(study) {
-    study.active = false;
-    study.studyEndDate = new Date();
   },
 };

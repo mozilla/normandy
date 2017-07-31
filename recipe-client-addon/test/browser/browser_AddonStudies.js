@@ -1,6 +1,7 @@
 "use strict";
 
 Cu.import("resource://gre/modules/IndexedDB.jsm", this);
+Cu.import("resource://testing-common/TestUtils.jsm", this);
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Addons.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
@@ -311,24 +312,8 @@ compose_task(
   ]),
   withInstalledWebExtension({id: "installed@example.com"}),
   async function testInit([study], [id, addonFile]) {
-    // Wait (or throw if we time out ) for the shield-study-ended event to
-    // ensure that the study data has been updated.
-    await new Promise((resolve, reject) => {
-      let timeout = null;
-      function observe(subject, topic) {
-        clearTimeout(timeout);
-        Services.obs.removeObserver(observe, "shield-study-ended");
-        resolve();
-      }
-
-      Services.obs.addObserver(observe, "shield-study-ended");
-      timeout = setTimeout(() => {
-        Services.obs.removeObserver(observe, "shield-study-ended");
-        reject(new Error("shield-study-ended event was never dispatched."));
-      }, 5000);
-
-      Addons.uninstall(id);
-    });
+    await Addons.uninstall(id);
+    await TestUtils.topicObserved("shield-study-ended");
 
     const newStudy = await AddonStudies.get(study.recipeId);
     ok(!newStudy.active, "Studies are marked as inactive when their add-on is uninstalled.");
