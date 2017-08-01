@@ -30,6 +30,11 @@
                     "type": "string",
                     "format": "uri",
                     "minLength": 1
+                },
+                "isEnrollmentPaused": {
+                    "description": "Whether the study is currently enrolling new users",
+                    "type": "boolean",
+                    "default": false
                 }
             }
         }
