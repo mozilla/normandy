@@ -32,7 +32,7 @@
                     "minLength": 1
                 },
                 "isEnrollmentPaused": {
-                    "description": "Whether the study is currently enrolling new users",
+                    "description": "If true, new users will not be enrolled in the study.",
                     "type": "boolean",
                     "default": false
                 }
