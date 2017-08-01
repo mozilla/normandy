@@ -1,5 +1,6 @@
 "use strict";
 
+Cu.import("resource://testing-common/TestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
@@ -376,6 +377,7 @@ compose_task(
     ok(!registerTimerStub.called, "RecipeRunner.registerTimer is not called immediately");
 
     Services.obs.notifyObservers(null, "sessionstore-windows-restored");
+    await TestUtils.topicObserved("shield-init-complete");
     ok(runStub.called, "RecipeRunner.run is called after the UI is available");
     ok(registerTimerStub.called, "RecipeRunner.registerTimer is called after the UI is available");
     ok(
