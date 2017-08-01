@@ -29,8 +29,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
                                   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ActionSandboxManager",
                                   "resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "StudyStorage",
-                                  "resource://shield-recipe-client/lib/StudyStorage.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AddonStudies",
+                                  "resource://shield-recipe-client/lib/AddonStudies.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Uptake",
                                   "resource://shield-recipe-client/lib/Uptake.jsm");
 
@@ -205,7 +205,8 @@ this.RecipeRunner = {
             await manager.runAsyncCallback("action", recipe);
             status = Uptake.RECIPE_SUCCESS;
           } catch (e) {
-            log.error(`Could not execute recipe ${recipe.name}:`, e);
+            log.error(`Could not execute recipe ${recipe.name}:`);
+            Cu.reportError(e);
             status = Uptake.RECIPE_EXECUTION_ERROR;
           }
         }
@@ -235,7 +236,7 @@ this.RecipeRunner = {
     Object.values(actionSandboxManagers).forEach(manager => manager.removeHold("recipeRunner"));
 
     // Close storage connections
-    await StudyStorage.close();
+    await AddonStudies.close();
 
     Uptake.reportRunner(Uptake.RUNNER_SUCCESS);
   },

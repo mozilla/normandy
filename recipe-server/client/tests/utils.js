@@ -11,6 +11,7 @@ export function urlPathMatcher(path) {
   };
 }
 
+let _recipeId = 0;
 /**
  * Factory for creating recipe objects as returned by the API.
  */
@@ -20,7 +21,7 @@ export function recipeFactory(props = {}) {
   delete props.arguments;
 
   return {
-    id: 1,
+    id: _recipeId++,
     revision_id: 1,
     name: 'Test Recipe',
     enabled: false,

@@ -25,6 +25,8 @@ this.shutdown = function(data, reason) {
   const log = LogManager.getLogger("bootstrap");
   let modules = [
     "lib/ActionSandboxManager.jsm",
+    "lib/Addons.jsm",
+    "lib/AddonStudies.jsm",
     "lib/CleanupManager.jsm",
     "lib/ClientEnvironment.jsm",
     "lib/FilterExpressions.jsm",
@@ -39,7 +41,6 @@ this.shutdown = function(data, reason) {
     "lib/SandboxManager.jsm",
     "lib/ShieldRecipeClient.jsm",
     "lib/Storage.jsm",
-    "lib/StudyStorage.jsm",
     "lib/Uptake.jsm",
     "lib/Utils.jsm",
   ].map(m => `resource://shield-recipe-client/${m}`);

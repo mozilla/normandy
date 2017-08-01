@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
-/* global classnames FxButton InfoBox PropTypes r React remoteValues stringToDate sendPageEvent */
+/* global classnames FxButton InfoBox PropTypes r React remoteValues sendPageEvent */
 
 window.ShieldStudies = class ShieldStudies extends React.Component {
   constructor(props) {
@@ -78,12 +78,7 @@ class StudyList extends React.Component {
   }
 
   receiveRemoteValue(name, value) {
-    // Convert date strings to dates.
-    const studies = value.map(study => {
-      study.studyStartDate = stringToDate(study.studyStartDate);
-      study.studyEndDate = stringToDate(study.studyEndDate);
-      return study;
-    });
+    const studies = value.slice();
 
     // Sort by active status, then by start date descending.
     studies.sort((a, b) => {
@@ -114,7 +109,7 @@ class StudyListItem extends React.Component {
   }
 
   handleClickRemove() {
-    sendPageEvent("RemoveStudy", this.props.study.name);
+    sendPageEvent("RemoveStudy", this.props.study.recipeId);
   }
 
   render() {
@@ -145,6 +140,7 @@ class StudyListItem extends React.Component {
 }
 StudyListItem.propTypes = {
   study: PropTypes.shape({
+    recipeId: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     active: PropTypes.boolean,
     description: PropTypes.string.isRequired,

@@ -47,18 +47,6 @@ window.FxButton.propTypes = {
 };
 
 /**
- * Convert a string to a date. Returns the argument if it is falsy.
- * @param {String} dateString
- * @return {Date}
- */
-function stringToDate(dateString) {
-  if (dateString) {
-    return new Date(dateString);
-  }
-  return dateString;
-}
-
-/**
  * Wrapper class for a value that is provided by the frame script.
  *
  * Emits a "GetRemoteValue:{name}" page event on load to fetch the initial

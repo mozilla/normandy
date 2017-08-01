@@ -26,16 +26,23 @@ class OptOutStudyFields extends ActionFields {
 
         <ControlField
           disabled={disabled}
-          label="Message"
-          name="arguments.message"
+          label="Study Name"
+          name="arguments.name"
           component="input"
           type="text"
         />
 
         <ControlField
           disabled={disabled}
-          label="Extension"
-          name="arguments.extension"
+          label="Study Description"
+          name="arguments.description"
+          component="textarea"
+        />
+
+        <ControlField
+          disabled={disabled}
+          label="Add-on"
+          name="arguments.addonUrl"
           component="select"
         >
           {extensions.map(extension => (
