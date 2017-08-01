@@ -1,5 +1,7 @@
 import { Action, registerAction, registerAsyncCallback } from '../utils';
 
+const SHIELD_OPT_OUT_PREF = 'app.shield.optoutstudies.enabled';
+
 let seenRecipeIds = [];
 
 /**
@@ -22,6 +24,13 @@ export default class OptOutStudyAction extends Action {
     // Exit early if we're on an incompatible client.
     if (studies === undefined) {
       this.normandy.log('Client does not support studies, aborting.', 'info');
+      return;
+    }
+
+    // Check opt-out preference
+    const preferences = this.normandy.preferences;
+    if (preferences && !preferences.getBool(SHIELD_OPT_OUT_PREF, false)) {
+      this.normandy.log('User has opted-out of opt-out experiments, aborting.', 'info');
       return;
     }
 

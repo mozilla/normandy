@@ -63,6 +63,9 @@ describe('OptOutStudyAction', () => {
     normandy = {
       log: jasmine.createSpy('log'),
       studies: new MockStudies(),
+      preferences: {
+        getBool: jasmine.createSpy('getBool').and.returnValue(true),
+      },
     };
     resetAction();
   });
@@ -81,6 +84,19 @@ describe('OptOutStudyAction', () => {
       await action.execute();
       await postExecutionHook(normandy);
 
+      expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'info');
+    });
+
+    it('should log and exit if the user has opted out of opt-out studies', async () => {
+      normandy.preferences.getBool.and.returnValue(false);
+      const action = new OptOutStudyAction(normandy, optOutStudyFactory());
+
+      await action.execute();
+      await postExecutionHook(normandy);
+
+      expect(normandy.preferences.getBool).toHaveBeenCalledWith(
+        'app.shield.optoutstudies.enabled', false
+      );
       expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'info');
     });
 

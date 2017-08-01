@@ -1,5 +1,7 @@
 import { Action, registerAction, registerAsyncCallback } from '../utils';
 
+const SHIELD_OPT_OUT_PREF = 'app.shield.optoutstudies.enabled';
+
 let seenExperimentNames = [];
 
 /**
@@ -24,6 +26,13 @@ export default class PreferenceExperimentAction extends Action {
     // Exit early if we're on an incompatible client.
     if (experiments === undefined) {
       this.normandy.log('Client does not support preference experiments, aborting.', 'info');
+      return;
+    }
+
+    // Check opt-out preference
+    const preferences = this.normandy.preferences;
+    if (preferences && !preferences.getBool(SHIELD_OPT_OUT_PREF, false)) {
+      this.normandy.log('User has opted-out of preference experiments, aborting.', 'info');
       return;
     }
 
@@ -97,6 +106,7 @@ export async function postExecutionHook(normandy) {
   const activeExperiments = await normandy.preferenceExperiments.getAllActive();
   for (const experiment of activeExperiments) {
     if (!seenExperimentNames.includes(experiment.name)) {
+      // eslint-disable-next-line no-await-in-loop
       await normandy.preferenceExperiments.stop(experiment.name, true);
     }
   }
