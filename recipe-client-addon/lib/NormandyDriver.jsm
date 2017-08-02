@@ -22,7 +22,7 @@ Cu.import("resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 Cu.import("resource://shield-recipe-client/lib/Sampling.jsm");
 
 XPCOMUtils.defineLazyModuleGetter(
-  this, "StudyStorage", "resource://shield-recipe-client/lib/StudyStorage.jsm");
+  this, "AddonStudies", "resource://shield-recipe-client/lib/AddonStudies.jsm");
 
 const {generateUUID} = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
 
@@ -182,10 +182,11 @@ this.NormandyDriver = function(sandboxManager) {
 
     // Study storage API
     studies: {
-      create: sandboxManager.wrapAsync(StudyStorage.create, {cloneArguments: true}),
-      update: sandboxManager.wrapAsync(StudyStorage.update, {cloneArguments: true}),
-      get: sandboxManager.wrapAsync(StudyStorage.get, {cloneInto: true}),
-      has: sandboxManager.wrapAsync(StudyStorage.has),
+      start: sandboxManager.wrapAsync(AddonStudies.start, {cloneArguments: true, cloneInto: true}),
+      stop: sandboxManager.wrapAsync(AddonStudies.stop),
+      get: sandboxManager.wrapAsync(AddonStudies.get, {cloneInto: true}),
+      getAll: sandboxManager.wrapAsync(AddonStudies.getAll, {cloneInto: true}),
+      has: sandboxManager.wrapAsync(AddonStudies.has),
     },
   };
 };

@@ -1,6 +1,6 @@
 FROM ubuntu:zesty
 WORKDIR /root
-ENV CACHEBUST=2017-06-12
+ENV CACHEBUST=2017-07-26
 RUN apt-get update && apt-get install -y --no-install-recommends \
         apt-transport-https \
         curl \

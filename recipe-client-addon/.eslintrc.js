@@ -4,10 +4,12 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:mozilla/recommended",
+    "plugin:react/recommended",
   ],
 
   plugins: [
     "mozilla",
+    "react",
   ],
 
   rules: {

@@ -17,6 +17,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
   "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AboutPages",
+  "resource://shield-recipe-client-content/AboutPages.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -39,9 +41,10 @@ const DEFAULT_PREFS = {
   "logging.level": Log.Level.Warn,
   user_id: "",
   run_interval_seconds: 86400, // 24 hours
+  first_run: true,
+  shieldLearnMoreUrl: "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
 };
 const PREF_DEV_MODE = "extensions.shield-recipe-client.dev_mode";
-const PREF_SELF_SUPPORT_ENABLED = "browser.selfsupport.enabled";
 const PREF_LOGGING_LEVEL = PREF_BRANCH + "logging.level";
 
 let log = null;
@@ -63,14 +66,10 @@ this.ShieldRecipeClient = {
     );
     log = LogManager.getLogger("bootstrap");
 
-    // Disable self-support, since we replace its behavior.
-    // Self-support only checks its pref on start, so if we disable it, wait
-    // until next startup to run, unless the dev_mode preference is set.
-    if (Preferences.get(PREF_SELF_SUPPORT_ENABLED, true)) {
-      Preferences.set(PREF_SELF_SUPPORT_ENABLED, false);
-      if (!Preferences.get(PREF_DEV_MODE, false)) {
-        return;
-      }
+    try {
+      await AboutPages.init();
+    } catch (err) {
+      log.error("Failed to initialize about pages:", err);
     }
 
     // Initialize experiments first to avoid a race between initializing prefs
@@ -86,11 +85,6 @@ this.ShieldRecipeClient = {
 
   shutdown(reason) {
     CleanupManager.cleanup();
-
-    // Re-enable self-support if we're being disabled.
-    if (reason === REASONS.ADDON_DISABLE || reason === REASONS.ADDON_UNINSTALL) {
-      Services.prefs.setBoolPref(PREF_SELF_SUPPORT_ENABLED, true);
-    }
   },
 
   setDefaultPrefs() {

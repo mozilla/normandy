@@ -3,3 +3,5 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 resource shield-recipe-client .
+resource shield-recipe-client-content content/
+resource shield-recipe-client-vendor vendor/

@@ -1,8 +1,8 @@
 "use strict";
 
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
 
 add_task(withDriver(Assert, async function uuids(driver) {
   // Test that it is a UUID
@@ -84,41 +84,44 @@ add_task(withDriver(Assert, async function distribution(driver) {
   is(client.distribution, "funnelcake", "distribution is read from preferences");
 }));
 
-add_task(withSandboxManager(Assert, async function testCreateStorage(sandboxManager) {
-  const driver = new NormandyDriver(sandboxManager);
-  sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+compose_task(
+  withSandboxManager(Assert),
+  async function testCreateStorage(sandboxManager) {
+    const driver = new NormandyDriver(sandboxManager);
+    sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
 
-  // Assertion helpers
-  sandboxManager.addGlobal("is", is);
-  sandboxManager.addGlobal("deepEqual", (...args) => Assert.deepEqual(...args));
+    // Assertion helpers
+    sandboxManager.addGlobal("is", is);
+    sandboxManager.addGlobal("deepEqual", (...args) => Assert.deepEqual(...args));
 
-  await sandboxManager.evalInSandbox(`
-    (async function sandboxTest() {
-      const store = driver.createStorage("testprefix");
-      const otherStore = driver.createStorage("othertestprefix");
-      await store.clear();
-      await otherStore.clear();
+    await sandboxManager.evalInSandbox(`
+      (async function sandboxTest() {
+        const store = driver.createStorage("testprefix");
+        const otherStore = driver.createStorage("othertestprefix");
+        await store.clear();
+        await otherStore.clear();
 
-      await store.setItem("willremove", 7);
-      await otherStore.setItem("willremove", 4);
-      is(await store.getItem("willremove"), 7, "createStorage stores sandbox values");
-      is(
-        await otherStore.getItem("willremove"),
-        4,
-        "values are not shared between createStorage stores",
-      );
+        await store.setItem("willremove", 7);
+        await otherStore.setItem("willremove", 4);
+        is(await store.getItem("willremove"), 7, "createStorage stores sandbox values");
+        is(
+          await otherStore.getItem("willremove"),
+          4,
+          "values are not shared between createStorage stores",
+        );
 
-      const deepValue = {"foo": ["bar", "baz"]};
-      await store.setItem("deepValue", deepValue);
-      deepEqual(await store.getItem("deepValue"), deepValue, "createStorage clones stored values");
+        const deepValue = {"foo": ["bar", "baz"]};
+        await store.setItem("deepValue", deepValue);
+        deepEqual(await store.getItem("deepValue"), deepValue, "createStorage clones stored values");
 
-      await store.removeItem("willremove");
-      is(await store.getItem("willremove"), null, "createStorage removes items");
+        await store.removeItem("willremove");
+        is(await store.getItem("willremove"), null, "createStorage removes items");
 
-      is('prefix' in store, false, "createStorage doesn't expose non-whitelist attributes");
-    })();
-  `);
-}));
+        is('prefix' in store, false, "createStorage doesn't expose non-whitelist attributes");
+      })();
+    `);
+  }
+);
 
 add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
   const ADDON_ID = "normandydriver@example.com";
@@ -146,66 +149,60 @@ add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
   Assert.equal(addon, null, "Add-on has been uninstalled");
 }));
 
-add_task(withSandboxManager(Assert, async function testAddonsGetWorksInSandbox(sandboxManager) {
-  const driver = new NormandyDriver(sandboxManager);
-  sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+compose_task(
+  withSandboxManager(Assert),
+  async function testAddonsGetWorksInSandbox(sandboxManager) {
+    const driver = new NormandyDriver(sandboxManager);
+    sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
 
-  // Assertion helpers
-  sandboxManager.addGlobal("is", is);
-  sandboxManager.addGlobal("deepEqual", (...args) => Assert.deepEqual(...args));
+    // Assertion helpers
+    sandboxManager.addGlobal("is", is);
+    sandboxManager.addGlobal("deepEqual", (...args) => Assert.deepEqual(...args));
 
-  const ADDON_ID = "normandydriver@example.com";
+    const ADDON_ID = "normandydriver@example.com";
 
-  await driver.addons.install(TEST_XPI_URL);
+    await driver.addons.install(TEST_XPI_URL);
 
-  await sandboxManager.evalInSandbox(`
-    (async function sandboxTest() {
-      const addon = await driver.addons.get("${ADDON_ID}");
+    await sandboxManager.evalInSandbox(`
+      (async function sandboxTest() {
+        const addon = await driver.addons.get("${ADDON_ID}");
 
-      deepEqual(addon, {
-        id: "${ADDON_ID}",
-        name: "normandy_fixture",
-        version: "1.0",
-        installDate: addon.installDate,
-        isActive: true,
-        type: "extension",
-      }, "Add-on is accesible in the driver");
-    })();
-  `);
+        deepEqual(addon, {
+          id: "${ADDON_ID}",
+          name: "normandy_fixture",
+          version: "1.0",
+          installDate: addon.installDate,
+          isActive: true,
+          type: "extension",
+        }, "Add-on is accesible in the driver");
+      })();
+    `);
 
-  await driver.addons.uninstall(ADDON_ID);
-}));
+    await driver.addons.uninstall(ADDON_ID);
+  }
+);
 
-add_task(withSandboxManager(Assert, async function testStudyStorage(sandboxManager) {
-  const driver = new NormandyDriver(sandboxManager);
-  sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+compose_task(
+  withSandboxManager(Assert),
+  AddonStudies.withStudies([
+    studyFactory({name: "test-study", addonVersion: "5.0"}),
+  ]),
+  async function testAddonStudies(sandboxManager, [study]) {
+    const driver = new NormandyDriver(sandboxManager);
+    sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
 
-  // Assertion helpers
-  sandboxManager.addGlobal("is", is);
-  sandboxManager.addGlobal("ok", ok);
+    // Assertion helpers
+    sandboxManager.addGlobal("is", is);
+    sandboxManager.addGlobal("ok", ok);
 
-  await sandboxManager.evalInSandbox(`
-    (async function sandboxTest() {
-      await driver.studies.create({
-        name: "test-study",
-        addonId: "test@example.com",
-        addonVersion: "1.0",
-        description: "fake",
-        studyStartDate: new Date().toJSON(),
-      });
+    await sandboxManager.evalInSandbox(`
+      (async function sandboxTest() {
+        const hasStudy = await driver.studies.has(${study.recipeId});
+        ok(hasStudy, "studies.has checks for studies from within a sandbox.");
 
-      const hasStudy = await driver.studies.has("test-study");
-      ok(hasStudy, "studies.create creates studies from within a sandbox.");
-
-      let study = await driver.studies.get("test-study");
-      is(study.addonVersion, "1.0", "studies.get fetches studies from within a sandbox.");
-
-      await driver.studies.update("test-study", {addonVersion: "2.0"});
-      study = await driver.studies.get("test-study");
-      is(study.addonVersion, "2.0", "studies.update can update stored studies.");
-    })();
-  `);
-
-  await StudyStorage.clear();
-  await StudyStorage.close();
-}));
+        let study = await driver.studies.get(${study.recipeId});
+        is(study.addonVersion, "5.0", "studies.get fetches studies from within a sandbox.");
+      })();
+    `);
+  }
+);

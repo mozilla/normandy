@@ -29,8 +29,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "CleanupManager",
                                   "resource://shield-recipe-client/lib/CleanupManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ActionSandboxManager",
                                   "resource://shield-recipe-client/lib/ActionSandboxManager.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "StudyStorage",
-                                  "resource://shield-recipe-client/lib/StudyStorage.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AddonStudies",
+                                  "resource://shield-recipe-client/lib/AddonStudies.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Uptake",
                                   "resource://shield-recipe-client/lib/Uptake.jsm");
 
@@ -42,6 +42,9 @@ const log = LogManager.getLogger("recipe-runner");
 const prefs = Services.prefs.getBranch("extensions.shield-recipe-client.");
 const TIMER_NAME = "recipe-client-addon-run";
 const RUN_INTERVAL_PREF = "run_interval_seconds";
+const FIRST_RUN_PREF = "first_run";
+const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
+const SHIELD_INIT_NOTIFICATION = "shield-init-complete";
 
 this.RecipeRunner = {
   init() {
@@ -54,6 +57,28 @@ this.RecipeRunner = {
       this.run();
     }
 
+    if (prefs.getBoolPref(FIRST_RUN_PREF)) {
+      // Run once immediately after the UI is available. Do this before adding the
+      // timer so we can't end up racing it.
+      const observer = {
+        observe: (subject, topic, data) => {
+          Services.obs.removeObserver(observer, UI_AVAILABLE_NOTIFICATION);
+
+          this.run();
+          this.registerTimer();
+          prefs.setBoolPref(FIRST_RUN_PREF, false);
+
+          Services.obs.notifyObservers(null, SHIELD_INIT_NOTIFICATION);
+        },
+      };
+      Services.obs.addObserver(observer, UI_AVAILABLE_NOTIFICATION);
+      CleanupManager.addCleanupHandler(() => Services.obs.removeObserver(observer, UI_AVAILABLE_NOTIFICATION));
+    } else {
+      this.registerTimer();
+    }
+  },
+
+  registerTimer() {
     this.updateRunInterval();
     CleanupManager.addCleanupHandler(() => timerManager.unregisterTimer(TIMER_NAME));
 
@@ -180,7 +205,8 @@ this.RecipeRunner = {
             await manager.runAsyncCallback("action", recipe);
             status = Uptake.RECIPE_SUCCESS;
           } catch (e) {
-            log.error(`Could not execute recipe ${recipe.name}:`, e);
+            log.error(`Could not execute recipe ${recipe.name}:`);
+            Cu.reportError(e);
             status = Uptake.RECIPE_EXECUTION_ERROR;
           }
         }
@@ -210,7 +236,7 @@ this.RecipeRunner = {
     Object.values(actionSandboxManagers).forEach(manager => manager.removeHold("recipeRunner"));
 
     // Close storage connections
-    await StudyStorage.close();
+    await AddonStudies.close();
 
     Uptake.reportRunner(Uptake.RUNNER_SUCCESS);
   },
