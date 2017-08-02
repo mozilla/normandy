@@ -339,7 +339,12 @@ export class ExperimentBranchFields extends React.Component {
           name={`${fieldName}.slug`}
           connectToForm={false}
         >
-          <Input disabled={disabled} value={branch.get('slug', '')} onChange={this.handleChangeSlug} />
+          <Input
+            disabled={disabled}
+            value={branch.get('slug', '')}
+            onChange={this.handleChangeSlug}
+            id="pef-branch-name"
+          />
         </FormItem>
         <FormItem
           label="Preference Value"

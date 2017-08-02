@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
 import FormActions from 'control_new/components/forms/FormActions';
 import FormItem from 'control_new/components/forms/FormItem';
 import {
@@ -26,7 +27,12 @@ export default class ApprovalForm extends React.Component {
     approvalRequest: PropTypes.instanceOf(Map).isRequired,
     closeApprovalRequest: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
-  }
+    isSubmitting: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    isSubmitting: false,
+  };
 
   handleApproveClick(event) {
     this.props.onSubmit(event, { approved: true });
@@ -47,26 +53,30 @@ export default class ApprovalForm extends React.Component {
   }
 
   render() {
+    const { isSubmitting } = this.props;
+
     return (
       <Form>
         <FormItem name="comment">
-          <Input placeholder="Comment" />
+          <Input placeholder="Comment" disabled={isSubmitting} />
         </FormItem>
-        <FormActions>
-          <FormActions.Primary>
-            <Button icon="dislike" onClick={this.handleRejectClick} type="danger">
-                Reject
+        <SimpleLoadingOverlay isVisible={isSubmitting}>
+          <FormActions>
+            <FormActions.Primary>
+              <Button icon="dislike" onClick={this.handleRejectClick} type="danger">
+                  Reject
+                </Button>
+              <Button icon="like" onClick={this.handleApproveClick} type="primary">
+                Approve
               </Button>
-            <Button icon="like" onClick={this.handleApproveClick} type="primary">
-              Approve
-            </Button>
-          </FormActions.Primary>
-          <FormActions.Secondary>
-            <Button icon="close-circle" onClick={this.handleCloseButtonClick}>
-              Close
-            </Button>
-          </FormActions.Secondary>
-        </FormActions>
+            </FormActions.Primary>
+            <FormActions.Secondary>
+              <Button icon="close-circle" onClick={this.handleCloseButtonClick}>
+                Close
+              </Button>
+            </FormActions.Secondary>
+          </FormActions>
+        </SimpleLoadingOverlay>
       </Form>
     );
   }

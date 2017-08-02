@@ -102,7 +102,14 @@ export default class RecipeForm extends React.Component {
         )}
         <FormActions>
           <FormActions.Primary>
-            <Button type="primary" htmlType="submit" disabled={isLoading}>Save</Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={isLoading}
+              id="rf-save-button"
+            >
+              Save
+            </Button>
           </FormActions.Primary>
         </FormActions>
       </Form>
@@ -132,13 +139,19 @@ class ActionSelect extends React.Component {
     const stringValue = value ? value.toString(10) : undefined;
 
     return (
-      <Select placeholder="Select an action..." value={stringValue} {...props}>
-        {actions.toList().map(action => (
-          <Select.Option key={action.get('id')} value={action.get('id').toString(10)}>
-            {action.get('name')}
-          </Select.Option>
-        ))}
-      </Select>
+      <div id="rf-action-select">
+        <Select placeholder="Select an action..." value={stringValue} {...props}>
+          {actions.toList().map(action => (
+            <Select.Option
+              key={action.get('id')}
+              value={action.get('id').toString(10)}
+              id={`rf-${action.get('name')}`}
+            >
+              {action.get('name')}
+            </Select.Option>
+          ))}
+        </Select>
+      </div>
     );
   }
 }

@@ -108,20 +108,25 @@ export default class DetailsActionBar extends React.Component {
 
     return (
       <div className="details-action-bar clearfix">
-        <Link href={`${routerPath}/clone`}>
-          <Button icon="swap" type="primary">Clone</Button>
+        <Link href={`${routerPath}/clone`} id="dab-clone-link">
+          <Button icon="swap" type="primary" id="dab-clone-button">Clone</Button>
         </Link>
 
         {
           isLatest &&
-            <Link href={`/recipe/${recipeId}/edit`}>
-              <Button icon="edit" type="primary">Edit</Button>
+            <Link href={`/recipe/${recipeId}/edit`} id="dab-edit-link">
+              <Button icon="edit" type="primary" id="dab-edit-button">Edit</Button>
             </Link>
         }
 
         {
           isApprovable &&
-            <Button icon="question-circle" type="primary" onClick={this.handleRequestClick}>
+            <Button
+              icon="question-circle"
+              type="primary"
+              onClick={this.handleRequestClick}
+              id="dab-request-approval"
+            >
               Request Approval
             </Button>
         }
@@ -129,7 +134,7 @@ export default class DetailsActionBar extends React.Component {
         {
           isPendingApproval &&
             <Link href={`/recipe/${recipeId}/approval_history`}>
-              <Button icon="message" type="primary">Approval Request</Button>
+              <Button icon="message" type="primary" id="dab-approval-status">Approval Request</Button>
             </Link>
         }
 
