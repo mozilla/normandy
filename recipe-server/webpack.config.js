@@ -63,12 +63,12 @@ module.exports = [
     devtool: production ? undefined : 'cheap-module-source-map',
 
     entry: {
-      // control: [
-      //   'babel-polyfill',
-      //   './client/control/index.js',
-      //   './client/control/sass/control.scss',
-      //   './node_modules/font-awesome/scss/font-awesome.scss',
-      // ],
+      control: [
+        'babel-polyfill',
+        './client/control/index.js',
+        './client/control/sass/control.scss',
+        './node_modules/font-awesome/scss/font-awesome.scss',
+      ],
       control_new: [
         'babel-polyfill',
         './client/control_new/index.js',

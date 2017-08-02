@@ -2,11 +2,11 @@ import { Map } from 'immutable';
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 
-import TestComponent from 'control_new/components/data/QueryMultipleRecipes';
+import TestComponent from 'control_new/components/data/QueryFilteredRecipes';
 
-const { WrappedComponent: QueryMultipleRecipes } = TestComponent;
+const { WrappedComponent: QueryFilteredRecipes } = TestComponent;
 
-describe('<QueryMultipleRecipes>', () => {
+describe('<QueryFilteredRecipes>', () => {
   const props = {
     fetchFilteredRecipesPage: () => {},
     filters: new Map(),
@@ -15,7 +15,7 @@ describe('<QueryMultipleRecipes>', () => {
 
   it('should work', () => {
     const wrapper = () =>
-      shallow(<QueryMultipleRecipes {...props} />);
+      shallow(<QueryFilteredRecipes {...props} />);
 
     expect(wrapper).not.toThrow();
   });
@@ -23,7 +23,7 @@ describe('<QueryMultipleRecipes>', () => {
   it('should call fetchFilteredRecipesPage on mount', () => {
     let called = false;
     mount(
-      <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { called = true; }} />,
+      <QueryFilteredRecipes {...props} fetchFilteredRecipesPage={() => { called = true; }} />,
     );
 
     expect(called).toBe(true);
@@ -32,7 +32,7 @@ describe('<QueryMultipleRecipes>', () => {
   it('should call fetchFilteredRecipesPage if the `pageNumber` changes', () => {
     let callCount = 0;
     const wrapper = shallow(
-      <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />,
+      <QueryFilteredRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />,
     );
     expect(callCount).toBe(1);
 
@@ -52,7 +52,7 @@ describe('<QueryMultipleRecipes>', () => {
   it('should call fetchFilteredRecipesPage if the `filters` change', () => {
     let callCount = 0;
     const wrapper = shallow(
-      <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />,
+      <QueryFilteredRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />,
     );
     expect(callCount).toBe(1);
 
@@ -70,7 +70,7 @@ describe('<QueryMultipleRecipes>', () => {
     let callCount = 0;
     const wrapper = mount(
       <div fakeProp={1}>
-        <QueryMultipleRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />
+        <QueryFilteredRecipes {...props} fetchFilteredRecipesPage={() => { callCount += 1; }} />
       </div>,
     );
     expect(callCount).toBe(1);
@@ -83,7 +83,7 @@ describe('<QueryMultipleRecipes>', () => {
   });
 
   it('should not render anything', () => {
-    const wrapper = shallow(<QueryMultipleRecipes {...props} />);
+    const wrapper = shallow(<QueryFilteredRecipes {...props} />);
     expect(wrapper.children().length).toBe(0);
   });
 });
