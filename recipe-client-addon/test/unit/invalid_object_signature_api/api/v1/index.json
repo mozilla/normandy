@@ -1,0 +1,4 @@
+{
+  "object-signed": "/api/v1/object/signed/",
+  "classify-client": "/api/v1/classify_client/"
+}
