@@ -70,7 +70,7 @@ def filter_m2m(qs, field, values):
     return qs
 
 
-def sri_hash(data):
+def sri_hash(data, url_safe=False):
     """
     Return a subresource integrity attribute string for a file
     containing the given binary data.
@@ -82,5 +82,7 @@ def sri_hash(data):
     :param data:
         Bytes-like object containing the data to hash.
     """
-    data_hash = b64encode(sha384(data).digest())
-    return 'sha384-' + data_hash.decode()
+    data_hash = b64encode(sha384(data).digest()).decode()
+    if url_safe:
+        data_hash = data_hash.replace('+', '-').replace('/', '_')
+    return 'sha384-' + data_hash

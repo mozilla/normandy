@@ -5,6 +5,7 @@ from django.utils import timezone
 import factory
 
 from normandy.base.tests import FuzzyUnicode
+from normandy.base.utils import sri_hash
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
@@ -48,7 +49,7 @@ class ActionFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def implementation_hash(action):
-        return hashlib.sha1(action.implementation.encode()).hexdigest()
+        return sri_hash(action.implementation.encode(), url_safe=True)
 
     # It is important that the signature be based on the actual data, and not
     # some static value so that tests can make assertions against what data was

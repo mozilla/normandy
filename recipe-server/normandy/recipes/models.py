@@ -15,7 +15,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
-from normandy.base.utils import filter_m2m, get_client_ip
+from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
 from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
@@ -516,7 +516,7 @@ class Action(DirtyFieldsMixin, models.Model):
 
     name = models.SlugField(max_length=255, unique=True)
     implementation = models.TextField()
-    implementation_hash = models.CharField(max_length=40, editable=False)
+    implementation_hash = models.CharField(max_length=71, editable=False)
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
     signature = models.OneToOneField(Signature, related_name='action', null=True, blank=True)
 
@@ -560,7 +560,7 @@ class Action(DirtyFieldsMixin, models.Model):
         return reverse('action-detail', args=[self.name])
 
     def compute_implementation_hash(self):
-        return hashlib.sha1(self.implementation.encode()).hexdigest()
+        return sri_hash(self.implementation.encode(), url_safe=True)
 
     def update_signature(self):
         try:

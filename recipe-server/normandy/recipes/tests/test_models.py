@@ -78,7 +78,7 @@ class TestAction(object):
             '{'
             '"arguments_schema":{},'
             '"implementation_url":"/api/v1/action/test-action/implementation'
-            '/2201e6aba1faf53e9371afbd1b682254b76e059a/",'
+            '/sha384-ZRkmoh4lizeQ_jdtJBOQZmPzc3x09DKCA4gkdJmwEnO31F7Ttl8RyXkj3wG93lAP/",'
             '"name":"test-action"'
             '}'
         )
