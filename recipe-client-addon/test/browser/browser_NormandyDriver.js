@@ -184,10 +184,9 @@ compose_task(
 
 compose_task(
   withSandboxManager(Assert),
-  AddonStudies.withStudies([
-    studyFactory({name: "test-study", addonVersion: "5.0"}),
-  ]),
-  async function testAddonStudies(sandboxManager, [study]) {
+  withWebExtension({id: "driver-addon-studies@example.com"}),
+  async function testAddonStudies(sandboxManager, [addonId, addonFile]) {
+    const addonUrl = Services.io.newFileURI(addonFile).spec;
     const driver = new NormandyDriver(sandboxManager);
     sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
 
@@ -197,11 +196,30 @@ compose_task(
 
     await sandboxManager.evalInSandbox(`
       (async function sandboxTest() {
-        const hasStudy = await driver.studies.has(${study.recipeId});
-        ok(hasStudy, "studies.has checks for studies from within a sandbox.");
+        const recipeId = 5;
+        let hasStudy = await driver.studies.has(recipeId);
+        ok(!hasStudy, "studies.has returns false if the study hasn't been started yet.");
 
-        let study = await driver.studies.get(${study.recipeId});
-        is(study.addonVersion, "5.0", "studies.get fetches studies from within a sandbox.");
+        await driver.studies.start({
+          recipeId,
+          name: "fake",
+          description: "fake",
+          addonUrl: "${addonUrl}",
+        });
+        hasStudy = await driver.studies.has(recipeId);
+        ok(hasStudy, "studies.has returns true after the study has been started.");
+
+        let study = await driver.studies.get(recipeId);
+        is(
+          study.addonId,
+          "driver-addon-studies@example.com",
+          "studies.get fetches studies from within a sandbox."
+        );
+        ok(study.active, "Studies are marked as active after being started by the driver.");
+
+        await driver.studies.stop(recipeId);
+        study = await driver.studies.get(recipeId);
+        ok(!study.active, "Studies are marked as inactive after being stopped by the driver.");
       })();
     `);
   }
