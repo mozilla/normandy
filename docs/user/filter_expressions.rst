@@ -270,6 +270,58 @@ filter expressions.
       object varies depending on the recipe, and use of this property is only
       recommended if you are familiar with the argument schema.
 
+.. js:attribute:: normandy.isFirstRun
+
+   Boolean that indicates whether the user has just started Firefox for the
+   first time with their current profile. This is only ``true`` once
+   per-profile, and is set to ``false`` immediately after the first set of
+   recipes are executed.
+
+   Recipes that should not run immediately upon first run should include
+   ``!normandy.isFirstRun`` in their filter expression.
+
+.. js:attribute:: normandy.addons
+
+   Object containing information about installed add-ons. The keys on this
+   object are add-on IDs. The values contain the following attributes:
+
+   .. js:attribute:: addon.id
+
+      String ID of the add-on.
+
+   .. js:attribute:: addon.installDate
+
+      Date object indicating when the add-on was installed.
+
+   .. js:attribute:: addon.isActive
+
+      Boolean indicating whether the add-on is active (disabling an add-on but
+      not uninstalling it will set this to ``false``).
+
+   .. js:attribute:: addon.name
+
+      String containing the user-visible name of the add-on.
+
+   .. js:attribute:: addon.type
+
+      String indicating the add-on type. Common values are ``extension``,
+      ``theme``, and ``plugin``.
+
+   .. js:attribute:: addon.version
+
+      String containing the add-on's version number.
+
+   .. code-block:: javascript
+
+      // Target users with a specific add-on installed
+      normandy.addons["shield-recipe-client@mozilla.org"]
+
+      // Target users who have at least one of a group of add-ons installed
+      normandy.addons|keys intersect [
+         "shield-recipe-client@mozilla.org",
+         "some-other-addon@example.com"
+      ]
+
 Operators
 ---------
 This section describes the special operators available to filter expressions on
