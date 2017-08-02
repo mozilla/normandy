@@ -73,7 +73,7 @@
     "babel-preset-react": "6.11.1",
     "babili-webpack-plugin": "0.1.1",
     "css-loader": "0.24.0",
-    "enzyme": "2.4.1",
+    "enzyme": "2.9.1",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "15.0.1",
     "eslint-import-resolver-webpack": "0.8.3",

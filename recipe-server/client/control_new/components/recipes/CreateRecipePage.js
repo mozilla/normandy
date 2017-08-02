@@ -20,6 +20,7 @@ import { createRecipe as createAction } from 'control_new/state/app/recipes/acti
 export default class CreateRecipePage extends React.Component {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
+    push: PropTypes.func.isRequired,
   };
 
   state = {
