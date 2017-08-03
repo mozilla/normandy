@@ -73,7 +73,7 @@ this.withWebExtension = function(manifestOverrides = {}) {
 
 this.withInstalledWebExtension = function(manifestOverrides = {}) {
   return function wrapper(testFunction) {
-    return compose(
+    return decorate(
       withWebExtension(manifestOverrides),
       async function wrappedTestFunction(...args) {
         const [id, file] = args[args.length - 1];
@@ -207,14 +207,25 @@ this.withPrefEnv = function(inPrefs) {
   };
 };
 
-this.compose = function(...args) {
+/**
+ * Combine a list of functions right to left. The rightmost function is passed
+ * to the preceeding function as the argument; the result of this is passed to
+ * the next function until all are exhausted. For example, this:
+ *
+ * decorate(func1, func2, func3);
+ *
+ * is equivalent to this:
+ *
+ * func1(func2(func3));
+ */
+this.decorate = function(...args) {
   const funcs = Array.from(args);
-  let composed = funcs.pop();
+  let decorated = funcs.pop();
   funcs.reverse();
   for (const func of funcs) {
-    composed = func(composed);
+    decorated = func(decorated);
   }
-  return composed;
+  return decorated;
 };
 
 /**
@@ -222,12 +233,12 @@ this.compose = function(...args) {
  * wrappers. The last argument should be your test function; all other arguments
  * should be functions that accept a single test function argument.
  *
- * The arguments are composed together and passed to add_task as a single test
- * function.
+ * The arguments are combined using decorate and passed to add_task as a single
+ * test function.
  *
  * @param {[Function]} args
  * @example
- *   compose_task(
+ *   decorate_task(
  *     withMockPreferences,
  *     withMockNormandyApi,
  *     async function myTest(mockPreferences, mockApi) {
@@ -235,8 +246,8 @@ this.compose = function(...args) {
  *     }
  *   );
  */
-this.compose_task = function(...args) {
-  return add_task(compose(...args));
+this.decorate_task = function(...args) {
+  return add_task(decorate(...args));
 };
 
 let _studyFactoryId = 0;

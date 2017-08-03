@@ -8,7 +8,7 @@ Cu.import("resource://shield-recipe-client/lib/Addons.jsm", this);
 AddonTestUtils.initMochitest(this);
 
 const testInstallId = "testInstallUpdate@example.com";
-compose_task(
+decorate_task(
   withInstalledWebExtension({version: "1.0", id: testInstallId}),
   withWebExtension({version: "2.0", id: testInstallId}),
   async function testInstallUpdate([id1, addonFile1], [id2, addonFile2]) {

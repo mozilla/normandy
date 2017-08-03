@@ -137,8 +137,8 @@ this.AddonStudies = {
   },
 
   async init() {
-    // If the add-on an active study has been removed since we last ran, stop
-    // the study.
+    // If an active study's add-on has been removed since we last ran, stop the
+    // study.
     const activeStudies = (await this.getAll()).filter(study => study.active);
     const db = await getDatabase();
     for (const study of activeStudies) {

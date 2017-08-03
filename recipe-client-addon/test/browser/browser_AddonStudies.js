@@ -9,7 +9,7 @@ Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 // Initialize test utils
 AddonTestUtils.initMochitest(this);
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies(),
   async function testGetMissing() {
     is(
@@ -20,7 +20,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({name: "test-study"}),
   ]),
@@ -30,7 +30,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory(),
     studyFactory(),
@@ -45,7 +45,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({name: "test-study"}),
   ]),
@@ -58,7 +58,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies(),
   async function testCloseDatabase() {
     await AddonStudies.close();
@@ -82,7 +82,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({name: "test-study1"}),
     studyFactory({name: "test-study2"}),
@@ -126,7 +126,7 @@ add_task(async function testStartRequiredArguments() {
   }
 });
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory(),
   ]),
@@ -139,7 +139,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withStub(Addons, "applyInstall"),
   withWebExtension(),
   async function testStartAddonCleanup(applyInstallStub, [addonId, addonFile]) {
@@ -158,7 +158,7 @@ compose_task(
 );
 
 const testOverwriteId = "testStartAddonNoOverwrite@example.com";
-compose_task(
+decorate_task(
   withInstalledWebExtension({version: "1.0", id: testOverwriteId}),
   withWebExtension({version: "2.0", id: testOverwriteId}),
   async function testStartAddonNoOverwrite([installedId, installedFile], [id, addonFile]) {
@@ -173,7 +173,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withWebExtension({version: "2.0"}),
   async function testStart([addonId, addonFile]) {
     const startupPromise = AddonTestUtils.promiseWebExtensionStartup(addonId);
@@ -214,7 +214,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies(),
   async function testStopNoStudy() {
     await Assert.rejects(
@@ -225,7 +225,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: false}),
   ]),
@@ -239,7 +239,7 @@ compose_task(
 );
 
 const testStopId = "testStop@example.com";
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: true, addonId: testStopId, studyEndDate: null}),
   ]),
@@ -255,7 +255,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: true, addonId: "testStopWarn@example.com", studyEndDate: null}),
   ]),
@@ -273,7 +273,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: true, addonId: "does.not.exist@example.com", studyEndDate: null}),
     studyFactory({active: true, addonId: "installed@example.com"}),
@@ -306,7 +306,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: true, addonId: "installed@example.com", studyEndDate: null}),
   ]),

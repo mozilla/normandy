@@ -84,7 +84,7 @@ add_task(withDriver(Assert, async function distribution(driver) {
   is(client.distribution, "funnelcake", "distribution is read from preferences");
 }));
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   async function testCreateStorage(sandboxManager) {
     const driver = new NormandyDriver(sandboxManager);
@@ -149,7 +149,7 @@ add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
   Assert.equal(addon, null, "Add-on has been uninstalled");
 }));
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   async function testAddonsGetWorksInSandbox(sandboxManager) {
     const driver = new NormandyDriver(sandboxManager);
@@ -182,7 +182,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   AddonStudies.withStudies([
     studyFactory({name: "test-study", addonVersion: "5.0"}),

@@ -26,7 +26,7 @@ function listenerC(x = 1) {
   evidence.log += "c";
 }
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   async function(sandboxManager) {
     const eventEmitter = new EventEmitter(sandboxManager);
@@ -100,7 +100,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   async function sandboxedEmitter(sandboxManager) {
     const eventEmitter = new EventEmitter(sandboxManager);

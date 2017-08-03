@@ -7,7 +7,7 @@ Cu.import("resource://shield-recipe-client-content/AboutPages.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 
 function withStubInits(testFunction) {
-  return compose(
+  return decorate(
     withStub(AboutPages, "init"),
     withStub(AddonStudies, "init"),
     withStub(PreferenceExperiments, "init"),
@@ -16,7 +16,7 @@ function withStubInits(testFunction) {
   );
 }
 
-compose_task(
+decorate_task(
   withStubInits,
   async function testStartup() {
     await ShieldRecipeClient.startup();
@@ -27,7 +27,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withStubInits,
   async function testStartupPrefInitFail() {
     PreferenceExperiments.init.returns(Promise.reject(new Error("oh no")));
@@ -40,7 +40,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withStubInits,
   async function testStartupAboutPagesInitFail() {
     AboutPages.init.returns(Promise.reject(new Error("oh no")));
@@ -53,7 +53,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withStubInits,
   async function testStartupAddonStudiesInitFail() {
     AddonStudies.init.returns(Promise.reject(new Error("oh no")));
