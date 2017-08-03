@@ -134,8 +134,8 @@ add_task(withMockNormandyApi(async function testRun(mockApi) {
   mockApi.recipes = [matchRecipe, noMatchRecipe, missingRecipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const matchManager = managers["matchAction"];
-    const noMatchManager = managers["noMatchAction"];
+    const matchManager = managers.matchAction;
+    const noMatchManager = managers.noMatchAction;
 
     await RecipeRunner.run();
 
@@ -180,7 +180,7 @@ add_task(withMockNormandyApi(async function testRunRecipeError(mockApi) {
   mockApi.recipes = [recipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const manager = managers["action"];
+    const manager = managers.action;
     manager.runAsyncCallback.callsFake(async callbackName => {
       if (callbackName === "action") {
         throw new Error("Action execution failure");
@@ -205,7 +205,7 @@ add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
   mockApi.fetchRecipes.rejects(new Error("Signature not valid"));
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const manager = managers["action"];
+    const manager = managers.action;
     await RecipeRunner.run();
 
     // If the recipe fetch failed, do not run anything.
@@ -247,8 +247,8 @@ add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) 
   mockApi.recipes = [passRecipe, failRecipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const passManager = managers["passAction"];
-    const failManager = managers["failAction"];
+    const passManager = managers.passAction;
+    const failManager = managers.failAction;
     failManager.runAsyncCallback.returns(Promise.reject(new Error("oh no")));
 
     await RecipeRunner.run();
@@ -285,7 +285,7 @@ add_task(withMockNormandyApi(async function testRunPostExecutionFailure(mockApi)
   mockApi.recipes = [failRecipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const failManager = managers["failAction"];
+    const failManager = managers.failAction;
     failManager.runAsyncCallback.callsFake(async callbackName => {
       if (callbackName === "postExecution") {
         throw new Error("postExecution failure");
@@ -311,13 +311,13 @@ add_task(withMockNormandyApi(async function testLoadActionSandboxManagers(mockAp
     {name: "normalAction"},
     {name: "missingImpl"},
   ];
-  mockApi.implementations["normalAction"] = "window.scriptRan = true";
+  mockApi.implementations.normalAction = "window.scriptRan = true";
 
   const managers = await RecipeRunner.loadActionSandboxManagers();
   ok("normalAction" in managers, "Actions with implementations have managers");
   ok(!("missingImpl" in managers), "Actions without implementations are skipped");
 
-  const normalManager = managers["normalAction"];
+  const normalManager = managers.normalAction;
   ok(
     await normalManager.evalInSandbox("window.scriptRan"),
     "Implementations are run in the sandbox",

@@ -25,5 +25,6 @@ module.exports = {
     "prefer-const": "warn",
     "semi": ["error", "always"],
     "no-return-await": ["error"],
+    "dot-notation": ["error"],
   },
 };
