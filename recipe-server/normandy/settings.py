@@ -147,6 +147,7 @@ class Core(Configuration):
         'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
         'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
         'preference-experiment': os.path.join(BASE_DIR, 'client/actions/preference-experiment'),
+        'opt-out-study': os.path.join(BASE_DIR, 'client/actions/opt-out-study'),
     }
 
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
@@ -154,6 +155,8 @@ class Core(Configuration):
     SWAGGER_SETTINGS = {
         'DOC_EXPANSION': 'list',
     }
+
+    AWS_QUERYSTRING_AUTH = False
 
     # We changed the CSRF cookie from http-only to non http-only and need to override existing
     # cookies. The easiest way is just change the cookie name when such changes happen.

@@ -6,7 +6,7 @@ Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyApi.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ActionSandboxManager.jsm", this);
-Cu.import("resource://shield-recipe-client/lib/StudyStorage.jsm", this);
+Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Uptake.jsm", this);
 
 add_task(async function getFilterContext() {
@@ -119,7 +119,7 @@ async function withMockActionSandboxManagers(actions, testFunction) {
 }
 
 add_task(withMockNormandyApi(async function testRun(mockApi) {
-  const closeSpy = sinon.spy(StudyStorage, "close");
+  const closeSpy = sinon.spy(AddonStudies, "close");
   const reportRunner = sinon.stub(Uptake, "reportRunner");
   const reportAction = sinon.stub(Uptake, "reportAction");
   const reportRecipe = sinon.stub(Uptake, "reportRecipe");
@@ -197,7 +197,7 @@ add_task(withMockNormandyApi(async function testRunRecipeError(mockApi) {
 }));
 
 add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
-  const closeSpy = sinon.spy(StudyStorage, "close");
+  const closeSpy = sinon.spy(AddonStudies, "close");
   const reportRunner = sinon.stub(Uptake, "reportRunner");
 
   const action = {name: "action"};
@@ -234,7 +234,7 @@ add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
 }));
 
 add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) {
-  const closeSpy = sinon.spy(StudyStorage, "close");
+  const closeSpy = sinon.spy(AddonStudies, "close");
   const reportAction = sinon.stub(Uptake, "reportAction");
   const reportRecipe = sinon.stub(Uptake, "reportRecipe");
 
@@ -330,7 +330,13 @@ add_task(async function testStartup() {
   const updateRunIntervalStub = sinon.stub(RecipeRunner, "updateRunInterval");
 
   // in dev mode
-  await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.dev_mode", true]]});
+  await SpecialPowers.pushPrefEnv({
+    set: [
+      ["extensions.shield-recipe-client.dev_mode", true],
+      ["extensions.shield-recipe-client.first_run", false],
+    ],
+  });
+
   RecipeRunner.init();
   ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
   ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
@@ -341,7 +347,13 @@ add_task(async function testStartup() {
   updateRunIntervalStub.reset();
 
   // not in dev mode
-  await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.dev_mode", false]]});
+  await SpecialPowers.pushPrefEnv({
+    set: [
+      ["extensions.shield-recipe-client.dev_mode", false],
+      ["extensions.shield-recipe-client.first_run", false],
+    ],
+  });
+
   RecipeRunner.init();
   ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
   ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");

@@ -6,3 +6,4 @@ moz.build
 vendor
 test
 skin
+content
