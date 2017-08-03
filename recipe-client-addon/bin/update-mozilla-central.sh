@@ -4,6 +4,7 @@ set -eu
 
 baseDir="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
 mozCentral=""
+vendorDir="${baseDir}/vendor"
 buildVendor=false
 
 while [[ $# -gt 0 ]]
@@ -36,8 +37,8 @@ fi
 
 rm -rf "${dest}"/*
 
-# Build vendor files
-if [[ "$buildVendor" = true ]]; then
+# Build vendor files if enabled or if vendor doesn't exist yet
+if [[ "$buildVendor" = true || !(-d "$vendorDir") ]]; then
   pushd $baseDir
   npm run build
   popd

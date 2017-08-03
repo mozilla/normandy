@@ -5,6 +5,7 @@ set -eu
 BASE_DIR="$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")"
 TMP_DIR=$(mktemp -d)
 DEST="${TMP_DIR}/shield-recipe-client"
+VENDOR_DIR="${BASE_DIR}/vendor"
 BUILD_VENDOR=false
 
 while [[ $# -gt 0 ]]
@@ -31,7 +32,7 @@ function cleanup {
 trap cleanup EXIT
 
 # Build vendor files
-if [[ "$BUILD_VENDOR" = true ]]; then
+if [[ "$BUILD_VENDOR" = true || !(-d "$VENDOR_DIR") ]]; then
   pushd $BASE_DIR
   npm run build
   popd

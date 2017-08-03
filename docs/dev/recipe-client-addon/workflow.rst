@@ -71,8 +71,9 @@ files:
    cd recipe-client-addon
    ./bin/make-xpi.sh # Creates /recipe-client-addon/shield-recipe-client.xpi
 
-Pass the ``-b``/``--build-vendor`` flag to auto-build vendor dependencies before
-creating the XPI.
+If the vendor directory hasn't been built, ``make-xpi.sh`` auto-builds it. Or,
+pass the ``-b``/``--build-vendor`` flag to force-build vendor dependencies
+before creating the XPI.
 
 .. _recipe-client-sync:
 
@@ -87,8 +88,9 @@ checkout of mozilla-central. The files that are copied over are determined by
    cd recipe-client-addon
    ./bin/update-mozilla-central.sh /path/to/mozilla-central
 
-Pass the ``-b``/``--build-vendor`` flag to auto-build vendor dependencies before
-copying the files to the checkout.
+If the vendor directory hasn't been built, ``update-mozilla-central.sh``
+auto-builds it. Or, pass the ``-b``/``--build-vendor`` flag to force-build
+vendor dependencies before copying files to the checkout.
 
 .. _recipe-client-tests:
 
