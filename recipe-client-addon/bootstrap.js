@@ -14,7 +14,11 @@ XPCOMUtils.defineLazyModuleGetter(this, "LogManager",
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldRecipeClient",
   "resource://shield-recipe-client/lib/ShieldRecipeClient.jsm");
 
+const REASON_APP_STARTUP = 1;
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
+const STARTUP_EXPERIMENT_PREFS_BRANCH = "extensions.shield-recipe-client.startupExperimentPrefs";
+const PREF_LOGGING_LEVEL = "extensions.shield-recipe-client.logging.level";
+const BOOTSTRAP_LOGGER_NAME = "extensions.shield-recipe-client.bootstrap";
 const DEFAULT_PREFS = {
   "extensions.shield-recipe-client.api_url": "https://normandy.cdn.mozilla.net/api/v1",
   "extensions.shield-recipe-client.dev_mode": false,
@@ -29,6 +33,11 @@ const DEFAULT_PREFS = {
   ),
   "app.shield.optoutstudies.enabled": AppConstants.MOZ_DATA_REPORTING,
 };
+
+// Logging
+const log = Log.repository.getLogger(BOOTSTRAP_LOGGER_NAME);
+log.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
+log.level = Services.prefs.getIntPref(PREF_LOGGING_LEVEL, Log.Level.Warn);
 
 function initializeShieldPreferences() {
   const prefBranch = Services.prefs.getDefaultBranch("");
@@ -49,6 +58,39 @@ function initializeShieldPreferences() {
   }
 }
 
+function initializeExperimentPreferences() {
+  const defaultBranch = Services.prefs.getDefaultBranch("");
+  const experimentBranch = Services.prefs.getBranch(STARTUP_EXPERIMENT_PREFS_BRANCH);
+
+  for (const childPrefName of experimentBranch.getChildList("")) {
+    const realPrefName = childPrefName.slice(1); // Remove leading dot
+    const prefType = experimentBranch.getPrefType(childPrefName);
+
+    switch (prefType) {
+      case Services.prefs.PREF_STRING:
+        defaultBranch.setStringPref(realPrefName, experimentBranch.getStringPref(childPrefName));
+        break;
+
+      case Services.prefs.PREF_INT:
+        defaultBranch.setIntPref(realPrefName, experimentBranch.getIntPref(childPrefName));
+        break;
+
+      case Services.prefs.PREF_BOOL:
+        defaultBranch.setBoolPref(realPrefName, experimentBranch.getBoolPref(childPrefName));
+        break;
+
+      case Services.prefs.PREF_INVALID:
+        // This should never happen.
+        log.error(`Error setting startup pref ${childPrefName}; pref type is invalid (${prefType}).`);
+        break;
+
+      default:
+        // This should never happen either.
+        log.error(`Error getting startup pref ${childPrefName}; unknown value type ${prefType}.`);
+    }
+  }
+}
+
 const uiAvailableObserver = {
   observe(subject, topic, data) {
     Services.obs.removeObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
@@ -58,23 +100,29 @@ const uiAvailableObserver = {
 
 this.install = function() {};
 
-this.startup = function() {
+this.startup = function(data, reason) {
   // Initialization that needs to happen before the first paint on startup.
   initializeShieldPreferences();
+  initializeExperimentPreferences();
 
-  // Wait until the UI is available for remaining startup tasks
-  Services.obs.addObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
+  // If the app is starting up, wait until the UI is available before finishing
+  // init.
+  if (reason === REASON_APP_STARTUP) {
+    Services.obs.addObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
+  } else {
+    ShieldRecipeClient.startup();
+  }
 };
 
-this.shutdown = function(data, reason) {
-  ShieldRecipeClient.shutdown(reason);
+this.shutdown = async function(data, reason) {
+  // Wait for async write operations during shutdown before unloading modules.
+  await ShieldRecipeClient.shutdown(reason);
 
   // In case the observer didn't run, clean it up.
-  Services.obs.addObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
+  Services.obs.removeObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
 
   // Unload add-on modules. We don't do this in ShieldRecipeClient so that
   // modules are not unloaded accidentally during tests.
-  const log = LogManager.getLogger("bootstrap");
   let modules = [
     "lib/ActionSandboxManager.jsm",
     "lib/Addons.jsm",

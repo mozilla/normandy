@@ -5,8 +5,13 @@
 "use strict";
 
 const {utils: Cu} = Components;
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "AsyncShutdown", "resource://gre/modules/AsyncShutdown.jsm");
+
 this.EXPORTED_SYMBOLS = ["CleanupManager"];
 
+let cleanupPromise = null;
 const cleanupHandlers = new Set();
 
 this.CleanupManager = {
@@ -18,13 +23,27 @@ this.CleanupManager = {
     cleanupHandlers.delete(handler);
   },
 
-  cleanup() {
-    for (const handler of cleanupHandlers) {
-      try {
-        handler();
-      } catch (ex) {
-        Cu.reportError(ex);
-      }
+  async cleanup() {
+    if (cleanupPromise === null) {
+      cleanupPromise = (async () => {
+        for (const handler of cleanupHandlers) {
+          try {
+            await handler();
+          } catch (ex) {
+            // TODO: Log error in a way that persists after shutdown
+            Cu.reportError(ex);
+          }
+        }
+      })();
+
+      // Block shutdown to ensure any cleanup tasks that write data are
+      // finished.
+      AsyncShutdown.profileBeforeChange.addBlocker(
+        "ShieldRecipeClient: Cleaning up",
+        cleanupPromise,
+      );
     }
+
+    return cleanupPromise;
   },
 };

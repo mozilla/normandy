@@ -63,6 +63,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEnvironment", "resource://gre/
 this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 
 const EXPERIMENT_FILE = "shield-preference-experiments.json";
+const STARTUP_EXPERIMENT_PREFS_BRANCH = "extensions.shield-recipe-client.startupExperimentPrefs.";
 
 const PREFERENCE_TYPE_MAP = {
   boolean: Services.prefs.PREF_BOOL,
@@ -142,12 +143,9 @@ this.PreferenceExperiments = {
    * default preference branch.
    */
   async init() {
-    for (const experiment of await this.getAllActive()) {
-      // Set experiment default preferences, since they don't persist between restarts
-      if (experiment.preferenceBranchType === "default") {
-        setPref(DefaultPreferences, experiment.preferenceName, experiment.preferenceType, experiment.preferenceValue);
-      }
+    CleanupManager.addCleanupHandler(this.saveStartupPrefs.bind(this));
 
+    for (const experiment of await this.getAllActive()) {
       // Check that the current value of the preference is still what we set it to
       if (getPref(UserPreferences, experiment.preferenceName, experiment.preferenceType, undefined) !== experiment.preferenceValue) {
         // if not, stop the experiment, and skip the remaining steps
@@ -165,6 +163,41 @@ this.PreferenceExperiments = {
 
       // Watch for changes to the experiment's preference
       this.startObserver(experiment.name, experiment.preferenceName, experiment.preferenceType, experiment.preferenceValue);
+    }
+  },
+
+  /**
+   * Save in-progress preference experiments in a sub-branch of the shield
+   * prefs. On startup, we read these to set the experimental values.
+   */
+  async saveStartupPrefs() {
+    const prefBranch = Services.prefs.getBranch(STARTUP_EXPERIMENT_PREFS_BRANCH);
+    try {
+      prefBranch.resetBranch();
+    } catch (err) {
+      log.debug(`Could not reset startup pref branch: ${err.message}`);
+    }
+
+    for (const experiment of await this.getAllActive()) {
+      const name = experiment.preferenceName;
+      const value = experiment.preferenceValue;
+
+      switch (typeof value) {
+        case "string":
+          prefBranch.setCharPref(name, value);
+          break;
+
+        case "number":
+          prefBranch.setIntPref(name, value);
+          break;
+
+        case "boolean":
+          prefBranch.setBoolPref(name, value);
+          break;
+
+        default:
+          throw new Error(`Invalid preference type ${typeof value}`);
+      }
     }
   },
 
@@ -270,6 +303,7 @@ this.PreferenceExperiments = {
     store.saveSoon();
 
     TelemetryEnvironment.setExperimentActive(name, branch, {type: "normandy-preference-experiment"});
+    await this.saveStartupPrefs();
   },
 
   /**
@@ -408,6 +442,7 @@ this.PreferenceExperiments = {
     store.saveSoon();
 
     TelemetryEnvironment.setExperimentInactive(experimentName, experiment.branch);
+    await this.saveStartupPrefs();
   },
 
   /**
