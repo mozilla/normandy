@@ -1,7 +1,6 @@
 "use strict";
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://gre/modules/Services.jsm", this);
 Cu.import("resource://gre/modules/TelemetryController.jsm", this);
 Cu.import("resource://gre/modules/AddonManager.jsm", this);
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
@@ -136,14 +135,7 @@ add_task(withDriver(Assert, async function testAddonsInContext(driver) {
 }));
 
 add_task(async function isFirstRun() {
-  let environment = ClientEnvironment.getEnvironment();
-
-  // isFirstRun is set to false after the recipe client runs
-  ok(!environment.isFirstRun, "isFirstRun has a default value");
-
-  // isFirstRun is read from a preference
   await SpecialPowers.pushPrefEnv({set: [["extensions.shield-recipe-client.first_run", true]]});
-  environment = ClientEnvironment.getEnvironment();
+  const environment = ClientEnvironment.getEnvironment();
   ok(environment.isFirstRun, "isFirstRun is read from preferences");
 });
-

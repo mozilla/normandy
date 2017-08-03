@@ -1,6 +1,6 @@
 "use strict";
 
-Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://testing-common/TestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
@@ -324,42 +324,65 @@ add_task(withMockNormandyApi(async function testLoadActionSandboxManagers(mockAp
   );
 }));
 
-add_task(async function testStartup() {
-  const runStub = sinon.stub(RecipeRunner, "run");
-  const addCleanupHandlerStub = sinon.stub(CleanupManager, "addCleanupHandler");
-  const updateRunIntervalStub = sinon.stub(RecipeRunner, "updateRunInterval");
-
-  // in dev mode
-  await SpecialPowers.pushPrefEnv({
+compose_task(
+  withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", true],
       ["extensions.shield-recipe-client.first_run", false],
     ],
-  });
+  }),
+  withStub(RecipeRunner, "run"),
+  withStub(CleanupManager, "addCleanupHandler"),
+  withStub(RecipeRunner, "updateRunInterval"),
+  async function testInitDevMode(runStub, addCleanupHandlerStub, updateRunIntervalStub) {
+    RecipeRunner.init();
+    ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
+    ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
+    ok(updateRunIntervalStub.called, "A timer is registered when in dev mode");
+  }
+);
 
-  RecipeRunner.init();
-  ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
-  ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
-  ok(updateRunIntervalStub.called, "A timer is registered when in dev mode");
-
-  runStub.reset();
-  addCleanupHandlerStub.reset();
-  updateRunIntervalStub.reset();
-
-  // not in dev mode
-  await SpecialPowers.pushPrefEnv({
+compose_task(
+  withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", false],
       ["extensions.shield-recipe-client.first_run", false],
     ],
-  });
+  }),
+  withStub(RecipeRunner, "run"),
+  withStub(CleanupManager, "addCleanupHandler"),
+  withStub(RecipeRunner, "updateRunInterval"),
+  async function testInit(runStub, addCleanupHandlerStub, updateRunIntervalStub) {
+    RecipeRunner.init();
+    ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
+    ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");
+    ok(updateRunIntervalStub.called, "A timer is registered when not in dev mode");
+  }
+);
 
-  RecipeRunner.init();
-  ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
-  ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");
-  ok(updateRunIntervalStub.called, "A timer is registered when not in dev mode");
+compose_task(
+  withPrefEnv({
+    set: [
+      ["extensions.shield-recipe-client.dev_mode", false],
+      ["extensions.shield-recipe-client.first_run", true],
+    ],
+  }),
+  withStub(RecipeRunner, "run"),
+  withStub(RecipeRunner, "registerTimer"),
+  withStub(CleanupManager, "addCleanupHandler"),
+  withStub(RecipeRunner, "updateRunInterval"),
+  async function testInitFirstRun(runStub, registerTimerStub) {
+    RecipeRunner.init();
+    ok(!runStub.called, "RecipeRunner.run is not called immediately");
+    ok(!registerTimerStub.called, "RecipeRunner.registerTimer is not called immediately");
 
-  runStub.restore();
-  addCleanupHandlerStub.restore();
-  updateRunIntervalStub.restore();
-});
+    Services.obs.notifyObservers(null, "sessionstore-windows-restored");
+    await TestUtils.topicObserved("shield-init-complete");
+    ok(runStub.called, "RecipeRunner.run is called after the UI is available");
+    ok(registerTimerStub.called, "RecipeRunner.registerTimer is called after the UI is available");
+    ok(
+      !Services.prefs.getBoolPref("extensions.shield-recipe-client.first_run"),
+      "On first run, the first run pref is set to false after the UI is available"
+    );
+  }
+);
