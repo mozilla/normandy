@@ -182,11 +182,14 @@ this.NormandyDriver = function(sandboxManager) {
 
     // Study storage API
     studies: {
-      start: sandboxManager.wrapAsync(AddonStudies.start, {cloneArguments: true, cloneInto: true}),
-      stop: sandboxManager.wrapAsync(AddonStudies.stop),
-      get: sandboxManager.wrapAsync(AddonStudies.get, {cloneInto: true}),
-      getAll: sandboxManager.wrapAsync(AddonStudies.getAll, {cloneInto: true}),
-      has: sandboxManager.wrapAsync(AddonStudies.has),
+      start: sandboxManager.wrapAsync(
+        AddonStudies.start.bind(AddonStudies),
+        {cloneArguments: true, cloneInto: true}
+      ),
+      stop: sandboxManager.wrapAsync(AddonStudies.stop.bind(AddonStudies)),
+      get: sandboxManager.wrapAsync(AddonStudies.get.bind(AddonStudies), {cloneInto: true}),
+      getAll: sandboxManager.wrapAsync(AddonStudies.getAll.bind(AddonStudies), {cloneInto: true}),
+      has: sandboxManager.wrapAsync(AddonStudies.has.bind(AddonStudies)),
     },
 
     // Preference read-only API
