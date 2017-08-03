@@ -14,6 +14,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "LogManager",
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldRecipeClient",
   "resource://shield-recipe-client/lib/ShieldRecipeClient.jsm");
 
+const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
 const DEFAULT_PREFS = {
   "extensions.shield-recipe-client.api_url": "https://normandy.cdn.mozilla.net/api/v1",
   "extensions.shield-recipe-client.dev_mode": false,
@@ -29,10 +30,7 @@ const DEFAULT_PREFS = {
   "app.shield.optoutstudies.enabled": AppConstants.MOZ_DATA_REPORTING,
 };
 
-this.install = function() {};
-
-this.startup = function() {
-  // Initialize preference defaults before anything else happens.
+function initializeShieldPreferences() {
   const prefBranch = Services.prefs.getDefaultBranch("");
   for (const [name, value] of Object.entries(DEFAULT_PREFS)) {
     switch (typeof value) {
@@ -49,12 +47,30 @@ this.startup = function() {
         throw new Error(`Invalid default preference type ${typeof value}`);
     }
   }
+}
 
-  ShieldRecipeClient.startup();
+const uiAvailableObserver = {
+  observe(subject, topic, data) {
+    Services.obs.removeObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
+    ShieldRecipeClient.startup();
+  },
+};
+
+this.install = function() {};
+
+this.startup = function() {
+  // Initialization that needs to happen before the first paint on startup.
+  initializeShieldPreferences();
+
+  // Wait until the UI is available for remaining startup tasks
+  Services.obs.addObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
 };
 
 this.shutdown = function(data, reason) {
   ShieldRecipeClient.shutdown(reason);
+
+  // In case the observer didn't run, clean it up.
+  Services.obs.addObserver(uiAvailableObserver, UI_AVAILABLE_NOTIFICATION);
 
   // Unload add-on modules. We don't do this in ShieldRecipeClient so that
   // modules are not unloaded accidentally during tests.

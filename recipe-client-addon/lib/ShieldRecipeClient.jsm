@@ -39,6 +39,7 @@ const REASONS = {
 };
 const PREF_DEV_MODE = "extensions.shield-recipe-client.dev_mode";
 const PREF_LOGGING_LEVEL = "extensions.shield-recipe-client.logging.level";
+const SHIELD_INIT_NOTIFICATION = "shield-init-complete";
 
 let log = null;
 
@@ -84,6 +85,7 @@ this.ShieldRecipeClient = {
     }
 
     await RecipeRunner.init();
+    Services.obs.notifyObservers(null, SHIELD_INIT_NOTIFICATION);
   },
 
   shutdown(reason) {
