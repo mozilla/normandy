@@ -46,7 +46,7 @@ this.startup = function() {
         prefBranch.setBoolPref(name, value);
         break;
       default:
-        throw new Error(`Invalid default preference type ${type}`);
+        throw new Error(`Invalid default preference type ${typeof value}`);
     }
   }
 
