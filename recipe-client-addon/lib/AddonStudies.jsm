@@ -35,6 +35,9 @@ XPCOMUtils.defineLazyModuleGetter(this, "FileUtils", "resource://gre/modules/Fil
 XPCOMUtils.defineLazyModuleGetter(this, "IndexedDB", "resource://gre/modules/IndexedDB.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "AddonManager", "resource://gre/modules/AddonManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Addons", "resource://shield-recipe-client/lib/Addons.jsm");
+XPCOMUtils.defineLazyModuleGetter(
+  this, "CleanupManager", "resource://shield-recipe-client/lib/CleanupManager.jsm"
+);
 XPCOMUtils.defineLazyModuleGetter(this, "LogManager", "resource://shield-recipe-client/lib/LogManager.jsm");
 
 Cu.importGlobalProperties(["fetch"]); /* globals fetch */
@@ -47,7 +50,19 @@ const DB_OPTIONS = {
   version: 1,
   storage: "persistent",
 };
+const STUDY_ENDED_TOPIC = "shield-study-ended";
 const log = LogManager.getLogger("addon-studies");
+
+/**
+ * Create a new connection to the database.
+ */
+function openDatabase() {
+  return IndexedDB.open(DB_NAME, DB_OPTIONS, db => {
+    db.createObjectStore(STORE_NAME, {
+      keyPath: "recipeId",
+    });
+  });
+}
 
 /**
  * Cache the database connection so that it is shared among multiple operations.
@@ -55,11 +70,7 @@ const log = LogManager.getLogger("addon-studies");
 let databasePromise;
 async function getDatabase() {
   if (!databasePromise) {
-    databasePromise = IndexedDB.open(DB_NAME, DB_OPTIONS, db => {
-      db.createObjectStore(STORE_NAME, {
-        keyPath: "recipeId",
-      });
-    });
+    databasePromise = openDatabase();
   }
   return databasePromise;
 }
@@ -77,6 +88,18 @@ function getStore(db) {
   return db.objectStore(STORE_NAME, "readwrite");
 }
 
+/**
+ * Mark a study object as having ended. Modifies the study in-place.
+ * @param {IDBDatabase} db
+ * @param {Study} study
+ */
+async function markAsEnded(db, study) {
+  study.active = false;
+  study.studyEndDate = new Date();
+  await getStore(db).put(study);
+  Services.obs.notifyObservers(study, STUDY_ENDED_TOPIC);
+}
+
 this.AddonStudies = {
   /**
    * Test wrapper that temporarily replaces the stored studies with the given
@@ -92,7 +115,7 @@ this.AddonStudies = {
     return function wrapper(testFunction) {
       return async function wrappedTestFunction(...args) {
         const oldStudies = await AddonStudies.getAll();
-        const db = await getDatabase();
+        let db = await getDatabase();
         await AddonStudies.clear();
         for (const study of studies) {
           await getStore(db).add(study);
@@ -101,6 +124,7 @@ this.AddonStudies = {
         try {
           await testFunction(...args, studies);
         } finally {
+          db = await getDatabase(); // Re-acquire in case the test closed the connection.
           await AddonStudies.clear();
           for (const study of oldStudies) {
             await getStore(db).add(study);
@@ -110,6 +134,42 @@ this.AddonStudies = {
         }
       };
     };
+  },
+
+  async init() {
+    // If an active study's add-on has been removed since we last ran, stop the
+    // study.
+    const activeStudies = (await this.getAll()).filter(study => study.active);
+    const db = await getDatabase();
+    for (const study of activeStudies) {
+      const addon = await AddonManager.getAddonByID(study.addonId);
+      if (!addon) {
+        await markAsEnded(db, study);
+      }
+    }
+    await this.close();
+
+    // Listen for add-on uninstalls so we can stop the corresponding studies.
+    AddonManager.addAddonListener(this);
+    CleanupManager.addCleanupHandler(() => {
+      AddonManager.removeAddonListener(this);
+    });
+  },
+
+  /**
+   * If a study add-on is uninstalled, mark the study as having ended.
+   * @param {Addon} addon
+   */
+  async onUninstalled(addon) {
+    const activeStudies = (await this.getAll()).filter(study => study.active);
+    const matchingStudy = activeStudies.find(study => study.addonId === addon.id);
+    if (matchingStudy) {
+      // Use a dedicated DB connection instead of the shared one so that we can
+      // close it without fear of affecting other users of the shared connection.
+      const db = await openDatabase();
+      await markAsEnded(db, matchingStudy);
+      await db.close();
+    }
   },
 
   /**
@@ -253,9 +313,7 @@ this.AddonStudies = {
       throw new Error(`Cannot stop study for recipe ${recipeId}; it is already inactive.`);
     }
 
-    study.active = false;
-    study.studyEndDate = new Date();
-    await getStore(db).put(study);
+    await markAsEnded(db, study);
 
     try {
       await Addons.uninstall(study.addonId);
