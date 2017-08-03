@@ -104,8 +104,10 @@ this.ShieldPreferences = {
     fhrPref.setAttribute("id", FHR_UPLOAD_ENABLED_PREF);
     fhrPref.setAttribute("name", FHR_UPLOAD_ENABLED_PREF);
     fhrPref.setAttribute("type", "bool");
-    fhrPref.addEventListener("change", () => {
-      checkbox.disabled = !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF);
+    fhrPref.addEventListener("change", function(event) {
+      // Avoid reference to the document directly, to avoid leaks.
+      const eventTargetCheckbox = event.target.ownerDocument.getElementById("optOutStudiesEnabled");
+      eventTargetCheckbox.disabled = !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF);
     });
 
     // Actually inject the elements we've created.
