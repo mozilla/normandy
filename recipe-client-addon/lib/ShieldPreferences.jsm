@@ -25,7 +25,7 @@ const OPT_OUT_STUDIES_ENABLED_PREF = "app.shield.optoutstudies.enabled";
  * Handles Shield-specific preferences, including their UI.
  */
 this.ShieldPreferences = {
-  async init() {
+  init() {
     // If the FHR pref was disabled since our last run, disable opt-out as well.
     if (!Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF)) {
       Services.prefs.setBoolPref(OPT_OUT_STUDIES_ENABLED_PREF, false);
@@ -53,8 +53,7 @@ this.ShieldPreferences = {
       // Add the opt-out-study checkbox to the Privacy preferences when it is shown.
       case "advanced-pane-loaded":
         if (!Services.prefs.getBoolPref("browser.preferences.useOldOrganization", false)) {
-          const checkbox = new this.OptOutStudyCheckbox(subject.document);
-          checkbox.inject();
+          this.injectOptOutStudyCheckbox(subject.document);
         }
         break;
       // If the FHR pref changes, set the opt-out-study pref to the value it is changing to.
@@ -71,63 +70,50 @@ this.ShieldPreferences = {
    * Injects the opt-out-study preference checkbox into about:preferences and
    * handles events coming from the UI for it.
    */
-  OptOutStudyCheckbox: class {
-    constructor(document) {
-      this.document = document;
-      this.refs = {};
+  injectOptOutStudyCheckbox(doc) {
+    const container = doc.createElementNS(XUL_NS, "vbox");
+    container.classList.add("indent");
 
-      const container = this.refs.container = document.createElementNS(XUL_NS, "vbox");
-      container.classList.add("indent");
+    const hContainer = doc.createElementNS(XUL_NS, "hbox");
+    hContainer.setAttribute("align", "center");
+    container.appendChild(hContainer);
 
-      const hContainer = this.refs.hContainer = document.createElementNS(XUL_NS, "hbox");
-      hContainer.setAttribute("align", "center");
-      container.appendChild(hContainer);
+    const checkbox = doc.createElementNS(XUL_NS, "checkbox");
+    checkbox.setAttribute("id", "optOutStudiesEnabled");
+    checkbox.setAttribute("label", "Allow Firefox to install and run studies");
+    checkbox.setAttribute("preference", OPT_OUT_STUDIES_ENABLED_PREF);
+    checkbox.setAttribute("disabled", !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF));
+    hContainer.appendChild(checkbox);
 
-      const checkbox = this.refs.checkbox = document.createElementNS(XUL_NS, "checkbox");
-      checkbox.setAttribute("id", "optOutStudiesEnabled");
-      checkbox.setAttribute("label", "Allow Firefox to install and run studies");
-      checkbox.setAttribute("preference", OPT_OUT_STUDIES_ENABLED_PREF);
-      checkbox.setAttribute("disabled", !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF));
-      hContainer.appendChild(checkbox);
+    const viewStudies = doc.createElementNS(XUL_NS, "label");
+    viewStudies.setAttribute("id", "viewShieldStudies");
+    viewStudies.setAttribute("href", "about:studies");
+    viewStudies.setAttribute("useoriginprincipal", true);
+    viewStudies.textContent = "View Firefox Studies";
+    viewStudies.classList.add("learnMore", "text-link");
+    hContainer.appendChild(viewStudies);
 
-      const viewStudies = this.refs.viewStudies = document.createElementNS(XUL_NS, "label");
-      viewStudies.setAttribute("id", "viewShieldStudies");
-      viewStudies.setAttribute("href", "about:studies");
-      viewStudies.setAttribute("useoriginprincipal", true);
-      viewStudies.textContent = "View Firefox Studies";
-      viewStudies.classList.add("learnMore", "text-link");
-      hContainer.appendChild(viewStudies);
+    // <prefrence> elements for prefs that we need to monitor while the page is open.
+    const optOutPref = doc.createElementNS(XUL_NS, "preference");
+    optOutPref.setAttribute("id", OPT_OUT_STUDIES_ENABLED_PREF);
+    optOutPref.setAttribute("name", OPT_OUT_STUDIES_ENABLED_PREF);
+    optOutPref.setAttribute("type", "bool");
 
-      // <prefrence> elements for prefs that we need to monitor while the page is open.
-      const optOutPref = this.refs.optOutPref = document.createElementNS(XUL_NS, "preference");
-      optOutPref.setAttribute("id", OPT_OUT_STUDIES_ENABLED_PREF);
-      optOutPref.setAttribute("name", OPT_OUT_STUDIES_ENABLED_PREF);
-      optOutPref.setAttribute("type", "bool");
+    // Weirdly, FHR doesn't have a <preference> element on the page, so we create it.
+    const fhrPref = doc.createElementNS(XUL_NS, "preference");
+    fhrPref.setAttribute("id", FHR_UPLOAD_ENABLED_PREF);
+    fhrPref.setAttribute("name", FHR_UPLOAD_ENABLED_PREF);
+    fhrPref.setAttribute("type", "bool");
+    fhrPref.addEventListener("change", () => {
+      checkbox.disabled = !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF);
+    });
 
-      // Weirdly, FHR doesn't have a <preference> element on the page, so we create it.
-      const fhrPref = this.refs.fhrPref = document.createElementNS(XUL_NS, "preference");
-      fhrPref.setAttribute("id", FHR_UPLOAD_ENABLED_PREF);
-      fhrPref.setAttribute("name", FHR_UPLOAD_ENABLED_PREF);
-      fhrPref.setAttribute("type", "bool");
-      fhrPref.addEventListener("change", this);
-    }
+    // Actually inject the elements we've created.
+    const parent = doc.getElementById("submitHealthReportBox").closest("vbox");
+    parent.appendChild(container);
 
-    inject() {
-      const parent = this.document.getElementById("submitHealthReportBox").closest("vbox");
-      parent.appendChild(this.refs.container);
-
-      const preferences = this.document.getElementById("privacyPreferences");
-      preferences.appendChild(this.refs.optOutPref);
-      preferences.appendChild(this.refs.fhrPref);
-    }
-
-    handleEvent(event) {
-      switch (event.target.id) {
-        // Disable/enable the checkbox when the FHR pref changes.
-        case FHR_UPLOAD_ENABLED_PREF:
-          this.refs.checkbox.disabled = !Services.prefs.getBoolPref(FHR_UPLOAD_ENABLED_PREF);
-          break;
-      }
-    }
+    const preferences = doc.getElementById("privacyPreferences");
+    preferences.appendChild(optOutPref);
+    preferences.appendChild(fhrPref);
   },
 };

@@ -69,7 +69,7 @@ this.ShieldRecipeClient = {
     }
 
     try {
-      await ShieldPreferences.init();
+      ShieldPreferences.init();
     } catch (err) {
       log.error("Failed to initialize preferences UI:", err);
     }

@@ -15,18 +15,18 @@ XPCOMUtils.defineLazyModuleGetter(this, "ShieldRecipeClient",
   "resource://shield-recipe-client/lib/ShieldRecipeClient.jsm");
 
 const DEFAULT_PREFS = {
-  "extensions.shield-recipe-client.api_url": ["char", "https://normandy.cdn.mozilla.net/api/v1"],
-  "extensions.shield-recipe-client.dev_mode": ["bool", false],
-  "extensions.shield-recipe-client.enabled": ["bool", true],
-  "extensions.shield-recipe-client.startup_delay_seconds": ["int", 300],
-  "extensions.shield-recipe-client.logging.level": ["int", Log.Level.Warn],
-  "extensions.shield-recipe-client.user_id": ["char", ""],
-  "extensions.shield-recipe-client.run_interval_seconds": ["int", 86400], // 24 hours
-  "extensions.shield-recipe-client.first_run": ["bool", true],
-  "extensions.shield-recipe-client.shieldLearnMoreUrl": [
-    "char", "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield",
-  ],
-  "app.shield.optoutstudies.enabled": ["bool", AppConstants.MOZ_DATA_REPORTING],
+  "extensions.shield-recipe-client.api_url": "https://normandy.cdn.mozilla.net/api/v1",
+  "extensions.shield-recipe-client.dev_mode": false,
+  "extensions.shield-recipe-client.enabled": true,
+  "extensions.shield-recipe-client.startup_delay_seconds": 300,
+  "extensions.shield-recipe-client.logging.level": Log.Level.Warn,
+  "extensions.shield-recipe-client.user_id": "",
+  "extensions.shield-recipe-client.run_interval_seconds": 86400, // 24 hours
+  "extensions.shield-recipe-client.first_run": true,
+  "extensions.shield-recipe-client.shieldLearnMoreUrl": (
+    "https://support.mozilla.org/1/firefox/%VERSION%/%OS%/%LOCALE%/shield"
+  ),
+  "app.shield.optoutstudies.enabled": AppConstants.MOZ_DATA_REPORTING,
 };
 
 this.install = function() {};
@@ -34,15 +34,15 @@ this.install = function() {};
 this.startup = function() {
   // Initialize preference defaults before anything else happens.
   const prefBranch = Services.prefs.getDefaultBranch("");
-  for (const [name, [type, value]] of Object.entries(DEFAULT_PREFS)) {
-    switch (type) {
-      case "char":
+  for (const [name, value] of Object.entries(DEFAULT_PREFS)) {
+    switch (typeof value) {
+      case "string":
         prefBranch.setCharPref(name, value);
         break;
-      case "int":
+      case "number":
         prefBranch.setIntPref(name, value);
         break;
-      case "bool":
+      case "boolean":
         prefBranch.setBoolPref(name, value);
         break;
       default:
