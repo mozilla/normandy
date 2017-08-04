@@ -173,7 +173,11 @@ class Base(Core):
     # General settings
     DEBUG = values.BooleanValue(False)
     ADMINS = values.SingleNestedListValue([])
-    SILENCED_SYSTEM_CHECKS = values.ListValue([])
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        # Check CSRF cookie http only. disabled because we read the
+        # CSRF cookie in JS for forms in React.
+        'security.W017',
+    ])
 
     # Authentication
     def AUTHENTICATION_BACKENDS(self):
@@ -347,12 +351,6 @@ class Base(Core):
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
 
-    SILENCED_SYSTEM_CHECKS = values.ListValue([
-        # Check CSRF cookie http only. disabled because we read the
-        # CSRF cookie in JS for forms in React.
-        'security.W017',
-    ])
-
 
 class Development(Base):
     """Settings for local development."""
@@ -394,7 +392,10 @@ class ProductionReadOnly(Production):
         # No need for sessions, so removing those middlewares helps us go fast
     ]
     ADMIN_ENABLED = values.BooleanValue(False)
-    SILENCED_SYSTEM_CHECKS = values.ListValue(['security.W003'])  # CSRF check
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W003'  # CSRF middleware check
+        'security.W017'  # Check CSRF cookie http only
+    ])
 
 
 class ProductionInsecure(Production):
