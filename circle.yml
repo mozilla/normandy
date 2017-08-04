@@ -34,6 +34,7 @@ compile:
 
 test:
   override:
+    - ./ci/circleci/bin/runner.sh lint
     - ./ci/circleci/bin/runner.sh test
 
 deployment:

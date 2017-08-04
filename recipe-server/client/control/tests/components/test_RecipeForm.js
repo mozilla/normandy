@@ -3,10 +3,11 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { SubmissionError } from 'redux-form';
 
-import { RecipeForm, formConfig, initialValuesWrapper } from 'control/components/RecipeForm.js';
-import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields.js';
-// import HeartbeatFields from 'control/components/action_fields/HeartbeatFields.js';
-import { recipeFactory } from '../../../tests/utils.js';
+import { RecipeForm, formConfig, initialValuesWrapper } from 'control/components/RecipeForm';
+import ConsoleLogFields from 'control/components/action_fields/ConsoleLogFields';
+
+// import HeartbeatFields from 'control/components/action_fields/HeartbeatFields';
+import { recipeFactory } from '../../../tests/utils';
 
 /**
  * Creates mock required props for RecipeForm.
@@ -32,7 +33,7 @@ describe('<RecipeForm>', () => {
   describe('Argument fields', () => {
     it('should render the fields for the console-log action', () => {
       const wrapper = shallow(
-        <RecipeForm selectedAction="console-log" {...propFactory()} />
+        <RecipeForm selectedAction="console-log" {...propFactory()} />,
       );
       expect(wrapper.find(ConsoleLogFields).length).toBe(1);
     });
@@ -55,7 +56,7 @@ describe('<RecipeForm>', () => {
         recipe={recipe}
         {...propFactory()}
         route={{ isCloning: true }}
-      />
+      />,
     );
     // message should exist
     expect(wrapper.find('.cloning-message').length).toBe(1);
@@ -168,7 +169,7 @@ describe('<RecipeForm>', () => {
       const Component = ({ initialValues }) => <div>{initialValues}</div>;
       const WrappedComponent = initialValuesWrapper(Component);
       const wrapper = shallow(
-        <WrappedComponent recipe={'fakerecipe'} location={{}} />
+        <WrappedComponent recipe={'fakerecipe'} location={{}} />,
       );
 
       expect(wrapper.find(Component).prop('initialValues')).toBe('fakerecipe');
@@ -178,7 +179,7 @@ describe('<RecipeForm>', () => {
       const Component = ({ initialValues }) => <div>{initialValues}</div>;
       const WrappedComponent = initialValuesWrapper(Component);
       const wrapper = shallow(
-        <WrappedComponent recipe={'fakerecipe'} revision={'fakerevision'} />
+        <WrappedComponent recipe={'fakerecipe'} revision={'fakerevision'} />,
       );
 
       expect(wrapper.find(Component).prop('initialValues')).toBe('fakerevision');

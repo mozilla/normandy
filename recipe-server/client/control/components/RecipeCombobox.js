@@ -1,5 +1,4 @@
 import React, { PropTypes as pt } from 'react';
-
 import { omit } from 'underscore';
 
 import DropdownMenu from 'control/components/DropdownMenu';

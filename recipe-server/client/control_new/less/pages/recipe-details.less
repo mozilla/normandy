@@ -1,0 +1,113 @@
+dl.details {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+
+  &.narrow {
+    grid-template-columns: 120px 1fr;
+  }
+
+  dt,
+  dd {
+    border-bottom: 1px solid #EEE;
+    padding: 16px 0;
+
+    &:first-of-type {
+      padding-top: 0;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  dt {
+    color: #999;
+    font-weight: bold;
+    padding-right: 16px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    grid-column: span 2;
+  }
+}
+
+.page-recipe-details {
+  height: 100%;
+
+  > .ant-row {
+    height: 100%;
+    position: relative;
+  }
+
+  .recipe-history {
+    bottom: 0;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    > .ant-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      > .ant-card-body {
+        flex: 1;
+        overflow: auto;
+      }
+    }
+  }
+}
+
+.details-action-bar {
+  margin-bottom: 16px;
+
+  button {
+    float: right;
+    margin-left: 8px;
+  }
+}
+
+.recipe-details {
+  .ant-card {
+    margin: 16px 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.revision-notice {
+  margin-bottom: 16px;
+}
+
+.approval-history-details {
+  border-bottom: 1px solid #EEE;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+
+  &:last-child {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ant-card-extra {
+    .ant-tag {
+      margin-right: 0;
+    }
+  }
+}
+
+.approval-details {
+  border-top: 1px solid #EEE;
+  margin-top: 16px;
+  padding-top: 16px;
+}

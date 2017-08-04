@@ -1,10 +1,10 @@
+import { isEqual } from 'underscore';
+
 import {
   LOAD_SAVED_COLUMNS,
   UPDATE_COLUMN,
   saveLocalColumns as saveState,
 } from 'control/actions/ColumnActions';
-
-import { isEqual } from 'underscore';
 
 const initialState = [{
   label: 'Name',
@@ -83,7 +83,7 @@ function columnReducer(state = initialState, action) {
       // outdated columns from localStorage
       slugsMatch = isEqual(
         state.map(option => option.slug + option.label),
-        action.columns.map(option => option.slug + option.label)
+        action.columns.map(option => option.slug + option.label),
       );
 
       if (slugsMatch) {

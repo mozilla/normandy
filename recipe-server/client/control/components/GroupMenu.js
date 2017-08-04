@@ -87,8 +87,9 @@ export default class GroupMenu extends React.Component {
             className={'menu-item'}
             key={searchText}
             onClick={this.makeClickItemHandler('text', searchText)}
-            children={searchText}
-          />
+          >
+            {searchText}
+          </div>
         </div>
       );
     }
@@ -139,13 +140,13 @@ export default class GroupMenu extends React.Component {
                 <h3 className={`group-label ${value}`}>{label}</h3>
                 {
                   displayedOptions.map((option, index) =>
-                    <div
+                    (<div
                       className={`menu-item ${option.value}`}
                       key={index}
                       onClick={this.makeClickItemHandler(group, option)}
                     >
                       { option.label || option.value }
-                    </div>
+                    </div>),
                   )
                 }
                 {

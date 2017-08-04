@@ -8,9 +8,9 @@ export default function Header({ pageType: { ctaButtons }, currentLocation, rout
   let ctaBtns;
   if (ctaButtons) {
     ctaBtns = ctaButtons.map(({ text, icon, link }, index) =>
-      <Link className="button" to={absolutePath(currentLocation, link)} key={index}>
+      (<Link className="button" to={absolutePath(currentLocation, link)} key={index}>
         <i className={`pre fa fa-${icon}`} /> {text}
-      </Link>
+      </Link>),
     );
   }
 

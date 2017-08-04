@@ -2,7 +2,7 @@ import OptOutStudyAction, {
   postExecutionHook,
   resetAction,
 } from '../opt-out-study/';
-import { recipeFactory } from '../../tests/utils.js';
+import { recipeFactory } from '../../tests/utils';
 
 function argumentsFactory(args) {
   return {

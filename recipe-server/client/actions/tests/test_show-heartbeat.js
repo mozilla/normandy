@@ -1,6 +1,6 @@
 import { mockNormandy } from './utils';
 import ShowHeartbeatAction from '../show-heartbeat/';
-import { recipeFactory } from '../../tests/utils.js';
+import { recipeFactory } from '../../tests/utils';
 
 describe('ShowHeartbeatAction', () => {
   let normandy;
@@ -40,7 +40,7 @@ describe('ShowHeartbeatAction', () => {
 
     await action.execute();
     expect(normandy.showHeartbeat).toHaveBeenCalledWith(
-            jasmine.objectContaining(showHeartbeatArgs)
+            jasmine.objectContaining(showHeartbeatArgs),
         );
   });
 
@@ -63,7 +63,7 @@ describe('ShowHeartbeatAction', () => {
     });
 
     describe('`once`', () => {
-      it('should NOT show if another heartbeat has ran already', async() => {
+      it('should NOT show if another heartbeat has ran already', async () => {
         const firstAction = new ShowHeartbeatAction(normandy, recipeFactory());
         await firstAction.execute();
 
@@ -89,7 +89,7 @@ describe('ShowHeartbeatAction', () => {
         expect(normandy.mock.storage.data.lastShown).toEqual(10);
       });
 
-      it('should show if it has not been shown already', async() => {
+      it('should show if it has not been shown already', async () => {
         const onceRecipe = recipeFactory();
 
         const action = new ShowHeartbeatAction(normandy, onceRecipe);
@@ -98,7 +98,7 @@ describe('ShowHeartbeatAction', () => {
         expect(normandy.showHeartbeat).toHaveBeenCalled();
       });
 
-      it('should NOT show if it has been shown already', async() => {
+      it('should NOT show if it has been shown already', async () => {
         jasmine.clock().install();
 
         const onceRecipe = recipeFactory();
@@ -121,7 +121,7 @@ describe('ShowHeartbeatAction', () => {
         jasmine.clock().uninstall();
       });
 
-      it('should NOT show even if the lastShown date is malformed', async() => {
+      it('should NOT show even if the lastShown date is malformed', async () => {
         const onceRecipe = recipeFactory();
         const action = new ShowHeartbeatAction(normandy, onceRecipe);
         normandy.mock.storage.data.lastShown = 'ROYALTY GOT LOYALTY INSIDE MY DNA';
@@ -139,7 +139,7 @@ describe('ShowHeartbeatAction', () => {
         },
       };
 
-      it('should NOT show if another heartbeat has ran already', async() => {
+      it('should NOT show if another heartbeat has ran already', async () => {
         const firstRecipe = recipeFactory({ ...nagConfig });
         const firstAction = new ShowHeartbeatAction(normandy, firstRecipe);
         await firstAction.execute();
@@ -174,7 +174,7 @@ describe('ShowHeartbeatAction', () => {
         expect(normandy.showHeartbeat).toHaveBeenCalled();
       });
 
-      it('should not show if the user has interacted with it', async() => {
+      it('should not show if the user has interacted with it', async () => {
         const testAction = new ShowHeartbeatAction(normandy, recipeFactory({ ...nagConfig }));
         expect(normandy.showHeartbeat).not.toHaveBeenCalled();
 

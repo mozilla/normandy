@@ -1,0 +1,152 @@
+// Imports
+@import '~antd/dist/antd.less';
+@import 'ant-override';
+
+// Pages
+@import 'pages/404';
+@import 'pages/gateway';
+@import 'pages/recipe-details';
+@import 'pages/recipe-form';
+@import 'listing';
+
+// Common
+body {
+  height: 100%;
+}
+
+.clearfix() {
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
+#main,
+#main > .ant-layout {
+  align-content: stretch;
+  align-items: stretch;
+  display: flex;
+  flex: 1;
+  justify-content: flex-start;
+
+  .ant-layout-content {
+    flex: 0;
+  }
+}
+
+.centered {
+  text-align: center;
+}
+
+.righted {
+  text-align: right;
+}
+
+.boolean-icon {
+  font-size: 16px;
+  font-weight: bold;
+
+  &.is-true {
+    color: #0C0;
+  }
+
+  &.is-false {
+    color: #C00;
+  }
+}
+
+.current-user {
+  float: right;
+  position: relative;
+  z-index: 1;
+
+  .email {
+    margin-right: 16px;
+  }
+}
+
+.logo {
+  color: #333;
+  font-size: 22px;
+  padding-left: 48px;
+  position: relative;
+  white-space: nowrap;
+
+  &::before {
+    background: url('../img/logo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    content: '';
+    display: block;
+    height: 32px;
+    left: 0;
+    margin-top: -16px;
+    position: absolute;
+    top: 50%;
+    width: 32px;
+  }
+
+  @media (max-width: @screen-xs) {
+    font-size: 5.5vw;
+    padding-left: 38px;
+  }
+}
+
+.sidebar {
+  background: @white;
+
+  > .ant-layout-sider-children {
+    height: 100%;
+
+    > .ant-menu {
+      height: 100%;
+    }
+  }
+}
+
+.content-wrapper {
+  padding: 0 24px 24px;
+}
+
+.content {
+  background: @white;
+  height: 100%;
+  padding: 24px;
+}
+
+#main {
+  min-height: 100%;
+}
+
+/* Buttons at the bottom of a form */
+.form-actions {
+  border-top: 1px solid #EEE;
+  padding-top: 24px;
+
+  .clearfix();
+
+  .primary {
+    float: right;
+  }
+
+  .secondary {
+    float: left;
+  }
+
+  .primary,
+  .secondary {
+    & > *:not(:first-child) {
+      margin-left: 15px;
+    }
+  }
+}
+
+fieldset {
+  border: none;
+
+  legend {
+    color: #222;
+    font-weight: bold;
+  }
+}

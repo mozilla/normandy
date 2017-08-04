@@ -100,6 +100,8 @@ class Core(Configuration):
             'normandy.base.api.renderers.CanonicalJSONRenderer',
             'normandy.base.api.renderers.CustomBrowsableAPIRenderer',
         ),
+        'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': 10,
         'EXCEPTION_HANDLER': 'normandy.base.api.views.exception_handler',
     }
 
@@ -111,6 +113,10 @@ class Core(Configuration):
         'ACTIONS': {
             'BUNDLE_DIR_NAME': 'bundles/',
             'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-actions.json')
+        },
+        'VENDOR': {
+            'BUNDLE_DIR_NAME': 'bundles/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-vendor.json')
         }
     }
 
@@ -151,6 +157,10 @@ class Core(Configuration):
     }
 
     AWS_QUERYSTRING_AUTH = False
+
+    # We changed the CSRF cookie from http-only to non http-only and need to override existing
+    # cookies. The easiest way is just change the cookie name when such changes happen.
+    CSRF_COOKIE_NAME = 'csrftoken-20170707'
 
 
 class Base(Core):
@@ -281,7 +291,7 @@ class Base(Core):
     SECURE_PROXY_SSL_HEADER = values.TupleValue()
     SECURE_HSTS_SECONDS = values.IntegerValue(3600)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
-    CSRF_COOKIE_HTTPONLY = values.BooleanValue(True)
+    CSRF_COOKIE_HTTPONLY = values.BooleanValue(False)
     CSRF_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_SSL_REDIRECT = values.BooleanValue(True)
     SECURE_REDIRECT_EXEMPT = values.ListValue([])
@@ -337,6 +347,12 @@ class Base(Core):
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
 
+    SILENCED_SYSTEM_CHECKS = values.ListValue([
+        # Check CSRF cookie http only. disabled because we read the
+        # CSRF cookie in JS for forms in React.
+        'security.W017',
+    ])
+
 
 class Development(Base):
     """Settings for local development."""
@@ -351,6 +367,7 @@ class Development(Base):
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
     PEER_APPROVAL_ENFORCED = values.BooleanValue(False)
+    CSP_REPORT_URI = values.Value('')
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
@@ -402,6 +419,7 @@ class ProductionInsecure(Production):
         'security.W009',  # Secret key length
         'security.W012',  # Check session cookie secure
         'security.W016',  # Check CSRF cookie secure
+        'security.W017',  # Check CSRF cookie http only
     ])
 
 

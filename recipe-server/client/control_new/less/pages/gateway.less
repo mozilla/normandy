@@ -1,0 +1,43 @@
+.page-gateway {
+  .anticon {
+    display: block;
+    font-size: 3em;
+    margin-bottom: 0.5em;
+    text-align: center;
+  }
+
+  .gw-col {
+    margin-bottom: 1em;
+    text-align: center;
+
+    &:hover,
+    &:focus {
+      .ant-card-head {
+        background: @primary-2;
+      }
+    }
+
+    .ant-card-head {
+      background: @primary-1;
+      transition: 0.3s background;
+    }
+
+    a {
+      border: none;
+      bottom: 0;
+      color: inherit;
+      height: 100%;
+      left: 0;
+      overflow: hidden;
+      position: absolute;
+      right: 0;
+      text-indent: -999px;
+      top: 0;
+      width: 100%;
+    }
+  }
+
+  .ant-btn {
+    margin-top: 1em;
+  }
+}

@@ -8,7 +8,7 @@ export default function NoMatch() {
   return (
     <div className="no-match fluid-8">
       <h2>Page Not Found</h2>
-      <p>Sorry, we could not find the page you're looking for.</p>
+      <p>Sorry, we could not find the page you&apos;re looking for.</p>
       <p><Link to="/control/">Click here to return to the control index.</Link></p>
     </div>
   );

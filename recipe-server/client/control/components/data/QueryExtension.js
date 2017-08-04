@@ -7,7 +7,7 @@ import { fetchExtension } from 'control/state/extensions/actions';
 
 class QueryExtension extends React.Component {
   static propTypes = {
-    fetchExtension: pt.func,
+    fetchExtension: pt.func.isRequired,
     pk: pt.number.isRequired,
   }
 

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -eu
-
-# build image
-docker build -t normandy-lint:build .

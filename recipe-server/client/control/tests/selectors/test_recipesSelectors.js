@@ -4,7 +4,7 @@ import {
   fixtureRecipes,
   fixtureRecipeDict,
   fixtureStoredRevisions,
-} from '../fixtures.js';
+} from '../fixtures';
 
 
 const fixtureApprovedRevisions = {

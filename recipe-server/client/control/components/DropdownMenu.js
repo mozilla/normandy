@@ -160,7 +160,7 @@ export default class DropdownMenu extends React.Component {
     const menuClass = cx('dropdown-menu', this.id);
     const contentClass = cx('dropdown-content',
       pinRight && 'pin-right',
-      pinTop && 'pin-top'
+      pinTop && 'pin-top',
     );
 
     if (display === false) {

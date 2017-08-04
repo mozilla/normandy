@@ -1,11 +1,10 @@
 import React, { PropTypes as pt } from 'react';
 import { connect } from 'react-redux';
+import { isEqual } from 'underscore';
 
 import ColumnMenu from 'control/components/ColumnMenu';
 import ActiveFilters from 'control/components/ActiveFilters';
 import RecipeCombobox from 'control/components/RecipeCombobox';
-
-import { isEqual } from 'underscore';
 
 import {
   loadLocalColumns,
@@ -172,5 +171,5 @@ const mapDispatchToProps = {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(RecipeFilters);

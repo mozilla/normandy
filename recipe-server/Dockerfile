@@ -20,7 +20,7 @@ RUN pip install -U 'pip>=8' && \
     npm install
 
 COPY . /app
-RUN NODE_ENV=production ./node_modules/.bin/webpack && \
+RUN NODE_ENV=production npm run build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media && \
     mkdir -p __version__ && \

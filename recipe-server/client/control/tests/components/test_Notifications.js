@@ -1,6 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { DisconnectedNotifications, Notification } from 'control/components/Notifications.js';
+
+import { DisconnectedNotifications, Notification } from 'control/components/Notifications';
 
 describe('Notification components', () => {
   describe('<DisconnectedNotifications>', () => {
@@ -8,7 +9,7 @@ describe('Notification components', () => {
       const notification1 = { messageType: 'success', message: 'message', id: 1 };
       const notification2 = { messageType: 'success', message: 'message', id: 2 };
       const wrapper = shallow(
-        <DisconnectedNotifications notifications={[notification1, notification2]} />
+        <DisconnectedNotifications notifications={[notification1, notification2]} />,
       );
 
       const notifications = wrapper.find(Notification);
