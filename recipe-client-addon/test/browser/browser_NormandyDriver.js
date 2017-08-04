@@ -225,7 +225,7 @@ decorate_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [
       ["test.char", "a string"],
