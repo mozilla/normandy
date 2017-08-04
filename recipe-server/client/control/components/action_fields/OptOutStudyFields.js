@@ -51,6 +51,15 @@ class OptOutStudyFields extends ActionFields {
             </option>
           ))}
         </ControlField>
+
+        <ControlField
+          label="Pause Enrollment (If checked, no new study participants will be enrolled)"
+          name="arguments.isEnrollmentPaused"
+          component="input"
+          type="checkbox"
+          className="checkbox-field"
+          disabled={disabled}
+        />
       </div>
     );
   }

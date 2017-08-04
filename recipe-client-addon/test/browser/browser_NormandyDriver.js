@@ -84,7 +84,7 @@ add_task(withDriver(Assert, async function distribution(driver) {
   is(client.distribution, "funnelcake", "distribution is read from preferences");
 }));
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   async function testCreateStorage(sandboxManager) {
     const driver = new NormandyDriver(sandboxManager);
@@ -149,7 +149,7 @@ add_task(withDriver(Assert, async function getAddon(driver, sandboxManager) {
   Assert.equal(addon, null, "Add-on has been uninstalled");
 }));
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
   async function testAddonsGetWorksInSandbox(sandboxManager) {
     const driver = new NormandyDriver(sandboxManager);
@@ -182,12 +182,11 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withSandboxManager(Assert),
-  AddonStudies.withStudies([
-    studyFactory({name: "test-study", addonVersion: "5.0"}),
-  ]),
-  async function testAddonStudies(sandboxManager, [study]) {
+  withWebExtension({id: "driver-addon-studies@example.com"}),
+  async function testAddonStudies(sandboxManager, [addonId, addonFile]) {
+    const addonUrl = Services.io.newFileURI(addonFile).spec;
     const driver = new NormandyDriver(sandboxManager);
     sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
 
@@ -197,12 +196,115 @@ compose_task(
 
     await sandboxManager.evalInSandbox(`
       (async function sandboxTest() {
-        const hasStudy = await driver.studies.has(${study.recipeId});
-        ok(hasStudy, "studies.has checks for studies from within a sandbox.");
+        const recipeId = 5;
+        let hasStudy = await driver.studies.has(recipeId);
+        ok(!hasStudy, "studies.has returns false if the study hasn't been started yet.");
 
-        let study = await driver.studies.get(${study.recipeId});
-        is(study.addonVersion, "5.0", "studies.get fetches studies from within a sandbox.");
+        await driver.studies.start({
+          recipeId,
+          name: "fake",
+          description: "fake",
+          addonUrl: "${addonUrl}",
+        });
+        hasStudy = await driver.studies.has(recipeId);
+        ok(hasStudy, "studies.has returns true after the study has been started.");
+
+        let study = await driver.studies.get(recipeId);
+        is(
+          study.addonId,
+          "driver-addon-studies@example.com",
+          "studies.get fetches studies from within a sandbox."
+        );
+        ok(study.active, "Studies are marked as active after being started by the driver.");
+
+        await driver.studies.stop(recipeId);
+        study = await driver.studies.get(recipeId);
+        ok(!study.active, "Studies are marked as inactive after being stopped by the driver.");
       })();
     `);
   }
+);
+
+compose_task(
+  withPrefEnv({
+    set: [
+      ["test.char", "a string"],
+      ["test.int", 5],
+      ["test.bool", true],
+    ],
+  }),
+  withSandboxManager(Assert, async function testPreferences(sandboxManager) {
+    const driver = new NormandyDriver(sandboxManager);
+    sandboxManager.cloneIntoGlobal("driver", driver, {cloneFunctions: true});
+
+    // Assertion helpers
+    sandboxManager.addGlobal("is", is);
+    sandboxManager.addGlobal("ok", ok);
+    sandboxManager.addGlobal("assertThrows", Assert.throws.bind(Assert));
+
+    await sandboxManager.evalInSandbox(`
+      (async function sandboxTest() {
+        ok(
+          driver.preferences.getBool("test.bool"),
+          "preferences.getBool can retrieve boolean preferences."
+        );
+        is(
+          driver.preferences.getInt("test.int"),
+          5,
+          "preferences.getInt can retrieve integer preferences."
+        );
+        is(
+          driver.preferences.getChar("test.char"),
+          "a string",
+          "preferences.getChar can retrieve string preferences."
+        );
+        assertThrows(
+          () => driver.preferences.getChar("test.int"),
+          "preferences.getChar throws when retreiving a non-string preference."
+        );
+        assertThrows(
+          () => driver.preferences.getInt("test.bool"),
+          "preferences.getInt throws when retreiving a non-integer preference."
+        );
+        assertThrows(
+          () => driver.preferences.getBool("test.char"),
+          "preferences.getBool throws when retreiving a non-boolean preference."
+        );
+        assertThrows(
+          () => driver.preferences.getChar("test.does.not.exist"),
+          "preferences.getChar throws when retreiving a non-existant preference."
+        );
+        assertThrows(
+          () => driver.preferences.getInt("test.does.not.exist"),
+          "preferences.getInt throws when retreiving a non-existant preference."
+        );
+        assertThrows(
+          () => driver.preferences.getBool("test.does.not.exist"),
+          "preferences.getBool throws when retreiving a non-existant preference."
+        );
+        ok(
+          driver.preferences.getBool("test.does.not.exist", true),
+          "preferences.getBool returns a default value if the preference doesn't exist."
+        );
+        is(
+          driver.preferences.getInt("test.does.not.exist", 7),
+          7,
+          "preferences.getInt returns a default value if the preference doesn't exist."
+        );
+        is(
+          driver.preferences.getChar("test.does.not.exist", "default"),
+          "default",
+          "preferences.getChar returns a default value if the preference doesn't exist."
+        );
+        ok(
+          driver.preferences.has("test.char"),
+          "preferences.has returns true if the given preference exists."
+        );
+        ok(
+          !driver.preferences.has("test.does.not.exist"),
+          "preferences.has returns false if the given preference does not exist."
+        );
+      })();
+    `);
+  })
 );

@@ -1,6 +1,6 @@
 "use strict";
 
-Cu.import("resource://gre/modules/Preferences.jsm");
+Cu.import("resource://testing-common/TestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/ClientEnvironment.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/CleanupManager.jsm", this);
@@ -134,8 +134,8 @@ add_task(withMockNormandyApi(async function testRun(mockApi) {
   mockApi.recipes = [matchRecipe, noMatchRecipe, missingRecipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const matchManager = managers["matchAction"];
-    const noMatchManager = managers["noMatchAction"];
+    const matchManager = managers.matchAction;
+    const noMatchManager = managers.noMatchAction;
 
     await RecipeRunner.run();
 
@@ -180,7 +180,7 @@ add_task(withMockNormandyApi(async function testRunRecipeError(mockApi) {
   mockApi.recipes = [recipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const manager = managers["action"];
+    const manager = managers.action;
     manager.runAsyncCallback.callsFake(async callbackName => {
       if (callbackName === "action") {
         throw new Error("Action execution failure");
@@ -205,7 +205,7 @@ add_task(withMockNormandyApi(async function testRunFetchFail(mockApi) {
   mockApi.fetchRecipes.rejects(new Error("Signature not valid"));
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const manager = managers["action"];
+    const manager = managers.action;
     await RecipeRunner.run();
 
     // If the recipe fetch failed, do not run anything.
@@ -247,8 +247,8 @@ add_task(withMockNormandyApi(async function testRunPreExecutionFailure(mockApi) 
   mockApi.recipes = [passRecipe, failRecipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const passManager = managers["passAction"];
-    const failManager = managers["failAction"];
+    const passManager = managers.passAction;
+    const failManager = managers.failAction;
     failManager.runAsyncCallback.returns(Promise.reject(new Error("oh no")));
 
     await RecipeRunner.run();
@@ -285,7 +285,7 @@ add_task(withMockNormandyApi(async function testRunPostExecutionFailure(mockApi)
   mockApi.recipes = [failRecipe];
 
   await withMockActionSandboxManagers(mockApi.actions, async managers => {
-    const failManager = managers["failAction"];
+    const failManager = managers.failAction;
     failManager.runAsyncCallback.callsFake(async callbackName => {
       if (callbackName === "postExecution") {
         throw new Error("postExecution failure");
@@ -311,55 +311,78 @@ add_task(withMockNormandyApi(async function testLoadActionSandboxManagers(mockAp
     {name: "normalAction"},
     {name: "missingImpl"},
   ];
-  mockApi.implementations["normalAction"] = "window.scriptRan = true";
+  mockApi.implementations.normalAction = "window.scriptRan = true";
 
   const managers = await RecipeRunner.loadActionSandboxManagers();
   ok("normalAction" in managers, "Actions with implementations have managers");
   ok(!("missingImpl" in managers), "Actions without implementations are skipped");
 
-  const normalManager = managers["normalAction"];
+  const normalManager = managers.normalAction;
   ok(
     await normalManager.evalInSandbox("window.scriptRan"),
     "Implementations are run in the sandbox",
   );
 }));
 
-add_task(async function testStartup() {
-  const runStub = sinon.stub(RecipeRunner, "run");
-  const addCleanupHandlerStub = sinon.stub(CleanupManager, "addCleanupHandler");
-  const updateRunIntervalStub = sinon.stub(RecipeRunner, "updateRunInterval");
-
-  // in dev mode
-  await SpecialPowers.pushPrefEnv({
+decorate_task(
+  withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", true],
       ["extensions.shield-recipe-client.first_run", false],
     ],
-  });
+  }),
+  withStub(RecipeRunner, "run"),
+  withStub(CleanupManager, "addCleanupHandler"),
+  withStub(RecipeRunner, "updateRunInterval"),
+  async function testInitDevMode(runStub, addCleanupHandlerStub, updateRunIntervalStub) {
+    RecipeRunner.init();
+    ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
+    ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
+    ok(updateRunIntervalStub.called, "A timer is registered when in dev mode");
+  }
+);
 
-  RecipeRunner.init();
-  ok(runStub.called, "RecipeRunner.run is called immediately when in dev mode");
-  ok(addCleanupHandlerStub.called, "A cleanup function is registered when in dev mode");
-  ok(updateRunIntervalStub.called, "A timer is registered when in dev mode");
-
-  runStub.reset();
-  addCleanupHandlerStub.reset();
-  updateRunIntervalStub.reset();
-
-  // not in dev mode
-  await SpecialPowers.pushPrefEnv({
+decorate_task(
+  withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", false],
       ["extensions.shield-recipe-client.first_run", false],
     ],
-  });
+  }),
+  withStub(RecipeRunner, "run"),
+  withStub(CleanupManager, "addCleanupHandler"),
+  withStub(RecipeRunner, "updateRunInterval"),
+  async function testInit(runStub, addCleanupHandlerStub, updateRunIntervalStub) {
+    RecipeRunner.init();
+    ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
+    ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");
+    ok(updateRunIntervalStub.called, "A timer is registered when not in dev mode");
+  }
+);
 
-  RecipeRunner.init();
-  ok(!runStub.called, "RecipeRunner.run is not called immediately when not in dev mode");
-  ok(addCleanupHandlerStub.called, "A cleanup function is registered when not in dev mode");
-  ok(updateRunIntervalStub.called, "A timer is registered when not in dev mode");
+decorate_task(
+  withPrefEnv({
+    set: [
+      ["extensions.shield-recipe-client.dev_mode", false],
+      ["extensions.shield-recipe-client.first_run", true],
+    ],
+  }),
+  withStub(RecipeRunner, "run"),
+  withStub(RecipeRunner, "registerTimer"),
+  withStub(CleanupManager, "addCleanupHandler"),
+  withStub(RecipeRunner, "updateRunInterval"),
+  async function testInitFirstRun(runStub, registerTimerStub) {
+    RecipeRunner.init();
+    ok(!runStub.called, "RecipeRunner.run is not called immediately");
+    ok(!registerTimerStub.called, "RecipeRunner.registerTimer is not called immediately");
 
-  runStub.restore();
-  addCleanupHandlerStub.restore();
-  updateRunIntervalStub.restore();
-});
+    Services.obs.notifyObservers(null, "sessionstore-windows-restored");
+    await TestUtils.topicObserved("shield-init-complete");
+    ok(runStub.called, "RecipeRunner.run is called after the UI is available");
+    ok(registerTimerStub.called, "RecipeRunner.registerTimer is called after the UI is available");
+    ok(
+      !Services.prefs.getBoolPref("extensions.shield-recipe-client.first_run"),
+      "On first run, the first run pref is set to false after the UI is available"
+    );
+  }
+);

@@ -1,6 +1,7 @@
 "use strict";
 
 Cu.import("resource://gre/modules/IndexedDB.jsm", this);
+Cu.import("resource://testing-common/TestUtils.jsm", this);
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/Addons.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
@@ -8,7 +9,7 @@ Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 // Initialize test utils
 AddonTestUtils.initMochitest(this);
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies(),
   async function testGetMissing() {
     is(
@@ -19,7 +20,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({name: "test-study"}),
   ]),
@@ -29,7 +30,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory(),
     studyFactory(),
@@ -44,7 +45,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({name: "test-study"}),
   ]),
@@ -57,7 +58,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies(),
   async function testCloseDatabase() {
     await AddonStudies.close();
@@ -81,7 +82,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({name: "test-study1"}),
     studyFactory({name: "test-study2"}),
@@ -125,7 +126,7 @@ add_task(async function testStartRequiredArguments() {
   }
 });
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory(),
   ]),
@@ -138,7 +139,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withStub(Addons, "applyInstall"),
   withWebExtension(),
   async function testStartAddonCleanup(applyInstallStub, [addonId, addonFile]) {
@@ -157,17 +158,11 @@ compose_task(
 );
 
 const testOverwriteId = "testStartAddonNoOverwrite@example.com";
-compose_task(
-  withWebExtension({version: "1.0", id: testOverwriteId}),
+decorate_task(
+  withInstalledWebExtension({version: "1.0", id: testOverwriteId}),
   withWebExtension({version: "2.0", id: testOverwriteId}),
-  async function testStartAddonNoOverwrite([id1, addonFile1], [id2, addonFile2]) {
-    // Install 1.0 add-on
-    const startupPromise = AddonTestUtils.promiseWebExtensionStartup(testOverwriteId);
-    const installedAddonUrl = Services.io.newFileURI(addonFile1).spec;
-    await Addons.install(installedAddonUrl);
-    await startupPromise;
-
-    const addonUrl = Services.io.newFileURI(addonFile2).spec;
+  async function testStartAddonNoOverwrite([installedId, installedFile], [id, addonFile]) {
+    const addonUrl = Services.io.newFileURI(addonFile).spec;
     await Assert.rejects(
       AddonStudies.start(startArgsFactory({addonUrl})),
       /updating is disabled/,
@@ -178,7 +173,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withWebExtension({version: "2.0"}),
   async function testStart([addonId, addonFile]) {
     const startupPromise = AddonTestUtils.promiseWebExtensionStartup(addonId);
@@ -219,7 +214,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies(),
   async function testStopNoStudy() {
     await Assert.rejects(
@@ -230,7 +225,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: false}),
   ]),
@@ -244,17 +239,12 @@ compose_task(
 );
 
 const testStopId = "testStop@example.com";
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: true, addonId: testStopId, studyEndDate: null}),
   ]),
-  withWebExtension({id: testStopId}),
+  withInstalledWebExtension({id: testStopId}),
   async function testStop([study], [addonId, addonFile]) {
-    const startupPromise = AddonTestUtils.promiseWebExtensionStartup(addonId);
-    const addonUrl = Services.io.newFileURI(addonFile).spec;
-    await Addons.install(addonUrl);
-    await startupPromise;
-
     await AddonStudies.stop(study.recipeId);
     const newStudy = await AddonStudies.get(study.recipeId);
     ok(!newStudy.active, "stop marks the study as inactive.");
@@ -265,7 +255,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     studyFactory({active: true, addonId: "testStopWarn@example.com", studyEndDate: null}),
   ]),
@@ -280,5 +270,56 @@ compose_task(
       SimpleTest.monitorConsole(resolve, [{message: /Could not uninstall addon/}]);
       AddonStudies.stop(study.recipeId).then(() => SimpleTest.endMonitorConsole());
     });
+  }
+);
+
+decorate_task(
+  AddonStudies.withStudies([
+    studyFactory({active: true, addonId: "does.not.exist@example.com", studyEndDate: null}),
+    studyFactory({active: true, addonId: "installed@example.com"}),
+    studyFactory({active: false, addonId: "already.gone@example.com", studyEndDate: new Date(2012, 1)}),
+  ]),
+  withInstalledWebExtension({id: "installed@example.com"}),
+  async function testInit([activeStudy, activeInstalledStudy, inactiveStudy]) {
+    await AddonStudies.init();
+
+    const newActiveStudy = await AddonStudies.get(activeStudy.recipeId);
+    ok(!newActiveStudy.active, "init marks studies as inactive if their add-on is not installed.");
+    ok(
+      newActiveStudy.studyEndDate,
+      "init sets the study end date if a study's add-on is not installed."
+    );
+
+    const newInactiveStudy = await AddonStudies.get(inactiveStudy.recipeId);
+    is(
+      newInactiveStudy.studyEndDate.getFullYear(),
+      2012,
+      "init does not modify inactive studies."
+    );
+
+    const newActiveInstalledStudy = await AddonStudies.get(activeInstalledStudy.recipeId);
+    Assert.deepEqual(
+      activeInstalledStudy,
+      newActiveInstalledStudy,
+      "init does not modify studies whose add-on is still installed."
+    );
+  }
+);
+
+decorate_task(
+  AddonStudies.withStudies([
+    studyFactory({active: true, addonId: "installed@example.com", studyEndDate: null}),
+  ]),
+  withInstalledWebExtension({id: "installed@example.com"}),
+  async function testInit([study], [id, addonFile]) {
+    await Addons.uninstall(id);
+    await TestUtils.topicObserved("shield-study-ended");
+
+    const newStudy = await AddonStudies.get(study.recipeId);
+    ok(!newStudy.active, "Studies are marked as inactive when their add-on is uninstalled.");
+    ok(
+      newStudy.studyEndDate,
+      "The study end date is set when the add-on for the study is uninstalled."
+    );
   }
 );
