@@ -560,6 +560,10 @@ class Action(DirtyFieldsMixin, models.Model):
         return reverse('action-detail', args=[self.name])
 
     def compute_implementation_hash(self):
+        # User Sub Resource Integrity because the implementation is a
+        # subresource, and SRI includes the algorithm in the format,
+        # so this is robust to future changes in both client and
+        # server.
         return sri_hash(self.implementation.encode(), url_safe=True)
 
     def update_signature(self):

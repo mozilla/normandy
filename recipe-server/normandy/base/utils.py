@@ -1,5 +1,5 @@
 import json
-from base64 import b64encode
+from base64 import b64encode, urlsafe_b64encode
 from datetime import datetime
 from hashlib import sha384
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -82,7 +82,9 @@ def sri_hash(data, url_safe=False):
     :param data:
         Bytes-like object containing the data to hash.
     """
-    data_hash = b64encode(sha384(data).digest()).decode()
+    digest = sha384(data).digest()
     if url_safe:
-        data_hash = data_hash.replace('+', '-').replace('/', '_')
-    return 'sha384-' + data_hash
+        data_hash = urlsafe_b64encode(digest)
+    else:
+        data_hash = b64encode(digest)
+    return 'sha384-' + data_hash.decode()
