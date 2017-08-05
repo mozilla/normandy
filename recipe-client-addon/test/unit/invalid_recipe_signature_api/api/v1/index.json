@@ -1,4 +1,4 @@
 {
-  "object-signed": "/api/v1/object/signed/",
+  "recipe-signed": "/api/v1/recipe/signed/",
   "classify-client": "/api/v1/classify_client/"
 }

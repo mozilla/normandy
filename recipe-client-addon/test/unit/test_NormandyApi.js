@@ -105,11 +105,7 @@ add_task(withMockApiServer(async function test_getApiUrl(serverUrl) {
 }));
 
 add_task(withMockApiServer(async function test_getApiUrlSlashes(serverUrl, preferences) {
-  const fakeResponse = {
-    async json() {
-      return {"test-endpoint": `${serverUrl}/test/`};
-    },
-  };
+  const fakeResponse = new MockResponse(JSON.stringify({"test-endpoint": `${serverUrl}/test/`}));
   const mockGet = sinon.stub(NormandyApi, "get", async () => fakeResponse);
 
   // without slash
@@ -202,10 +198,10 @@ add_task(async function test_fetchSignedObjects_validation_error() {
 
 // Test validation errors due to validation returning false (e.g. when parameters
 // passed to validation are correctly formed, but not valid for the data).
-const invalidSignatureServer = makeMockApiServer(do_get_file("invalid_object_signature_api"));
+const invalidSignatureServer = makeMockApiServer(do_get_file("invalid_recipe_signature_api"));
 add_task(withServer(invalidSignatureServer, async function test_fetchSignedObjects_invalid_signature() {
   try {
-    await NormandyApi.fetchSignedObjects("object");
+    await NormandyApi.fetchSignedObjects("recipe");
     ok(false, "fetchSignedObjects did not throw for an invalid signature");
   } catch (err) {
     ok(err instanceof NormandyApi.InvalidSignatureError, "Error is an InvalidSignatureError");
@@ -258,23 +254,17 @@ add_task(withScriptServer("query_server.sjs", async function test_postData(serve
   );
 }));
 
-add_task(withScriptServer("echo_server.sjs", async function test_fetchImplementation(serverUrl) {
-  const action = {
-    implementation_url: `${serverUrl}?status=200&body=testcontent`,
-  };
-  equal(
-    await NormandyApi.fetchImplementation(action),
-    "testcontent",
-    "fetchImplementation fetches the content at the correct URL",
-  );
-}));
-
 add_task(withMockApiServer(async function test_fetchImplementation_itWorksWithRealData() {
-  const actions = await NormandyApi.fetchActions();
-  // Just test this doesn't throw
-  await NormandyApi.fetchImplementation(actions[0]);
-}));
+  const [action] = await NormandyApi.fetchActions();
+  const implementation = await NormandyApi.fetchImplementation(action);
 
+  const decoder = new TextDecoder();
+  const relativePath = `mock_api${action.implementation_url}`;
+  const file = do_get_file(relativePath);
+  const expected = decoder.decode(await OS.File.read(file.path));
+
+  equal(implementation, expected);
+}));
 
 add_task(withScriptServer(
   "echo_server.sjs",

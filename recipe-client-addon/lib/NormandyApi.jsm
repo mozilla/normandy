@@ -95,6 +95,10 @@ this.NormandyApi = {
       const object = objectWithSig[type];
 
       const serialized = CanonicalJSON.stringify(object);
+      // Check that the rawtext (the object and the signature)
+      // includes the CanonicalJSON version of the object. This isn't
+      // strictly needed, but it is a great benefit for debugging
+      // signature problems.
       if (!rawText.includes(serialized)) {
         log.debug(rawText, serialized);
         throw new NormandyApi.InvalidSignatureError(
@@ -155,7 +159,7 @@ this.NormandyApi = {
    * @resolves {Array}
    */
   async fetchRecipes(filters = {enabled: true}) {
-    return this.fetchSignedObjects('recipe', filters);
+    return this.fetchSignedObjects("recipe", filters);
   },
 
   /**
@@ -163,12 +167,11 @@ this.NormandyApi = {
    * @resolves {Array}
    */
   async fetchActions(filters = {}) {
-    return this.fetchSignedObjects('action', filters);
+    return this.fetchSignedObjects("action", filters);
   },
 
   async fetchImplementation(action) {
-    const implementationUrl = this.absolutify(action.implementation_url);
-
+    const implementationUrl = new URL(this.absolutify(action.implementation_url));
 
     // fetch implementation
     const response = await fetch(implementationUrl);
@@ -179,33 +182,36 @@ this.NormandyApi = {
     }
     const responseText = await response.text();
 
-    // Try to verify integrity of the implementation text. If no
-    // integrity value is found, skip. If the integrity value doesn't
-    // match thte content or uses an unknown algorithm, fail.
-    const integrityRe = new RegExp('/([a-z]+[0-9]+)-([a-zA-Z0-9+-]+)/$');
-    const match = integrityRe.exec(implementationUrl);
-    if (match) {
-      const [, algorithm, expectedHash] = match;
-      if (algorithm !== 'sha384') {
-        throw new Error(
-          `Failed to fetch action implemenation for ${action.name}: ` +
-          `Unexpected integrity algorithm, expected "sha384", got ${algorithm}`
-        );
-      }
+    // Try to verify integrity of the implementation text.  If the
+    // integrity value doesn't match the content or uses an unknown
+    // algorithm, fail.
 
-      // verify integrity hash
-      const hasher = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
-      hasher.init(hasher.SHA384);
-      const dataToHash = new TextEncoder().encode(responseText);
-      hasher.update(dataToHash, dataToHash.length);
-      const useBase64 = true;
-      const hash = hasher.finish(useBase64).replace(/\+/g, '-').replace(/\//g, '_');
-      if (hash !== expectedHash) {
-        throw new Error(
-          `Failed to fetch action implementation for ${action.name}: ` +
-          `Integrity hash does not match content. Expected ${expectedHash} got ${hash}.`
-        );
-      }
+    // Get the last non-empty portion of the url path, and split it
+    // into two to get the aglorithm and hash.
+    const parts = implementationUrl.pathname.split("/");
+    const lastNonEmpty = parts.filter(p => p !== "").slice(-1)[0];
+    const [algorithm, ...hashParts] = lastNonEmpty.split("-");
+    const expectedHash = hashParts.join("-");
+
+    if (algorithm !== "sha384") {
+      throw new Error(
+        `Failed to fetch action implemenation for ${action.name}: ` +
+        `Unexpected integrity algorithm, expected "sha384", got ${algorithm}`
+      );
+    }
+
+    // verify integrity hash
+    const hasher = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
+    hasher.init(hasher.SHA384);
+    const dataToHash = new TextEncoder().encode(responseText);
+    hasher.update(dataToHash, dataToHash.length);
+    const useBase64 = true;
+    const hash = hasher.finish(useBase64).replace(/\+/g, "-").replace(/\//g, "_");
+    if (hash !== expectedHash) {
+      throw new Error(
+        `Failed to fetch action implementation for ${action.name}: ` +
+        `Integrity hash does not match content. Expected ${expectedHash} got ${hash}.`
+      );
     }
 
     return responseText;
