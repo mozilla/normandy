@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from 'antd';
+import { Alert, Button, Form, Input, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -12,7 +12,9 @@ import PreferenceExperimentFields from 'control_new/components/recipes/Preferenc
 import ShowHeartbeatFields from 'control_new/components/recipes/ShowHeartbeatFields';
 import { getAction, getAllActions } from 'control_new/state/app/actions/selectors';
 import { areAnyRequestsInProgress } from 'control_new/state/app/requests/selectors';
+import { getGithubUrl } from 'control_new/state/app/serviceInfo/selectors';
 import { createForm } from 'control_new/utils/forms';
+import QueryServiceInfo from 'control_new/components/data/QueryServiceInfo';
 
 
 /**
@@ -20,14 +22,14 @@ import { createForm } from 'control_new/utils/forms';
  */
 @createForm({})
 @connect(
-  (state, props) => ({
-    selectedAction: getAction(
-      state,
-      props.form.getFieldValue('action_id'),
-      new Map(),
-    ),
-    isLoading: areAnyRequestsInProgress(state),
-  }),
+  (state, props) => {
+    const actionId = props.form.getFieldValue('action_id');
+    const selectedAction = getAction(state, actionId, new Map());
+    return {
+      selectedActionName: selectedAction.get('name'),
+      isLoading: areAnyRequestsInProgress(state),
+    };
+  }
 )
 @autobind
 export default class RecipeForm extends React.Component {
@@ -36,7 +38,7 @@ export default class RecipeForm extends React.Component {
     isLoading: PropTypes.bool,
     onSubmit: PropTypes.func.isRequired,
     recipe: PropTypes.instanceOf(Map),
-    selectedAction: PropTypes.instanceOf(Map).isRequired,
+    selectedActionName: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -63,10 +65,10 @@ export default class RecipeForm extends React.Component {
       isLoading,
       onSubmit,
       recipe,
-      selectedAction,
+      selectedActionName,
     } = this.props;
 
-    const ArgumentsFields = RecipeForm.argumentsFields[selectedAction.get('name')];
+    const ArgumentsFields = RecipeForm.argumentsFields[selectedActionName];
 
     return (
       <Form onSubmit={onSubmit}>
@@ -100,6 +102,8 @@ export default class RecipeForm extends React.Component {
             />
           </fieldset>
         )}
+        {selectedActionName && !ArgumentsFields &&
+          <ArgumentEditorMissingError name={selectedActionName} />}
         <FormActions>
           <FormActions.Primary>
             <Button
@@ -153,5 +157,50 @@ class ActionSelect extends React.Component {
         </Select>
       </div>
     );
+  }
+}
+
+@connect(
+  state => ({
+    githubUrl: getGithubUrl(state),
+  })
+)
+class ArgumentEditorMissingError extends React.PureComponent {
+  static propTypes = {
+    githubUrl: PropTypes.string,
+    name: PropTypes.string.isRequired,
+  }
+
+  defaultPropTypes = {
+    githubUrl: null,
+  }
+
+  render() {
+    const { githubUrl, name } = this.props;
+    let fileIssueUrl;
+    if (githubUrl) {
+      const u = new URL(githubUrl);
+      u.pathname += '/issues/new';
+      u.searchParams.set('title', `Argument fields missing for action "${name}"`);
+      fileIssueUrl = u.toString();
+    }
+
+    console.log('QueryServiceInfo', QueryServiceInfo, 'Alert', Alert);
+
+    return (
+      <div>
+        <QueryServiceInfo />
+        <Alert
+          message="Error - Argument editor not available"
+          description={
+            <span>
+              This is a bug. Please <a href={fileIssueUrl}>file an issue on GitHub for it.</a>
+            </span>
+          }
+          type="error"
+          showIcon
+        />
+      </div>
+    )
   }
 }
