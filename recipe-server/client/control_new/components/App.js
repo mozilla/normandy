@@ -7,6 +7,7 @@ import { Link } from 'redux-little-router';
 import CurrentUserDetails from 'control_new/components/common/CurrentUserDetails';
 import NavigationCrumbs from 'control_new/components/common/NavigationCrumbs';
 import NavigationMenu from 'control_new/components/common/NavigationMenu';
+import EnvAlert from 'control_new/components/common/EnvAlert';
 import QueryActions from 'control_new/components/data/QueryActions';
 import QueryServiceInfo from 'control_new/components/data/QueryServiceInfo';
 
@@ -28,6 +29,8 @@ export default class App extends React.Component {
     return (
       <LocaleProvider locale={enUS}>
         <Layout>
+          <EnvAlert />
+
           {/*
            Global query components; add any queries for data needed across the
            entire app that we only need to fetch once.
