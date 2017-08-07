@@ -76,7 +76,7 @@ export default class EditRecipePage extends React.Component {
     return (
       <div className="edit-page">
         <QueryRecipe pk={recipeId} />
-        <LoadingOverlay requests={`fetch-recipe-${recipeId}`}>
+        <LoadingOverlay requestIds={`fetch-recipe-${recipeId}`}>
           <h2>Edit Recipe</h2>
 
           <RecipeForm

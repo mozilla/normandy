@@ -179,7 +179,7 @@ export default class RecipeListing extends React.Component {
 
         <ListingActionBar />
 
-        <LoadingOverlay requests={requestId}>
+        <LoadingOverlay requestIds={requestId}>
           <DataList
             columns={columns}
             columnRenderers={RecipeListing.columnRenderers}

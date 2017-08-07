@@ -41,15 +41,15 @@ export class SimpleLoadingOverlay extends React.PureComponent {
 
 
 @connect(
-  (state, { requests }) => {
+  (state, { requestIds }) => {
     let isLoading;
 
     // If we're given one or more request IDs, check if at least one is in progress.
     // If nothing is given, simply check if _any_ request is in progress.
-    if (requests) {
-      let requestArray = requests;
+    if (requestIds) {
+      let requestArray = requestIds;
       if (!(requestArray instanceof Array)) {
-        requestArray = [requests];
+        requestArray = [requestIds];
       }
 
       isLoading = !!requestArray.find(reqId => isRequestInProgress(state, reqId));
@@ -65,11 +65,11 @@ export class SimpleLoadingOverlay extends React.PureComponent {
 export default class LoadingOverlay extends React.PureComponent {
   static propTypes = {
     isLoading: PropTypes.bool.isRequired,
-    requests: PropTypes.oneOf([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
+    requestIds: PropTypes.oneOf([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
   };
 
   static defaultProps = {
-    requests: null,
+    requestIds: null,
   };
 
   render() {

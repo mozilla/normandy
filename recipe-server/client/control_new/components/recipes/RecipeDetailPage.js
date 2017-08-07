@@ -50,12 +50,12 @@ export default class RecipeDetailPage extends React.Component {
           <Col span={16}>
             <DetailsActionBar />
             <RevisionNotice revision={revision} />
-            <LoadingOverlay requests={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
+            <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
               <RecipeDetails recipe={revision.get('recipe', new Map())} />
             </LoadingOverlay>
           </Col>
           <Col span={8} className="recipe-history">
-            <Card className="card-no-hover" title="History">
+            <Card className="noHovering" title="History">
               <HistoryTimeline
                 history={history}
                 recipeId={recipeId}

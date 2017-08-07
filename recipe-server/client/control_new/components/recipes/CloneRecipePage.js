@@ -96,7 +96,7 @@ export default class CloneRecipePage extends React.Component {
         <QueryRecipe pk={recipeId} />
         <QueryRevision pk={revisionId} />
 
-        <LoadingOverlay requests={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
+        <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
           <h2>Clone Recipe</h2>
           { recipeName &&
             <Link href={recipeDetailsURL}>

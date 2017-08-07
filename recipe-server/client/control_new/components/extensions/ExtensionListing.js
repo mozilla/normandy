@@ -120,7 +120,7 @@ export default class ExtensionListing extends React.Component {
 
         <ListingActionBar />
 
-        <LoadingOverlay requests={`fetch-extensions-page-${pageNumber}`}>
+        <LoadingOverlay requestIds={`fetch-extensions-page-${pageNumber}`}>
           <DataList
             columns={columns}
             columnRenderers={ExtensionListing.columnRenderers}

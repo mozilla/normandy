@@ -14,7 +14,7 @@ export default class RecipeDetails extends React.Component {
 
     return (
       <div className="recipe-details">
-        <Card className="card-no-hover" key="recipe-details" title="Recipe">
+        <Card className="noHovering" key="recipe-details" title="Recipe">
           <dl className="details">
             <dt>Name</dt>
             <dd>{recipe.get('name')}</dd>
@@ -26,7 +26,7 @@ export default class RecipeDetails extends React.Component {
           </dl>
         </Card>
 
-        <Card className="card-no-hover" key="action-details" title="Action">
+        <Card className="noHovering" key="action-details" title="Action">
           <dl className="details">
             <dt>Name</dt>
             <dd>{recipe.getIn(['action', 'name'])}</dd>
