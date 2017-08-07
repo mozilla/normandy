@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DocumentUrlInput from 'control_new/components/forms/DocumentUrlInput';
 import FormItem from 'control_new/components/forms/FormItem';
 import { connectFormProps } from 'control_new/utils/forms';
 
@@ -62,7 +63,7 @@ export default class ShowHeartbeatFields extends React.Component {
           name="arguments.postAnswerUrl"
           initialValue={recipeArguments.get('postAnswerUrl', '')}
         >
-          <Input disabled={disabled} />
+          <DocumentUrlInput disabled={disabled} />
         </FormItem>
         <FormItem
           label="Learn More Message"
