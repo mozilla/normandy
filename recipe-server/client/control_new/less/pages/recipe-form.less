@@ -1,5 +1,5 @@
 .action-info {
-  background: #E9E9E9;
+  background: @layout-body-background;
   border-radius: @border-radius-base;
   margin-bottom: @form-item-margin-bottom;
   padding: 15px;
@@ -16,19 +16,17 @@
   .ant-form-inline();
 
   .branch {
-    background: #E9E9E9;
+    background: @layout-body-background;
     border-radius: @border-radius-base;
     margin-bottom: @form-item-margin-bottom;
     padding: 15px;
   }
 
   .branch-fields {
+    align-items: last baseline;
     display: flex;
-    line-height: 30px; // Prevent form items from shifting down
-
-    .ant-form-item {
-      flex: 1;
-    }
+    flex-direction: row;
+    justify-content: space-between;
 
     .ant-form-item-label {
       font-weight: bold;
@@ -37,8 +35,21 @@
     .delete-btn {
       flex: 0;
     }
+
+    @media (max-width: @screen-xs) {
+      & {
+        align-items: inherit;
+        flex-direction: column;
+      }
+
+      .ant-form-item {
+        flex: 1;
+        margin-bottom: 1em;
+      }
+    }
   }
 }
+
 
 .edit-page {
   h2 {
@@ -49,5 +60,35 @@
 .clone-page {
   .ant-alert {
     margin: 1em 0;
+  }
+}
+
+.recipe-form {
+  .ant-form .ant-checkbox-wrapper {
+    line-height: 1em;
+  }
+
+  .post-answer-url {
+    margin-bottom: 0;
+  }
+
+  .post-answer-url-checkbox {
+    margin-bottom: 1em;
+  }
+}
+
+.switch-input {
+  display: flex;
+  flex-direction: row-reverse;
+  font-size: 1em;
+  justify-content: end;
+  margin-top: 3.5em;
+
+  .ant-form-item-label {
+    margin-left: 0.75em;
+  }
+
+  @media (max-width: @screen-md) {
+    margin-top: 1.75em;
   }
 }

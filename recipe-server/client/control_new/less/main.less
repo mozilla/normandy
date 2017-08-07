@@ -1,6 +1,12 @@
 // Imports
 @import '~antd/dist/antd.less';
+
+// Webfonts
+@import 'fonts';
+
+// Ant component and color overrides
 @import 'ant-override';
+@import 'ant-shades';
 
 // Pages
 @import 'pages/404';
@@ -12,6 +18,7 @@
 // Common
 body {
   height: 100%;
+  letter-spacing: calc(0.025em + 0.01vw);
 }
 
 .clearfix() {
@@ -69,8 +76,10 @@ body {
 .logo {
   color: #333;
   font-size: 22px;
+  font-weight: 900;
   padding-left: 48px;
   position: relative;
+  text-shadow: 1px 1px 0 fade(@white, 55%);
   white-space: nowrap;
 
   &::before {
@@ -121,8 +130,10 @@ body {
 
 /* Buttons at the bottom of a form */
 .form-actions {
-  border-top: 1px solid #EEE;
-  padding-top: 24px;
+  background: #FBFBFB;
+  border: 1px solid #D9D9D9;
+  margin-top: 2em;
+  padding: 15px;
 
   .clearfix();
 

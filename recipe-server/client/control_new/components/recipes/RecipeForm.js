@@ -71,7 +71,7 @@ export default class RecipeForm extends React.Component {
     const ArgumentsFields = RecipeForm.argumentsFields[selectedActionName];
 
     return (
-      <Form onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit} className="recipe-form">
         <FormItem
           name="name"
           label="Name"
@@ -95,7 +95,7 @@ export default class RecipeForm extends React.Component {
         </FormItem>
         {ArgumentsFields && (
           <fieldset>
-            <legend>Arguments</legend>
+            <legend>Action Arguments</legend>
             <ArgumentsFields
               recipeArguments={recipe.get('arguments')}
               disabled={isLoading}
