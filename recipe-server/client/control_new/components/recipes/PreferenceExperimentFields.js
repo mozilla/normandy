@@ -5,6 +5,7 @@ import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DocumentUrlInput from 'control_new/components/forms/DocumentUrlInput';
 import FormItem from 'control_new/components/forms/FormItem';
 import { connectFormProps } from 'control_new/utils/forms';
 
@@ -83,46 +84,6 @@ export default class PreferenceExperimentFields extends React.Component {
           <ExperimentBranches disabled={disabled} />
         </FormItem>
       </div>
-    );
-  }
-}
-
-/**
- * URL input that displays a clickable link to its value.
- */
-export class DocumentUrlInput extends React.Component {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    // rc-form warns if the component already has a value prop, but doesn't
-    // initially provide it. So we can't have a default, and also can't require
-    // it.
-    // eslint-disable-next-line react/require-default-props
-    value: PropTypes.string,
-  };
-
-  static defaultProps = {
-    disabled: false,
-  };
-
-  render() {
-    const { disabled, value, ...props } = this.props;
-    let addonBefore = <span><Icon type="link" /> View</span>;
-    if (value) {
-      addonBefore = (
-        <a href={this.props.value} target="_blank" rel="noopener noreferrer">
-          {addonBefore}
-        </a>
-      );
-    }
-
-    return (
-      <Input
-        disabled={disabled}
-        type="url"
-        addonBefore={addonBefore}
-        value={value}
-        {...props}
-      />
     );
   }
 }
