@@ -393,8 +393,8 @@ class ProductionReadOnly(Production):
     ]
     ADMIN_ENABLED = values.BooleanValue(False)
     SILENCED_SYSTEM_CHECKS = values.ListValue([
-        'security.W003'  # CSRF middleware check
-        'security.W017'  # Check CSRF cookie http only
+        'security.W003',  # CSRF middleware check
+        'security.W017',  # Check CSRF cookie http only
     ])
 
 
