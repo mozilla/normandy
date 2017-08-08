@@ -19,7 +19,7 @@ describe('getApprovalRequest', () => {
       approvalRequests: {
         ...INITIAL_STATE.newState.approvalRequests,
         items: INITIAL_STATE.newState.approvalRequests.items.set(
-          APPROVAL_REQUEST.id, fromJS(APPROVAL_REQUEST)
+          APPROVAL_REQUEST.id, fromJS(APPROVAL_REQUEST),
         ),
       },
     },

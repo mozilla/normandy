@@ -26,5 +26,6 @@ if settings.ADMIN_ENABLED:
                 name='logout'
             ),
             url(r'^.*$', views.IndexView, name='index'),
-        ]))
+        ])),
+        url(r'^control-new/', views.new_control),
     ]

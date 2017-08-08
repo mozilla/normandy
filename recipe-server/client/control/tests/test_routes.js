@@ -2,8 +2,7 @@ import { replace } from 'react-router-redux';
 import { shallow } from 'enzyme';
 
 import { createApp } from 'control/app';
-
-import NoMatch from 'control/components/NoMatch.js';
+import NoMatch from 'control/components/NoMatch';
 
 describe('Control routes', () => {
   let app;

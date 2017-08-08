@@ -16,7 +16,7 @@ export function resetAction() {
 export default class OptOutStudyAction extends Action {
   async execute() {
     const recipeId = this.recipe.id;
-    const { name, description, addonUrl } = this.recipe.arguments;
+    const { name, description, addonUrl, isEnrollmentPaused } = this.recipe.arguments;
     const studies = this.normandy.studies;
 
     // Exit early if we're on an incompatible client.
@@ -27,9 +27,12 @@ export default class OptOutStudyAction extends Action {
 
     seenRecipeIds.push(recipeId);
 
-    // If the study doesn't exist yet, enroll!
     const hasStudy = await studies.has(recipeId);
-    if (!hasStudy) {
+    if (isEnrollmentPaused) {
+      this.normandy.log(`Enrollment is paused for recipe ${recipeId}`, 'debug');
+    } else if (hasStudy) {
+      this.normandy.log(`Study for recipe ${recipeId} already exists`, 'debug');
+    } else {
       this.normandy.log(`Starting study for recipe ${recipeId}`, 'debug');
       await studies.start({
         recipeId,
@@ -37,8 +40,6 @@ export default class OptOutStudyAction extends Action {
         description,
         addonUrl,
       });
-    } else {
-      this.normandy.log(`Study for recipe ${recipeId} already exists`, 'debug');
     }
   }
 }
@@ -61,7 +62,7 @@ export async function postExecutionHook(normandy) {
   const activeStudies = (await studies.getAll()).filter(study => study.active);
   for (const study of activeStudies) {
     if (!seenRecipeIds.includes(study.recipeId)) {
-      normandy.log('Stopping study for recipe ${study.recipeId}.', 'debug');
+      normandy.log(`Stopping study for recipe ${study.recipeId}.`, 'debug');
       try {
         // eslint-disable-next-line no-await-in-loop
         await studies.stop(study.recipeId);

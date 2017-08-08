@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
+
 import { HistoryItem, HistoryList } from 'control/components/RecipeHistory';
 import DraftStatus, { STATUS_MESSAGES } from 'control/components/DraftStatus';
 import DraftStatusIcon, { STATUS_ICONS } from 'control/components/DraftStatusIcon';
@@ -12,7 +13,7 @@ describe('Recipe history components', () => {
       const revision2 = { id: 2 };
       const dispatch = () => null;
       const wrapper = shallow(
-        <HistoryList dispatch={dispatch} recipe={recipe} revisions={[revision1, revision2]} />
+        <HistoryList dispatch={dispatch} recipe={recipe} revisions={[revision1, revision2]} />,
       );
 
       const items = wrapper.find(HistoryItem);
@@ -38,7 +39,7 @@ describe('Recipe history components', () => {
       };
 
       const wrapper = shallow(
-        <HistoryItem revision={revision} recipe={recipe} dispatch={dispatch} />
+        <HistoryItem revision={revision} recipe={recipe} dispatch={dispatch} />,
       );
 
       it('should render the revision number', () =>

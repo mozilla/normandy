@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { shallow } from 'enzyme';
+import { Tr } from 'reactable';
+
 import appReducer from 'control/reducers';
 import * as actions from 'control/actions/RecipeActions';
 import { initialState } from 'control/tests/fixtures';
-
-import { Tr } from 'reactable';
 import { DisconnectedRecipeList as RecipeList } from 'control/components/RecipeList';
 
 const propFactory = props => ({
@@ -43,7 +43,7 @@ describe('<RecipeList>', () => {
     });
 
     const wrapper = shallow(
-      <RecipeList {...propFactory({ recipes: store.recipes })} />
+      <RecipeList {...propFactory({ recipes: store.recipes })} />,
     );
 
     expect(wrapper.find(Tr).length).toBe(1);

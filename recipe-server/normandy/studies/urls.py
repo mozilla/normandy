@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from normandy.studies.api import ExtensionViewSet
+from normandy.studies.api.v2.views import ExtensionViewSet
 
 
 # API Router

@@ -1,4 +1,5 @@
 import React, { PropTypes as pt } from 'react';
+
 import NumberField from 'control/components/form_fields/NumberField';
 
 const SelectMenu = props => {

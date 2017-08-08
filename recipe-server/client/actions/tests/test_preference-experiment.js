@@ -6,8 +6,8 @@ import PreferenceExperimentAction, {
   resetAction,
 } from '../preference-experiment/';
 import packageJson from '../preference-experiment/package.json';
-import { recipeFactory } from '../../tests/utils.js';
-import { MockStorage } from './utils.js';
+import { recipeFactory } from '../../tests/utils';
+import { MockStorage } from './utils';
 
 function argumentsFactory(args) {
   return {

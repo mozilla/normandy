@@ -324,7 +324,7 @@ add_task(withMockNormandyApi(async function testLoadActionSandboxManagers(mockAp
   );
 }));
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", true],
@@ -342,7 +342,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", false],
@@ -360,7 +360,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [
       ["extensions.shield-recipe-client.dev_mode", false],

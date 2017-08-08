@@ -7,7 +7,7 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
 from normandy.base.api import UpdateOrCreateModelViewSet
-from normandy.base.api.filters import CaseInsensitiveBooleanFilter
+from normandy.base.api.filters import AliasedOrderingFilter, CaseInsensitiveBooleanFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.decorators import api_cache_control
@@ -29,6 +29,7 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     """Viewset for viewing recipe actions."""
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+    pagination_class = None
 
 
 class RecipeFilters(django_filters.FilterSet):
@@ -39,11 +40,22 @@ class RecipeFilters(django_filters.FilterSet):
         fields = ['latest_revision__action', 'enabled']
 
 
+class RecipeOrderingFilter(AliasedOrderingFilter):
+    aliases = {
+        'last_updated': ('latest_revision__updated', 'Last Updated'),
+        'name': ('latest_revision__name', 'Name'),
+    }
+
+
 class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     """Viewset for viewing and uploading recipes."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_class = RecipeFilters
+    filter_backends = [
+        django_filters.rest_framework.DjangoFilterBackend,
+        RecipeOrderingFilter,
+    ]
     permission_classes = [
         permissions.DjangoModelPermissionsOrAnonReadOnly,
         AdminEnabledOrReadOnly,
@@ -71,8 +83,8 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         if 'text' in self.request.GET:
             text = self.request.GET.get('text')
-            queryset = queryset.filter(Q(latest_revision__name__contains=text) |
-                                       Q(latest_revision__extra_filter_expression__contains=text))
+            queryset = queryset.filter(Q(latest_revision__name__icontains=text) |
+                                       Q(latest_revision__extra_filter_expression__icontains=text))
 
         return queryset
 
@@ -119,6 +131,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None
 
     @detail_route(methods=['POST'])
     def request_approval(self, request, pk=None):
@@ -141,12 +154,13 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    pagination_class = None
 
     @detail_route(methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
 
-        if 'comment' not in request.data:
+        if not request.data.get('comment'):
             return Response({'comment': 'This field is required.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -167,7 +181,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     def reject(self, request, pk=None):
         approval_request = self.get_object()
 
-        if 'comment' not in request.data:
+        if not request.data.get('comment'):
             return Response({'comment': 'This field is required.'},
                             status=status.HTTP_400_BAD_REQUEST)
 

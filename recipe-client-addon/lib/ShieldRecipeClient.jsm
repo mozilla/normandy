@@ -21,6 +21,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "AboutPages",
   "resource://shield-recipe-client-content/AboutPages.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldPreferences",
   "resource://shield-recipe-client/lib/ShieldPreferences.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AddonStudies",
+  "resource://shield-recipe-client/lib/AddonStudies.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -58,6 +60,12 @@ this.ShieldRecipeClient = {
       await AboutPages.init();
     } catch (err) {
       log.error("Failed to initialize about pages:", err);
+    }
+
+    try {
+      await AddonStudies.init();
+    } catch (err) {
+      log.error("Failed to initialize addon studies:", err);
     }
 
     // Initialize experiments first to avoid a race between initializing prefs

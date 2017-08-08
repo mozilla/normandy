@@ -2,13 +2,14 @@ import OptOutStudyAction, {
   postExecutionHook,
   resetAction,
 } from '../opt-out-study/';
-import { recipeFactory } from '../../tests/utils.js';
+import { recipeFactory } from '../../tests/utils';
 
 function argumentsFactory(args) {
   return {
     name: 'Fake Study',
     description: 'not real',
     addonUrl: 'http://example.com/addon.xpi',
+    isEnrollmentPaused: false,
     ...args,
   };
 }
@@ -113,6 +114,17 @@ describe('OptOutStudyAction', () => {
         addonUrl: recipe.arguments.addonUrl,
       });
 
+      const action = new OptOutStudyAction(normandy, recipe);
+      spyOn(normandy.studies, 'start').and.callThrough();
+
+      await action.execute();
+      await postExecutionHook(normandy);
+
+      expect(normandy.studies.start).not.toHaveBeenCalled();
+    });
+
+    it('should do nothing if enrollment is paused', async () => {
+      const recipe = optOutStudyFactory({ isEnrollmentPaused: true });
       const action = new OptOutStudyAction(normandy, recipe);
       spyOn(normandy.studies, 'start').and.callThrough();
 

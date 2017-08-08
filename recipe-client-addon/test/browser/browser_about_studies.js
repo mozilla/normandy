@@ -11,14 +11,14 @@ function withAboutStudies(testFunc) {
   );
 }
 
-compose_task(
+decorate_task(
   withAboutStudies,
   async function testAboutStudiesWorks(browser) {
     ok(browser.contentDocument.getElementById("app"), "App element was found");
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [["extensions.shield-recipe-client.shieldLearnMoreUrl", "http://test/%OS%/"]],
   }),
@@ -39,7 +39,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [["browser.preferences.useOldOrganization", false]],
   }),
@@ -58,7 +58,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [["browser.preferences.useOldOrganization", true]],
   }),
@@ -93,7 +93,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   AddonStudies.withStudies([
     // Sort order should be study3, study1, study2 (order by enabled, then most recent).
     studyFactory({

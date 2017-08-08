@@ -24,5 +24,8 @@
       "at-rules",
     ],
     "order/declaration-block-properties-alphabetical-order": true,
+    "unit-no-unknown": [true, {
+      "ignoreUnits": ["/fr/"],
+    }],
   }
 }

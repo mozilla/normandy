@@ -1,19 +1,25 @@
 env:
   es6: true
+
 extends:
   - airbnb
   - plugin:react/recommended
+
 parser: babel-eslint
+
 plugins:
   - jasmine
   - babel
   - react
+
 globals:
   PRODUCTION: false
   DEVELOPMENT: false
+
 rules:
   arrow-parens: [warn, as-needed]
   comma-dangle: [warn]
+  class-methods-use-this: [off]
   no-console: [off]
   no-continue: [off]
   no-mixed-operators: [warn, { allowSamePrecedence: true }]
@@ -24,10 +30,20 @@ rules:
   no-underscore-dangle: [off]
   no-use-before-define: [warn, { functions: false, classes: false }]
   prefer-const: [warn]
+  no-plusplus: [off]
+  no-await-in-loop: [off]
 
   import/no-extraneous-dependencies: [error, {devDependencies: true}]
   import/no-mutable-exports: [off]
   import/no-named-as-default: [off]
+  import/order:
+    - error
+    - newlines-between: always-and-inside-groups
+      groups:
+      - [builtin, external]
+      - [internal]
+      - [parent, index, sibling]
+
   react/jsx-filename-extension: [error, { extensions: [.js] }]
   react/no-multi-comp: [off]
   react/jsx-no-bind: [error]
@@ -36,9 +52,14 @@ rules:
   react/no-danger-with-children: [error]
   react/require-extension: [off]  # deprecated
   react/self-closing-comp: [warn]
+  react/forbid-prop-types: [off]
+  react/no-unused-prop-types: [off]
+  react/no-array-index-key: [off]
+  react/prefer-stateless-function: [off]
   jsx-a11y/label-has-for: [off]
 
   generator-star-spacing: [warn]
+
 settings:
   import/resolver:
     webpack:

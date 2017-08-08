@@ -17,7 +17,7 @@ popd
 echo 'Syncing recipe-client-addon to mozilla-central...'
 pushd normandy/recipe-client-addon
 npm install
-./bin/update-mozilla-central.sh ../../mozilla-central/
+./bin/update-mozilla-central.sh --build-vendor ../../mozilla-central/
 popd
 
 echo 'Setting up environment'

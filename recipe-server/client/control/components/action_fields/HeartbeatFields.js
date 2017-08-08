@@ -122,5 +122,5 @@ export class HeartbeatFields extends ActionFields {
 export default connect(
   state => ({
     recipeArguments: formSelector(state, 'arguments'),
-  })
+  }),
 )(HeartbeatFields);
