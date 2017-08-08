@@ -83,8 +83,8 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         if 'text' in self.request.GET:
             text = self.request.GET.get('text')
-            queryset = queryset.filter(Q(latest_revision__name__contains=text) |
-                                       Q(latest_revision__extra_filter_expression__contains=text))
+            queryset = queryset.filter(Q(latest_revision__name__icontains=text) |
+                                       Q(latest_revision__extra_filter_expression__icontains=text))
 
         return queryset
 
