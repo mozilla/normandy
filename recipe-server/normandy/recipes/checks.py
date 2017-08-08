@@ -63,7 +63,8 @@ def action_signatures_are_correct(app_configs, **kwargs):
         Action = apps.get_model('recipes', 'Action')
         signed_actions = list(Action.objects.exclude(signature=None))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
-        errors.append(Info(f'Could not retrieve actions: f{e}', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
+        msg = f'Could not retrieve actions: f{e}'
+        errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
     else:
         for action in signed_actions:
             data = action.canonical_json()
@@ -90,7 +91,8 @@ def signatures_use_good_certificates(app_configs, **kwargs):
         Action = apps.get_model('recipes', 'Action')
         signatures = list(Signature.objects.all())
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
-        errors.append(Info(f'Could not retrieve signatures: {e}', id=INFO_COULD_NOT_RETRIEVE_SIGNATURES))
+        msg = f'Could not retrieve signatures: {e}'
+        errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_SIGNATURES))
     else:
         urls = set(s.x5u for s in signatures)
         for url in urls:
@@ -101,9 +103,8 @@ def signatures_use_good_certificates(app_configs, **kwargs):
                 matching_actions = Action.objects.filter(signature__x5u=url)
                 bad_objects = list(matching_recipes) + list(matching_actions)
 
-                count = len(bad_objects)
                 object_names = ', '.join(bad_objects)
-                msg = (f'{len(bad_objects)} objects are signed with a bad cert: {objects_names}. '
+                msg = (f'{len(bad_objects)} objects are signed with a bad cert: {object_names}. '
                        f'{exc.detail}. Certificate url is {url}. ')
                 errors.append(Warning(msg, id=WARNING_BAD_SIGNING_CERTIFICATE))
 

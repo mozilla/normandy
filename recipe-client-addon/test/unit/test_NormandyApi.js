@@ -19,7 +19,7 @@ class MockResponse {
   }
 
   async json() {
-    return JSON.loads(this.content);
+    return JSON.parse(this.content);
   }
 }
 
@@ -151,7 +151,7 @@ add_task(async function test_fetchSignedObjects_canonical_mismatch() {
   const get = sinon.stub(NormandyApi, "get").resolves(response);
 
   try {
-    await NormandyApi.fetchSignedObjects('object');
+    await NormandyApi.fetchSignedObjects("object");
     ok(false, "fetchSignedObjects did not throw for canonical JSON mismatch");
   } catch (err) {
     ok(err instanceof NormandyApi.InvalidSignatureError, "Error is an InvalidSignatureError");
@@ -185,7 +185,7 @@ add_task(async function test_fetchSignedObjects_validation_error() {
 
   // Validation should fail due to a malformed x5u and signature.
   try {
-    await NormandyApi.fetchSignedObjects('object');
+    await NormandyApi.fetchSignedObjects("object");
     ok(false, "fetchSignedObjects did not throw for a validation error");
   } catch (err) {
     ok(err instanceof NormandyApi.InvalidSignatureError, "Error is an InvalidSignatureError");

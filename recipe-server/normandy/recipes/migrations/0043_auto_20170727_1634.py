@@ -20,11 +20,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='action',
             name='signature',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='action', to='recipes.Signature'),
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='action', to='recipes.Signature'
+            ),
         ),
         migrations.AlterField(
             model_name='recipe',
             name='signature',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='recipe', to='recipes.Signature'),
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='recipe',
+                to='recipes.Signature'
+            ),
         ),
     ]
