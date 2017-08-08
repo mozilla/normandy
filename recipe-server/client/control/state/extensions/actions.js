@@ -25,7 +25,7 @@ export function fetchAllExtensions() {
     const requestId = 'fetch-all-extensions';
     const extensions = await dispatch(makeApiRequest(requestId, 'v2/extension/'));
 
-    extensions.forEach(extension => {
+    extensions.results.forEach(extension => {
       dispatch({
         type: EXTENSION_RECEIVE,
         extension,
