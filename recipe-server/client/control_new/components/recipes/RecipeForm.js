@@ -171,7 +171,7 @@ class ArgumentEditorMissingError extends React.PureComponent {
     name: PropTypes.string.isRequired,
   }
 
-  defaultPropTypes = {
+  static defaultProps = {
     githubUrl: null,
   }
 
@@ -179,13 +179,11 @@ class ArgumentEditorMissingError extends React.PureComponent {
     const { githubUrl, name } = this.props;
     let fileIssueUrl;
     if (githubUrl) {
-      const u = new URL(githubUrl);
-      u.pathname += '/issues/new';
-      u.searchParams.set('title', `Argument fields missing for action "${name}"`);
-      fileIssueUrl = u.toString();
+      const url = new URL(githubUrl);
+      url.pathname += '/issues/new';
+      url.searchParams.set('title', `Argument fields missing for action "${name}"`);
+      fileIssueUrl = url.toString();
     }
-
-    console.log('QueryServiceInfo', QueryServiceInfo, 'Alert', Alert);
 
     return (
       <div>
@@ -201,6 +199,6 @@ class ArgumentEditorMissingError extends React.PureComponent {
           showIcon
         />
       </div>
-    )
+    );
   }
 }
