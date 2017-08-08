@@ -163,6 +163,7 @@ class TestServiceInfoView(object):
             },
             'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
             'logout_url': settings.OIDC_LOGOUT_URL,
+            'github_url': settings.GITHUB_URL,
         }
 
     def test_logged_out(self, settings):
@@ -176,4 +177,5 @@ class TestServiceInfoView(object):
             'user': None,
             'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
             'logout_url': settings.OIDC_LOGOUT_URL,
+            'github_url': settings.GITHUB_URL,
         }

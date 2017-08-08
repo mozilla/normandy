@@ -351,6 +351,8 @@ class Base(Core):
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
 
+    GITHUB_URL = values.Value('https://github.com/mozilla/normandy')
+
 
 class Development(Base):
     """Settings for local development."""

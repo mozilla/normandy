@@ -58,7 +58,7 @@ def version(request):
     """
     Return data for developers and users to inspect the state of a server.
     """
-    repo_url = 'https://github.com/mozilla/normandy'
+    repo_url = settings.GITHUB_URL
     version_info = get_version_info()
 
     commit = version_info['commit']

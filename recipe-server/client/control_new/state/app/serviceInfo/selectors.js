@@ -12,3 +12,7 @@ export function isPeerApprovalEnforced(state) {
 export function getLogoutUrl(state, defaultsTo = null) {
   return state.app.serviceInfo.get('logout_url', defaultsTo);
 }
+
+export function getGithubUrl(state, defaultsTo = null) {
+  return state.app.serviceInfo.get('github_url', defaultsTo);
+}
