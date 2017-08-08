@@ -13,7 +13,7 @@ function withPrivacyPrefs(testFunc) {
   );
 }
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [[OPT_OUT_PREF, true]],
   }),
@@ -24,7 +24,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [[OPT_OUT_PREF, false]],
   }),
@@ -35,7 +35,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [[FHR_PREF, true]],
   }),
@@ -46,7 +46,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [[FHR_PREF, false]],
   }),
@@ -57,7 +57,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [
       [FHR_PREF, true],
@@ -110,7 +110,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrefEnv({
     set: [
       [FHR_PREF, true],
@@ -162,7 +162,7 @@ compose_task(
   }
 );
 
-compose_task(
+decorate_task(
   withPrivacyPrefs,
   async function testViewStudiesLink(browser) {
     browser.contentDocument.getElementById("viewShieldStudies").click();
