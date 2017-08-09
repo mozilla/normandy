@@ -63,10 +63,10 @@ export default class ApprovalForm extends React.Component {
         <SimpleLoadingOverlay isVisible={isSubmitting}>
           <FormActions>
             <FormActions.Primary>
-              <Button icon="dislike" onClick={this.handleRejectClick} type="danger">
+              <Button icon="dislike" onClick={this.handleRejectClick} type="danger" id="af-reject">
                   Reject
                 </Button>
-              <Button icon="like" onClick={this.handleApproveClick} type="primary">
+              <Button icon="like" onClick={this.handleApproveClick} type="primary" id="af-approve">
                 Approve
               </Button>
             </FormActions.Primary>

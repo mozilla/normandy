@@ -43,6 +43,10 @@ export default class NavigationCrumbs extends React.Component {
     this.gatherBreadcrumbs(router || this.props.router);
   }
 
+  getCrumbSlug(crumb) {
+    return crumb.name.toLowerCase().replace(/\s+/g, '-');
+  }
+
   gatherBreadcrumbs(router) {
     const { result, pathname, params } = router;
 
@@ -71,7 +75,7 @@ export default class NavigationCrumbs extends React.Component {
       <Breadcrumb>
         {breadcrumbs.map((crumb, idx) =>
           (<Breadcrumb.Item key={idx}>
-            <Link href={crumb.link}>{ crumb.name }</Link>
+            <Link href={crumb.link} id={this.getCrumbSlug(crumb)}>{ crumb.name }</Link>
           </Breadcrumb.Item>),
         )}
       </Breadcrumb>

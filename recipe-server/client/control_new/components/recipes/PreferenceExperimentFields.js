@@ -191,7 +191,13 @@ export class ExperimentBranches extends React.Component {
             </li>
           ))}
         </ul>
-        <Button disabled={disabled} type="default" icon="plus" onClick={this.handleClickAdd}>
+        <Button
+          disabled={disabled}
+          type="default"
+          icon="plus"
+          onClick={this.handleClickAdd}
+          id="add-branch"
+        >
           Add Branch
         </Button>
       </div>
@@ -215,10 +221,10 @@ export class BooleanPreferenceField extends React.Component {
   render() {
     return (
       <Radio.Group {...this.props}>
-        <Radio.Button value={true}>
+        <Radio.Button value={true} id="pref-true">
           <Icon type="check" /> True
         </Radio.Button>
-        <Radio.Button value={false}>
+        <Radio.Button value={false} id="pref-false">
           <Icon type="close" /> False
         </Radio.Button>
       </Radio.Group>
