@@ -28,8 +28,9 @@ from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
     ClientSerializer,
-    RecipeSerializer,
     RecipeRevisionSerializer,
+    RecipeSerializer,
+    SignedActionSerializer,
     SignedRecipeSerializer,
 )
 
@@ -42,6 +43,13 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
+
+    @list_route(methods=['GET'])
+    @api_cache_control()
+    def signed(self, request, pk=None):
+        actions = self.filter_queryset(self.get_queryset()).exclude(signature=None)
+        serializer = SignedActionSerializer(actions, many=True)
+        return Response(serializer.data)
 
 
 class ActionImplementationView(generics.RetrieveAPIView):

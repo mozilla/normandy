@@ -53,7 +53,14 @@ class TestCanonicalJsonDumps(object):
         json.loads(dumped)
 
 
-def test_sri_hash():
-    # Pre-generated base64 hash of the string "foobar"
-    expected = 'sha384-PJww2fZl501RXIQpYNSkUcg6ASX9Pec5LXs3IxrxDHLqWK7fzfiaV2W/kCr5Ps8G'
-    assert sri_hash(b'foobar') == expected
+class TestSRIHash(object):
+
+    def test_it_works(self):
+        # Pre-generated base64 hash of the string "foobar"
+        expected = 'sha384-PJww2fZl501RXIQpYNSkUcg6ASX9Pec5LXs3IxrxDHLqWK7fzfiaV2W/kCr5Ps8G'
+        assert sri_hash(b'foobar') == expected
+
+    def test_url_safe_works(self):
+        # Pre-generated base64 hash of the string "normandy", urlsafe-ed
+        expected = 'sha384-6FydcL0iVnTqXT3rBg6YTrlz0K-mw57n9zxTEmxYG6FIO_vZTMlTWsbkxHchsO65'
+        assert sri_hash(b'normandy', url_safe=True) == expected

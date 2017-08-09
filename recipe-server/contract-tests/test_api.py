@@ -117,6 +117,27 @@ def test_recipe_signatures(conf, requests_session):
         signing.verify_x5u(url)
 
 
+def test_action_signatures(conf, requests_session):
+    r = requests_session.get(conf.getoption('server') + '/api/v1/action/signed/')
+    r.raise_for_status()
+    data = r.json()
+
+    if len(data) == 0:
+        pytest.skip('No signed actions')
+
+    cert_urls = set()
+
+    for item in data:
+        canonical_action = canonical_json(item['action'])
+        signature = item['signature']['signature']
+        pubkey = item['signature']['public_key']
+        cert_urls.add(item['signature']['x5u'])
+        assert signing.verify_signature(canonical_action, signature, pubkey)
+
+    for url in cert_urls:
+        signing.verify_x5u(url)
+
+
 def test_recipe_api_is_json(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/recipe/?enabled=1')
     r.raise_for_status()

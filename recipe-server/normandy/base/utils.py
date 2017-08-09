@@ -1,5 +1,5 @@
 import json
-from base64 import b64encode
+from base64 import b64encode, urlsafe_b64encode
 from datetime import datetime
 from hashlib import sha384
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -70,7 +70,7 @@ def filter_m2m(qs, field, values):
     return qs
 
 
-def sri_hash(data):
+def sri_hash(data, url_safe=False):
     """
     Return a subresource integrity attribute string for a file
     containing the given binary data.
@@ -82,5 +82,9 @@ def sri_hash(data):
     :param data:
         Bytes-like object containing the data to hash.
     """
-    data_hash = b64encode(sha384(data).digest())
+    digest = sha384(data).digest()
+    if url_safe:
+        data_hash = urlsafe_b64encode(digest)
+    else:
+        data_hash = b64encode(digest)
     return 'sha384-' + data_hash.decode()
