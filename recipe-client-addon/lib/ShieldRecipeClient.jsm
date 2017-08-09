@@ -3,9 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {utils: Cu} = Components;
+const {utils: Cu, interfaces: Ci} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
@@ -25,6 +24,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "AddonStudies",
   "resource://shield-recipe-client/lib/AddonStudies.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
+
+const {PREF_STRING, PREF_BOOL, PREF_INT} = Ci.nsIPrefBranch;
 
 const REASONS = {
   APP_STARTUP: 1,      // The application is starting up.
@@ -50,9 +51,9 @@ this.ShieldRecipeClient = {
   async startup() {
     // Setup logging and listen for changes to logging prefs
     LogManager.configure(Services.prefs.getIntPref(PREF_LOGGING_LEVEL));
-    Preferences.observe(PREF_LOGGING_LEVEL, LogManager.configure);
+    Services.prefs.addObserver(PREF_LOGGING_LEVEL, LogManager.configure);
     CleanupManager.addCleanupHandler(
-      () => Preferences.ignore(PREF_LOGGING_LEVEL, LogManager.configure),
+      () => Services.prefs.removeObserver(PREF_LOGGING_LEVEL, LogManager.configure),
     );
     log = LogManager.getLogger("bootstrap");
 
