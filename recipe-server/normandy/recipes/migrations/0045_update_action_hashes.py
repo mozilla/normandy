@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import hashlib
-from base64 import b64encode, urlsafe_b64encode
+from base64 import urlsafe_b64encode
 
 from django.db import migrations
 
