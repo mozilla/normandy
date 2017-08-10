@@ -1,4 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
 
 def index(request):
@@ -6,4 +7,4 @@ def index(request):
 
 
 def favicon(request):
-    return HttpResponseRedirect('/static/img/favicon.ico')
+    return HttpResponseRedirect(static('img/favicon.ico'))
