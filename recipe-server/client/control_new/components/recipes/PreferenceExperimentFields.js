@@ -221,10 +221,10 @@ export class BooleanPreferenceField extends React.Component {
   render() {
     return (
       <Radio.Group {...this.props}>
-        <Radio.Button value={true} id="pref-true">
+        <Radio.Button value={true} className="pref-true">
           <Icon type="check" /> True
         </Radio.Button>
-        <Radio.Button value={false} id="pref-false">
+        <Radio.Button value={false} className="pref-false">
           <Icon type="close" /> False
         </Radio.Button>
       </Radio.Group>
