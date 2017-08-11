@@ -6,8 +6,8 @@ import React from 'react';
  * environment. On production, nothing is shown.
  */
 export default class EnvAlert extends React.PureComponent {
-  static productionUrls = ['normandy-admin.prod.'];
-  static stageUrls = ['normandy-admin.stage.'];
+  static productionFragments = ['normandy-admin.prod.'];
+  static stageFragments = ['normandy-admin.stage.'];
 
   static learnMoreLink = (
     <a
@@ -19,22 +19,23 @@ export default class EnvAlert extends React.PureComponent {
     </a>);
 
   /**
-   * Find a string fragment in an array of strings.
+   * Given a URL and an array of strings, determines if that URL contains at least
+   * one of the strings.
    *
-   * @param  {String}        needle   String fragment to find.
-   * @param  {Array<String>} haystack String collection to search.
-   * @return {Boolean}                Was the fragment found?
+   * @param  {String}        url       URL to search over.
+   * @param  {Array<String>} fragments Collection of strings to find in the URL.
+   * @return {Boolean}                 True if URL contains at least one fragment.
    */
-  static findPartialString(needle, haystack) {
-    return !!haystack.find(straw => straw.indexOf(needle) > -1);
+  static findFragmentsInURL(url, fragments) {
+    return !!fragments.find(piece => url.indexOf(piece) > -1);
   }
 
   static checkProduction(url) {
-    return EnvAlert.findPartialString(url, EnvAlert.productionUrls);
+    return EnvAlert.findFragmentsInURL(url, EnvAlert.productionFragments);
   }
 
   static checkStaging(url) {
-    return EnvAlert.findPartialString(url, EnvAlert.stageUrls);
+    return EnvAlert.findFragmentsInURL(url, EnvAlert.stageFragments);
   }
 
   render() {

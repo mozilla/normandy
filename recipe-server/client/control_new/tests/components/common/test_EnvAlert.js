@@ -10,33 +10,25 @@ describe('<EnvAlert>', () => {
     expect(wrapper).not.toThrow();
   });
 
-  describe('findPartialString', () => {
-    const testStrings = ['abc', 'def'];
+  describe('findFragmentsInURL', () => {
+    const testStrings = ['normandy-admin', 'fake-url.com', '/control/'];
 
     it('should find a piece of a string amongst an array of strings', () => {
-      // abc is present in 'abc'
-      let result = EnvAlert.findPartialString('abc', testStrings);
+      let result = EnvAlert.findFragmentsInURL('https://www.normandy-admin.stage.com/control/',
+        testStrings);
       expect(result).toBe(true);
 
-      // ef is present in 'def'
-      result = EnvAlert.findPartialString('ef', testStrings);
+      result = EnvAlert.findFragmentsInURL('https://www.fake-url.com/', testStrings);
       expect(result).toBe(true);
 
-      // xyz is not present
-      result = EnvAlert.findPartialString('xyz', testStrings);
+      result = EnvAlert.findFragmentsInURL('http://mozilla.org/', testStrings);
       expect(result).toBe(false);
 
-      // abcdef is not present
-      result = EnvAlert.findPartialString('abcdef', testStrings);
+      result = EnvAlert.findFragmentsInURL('https://youtu.be/dQw4w9WgXcQ', testStrings);
       expect(result).toBe(false);
+
+      result = EnvAlert.findFragmentsInURL('http://firefox.com/normandy-admin/', testStrings);
+      expect(result).toBe(true);
     });
-  });
-
-  it('should have accurate production URLs', () => {
-    expect(EnvAlert.productionUrls).toEqual(['normandy-admin.prod.']);
-  });
-
-  it('should have accurate staging URLs', () => {
-    expect(EnvAlert.stageUrls).toEqual(['normandy-admin.stage.']);
   });
 });
