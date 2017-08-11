@@ -29,7 +29,7 @@ import QueryServiceInfo from 'control_new/components/data/QueryServiceInfo';
       selectedActionName: selectedAction.get('name'),
       isLoading: areAnyRequestsInProgress(state),
     };
-  }
+  },
 )
 @autobind
 export default class RecipeForm extends React.Component {
@@ -163,7 +163,7 @@ class ActionSelect extends React.Component {
 @connect(
   state => ({
     githubUrl: getGithubUrl(state),
-  })
+  }),
 )
 class ArgumentEditorMissingError extends React.PureComponent {
   static propTypes = {

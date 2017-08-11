@@ -95,7 +95,7 @@ describe('OptOutStudyAction', () => {
       await postExecutionHook(normandy);
 
       expect(normandy.preferences.getBool).toHaveBeenCalledWith(
-        'app.shield.optoutstudies.enabled', false
+        'app.shield.optoutstudies.enabled', false,
       );
       expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'info');
     });
