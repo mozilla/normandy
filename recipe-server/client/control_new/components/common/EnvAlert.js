@@ -1,11 +1,20 @@
 import { Alert } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
+import { connect } from 'react-redux';
 
 /**
  * Simple component which tells the user whether they are viewing a dev or staging
  * environment. On production, nothing is shown.
  */
+@connect(() => ({
+  currentUrl: window.location.href,
+}))
 export default class EnvAlert extends React.PureComponent {
+  static propTypes = {
+    currentUrl: PropTypes.string.isRequired,
+  };
+
   static productionFragments = ['normandy-admin.prod.'];
   static stageFragments = ['normandy-admin.stage.'];
 
@@ -39,7 +48,7 @@ export default class EnvAlert extends React.PureComponent {
   }
 
   render() {
-    const currentUrl = window.location.href;
+    const { currentUrl } = this.props;
 
     // Never show this component when on production.
     if (EnvAlert.checkProduction(currentUrl)) {
