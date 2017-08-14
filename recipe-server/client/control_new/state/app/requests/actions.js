@@ -13,15 +13,16 @@ import APIClient from 'control_new/utils/api';
 
 export function makeApiRequest(requestId, endpoint, options = {}) {
   return async (dispatch, getState) => {
+
+    const request = getRequest(getState(), requestId);
+    if (request.inProgress) { return true; }
     let root;
     if ('root' in options) {
       root = options.root;
       delete options.root;
     }
-    const api = new APIClient(root);
-    const request = getRequest(getState(), requestId);
 
-    if (request.inProgress) { return true; }
+    const api = new APIClient(root);
 
     dispatch({
       type: REQUEST_SEND,
