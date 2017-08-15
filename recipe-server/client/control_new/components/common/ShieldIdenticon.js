@@ -3,52 +3,51 @@ import PropTypes from 'prop-types';
 
 import Genome from 'control_new/utils/Genome';
 
-// Solarized colors
-export const colors = [
-  '#002b36', // base03
-  '#073642', // base02
-  '#586e75', // base01
-  '#657b83', // base00
-  '#839496', // base0
-  '#93a1a1', // base1
-  '#eee8d5', // base2
-  '#fdf6e3', // base3
-  '#b58900', // yellow
-  '#cb4b16', // orange
-  '#dc322f', // red
-  '#d33682', // magenta
-  '#6c71c4', // violet
-  '#268bd2', // blue
-  '#2aa198', // cyan
-  '#859900', // green
+
+const emojis = [
+  '😄', '😃', '😀', '😊', '😉', '😍', '😘', '😚', '😗', '😙', '😜', '😝', '😛', '😳', '😁', '😔',
+  '😌', '😒', '😞', '😣', '😢', '😂', '😭', '😪', '😥', '😰', '😅', '😓', '😨', '😱', '😠', '😡',
+  '😤', '😖', '😆', '😋', '😷', '😎', '😴', '😵', '😲', '😟', '😦', '😧', '😈', '👿', '😮', '😬',
+  '😐', '😯', '😶', '😇', '😏', '😑', '👼', '😺', '😻', '😽', '😼', '🙀', '😿', '😹', '😾', '👹',
+  '👺', '🙈', '🙉', '🙊', '💀', '👽', '💩', '🔥', '✨', '🌟', '💫', '💥', '💦', '💧', '💤', '👂',
+  '👀', '👃', '👅', '👄', '👍', '👎', '👌', '👊', '✊', '👋', '✋', '👐', '👆', '🙌', '🙏', '👏',
+  '💪', '💃', '🎩', '👑', '👒', '👟', '👞', '👡', '👠', '👢', '💼', '👜', '👝', '👛', '👓', '🎀',
+  '🌂', '💄', '💛', '💙', '💜', '💚', '💔', '💗', '💓', '💕', '💖', '💞', '💘', '💌', '💋', '💍',
+  '💎', '👣', '🐶', '🐺', '🐱', '🐭', '🐹', '🐰', '🐸', '🐯', '🐨', '🐻', '🐷', '🐽', '🐮', '🐗',
+  '🐵', '🐒', '🐴', '🐑', '🐘', '🐼', '🐧', '🐦', '🐤', '🐥', '🐣', '🐔', '🐍', '🐢', '🐛', '🐝',
+  '🐜', '🐞', '🐌', '🐙', '🐚', '🐠', '🐟', '🐬', '🐳', '🐋', '🐄', '🐏', '🐀', '🐃', '🐅', '🐇',
+  '🐉', '🐎', '🐐', '🐓', '🐕', '🐖', '🐁', '🐂', '🐲', '🐡', '🐊', '🐫', '🐪', '🐆', '🐈', '🐩',
+  '🐾', '💐', '🌸', '🌷', '🍀', '🌹', '🌻', '🌺', '🍁', '🍃', '🍂', '🌿', '🌾', '🍄', '🌵', '🌴',
+  '🌲', '🌳', '🌰', '🌱', '🌼', '🌐', '🌞', '🌝', '🌚', '🌜', '🌛', '🌙', '🌍', '🌎', '🌏', '⭐',
+  '⛅', '⛄', '🌀', '💝', '🎒', '🎓', '🎏', '🎃', '👻', '🎄', '🎁', '🎋', '🎉', '🎈', '🔮', '🎥',
+  '📷', '📹', '📼', '💿', '📀', '💽', '💾', '💻', '📱', '📞', '📟', '📠', '📡', '📺', '📻', '🔊',
+  '🔔', '📢', '⏳', '⏰', '🔓', '🔒', '🔏', '🔐', '🔑', '🔎', '💡', '🔦', '🔆', '🔅', '🔌', '🔋',
+  '🔍', '🛁', '🛀', '🚿', '🚽', '🔧', '🔨', '🚪', '💣', '🔫', '🔪', '💊', '💉', '💰', '💸',
+  '📨', '📬', '📌', '📎', '📕', '📓', '📚', '📖', '🔬', '🔭', '🎨', '🎬', '🎤', '🎵', '🎹', '🎻',
+  '🎺', '🎷', '🎸', '👾', '🎮', '🃏', '🎲', '🎯', '🏈', '🏀', '⚽', '🎾', '🎱', '🏉', '🎳', '⛳',
+  '🚴', '🏁', '🏇', '🏆', '🎿', '🏂', '🏄', '🎣', '🍵', '🍶', '🍼', '🍺', '🍻', '🍸', '🍹', '🍷',
+  '🍴', '🍕', '🍔', '🍟', '🍗', '🍤', '🍞', '🍩', '🍮', '🍦', '🍨', '🍧', '🎂', '🍰', '🍪', '🍫',
+  '🍬', '🍭', '🍯', '🍎', '🍏', '🍊', '🍋', '🍒', '🍇', '🍉', '🍓', '🍑', '🍌', '🍐', '🍍', '🍆',
+  '🍅', '🌽', '🏠', '🏡', '⛵', '🚤', '🚣', '🚀', '🚁', '🚂', '🚎', '🚌', '🚍', '🚙', '🚘', '🚗',
+  '🚕', '🚖', '🚛', '🚚', '🚨', '🚓', '🚔', '🚒', '🚑', '🚐', '🚲', '🚜', '💈', '🚦', '🚧', '🏮',
+  '🎰', '🗿', '🎪', '🎭', '📍', '🚩', '💯',
 ];
 
-// A list of low-contrast color pairs
-export const badColors = {
-  '#002b36': ['#073642'],
-  '#073642': ['#002b36'],
-  '#268bd2': ['#657b83'],
-  '#586e75': ['#6c71c4'],
-  '#657b83': ['#6c71c4', '#268bd2'],
-  '#6c71c4': ['#586e75', '#657b83'],
-  '#839496': ['#93a1a1', '#859900'],
-  '#859900': ['#839496', '#b58900'],
-  '#93a1a1': ['#839496'],
-  '#b58900': ['#859900'],
-  '#cb4b16': ['#dc322f', '#d33682'],
-  '#d33682': ['#cb4b16', '#dc322f'],
-  '#dc322f': ['#cb4b16', '#d33682'],
-  '#eee8d5': ['#fdf6e3'],
-  '#fdf6e3': ['#eee8d5'],
-};
-// colors are always bad with themselves
-for (let color of colors) {
-  if (!(color in badColors)) {
-    badColors[color] = [];
-  }
-  badColors[color].push(color);
-}
-console.log(badColors);
+export const colors = [
+  '#002b36',
+  '#073642',
+  '#eee8d5',
+  '#fdf6e3',
+  '#ffba49',
+  '#6c71c4',
+  '#268bd2',
+  '#2aa198',
+  '#a1e064',
+  '#2C3E50',
+  '#FC4349',
+  '#D7DADB',
+  '#6DBCDB',
+];
 
 const shieldShape = `
   M 0.5 0.0
@@ -65,8 +64,8 @@ function NullTreatment() { return null; }
   padding: genome.float(0.1, 0.4, 32, 'stripe padding'),
   direction: genome.choice(Stripes.directions, 'stripe direction'),
 }))
-class Stripes extends React.Component {
-  static directions = ['vertical', 'horizontal', 'diagnol1', 'diagnol2']
+class Stripes extends React.PureComponent {
+  static directions = ['vertical', 'horizontal', 'diagonal1', 'diagonal2']
 
   static propTypes = {
     genome: PropTypes.shape({ then: PropTypes.func.isRequired }).isRequired,
@@ -90,11 +89,11 @@ class Stripes extends React.Component {
           height={1.5}
           fill={fill}
           key={`stripe-${i}`}
-        />
+        />,
       );
     }
 
-    const rotations = { vertical: 0, diagnol1: 45, horizontal: 90, diagnol2: 135 };
+    const rotations = { vertical: 0, diagonal1: 45, horizontal: 90, diagonal2: 135 };
     const transform = `scale(100) rotate(${rotations[direction]} 0.5,0.5)`;
 
     return <g transform={transform}>{stripes}</g>;
@@ -104,7 +103,7 @@ class Stripes extends React.Component {
 @Genome.wrapComponent(genome => ({
   area: genome.choice(Cover.areas, 'area'),
 }))
-class Cover extends React.Component {
+class Cover extends React.PureComponent {
   static areas = [
     'top',
     'bottom',
@@ -146,88 +145,120 @@ class Cover extends React.Component {
   }
 }
 
+
+function hexLuma(hex) {
+  // Quick HEX to RGB.
+  const hexRgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const R = parseInt(hexRgb[1], 16);
+  const G = parseInt(hexRgb[2], 16);
+  const B = parseInt(hexRgb[3], 16);
+
+  // Determine color luminance based on perceived values.
+  return (0.2126 * R) + (0.7152 * G) + (0.0722 * B);
+}
+
+function pickPair(genome, base) {
+  const baseLuminance = hexLuma(base);
+  let chosenColor;
+  let pairLuminance;
+
+  do {
+    chosenColor = genome.choice(colors, 'counter color');
+    pairLuminance = hexLuma(chosenColor);
+  } while (Math.abs(baseLuminance - pairLuminance) < 75);
+
+  return chosenColor;
+}
+
+
 /** Renders an identicon Shield */
 @Genome.wrapComponent(genome => {
   const treatment = genome.weightedChoice(Shield.treatments, 'treatment').component;
-  const letter = genome.letter('device letter');
+  const emoji = genome.choice(emojis, 'device emoji');
 
-  let localBadColors = [];
-  const fieldColor = genome.choice(colors, 'fieldColor');
-  localBadColors = localBadColors.concat(badColors[fieldColor] || []);
+  const fieldColor = genome.choice(colors, 'field color');
+  const patternColor = pickPair(genome, fieldColor);
 
-  let patternColorChoices = colors.filter(c => localBadColors.indexOf(c) === -1);
-  const patternColor = genome.choice(patternColorChoices, 'patternColor');
-
-  localBadColors = localBadColors.concat(badColors[patternColor] || []);
-  let deviceColorChoices = colors.filter(c => localBadColors.indexOf(c) === -1);
-  const deviceColor = genome.choice(deviceColorChoices, 'deviceColor');
-
-  return { treatment, fieldColor, patternColor, letter, deviceColor };
+  return { treatment, fieldColor, patternColor, emoji };
 })
-export default class Shield extends React.Component {
+export class Shield extends React.PureComponent {
   static propTypes = {
     treatment: PropTypes.func.isRequired,
     fieldColor: PropTypes.string.isRequired,
-    deviceColor: PropTypes.string.isRequired,
     patternColor: PropTypes.string.isRequired,
-    letter: PropTypes.string.isRequired,
-    size: PropTypes.number.isRequired,
+    emoji: PropTypes.string.isRequired,
     genome: PropTypes.shape({ then: PropTypes.func.isRequired }).isRequired,
-  }
-
-  static defaultProps = {
-    size: 64,
-  }
+  };
 
   static treatments = [
     { component: NullTreatment, weight: 1 },
     { component: Stripes, weight: 6 },
     { component: Cover, weight: 4 },
-  ]
+  ];
 
   render() {
     const {
       treatment: Treatment,
       fieldColor,
       patternColor,
-      deviceColor,
-      letter,
-      size,
+      emoji,
       genome,
     } = this.props;
 
     return (
-      <div className='shield-identicon'>
-        <svg width={size} height={size} viewBox="0 0 100 100">
-          <defs>
-            <clipPath id="shield-border" transform="scale(100)">
-              <path d={shieldShape} />
-            </clipPath>
-          </defs>
+      <g>
+        <defs>
+          <clipPath id="shield-border" transform="scale(100)">
+            <path d={shieldShape} />
+          </clipPath>
+        </defs>
 
-          <g clipPath="url(#shield-border)">
-            <rect fill={fieldColor} width="100" height="100" />
-            <Treatment genome={genome} fill={patternColor} />
-            <text
-              fill={deviceColor}
-              fontFamily="serif"
-              fontSize={64}
-              fontWeight="bold"
-              textAnchor="middle"
-              x={50}
-              y={72}
-            >
-              {letter && letter[0]}
-            </text>
-            <path
-              d={shieldShape}
-              stroke="black"
-              fill="none"
-              transform="scale(100)"
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
-            />
-          </g>
+        <g clipPath="url(#shield-border)">
+          <rect fill={fieldColor} width="100" height="100" />
+          <Treatment genome={genome} fill={patternColor} />
+          <text
+            fill="#fff"
+            fontFamily="serif"
+            fontSize={48}
+            fontWeight="bold"
+            textAnchor="middle"
+            x={50}
+            y={72}
+          >
+            {emoji}
+          </text>
+        </g>
+      </g>
+    );
+  }
+}
+
+
+export default class CachedShield extends React.PureComponent {
+  static propTypes = {
+    seed: PropTypes.any.isRequired,
+    size: PropTypes.number,
+  };
+
+  static defaultProps = {
+    size: 64,
+  };
+
+  static cache = {};
+
+  render() {
+    const cacheKey = this.props.seed;
+
+    // The guts of the shield remains the same, so we can cache the result here.
+    if (!CachedShield.cache[cacheKey]) {
+      CachedShield.cache[cacheKey] = <Shield {...this.props} />;
+    }
+
+    return (
+      <div className="shield-identicon">
+        {/* The `size` prop can change without affecting the cached shield design. */}
+        <svg viewBox="0 0 100 100" height={this.props.size} width={this.props.size}>
+          {CachedShield.cache[cacheKey]}
         </svg>
       </div>
     );

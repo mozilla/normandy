@@ -58,7 +58,6 @@ rules:
   react/prefer-stateless-function: [off]
   jsx-a11y/label-has-for: [off]
   jsx-a11y/href-no-hash: [off]
-  react/prefer-stateless-function: [off]
 
   generator-star-spacing: [warn]
 

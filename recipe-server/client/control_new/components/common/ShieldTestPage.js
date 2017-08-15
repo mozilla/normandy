@@ -1,10 +1,8 @@
 import { Card, Row, Col } from 'antd';
 import autobind from 'autobind-decorator';
-import { fromJS, Set, Map } from 'immutable';
-import PropTypes from 'prop-types';
 import React from 'react';
 
-import ShieldIdenticon, { colors, badColors as originalBadColors } from 'control_new/components/common/ShieldIdenticon';
+import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
 
 
 @autobind
@@ -22,18 +20,18 @@ export default class ShieldTestPage extends React.Component {
 
   render() {
     const shields = this.state.seeds.map(seed => (
-      <Card className='shield-card'>
+      <Card className="shield-card" key={seed}>
         <Row>
           <Col span={12} style={{ textAlign: 'center' }}>
-            <ShieldIdenticon key={`${seed}-16`} seed={seed} size={16} />
-            <ShieldIdenticon key={`${seed}-32`} seed={seed} size={32} />
+            <ShieldIdenticon seed={seed} size={16} />
+            <ShieldIdenticon seed={seed} size={32} />
           </Col>
           <Col span={12}>
-            <ShieldIdenticon key={`${seed}-64`} seed={seed} size={64} />
+            <ShieldIdenticon seed={seed} size={64} />
           </Col>
         </Row>
-        <ShieldIdenticon key={`${seed}-128`} seed={seed} size={128} />
-        <span className='seed'>{seed}</span>
+        <ShieldIdenticon seed={seed} size={128} />
+        <span className="seed">{seed}</span>
       </Card>
     ));
 
