@@ -8,7 +8,7 @@ export function getRequest(state, id, defaultsTo = DEFAULT_REQUEST) {
 
 export function isRequestInProgress(state, id) {
   const request = getRequest(state, id);
-  return request.get('inProgress');
+  return request.get('inProgress', false);
 }
 
 

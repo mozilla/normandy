@@ -39,7 +39,7 @@ export default class HistoryTimeline extends React.Component {
     return (
       <div>
         <QueryRecipeHistory pk={recipeId} />
-        <LoadingOverlay>
+        <LoadingOverlay requestIds={`fetch-recipe-history-${recipeId}`}>
           <Timeline>
             {
               history.map((revision, index) => {

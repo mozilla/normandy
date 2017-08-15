@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 
@@ -72,12 +72,11 @@ export default class EditRecipePage extends React.Component {
 
   render() {
     const { recipe, recipeId } = this.props;
-    const recipeName = recipe.get('name');
 
     return (
       <div className="edit-page">
         <QueryRecipe pk={recipeId} />
-        <SimpleLoadingOverlay isVisible={!recipeName}>
+        <LoadingOverlay requestIds={`fetch-recipe-${recipeId}`}>
           <h2>Edit Recipe</h2>
 
           <RecipeForm
@@ -85,7 +84,7 @@ export default class EditRecipePage extends React.Component {
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
           />
-        </SimpleLoadingOverlay>
+        </LoadingOverlay>
       </div>
     );
   }

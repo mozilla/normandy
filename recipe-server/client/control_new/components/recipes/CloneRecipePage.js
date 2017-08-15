@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, push as pushAction } from 'redux-little-router';
 
-import { SimpleLoadingOverlay } from 'control_new/components/common/LoadingOverlay';
+import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
 import QueryRevision from 'control_new/components/data/QueryRevision';
@@ -96,7 +96,7 @@ export default class CloneRecipePage extends React.Component {
         <QueryRecipe pk={recipeId} />
         <QueryRevision pk={revisionId} />
 
-        <SimpleLoadingOverlay isVisible={!recipeName}>
+        <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
           <h2>Clone Recipe</h2>
           { recipeName &&
             <Link href={recipeDetailsURL}>
@@ -109,7 +109,7 @@ export default class CloneRecipePage extends React.Component {
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
           />
-        </SimpleLoadingOverlay>
+        </LoadingOverlay>
       </div>
     );
   }

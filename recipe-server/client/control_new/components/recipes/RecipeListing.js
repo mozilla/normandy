@@ -164,17 +164,22 @@ export default class RecipeListing extends React.Component {
   render() {
     const { columns, count, ordering, pageNumber, recipes, status } = this.props;
 
+    const filters = this.getFilters();
+
+    const filterIds = Object.keys(filters).map(key => `${key}-${filters[key]}`);
+    const requestId = `fetch-filtered-recipes-page-${pageNumber}-${filterIds.join('-')}`;
+
     return (
       <div>
         <QueryRecipeListingColumns />
         <QueryFilteredRecipes
           pageNumber={pageNumber}
-          filters={this.getFilters()}
+          filters={filters}
         />
 
         <ListingActionBar />
 
-        <LoadingOverlay>
+        <LoadingOverlay requestIds={requestId}>
           <DataList
             columns={columns}
             columnRenderers={RecipeListing.columnRenderers}
