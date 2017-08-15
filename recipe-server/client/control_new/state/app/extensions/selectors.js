@@ -14,8 +14,8 @@ export function getExtensionListingCount(state) {
 
 
 export function getExtensionListing(state) {
-  const recipes = state.app.extensions.listing.get('results', new List([]));
-  return recipes.map(id => getExtension(state, id));
+  const extensions = state.app.extensions.listing.get('results', new List([]));
+  return extensions.map(id => getExtension(state, id));
 }
 
 
