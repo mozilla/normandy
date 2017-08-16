@@ -1,5 +1,4 @@
-import { fromJS, Map, List } from 'immutable';
-import { combineReducers } from 'redux';
+import { fromJS, List } from 'immutable';
 
 import {
   LOCALES_RECEIVE,

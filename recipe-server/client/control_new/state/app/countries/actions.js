@@ -1,5 +1,3 @@
-import * as localForage from 'localforage';
-
 import {
   COUNTRIES_RECEIVE,
 } from 'control_new/state/action-types';
@@ -19,7 +17,7 @@ export function countriesReceived(countries) {
 export function fetchCountries() {
   return async dispatch => {
     const requestId = 'fetch-countries';
-    const filters = await dispatch(makeApiRequest(requestId, `v1/filters/`));
+    const filters = await dispatch(makeApiRequest(requestId, 'v1/filters/'));
     dispatch(countriesReceived(filters.countries));
   };
 }

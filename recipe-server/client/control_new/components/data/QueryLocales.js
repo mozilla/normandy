@@ -1,8 +1,7 @@
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { isEqual } from 'underscore';
 
 import { fetchLocales } from 'control_new/state/app/locales/actions';
 import { getLocales } from 'control_new/state/app/locales/selectors';
@@ -18,10 +17,12 @@ import { getLocales } from 'control_new/state/app/locales/selectors';
 export default class QueryLocales extends React.PureComponent {
   static propTypes = {
     fetchLocales: PropTypes.func,
+    locales: PropTypes.instanceOf(List).isRequired,
   };
 
   static defaultProps = {
     fetchLocales: null,
+    locales: new List(),
   };
 
   componentWillMount() {

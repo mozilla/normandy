@@ -13,7 +13,6 @@ import APIClient from 'control_new/utils/api';
 
 export function makeApiRequest(requestId, endpoint, options = {}) {
   return async (dispatch, getState) => {
-
     const request = getRequest(getState(), requestId);
     if (request.inProgress) { return true; }
     let root;
