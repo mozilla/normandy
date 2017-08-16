@@ -75,7 +75,7 @@ export default class OptOutStudyFields extends React.Component {
               name="arguments.isEnrollmentPaused"
               initialValue={recipeArguments.get('isEnrollmentPaused', false)}
             >
-              <SwitchBox>
+              <SwitchBox disabled={disabled}>
                 Prevents new users from joining this study&nbsp;cohort. <br /> Existing
                 users will remain in&nbsp;the&nbsp;study.
               </SwitchBox>
