@@ -6,7 +6,7 @@ import SwitchBox from 'control_new/components/forms/SwitchBox';
 describe('<SwitchBox>', () => {
   const props = {
     children: null,
-    onChange: ()=>{},
+    onChange: () => {},
     value: null,
   };
 
