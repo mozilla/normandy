@@ -9,6 +9,7 @@ import FormItem from 'control_new/components/forms/FormItem';
 import FormActions from 'control_new/components/forms/FormActions';
 import LocalesField from 'control_new/components/forms/LocalesField';
 import CountriesField from 'control_new/components/forms/CountriesField';
+import ChannelsField from 'control_new/components/forms/ChannelsField';
 import ConsoleLogFields from 'control_new/components/recipes/ConsoleLogFields';
 import PreferenceExperimentFields from 'control_new/components/recipes/PreferenceExperimentFields';
 import ShowHeartbeatFields from 'control_new/components/recipes/ShowHeartbeatFields';
@@ -87,6 +88,16 @@ export default class RecipeForm extends React.Component {
           <legend>Audience Targeting and Filters</legend>
 
           <Row type="flex" justify="space-between" gutter={64}>
+            <Col xs={24}>
+              <FormItem
+                name="channels"
+                label="Channels"
+                initialValue={recipe.get('channels')}
+              >
+                <ChannelsField disabled={isLoading} />
+              </FormItem>
+            </Col>
+
             <Col xs={24} lg={12}>
               <FormItem
                 name="locales"
