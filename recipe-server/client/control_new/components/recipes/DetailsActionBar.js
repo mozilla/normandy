@@ -140,14 +140,24 @@ export default class DetailsActionBar extends React.Component {
 
         {
           isLatestApproved && recipe.get('enabled') &&
-            <Button icon="close-circle" type="danger" onClick={this.handleDisableClick}>
+            <Button
+              icon="close-circle"
+              type="danger"
+              onClick={this.handleDisableClick}
+              id="dab-disable"
+            >
               Disable
             </Button>
         }
 
         {
           isLatestApproved && !recipe.get('enabled') &&
-            <Button icon="check-circle" type="primary" onClick={this.handlePublishClick}>
+            <Button
+              icon="check-circle"
+              type="primary"
+              onClick={this.handlePublishClick}
+              id="dab-publish"
+            >
               Publish
             </Button>
         }

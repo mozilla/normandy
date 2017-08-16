@@ -136,14 +136,14 @@ export default class ExtensionForm extends React.Component {
             accept=".xpi"
             fileList={this.getUploadFileList()}
           >
-            <Button>
+            <Button id="ef-upload-xpi">
               <Icon type="upload" /> Upload XPI
             </Button>
           </Upload>
         </FormItem>
         <FormActions>
           <FormActions.Primary>
-            <Button type="primary" htmlType="submit">Save</Button>
+            <Button type="primary" htmlType="submit" id="ef-save">Save</Button>
           </FormActions.Primary>
         </FormActions>
       </Form>
