@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-boolean-value */
-import { Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
+import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -14,6 +14,7 @@ import { connectFormProps } from 'control_new/utils/forms';
 export default class PreferenceExperimentFields extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
+    form: PropTypes.object.isRequired,
     recipeArguments: PropTypes.instanceOf(Map),
   };
 
@@ -25,65 +26,91 @@ export default class PreferenceExperimentFields extends React.Component {
   render() {
     const {
       disabled,
+      form,
       recipeArguments,
     } = this.props;
 
     return (
-      <div>
+      <Row>
         <p className="action-info">Run a feature experiment activated by a preference.</p>
-        <FormItem
-          label="Experiment Name"
-          name="arguments.slug"
-          initialValue={recipeArguments.get('slug', '')}
-        >
-          <Input disabled={disabled} />
-        </FormItem>
+        <Col sm={24} md={11}>
+          <FormItem
+            label="Experiment Name"
+            name="arguments.slug"
+            initialValue={recipeArguments.get('slug', '')}
+          >
+            <Input disabled={disabled} />
+          </FormItem>
 
-        <FormItem
-          label="Experiment Document URL"
-          name="arguments.experimentDocumentUrl"
-          initialValue={recipeArguments.get('experimentDocumentUrl', '')}
-        >
-          <DocumentUrlInput disabled={disabled} />
-        </FormItem>
+          <FormItem
+            label="Experiment Document URL"
+            name="arguments.experimentDocumentUrl"
+            initialValue={recipeArguments.get('experimentDocumentUrl', '')}
+          >
+            <DocumentUrlInput disabled={disabled} />
+          </FormItem>
+        </Col>
+        <Col sm={24} md={{ span: 12, offset: 1 }}>
+          <FormItem
+            label="Preference Name"
+            name="arguments.preferenceName"
+            initialValue={recipeArguments.get('preferenceName', '')}
+          >
+            <Input disabled={disabled} />
+          </FormItem>
 
-        <FormItem
-          label="Preference Name"
-          name="arguments.preferenceName"
-          initialValue={recipeArguments.get('preferenceName', '')}
-        >
-          <Input disabled={disabled} />
-        </FormItem>
+          <Col sm={24}>
+            <Col xs={24} sm={11}>
+              <FormItem
+                label="Preference Type"
+                name="arguments.preferenceType"
+                initialValue={recipeArguments.get('preferenceType', 'boolean')}
+              >
+                <Select disabled={disabled}>
+                  <Select.Option value="boolean">Boolean</Select.Option>
+                  <Select.Option value="integer">Integer</Select.Option>
+                  <Select.Option value="string">String</Select.Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col xs={24} sm={{ span: 12, offset: 1 }}>
+              <FormItem
+                label="Preference Branch Type"
+                name="arguments.preferenceBranchType"
+                initialValue={recipeArguments.get('preferenceBranchType', 'default')}
+              >
+                <PreferenceBranchSelect disabled={disabled} />
+              </FormItem>
+            </Col>
+            {form.getFieldValue('arguments.preferenceBranchType') === 'user' &&
+              <Col xs={24}>
+                <Alert
+                  message="User Preference Branch"
+                  description={
+                    <span>
+                      Setting user preferences instead of default ones is not recommended.<br />
+                      Do not choose this unless you know what you are doing.
+                    </span>
+                  }
+                  type="warning"
+                  showIcon
+                />
+              </Col>
+            }
+          </Col>
+        </Col>
 
-        <FormItem
-          label="Preference Type"
-          name="arguments.preferenceType"
-          initialValue={recipeArguments.get('preferenceType', 'boolean')}
-        >
-          <Select disabled={disabled}>
-            <Select.Option value="boolean">Boolean</Select.Option>
-            <Select.Option value="integer">Integer</Select.Option>
-            <Select.Option value="string">String</Select.Option>
-          </Select>
-        </FormItem>
-
-        <FormItem
-          label="Preference Branch Type"
-          name="arguments.preferenceBranchType"
-          initialValue={recipeArguments.get('preferenceBranchType', 'default')}
-        >
-          <PreferenceBranchSelect disabled={disabled} />
-        </FormItem>
-
-        <FormItem
-          label="Experiment Branches"
-          name="arguments.branches"
-          initialValue={recipeArguments.get('branches', new List())}
-          config={{ valuePropName: 'branches' }}
-        >
-          <ExperimentBranches disabled={disabled} />
-        </FormItem>
-      </div>
+        <Col sm={24}>
+          <FormItem
+            label="Experiment Branches"
+            name="arguments.branches"
+            initialValue={recipeArguments.get('branches', new List())}
+            config={{ valuePropName: 'branches' }}
+          >
+            <ExperimentBranches disabled={disabled} />
+          </FormItem>
+        </Col>
+      </Row>
     );
   }
 }
@@ -95,7 +122,6 @@ export default class PreferenceExperimentFields extends React.Component {
 export class PreferenceBranchSelect extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
-    form: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     value: PropTypes.any,
   };
@@ -106,24 +132,12 @@ export class PreferenceBranchSelect extends React.Component {
   };
 
   render() {
-    const { disabled, form, onChange, value } = this.props;
+    const { disabled, onChange, value } = this.props;
     return (
-      <div>
-        <Select disabled={disabled} onChange={onChange} value={value}>
-          <Select.Option value="default">Default</Select.Option>
-          <Select.Option value="user">User</Select.Option>
-        </Select>
-        {form.getFieldValue('arguments.preferenceBranchType') === 'user' &&
-          <Alert
-            message={`
-              Setting user preferences instead of default ones is not recommended.
-              Do not choose this unless you know what you are doing.
-            `}
-            type="warning"
-            showIcon
-          />
-        }
-      </div>
+      <Select disabled={disabled} onChange={onChange} value={value} {...this.props}>
+        <Select.Option value="default">Default</Select.Option>
+        <Select.Option value="user">User</Select.Option>
+      </Select>
     );
   }
 }

@@ -1,8 +1,10 @@
-// Use locally-hosted icon font
-@icon-url: '~control_new/fonts/iconfont';
+@primary-color: #108EE9;
 
-@white: #FFF;
-@black: #000;
+// Fix alerts not using the correct blue color.
+.ant-alert-info {
+  background-color: @blue-1;
+  border-color: @blue-2;
+}
 
 // Component styles
 .ant-breadcrumb {
@@ -18,7 +20,31 @@
 }
 
 .ant-menu-submenu-title {
-  background: rgba(0, 0, 0, 0.025);
+  background: fade(@black, 3%);
+}
+
+.ant-menu-item-selected {
+  background: mix(@primary-color, #FFF, 1%) !important;
+}
+
+.ant-form-item {
+  margin-bottom: 1em;
+}
+
+.ant-layout-sider.sidebar {
+  background: @component-background;
+
+  .ant-menu-inline {
+    border: none;
+  }
+}
+
+.ant-tag {
+  margin-bottom: 0.5em;
+}
+
+a {
+  color: @primary-9;
 }
 
 // ant Card's `noHovering` doesn't seem to do anything, so this class makes up for it.

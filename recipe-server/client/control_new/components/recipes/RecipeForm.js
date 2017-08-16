@@ -29,7 +29,7 @@ import QueryServiceInfo from 'control_new/components/data/QueryServiceInfo';
       selectedActionName: selectedAction.get('name'),
       isLoading: areAnyRequestsInProgress(state),
     };
-  }
+  },
 )
 @autobind
 export default class RecipeForm extends React.Component {
@@ -71,7 +71,7 @@ export default class RecipeForm extends React.Component {
     const ArgumentsFields = RecipeForm.argumentsFields[selectedActionName];
 
     return (
-      <Form onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit} className="recipe-form">
         <FormItem
           name="name"
           label="Name"
@@ -95,7 +95,7 @@ export default class RecipeForm extends React.Component {
         </FormItem>
         {ArgumentsFields && (
           <fieldset>
-            <legend>Arguments</legend>
+            <legend>Action Arguments</legend>
             <ArgumentsFields
               recipeArguments={recipe.get('arguments')}
               disabled={isLoading}
@@ -163,7 +163,7 @@ class ActionSelect extends React.Component {
 @connect(
   state => ({
     githubUrl: getGithubUrl(state),
-  })
+  }),
 )
 class ArgumentEditorMissingError extends React.PureComponent {
   static propTypes = {
