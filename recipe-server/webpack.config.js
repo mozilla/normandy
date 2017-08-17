@@ -57,7 +57,11 @@ if (production) {
   ]);
 }
 
-module.exports = function(env) {
+module.exports = function (webpackEnvOptions) {
+  var envOptions = webpackEnvOptions || {
+    'update-actions': false,
+  };
+
   return [
     {
       context: __dirname,
@@ -165,7 +169,7 @@ module.exports = function(env) {
         function updateActions() {
           this.plugin('done', function () {
             var cmd;
-            if (env['update-actions']) {
+            if (envOptions['update-actions']) {
               // Don't disable actions since this is mostly for development.
               cmd = 'python manage.py update_actions';
 
