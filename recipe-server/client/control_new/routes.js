@@ -15,6 +15,7 @@ import Gateway from 'control_new/components/pages/Gateway';
 import RecipeListing from 'control_new/components/recipes/RecipeListing';
 import MissingPage from 'control_new/components/pages/MissingPage';
 import RecipeDetailPage from 'control_new/components/recipes/RecipeDetailPage';
+import ShieldTestPage from 'control_new/components/common/ShieldTestPage';
 
 
 const routes = {
@@ -65,6 +66,13 @@ const routes = {
         crumb: 'Edit Extension',
       },
     },
+    '/tests': {
+      crumb: 'Tests',
+      '/shields': {
+        component: ShieldTestPage,
+        crumb: 'Shields',
+      }
+    }
   },
 };
 

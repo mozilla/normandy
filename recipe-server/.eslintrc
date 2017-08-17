@@ -22,7 +22,7 @@ rules:
   class-methods-use-this: [off]
   no-console: [off]
   no-continue: [off]
-  no-mixed-operators: [warn, { allowSamePrecedence: true }]
+  no-mixed-operators: [off]
   no-param-reassign: [warn, { props: false }]
   no-prototype-builtins: [off]
   no-restricted-syntax: [off]
@@ -57,6 +57,7 @@ rules:
   react/no-array-index-key: [off]
   react/prefer-stateless-function: [off]
   jsx-a11y/label-has-for: [off]
+  jsx-a11y/href-no-hash: [off]
 
   generator-star-spacing: [warn]
 
