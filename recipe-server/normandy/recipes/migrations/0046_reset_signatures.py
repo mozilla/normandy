@@ -29,7 +29,7 @@ def remove_signatures(apps, schema_editor):
         sig = action.signature
         action.signature = None
         action.save()
-        action.delete()
+        sig.delete()
 
     for sig in Signature.objects.all():
         sig.delete()
