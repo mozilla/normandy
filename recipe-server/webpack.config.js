@@ -36,10 +36,6 @@ var plugins = [
       },
     },
   }),
-  new webpack.DllReferencePlugin({
-    context: '.',
-    manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
-  }),
 ];
 
 if (production) {
@@ -94,6 +90,10 @@ module.exports = function(env) {
 
       plugins: plugins.concat([
         new BundleTracker({ filename: './webpack-stats.json' }),
+        new webpack.DllReferencePlugin({
+          context: '.',
+          manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
+        }),
       ]),
 
       module: {
