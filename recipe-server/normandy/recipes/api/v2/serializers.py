@@ -1,5 +1,6 @@
 from pyjexl import JEXL
 from rest_framework import serializers
+from factory.fuzzy import FuzzyText
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
@@ -61,7 +62,8 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             'date_created',
             'id',
             'recipe',
-            'user'
+            'user',
+            'identicon_seed'
         ]
 
     def get_recipe(self, instance):
@@ -90,6 +92,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         slug_field='code', queryset=Locale.objects.all(), many=True, required=False)
     latest_revision = RecipeRevisionSerializer(read_only=True)
     name = serializers.CharField()
+    identicon_seed = serializers.CharField(required=False)
 
     class Meta:
         model = Recipe
@@ -110,6 +113,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'last_updated',
             'latest_revision',
             'name',
+            'identicon_seed',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -131,6 +135,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
+        # if there is no identicon_seed, generate one
+        if 'identicon_seed' not in validated_data:
+            validated_data['identicon_seed'] = f'v1:{FuzzyText().fuzz()}'
+
         recipe = Recipe.objects.create()
         return self.update(recipe, validated_data)
 

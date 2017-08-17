@@ -135,6 +135,13 @@ class RecipeFactory(factory.DjangoModelFactory):
             self.save()
 
 
+class FuzzyIdenticonSeed(factory.fuzzy.FuzzyText):
+    """A FuzzyText factory to generate identicon seeds."""
+
+    def __init__(self, **kwargs):
+        super().__init__(prefix='v1:', **kwargs)
+
+
 @factory.use_strategy(factory.BUILD_STRATEGY)
 class RecipeRevisionFactory(factory.DjangoModelFactory):
     class Meta:
@@ -143,6 +150,7 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
+    identicon_seed = FuzzyIdenticonSeed()
 
 
 class ApprovalRequestFactory(factory.DjangoModelFactory):

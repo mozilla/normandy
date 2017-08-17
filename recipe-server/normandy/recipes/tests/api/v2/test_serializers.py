@@ -60,6 +60,7 @@ class TestRecipeSerializer:
                 'approver': None,
                 'comment': None,
             },
+            'identicon_seed': Whatever.startswith('v1:'),
         }
 
     # If the action specified cannot be found, raise validation

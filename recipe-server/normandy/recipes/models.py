@@ -21,6 +21,7 @@ from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
 from normandy.recipes.validators import validate_json
+from normandy.recipes.fields import IdenticonSeedField
 
 
 INFO_REQUESTING_RECIPE_SIGNATURES = 'normandy.recipes.I001'
@@ -181,6 +182,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def locales(self):
         return self.current_revision.locales
 
+    @current_revision_property
+    def identicon_seed(self):
+        return self.current_revision.identicon_seed
+
     @property
     def approval_request(self):
         try:
@@ -317,6 +322,7 @@ class RecipeRevision(models.Model):
     channels = models.ManyToManyField(Channel)
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
+    identicon_seed = IdenticonSeedField(max_length=64)
 
     class Meta:
         ordering = ('-created',)
@@ -331,6 +337,7 @@ class RecipeRevision(models.Model):
             'channels': list(self.channels.all()),
             'countries': list(self.countries.all()),
             'locales': list(self.locales.all()),
+            'identicon_seed': self.identicon_seed,
         }
 
     @property

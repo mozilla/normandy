@@ -165,6 +165,19 @@ class TestRecipeAPI(object):
         recipes = Recipe.objects.all()
         assert recipes.count() == 0
 
+    def test_creation_when_identicon_seed_is_invalid(self, api_client):
+        action = ActionFactory()
+
+        res = api_client.post('/api/v2/recipe/', {
+            'name': 'Test Recipe',
+            'action_id': action.id,
+            'arguments': {},
+            'extra_filter_expression': 'whatever',
+            'enabled': True,
+            'identicon_seed': 'invalid_identicon_seed'
+        })
+        assert res.status_code == 400
+
     def test_it_can_change_action_for_recipes(self, api_client):
         recipe = RecipeFactory()
         action = ActionFactory()
@@ -468,6 +481,11 @@ class TestRecipeRevisionAPI(object):
         res = api_client.post(
             '/api/v2/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
         assert res.status_code == 400
+
+    def test_it_has_an_identicon_seed(self, api_client):
+        recipe = RecipeFactory(enabled=True, approver=UserFactory())
+        res = api_client.get(f'/api/v2/recipe_revision/{recipe.latest_revision.id}/')
+        assert res.data['identicon_seed'] == recipe.identicon_seed
 
 
 @pytest.mark.django_db

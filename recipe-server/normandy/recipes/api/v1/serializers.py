@@ -5,6 +5,7 @@ from django.conf import settings
 
 from pyjexl import JEXL
 from rest_framework import serializers
+from factory.fuzzy import FuzzyText
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
@@ -106,6 +107,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
     approved_revision_id = serializers.CharField(source='approved_revision.id', read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
+    identicon_seed = serializers.CharField(required=False)
 
     class Meta:
         model = Recipe
@@ -126,6 +128,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'latest_revision_id',
             'approved_revision_id',
             'approval_request',
+            'identicon_seed',
         ]
 
     def update(self, instance, validated_data):
@@ -133,6 +136,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
+        # if there is no identicon seed, generate one
+        if 'identicon_seed' not in validated_data:
+            validated_data['identicon_seed'] = f'v1:{FuzzyText().fuzz()}'
+
         recipe = Recipe.objects.create()
         return self.update(recipe, validated_data)
 
