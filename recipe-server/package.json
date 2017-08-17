@@ -120,7 +120,6 @@
     "uglifyjs-webpack-plugin": "0.4.6",
     "webpack": "3.4.0",
     "webpack-async-await": "1.0.4",
-    "webpack-bundle-tracker": "0.2.0",
-    "yargs": "5.0.0"
+    "webpack-bundle-tracker": "0.2.0"
   }
 }
