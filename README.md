@@ -1,12 +1,12 @@
 <h1>Normandy</h1>
 
-***Normandy is a collection of projects that provide a fast and accurate way to
-interact with unbiased subsets of Firefox users.***
+**Normandy is a collection of projects that provide a fast and accurate way to
+interact with unbiased subsets of Firefox users.**
 
 <hr/>
 
-***This repo is a *monorepo*. It contains several projects, each represented by a
-top level directory:***
+**This repo is a *monorepo*. It contains several projects, each represented by a
+top level directory:**
 
 *
 * recipe-server - Django server that manages and delivers recipes
@@ -30,12 +30,12 @@ top level directory:***
 
 <h1>Documentation</h1>
 
-***Developer documentation for the service can be found at http://normandy.readthedocs.org/.***
+**Developer documentation for the service can be found at http://normandy.readthedocs.org/.**
 
 <hr/>
 
 <h1>License</h1>
 
-***Normandy is licensed under the MPLv2. See the `LICENSE` file for details.***
+**Normandy is licensed under the MPLv2. See the `LICENSE` file for details.**
 
 <hr/>
