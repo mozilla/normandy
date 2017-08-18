@@ -10,6 +10,7 @@ import FormActions from 'control_new/components/forms/FormActions';
 import ConsoleLogFields from 'control_new/components/recipes/ConsoleLogFields';
 import PreferenceExperimentFields from 'control_new/components/recipes/PreferenceExperimentFields';
 import ShowHeartbeatFields from 'control_new/components/recipes/ShowHeartbeatFields';
+import OptOutStudyFields from 'control_new/components/recipes/OptOutStudyFields';
 import { getAction, getAllActions } from 'control_new/state/app/actions/selectors';
 import { areAnyRequestsInProgress } from 'control_new/state/app/requests/selectors';
 import { getGithubUrl } from 'control_new/state/app/serviceInfo/selectors';
@@ -50,6 +51,7 @@ export default class RecipeForm extends React.Component {
     'console-log': ConsoleLogFields,
     'show-heartbeat': ShowHeartbeatFields,
     'preference-experiment': PreferenceExperimentFields,
+    'opt-out-study': OptOutStudyFields,
   };
 
   componentWillReceiveProps(newProps) {

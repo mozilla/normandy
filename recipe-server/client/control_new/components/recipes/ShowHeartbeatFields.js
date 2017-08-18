@@ -1,11 +1,11 @@
-import { Col, Input, InputNumber, Row, Select, Switch, Tooltip } from 'antd';
+import { Col, Input, InputNumber, Row, Select, Tooltip } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import DocumentUrlInput from 'control_new/components/forms/DocumentUrlInput';
-
+import SwitchBox from 'control_new/components/forms/SwitchBox';
 import FormItem from 'control_new/components/forms/FormItem';
 import { connectFormProps } from 'control_new/utils/forms';
 
@@ -93,10 +93,10 @@ export default class ShowHeartbeatFields extends React.Component {
             className="switch-input"
             name="arguments.includeTelemetryUUID"
             initialValue={recipeArguments.get('includeTelemetryUUID', false)}
-            config={{ valuePropName: 'checked' }}
-            label="Include UUID in Post-Answer URL and Telemetry"
           >
-            <Switch disabled={disabled} />
+            <SwitchBox disabled={disabled}>
+              Include UUID in Post-Answer URL and Telemetry
+            </SwitchBox>
           </FormItem>
         </Col>
         <Col sm={24}>
