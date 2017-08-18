@@ -1,5 +1,6 @@
 import hashlib
 from unittest.mock import patch
+from urllib.parse import quote as url_quote
 
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
@@ -132,6 +133,29 @@ class TestImplementationAPI(object):
         ))
         assert res.status_code == 200
         assert res.client.cookies == {}
+
+    # v57 and v69 of Normandy need to coexist for a bit of time,
+    # so test that both v69 and v57 type are recognized
+
+    def test_it_supports_v57_hash_formats(self):
+        action = ActionFactory()
+        impl_hash = 'c356d1cacb7787db864394ecc88977fd7da35f76'
+        url = reverse(
+            'recipes:action-implementation',
+            kwargs={'name': action.name, 'impl_hash': impl_hash},
+        )
+        action_name = url_quote(action.name)
+        assert url.endswith(f'/api/v1/action/{action_name}/implementation/{impl_hash}/')
+
+    def test_it_supports_v69_hash_formats(self):
+        action = ActionFactory()
+        impl_hash = 'sha384-FkJOz1XrkSu39biGtknNfSLPZnybaTrPdJwLFqungYwg9FjOxXxQBzmkDjS7p-wT'
+        action_name = url_quote(action.name)
+        url = reverse(
+            'recipes:action-implementation',
+            kwargs={'name': action.name, 'impl_hash': impl_hash},
+        )
+        assert url.endswith(f"/api/v1/action/{action_name}/implementation/{impl_hash}/")
 
 
 @pytest.mark.django_db
