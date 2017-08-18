@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^api/v2/', include(v2_router.urls)),
     url(r'^api/v1/', include(v1_router.urls)),
     url(
-        r'^api/v1/action/(?P<name>[_\-\w]+)/implementation/(?P<impl_hash>[0-9a-f]{40})/$',
+        r'^api/v1/action/(?P<name>[_\-\w]+)/implementation/(?P<impl_hash>[^/]+)/$',
         api_v1_views.ActionImplementationView.as_view(),
         name='action-implementation'
     ),
