@@ -50,7 +50,7 @@ steps, as they don't affect your setup if nothing has changed:
    python manage.py initial_data
 
    # Build frontend files
-   ./node_modules/.bin/webpack --config ./webpack.config.js --update-actions
+   ./node_modules/.bin/webpack --config ./webpack.config.js --env.update-actions
 
 Building the Documentation
 --------------------------
@@ -98,13 +98,13 @@ make changes:
 
    npm run watch
 
-Running the command with ``--update-actions`` will automatically call
+Running the command with ``--env.update-actions`` will automatically call
 ``manage.py update_actions`` when action code is built. Arguments are separated
 from the rest of the command by ``--``:
 
 .. code-block:: bash
 
-   npm run watch -- --update-actions
+   npm run watch -- --env.update-actions
 
 .. _Webpack: http://webpack.github.io/
 

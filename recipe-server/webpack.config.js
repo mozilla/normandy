@@ -6,7 +6,6 @@ var BundleTracker = require('webpack-bundle-tracker');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var AsyncAwaitPlugin = require('webpack-async-await');
 var BabiliPlugin = require('babili-webpack-plugin');
-var argv = require('yargs').argv;
 var childProcess = require('child_process');
 var babiliPreset = require('babel-preset-babili');
 var babelCore = require('babel-core');
@@ -37,10 +36,6 @@ var plugins = [
       },
     },
   }),
-  new webpack.DllReferencePlugin({
-    context: '.',
-    manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
-  })
 ];
 
 if (production) {
@@ -62,138 +57,148 @@ if (production) {
   ]);
 }
 
-module.exports = [
-  {
-    context: __dirname,
-    devtool: production ? undefined : 'cheap-module-source-map',
+module.exports = function (webpackEnvOptions) {
+  var envOptions = webpackEnvOptions || {
+    'update-actions': false,
+  };
 
-    entry: {
-      control: [
-        'babel-polyfill',
-        './client/control/index.js',
-        './client/control/sass/control.scss',
-        './node_modules/font-awesome/scss/font-awesome.scss',
-      ],
-      control_new: [
-        'babel-polyfill',
-        './client/control_new/index.js',
-        './client/control_new/less/main.less',
-      ],
-    },
+  return [
+    {
+      context: __dirname,
+      devtool: production ? undefined : 'cheap-module-source-map',
 
-    output: {
-      path: path.resolve('./assets/bundles/'),
-      filename: jsNamePattern,
-      chunkFilename: '[id].bundle.js',
-    },
-    externals: {
-      'react/lib/ExecutionEnvironment': true,
-      'react/lib/ReactContext': true,
-      'react/addons': true,
-    },
+      entry: {
+        control: [
+          'babel-polyfill',
+          './client/control/index.js',
+          './client/control/sass/control.scss',
+          './node_modules/font-awesome/scss/font-awesome.scss',
+        ],
+        control_new: [
+          'babel-polyfill',
+          './client/control_new/index.js',
+          './client/control_new/less/main.less',
+        ],
+      },
 
-    plugins: plugins.concat([
-      new BundleTracker({ filename: './webpack-stats.json' }),
-    ]),
+      output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: jsNamePattern,
+        chunkFilename: '[id].bundle.js',
+      },
+      externals: {
+        'react/lib/ExecutionEnvironment': true,
+        'react/lib/ReactContext': true,
+        'react/addons': true,
+      },
 
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader',
+      plugins: plugins.concat([
+        new BundleTracker({ filename: './webpack-stats.json' }),
+        new webpack.DllReferencePlugin({
+          context: '.',
+          manifest: path.resolve('./assets/bundles/vendor-manifest.json'),
+        }),
+      ]),
+
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+          },
+          {
+            test: /\.scss$/,
+            use: ExtractTextPlugin.extract({
+              allChunks: true,
+              fallback: 'style-loader',
+              use: [
+                'css-loader?sourceMap',
+                'postcss-loader',
+                'sass-loader?sourceMap',
+              ],
+            }),
+          },
+          {
+            test: /\.less$/,
+            exclude: /node_modules/,
+            use: ExtractTextPlugin.extract({
+              allChunks: true,
+              fallback: 'style-loader',
+              use: [
+                'css-loader?sourceMap',
+                'less-loader',
+              ],
+            }),
+          },
+          {
+            test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+            loader: 'file-loader',
+          },
+        ],
+      },
+
+      resolve: {
+        alias: {
+          client: path.resolve(__dirname, './client'),
+          actions: path.resolve(__dirname, './client/actions'),
+          control: path.resolve(__dirname, './client/control'),
+          tests: path.resolve(__dirname, './client/tests'),
+          control_new: path.resolve(__dirname, './client/control_new'),
         },
-        {
-          test: /\.scss$/,
-          use: ExtractTextPlugin.extract({
-            allChunks: true,
-            fallback: 'style-loader',
-            use: [
-              'css-loader?sourceMap',
-              'postcss-loader',
-              'sass-loader?sourceMap',
-            ],
-          }),
-        },
-        {
-          test: /\.less$/,
-          exclude: /node_modules/,
-          use: ExtractTextPlugin.extract({
-            allChunks: true,
-            fallback: 'style-loader',
-            use: [
-              'css-loader?sourceMap',
-              'less-loader',
-            ],
-          }),
-        },
-        {
-          test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-          loader: 'file-loader',
-        },
-      ],
-    },
+      },
 
-    resolve: {
-      alias: {
-        client: path.resolve(__dirname, './client'),
-        actions: path.resolve(__dirname, './client/actions'),
-        control: path.resolve(__dirname, './client/control'),
-        tests: path.resolve(__dirname, './client/tests'),
-        control_new: path.resolve(__dirname, './client/control_new'),
+      node: {
+        fs: 'empty',
       },
     },
+    {
+      devtool: production ? undefined : 'cheap-module-source-map',
 
-    node: {
-      fs: 'empty',
-    },
-  },
-  {
-    devtool: production ? undefined : 'cheap-module-source-map',
-
-    entry: {
-      'console-log': './client/actions/console-log/index',
-      'show-heartbeat': './client/actions/show-heartbeat/index',
-      'preference-experiment': './client/actions/preference-experiment/index',
-      'opt-out-study': './client/actions/opt-out-study/index',
-    },
-
-    plugins: plugins.concat([
-      new BundleTracker({ filename: './webpack-stats-actions.json' }),
-      // Small plugin to update the actions in the database if
-      // --update-actions was passed.
-      function updateActions() {
-        this.plugin('done', function () {
-          var cmd;
-          if (argv['update-actions']) {
-            // Don't disable actions since this is mostly for development.
-            cmd = 'python manage.py update_actions';
-
-            childProcess.exec(cmd, function (err, stdout, stderr) {
-              console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
-              console.log(stdout);
-              if (stderr) {
-                console.error(stderr);
-              }
-            });
-          }
-        });
+      entry: {
+        'console-log': './client/actions/console-log/index',
+        'show-heartbeat': './client/actions/show-heartbeat/index',
+        'preference-experiment': './client/actions/preference-experiment/index',
+        'opt-out-study': './client/actions/opt-out-study/index',
       },
-    ]),
 
-    output: {
-      path: path.resolve('./assets/bundles/'),
-      filename: jsNamePattern,
-    },
+      plugins: plugins.concat([
+        new BundleTracker({ filename: './webpack-stats-actions.json' }),
+        // Small plugin to update the actions in the database if
+        // --env.update-actions was passed.
+        function updateActions() {
+          this.plugin('done', function () {
+            var cmd;
+            if (envOptions['update-actions']) {
+              // Don't disable actions since this is mostly for development.
+              cmd = 'python manage.py update_actions';
 
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader',
+              childProcess.exec(cmd, function (err, stdout, stderr) {
+                console.log('\n' + BOLD + 'Updating Actions' + END_BOLD);
+                console.log(stdout);
+                if (stderr) {
+                  console.error(stderr);
+                }
+              });
+            }
+          });
         },
-      ],
+      ]),
+
+      output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: jsNamePattern,
+      },
+
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+          },
+        ],
+      },
     },
-  },
-];
+  ];
+};
