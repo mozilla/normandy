@@ -39,7 +39,8 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
     errors = []
     try:
         Recipe = apps.get_model('recipes', 'Recipe')
-        signed_recipes = list(Recipe.objects.exclude(signature=None))
+        # pre-fetch signatures, to avoid race condition with deleted signatures
+        signed_recipes = list(Recipe.objects.exclude(signature=None).select_related('signature'))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         errors.append(Info(f'Could not retrieve recipes: {e}', id=INFO_COULD_NOT_RETRIEVE_RECIPES))
     else:
@@ -61,7 +62,8 @@ def action_signatures_are_correct(app_configs, **kwargs):
     errors = []
     try:
         Action = apps.get_model('recipes', 'Action')
-        signed_actions = list(Action.objects.exclude(signature=None))
+        # pre-fetch signatures, to avoid race condition with deleted signatures
+        signed_actions = list(Action.objects.exclude(signature=None).select_related('signature'))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         msg = f'Could not retrieve actions: f{e}'
         errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
