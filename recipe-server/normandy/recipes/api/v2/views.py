@@ -1,8 +1,9 @@
 from django.db import transaction
 from django.db.models import Q
+from django.shortcuts import render
 
 import django_filters
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, viewsets, views
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
@@ -23,6 +24,7 @@ from normandy.recipes.api.v2.serializers import (
     RecipeRevisionSerializer,
     RecipeSerializer,
 )
+from normandy.base.genome import Genome
 
 
 class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
@@ -222,3 +224,98 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         approval_request = self.get_object()
         approval_request.close()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IdenticonView(views.APIView):
+    @staticmethod
+    def hex_luma(hex):
+        # hex color code to RGB
+        hex = hex[1:]  # remove '#'
+        rgb = [int(h, 16) for h in [hex[i: i + 2] for i in range(0, len(hex), 2)]]
+
+        # Determine color luminance based on perceived values.
+        return (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2])
+
+    def pick_pair(self, genome, base):
+        base_luminance = self.hex_luma(base)
+        chosen_color = None
+        pair_luminance = None
+
+        while True:
+            chosen_color = genome.color('counter color')
+            pair_luminance = self.hex_luma(chosen_color)
+
+            if abs(base_luminance - pair_luminance) < 75:
+                break
+
+        return chosen_color
+
+    def get(self, request, *, generation, seed):
+        if generation != 'v1':
+            return Response(
+                {'error': 'Invalid identicon generation, only v1 is supported.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        genome = Genome.generate(seed)
+
+        treatments = [
+            {'name': 'SingleColor', 'weight': 1},
+            {'name': 'TwoColor', 'weight': 4},
+            {'name': 'Stripes', 'weight': 6},
+        ]
+        treatment = genome.weightedChoice(treatments, 'shield treatment')['name']
+        emoji = genome.emoji('shield emoji')
+        field_color = genome.color('field color')
+        pattern_color = self.pick_pair(genome, field_color)
+
+        context = {
+            'treatment': treatment,
+            'emoji': emoji,
+            'field_color': field_color,
+            'pattern_color': pattern_color,
+        }
+
+        # Add treatment-specific information to context
+        if treatment == 'SingleColor':
+            pass
+        elif treatment == 'TwoColor':
+            areas = [
+                'top',
+                'bottom',
+                'left',
+                'right',
+                'topLeft',
+                'topRight',
+                'bottomLeft',
+                'bottomRight',
+            ]
+            area = genome.choice(areas, 'area')
+            rotations = {
+                'top': 0,
+                'topRight': 45,
+                'right': 90,
+                'bottomRight': 135,
+                'bottom': 180,
+                'bottomLeft': 225,
+                'left': 270,
+                'topLeft': 315,
+            }
+            context['transform'] = f'scale(100) rotate({rotations[area]} 0.5,0.5)'
+        elif treatment == 'Stripes':
+            count = genome.int(1, 4, 'stripe count')
+            padding = genome.float(0.1, 0.4, 32, 'stripe padding')
+            directions = ['vertical', 'horizontal', 'diagonal1', 'diagonal2']
+            direction = genome.choice(directions, 'stripe direction')
+            stride = (1 - 2 * padding) / (2 * count + 1)
+
+            context['stripe_x_list'] = [padding + stride * (2 * i + 1) for i in range(count)]
+            context['stride'] = stride
+            rotations = {
+                'vertical': 0,
+                'diagonal1': 45,
+                'horizontal': 90,
+                'diagonal2': 135
+            }
+            context['transform'] = f'scale(100) rotate({rotations[direction]} 0.5,0.5)'
+
+        return render(request, 'identicon.svg', context)
