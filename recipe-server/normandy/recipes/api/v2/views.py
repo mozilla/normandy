@@ -238,17 +238,10 @@ class IdenticonView(views.APIView):
 
     def pick_pair(self, genome, base):
         base_luminance = self.hex_luma(base)
-        chosen_color = None
-        pair_luminance = None
-
-        while True:
-            chosen_color = genome.color('counter color')
-            pair_luminance = self.hex_luma(chosen_color)
-
-            if abs(base_luminance - pair_luminance) < 75:
-                break
-
-        return chosen_color
+        good_pairs = list(filter(lambda c: abs(base_luminance - self.hex_luma(c)) > 75,
+                                 genome.colors))
+        assert len(good_pairs) > 0, 'no colors satisfy the luminance requirement'
+        return genome.choice(good_pairs, 'counter color')
 
     def get(self, request, *, generation, seed):
         if generation != 'v1':
