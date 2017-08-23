@@ -1,5 +1,6 @@
 "use strict";
 
+Cu.import("resource://gre/modules/AppConstants.jsm");
 Cu.import("resource://testing-common/AddonTestUtils.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/AddonStudies.jsm", this);
 Cu.import("resource://shield-recipe-client/lib/NormandyDriver.jsm", this);
@@ -42,7 +43,13 @@ add_task(withDriver(Assert, async function uninstallInvalidAddonId(driver) {
 
 
 add_task(withDriver(Assert, async function installXpiBadURL(driver) {
-  const xpiUrl = "file:///tmp/invalid_xpi.xpi";
+  let xpiUrl;
+  if (AppConstants.platform === "win") {
+    xpiUrl = "file:///C:/invalid_xpi.xpi";
+  } else {
+    xpiUrl = "file:///tmp/invalid_xpi.xpi";
+  }
+
   try {
     await driver.addons.install(xpiUrl);
     ok(false, "Installation succeeded on an XPI that doesn't exist");

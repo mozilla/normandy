@@ -181,9 +181,14 @@ XPCOMUtils.defineLazyGetter(this.AboutPages, "aboutStudies", () => {
      *   that requested a study list.
      */
     async sendStudyList(target) {
-      target.messageManager.sendAsyncMessage("Shield:ReceiveStudyList", {
-        studies: await AddonStudies.getAll(),
-      });
+      try {
+        target.messageManager.sendAsyncMessage("Shield:ReceiveStudyList", {
+          studies: await AddonStudies.getAll(),
+        });
+      } catch (err) {
+        // The child process might be gone, so no need to throw here.
+        Cu.reportError(err);
+      }
     },
 
     /**
