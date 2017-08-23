@@ -1,6 +1,9 @@
 import json
 import random
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urljoin, urlparse, urlunparse
+
+from django.core.management import call_command
+from django.test import override_settings
 
 from product_details import product_details
 
@@ -102,13 +105,17 @@ class TestCase(object):
             Protocol and domain to use for absolute URLs in the serialized
             API.
         """
-        root_path = api_path.add('api', 'v1')
-        self.serialize_api_root(root_path, domain)
-        self.serialize_recipe_api(root_path)
-        self.serialize_client_api(root_path)
-        self.serialize_action_api(root_path, domain)
+        cdn_url = urljoin(domain, self.name) + '/'
+        with override_settings(CDN_URL=cdn_url):
+            call_command('update_action_signatures', '--force')
+            root_path = api_path.add('api', 'v1')
+            self.serialize_api_root(root_path, domain)
+            self.serialize_recipe_api(root_path)
+            self.serialize_client_api(root_path)
+            self.serialize_action_api(root_path)
 
     def serialize_api_root(self, root_path, domain):
+        root_path.save()
         root_data = json.loads(root_path.fetch())
         for name, url in root_data.items():
             root_data[name] = self.update_url(url, domain)
@@ -124,26 +131,16 @@ class TestCase(object):
         client_json = canonical_json_dumps(client_data)
         root_path.add('classify_client').save(client_json)
 
-    def serialize_action_api(self, root_path, domain):
+    def serialize_action_api(self, root_path):
         # Action index
-        index_path = root_path.add('action')
-        index_data = json.loads(index_path.fetch())
-        for action_data in index_data:
-            new_url = self.update_url(action_data['implementation_url'], domain)
-            action_data['implementation_url'] = new_url
-        index_path.save(canonical_json_dumps(index_data))
+        index_path = root_path.add('action', 'signed')
+        index_path.save()
 
         # Individual actions
         for action in Action.objects.all():
             # Action
             action_path = root_path.add('action', action.name)
-            action_data = json.loads(action_path.fetch())
-
-            new_url = self.update_url(action_data['implementation_url'], domain)
-            action_data['implementation_url'] = new_url
-
-            action_json = canonical_json_dumps(action_data)
-            action_path.save(action_json)
+            action_path.save()
 
             # Action implementation
             action_path.add('implementation', action.implementation_hash).save()
