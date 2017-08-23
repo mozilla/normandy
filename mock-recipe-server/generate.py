@@ -10,8 +10,6 @@ from pathlib import Path
 
 import configurations
 
-from utils import APIPath
-
 
 # Add normandy to the import path and setup Django stuff.
 sys.path.insert(0, '/app')
@@ -24,6 +22,7 @@ configurations.setup()
 from django.template import Context, Template  # noqa
 
 from testcases import get_testcases  # noqa
+from utils import APIPath  # noqa
 
 
 def main():
@@ -36,7 +35,7 @@ def main():
     testcases = get_testcases()
     for testcase in testcases:
         testcase.load()
-        testcase_api_path = APIPath(build_path / testcase.name, 'https://proxy:8443')
+        testcase_api_path = APIPath(build_path / testcase.name)
         testcase.serialize_api(testcase_api_path, domain)
 
     # Write the root index page.

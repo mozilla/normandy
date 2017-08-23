@@ -9,7 +9,7 @@ def test_testcase_difference(root_path):
     recipes = set()
 
     testcase_paths = (
-        APIPath(path, 'http://example.com')
+        APIPath(path)
         for path in root_path.path.iterdir() if path.is_dir()
     )
     for testcase_path in testcase_paths:

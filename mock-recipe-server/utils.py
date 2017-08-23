@@ -1,20 +1,22 @@
 from pathlib import Path
-from urllib.parse import urljoin
 
-import requests
+from django.test import Client
+
+
+client = Client()
 
 
 class APIPath(object):
     """Represents an API URL that is mirrored on the filesystem."""
-    def __init__(self, base_path, base_url, segments=None):
+    def __init__(self, base_path, segments=None):
         self.base_path = base_path
-        self.base_url = base_url
         self.segments = segments or []
 
     @property
     def url(self):
         """Generate the current URL string."""
-        return urljoin(self.base_url, '/'.join(self.segments) + '/')
+        path = '/'.join(self.segments)
+        return f'/{path}/'
 
     @property
     def path(self):
@@ -28,13 +30,11 @@ class APIPath(object):
 
     def add(self, *paths):
         """Add segments to the current URL."""
-        return APIPath(self.base_path, self.base_url, self.segments + list(paths))
+        return APIPath(self.base_path, self.segments + list(paths))
 
     def fetch(self):
         """Fetch the response text for the current URL."""
-        response = requests.get(self.url, verify=False)
-        response.raise_for_status()
-        return response.text
+        return client.get(self.url).content.decode()
 
     def read(self):
         """Read data on the filesystem for the current URL."""
