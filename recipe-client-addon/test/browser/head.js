@@ -55,17 +55,17 @@ this.withWebExtension = function(manifestOverrides = {}) {
         },
       }, manifestOverrides);
 
-      const file = AddonTestUtils.createTempWebExtensionFile({manifest});
+      const addonFile = AddonTestUtils.createTempWebExtensionFile({manifest});
 
       // Workaround: Add-on files are cached by URL, and
       // createTempWebExtensionFile re-uses filenames if the previous file has
       // been deleted. So we need to flush the cache to avoid it.
-      Services.obs.notifyObservers(file, "flush-cache-entry");
+      Services.obs.notifyObservers(addonFile, "flush-cache-entry");
 
       try {
-        await testFunction(...args, [id, file]);
+        await testFunction(...args, [id, addonFile]);
       } finally {
-        file.remove(true);
+        AddonTestUtils.cleanupTempXPIs();
       }
     };
   };

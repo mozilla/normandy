@@ -85,7 +85,6 @@ this.shutdown = function(data, reason) {
     "AboutPages.jsm",
   ].map(m => `resource://shield-recipe-client-content/${m}`));
   modules = modules.concat([
-    "ajv.js",
     "mozjexl.js",
   ].map(m => `resource://shield-recipe-client-vendor/${m}`));
 
