@@ -1,4 +1,4 @@
-import { fromJS, Map } from 'immutable';
+import { fromJS, Map, Set } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
@@ -43,7 +43,7 @@ function items(state = new Map(), action) {
   let recipe;
 
   switch (action.type) {
-    case RECIPE_RECEIVE:
+    case RECIPE_RECEIVE: {
       recipe = fromJS(action.recipe);
 
       recipe = recipe
@@ -55,6 +55,7 @@ function items(state = new Map(), action) {
         .remove('approved_revision');
 
       return state.set(action.recipe.id, recipe);
+    }
 
     case RECIPE_DELETE:
       return state.remove(action.recipeId);
@@ -67,11 +68,23 @@ function items(state = new Map(), action) {
 
 function listing(state = new Map(), action) {
   switch (action.type) {
-    case RECIPE_PAGE_RECEIVE:
+    case RECIPE_PAGE_RECEIVE: {
+      let totalRecipes = state.get('all', new Set());
+
+      fromJS(action.recipes.results.forEach(result => {
+        totalRecipes = totalRecipes.add(fromJS(result));
+      }));
+
+      totalRecipes = totalRecipes.sort((a, b) => a.get('id') <= b.get('id'));
+
+
       return state
         .set('count', action.recipes.count)
+        .set('numPages', Math.ceil(action.recipes.count / 10))
         .set('pageNumber', action.pageNumber)
-        .set('results', fromJS(action.recipes.results.map(result => result.id)));
+        .set('results', fromJS(action.recipes.results.map(result => result.id)))
+        .set('all', totalRecipes);
+    }
 
     case RECIPE_LISTING_COLUMNS_CHANGE:
       return state.set('columns', RECIPE_LISTING_COLUMNS.filter(column => (

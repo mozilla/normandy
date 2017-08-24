@@ -33,6 +33,10 @@ export function getRecipeListing(state) {
   return recipes.map(id => getRecipe(state, id));
 }
 
+export function getAllLoadedRecipes(state) {
+  return state.app.recipes.listing.get('all', new List());
+}
+
 export function getRecipeListingFlattenedAction(state) {
   const recipes = getRecipeListing(state);
   return recipes.map(item => item.set('action', item.getIn(['action', 'name'])));
@@ -40,6 +44,10 @@ export function getRecipeListingFlattenedAction(state) {
 
 export function getRecipeListingPageNumber(state) {
   return state.app.recipes.listing.get('pageNumber');
+}
+
+export function getRecipePageCount(state, defaultsTo = 0) {
+  return state.app.recipes.listing.get('numPages', defaultsTo);
 }
 
 export function getRecipeListingColumns(state, defaultsTo = DEFAULT_RECIPE_LISTING_COLUMNS) {

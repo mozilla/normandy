@@ -41,6 +41,7 @@ export function fetchExtensionsPage(pageNumber = 1) {
       type: EXTENSION_PAGE_RECEIVE,
       pageNumber,
       extensions,
+      isLastPage: extensions.results.next === null,
     });
   };
 }
