@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-boolean-value */
-import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
+import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select, message } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -22,6 +22,11 @@ export default class PreferenceExperimentFields extends React.Component {
     disabled: false,
     recipeArguments: new Map(),
   };
+
+  constructor(props) {
+    super(props);
+    this.shouldNotify = true;
+  }
 
   render() {
     const {
@@ -55,6 +60,18 @@ export default class PreferenceExperimentFields extends React.Component {
             label="Preference Name"
             name="arguments.preferenceName"
             initialValue={recipeArguments.get('preferenceName', '')}
+            config={{ getValueFromEvent: e => {
+              const trimmed = e.target.value.trim();
+              if (trimmed !== e.target.value && this.shouldNotify) {
+                this.shouldNotify = false;
+                message.info(
+                  'Whitespace was automatically trimmed from the Preference Name.',
+                  1.5,
+                  () => { this.shouldNotify = true; });
+              }
+              return trimmed;
+            },
+            }}
           >
             <Input disabled={disabled} />
           </FormItem>
@@ -219,17 +236,50 @@ export class ExperimentBranches extends React.Component {
   }
 }
 
+@autobind
 export class StringPreferenceField extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.func.isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+    this.shouldNotify = true;
+  }
+
+  handleChange(event) {
+    const { onChange } = this.props;
+    if (event.target.value) {
+      const trimmed = event.target.value.trim();
+      if (trimmed !== event.target.value && this.shouldNotify) {
+        event.target.value = trimmed;
+        this.shouldNotify = false;
+        message.info(
+          'Whitespace was automatically trimmed from a Preference Value of type String.',
+          1.5,
+          () => { this.shouldNotify = true; });
+      }
+    }
+    onChange(event);
+  }
   render() {
+    const { onChange, ...other } = this.props;
     return (
-      <Input {...this.props} />
+      <Input
+        onChange={this.handleChange}
+        {...other}
+      />
     );
   }
 }
 
 export class BooleanPreferenceField extends React.Component {
   static propTypes = {
-    value: PropTypes.any,
+    value: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    value: null,
   }
 
   render() {
