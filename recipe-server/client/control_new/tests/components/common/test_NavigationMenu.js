@@ -1,3 +1,4 @@
+import { List } from 'immutable';
 import React from 'react';
 import { shallow } from 'enzyme';
 
@@ -8,6 +9,7 @@ const { WrappedComponent: NavigationMenu } = TestComponent;
 describe('<NavigationMenu>', () => {
   const props = {
     router: {},
+    sessionHistory: new List(),
   };
 
   it('should work', () => {

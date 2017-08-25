@@ -1,12 +1,33 @@
 import { Card } from 'antd';
-import { Map } from 'immutable';
+import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { connect } from 'react-redux';
 
+import { addSessionView } from 'control_new/state/app/session/actions';
 
+@connect(() => ({}), { addSessionView })
 export default class RecipeDetails extends React.Component {
   static propTypes = {
+    addSessionView: PropTypes.func.isRequired,
     recipe: PropTypes.instanceOf(Map).isRequired,
+  }
+
+  componentDidMount() {
+    const recipeName = this.props.recipe.get('name');
+    if (recipeName) {
+      this.props.addSessionView(recipeName);
+    }
+  }
+
+  componentWillReceiveProps({ recipe }) {
+    const oldRecipe = this.props.recipe;
+
+    // New recipe means we add a session view.
+    if (!is(oldRecipe, recipe) && oldRecipe.get('name') !== recipe.get('name')) {
+      const recipeName = recipe.get('name');
+      this.props.addSessionView(recipeName);
+    }
   }
 
   render() {
