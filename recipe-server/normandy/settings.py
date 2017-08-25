@@ -383,6 +383,7 @@ class Production(Base):
     LOGGING_USE_JSON = values.Value(True)
     SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
     DEFAULT_FILE_STORAGE = values.Value('storages.backends.s3boto3.S3Boto3Storage')
+    AWS_S3_FILE_OVERWRITE = False
 
 
 class ProductionReadOnly(Production):
