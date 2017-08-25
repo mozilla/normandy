@@ -7,6 +7,7 @@ import React from 'react';
 
 import DocumentUrlInput from 'control_new/components/forms/DocumentUrlInput';
 import FormItem from 'control_new/components/forms/FormItem';
+import TrimWhitespaceFormItem from 'control_new/components/forms/TrimWhitespaceFormItem';
 import { connectFormProps } from 'control_new/utils/forms';
 
 
@@ -22,11 +23,6 @@ export default class PreferenceExperimentFields extends React.Component {
     disabled: false,
     recipeArguments: new Map(),
   };
-
-  constructor(props) {
-    super(props);
-    this.shouldNotify = true;
-  }
 
   render() {
     const {
@@ -56,25 +52,13 @@ export default class PreferenceExperimentFields extends React.Component {
           </FormItem>
         </Col>
         <Col sm={24} md={{ span: 12, offset: 1 }}>
-          <FormItem
+          <TrimWhitespaceFormItem
             label="Preference Name"
             name="arguments.preferenceName"
             initialValue={recipeArguments.get('preferenceName', '')}
-            config={{ getValueFromEvent: e => {
-              const trimmed = e.target.value.trim();
-              if (trimmed !== e.target.value && this.shouldNotify) {
-                this.shouldNotify = false;
-                message.info(
-                  'Whitespace was automatically trimmed from the Preference Name.',
-                  1.5,
-                  () => { this.shouldNotify = true; });
-              }
-              return trimmed;
-            },
-            }}
           >
             <Input disabled={disabled} />
-          </FormItem>
+          </TrimWhitespaceFormItem>
 
           <Col sm={24}>
             <Col xs={24} sm={11}>
@@ -249,18 +233,16 @@ export class StringPreferenceField extends React.Component {
 
   handleChange(event) {
     const { onChange } = this.props;
-    if (event.target.value) {
-      const trimmed = event.target.value.trim();
-      if (trimmed !== event.target.value && this.shouldNotify) {
-        event.target.value = trimmed;
-        this.shouldNotify = false;
-        message.info(
-          'Whitespace was automatically trimmed from a Preference Value of type String.',
-          1.5,
-          () => { this.shouldNotify = true; });
-      }
+    const value = event.target.value;
+    const trimmed = value.trim();
+    if (trimmed !== value && this.shouldNotify) {
+      this.shouldNotify = false;
+      message.info(
+        'Whitespace was automatically trimmed from a Preference Value of type String.',
+        1.5,
+        () => { this.shouldNotify = true; });
     }
-    onChange(event);
+    onChange(trimmed);
   }
   render() {
     const { onChange, ...other } = this.props;
