@@ -5,7 +5,7 @@ import React from 'react';
 
 import SwitchBox from 'control_new/components/forms/SwitchBox';
 import FormItem from 'control_new/components/forms/FormItem';
-import { ExtensionSelect, RecipeSelect } from 'control_new/components/forms/PaginatedSelect';
+import { ExtensionSelect } from 'control_new/components/forms/PaginatedSelect';
 
 import { connectFormProps } from 'control_new/utils/forms';
 
@@ -54,14 +54,6 @@ export default class OptOutStudyFields extends React.Component {
               initialValue={recipeArguments.get('addonUrl', '')}
             >
               <ExtensionSelect disabled={disabled} />
-            </FormItem>
-
-            <FormItem
-              label="Add-on Extension"
-              name="arguments.addonUrl"
-              initialValue={recipeArguments.get('addonUrl', '')}
-            >
-              <RecipeSelect disabled={disabled} />
             </FormItem>
 
             <FormItem

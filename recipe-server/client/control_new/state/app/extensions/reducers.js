@@ -27,9 +27,9 @@ function listing(state = new Map(), action) {
     case EXTENSION_PAGE_RECEIVE: {
       let totalExtensions = state.get('all', new Set());
 
-      fromJS(action.extensions.results.forEach(result => {
+      action.extensions.results.forEach(result => {
         totalExtensions = totalExtensions.add(fromJS(result));
-      }));
+      });
 
       totalExtensions = totalExtensions.sort((a, b) => a.get('id') <= b.get('id'));
 

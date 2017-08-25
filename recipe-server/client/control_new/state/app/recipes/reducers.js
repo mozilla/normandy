@@ -75,8 +75,7 @@ function listing(state = new Map(), action) {
         totalRecipes = totalRecipes.add(fromJS(result));
       }));
 
-      totalRecipes = totalRecipes.sort((a, b) => a.get('id') <= b.get('id'));
-
+      totalRecipes = totalRecipes.sort((a, b) => a.get('id') - b.get('id'));
 
       return state
         .set('count', action.recipes.count)
