@@ -86,7 +86,6 @@ this.ShieldPreferences = {
         if (!prefValue) {
           for (const study of await AddonStudies.getAll()) {
             if (study.active) {
-              dump(`\nSTOPPING ${study.recipeId}\n`);
               await AddonStudies.stop(study.recipeId);
             }
           }
