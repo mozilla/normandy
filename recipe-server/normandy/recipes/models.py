@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -545,7 +546,14 @@ class Action(DirtyFieldsMixin, models.Model):
         """Set of enabled recipes that are using this action."""
         return Recipe.objects.filter(
             latest_revision_id__in=self.recipe_revisions.values_list('id', flat=True),
-            enabled=True)
+            enabled=True
+        )
+
+    def recipes_used_by_html(self):
+        return render_to_string('admin/field_recipe_list.html', {
+            'recipes': self.recipes_used_by.order_by('latest_revision__name'),
+        })
+    recipes_used_by_html.short_description = 'Used in Recipes'
 
     def __str__(self):
         return self.name
