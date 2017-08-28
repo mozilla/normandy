@@ -311,4 +311,4 @@ class IdenticonView(views.APIView):
             }
             context['transform'] = f'scale(100) rotate({rotations[direction]} 0.5,0.5)'
 
-        return render(request, 'identicon.svg', context)
+        return render(request, 'identicon.svg', context, content_type='image/svg+xml')
