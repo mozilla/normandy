@@ -188,6 +188,12 @@ in other Django projects.
     :envvar:`DJANGO_API_CACHE_TIME`. If false, API views will send headers
     indicating that they should never be cached.
 
+.. envvar:: DJANGO_PERMANENT_REDIRECT_CACHE_TIME
+
+   :default: ``2592000`` (30 days)
+
+   The time in seconds to set in cache headers for permanent redirects.
+
 .. envvar:: DJANGO_LOGGING_USE_JSON
 
     :default: ``True``

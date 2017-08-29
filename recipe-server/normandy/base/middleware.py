@@ -1,10 +1,13 @@
 import os
 import re
 
+from django import http
 from django.conf import settings
 from django.utils import timezone
+from django.utils.cache import patch_cache_control
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.middleware.common import CommonMiddleware
 
 from mozilla_cloud_services_logger.django.middleware import (
     RequestSummaryLogger as OriginalRequestSummaryLogger
@@ -65,3 +68,26 @@ class NormandyWhiteNoiseMiddleware(WhiteNoiseMiddleware):
         # 32 is for content addressed files, like images or fonts, which use "[hash].[ext]"
         match = re.match(r'^.*([a-f0-9]{20}|[a-f0-9]{32})\.[\w\d]+$', filename)
         return bool(match)
+
+
+class HttpResponsePermanentRedirectCached(http.HttpResponsePermanentRedirect):
+    """
+    Permanent redirect that also includes cache headers.
+
+    This primarily helps our infrastructure stay reliable and
+    performant, and softens "permanent" redirects to merely be long
+    lived, which helps with maintainability.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        patch_cache_control(self, public=True, max_age=settings.PERMANENT_REDIRECT_CACHE_TIME)
+
+
+class NormandyCommonMiddleware(CommonMiddleware):
+    """
+    Overrides CommonMiddleware to customize it to Normandy's needs.
+
+    Includes cache control headers on APPEND_SLASH redirects.
+    """
+
+    response_redirect_class = HttpResponsePermanentRedirectCached
