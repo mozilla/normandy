@@ -112,17 +112,6 @@ class TestActionAPI(object):
         assert res.data[1]['action']['name'] == a2.name
         assert res.data[1]['signature']['signature'] == a2.signature.signature
 
-    def test_it_makes_a_reasonable_number_of_db_queries(self, client):
-        # Naive versions of this view could easily make several queries
-        # *per action*, which is very slow. Make sure that isn't the case.
-        ActionFactory.create_batch(100)
-        queries = CaptureQueriesContext(connection)
-        with queries:
-            res = client.get('/api/v1/action/')
-            assert res.status_code == 200
-        # Anything under 100 isn't doing one query per recipe.
-        assert len(queries) < 100
-
 
 @pytest.mark.django_db
 class TestImplementationAPI(object):
@@ -437,17 +426,6 @@ class TestRecipeAPI(object):
         assert len(res.data) == 1
         assert res.data[0]['recipe']['id'] == disabled_recipe.id
 
-    def test_signed_listing_makes_a_reasonable_number_of_db_queries(self, client):
-        # Naive versions of this view could easily make several queries
-        # *per recipe*, which is very slow. Make sure that isn't the case.
-        RecipeFactory.create_batch(100)
-        queries = CaptureQueriesContext(connection)
-        with queries:
-            res = client.get('/api/v1/recipe/signed/')
-            assert res.status_code == 200
-        # Anything under 100 isn't doing one query per recipe.
-        assert len(queries) < 100
-
     def test_list_sets_no_cookies(self, api_client):
         res = api_client.get('/api/v1/recipe/')
         assert res.status_code == 200
@@ -581,17 +559,6 @@ class TestRecipeAPI(object):
         r.refresh_from_db()
         assert list(r.channels.all()) == [c2]
 
-    def test_it_makes_a_reasonable_number_of_db_queries(self, client):
-        # Naive versions of this view could easily make several queries
-        # *per recipe*, which is very slow. Make sure that isn't the case.
-        RecipeFactory.create_batch(100)
-        queries = CaptureQueriesContext(connection)
-        with queries:
-            res = client.get('/api/v1/recipe/')
-            assert res.status_code == 200
-        # Anything under 100 isn't doing one query per recipe.
-        assert len(queries) < 100
-
 
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):
@@ -619,17 +586,6 @@ class TestRecipeRevisionAPI(object):
         res = api_client.post(
             '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
         assert res.status_code == 400
-
-    def test_it_makes_a_reasonable_number_of_db_queries(self, client):
-        # Naive versions of this view could easily make several queries
-        # *per revision*, which is very slow. Make sure that isn't the case.
-        RecipeRevisionFactory.create_batch(100)
-        queries = CaptureQueriesContext(connection)
-        with queries:
-            res = client.get('/api/v1/recipe_revision/')
-            assert res.status_code == 200
-        # Anything under 100 isn't doing one query per recipe.
-        assert len(queries) < 100
 
 
 @pytest.mark.django_db
@@ -703,17 +659,6 @@ class TestApprovalRequestAPI(object):
 
         with pytest.raises(ApprovalRequest.DoesNotExist):
             ApprovalRequest.objects.get(pk=a.pk)
-
-    def test_it_makes_a_reasonable_number_of_db_queries(self, client):
-        # Naive versions of this view could easily make several queries
-        # *per action*, which is very slow. Make sure that isn't the case.
-        ApprovalRequestFactory.create_batch(100)
-        queries = CaptureQueriesContext(connection)
-        with queries:
-            res = client.get('/api/v1/approval_request/')
-            assert res.status_code == 200
-        # Anything under 100 isn't doing one query per recipe.
-        assert len(queries) < 100
 
 
 @pytest.mark.django_db
@@ -926,3 +871,26 @@ class TestApprovalFlow(object):
 
         # The API should still have correct signatures
         self.verify_signatures(api_client, expected_count=1)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("endpoint,Factory", [
+    ('/api/v1/action/', ActionFactory),
+    ('/api/v1/action/signed/', ActionFactory),
+    ('/api/v1/recipe/', RecipeFactory),
+    ('/api/v1/recipe/signed/', RecipeFactory),
+    ('/api/v1/recipe_revision/', RecipeRevisionFactory),
+    ('/api/v1/approval_request/', ApprovalRequestFactory),
+])
+def test_apis_make_a_reasonable_number_of_db_queries(client, endpoint, Factory):
+    """
+    Naive versions of these views could easily make several queries
+    per item, which is very slow. Make sure that isn't the case.
+    """
+    Factory.create_batch(100)
+    queries = CaptureQueriesContext(connection)
+    with queries:
+        res = client.get(endpoint)
+        assert res.status_code == 200
+    # Anything under 100 isn't doing one query per recipe.
+    assert len(queries) < 100
