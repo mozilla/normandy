@@ -83,7 +83,17 @@ class RecipeFilters(django_filters.FilterSet):
 
 class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     """Viewset for viewing and uploading recipes."""
-    queryset = Recipe.objects.all()
+    queryset = (
+        Recipe.objects.all()
+        # Foreign keys
+        .select_related('latest_revision')
+        .select_related('latest_revision__action')
+        .select_related('latest_revision__approval_request')
+        # Many-to-many
+        .prefetch_related('latest_revision__channels')
+        .prefetch_related('latest_revision__countries')
+        .prefetch_related('latest_revision__locales')
+    )
     serializer_class = RecipeSerializer
     filter_class = RecipeFilters
     permission_classes = [
@@ -163,7 +173,16 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
 
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = RecipeRevision.objects.all()
+    queryset = (
+        RecipeRevision.objects.all()
+        .select_related('action')
+        .select_related('approval_request')
+        .select_related('recipe')
+        # Many-to-many
+        .prefetch_related('channels')
+        .prefetch_related('countries')
+        .prefetch_related('locales')
+    )
     serializer_class = RecipeRevisionSerializer
     permission_classes = [
         AdminEnabledOrReadOnly,

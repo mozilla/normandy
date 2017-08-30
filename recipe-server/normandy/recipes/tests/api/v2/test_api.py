@@ -1,3 +1,6 @@
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+
 import pytest
 from rest_framework.reverse import reverse
 
@@ -12,6 +15,7 @@ from normandy.recipes.tests import (
     CountryFactory,
     LocaleFactory,
     RecipeFactory,
+    RecipeRevisionFactory,
     fake_sign,
 )
 
@@ -70,6 +74,20 @@ class TestActionAPI(object):
         res = api_client.get('/api/v2/action/{id}/'.format(id=action.id))
         assert res.status_code == 200
         assert res.client.cookies == {}
+
+    def test_it_makes_a_reasonable_number_of_db_queries(self, client, settings):
+        # Naive versions of this view could easily make several queries
+        # *per action*, which is very slow. Make sure that isn't the case.
+        ActionFactory.create_batch(100)
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res = client.get('/api/v2/action/')
+            assert res.status_code == 200
+
+        # Pagination naturally makes one query per item in the page. Anything
+        # under `page_size * 2` isn't doing any additional queries per recipe.
+        page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+        assert len(queries) < page_size * 2
 
 
 @pytest.mark.django_db
@@ -437,6 +455,20 @@ class TestRecipeAPI(object):
         r.refresh_from_db()
         assert list(r.channels.all()) == [c2]
 
+    def test_it_makes_a_reasonable_number_of_db_queries(self, client, settings):
+        # Naive versions of this view could easily make several queries
+        # *per action*, which is very slow. Make sure that isn't the case.
+        RecipeFactory.create_batch(100)
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res = client.get('/api/v2/recipe/')
+            assert res.status_code == 200
+
+        # Pagination naturally makes one query per item in the page. Anything
+        # under `page_size * 2` isn't doing any additional queries per recipe.
+        page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+        assert len(queries) < page_size * 2
+
 
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):
@@ -464,6 +496,20 @@ class TestRecipeRevisionAPI(object):
         res = api_client.post(
             '/api/v2/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
         assert res.status_code == 400
+
+    def test_it_makes_a_reasonable_number_of_db_queries(self, client, settings):
+        # Naive versions of this view could easily make several queries
+        # *per action*, which is very slow. Make sure that isn't the case.
+        RecipeRevisionFactory.create_batch(100)
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res = client.get('/api/v2/recipe_revision/')
+            assert res.status_code == 200
+
+        # Pagination naturally makes one query per item in the page. Anything
+        # under `page_size * 2` isn't doing any additional queries per recipe.
+        page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+        assert len(queries) < page_size * 2
 
 
 @pytest.mark.django_db
@@ -537,6 +583,20 @@ class TestApprovalRequestAPI(object):
 
         with pytest.raises(ApprovalRequest.DoesNotExist):
             ApprovalRequest.objects.get(pk=a.pk)
+
+    def test_it_makes_a_reasonable_number_of_db_queries(self, client, settings):
+        # Naive versions of this view could easily make several queries
+        # *per action*, which is very slow. Make sure that isn't the case.
+        ApprovalRequestFactory.create_batch(100)
+        queries = CaptureQueriesContext(connection)
+        with queries:
+            res = client.get('/api/v2/approval_request/')
+            assert res.status_code == 200
+
+        # Pagination naturally makes one query per item in the page. Anything
+        # under `page_size * 2` isn't doing any additional queries per recipe.
+        page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+        assert len(queries) < page_size * 2
 
 
 @pytest.mark.django_db
