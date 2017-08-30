@@ -33,7 +33,7 @@ urlpatterns = [
         name='action-implementation'
     ),
     url(
-        r'^api/v2/identicon/(?P<generation>v[0-9]):(?P<seed>.{1,64}).svg',
+        r'^api/v2/identicon/(?P<generation>v[0-9]):(?P<seed>.{1,64})\.svg',
         api_v2_views.IdenticonView.as_view(),
         name='identicon'
     ),

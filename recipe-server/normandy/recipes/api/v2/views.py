@@ -234,6 +234,6 @@ class IdenticonView(views.APIView):
                 {'error': 'Invalid identicon generation, only v1 is supported.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        genome = Genome.generate(seed)
+        genome = Genome(seed)
         identicon_svg = shield_identicon.generate_svg(genome)
         return HttpResponse(identicon_svg, content_type='image/svg+xml')

@@ -42,8 +42,8 @@ def two_color(genome, context):
 
 def stripes(genome, context):
     context['treatment'] = 'Stripes'
-    count = genome.int(1, 4)
-    padding = genome.float(0.1, 0.4, precision=32)
+    count = genome.randint(1, 4)
+    padding = genome.uniform(0.1, 0.4)
     directions = ['vertical', 'horizontal', 'diagonal1', 'diagonal2']
     direction = genome.choice(directions)
     stride = (1 - 2 * padding) / (2 * count + 1)
