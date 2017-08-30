@@ -74,8 +74,8 @@ export default class RevisionApprovalTag extends React.Component {
     if ([REVISION_LIVE, REVISION_DISABLED, REVISION_APPROVED, REVISION_REJECTED].includes(status)) {
       popoverContent = (
         <div>
-          <div><strong>&quot;{revision.getIn(['approval_request', 'comment'])}&quot;</strong></div>
-          <div><em>~ {revision.getIn(['approval_request', 'approver', 'email'])}</em></div>
+          <div><strong>“{revision.getIn(['approval_request', 'comment'])}”</strong></div>
+          <label>— {revision.getIn(['approval_request', 'approver', 'email'])}</label>
         </div>
       );
     } else {
@@ -83,7 +83,7 @@ export default class RevisionApprovalTag extends React.Component {
     }
 
     return (
-      <Popover content={popoverContent}>
+      <Popover overlayClassName="timeline-popover" content={popoverContent} placement="right">
         <Link href={`/recipe/${revision.getIn(['recipe', 'id'])}/approval_history`}>
           <Tag color={color}>
             {label}
