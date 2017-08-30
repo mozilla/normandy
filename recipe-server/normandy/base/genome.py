@@ -4,6 +4,8 @@ import string
 
 from hashlib import sha256
 
+from normandy.base.color import Color
+
 
 class Genome:
     """A seedable source that provides arbitrarily sized chunks of randomness."""
@@ -11,91 +13,90 @@ class Genome:
         self.chromosome = chromosome
         self.entropy = entropy
         self.log = []
+        # Colors taken from the Solarized color scheme (http://ethanschoonover.com/solarized)
         self.colors = [
-            '#002b36',  # base03
-            '#073642',  # base02
-            '#586e75',  # base01
-            '#657b83',  # base00
-            '#839496',  # base0
-            '#93a1a1',  # base1
-            '#eee8d5',  # base2
-            '#fdf6e3',  # base3
-            # '#b58900',  # yellow
-            '#ffcf00',
-            '#cb4b16',  # orange
-            '#dc322f',  # red
-            '#d33682',  # magenta
-            '#6c71c4',  # violet
-            '#268bd2',  # blue
-            '#2aa198',  # cyan
-            '#859900',  # green
+            Color((0x00, 0x2b, 0x36)),
+            Color((0x07, 0x36, 0x42)),
+            Color((0x58, 0x6e, 0x75)),
+            Color((0x65, 0x7b, 0x83)),
+            Color((0x83, 0x94, 0x96)),
+            Color((0x93, 0xa1, 0xa1)),
+            Color((0xee, 0xe8, 0xd5)),
+            Color((0xfd, 0xf6, 0xe3)),
+            Color((0xff, 0xcf, 0x00)),  # alternate yellow color
+            Color((0xcb, 0x4b, 0x16)),
+            Color((0xdc, 0x32, 0x2f)),
+            Color((0xd3, 0x36, 0x82)),
+            Color((0x6c, 0x71, 0xc4)),
+            Color((0x26, 0x8b, 0xd2)),
+            Color((0x2a, 0xa1, 0x98)),
+            Color((0x85, 0x99, 0x00)),
         ]
 
     @staticmethod
     def generate(seed=random.random()):
-        """Asynchronously returns a Genome based on the given seed.
-        seed -- Any JSON serializable value. Will be used to seed the
-                genome. If not provided, will be randomly generated.
         """
-        hash = sha256(str(seed).encode('utf-8'))
-        chromosome = int(hash.hexdigest(), base=16)
+        Asynchronously returns a Genome based on the given seed.
+        :param seed:
+            Any JSON serializable value. Will be used to seed the genome.
+            If not provided, will be randomly generated.
+        """
+        sha_256 = sha256(str(seed).encode('utf-8'))
+        chromosome = int(sha_256.hexdigest(), base=16)
         return Genome(chromosome, 256)
 
-    def take(self, mod, reason):
-        """Return an integer in the range [0, mod), and deduct the correct
+    def take(self, mod):
+        """
+        Return an integer in the range [0, mod), and deduct the correct
         amount of entropy from the pool. Vulnerable to modulus-bias when
-        `mod` is not a power of two.
+        ``mod`` is not a power of two.
         This is the fundamental way to consume a Genome. All the other
         methods below that use entropy defer to this method.
         """
         needed = math.log2(mod)
         if self.entropy < needed:
             raise Exception('Not enough entropy left in genome.')
-        self.entropy -= needed
         quotient, remainder = divmod(self.chromosome, mod)
-        self.log.append({
-            'reason': reason,
-            'mod': mod,
-            'remainder': str(remainder),
-            'before': self.chromosome,
-            'after': quotient,
-        })
+        self.entropy -= needed
         self.chromosome = quotient
         return remainder
 
-    def choice(self, options, extra):
+    def choice(self, options):
         """Choose a random value from an array."""
-        idx = self.take(len(options), extra)
+        idx = self.take(len(options))
         return options[idx]
 
-    def weightedChoice(self, options, reason):
-        """Choose a random object from an array by weight.
+    def weighted_choice(self, options):
+        """
+        Choose a random object from an array by weight.
         `options` should be objects with at least a `weight` key.
         """
-        sumWeights = sum(o['weight'] for o in options)
+        sum_weights = sum(o['weight'] for o in options)
 
-        choice = self.take(sumWeights, reason)
+        choice = self.take(sum_weights)
         for option in options:
             choice -= option['weight']
             if choice <= 0:
                 return option
         raise Exception('No choices chosen.')
 
-    def int(self, min, max, reason):
-        """A random integer between `min` and `max`"""
-        return self.take(max - min, reason) + min
+    def int(self, min_value, max_value):
+        """A random integer between ``min_value`` and ``max_value``."""
+        return self.take(max_value - min_value) + min_value
 
-    def float(self, min, max, precision, reason):
-        """Generates a random integer in [0, precision), and then maps that as a
-        float to the range [min, max)."""
-        r = self.take(precision, reason) / precision
-        return r * (max - min) + min
+    def float(self, min_value, max_value, *, precision):
+        """
+        Generates a random integer in [0, precision), and then maps that as a
+        float to the range [min_value, max_value).
+        """
+        initial_rand = self.take(precision) / precision
+        return initial_rand * (max_value - min_value) + min_value
 
-    def letter(self, reason):
+    def letter(self):
         """Generates a random capital letter."""
-        return string.ascii_letters[self.int(26, 52, reason)]
+        return string.ascii_letters[self.int(26, 52)]
 
-    def emoji(self, reason):
+    def emoji(self):
         """Generates a random emoji."""
         emojis = ["😄", "😃", "😀", "😊", "😉", "😍", "😘", "😚", "😗", "😙", "😜", "😝", "😛",
                   "😳", "😁", "😔", "😌", "😒", "😞", "😣", "😢", "😂", "😭", "😪", "😥", "😰",
@@ -129,8 +130,8 @@ class Genome:
                   "🚌", "🚍", "🚙", "🚘", "🚗", "🚕", "🚖", "🚛", "🚚", "🚨", "🚓", "🚔", "🚒",
                   "🚑", "🚐", "🚲", "🚜", "💈", "🚦", "🚧", "🏮", "🎰", "🗿", "🎪", "🎭", "📍",
                   "🚩", "💯"]
-        return self.choice(emojis, reason)
+        return self.choice(emojis)
 
-    def color(self, reason):
+    def color(self):
         """Generates a random color."""
-        return self.choice(self.colors, reason)
+        return self.choice(self.colors)

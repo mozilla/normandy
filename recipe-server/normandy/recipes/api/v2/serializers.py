@@ -135,7 +135,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
-        # if there is no identicon_seed, generate one
         if 'identicon_seed' not in validated_data:
             validated_data['identicon_seed'] = f'v1:{FuzzyText().fuzz()}'
 

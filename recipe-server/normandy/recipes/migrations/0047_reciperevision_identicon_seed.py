@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             name='identicon_seed',
             field=normandy.recipes.fields.IdenticonSeedField(blank=True, null=True, max_length=64),
         ),
-        migrations.RunPython(generate_identicon_seeds, generate_identicon_seeds),
+        migrations.RunPython(generate_identicon_seeds),
         migrations.AlterField(
             model_name='reciperevision',
             name='identicon_seed',
