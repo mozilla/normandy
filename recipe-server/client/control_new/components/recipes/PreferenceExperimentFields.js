@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-boolean-value */
-import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select, message } from 'antd';
+import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -7,7 +7,6 @@ import React from 'react';
 
 import DocumentUrlInput from 'control_new/components/forms/DocumentUrlInput';
 import FormItem from 'control_new/components/forms/FormItem';
-import TrimWhitespaceFormItem from 'control_new/components/forms/TrimWhitespaceFormItem';
 import { connectFormProps } from 'control_new/utils/forms';
 
 
@@ -52,13 +51,14 @@ export default class PreferenceExperimentFields extends React.Component {
           </FormItem>
         </Col>
         <Col sm={24} md={{ span: 12, offset: 1 }}>
-          <TrimWhitespaceFormItem
+          <FormItem
             label="Preference Name"
             name="arguments.preferenceName"
             initialValue={recipeArguments.get('preferenceName', '')}
+            trimWhitespace
           >
             <Input disabled={disabled} />
-          </TrimWhitespaceFormItem>
+          </FormItem>
 
           <Col sm={24}>
             <Col xs={24} sm={11}>
@@ -233,16 +233,7 @@ export class StringPreferenceField extends React.Component {
 
   handleChange(event) {
     const { onChange } = this.props;
-    const value = event.target.value;
-    const trimmed = value.trim();
-    if (trimmed !== value && this.shouldNotify) {
-      this.shouldNotify = false;
-      message.info(
-        'Whitespace was automatically trimmed from a Preference Value of type String.',
-        1.5,
-        () => { this.shouldNotify = true; });
-    }
-    onChange(trimmed);
+    onChange(event.target.value.trim());
   }
   render() {
     const { onChange, ...other } = this.props;

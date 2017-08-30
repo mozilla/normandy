@@ -139,6 +139,8 @@ export function createForm({ validateFields, ...formConfig }) {
  */
 export function connectFormProps(Component) {
   return class Wrapper extends React.Component {
+    static wrappedComponent = Component;
+
     static contextTypes = {
       form: PropTypes.object,
       formErrors: PropTypes.object,

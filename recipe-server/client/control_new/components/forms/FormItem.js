@@ -1,3 +1,4 @@
+import autobind from 'autobind-decorator';
 import { Form } from 'antd';
 import get from 'lodash.get';
 import PropTypes from 'prop-types';
@@ -16,6 +17,7 @@ import { connectFormProps } from 'control_new/utils/forms';
  * Because of this, the child passed to FormItem must be a class-based
  * component.
  */
+@autobind
 @connectFormProps
 export default class FormItem extends React.Component {
   static propTypes = {
@@ -42,6 +44,9 @@ export default class FormItem extends React.Component {
 
     // List of validation rules (passed to form.getFieldDecorator).
     rules: PropTypes.arrayOf(PropTypes.object),
+
+    // If true, automatically trim whitespace from the value.
+    trimWhitespace: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -50,20 +55,39 @@ export default class FormItem extends React.Component {
     initialValue: null,
     name: null,
     rules: null,
+    trimWhitespace: false,
   };
 
+  trimValue(event) {
+    // InputNumber passes the value as the parameter,
+    // but Input passes it via event.target.value.
+    let value = event;
+    if (event && event.target) {
+      value = event.target.value;
+    }
+    return value.trim();
+  }
+
   render() {
+    let { config } = this.props;
     const {
       children,
-      config,
       connectToForm,
       form,
       formErrors,
       initialValue,
       name,
       rules,
+      trimWhitespace,
       ...customItemProps
     } = this.props;
+
+    if (trimWhitespace) {
+      if (config.getValueFromEvent) {
+        throw Error('config.getValueFromEvent is already defined, do not also use trimWhitespace.');
+      }
+      config = { ...config, getValueFromEvent: this.trimValue };
+    }
 
     const defaultItemProps = {};
     const error = get(formErrors, name);
