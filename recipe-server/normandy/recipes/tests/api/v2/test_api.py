@@ -1,3 +1,6 @@
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+
 import pytest
 from rest_framework.reverse import reverse
 
@@ -12,6 +15,7 @@ from normandy.recipes.tests import (
     CountryFactory,
     LocaleFactory,
     RecipeFactory,
+    RecipeRevisionFactory,
     fake_sign,
 )
 
@@ -722,3 +726,25 @@ class TestApprovalFlow(object):
 
         # The API should still have correct signatures
         self.verify_signatures(api_client, expected_count=1)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("endpoint,Factory", [
+    ('/api/v2/action/', ActionFactory),
+    ('/api/v2/recipe/', RecipeFactory),
+    ('/api/v2/recipe_revision/', RecipeRevisionFactory),
+    ('/api/v2/approval_request/', ApprovalRequestFactory),
+])
+def test_apis_makes_a_reasonable_number_of_db_queries(endpoint, Factory, client, settings):
+    # Naive versions of this view could easily make several queries
+    # per item, which is very slow. Make sure that isn't the case.
+    Factory.create_batch(100)
+    queries = CaptureQueriesContext(connection)
+    with queries:
+        res = client.get(endpoint)
+        assert res.status_code == 200
+
+    # Pagination naturally makes one query per item in the page. Anything
+    # under `page_size * 2` isn't doing any additional queries per recipe.
+    page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+    assert len(queries) < page_size * 2

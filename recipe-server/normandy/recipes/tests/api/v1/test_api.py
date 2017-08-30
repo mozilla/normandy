@@ -18,6 +18,7 @@ from normandy.recipes.tests import (
     CountryFactory,
     LocaleFactory,
     RecipeFactory,
+    RecipeRevisionFactory,
     fake_sign,
 )
 
@@ -870,3 +871,26 @@ class TestApprovalFlow(object):
 
         # The API should still have correct signatures
         self.verify_signatures(api_client, expected_count=1)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("endpoint,Factory", [
+    ('/api/v1/action/', ActionFactory),
+    ('/api/v1/action/signed/', ActionFactory),
+    ('/api/v1/recipe/', RecipeFactory),
+    ('/api/v1/recipe/signed/', RecipeFactory),
+    ('/api/v1/recipe_revision/', RecipeRevisionFactory),
+    ('/api/v1/approval_request/', ApprovalRequestFactory),
+])
+def test_apis_make_a_reasonable_number_of_db_queries(client, endpoint, Factory):
+    """
+    Naive versions of these views could easily make several queries
+    per item, which is very slow. Make sure that isn't the case.
+    """
+    Factory.create_batch(100)
+    queries = CaptureQueriesContext(connection)
+    with queries:
+        res = client.get(endpoint)
+        assert res.status_code == 200
+    # Anything under 100 isn't doing one query per recipe.
+    assert len(queries) < 100
