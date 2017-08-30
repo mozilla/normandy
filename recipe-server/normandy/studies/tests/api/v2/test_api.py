@@ -1,9 +1,14 @@
 from urllib.parse import urlparse
 
 import pytest
+from pathlib import Path
+
+from django.conf import settings
 
 from normandy.base.tests import Whatever
+from normandy.studies.models import Extension
 from normandy.studies.tests import ExtensionFactory
+from normandy.studies.api.v2.fields import ExtensionFileField
 
 
 @pytest.mark.django_db
@@ -70,3 +75,50 @@ class TestExtensionAPI(object):
         assert res.status_code == 200
         expected_path = matching_extension.xpi.url
         assert [urlparse(ext['xpi']).path for ext in res.data['results']] == [expected_path]
+
+    def _upload_extension(self, api_client, path):
+        with open(path, 'rb') as f:
+            res = api_client.post('/api/v2/extension/', {
+                'name': 'test extension',
+                'xpi': f,
+            }, format='multipart')
+        return res
+
+    def test_upload_works_webext(self, api_client):
+        path = Path(settings.BASE_DIR) / 'normandy/studies/tests/data/webext-signed.xpi'
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 201  # created
+        Extension.objects.filter(id=res.data['id']).exists()
+
+    def test_upload_works_legacy(self, api_client):
+        path = './normandy/studies/tests/data/legacy-signed.xpi'
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 201  # created
+        Extension.objects.filter(id=res.data['id']).exists()
+
+    def test_uploads_must_be_zips(self, api_client):
+        path = './normandy/studies/tests/data/not-an-addon.txt'
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 400  # Client error
+        assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_a_zip']]}
+
+    def test_uploads_must_be_signed_webext(self, api_client):
+        path = './normandy/studies/tests/data/webext-unsigned.xpi'
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 400  # Client error
+        assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_signed']]}
+
+    def test_uploads_must_be_signed_legacy(self, api_client):
+        path = './normandy/studies/tests/data/legacy-unsigned.xpi'
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 400  # Client error
+        assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_signed']]}
+
+    def test_uploaded_webexts_must_have_id(self, api_client):
+        # NB: This is a fragile test. It uses a unsigned webext, and
+        # so it relies on the ID check happening before the signing
+        # check, so that the error comes from the former.
+        path = './normandy/studies/tests/data/webext-no-id-unsigned.xpi'
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 400  # Client error
+        assert res.data == {'xpi': [ExtensionFileField.default_error_messages['no_id']]}
