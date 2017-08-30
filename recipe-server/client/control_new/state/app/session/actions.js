@@ -61,13 +61,13 @@ export function saveSession() {
   };
 }
 
-export function addSessionView(caption) {
+export function addSessionView(category, caption) {
   return async (dispatch, getState) => {
     const url = getState().router.pathname;
 
     dispatch({
       type: SESSION_INFO_HISTORY_VIEW,
-      item: new Map({ url, caption }),
+      item: new Map({ url, caption, category }),
     });
 
     // Automatically save the session when views are added.

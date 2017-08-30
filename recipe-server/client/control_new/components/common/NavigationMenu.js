@@ -12,18 +12,20 @@ const { Divider, Item, SubMenu } = Menu;
 
 @connect(
   state => ({
-    sessionHistory: getSessionHistory(state),
+    recipeSessionHistory: getSessionHistory(state, 'recipe'),
+    extensionSessionHistory: getSessionHistory(state, 'extension'),
     router: state.router,
   }),
 )
 export default class NavigationMenu extends React.Component {
   static propTypes = {
-    sessionHistory: PropTypes.instanceOf(List).isRequired,
+    recipeSessionHistory: PropTypes.instanceOf(List).isRequired,
+    extensionSessionHistory: PropTypes.instanceOf(List).isRequired,
     router: PropTypes.object.isRequired,
   };
 
   render() {
-    const { router, sessionHistory } = this.props;
+    const { router, recipeSessionHistory, extensionSessionHistory } = this.props;
     const { pathname, search } = router;
 
     return (
@@ -41,10 +43,10 @@ export default class NavigationMenu extends React.Component {
               <Link href="/recipe">View All</Link>
             </Item>
 
-            {sessionHistory.size > 0 && <Divider />}
+            {recipeSessionHistory.size > 0 && <Divider />}
 
             {
-              sessionHistory.map(item =>
+              recipeSessionHistory.map(item =>
                 (<Item key={item.get('url')}>
                   <Link href={item.get('url')}>{ item.get('caption') }</Link>
                 </Item>),
@@ -56,6 +58,16 @@ export default class NavigationMenu extends React.Component {
             <Item key="/extension">
               <Link href="/extension">View All</Link>
             </Item>
+
+            {extensionSessionHistory.size > 0 && <Divider />}
+
+            {
+              extensionSessionHistory.map(item =>
+                (<Item key={item.get('url')}>
+                  <Link href={item.get('url')}>{ item.get('caption') }</Link>
+                </Item>),
+              )
+            }
           </SubMenu>
         </Menu>
       </div>

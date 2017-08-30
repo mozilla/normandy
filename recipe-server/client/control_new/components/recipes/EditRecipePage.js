@@ -52,7 +52,7 @@ export default class EditRecipePage extends React.Component {
   componentDidMount() {
     const recipeName = this.props.recipe.get('name');
     if (recipeName) {
-      this.props.addSessionView(recipeName);
+      this.props.addSessionView('recipe', recipeName);
     }
   }
 
@@ -62,7 +62,7 @@ export default class EditRecipePage extends React.Component {
     // New recipe means we add a session view.
     if (!is(oldRecipe, recipe)) {
       const recipeName = recipe.get('name');
-      this.props.addSessionView(recipeName);
+      this.props.addSessionView('recipe', recipeName);
     }
   }
 

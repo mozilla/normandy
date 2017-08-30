@@ -9,7 +9,8 @@ const { WrappedComponent: NavigationMenu } = TestComponent;
 describe('<NavigationMenu>', () => {
   const props = {
     router: {},
-    sessionHistory: new List(),
+    recipeSessionHistory: new List(),
+    extensionSessionHistory: new List(),
   };
 
   it('should work', () => {

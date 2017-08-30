@@ -26,7 +26,7 @@ describe('Session reducer', () => {
     it('should add an item to the state history', () => {
       const url = 'mozilla.com';
       const caption = 'test';
-      const fakeItem = new Map({ url, caption });
+      const fakeItem = new Map({ type: 'test', url, caption });
 
       const result = sessionReducer(undefined, {
         type: SESSION_INFO_HISTORY_VIEW,
@@ -38,8 +38,8 @@ describe('Session reducer', () => {
 
     it('should only have unique items in history', () => {
       const url = 'mozilla.com';
-      const fakeItem = new Map({ url, caption: '1' });
-      const fakeItem2 = new Map({ url, caption: '2' });
+      const fakeItem = new Map({ type: 'test', url, caption: '1' });
+      const fakeItem2 = new Map({ type: 'test', url, caption: '2' });
 
       let result = sessionReducer(undefined, {
         type: SESSION_INFO_HISTORY_VIEW,
@@ -65,9 +65,9 @@ describe('Session reducer', () => {
 
     it('should arrange order from latest to oldest', () => {
       const url = 'mozilla.com';
-      const fakeItem = new Map({ url, caption: '1' });
-      const fakeItem2 = new Map({ url, caption: '2' });
-      const fakeItem3 = new Map({ url, caption: '3' });
+      const fakeItem = new Map({ type: 'test', url, caption: '1' });
+      const fakeItem2 = new Map({ type: 'test', url, caption: '2' });
+      const fakeItem3 = new Map({ type: 'test', url, caption: '3' });
 
       let result = sessionReducer(undefined, {
         type: SESSION_INFO_HISTORY_VIEW,
