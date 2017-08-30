@@ -13,7 +13,7 @@ from normandy.base.tests import Whatever
 
 
 @pytest.mark.django_db
-class TestApiRoot(object):
+class TestApiRootV1(object):
     def test_it_works(self, api_client):
         res = api_client.get('/api/v1/')
         assert res.status_code == 200
@@ -34,6 +34,35 @@ class TestApiRoot(object):
         res = api_client.get('/api/v1/')
         assert res.status_code == 200
         assert res.json()['classify-client'] == 'https://testserver-app/api/v1/classify_client/'
+
+    def test_includes_cache_headers(self, api_client):
+        res = api_client.get('/api/v1/')
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max-age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
+
+
+@pytest.mark.django_db
+class TestApiRootV2(object):
+    @pytest.mark.xfail(reason='issue #1008')
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v2/')
+        assert res.status_code == 200
+
+        assert res.json() == {
+            'action-list': 'http://testserver/api/v2/action/',
+            'recipe-list': 'http://testserver/api/v2/recipe/',
+            'reciperevision-list': 'http://testserver/api/v2/recipe_revision/',
+            'approvalrequest-list': 'http://testserver/api/v2/approval_request/',
+        }
+
+    def test_includes_cache_headers(self, api_client):
+        res = api_client.get('/api/v2/')
+        assert res.status_code == 200
+        # It isn't important to assert a particular value for max-age
+        assert 'max-age=' in res['Cache-Control']
+        assert 'public' in res['Cache-Control']
 
 
 class TestAPIRootView(object):

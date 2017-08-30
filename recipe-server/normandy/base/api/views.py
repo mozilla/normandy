@@ -10,6 +10,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView, exception_handler as original_exception_handler
 
 from normandy.base.api.serializers import UserSerializer, ServiceInfoSerializer
+from normandy.base.decorators import api_cache_control
 
 
 class APIRootView(APIView):
@@ -21,6 +22,7 @@ class APIRootView(APIView):
     exclude_from_schema = True
     api_urls = []
 
+    @api_cache_control(max_age=settings.API_CACHE_TIME)
     def get(self, request, *args, **kwargs):
         ret = {}
 
