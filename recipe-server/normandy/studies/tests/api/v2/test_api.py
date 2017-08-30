@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 import pytest
 
 from normandy.base.tests import Whatever
@@ -51,3 +53,20 @@ class TestExtensionAPI(object):
         res = api_client.get('/api/v2/extension/{id}/'.format(id=extension.id))
         assert res.status_code == 200
         assert res.client.cookies == {}
+
+    def test_filtering_by_name(self, api_client):
+        matching_extension = ExtensionFactory()
+        ExtensionFactory()  # Generate another extension that will not match
+
+        res = api_client.get(f'/api/v2/extension/?text={matching_extension.name}')
+        assert res.status_code == 200
+        assert [ext['name'] for ext in res.data['results']] == [matching_extension.name]
+
+    def test_filtering_by_xpi(self, api_client):
+        matching_extension = ExtensionFactory()
+        ExtensionFactory()  # Generate another extension that will not match
+
+        res = api_client.get(f'/api/v2/extension/?text={matching_extension.xpi}')
+        assert res.status_code == 200
+        expected_path = matching_extension.xpi.url
+        assert [urlparse(ext['xpi']).path for ext in res.data['results']] == [expected_path]
