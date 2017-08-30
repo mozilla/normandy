@@ -1,4 +1,4 @@
-import { Alert, Button, Form, Input, Select } from 'antd';
+import { Alert, Button, Row, Col, Form, Input, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -7,6 +7,9 @@ import { connect } from 'react-redux';
 
 import FormItem from 'control_new/components/forms/FormItem';
 import FormActions from 'control_new/components/forms/FormActions';
+import LocalesField from 'control_new/components/forms/LocalesField';
+import CountriesField from 'control_new/components/forms/CountriesField';
+import ChannelsField from 'control_new/components/forms/ChannelsField';
 import ConsoleLogFields from 'control_new/components/recipes/ConsoleLogFields';
 import PreferenceExperimentFields from 'control_new/components/recipes/PreferenceExperimentFields';
 import ShowHeartbeatFields from 'control_new/components/recipes/ShowHeartbeatFields';
@@ -81,6 +84,44 @@ export default class RecipeForm extends React.Component {
         >
           <Input disabled={isLoading} />
         </FormItem>
+
+
+        <fieldset>
+          <legend>Audience Targeting and Filters</legend>
+
+          <Row type="flex" justify="space-between" gutter={64}>
+            <Col xs={24}>
+              <FormItem
+                name="channels"
+                label="Channels"
+                initialValue={recipe.get('channels')}
+              >
+                <ChannelsField disabled={isLoading} />
+              </FormItem>
+            </Col>
+
+            <Col xs={24} lg={12}>
+              <FormItem
+                name="locales"
+                label="Locales"
+                initialValue={recipe.get('locales')}
+              >
+                <LocalesField disabled={isLoading} />
+              </FormItem>
+            </Col>
+
+            <Col xs={24} lg={12}>
+              <FormItem
+                name="countries"
+                label="Countries"
+                initialValue={recipe.get('countries')}
+              >
+                <CountriesField disabled={isLoading} />
+              </FormItem>
+            </Col>
+          </Row>
+        </fieldset>
+
         <FormItem
           name="extra_filter_expression"
           label="Filter Expression"
