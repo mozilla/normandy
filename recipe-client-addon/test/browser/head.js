@@ -278,6 +278,19 @@ this.withStub = function(...stubArgs) {
   };
 };
 
+this.withSpy = function(...spyArgs) {
+  return function wrapper(testFunction) {
+    return async function wrappedTestFunction(...args) {
+      const spy = sinon.spy(...spyArgs);
+      try {
+        await testFunction(...args, spy);
+      } finally {
+        spy.restore();
+      }
+    };
+  };
+};
+
 this.studyEndObserved = function(recipeId) {
   return TestUtils.topicObserved(
     "shield-study-ended",

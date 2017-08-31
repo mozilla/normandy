@@ -11,22 +11,24 @@ XPCOMUtils.defineLazyModuleGetter(this, "AsyncShutdown", "resource://gre/modules
 
 this.EXPORTED_SYMBOLS = ["CleanupManager"];
 
-let cleanupPromise = null;
-const cleanupHandlers = new Set();
+class CleanupManagerClass {
+  constructor() {
+    this.handlers = new Set();
+    this.cleanupPromise = null;
+  }
 
-this.CleanupManager = {
   addCleanupHandler(handler) {
-    cleanupHandlers.add(handler);
-  },
+    this.handlers.add(handler);
+  }
 
   removeCleanupHandler(handler) {
-    cleanupHandlers.delete(handler);
-  },
+    this.handlers.delete(handler);
+  }
 
   async cleanup() {
-    if (cleanupPromise === null) {
-      cleanupPromise = (async () => {
-        for (const handler of cleanupHandlers) {
+    if (this.cleanupPromise === null) {
+      this.cleanupPromise = (async () => {
+        for (const handler of this.handlers) {
           try {
             await handler();
           } catch (ex) {
@@ -40,10 +42,12 @@ this.CleanupManager = {
       // finished.
       AsyncShutdown.profileBeforeChange.addBlocker(
         "ShieldRecipeClient: Cleaning up",
-        cleanupPromise,
+        this.cleanupPromise,
       );
     }
 
-    return cleanupPromise;
-  },
-};
+    return this.cleanupPromise;
+  }
+}
+
+this.CleanupManager = new CleanupManagerClass();

@@ -172,11 +172,7 @@ this.PreferenceExperiments = {
    */
   async saveStartupPrefs() {
     const prefBranch = Services.prefs.getBranch(STARTUP_EXPERIMENT_PREFS_BRANCH);
-    try {
-      prefBranch.resetBranch();
-    } catch (err) {
-      log.debug(`Could not reset startup pref branch: ${err.message}`);
-    }
+    prefBranch.deleteBranch("");
 
     for (const experiment of await this.getAllActive()) {
       const name = experiment.preferenceName;
@@ -327,7 +323,7 @@ this.PreferenceExperiments = {
     const observerInfo = {
       preferenceName,
       observer() {
-        let newValue = getPref(UserPreferences, preferenceName, preferenceType, undefined);
+        const newValue = getPref(UserPreferences, preferenceName, preferenceType, undefined);
         if (newValue !== preferenceValue) {
           PreferenceExperiments.stop(experimentName, false)
                                .catch(Cu.reportError);
