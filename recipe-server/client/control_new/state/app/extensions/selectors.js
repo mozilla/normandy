@@ -15,10 +15,6 @@ export function getExtensionPageCount(state, defaultsTo = 0) {
   return state.app.extensions.listing.get('numPages', defaultsTo);
 }
 
-export function getAllLoadedExtensions(state) {
-  return state.app.extensions.listing.get('all', new List());
-}
-
 export function getExtensionListing(state) {
   const extensions = state.app.extensions.listing.get('results', new List([]));
   return extensions.map(id => getExtension(state, id));

@@ -5,7 +5,7 @@ import React from 'react';
 
 import SwitchBox from 'control_new/components/forms/SwitchBox';
 import FormItem from 'control_new/components/forms/FormItem';
-import { ExtensionSelect } from 'control_new/components/forms/PaginatedSelect';
+import ExtensionSelect from 'control_new/components/extensions/ExtensionSelect';
 
 import { connectFormProps } from 'control_new/utils/forms';
 
