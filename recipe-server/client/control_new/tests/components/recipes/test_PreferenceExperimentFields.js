@@ -38,5 +38,18 @@ describe('<PreferenceExperimentFields>', () => {
       stringPrefFieldInstance.handleChange(noWhitespace);
       expect(trimmedValues.every(value => value === 'foobar')).toBe(true);
     });
+
+    it('should not trim whitespace from the middle of a string', () => {
+      let trimmedValue;
+      const stringPrefFieldInstance = new StringPreferenceField({
+        onChange: value => { trimmedValue = value; },
+      });
+
+      const whitespaceMiddleString = 'foo    bar';
+      const whiteSpaceMiddleEvent = createFakeEvent(whitespaceMiddleString);
+
+      stringPrefFieldInstance.handleChange(whiteSpaceMiddleEvent);
+      expect(trimmedValue).toBe(whitespaceMiddleString);
+    });
   });
 });

@@ -226,11 +226,6 @@ export class StringPreferenceField extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-    this.shouldNotify = true;
-  }
-
   handleChange(event) {
     const { onChange } = this.props;
     onChange(event.target.value.trim());

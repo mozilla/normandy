@@ -28,15 +28,20 @@ describe('<FormItem>', () => {
   });
 
   it('should correctly trim whitespace', () => {
-    const formItemInstance = new FormItem();
-
     const whitespaceBefore = createFakeEvent('   foobar');
     const whitespaceAfter = createFakeEvent('foobar   ');
     const noWhitespace = createFakeEvent('foobar');
 
     const expectedValue = 'foobar';
-    expect(formItemInstance.trimValue(whitespaceBefore)).toBe(expectedValue);
-    expect(formItemInstance.trimValue(whitespaceAfter)).toBe(expectedValue);
-    expect(formItemInstance.trimValue(noWhitespace)).toBe(expectedValue);
+    expect(FormItem.trimValue(whitespaceBefore)).toBe(expectedValue);
+    expect(FormItem.trimValue(whitespaceAfter)).toBe(expectedValue);
+    expect(FormItem.trimValue(noWhitespace)).toBe(expectedValue);
+  });
+
+  it('should not trim whitespace from the middle of a string', () => {
+    const whitespaceMiddleString = 'foo    bar';
+    const whiteSpaceMiddleEvent = createFakeEvent(whitespaceMiddleString);
+
+    expect(FormItem.trimValue(whiteSpaceMiddleEvent)).toBe(whitespaceMiddleString);
   });
 });

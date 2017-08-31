@@ -1,5 +1,5 @@
-import autobind from 'autobind-decorator';
 import { Form } from 'antd';
+import autobind from 'autobind-decorator';
 import get from 'lodash.get';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -58,7 +58,7 @@ export default class FormItem extends React.Component {
     trimWhitespace: false,
   };
 
-  trimValue(event) {
+  static trimValue(event) {
     // InputNumber passes the value as the parameter,
     // but Input passes it via event.target.value.
     let value = event;
@@ -69,9 +69,9 @@ export default class FormItem extends React.Component {
   }
 
   render() {
-    let { config } = this.props;
     const {
       children,
+      config,
       connectToForm,
       form,
       formErrors,
@@ -86,7 +86,6 @@ export default class FormItem extends React.Component {
       if (config.getValueFromEvent) {
         throw Error('config.getValueFromEvent is already defined, do not also use trimWhitespace.');
       }
-      config = { ...config, getValueFromEvent: this.trimValue };
     }
 
     const defaultItemProps = {};
@@ -102,11 +101,11 @@ export default class FormItem extends React.Component {
 
     let field = children;
     if (connectToForm && name) {
-      field = form.getFieldDecorator(name, {
-        initialValue,
-        rules,
-        ...config,
-      })(children);
+      const fieldDecoratorArgs = { initialValue, rules, ...config };
+      if (trimWhitespace) {
+        fieldDecoratorArgs.getValueFromEvent = FormItem.trimValue;
+      }
+      field = form.getFieldDecorator(name, fieldDecoratorArgs)(children);
     }
 
     return (
