@@ -2,6 +2,6 @@
 
 export function getSessionHistory(state, category, count = 5) {
   return state.app.session.history
-    .filter(item => item.get('category') === category)
+    .filter(item => item && item.get('category') === category)
     .take(count);
 }

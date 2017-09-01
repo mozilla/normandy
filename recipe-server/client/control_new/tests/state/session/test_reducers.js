@@ -1,4 +1,4 @@
-import { List, Map, is } from 'immutable';
+import { List, is } from 'immutable';
 
 import {
   SESSION_INFO_RECEIVE,
@@ -7,6 +7,7 @@ import {
 import sessionReducer from 'control_new/state/app/session/reducers';
 import {
   INITIAL_STATE,
+  SessionFactory,
 } from 'control_new/tests/state/session';
 
 
@@ -24,9 +25,7 @@ describe('Session reducer', () => {
 
   describe('SESSION_INFO_HISTORY_VIEW', () => {
     it('should add an item to the state history', () => {
-      const url = 'mozilla.com';
-      const caption = 'test';
-      const fakeItem = new Map({ type: 'test', url, caption });
+      const fakeItem = SessionFactory.build();
 
       const result = sessionReducer(undefined, {
         type: SESSION_INFO_HISTORY_VIEW,
@@ -37,9 +36,8 @@ describe('Session reducer', () => {
     });
 
     it('should only have unique items in history', () => {
-      const url = 'mozilla.com';
-      const fakeItem = new Map({ type: 'test', url, caption: '1' });
-      const fakeItem2 = new Map({ type: 'test', url, caption: '2' });
+      const fakeItem = SessionFactory.build();
+      const fakeItem2 = SessionFactory.build();
 
       let result = sessionReducer(undefined, {
         type: SESSION_INFO_HISTORY_VIEW,
@@ -64,10 +62,9 @@ describe('Session reducer', () => {
     });
 
     it('should arrange order from latest to oldest', () => {
-      const url = 'mozilla.com';
-      const fakeItem = new Map({ type: 'test', url, caption: '1' });
-      const fakeItem2 = new Map({ type: 'test', url, caption: '2' });
-      const fakeItem3 = new Map({ type: 'test', url, caption: '3' });
+      const fakeItem = SessionFactory.build();
+      const fakeItem2 = SessionFactory.build();
+      const fakeItem3 = SessionFactory.build();
 
       let result = sessionReducer(undefined, {
         type: SESSION_INFO_HISTORY_VIEW,
