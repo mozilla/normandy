@@ -52,7 +52,7 @@ class TestNormandySecurityMiddleware(object):
 
     def test_it_includes_cache_headers(self, rf, enable_ssl_redirect, settings):
         cache_time = randint(100, 1000)
-        settings.PERMANENT_REDIRECT_CACHE_TIME = cache_time
+        settings.HTTPS_REDIRECT_CACHE_TIME = cache_time
 
         middleware = NormandySecurityMiddleware()
         req = rf.get('/', secure=False)

@@ -108,7 +108,7 @@ class NormandySecurityMiddleware(SecurityMiddleware):
         response = super().process_request(request)
         if response is not None:
             assert type(response) is http.HttpResponsePermanentRedirect
-            patch_cache_control(response, public=True, max_age=settings.PERMANENT_REDIRECT_CACHE_TIME)
+            patch_cache_control(response, public=True, max_age=settings.HTTPS_REDIRECT_CACHE_TIME)
 
             # Pull out just the HTTP headers from the rest of the request meta
             headers = {
