@@ -41,7 +41,7 @@ class Core(Configuration):
         'normandy.base.middleware.RequestSummaryLogger',
         'django.middleware.security.SecurityMiddleware',
         'normandy.base.middleware.NormandyWhiteNoiseMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'normandy.base.middleware.NormandyCommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'csp.middleware.CSPMiddleware',
     ]
@@ -329,6 +329,7 @@ class Base(Core):
     NUM_PROXIES = values.IntegerValue(0)
     API_CACHE_TIME = values.IntegerValue(30)
     API_CACHE_ENABLED = values.BooleanValue(True)
+    PERMANENT_REDIRECT_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 30)
 
     # If true, approvals must come from two separate users. If false, the same
     # user can approve their own request.
