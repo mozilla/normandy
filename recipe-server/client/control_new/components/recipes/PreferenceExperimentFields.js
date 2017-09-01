@@ -55,6 +55,7 @@ export default class PreferenceExperimentFields extends React.Component {
             label="Preference Name"
             name="arguments.preferenceName"
             initialValue={recipeArguments.get('preferenceName', '')}
+            trimWhitespace
           >
             <Input disabled={disabled} />
           </FormItem>
@@ -219,17 +220,34 @@ export class ExperimentBranches extends React.Component {
   }
 }
 
+@autobind
 export class StringPreferenceField extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.func.isRequired,
+  };
+
+  handleChange(event) {
+    const { onChange } = this.props;
+    onChange(event.target.value.trim());
+  }
   render() {
+    const { onChange, ...other } = this.props;
     return (
-      <Input {...this.props} />
+      <Input
+        onChange={this.handleChange}
+        {...other}
+      />
     );
   }
 }
 
 export class BooleanPreferenceField extends React.Component {
   static propTypes = {
-    value: PropTypes.any,
+    value: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    value: null,
   }
 
   render() {

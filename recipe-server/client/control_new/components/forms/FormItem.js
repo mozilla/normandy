@@ -1,4 +1,5 @@
 import { Form } from 'antd';
+import autobind from 'autobind-decorator';
 import get from 'lodash.get';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -16,6 +17,7 @@ import { connectFormProps } from 'control_new/utils/forms';
  * Because of this, the child passed to FormItem must be a class-based
  * component.
  */
+@autobind
 @connectFormProps
 export default class FormItem extends React.Component {
   static propTypes = {
@@ -42,6 +44,9 @@ export default class FormItem extends React.Component {
 
     // List of validation rules (passed to form.getFieldDecorator).
     rules: PropTypes.arrayOf(PropTypes.object),
+
+    // If true, automatically trim whitespace from the value.
+    trimWhitespace: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -50,7 +55,18 @@ export default class FormItem extends React.Component {
     initialValue: null,
     name: null,
     rules: null,
+    trimWhitespace: false,
   };
+
+  static trimValue(event) {
+    // InputNumber passes the value as the parameter,
+    // but Input passes it via event.target.value.
+    let value = event;
+    if (event && event.target) {
+      value = event.target.value;
+    }
+    return value.trim();
+  }
 
   render() {
     const {
@@ -62,8 +78,15 @@ export default class FormItem extends React.Component {
       initialValue,
       name,
       rules,
+      trimWhitespace,
       ...customItemProps
     } = this.props;
+
+    if (trimWhitespace) {
+      if (config.getValueFromEvent) {
+        throw Error('config.getValueFromEvent is already defined, do not also use trimWhitespace.');
+      }
+    }
 
     const defaultItemProps = {};
     const error = get(formErrors, name);
@@ -78,11 +101,11 @@ export default class FormItem extends React.Component {
 
     let field = children;
     if (connectToForm && name) {
-      field = form.getFieldDecorator(name, {
-        initialValue,
-        rules,
-        ...config,
-      })(children);
+      const fieldDecoratorArgs = { initialValue, rules, ...config };
+      if (trimWhitespace) {
+        fieldDecoratorArgs.getValueFromEvent = FormItem.trimValue;
+      }
+      field = form.getFieldDecorator(name, fieldDecoratorArgs)(children);
     }
 
     return (
