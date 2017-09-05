@@ -43,7 +43,7 @@ function items(state = new Map(), action) {
   let recipe;
 
   switch (action.type) {
-    case RECIPE_RECEIVE:
+    case RECIPE_RECEIVE: {
       recipe = fromJS(action.recipe);
 
       recipe = recipe
@@ -55,6 +55,7 @@ function items(state = new Map(), action) {
         .remove('approved_revision');
 
       return state.set(action.recipe.id, recipe);
+    }
 
     case RECIPE_DELETE:
       return state.remove(action.recipeId);

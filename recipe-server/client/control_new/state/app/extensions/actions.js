@@ -23,11 +23,14 @@ export function fetchExtension(pk) {
 }
 
 
-export function fetchExtensionsPage(pageNumber = 1) {
+export function fetchExtensionsPage(pageNumber = 1, filters = {}) {
   return async dispatch => {
     const requestId = `fetch-extensions-page-${pageNumber}`;
     const extensions = await dispatch(makeApiRequest(requestId, 'v2/extension/', {
-      data: { page: pageNumber },
+      data: {
+        page: pageNumber,
+        ...filters,
+      },
     }));
 
     extensions.results.forEach(extension => {
@@ -41,6 +44,7 @@ export function fetchExtensionsPage(pageNumber = 1) {
       type: EXTENSION_PAGE_RECEIVE,
       pageNumber,
       extensions,
+      isLastPage: extensions.results.next === null,
     });
   };
 }

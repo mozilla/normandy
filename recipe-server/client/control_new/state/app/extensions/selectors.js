@@ -7,22 +7,18 @@ export function getExtension(state, id, defaultsTo = null) {
   return state.app.extensions.items.get(id, defaultsTo);
 }
 
-
 export function getExtensionListingCount(state) {
   return state.app.extensions.listing.get('count');
 }
-
 
 export function getExtensionListing(state) {
   const extensions = state.app.extensions.listing.get('results', new List([]));
   return extensions.map(id => getExtension(state, id));
 }
 
-
 export function getExtensionListingPageNumber(state) {
   return state.app.extensions.listing.get('pageNumber');
 }
-
 
 export function getExtensionListingColumns(
   state,

@@ -21,8 +21,8 @@ export default class QueryFilteredRecipes extends React.Component {
 
   static defaultProps = {
     fetchFilteredRecipesPage: null,
-    filters: null,
-    pageNumber: null,
+    filters: {},
+    pageNumber: 1,
   }
 
   componentWillMount() {

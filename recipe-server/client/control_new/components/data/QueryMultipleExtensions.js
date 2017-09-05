@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import { isEqual } from 'underscore';
 
 import {
   fetchExtensionsPage as fetchExtensionsPageAction,
@@ -16,22 +17,24 @@ import {
 export default class QueryMultipleExtensions extends React.Component {
   static propTypes = {
     fetchExtensionsPage: PropTypes.func.isRequired,
+    filters: PropTypes.object,
     pageNumber: PropTypes.number,
   };
 
   static defaultProps = {
+    filters: {},
     pageNumber: null,
   };
 
   componentWillMount() {
-    const { fetchExtensionsPage, pageNumber } = this.props;
-    fetchExtensionsPage(pageNumber);
+    const { fetchExtensionsPage, filters, pageNumber } = this.props;
+    fetchExtensionsPage(pageNumber, filters);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { fetchExtensionsPage, pageNumber } = this.props;
-    if (pageNumber !== nextProps.pageNumber) {
-      fetchExtensionsPage(nextProps.pageNumber);
+    const { fetchExtensionsPage, filters, pageNumber } = this.props;
+    if (pageNumber !== nextProps.pageNumber || !isEqual(filters, nextProps.filters)) {
+      fetchExtensionsPage(nextProps.pageNumber, nextProps.filters);
     }
   }
 

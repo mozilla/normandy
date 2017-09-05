@@ -1,31 +1,23 @@
-import { Col, Row, Input, Select } from 'antd';
-import { Map, List } from 'immutable';
+import { Col, Row, Input } from 'antd';
+import { Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { connect } from 'react-redux';
 
 import SwitchBox from 'control_new/components/forms/SwitchBox';
 import FormItem from 'control_new/components/forms/FormItem';
+import ExtensionSelect from 'control_new/components/extensions/ExtensionSelect';
+
 import { connectFormProps } from 'control_new/utils/forms';
 
-import { getExtensionListing } from 'control_new/state/app/extensions/selectors';
-
 @connectFormProps
-@connect(
-  state => ({
-    extensions: getExtensionListing(state),
-  }),
-)
 export default class OptOutStudyFields extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
-    extensions: PropTypes.instanceOf(List).isRequired,
     recipeArguments: PropTypes.instanceOf(Map).isRequired,
   };
 
   static defaultProps = {
     disabled: false,
-    extensions: new List(),
     recipeArguments: new Map(),
   };
 
@@ -61,13 +53,7 @@ export default class OptOutStudyFields extends React.Component {
               name="arguments.addonUrl"
               initialValue={recipeArguments.get('addonUrl', '')}
             >
-              <Select disabled={disabled}>
-                {this.props.extensions.map(extension =>
-                  (<Select.Option key={extension.get('id')} value={extension.get('xpi')}>
-                    {extension.get('name')}
-                  </Select.Option>),
-                )}
-              </Select>
+              <ExtensionSelect disabled={disabled} />
             </FormItem>
 
             <FormItem
