@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 
@@ -8,11 +9,18 @@ from django.utils.cache import patch_cache_control
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.middleware.common import CommonMiddleware
+from django.middleware.security import SecurityMiddleware
 
 from mozilla_cloud_services_logger.django.middleware import (
     RequestSummaryLogger as OriginalRequestSummaryLogger
 )
 from whitenoise.middleware import WhiteNoiseMiddleware
+
+
+DEBUG_HTTP_TO_HTTPS_REDIRECT = 'normandy.base.middleware.D001'
+
+
+logger = logging.getLogger(__name__)
 
 
 def request_received_at_middleware(get_response):
@@ -91,3 +99,32 @@ class NormandyCommonMiddleware(CommonMiddleware):
     """
 
     response_redirect_class = HttpResponsePermanentRedirectCached
+
+
+class NormandySecurityMiddleware(SecurityMiddleware):
+    """Logs HTTP to HTTPS redirects, and adds cache headers to them."""
+
+    def process_request(self, request):
+        response = super().process_request(request)
+        if response is not None:
+            assert type(response) is http.HttpResponsePermanentRedirect
+            patch_cache_control(response, public=True, max_age=settings.HTTPS_REDIRECT_CACHE_TIME)
+
+            # Pull out just the HTTP headers from the rest of the request meta
+            headers = {
+                key.lstrip('HTTP_'): value
+                for (key, value) in request.META.items()
+                if key.startswith('HTTP_') or key == 'CONTENT_TYPE' or key == 'CONTENT_LENGTH'
+            }
+
+            logger.debug(
+                f'Served HTTP to HTTPS redirect for {request.path}',
+                extra={
+                    'code': DEBUG_HTTP_TO_HTTPS_REDIRECT,
+                    'method': request.method,
+                    'body': request.body.decode('utf-8'),
+                    'path': request.path,
+                    'headers': headers,
+                }
+            )
+        return response

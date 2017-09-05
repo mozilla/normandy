@@ -1,6 +1,17 @@
 from random import randint
 
-from normandy.base.middleware import NormandyCommonMiddleware
+import pytest
+
+from normandy.base.middleware import (
+    NormandyCommonMiddleware,
+    NormandySecurityMiddleware,
+    DEBUG_HTTP_TO_HTTPS_REDIRECT,
+)
+
+
+@pytest.fixture
+def mock_logger(mocker):
+    return mocker.patch('normandy.base.middleware.logger')
 
 
 class TestNormandyCommonMiddleware(object):
@@ -21,3 +32,58 @@ class TestNormandyCommonMiddleware(object):
         assert res['Location'] == url + '/'
         cache_control = set(res['Cache-Control'].split(', '))
         assert cache_control == {'public', f'max-age={cache_time}'}
+
+
+class TestNormandySecurityMiddleware(object):
+
+    @pytest.fixture
+    def enable_ssl_redirect(self, settings):
+        settings.SECURE_SSL_REDIRECT = True
+        settings.SECURE_REDIRECT_EXEMPT = []
+
+    def test_it_works(self, rf, enable_ssl_redirect):
+        middleware = NormandySecurityMiddleware()
+        req = rf.get('/', secure=False)
+        res = middleware.process_request(req)
+
+        assert res is not None
+        assert res.status_code == 301
+        assert res['Location'].startswith('https:')
+
+    def test_it_includes_cache_headers(self, rf, enable_ssl_redirect, settings):
+        cache_time = randint(100, 1000)
+        settings.HTTPS_REDIRECT_CACHE_TIME = cache_time
+
+        middleware = NormandySecurityMiddleware()
+        req = rf.get('/', secure=False)
+        res = middleware.process_request(req)
+
+        cache_control = set(res['Cache-Control'].split(', '))
+        assert cache_control == {'public', f'max-age={cache_time}'}
+
+    def test_it_logs(self, rf, enable_ssl_redirect, mock_logger):
+        middleware = NormandySecurityMiddleware()
+        req = rf.post(
+            path='/',
+            data='this is the body',
+            content_type='text/plain',
+            HTTP_X_HELLO='world',
+            secure=False,
+        )
+        middleware.process_request(req)
+
+        mock_logger.debug.assert_called_with(
+            'Served HTTP to HTTPS redirect for /',
+            extra={
+                'code': DEBUG_HTTP_TO_HTTPS_REDIRECT,
+                'method': 'POST',
+                'path': '/',
+                'body': 'this is the body',
+                'headers': {
+                    'X_HELLO': 'world',
+                    'CONTENT_TYPE': 'text/plain',
+                    'CONTENT_LENGTH': 16,
+                    'COOKIE': '',
+                },
+            }
+        )

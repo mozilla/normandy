@@ -39,7 +39,7 @@ class Core(Configuration):
     MIDDLEWARE = [
         'normandy.base.middleware.request_received_at_middleware',
         'normandy.base.middleware.RequestSummaryLogger',
-        'django.middleware.security.SecurityMiddleware',
+        'normandy.base.middleware.NormandySecurityMiddleware',
         'normandy.base.middleware.NormandyWhiteNoiseMiddleware',
         'normandy.base.middleware.NormandyCommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -174,6 +174,9 @@ class Base(Core):
     DEBUG = values.BooleanValue(False)
     ADMINS = values.SingleNestedListValue([])
     SILENCED_SYSTEM_CHECKS = values.ListValue([
+        # We've subclassed Django's security middleware, so Django's
+        # checks can't tell we are using the middleware.
+        'security.W001',
         # Check CSRF cookie http only. disabled because we read the
         # CSRF cookie in JS for forms in React.
         'security.W017',
@@ -330,6 +333,7 @@ class Base(Core):
     API_CACHE_TIME = values.IntegerValue(30)
     API_CACHE_ENABLED = values.BooleanValue(True)
     PERMANENT_REDIRECT_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 30)
+    HTTPS_REDIRECT_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 30)
 
     # If true, approvals must come from two separate users. If false, the same
     # user can approve their own request.
@@ -397,6 +401,7 @@ class ProductionReadOnly(Production):
     ]
     ADMIN_ENABLED = values.BooleanValue(False)
     SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W001',  # Security middle ware check
         'security.W003',  # CSRF middleware check
         'security.W017',  # Check CSRF cookie http only
     ])
@@ -419,6 +424,7 @@ class ProductionInsecure(Production):
 
     # These checks aren't useful for a purposefully insecure environment
     SILENCED_SYSTEM_CHECKS = values.ListValue([
+        'security.W001',  # security middleware check
         'security.W004',  # check hsts seconds
         'security.W008',  # Secure SSL redirect
         'security.W009',  # Secret key length

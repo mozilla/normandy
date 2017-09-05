@@ -194,6 +194,13 @@ in other Django projects.
 
    The time in seconds to set in cache headers for permanent redirects.
 
+.. envvar:: DJANGO_HTTPS_REDIRECT_CACHE_TIME
+
+   :default: ``2592000`` (30 days)
+
+   The time in seconds to set in cache headers for permanent redirects
+   to change from HTTP to HTTPS.
+
 .. envvar:: DJANGO_LOGGING_USE_JSON
 
     :default: ``True``
