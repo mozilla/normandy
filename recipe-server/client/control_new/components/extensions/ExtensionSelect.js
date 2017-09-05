@@ -1,4 +1,4 @@
-import { Select, Spin } from 'antd';
+import { Icon, Select, Spin } from 'antd';
 import autobind from 'autobind-decorator';
 import { List } from 'immutable';
 import PropTypes from 'prop-types';
@@ -26,6 +26,11 @@ export default class ExtensionSelect extends React.Component {
     isLoadingSearch: PropTypes.bool.isRequired,
   };
 
+  // Define the commonly-used elements on the class, so they're compiled only once.
+  static placeholderElement = (<span><Icon type="search" />{' Search Extensions'}</span>);
+  static noOptionsDisplay = (<span>No extensions found!</span>);
+  static loadingDisplay = (<Spin size="small" />);
+
   state = {
     search: null,
   };
@@ -44,9 +49,13 @@ export default class ExtensionSelect extends React.Component {
   render() {
     const { search } = this.state;
     let displayedList = this.props.extensions;
-
-
     const queryFilters = search ? { text: search } : {};
+
+    const {
+      placeholderElement,
+      loadingDisplay,
+      noOptionsDisplay,
+    } = ExtensionSelect;
 
     if (this.props.isLoadingSearch) {
       displayedList = new List();
@@ -57,8 +66,8 @@ export default class ExtensionSelect extends React.Component {
         <QueryMultipleExtensions filters={queryFilters} pageNumber={1} />
         <Select
           filterOption={false}
-          placeholder="Select Extension"
-          notFoundContent={this.props.isLoadingSearch ? <Spin size="small" /> : <span>No extensions found!</span>}
+          placeholder={placeholderElement}
+          notFoundContent={this.props.isLoadingSearch ? loadingDisplay : noOptionsDisplay}
           onSearch={this.updateSearch}
           showSearch
         >

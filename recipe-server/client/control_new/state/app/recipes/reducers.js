@@ -1,4 +1,4 @@
-import { fromJS, Map, Set } from 'immutable';
+import { fromJS, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
@@ -68,22 +68,11 @@ function items(state = new Map(), action) {
 
 function listing(state = new Map(), action) {
   switch (action.type) {
-    case RECIPE_PAGE_RECEIVE: {
-      let totalRecipes = state.get('all', new Set());
-
-      fromJS(action.recipes.results.forEach(result => {
-        totalRecipes = totalRecipes.add(fromJS(result));
-      }));
-
-      totalRecipes = totalRecipes.sort((a, b) => a.get('id') - b.get('id'));
-
+    case RECIPE_PAGE_RECEIVE:
       return state
         .set('count', action.recipes.count)
-        .set('numPages', Math.ceil(action.recipes.count / 10))
         .set('pageNumber', action.pageNumber)
-        .set('results', fromJS(action.recipes.results.map(result => result.id)))
-        .set('all', totalRecipes);
-    }
+        .set('results', fromJS(action.recipes.results.map(result => result.id)));
 
     case RECIPE_LISTING_COLUMNS_CHANGE:
       return state.set('columns', RECIPE_LISTING_COLUMNS.filter(column => (

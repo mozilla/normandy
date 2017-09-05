@@ -1,4 +1,4 @@
-import { fromJS, Map, Set } from 'immutable';
+import { fromJS, Map } from 'immutable';
 import { combineReducers } from 'redux';
 
 import {
@@ -24,22 +24,11 @@ function items(state = new Map(), action) {
 
 function listing(state = new Map(), action) {
   switch (action.type) {
-    case EXTENSION_PAGE_RECEIVE: {
-      let totalExtensions = state.get('all', new Set());
-
-      action.extensions.results.forEach(result => {
-        totalExtensions = totalExtensions.add(fromJS(result));
-      });
-
-      totalExtensions = totalExtensions.sort((a, b) => a.get('id') <= b.get('id'));
-
+    case EXTENSION_PAGE_RECEIVE:
       return state
         .set('count', action.extensions.count)
-        .set('numPages', Math.ceil(action.extensions.count / 10))
         .set('pageNumber', action.pageNumber)
-        .set('results', fromJS(action.extensions.results.map(extension => extension.id)))
-        .set('all', totalExtensions);
-    }
+        .set('results', fromJS(action.extensions.results.map(extension => extension.id)));
 
     case EXTENSION_LISTING_COLUMNS_CHANGE:
       return state.set('columns', EXTENSION_LISTING_COLUMNS.filter(column => (
