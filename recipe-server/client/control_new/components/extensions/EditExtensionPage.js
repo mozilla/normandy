@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import autobind from 'autobind-decorator';
-import { Map } from 'immutable';
+import { Map, is } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -13,7 +13,7 @@ import {
 } from 'control_new/state/app/extensions/actions';
 import { getExtension } from 'control_new/state/app/extensions/selectors';
 import { getUrlParamAsInt } from 'control_new/state/router/selectors';
-
+import { addSessionView as addSessionViewAction } from 'control_new/state/app/session/actions';
 
 @connect(
   state => {
@@ -26,6 +26,7 @@ import { getUrlParamAsInt } from 'control_new/state/router/selectors';
   },
   {
     updateExtension: updateExtensionAction,
+    addSessionView: addSessionViewAction,
   },
 )
 @autobind
@@ -34,11 +35,29 @@ export default class EditExtensionPage extends React.Component {
     extension: PropTypes.instanceOf(Map).isRequired,
     extensionId: PropTypes.number.isRequired,
     updateExtension: PropTypes.func.isRequired,
+    addSessionView: PropTypes.func.isRequired,
   }
 
   state = {
     formErrors: {},
   };
+
+  componentDidMount() {
+    const extensionName = this.props.extension.get('name');
+    if (extensionName) {
+      this.props.addSessionView('extension', extensionName);
+    }
+  }
+
+  componentWillReceiveProps({ extension }) {
+    const oldExtensions = this.props.extension;
+
+    // New extension means we add a session view.
+    if (!is(oldExtensions, extension) && oldExtensions.get('name') !== extension.get('name')) {
+      const extensionName = extension.get('name');
+      this.props.addSessionView('extension', extensionName);
+    }
+  }
 
   /**
    * Update the existing extension and display a message.

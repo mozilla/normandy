@@ -65,7 +65,7 @@ export class SimpleLoadingOverlay extends React.PureComponent {
 export default class LoadingOverlay extends React.PureComponent {
   static propTypes = {
     isLoading: PropTypes.bool.isRequired,
-    requestIds: PropTypes.oneOf([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
+    requestIds: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
   };
 
   static defaultProps = {

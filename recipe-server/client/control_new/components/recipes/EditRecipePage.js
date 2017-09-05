@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import autobind from 'autobind-decorator';
-import { Map } from 'immutable';
+import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
 import RecipeForm from 'control_new/components/recipes/RecipeForm';
 import QueryRecipe from 'control_new/components/data/QueryRecipe';
+
+import { addSessionView } from 'control_new/state/app/session/actions';
 
 import { updateRecipe } from 'control_new/state/app/recipes/actions';
 import { getRecipe } from 'control_new/state/app/recipes/selectors';
@@ -26,12 +28,14 @@ import { getUrlParamAsInt } from 'control_new/state/router/selectors';
     };
   },
   {
+    addSessionView,
     updateRecipe,
   },
 )
 @autobind
 export default class EditRecipePage extends React.Component {
   static propTypes = {
+    addSessionView: PropTypes.func.isRequired,
     updateRecipe: PropTypes.func.isRequired,
     recipeId: PropTypes.number.isRequired,
     recipe: PropTypes.instanceOf(Map),
@@ -44,6 +48,23 @@ export default class EditRecipePage extends React.Component {
   state = {
     formErrors: undefined,
   };
+
+  componentDidMount() {
+    const recipeName = this.props.recipe.get('name');
+    if (recipeName) {
+      this.props.addSessionView('recipe', recipeName);
+    }
+  }
+
+  componentWillReceiveProps({ recipe }) {
+    const oldRecipe = this.props.recipe;
+
+    // New recipe means we add a session view.
+    if (!is(oldRecipe, recipe)) {
+      const recipeName = recipe.get('name');
+      this.props.addSessionView('recipe', recipeName);
+    }
+  }
 
   /**
    * Update the existing recipe and display a message.

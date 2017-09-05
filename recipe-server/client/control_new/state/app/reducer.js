@@ -7,6 +7,7 @@ import recipes from 'control_new/state/app/recipes/reducers';
 import requests from 'control_new/state/app/requests/reducers';
 import revisions from 'control_new/state/app/revisions/reducers';
 import serviceInfo from 'control_new/state/app/serviceInfo/reducers';
+import session from 'control_new/state/app/session/reducers';
 import users from 'control_new/state/app/users/reducers';
 
 
@@ -18,6 +19,7 @@ const reducer = combineReducers({
   requests,
   revisions,
   serviceInfo,
+  session,
   users,
 });
 
