@@ -32,7 +32,6 @@ class CleanupManagerClass {
           try {
             await handler();
           } catch (ex) {
-            // TODO: Log error in a way that persists after shutdown
             Cu.reportError(ex);
           }
         }

@@ -165,7 +165,7 @@ decorate_task(
       "initExperimentPrefs skips prefs that don't match the existing default value's type.",
     );
   },
-).skip();
+);
 
 decorate_task(
   withBootstrap,

@@ -68,13 +68,12 @@ this.Bootstrap = {
     const experimentBranch = Services.prefs.getBranch(STARTUP_EXPERIMENT_PREFS_BRANCH);
 
     for (const childPrefName of experimentBranch.getChildList("")) {
-      const realPrefName = childPrefName.slice(1); // Remove leading dot
-      const realPrefType = defaultBranch.getPrefType(childPrefName);
       const experimentPrefType = experimentBranch.getPrefType(childPrefName);
+      const realPrefName = childPrefName.slice(1); // Remove leading dot
+      const realPrefType = defaultBranch.getPrefType(realPrefName);
 
-      // TODO: This never passes?
       if (realPrefType !== Services.prefs.PREF_INVALID && realPrefType !== experimentPrefType) {
-        log.error(`Error setting startup pref ${childPrefName}; pref type does not match.`);
+        log.error(`Error setting startup pref ${realPrefName}; pref type does not match.`);
         continue;
       }
 
@@ -133,7 +132,11 @@ this.Bootstrap = {
     await ShieldRecipeClient.shutdown(reason);
 
     // In case the observer didn't run, clean it up.
-    Services.obs.removeObserver(this, UI_AVAILABLE_NOTIFICATION);
+    try {
+      Services.obs.removeObserver(this, UI_AVAILABLE_NOTIFICATION);
+    } catch (err) {
+      // It must already be removed!
+    }
 
     // Unload add-on modules. We don't do this in ShieldRecipeClient so that
     // modules are not unloaded accidentally during tests.
@@ -160,11 +163,9 @@ this.Bootstrap = {
       "lib/Utils.jsm",
     ].map(m => `resource://shield-recipe-client/${m}`);
     modules = modules.concat([
-      "AboutPages.jsm",
-    ].map(m => `resource://shield-recipe-client-content/${m}`));
-    modules = modules.concat([
-      "mozjexl.js",
-    ].map(m => `resource://shield-recipe-client-vendor/${m}`));
+      "resource://shield-recipe-client-content/AboutPages.jsm",
+      "resource://shield-recipe-client-vendor/mozjexl.js",
+    ]);
 
     for (const module of modules) {
       log.debug(`Unloading ${module}`);
