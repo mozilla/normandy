@@ -24,8 +24,7 @@ from normandy.recipes.api.v2.serializers import (
     RecipeRevisionSerializer,
     RecipeSerializer,
 )
-import normandy.recipes.api.v2.shield_identicon as shield_identicon
-from normandy.base.genome import Genome
+from normandy.recipes.api.v2 import shield_identicon
 
 
 class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
@@ -234,6 +233,6 @@ class IdenticonView(views.APIView):
                 {'error': 'Invalid identicon generation, only v1 is supported.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        genome = Genome(seed)
+        genome = shield_identicon.Genome(seed)
         identicon_svg = shield_identicon.generate_svg(genome)
         return HttpResponse(identicon_svg, content_type='image/svg+xml')

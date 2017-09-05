@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.base.genome import Genome
+from normandy.recipes.api.v2.shield_identicon import Genome
 
 
 @pytest.fixture
@@ -31,14 +31,6 @@ class TestGenome(object):
             {'weight': 1, 'value': 'apple'},
         ]
 
-    def test_letter(self, genome):
-        letter_values = [
-            genome.letter(),
-            genome.letter(),
-            genome.letter(),
-        ]
-        assert letter_values == ['B', 'I', 'C']
-
     def test_emoji(self, genome):
         emoji_values = [
             genome.emoji(),
@@ -49,11 +41,10 @@ class TestGenome(object):
 
     def test_color(self, genome):
         color_values = [
-            genome.color().get_rgb_color(),
-            genome.color().get_rgb_color(),
-            genome.color().get_rgb_color(),
+            genome.color().rgb_color,
+            genome.color().rgb_color,
+            genome.color().rgb_color,
         ]
-        print(color_values)
         assert color_values == [
             (7, 54, 66),
             (255, 207, 0),
