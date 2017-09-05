@@ -586,56 +586,65 @@ add_task(withMockExperiments(withMockPreferences(async function testInit(experim
 })));
 
 // init should register telemetry experiments
-add_task(withMockExperiments(withMockPreferences(async function testInit(experiments, mockPreferences) {
-  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
-  const startObserverStub = sinon.stub(PreferenceExperiments, "startObserver");
-  mockPreferences.set("fake.pref", "experiment value");
+decorate_task(
+  withMockExperiments,
+  withMockPreferences,
+  withStub(TelemetryEnvironment, "setExperimentActive"),
+  withStub(PreferenceExperiments, "startObserver"),
+  async function testInit(experiments, mockPreferences, setActiveStub, startObserverStub) {
+    mockPreferences.set("fake.pref", "experiment value");
 
-  experiments.test = experimentFactory({
-    name: "test",
-    branch: "branch",
-    preferenceName: "fake.pref",
-    preferenceValue: "experiment value",
-    expired: false,
-    preferenceBranchType: "default",
-  });
+    experiments.test = experimentFactory({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.pref",
+      preferenceValue: "experiment value",
+      expired: false,
+      preferenceBranchType: "default",
+    });
 
-  await PreferenceExperiments.init();
-  ok(setActiveStub.calledWith("test", "branch"), "Experiment is registered by init");
-  startObserverStub.restore();
-  setActiveStub.restore();
-})));
+    await PreferenceExperiments.init();
+    ok(
+      setActiveStub.calledWith("test", "branch", {type: "normandy-preference-experiment"}),
+      "Experiment is registered by init",
+    );
+  },
+);
 
 // starting and stopping experiments should register in telemetry
-add_task(withMockExperiments(async function testInitTelemetry() {
-  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
-  const setInactiveStub = sinon.stub(TelemetryEnvironment, "setExperimentInactive");
+decorate_task(
+  withMockExperiments,
+  withStub(TelemetryEnvironment, "setExperimentActive"),
+  withStub(TelemetryEnvironment, "setExperimentInactive"),
+  async function testInitTelemetry(experiments, setActiveStub, setInactiveStub) {
+    await PreferenceExperiments.start({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.preference",
+      preferenceValue: "value",
+      preferenceType: "string",
+      preferenceBranchType: "default",
+    });
 
-  await PreferenceExperiments.start({
-    name: "test",
-    branch: "branch",
-    preferenceName: "fake.preference",
-    preferenceValue: "value",
-    preferenceType: "string",
-    preferenceBranchType: "default",
-  });
-
-  ok(setActiveStub.calledWith("test", "branch"), "Experiment is registerd by start()");
-  await PreferenceExperiments.stop("test");
-  ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregisterd by stop()");
-
-  setActiveStub.restore();
-  setInactiveStub.restore();
-}));
+    ok(
+      setActiveStub.calledWith("test", "branch", {type: "normandy-preference-experiment"}),
+      "Experiment is registerd by start()",
+    );
+    await PreferenceExperiments.stop("test");
+    ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregisterd by stop()");
+  },
+);
 
 // Experiments shouldn't be recorded by init() in telemetry if they are expired
-add_task(withMockExperiments(async function testInitTelemetryExpired(experiments) {
-  const setActiveStub = sinon.stub(TelemetryEnvironment, "setExperimentActive");
-  experiments.experiment1 = experimentFactory({name: "expired", branch: "branch", expired: true});
-  await PreferenceExperiments.init();
-  ok(!setActiveStub.called, "Expired experiment is not registered by init");
-  setActiveStub.restore();
-}));
+decorate_task(
+  withMockExperiments,
+  withStub(TelemetryEnvironment, "setExperimentActive"),
+  async function testInitTelemetryExpired(experiments, setActiveStub) {
+    experiments.experiment1 = experimentFactory({name: "expired", branch: "branch", expired: true});
+    await PreferenceExperiments.init();
+    ok(!setActiveStub.called, "Expired experiment is not registered by init");
+  },
+);
 
 // Experiments should end if the preference has been changed when init() is called
 add_task(withMockExperiments(withMockPreferences(async function testInitChanges(experiments, mockPreferences) {

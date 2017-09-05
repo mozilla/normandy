@@ -157,7 +157,11 @@ this.PreferenceExperiments = {
       }
 
       // Notify Telemetry of experiments we're running, since they don't persist between restarts
-      TelemetryEnvironment.setExperimentActive(experiment.name, experiment.branch);
+      TelemetryEnvironment.setExperimentActive(
+        experiment.name,
+        experiment.branch,
+        {type: "normandy-preference-experiment"}
+      );
 
       // Watch for changes to the experiment's preference
       this.startObserver(experiment.name, experiment.preferenceName, experiment.preferenceType, experiment.preferenceValue);
@@ -265,7 +269,7 @@ this.PreferenceExperiments = {
     store.data[name] = experiment;
     store.saveSoon();
 
-    TelemetryEnvironment.setExperimentActive(name, branch);
+    TelemetryEnvironment.setExperimentActive(name, branch, {type: "normandy-preference-experiment"});
   },
 
   /**
