@@ -7,12 +7,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction, Link } from 'redux-little-router';
 
+
 import BooleanIcon from 'control/components/common/BooleanIcon';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryFilteredRecipes from 'control/components/data/QueryFilteredRecipes';
 import QueryRecipeListingColumns from 'control/components/data/QueryRecipeListingColumns';
 import ListingActionBar from 'control/components/recipes/ListingActionBar';
 import DataList from 'control/components/tables/DataList';
+import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
+
 import {
   fetchFilteredRecipesPage as fetchFilteredRecipesPageAction,
 } from 'control/state/app/recipes/actions';
@@ -74,7 +77,18 @@ export default class RecipeListing extends React.PureComponent {
           title="Name"
           dataIndex="name"
           key="name"
-          render={RecipeListing.renderLinkedText}
+          render={(text, record) =>
+            (
+              <div className="recipe-listing-name">
+                <ShieldIdenticon
+                  className="shieldicon"
+                  seed={record.id}
+                  size={32}
+                />
+                {RecipeListing.renderLinkedText(text, record)}
+              </div>
+            )
+          }
           sortOrder={DataList.getSortOrder('name', ordering)}
           sorter
         />
