@@ -13,7 +13,14 @@
 @import 'pages/gateway';
 @import 'pages/recipe-details';
 @import 'pages/recipe-form';
-@import 'listing';
+
+// Components
+@import 'components/boolean-icon';
+@import 'components/form-actions';
+@import 'components/history-timeline';
+@import 'components/listing';
+@import 'components/switchbox';
+
 
 // Common
 body {
@@ -39,6 +46,7 @@ body {
 
   .ant-layout-content {
     flex: 0;
+    flex-grow: 1;
   }
 }
 
@@ -48,19 +56,6 @@ body {
 
 .righted {
   text-align: right;
-}
-
-.boolean-icon {
-  font-size: 16px;
-  font-weight: bold;
-
-  &.is-true {
-    color: #0C0;
-  }
-
-  &.is-false {
-    color: #C00;
-  }
 }
 
 .current-user {
@@ -128,31 +123,6 @@ body {
   min-height: 100%;
 }
 
-/* Buttons at the bottom of a form */
-.form-actions {
-  background: #FBFBFB;
-  border: 1px solid #D9D9D9;
-  margin-top: 2em;
-  padding: 15px;
-
-  .clearfix();
-
-  .primary {
-    float: right;
-  }
-
-  .secondary {
-    float: left;
-  }
-
-  .primary,
-  .secondary {
-    & > *:not(:first-child) {
-      margin-left: 15px;
-    }
-  }
-}
-
 fieldset {
   border: none;
 
@@ -162,29 +132,3 @@ fieldset {
   }
 }
 
-.switchbox {
-  align-items: center;
-  display: flex;
-
-  .label {
-    cursor: pointer;
-    line-height: 1.5em;
-    padding-left: 1em;
-  }
-}
-
-.timeline-popover {
-  font-weight: 400;
-
-  label {
-    display: block;
-    margin-top: 0.5em;
-    text-align: right;
-  }
-
-  .ant-popover-inner-content {
-    background: @white;
-    border-radius: 2px;
-    max-width: 300px;
-  }
-}
