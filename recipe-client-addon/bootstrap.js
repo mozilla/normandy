@@ -20,7 +20,7 @@ this.EXPORTED_SYMBOLS = ["Bootstrap"];
 
 const REASON_APP_STARTUP = 1;
 const UI_AVAILABLE_NOTIFICATION = "sessionstore-windows-restored";
-const STARTUP_EXPERIMENT_PREFS_BRANCH = "extensions.shield-recipe-client.startupExperimentPrefs";
+const STARTUP_EXPERIMENT_PREFS_BRANCH = "extensions.shield-recipe-client.startupExperimentPrefs.";
 const PREF_LOGGING_LEVEL = "extensions.shield-recipe-client.logging.level";
 const BOOTSTRAP_LOGGER_NAME = "extensions.shield-recipe-client.bootstrap";
 const DEFAULT_PREFS = {
@@ -67,37 +67,36 @@ this.Bootstrap = {
     const defaultBranch = Services.prefs.getDefaultBranch("");
     const experimentBranch = Services.prefs.getBranch(STARTUP_EXPERIMENT_PREFS_BRANCH);
 
-    for (const childPrefName of experimentBranch.getChildList("")) {
-      const experimentPrefType = experimentBranch.getPrefType(childPrefName);
-      const realPrefName = childPrefName.slice(1); // Remove leading dot
-      const realPrefType = defaultBranch.getPrefType(realPrefName);
+    for (const prefName of experimentBranch.getChildList("")) {
+      const experimentPrefType = experimentBranch.getPrefType(prefName);
+      const realPrefType = defaultBranch.getPrefType(prefName);
 
       if (realPrefType !== Services.prefs.PREF_INVALID && realPrefType !== experimentPrefType) {
-        log.error(`Error setting startup pref ${realPrefName}; pref type does not match.`);
+        log.error(`Error setting startup pref ${prefName}; pref type does not match.`);
         continue;
       }
 
       switch (experimentPrefType) {
         case Services.prefs.PREF_STRING:
-          defaultBranch.setCharPref(realPrefName, experimentBranch.getCharPref(childPrefName));
+          defaultBranch.setCharPref(prefName, experimentBranch.getCharPref(prefName));
           break;
 
         case Services.prefs.PREF_INT:
-          defaultBranch.setIntPref(realPrefName, experimentBranch.getIntPref(childPrefName));
+          defaultBranch.setIntPref(prefName, experimentBranch.getIntPref(prefName));
           break;
 
         case Services.prefs.PREF_BOOL:
-          defaultBranch.setBoolPref(realPrefName, experimentBranch.getBoolPref(childPrefName));
+          defaultBranch.setBoolPref(prefName, experimentBranch.getBoolPref(prefName));
           break;
 
         case Services.prefs.PREF_INVALID:
           // This should never happen.
-          log.error(`Error setting startup pref ${childPrefName}; pref type is invalid (${experimentPrefType}).`);
+          log.error(`Error setting startup pref ${prefName}; pref type is invalid (${experimentPrefType}).`);
           break;
 
         default:
           // This should never happen either.
-          log.error(`Error getting startup pref ${childPrefName}; unknown value type ${experimentPrefType}.`);
+          log.error(`Error getting startup pref ${prefName}; unknown value type ${experimentPrefType}.`);
       }
     }
   },
