@@ -39,7 +39,7 @@ import { getLatestRevisionIdForRecipe } from 'control_new/state/app/recipes/sele
   },
 )
 @autobind
-export default class CloneRecipePage extends React.Component {
+export default class CloneRecipePage extends React.PureComponent {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     isLatestRevision: PropTypes.bool.isRequired,

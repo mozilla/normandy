@@ -12,7 +12,7 @@ import { fetchFilteredRecipesPage } from 'control_new/state/app/recipes/actions'
     fetchFilteredRecipesPage,
   },
 )
-export default class QueryFilteredRecipes extends React.Component {
+export default class QueryFilteredRecipes extends React.PureComponent {
   static propTypes = {
     fetchFilteredRecipesPage: PropTypes.func,
     filters: PropTypes.object,

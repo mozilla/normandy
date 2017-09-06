@@ -11,7 +11,7 @@ import { fetchExtension } from 'control_new/state/app/extensions/actions';
     fetchExtension,
   },
 )
-export default class QueryExtension extends React.Component {
+export default class QueryExtension extends React.PureComponent {
   static propTypes = {
     fetchExtension: PropTypes.func.isRequired,
     pk: PropTypes.number.isRequired,

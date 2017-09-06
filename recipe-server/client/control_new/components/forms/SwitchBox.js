@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 @autobind
-export default class SwitchBox extends React.Component {
+export default class SwitchBox extends React.PureComponent {
   static propTypes = {
     children: PropTypes.node,
     onChange: PropTypes.func.isRequired,

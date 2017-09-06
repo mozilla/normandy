@@ -23,7 +23,7 @@ import { getUrlParamAsInt } from 'control_new/state/router/selectors';
     };
   },
 )
-export default class ApprovalHistoryPage extends React.Component {
+export default class ApprovalHistoryPage extends React.PureComponent {
   static propTypes = {
     history: PropTypes.instanceOf(List).isRequired,
     recipeId: PropTypes.number.isRequired,

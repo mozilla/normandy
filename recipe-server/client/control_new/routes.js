@@ -80,7 +80,7 @@ export const {
 @connect(state => ({
   router: state.router,
 }))
-export default class Router extends React.Component {
+export default class Router extends React.PureComponent {
   static propTypes = {
     router: PropTypes.object.isRequired,
   };

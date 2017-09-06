@@ -22,7 +22,7 @@ import {
     status: getRevisionStatus(state, revision.get('id')),
   }),
 )
-export default class RevisionApprovalTag extends React.Component {
+export default class RevisionApprovalTag extends React.PureComponent {
   static propTypes = {
     revision: PropTypes.instanceOf(Map).isRequired,
     status: PropTypes.string,

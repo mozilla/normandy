@@ -28,7 +28,7 @@ import {
   },
 )
 @autobind
-export default class ListingActionBar extends React.Component {
+export default class ListingActionBar extends React.PureComponent {
   static propTypes = {
     columns: PropTypes.instanceOf(List).isRequired,
     getCurrentURL: PropTypes.func.isRequired,

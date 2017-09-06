@@ -19,7 +19,7 @@ import { connectFormProps } from 'control_new/utils/forms';
  */
 @autobind
 @connectFormProps
-export default class FormItem extends React.Component {
+export default class FormItem extends React.PureComponent {
   static propTypes = {
     // The input component used to enter data for this field.
     children: PropTypes.node.isRequired,

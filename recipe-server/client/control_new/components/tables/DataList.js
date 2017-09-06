@@ -21,7 +21,7 @@ import {
   },
 )
 @autobind
-export default class DataList extends React.Component {
+export default class DataList extends React.PureComponent {
   static propTypes = {
     columnRenderers: PropTypes.object.isRequired,
     columns: PropTypes.instanceOf(List).isRequired,

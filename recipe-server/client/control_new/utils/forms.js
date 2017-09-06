@@ -25,7 +25,7 @@ import React from 'react';
  * Usage example:
  *
  * @createForm({})
- * class MyForm extends React.Component {
+ * class MyForm extends React.PureComponent {
  *   render() {
  *     const { onSubmit } = this.props;
  *     return (

@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 
 import { createForm, connectFormProps } from 'control_new/utils/forms';
 
-class FakeComponent extends React.Component { render() { return null; } }
+class FakeComponent extends React.PureComponent { render() { return null; } }
 
 describe('Forms utils', () => {
   describe('createForm', () => {

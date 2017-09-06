@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 
-export default class CheckboxMenu extends React.Component {
+export default class CheckboxMenu extends React.PureComponent {
   static propTypes = {
     checkboxes: PropTypes.array,
     label: PropTypes.string,

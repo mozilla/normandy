@@ -45,7 +45,7 @@ import {
   },
 )
 @autobind
-export default class RecipeListing extends React.Component {
+export default class RecipeListing extends React.PureComponent {
   static propTypes = {
     columns: PropTypes.instanceOf(List).isRequired,
     count: PropTypes.number,

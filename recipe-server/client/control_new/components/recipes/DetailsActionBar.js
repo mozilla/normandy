@@ -55,7 +55,7 @@ import {
   },
 )
 @autobind
-export default class DetailsActionBar extends React.Component {
+export default class DetailsActionBar extends React.PureComponent {
   static propTypes = {
     disableRecipe: PropTypes.func.isRequired,
     enableRecipe: PropTypes.func.isRequired,

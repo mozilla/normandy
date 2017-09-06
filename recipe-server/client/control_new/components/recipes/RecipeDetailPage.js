@@ -33,7 +33,7 @@ import { getUrlParam, getUrlParamAsInt } from 'control_new/state/router/selector
     };
   },
 )
-export default class RecipeDetailPage extends React.Component {
+export default class RecipeDetailPage extends React.PureComponent {
   static propTypes = {
     history: PropTypes.instanceOf(List).isRequired,
     recipeId: PropTypes.number.isRequired,

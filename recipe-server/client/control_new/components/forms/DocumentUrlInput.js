@@ -5,7 +5,7 @@ import React from 'react';
 /**
  * URL input that displays a clickable link to its value.
  */
-export default class DocumentUrlInput extends React.Component {
+export default class DocumentUrlInput extends React.PureComponent {
   static propTypes = {
     disabled: PropTypes.bool,
     // rc-form warns if the component already has a value prop, but doesn't

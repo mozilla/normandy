@@ -39,7 +39,7 @@ if (initialLocation) {
   store.dispatch(initializeCurrentLocation(initialLocation));
 }
 
-class Root extends React.Component {
+class Root extends React.PureComponent {
   render() {
     return (
       <Provider store={store}>

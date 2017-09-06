@@ -11,7 +11,7 @@ import { loadExtensionListingColumns } from 'control_new/state/app/extensions/ac
     loadExtensionListingColumns,
   },
 )
-export default class QueryExtensionListingColumns extends React.Component {
+export default class QueryExtensionListingColumns extends React.PureComponent {
   static propTypes = {
     loadExtensionListingColumns: PropTypes.func.isRequired,
   };

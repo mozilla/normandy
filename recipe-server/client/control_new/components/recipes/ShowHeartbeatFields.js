@@ -11,7 +11,7 @@ import { connectFormProps } from 'control_new/utils/forms';
 
 
 @connectFormProps
-export default class ShowHeartbeatFields extends React.Component {
+export default class ShowHeartbeatFields extends React.PureComponent {
   static propTypes = {
     disabled: PropTypes.bool,
     form: PropTypes.object.isRequired,
@@ -137,7 +137,7 @@ export default class ShowHeartbeatFields extends React.Component {
 }
 
 @autobind
-class RepeatSelect extends React.Component {
+class RepeatSelect extends React.PureComponent {
   static propTypes = {
     repeatCount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };

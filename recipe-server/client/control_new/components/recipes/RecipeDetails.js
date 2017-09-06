@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { addSessionView } from 'control_new/state/app/session/actions';
 
 @connect(() => ({}), { addSessionView })
-export default class RecipeDetails extends React.Component {
+export default class RecipeDetails extends React.PureComponent {
   static propTypes = {
     addSessionView: PropTypes.func.isRequired,
     recipe: PropTypes.instanceOf(Map).isRequired,

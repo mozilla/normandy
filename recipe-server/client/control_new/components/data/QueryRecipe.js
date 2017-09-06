@@ -13,7 +13,7 @@ import {
     fetchRecipe: fetchRecipeAction,
   },
 )
-export default class QueryRecipe extends React.Component {
+export default class QueryRecipe extends React.PureComponent {
   static propTypes = {
     fetchRecipe: PropTypes.func.isRequired,
     pk: PropTypes.number.isRequired,
