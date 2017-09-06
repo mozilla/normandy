@@ -1,8 +1,9 @@
 from django.db import transaction
 from django.db.models import Q
+from django.http import HttpResponse
 
 import django_filters
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, viewsets, views
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
@@ -23,6 +24,7 @@ from normandy.recipes.api.v2.serializers import (
     RecipeRevisionSerializer,
     RecipeSerializer,
 )
+from normandy.recipes.api.v2 import shield_identicon
 
 
 class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
@@ -222,3 +224,15 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         approval_request = self.get_object()
         approval_request.close()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IdenticonView(views.APIView):
+    def get(self, request, *, generation, seed):
+        if generation != 'v1':
+            return Response(
+                {'error': 'Invalid identicon generation, only v1 is supported.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        genome = shield_identicon.Genome(seed)
+        identicon_svg = shield_identicon.generate_svg(genome)
+        return HttpResponse(identicon_svg, content_type='image/svg+xml')

@@ -3,6 +3,9 @@ from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
+from pathlib import Path
+
+from django.conf import settings
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
@@ -164,6 +167,19 @@ class TestRecipeAPI(object):
 
         recipes = Recipe.objects.all()
         assert recipes.count() == 0
+
+    def test_creation_when_identicon_seed_is_invalid(self, api_client):
+        action = ActionFactory()
+
+        res = api_client.post('/api/v2/recipe/', {
+            'name': 'Test Recipe',
+            'action_id': action.id,
+            'arguments': {},
+            'extra_filter_expression': 'whatever',
+            'enabled': True,
+            'identicon_seed': 'invalid_identicon_seed'
+        })
+        assert res.status_code == 400
 
     def test_it_can_change_action_for_recipes(self, api_client):
         recipe = RecipeFactory()
@@ -469,6 +485,11 @@ class TestRecipeRevisionAPI(object):
             '/api/v2/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
         assert res.status_code == 400
 
+    def test_it_has_an_identicon_seed(self, api_client):
+        recipe = RecipeFactory(enabled=True, approver=UserFactory())
+        res = api_client.get(f'/api/v2/recipe_revision/{recipe.latest_revision.id}/')
+        assert res.data['identicon_seed'] == recipe.identicon_seed
+
 
 @pytest.mark.django_db
 class TestApprovalRequestAPI(object):
@@ -748,3 +769,23 @@ def test_apis_makes_a_reasonable_number_of_db_queries(endpoint, Factory, client,
     # under `page_size * 2` isn't doing any additional queries per recipe.
     page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
     assert len(queries) < page_size * 2
+
+
+@pytest.mark.django_db
+class TestIdenticonAPI(object):
+    def test_it_works(self, api_client):
+        res = api_client.get('/api/v2/identicon/v1:foobar.svg')
+        assert res.status_code == 200
+
+    def test_it_returns_the_same_output(self, api_client):
+        res1 = api_client.get('/api/v2/identicon/v1:foobar.svg')
+        res2 = api_client.get('/api/v2/identicon/v1:foobar.svg')
+        assert res1.content == res2.content
+
+    def test_it_returns_known_output(self, api_client):
+        res = api_client.get('/api/v2/identicon/v1:foobar.svg')
+        reference_svg = Path(settings.BASE_DIR).joinpath(
+            'normandy', 'recipes', 'tests', 'api', 'v2', 'foobar.svg'
+        )
+        with open(reference_svg, 'rb') as svg_file:
+            assert svg_file.read() == res.content

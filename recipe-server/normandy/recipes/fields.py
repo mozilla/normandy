@@ -1,6 +1,7 @@
 import hashlib
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class LocaleField(models.CharField):
@@ -34,3 +35,21 @@ class AutoHashField(models.CharField):
         del kwargs['max_length']
         del kwargs['editable']
         return name, path, args, kwargs
+
+
+class IdenticonSeedField(models.CharField):
+    """Adds validation specific to identicon_seed."""
+    def __init__(self, *args, max_length=64, **kwargs):
+        return super().__init__(*args, max_length=max_length, **kwargs)
+
+    def to_python(self, value):
+        if value is None:
+            return super().to_python(value)
+
+        prefix_split = value.split(':')
+        if not prefix_split:
+            raise ValidationError(f'Invalid identicon_seed "{value}", missing prefix.')
+        if prefix_split[0] != 'v1':
+            raise ValidationError(
+                f'Invalid identicon_seed "{value}", invalid prefix "{prefix_split[0]}".')
+        return super().to_python(value)
