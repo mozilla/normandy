@@ -57,7 +57,12 @@ export default class ExtensionSelect extends React.Component {
       noOptionsDisplay,
     } = ExtensionSelect;
 
-    if (this.props.isLoadingSearch) {
+    const {
+      isLoadingSearch,
+      ...rest
+    } = this.props;
+
+    if (isLoadingSearch) {
       displayedList = new List();
     }
 
@@ -65,9 +70,10 @@ export default class ExtensionSelect extends React.Component {
       <div>
         <QueryMultipleExtensions filters={queryFilters} pageNumber={1} />
         <Select
+          {...rest}
           filterOption={false}
           placeholder={placeholderElement}
-          notFoundContent={this.props.isLoadingSearch ? loadingDisplay : noOptionsDisplay}
+          notFoundContent={isLoadingSearch ? loadingDisplay : noOptionsDisplay}
           onSearch={this.updateSearch}
           showSearch
         >
