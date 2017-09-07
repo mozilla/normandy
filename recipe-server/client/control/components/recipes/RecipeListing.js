@@ -82,7 +82,7 @@ export default class RecipeListing extends React.PureComponent {
               <div className="recipe-listing-name">
                 <ShieldIdenticon
                   className="shieldicon"
-                  seed={record.id}
+                  seed={record.latest_revision.identicon_seed}
                   size={32}
                 />
                 {RecipeListing.renderLinkedText(text, record)}

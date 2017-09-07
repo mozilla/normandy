@@ -53,7 +53,7 @@ export default class RecipeDetailPage extends React.PureComponent {
             <RevisionNotice revision={revision} />
             <Row type="flex" align="middle">
               <Col span={4}>
-                <ShieldIdenticon seed={recipeId} letter={revision.getIn(['recipe', 'name'])} />
+                <ShieldIdenticon seed={revision.get('identicon_seed')} />
               </Col>
               <Col span={20}>
                 <DetailsActionBar />
