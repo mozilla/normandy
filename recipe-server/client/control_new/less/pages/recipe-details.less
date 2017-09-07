@@ -1,9 +1,11 @@
 dl.details {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px calc(~"100% - 200px");
+  white-space: pre-wrap;
+  word-wrap: break-word;
 
   &.narrow {
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 120px calc(~"100% - 120px");
   }
 
   dt,
@@ -30,6 +32,10 @@ dl.details {
 
   h1 {
     grid-column: span 2;
+  }
+
+  pre {
+    white-space: inherit;
   }
 }
 
