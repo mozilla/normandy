@@ -5,7 +5,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { push as pushAction, Link } from 'redux-little-router';
+import { push as pushAction } from 'redux-little-router';
 
 import BooleanIcon from 'control/components/common/BooleanIcon';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
@@ -74,7 +74,7 @@ export default class RecipeListing extends React.PureComponent {
           title="Name"
           dataIndex="name"
           key="name"
-          render={RecipeListing.renderLinkedText}
+          render={text => <a>{text}</a>}
           sortOrder={DataList.getSortOrder('name', ordering)}
           sorter
         />
@@ -87,7 +87,7 @@ export default class RecipeListing extends React.PureComponent {
           title="Action"
           dataIndex="action"
           key="action"
-          render={RecipeListing.renderLinkedText}
+          render={text => <a>{text}</a>}
         />
       );
     },
@@ -129,10 +129,6 @@ export default class RecipeListing extends React.PureComponent {
     },
   };
 
-  static renderLinkedText(text, record) {
-    return <Link href={`/recipe/${record.id}/`}>{text}</Link>;
-  }
-
   getFilters() {
     const { ordering, searchText, status } = this.props;
 
@@ -156,7 +152,12 @@ export default class RecipeListing extends React.PureComponent {
     push(getCurrentURL({ page }));
   }
 
-  handleRowClick(record) {
+  handleRowClick(record, index, event) {
+    // FIXME Middle click on text does not work
+    if (event.ctrlKey || event.metaKey || event.button === 1) {
+      window.open(`recipe/${record.id}`);
+      return;
+    }
     const { push } = this.props;
     push(`/recipe/${record.id}/`);
   }
