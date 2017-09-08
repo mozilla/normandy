@@ -20,7 +20,7 @@ import {
     status: getRevisionDraftStatus(state, revision.get('id')),
   }),
 )
-export default class RevisionNotice extends React.Component {
+export default class RevisionNotice extends React.PureComponent {
   static propTypes = {
     enabled: PropTypes.bool.isRequired,
     isPendingApproval: PropTypes.bool.isRequired,

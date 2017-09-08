@@ -20,7 +20,7 @@ import {
     isLatestRevision: id => isLatestRevisionSelector(state, id),
   }),
 )
-export default class HistoryTimeline extends React.Component {
+export default class HistoryTimeline extends React.PureComponent {
   static propTypes = {
     history: PropTypes.instanceOf(List).isRequired,
     isLatestRevision: PropTypes.func.isRequired,

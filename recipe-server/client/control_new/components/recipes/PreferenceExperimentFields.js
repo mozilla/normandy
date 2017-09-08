@@ -11,7 +11,7 @@ import { connectFormProps } from 'control_new/utils/forms';
 
 
 @connectFormProps
-export default class PreferenceExperimentFields extends React.Component {
+export default class PreferenceExperimentFields extends React.PureComponent {
   static propTypes = {
     disabled: PropTypes.bool,
     form: PropTypes.object.isRequired,
@@ -120,7 +120,7 @@ export default class PreferenceExperimentFields extends React.Component {
  * Select that shows a warning when the user preference branch is selected.
  */
 @connectFormProps
-export class PreferenceBranchSelect extends React.Component {
+export class PreferenceBranchSelect extends React.PureComponent {
   static propTypes = {
     disabled: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
@@ -157,7 +157,7 @@ export class PreferenceBranchSelect extends React.Component {
  */
 @connectFormProps
 @autobind
-export class ExperimentBranches extends React.Component {
+export class ExperimentBranches extends React.PureComponent {
   static propTypes = {
     disabled: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
@@ -221,7 +221,7 @@ export class ExperimentBranches extends React.Component {
 }
 
 @autobind
-export class StringPreferenceField extends React.Component {
+export class StringPreferenceField extends React.PureComponent {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
   };
@@ -241,7 +241,7 @@ export class StringPreferenceField extends React.Component {
   }
 }
 
-export class BooleanPreferenceField extends React.Component {
+export class BooleanPreferenceField extends React.PureComponent {
   static propTypes = {
     value: PropTypes.bool,
   }
@@ -264,7 +264,7 @@ export class BooleanPreferenceField extends React.Component {
   }
 }
 
-export class IntegerPreferenceField extends React.Component {
+export class IntegerPreferenceField extends React.PureComponent {
   render() {
     return (
       <InputNumber {...this.props} />
@@ -274,7 +274,7 @@ export class IntegerPreferenceField extends React.Component {
 
 @connectFormProps
 @autobind
-export class ExperimentBranchFields extends React.Component {
+export class ExperimentBranchFields extends React.PureComponent {
   static propTypes = {
     branch: PropTypes.instanceOf(Map).isRequired,
     disabled: PropTypes.bool,

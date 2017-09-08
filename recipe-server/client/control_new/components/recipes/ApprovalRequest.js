@@ -31,7 +31,7 @@ import {
   },
 )
 @autobind
-export default class ApprovalRequest extends React.Component {
+export default class ApprovalRequest extends React.PureComponent {
   static propTypes = {
     approvalRequest: PropTypes.instanceOf(Map).isRequired,
     approveApprovalRequest: PropTypes.func.isRequired,

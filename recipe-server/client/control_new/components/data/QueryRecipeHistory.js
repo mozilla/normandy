@@ -12,7 +12,7 @@ import {
     fetchRecipeHistory: fetchRecipeHistoryAction,
   },
 )
-export default class QueryRecipeHistory extends React.Component {
+export default class QueryRecipeHistory extends React.PureComponent {
   static propTypes = {
     fetchRecipeHistory: PropTypes.func.isRequired,
     pk: PropTypes.number.isRequired,

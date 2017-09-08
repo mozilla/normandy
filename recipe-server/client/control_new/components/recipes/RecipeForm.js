@@ -33,7 +33,7 @@ import QueryServiceInfo from 'control_new/components/data/QueryServiceInfo';
   },
 )
 @autobind
-export default class RecipeForm extends React.Component {
+export default class RecipeForm extends React.PureComponent {
   static propTypes = {
     form: PropTypes.object.isRequired,
     isLoading: PropTypes.bool,
@@ -128,7 +128,7 @@ export default class RecipeForm extends React.Component {
     actions: getAllActions(state, new Map()),
   }),
 )
-class ActionSelect extends React.Component {
+class ActionSelect extends React.PureComponent {
   static propTypes = {
     actions: PropTypes.instanceOf(Map).isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

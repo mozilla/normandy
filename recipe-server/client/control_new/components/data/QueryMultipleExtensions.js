@@ -14,7 +14,7 @@ import {
     fetchExtensionsPage: fetchExtensionsPageAction,
   },
 )
-export default class QueryMultipleExtensions extends React.Component {
+export default class QueryMultipleExtensions extends React.PureComponent {
   static propTypes = {
     fetchExtensionsPage: PropTypes.func.isRequired,
     filters: PropTypes.object,

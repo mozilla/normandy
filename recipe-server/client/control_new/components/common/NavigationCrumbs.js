@@ -11,7 +11,7 @@ import { Link } from 'redux-little-router';
   }),
 )
 @autobind
-export default class NavigationCrumbs extends React.Component {
+export default class NavigationCrumbs extends React.PureComponent {
   static propTypes = {
     router: PropTypes.object.isRequired,
   };

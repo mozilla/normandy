@@ -16,7 +16,7 @@ import {
     logoutUrl: getLogoutUrl(state, ''),
   }),
 )
-export default class CurrentUserDetails extends React.Component {
+export default class CurrentUserDetails extends React.PureComponent {
   static propTypes = {
     logoutUrl: PropTypes.string.isRequired,
     user: PropTypes.instanceOf(Map).isRequired,

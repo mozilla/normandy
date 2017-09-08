@@ -11,7 +11,7 @@ import { fetchServiceInfo } from 'control_new/state/app/serviceInfo/actions';
     fetchServiceInfo,
   },
 )
-export default class QueryServiceInfo extends React.Component {
+export default class QueryServiceInfo extends React.PureComponent {
   static propTypes = {
     fetchServiceInfo: PropTypes.func.isRequired,
   }

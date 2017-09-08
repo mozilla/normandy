@@ -4,7 +4,7 @@ import { Link } from 'redux-little-router';
 import { Row, Col, Icon, Card } from 'antd';
 
 
-export default class Gateway extends React.Component {
+export default class Gateway extends React.PureComponent {
   render() {
     return (
       <Row className="page-gateway" type="flex" justify="space-around" align="top">

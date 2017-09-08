@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-export default class MissingPage extends React.Component {
+export default class MissingPage extends React.PureComponent {
   render() {
     return (
       <div className="page-404">

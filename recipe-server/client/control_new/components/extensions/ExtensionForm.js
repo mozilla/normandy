@@ -30,7 +30,7 @@ import { createForm } from 'control_new/utils/forms';
   },
 })
 @autobind
-export default class ExtensionForm extends React.Component {
+export default class ExtensionForm extends React.PureComponent {
   static propTypes = {
     extension: PropTypes.instanceOf(Map),
     form: PropTypes.object.isRequired,

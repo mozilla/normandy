@@ -17,7 +17,7 @@ const { Divider, Item, SubMenu } = Menu;
     router: state.router,
   }),
 )
-export default class NavigationMenu extends React.Component {
+export default class NavigationMenu extends React.PureComponent {
   static propTypes = {
     recipeSessionHistory: PropTypes.instanceOf(List).isRequired,
     extensionSessionHistory: PropTypes.instanceOf(List).isRequired,

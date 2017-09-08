@@ -11,7 +11,7 @@ import { loadRecipeListingColumns } from 'control_new/state/app/recipes/actions'
     loadRecipeListingColumns,
   },
 )
-export default class QueryRecipeListingColumns extends React.Component {
+export default class QueryRecipeListingColumns extends React.PureComponent {
   static propTypes = {
     loadRecipeListingColumns: PropTypes.func.isRequired,
   };

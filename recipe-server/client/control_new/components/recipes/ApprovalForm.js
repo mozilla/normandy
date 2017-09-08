@@ -22,7 +22,7 @@ import { createForm } from 'control_new/utils/forms';
 )
 @createForm({})
 @autobind
-export default class ApprovalForm extends React.Component {
+export default class ApprovalForm extends React.PureComponent {
   static propTypes = {
     approvalRequest: PropTypes.instanceOf(Map).isRequired,
     closeApprovalRequest: PropTypes.func.isRequired,

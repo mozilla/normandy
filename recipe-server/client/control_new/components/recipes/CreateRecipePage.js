@@ -17,7 +17,7 @@ import { createRecipe as createAction } from 'control_new/state/app/recipes/acti
   },
 )
 @autobind
-export default class CreateRecipePage extends React.Component {
+export default class CreateRecipePage extends React.PureComponent {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,

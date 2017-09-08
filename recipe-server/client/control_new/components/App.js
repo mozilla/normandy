@@ -14,7 +14,7 @@ import QueryServiceInfo from 'control_new/components/data/QueryServiceInfo';
 const { Content, Header, Sider } = Layout;
 
 
-export default class App extends React.Component {
+export default class App extends React.PureComponent {
   static propTypes = {
     children: PropTypes.node,
   };

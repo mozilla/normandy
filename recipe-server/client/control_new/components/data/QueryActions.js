@@ -10,7 +10,7 @@ import { fetchAllActions } from 'control_new/state/app/actions/actions';
     fetchAllActions,
   },
 )
-export default class QueryActions extends React.Component {
+export default class QueryActions extends React.PureComponent {
   static propTypes = {
     fetchAllActions: PropTypes.func.isRequired,
   }

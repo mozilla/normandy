@@ -16,11 +16,11 @@ import React from 'react';
  *   </FormActions.Secondary>
  * </FormActions>
  */
-export default class FormActions extends React.Component {
+export default class FormActions extends React.PureComponent {
   /**
    * Container for the primary actions (floated to the right).
    */
-  static Primary = class Primary extends React.Component {
+  static Primary = class Primary extends React.PureComponent {
     static propTypes = {
       children: PropTypes.node,
     };
@@ -38,7 +38,7 @@ export default class FormActions extends React.Component {
   /**
    * Container for the secondary actions (floated to the left).
    */
-  static Secondary = class Secondary extends React.Component {
+  static Secondary = class Secondary extends React.PureComponent {
     static propTypes = {
       children: PropTypes.node,
     };
