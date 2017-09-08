@@ -150,7 +150,7 @@ class ActionSelect extends React.PureComponent {
           {actions.toList().map(action => (
             <Select.Option
               key={action.get('id')}
-              value={action.get('id').toString(10)}
+              value={action.get('id', '').toString(10)}
               className={`rf-${action.get('name')}`}
             >
               {action.get('name')}
