@@ -5,6 +5,8 @@ var path = require('path');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var webpack = require('webpack');
 
+var production = process.env.NODE_ENV === 'production';
+
 var settings = require('./package.json');
 
 var ignoredVendors = [
@@ -27,7 +29,23 @@ module.exports = {
     library: 'vendorDLL',
   },
   plugins: [
+    new webpack.DefinePlugin({
+      PRODUCTION: production,
+      DEVELOPMENT: !production,
+      process: {
+        env: {
+          NODE_ENV: production ? '"production"' : '"development"',
+        },
+      },
+    }),
     new BundleTracker({ filename: './webpack-stats-vendor.json' }),
+    new webpack.DllPlugin({
+      name: 'vendorDLL',
+      // This manifest file is referred to by webpack.config's `DllReferencePlugin`,
+      // which essentially imports the compiled vendor bundle into our main app.
+      path: path.resolve('./assets/bundles/vendor-manifest.json'),
+    })
+  ].concat(!production ? [] : [
     // Compress the resulting bundled file via simple UglifyJS settings.
     new UglifyJSPlugin({
       parallel: {
@@ -44,11 +62,5 @@ module.exports = {
         warnings: false
       }
     }),
-    new webpack.DllPlugin({
-      name: 'vendorDLL',
-      // This manifest file is referred to by webpack.config's `DllReferencePlugin`,
-      // which essentially imports the compiled vendor bundle into our main app.
-      path: path.resolve('./assets/bundles/vendor-manifest.json'),
-    }),
-  ]
+  ]),
 };
