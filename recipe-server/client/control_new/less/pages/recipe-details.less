@@ -1,9 +1,11 @@
 dl.details {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: calc(~"75px + 5vw") calc(~"100% - calc(75px + 5vw)");
+  white-space: pre-wrap;
+  word-wrap: break-word;
 
   &.narrow {
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: calc(~"75px + 5vw") calc(~"100% - calc(75px + 5vw)");
   }
 
   dt,
@@ -30,6 +32,25 @@ dl.details {
 
   h1 {
     grid-column: span 2;
+  }
+
+  pre {
+    white-space: inherit;
+  }
+
+  @media (max-width: @screen-sm) {
+    grid-template-columns: 100%;
+
+    dd,
+    dt {
+      border-bottom: none;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+
+    dt {
+      padding-top: 1em;
+    }
   }
 }
 
