@@ -22,8 +22,17 @@ const { Option } = Select;
 @autobind
 export default class ExtensionSelect extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     extensions: PropTypes.instanceOf(List).isRequired,
     isLoadingSearch: PropTypes.bool.isRequired,
+    onChange: PropTypes.func,
+    size: PropTypes.oneOf(['small', 'large']),
+  };
+
+  static defaultProps = {
+    disabled: false,
+    onChange: null,
+    size: 'default',
   };
 
   // Define the commonly-used elements on the class, so they're compiled only once.
@@ -59,7 +68,9 @@ export default class ExtensionSelect extends React.Component {
 
     const {
       isLoadingSearch,
-      ...rest
+      disabled,
+      onChange,
+      size,
     } = this.props;
 
     if (isLoadingSearch) {
@@ -70,7 +81,9 @@ export default class ExtensionSelect extends React.Component {
       <div>
         <QueryMultipleExtensions filters={queryFilters} pageNumber={1} />
         <Select
-          {...rest}
+          disabled={disabled}
+          onChange={onChange}
+          size={size}
           filterOption={false}
           placeholder={placeholderElement}
           notFoundContent={isLoadingSearch ? loadingDisplay : noOptionsDisplay}
