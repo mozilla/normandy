@@ -27,12 +27,14 @@ export default class ExtensionSelect extends React.Component {
     isLoadingSearch: PropTypes.bool.isRequired,
     onChange: PropTypes.func,
     size: PropTypes.oneOf(['small', 'large']),
+    value: PropTypes.any,
   };
 
   static defaultProps = {
     disabled: false,
     onChange: null,
     size: 'default',
+    value: null,
   };
 
   // Define the commonly-used elements on the class, so they're compiled only once.
@@ -71,6 +73,7 @@ export default class ExtensionSelect extends React.Component {
       disabled,
       onChange,
       size,
+      value,
     } = this.props;
 
     if (isLoadingSearch) {
@@ -81,6 +84,7 @@ export default class ExtensionSelect extends React.Component {
       <div>
         <QueryMultipleExtensions filters={queryFilters} pageNumber={1} />
         <Select
+          value={value || undefined}
           disabled={disabled}
           onChange={onChange}
           size={size}
@@ -90,9 +94,12 @@ export default class ExtensionSelect extends React.Component {
           onSearch={this.updateSearch}
           showSearch
         >
-          {displayedList.map(item =>
-            <Option key={item.get('xpi')}>{item.get('name')}</Option>,
-          )}
+          {displayedList.map(item => {
+            const xpi = item.get('xpi');
+            const name = item.get('name');
+
+            return (<Option key={xpi} value={xpi} title={name}>{name}</Option>);
+          })}
         </Select>
       </div>
     );
