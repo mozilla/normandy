@@ -5,46 +5,48 @@ import {
   ACTION_RECEIVE,
   RECIPE_RECEIVE,
   REVISION_RECEIVE,
+  USER_RECEIVE,
 } from 'control/state/action-types';
-import actionsReducer from 'control/state/actions/reducers';
-import recipesReducer from 'control/state/recipes/reducers';
-import revisionsReducer from 'control/state/revisions/reducers';
+import actionsReducer from 'control/state/app/actions/reducers';
+import recipesReducer from 'control/state/app/recipes/reducers';
+import revisionsReducer from 'control/state/app/revisions/reducers';
+import usersReducer from 'control/state/app/users/reducers';
 import {
   getRecipe,
   getRecipeFilters,
   getRecipeHistory,
-} from 'control/state/recipes/selectors';
-
-import {
-  FILTERS,
-  RECIPE,
-} from '.';
-
+} from 'control/state/app/recipes/selectors';
 import {
   INITIAL_STATE,
-} from '..';
-
+} from 'control/tests/state';
 import {
-  REVISION,
-} from '../revisions';
+  FILTERS,
+  RecipeFactory,
+} from 'control/tests/state/recipes';
 
 
 describe('getRecipe', () => {
+  const recipe = RecipeFactory.build();
+
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
+    app: {
+      ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: RECIPE.action,
+        action: recipe.action,
       }),
       recipes: recipesReducer(undefined, {
         type: RECIPE_RECEIVE,
-        recipe: RECIPE,
+        recipe,
       }),
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: RECIPE.latest_revision,
+        revision: recipe.latest_revision,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: recipe.latest_revision.user,
       }),
     },
   };
@@ -54,7 +56,7 @@ describe('getRecipe', () => {
   });
 
   it('should return the recipe', () => {
-    expect(getRecipe(STATE, RECIPE.id)).toEqualImmutable(fromJS(RECIPE));
+    expect(getRecipe(STATE, recipe.id)).toEqualImmutable(fromJS(recipe));
   });
 
   it('should return `null` for invalid ID', () => {
@@ -70,10 +72,10 @@ describe('getRecipe', () => {
 describe('getRecipeFilters', () => {
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
+    app: {
+      ...INITIAL_STATE.app,
       recipes: {
-        ...INITIAL_STATE.newState.recipes,
+        ...INITIAL_STATE.app.recipes,
         filters: fromJS(FILTERS),
       },
     },
@@ -90,24 +92,30 @@ describe('getRecipeFilters', () => {
 
 
 describe('getRecipeHistory', () => {
+  const recipe = RecipeFactory.build();
+
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
+    app: {
+      ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: REVISION.recipe.action,
+        action: recipe.action,
       }),
       recipes: {
-        ...INITIAL_STATE.newState.recipes,
-        history: INITIAL_STATE.newState.recipes.history.set(
-          REVISION.recipe.id,
-          fromJS([REVISION.id]),
+        ...INITIAL_STATE.app.recipes,
+        history: INITIAL_STATE.app.recipes.history.set(
+          recipe.id,
+          fromJS([recipe.latest_revision.id]),
         ),
       },
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: RECIPE.latest_revision,
+        revision: recipe.latest_revision,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: recipe.latest_revision.user,
       }),
     },
   };
@@ -117,6 +125,6 @@ describe('getRecipeHistory', () => {
   });
 
   it('should return the list of revisions', () => {
-    expect(getRecipeHistory(STATE, REVISION.recipe.id)).toEqualImmutable(fromJS([REVISION]));
+    expect(getRecipeHistory(STATE, recipe.id)).toEqualImmutable(fromJS([recipe.latest_revision]));
   });
 });

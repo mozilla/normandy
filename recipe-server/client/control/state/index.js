@@ -1,24 +1,12 @@
-import { routerReducer as routing } from 'react-router-redux';
 import { combineReducers } from 'redux';
-import { reducer as form } from 'redux-form';
 
-import actions from './actions/reducers';
-import approvalRequests from './approvalRequests/reducers';
-import extensions from './extensions/reducers';
-import recipes from './recipes/reducers';
-import requests from './requests/reducers';
-import revisions from './revisions/reducers';
+import app from 'control/state/app/reducer';
+import { reducer as router } from 'control/routes';
 
 
 const reducer = combineReducers({
-  actions,
-  approvalRequests,
-  extensions,
-  form,
-  recipes,
-  requests,
-  revisions,
-  routing,
+  app,
+  router,
 });
 
 export default reducer;

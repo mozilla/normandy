@@ -1,30 +1,30 @@
 import { fromJS } from 'immutable';
 
-import { getAction } from 'control/state/actions/selectors';
-
-import {
-  ACTION,
-} from '.';
-
+import { getAction } from 'control/state/app/actions/selectors';
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control/tests/state';
+import {
+  ActionFactory,
+} from 'control/tests/state/actions';
 
 
 describe('getAction', () => {
+  const action = ActionFactory.build();
+
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
+    app: {
+      ...INITIAL_STATE.app,
       actions: {
-        ...INITIAL_STATE.newState.actions,
-        items: INITIAL_STATE.newState.actions.items.set(ACTION.id, fromJS(ACTION)),
+        ...INITIAL_STATE.app.actions,
+        items: INITIAL_STATE.app.actions.items.set(action.id, fromJS(action)),
       },
     },
   };
 
   it('should return the action', () => {
-    expect(getAction(STATE, ACTION.id)).toEqual(fromJS(ACTION));
+    expect(getAction(STATE, action.id)).toEqual(fromJS(action));
   });
 
   it('should return `null` for invalid ID', () => {

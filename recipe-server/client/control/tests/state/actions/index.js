@@ -1,4 +1,7 @@
+import faker from 'faker';
 import { Map } from 'immutable';
+
+import { AutoIncrementField, Factory, Field } from 'control/tests/factory';
 
 
 export const INITIAL_STATE = {
@@ -6,7 +9,13 @@ export const INITIAL_STATE = {
 };
 
 
-export const ACTION = {
-  id: 1,
-  name: 'test-action',
-};
+export class ActionFactory extends Factory {
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      argument_schema: {},
+      implementation_url: new Field(faker.internet.url),
+      name: new Field(faker.lorem.slug),
+    };
+  }
+}

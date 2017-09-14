@@ -1,32 +1,47 @@
 import { fromJS } from 'immutable';
-
-import { getApprovalRequest } from 'control/state/approvalRequests/selectors';
+import * as matchers from 'jasmine-immutable-matchers';
 
 import {
-  APPROVAL_REQUEST,
-} from '.';
-
+  APPROVAL_REQUEST_RECEIVE,
+  USER_RECEIVE,
+} from 'control/state/action-types';
+import approvalRequestsReducer from 'control/state/app/approvalRequests/reducers';
+import { getApprovalRequest } from 'control/state/app/approvalRequests/selectors';
+import usersReducer from 'control/state/app/users/reducers';
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control/tests/state';
+import {
+  ApprovalRequestFactory,
+} from 'control/tests/state/approvalRequests';
 
 
 describe('getApprovalRequest', () => {
+  const approvalRequest = ApprovalRequestFactory.build();
+
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
-      approvalRequests: {
-        ...INITIAL_STATE.newState.approvalRequests,
-        items: INITIAL_STATE.newState.approvalRequests.items.set(
-          APPROVAL_REQUEST.id, fromJS(APPROVAL_REQUEST),
-        ),
-      },
+    app: {
+      ...INITIAL_STATE.app,
+      approvalRequests: approvalRequestsReducer(undefined, {
+        type: APPROVAL_REQUEST_RECEIVE,
+        approvalRequest,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: approvalRequest.creator,
+      }),
     },
   };
 
+  beforeEach(() => {
+    jasmine.addMatchers(matchers);
+  });
+
   it('should return the approval request', () => {
-    expect(getApprovalRequest(STATE, APPROVAL_REQUEST.id)).toEqual(fromJS(APPROVAL_REQUEST));
+    expect(getApprovalRequest(STATE, approvalRequest.id)).toEqualImmutable(
+      fromJS(approvalRequest),
+    );
   });
 
   it('should return `null` for invalid ID', () => {

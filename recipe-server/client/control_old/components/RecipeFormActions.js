@@ -1,0 +1,263 @@
+import React, {
+  PropTypes as pt,
+} from 'react';
+import { Link } from 'react-router';
+import cx from 'classnames';
+
+import DropdownMenu from 'control_old/components/DropdownMenu';
+
+export const FormButton = ({
+  className,
+  label,
+  element = 'button',
+  type = 'button',
+  onClick,
+  display,
+  ...props
+}) => {
+  if (display === false) {
+    return null;
+  }
+
+  // need titlecase for JSX
+  const Element = element;
+  return (
+    <Element
+      className={cx('button', className)}
+      onClick={onClick}
+      type={type}
+      key={label + className}
+      {...props}
+    >
+      {label}
+    </Element>
+  );
+};
+
+FormButton.propTypes = {
+  display: pt.bool,
+  className: pt.string,
+  label: pt.string,
+  element: pt.any,
+  type: pt.string,
+  onClick: pt.func,
+};
+
+
+export default class RecipeFormActions extends React.Component {
+  static propTypes = {
+    onAction: pt.func.isRequired,
+    isApproved: pt.bool,
+    isEnabled: pt.bool,
+    isUserViewingOutdated: pt.bool,
+    isViewingLatestApproved: pt.bool,
+    isPendingApproval: pt.bool,
+    isUserRequester: pt.bool,
+    isAlreadySaved: pt.bool,
+    isFormPristine: pt.bool,
+    isCloning: pt.bool,
+    isFormDisabled: pt.bool,
+    isAccepted: pt.bool,
+    isRejected: pt.bool,
+    hasApprovalRequest: pt.bool,
+    recipeId: pt.number,
+    isPeerApprovalEnforced: pt.bool,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      comment: {},
+    };
+  }
+
+  onCommentChange(type) {
+    return evt => {
+      this.setState({
+        comment: {
+          ...this.state.comment,
+          [type]: evt.target.value,
+        },
+      });
+    };
+  }
+
+  getActions({
+    isRecipeApproved,
+    isEnabled,
+    isViewingLatestApproved,
+    isUserViewingOutdated,
+    isPendingApproval,
+    isUserRequester,
+    isAlreadySaved,
+    isFormPristine,
+    isCloning,
+    isFormDisabled,
+    hasApprovalRequest,
+    recipeId,
+    isPeerApprovalEnforced,
+  }) {
+    return [
+      // delete
+      <FormButton
+        key="delete"
+        display={isAlreadySaved && !isCloning}
+        disabled={isFormDisabled}
+        className="action-delete delete"
+        label="Delete"
+        element={Link}
+        to={`/control_old/recipe/${recipeId}/delete/`}
+      />,
+      // save
+      <FormButton
+        key="save"
+        disabled={isFormPristine}
+        display={isAlreadySaved && !isCloning}
+        className="action-save submit"
+        type="submit"
+        label="Save Draft"
+      />,
+      // new
+      <FormButton
+        key="new"
+        disabled={isFormPristine}
+        display={!isAlreadySaved || isCloning}
+        className="action-new submit"
+        type="submit"
+        label="Save New Recipe"
+      />,
+      // enable
+      <FormButton
+        key="enable"
+        display={isRecipeApproved && isViewingLatestApproved && !isEnabled}
+        className="action-enable submit"
+        label="Enable"
+        element={isRecipeApproved ? Link : 'button'}
+        to={`/control_old/recipe/${recipeId}/enable/`}
+      />,
+      // disable
+      <FormButton
+        key="disable"
+        display={!isUserViewingOutdated && isEnabled}
+        className="action-disable submit delete"
+        label="Disable"
+        element={Link}
+        to={`/control_old/recipe/${recipeId}/disable/`}
+      />,
+      // cancel
+      <FormButton
+        key="cancel"
+        display={!isUserViewingOutdated && isPendingApproval}
+        className="action-cancel submit delete"
+        onClick={this.createActionEmitter('cancel')}
+        label="Cancel Review"
+      />,
+      // approve
+      <DropdownMenu
+        key="approve"
+        display={!isUserViewingOutdated && isPendingApproval && !isCloning}
+        pinTop
+        pinRight
+        useClick
+        trigger={
+          <FormButton
+            disabled={isUserRequester && isPeerApprovalEnforced}
+            className="action-approve submit"
+            label="Approve"
+          />
+        }
+      >
+        <div className="approve-dropdown">
+          Add a review comment
+          <textarea
+            defaultValue={this.state.comment.approve}
+            onChange={this.onCommentChange('approve')}
+          />
+          <FormButton
+            className="mini-button"
+            type="button"
+            onClick={() => {
+              this.props.onAction('approve', {
+                comment: this.state.comment.approve,
+              });
+            }}
+            disabled={!this.state.comment.approve}
+          >
+            Approve
+          </FormButton>
+        </div>
+      </DropdownMenu>,
+      // reject
+      <DropdownMenu
+        key="reject"
+        display={!isUserViewingOutdated && isPendingApproval && !isCloning}
+        pinTop
+        pinRight
+        useClick
+        trigger={
+          <FormButton
+            disabled={isUserRequester && isPeerApprovalEnforced}
+            className="action-reject submit delete"
+            label="Reject"
+          />
+        }
+      >
+        <div className="reject-dropdown">
+          Add a review comment
+          <textarea
+            defaultValue={this.state.comment.reject}
+            onChange={this.onCommentChange('reject')}
+          />
+          <FormButton
+            className="mini-button"
+            type="button"
+            onClick={() => {
+              this.props.onAction('reject', {
+                comment: this.state.comment.reject,
+              });
+            }}
+            disabled={!this.state.comment.reject}
+          >
+            Reject
+          </FormButton>
+        </div>
+      </DropdownMenu>,
+      // request
+      <FormButton
+        key="request"
+        display={!isUserViewingOutdated && !hasApprovalRequest
+          && !isPendingApproval && isAlreadySaved && !isCloning}
+        disabled={!isFormPristine}
+        className="action-request submit"
+        onClick={this.createActionEmitter('request')}
+        label="Request Approval"
+      />,
+    ];
+  }
+
+  createActionEmitter(type) {
+    this.actionCache = this.actionCache || {};
+
+    if (!this.actionCache[type]) {
+      this.actionCache[type] = () => {
+        this.props.onAction(type);
+      };
+    }
+
+    return this.actionCache[type];
+  }
+
+  /**
+   * Render
+   */
+  render() {
+    return (
+      <div className="form-actions">
+        {this.getActions(this.props).map((Action, idx) =>
+          // Need to key the action buttons to satisfy a React warning
+          React.cloneElement(Action, { key: idx }), // eslint-disable-line react/no-array-index-key
+        )}
+      </div>
+    );
+  }
+}

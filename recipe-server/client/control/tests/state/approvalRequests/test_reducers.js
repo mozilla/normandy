@@ -1,41 +1,57 @@
 import { fromJS } from 'immutable';
+import * as matchers from 'jasmine-immutable-matchers';
 
 import {
   APPROVAL_REQUEST_DELETE,
   APPROVAL_REQUEST_RECEIVE,
 } from 'control/state/action-types';
-import approvalRequestsReducer from 'control/state/approvalRequests/reducers';
-
+import approvalRequestsReducer from 'control/state/app/approvalRequests/reducers';
 import {
   INITIAL_STATE,
-  APPROVAL_REQUEST,
-} from '.';
+  ApprovalRequestFactory,
+} from 'control/tests/state/approvalRequests';
 
 
 describe('Approval requests reducer', () => {
+  const approvalRequest = ApprovalRequestFactory.build();
+
+  beforeEach(() => {
+    jasmine.addMatchers(matchers);
+  });
+
   it('should return initial state by default', () => {
-    expect(approvalRequestsReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(approvalRequestsReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle APPROVAL_REQUEST_RECEIVE', () => {
-    expect(approvalRequestsReducer(undefined, {
+    const reducedApprovalRequest = {
+      ...approvalRequest,
+      approver_id: approvalRequest.approver ? approvalRequest.approver.id : null,
+      creator_id: approvalRequest.creator.id,
+    };
+
+    delete reducedApprovalRequest.approver;
+    delete reducedApprovalRequest.creator;
+
+    const updatedState = approvalRequestsReducer(undefined, {
       type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest: APPROVAL_REQUEST,
-    })).toEqual({
-      ...INITIAL_STATE,
-      items: INITIAL_STATE.items.set(APPROVAL_REQUEST.id, fromJS(APPROVAL_REQUEST)),
+      approvalRequest,
     });
+
+    expect(updatedState.items).toEqualImmutable(
+      INITIAL_STATE.items.set(approvalRequest.id, fromJS(reducedApprovalRequest)),
+    );
   });
 
   it('should handle APPROVAL_REQUEST_DELETE', () => {
     const state = approvalRequestsReducer(undefined, {
       type: APPROVAL_REQUEST_RECEIVE,
-      approvalRequest: APPROVAL_REQUEST,
+      approvalRequest,
     });
 
     const updatedState = approvalRequestsReducer(state, {
       type: APPROVAL_REQUEST_DELETE,
-      approvalRequestId: APPROVAL_REQUEST.id,
+      approvalRequestId: approvalRequest.id,
     });
 
     expect(updatedState).toEqual(INITIAL_STATE);

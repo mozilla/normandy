@@ -9,11 +9,10 @@ import {
 import {
   DEFAULT_REQUEST,
 } from 'control/state/constants';
-import requestsReducer from 'control/state/requests/reducers';
-
+import requestsReducer from 'control/state/app/requests/reducers';
 import {
   INITIAL_STATE,
-} from '.';
+} from 'control/tests/state/requests';
 
 
 describe('Requests reducer', () => {
@@ -22,7 +21,7 @@ describe('Requests reducer', () => {
   });
 
   it('should return initial state by default', () => {
-    expect(requestsReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(requestsReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle REQUEST_SEND', () => {

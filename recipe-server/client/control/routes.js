@@ -1,106 +1,93 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { IndexRedirect, IndexRoute, Route } from 'react-router';
+import { connect } from 'react-redux';
+import { routerForBrowser } from 'redux-little-router';
 
-import ControlApp from 'control/components/ControlApp';
-import ExtensionForm from 'control/components/ExtensionForm';
-import ExtensionList from 'control/components/ExtensionList';
-import RecipeList from 'control/components/RecipeList';
-import RecipeForm from 'control/components/RecipeForm';
-import RecipeHistory from 'control/components/RecipeHistory';
-import DeleteRecipe from 'control/components/DeleteRecipe';
-import EnableRecipe from 'control/components/EnableRecipe';
-import DisableRecipe from 'control/components/DisableRecipe';
-import NoMatch from 'control/components/NoMatch';
+import App from 'control/components/App';
+import CreateExtensionPage from 'control/components/extensions/CreateExtensionPage';
+import EditExtensionPage from 'control/components/extensions/EditExtensionPage';
+import ApprovalHistoryPage from 'control/components/recipes/ApprovalHistoryPage';
+import CreateRecipePage from 'control/components/recipes/CreateRecipePage';
+import CloneRecipePage from 'control/components/recipes/CloneRecipePage';
+import EditRecipePage from 'control/components/recipes/EditRecipePage';
+import ExtensionListing from 'control/components/extensions/ExtensionListing';
+import Gateway from 'control/components/pages/Gateway';
+import RecipeListing from 'control/components/recipes/RecipeListing';
+import MissingPage from 'control/components/pages/MissingPage';
+import RecipeDetailPage from 'control/components/recipes/RecipeDetailPage';
 
-export default (
-  <Route path="/control/" component={ControlApp}>
-    <IndexRedirect to="recipe/" />
-    <Route path="recipe/" name="Recipes">
-      <IndexRoute
-        component={RecipeList}
-        ctaButtons={[
-          { text: 'Add New', icon: 'plus', link: 'new/' },
-        ]}
-      />
-      <Route
-        path="new/"
-        component={RecipeForm}
-        name="Add New"
-      />
-      <Route path=":id/" name="Recipe">
-        <IndexRoute
-          name="Latest"
-          component={RecipeForm}
-          ctaButtons={[
-            { text: 'Clone', icon: 'files-o', link: 'clone/' },
-            { text: 'History', icon: 'history', link: 'history/' },
-          ]}
-        />
-        <Route
-          path="revision/:revisionId"
-          component={RecipeForm}
-          name="Revision"
-          ctaButtons={[
-            { text: 'Clone', icon: 'files-o', link: '../../clone/' },
-            { text: 'History', icon: 'history', link: '../../history/' },
-          ]}
-        />
-        <Route
-          path="clone/"
-          component={RecipeForm}
-          name="Clone"
-          isCloning
-          ctaButtons={[
-            { text: 'Cancel', icon: 'ban', link: '../' },
-          ]}
-        />
-        <Route
-          path="history/"
-          component={RecipeHistory}
-          name="History"
-        />
-        <Route
-          path="delete/"
-          component={DeleteRecipe}
-          name="Delete"
-        />
-        <Route
-          path="enable/"
-          component={EnableRecipe}
-          name="Enable"
-        />
-        <Route
-          path="disable/"
-          component={DisableRecipe}
-          name="Disable"
-        />
-        <Route
-          path=":revisionId/"
-          component={RecipeForm}
-          ctaButtons={[
-            { text: 'History', icon: 'history', link: '../history/' },
-          ]}
-        />
-      </Route>
-    </Route>
-    <Route path="extension/" name="Extensions">
-      <IndexRoute
-        component={ExtensionList}
-        ctaButtons={[
-          { text: 'Add New', icon: 'plus', link: 'new/' },
-        ]}
-      />
-      <Route
-        path="new/"
-        name="Add New"
-        component={ExtensionForm}
-      />
-      <Route
-        path=":pk/"
-        name="Extension"
-        component={ExtensionForm}
-      />
-    </Route>
-    <Route path="*" component={NoMatch} />
-  </Route>
-);
+
+const routes = {
+  '/': {
+    component: Gateway,
+    crumb: 'Home',
+    '/recipe': {
+      component: RecipeListing,
+      crumb: 'Recipes Listing',
+      '/new': {
+        component: CreateRecipePage,
+        crumb: 'New Recipe',
+      },
+      '/:recipeId': {
+        component: RecipeDetailPage,
+        crumb: 'View Recipe',
+        '/rev/:revisionId': {
+          component: RecipeDetailPage,
+          crumb: 'Revision',
+          '/clone': {
+            component: CloneRecipePage,
+            crumb: 'Clone Revision',
+          },
+        },
+        '/edit': {
+          component: EditRecipePage,
+          crumb: 'Edit Recipe',
+        },
+        '/approval_history': {
+          component: ApprovalHistoryPage,
+          crumb: 'Approval History',
+        },
+        '/clone': {
+          component: CloneRecipePage,
+          crumb: 'Clone Recipe',
+        },
+      },
+    },
+    '/extension': {
+      component: ExtensionListing,
+      crumb: 'Extensions Listing',
+      '/new': {
+        component: CreateExtensionPage,
+        crumb: 'New Extension',
+      },
+      '/:extensionId': {
+        component: EditExtensionPage,
+        crumb: 'Edit Extension',
+      },
+    },
+  },
+};
+
+export const {
+  reducer,
+  middleware,
+  enhancer,
+} = routerForBrowser({
+  routes,
+  basename: '',
+});
+
+@connect(state => ({
+  router: state.router,
+}))
+export default class Router extends React.PureComponent {
+  static propTypes = {
+    router: PropTypes.object.isRequired,
+  };
+
+  render() {
+    const { router } = this.props;
+    const content = router.route ? <router.result.component /> : <MissingPage />;
+    return <App>{content}</App>;
+  }
+}
