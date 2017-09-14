@@ -39,5 +39,5 @@ if settings.ADMIN_ENABLED:
             {'login_url': reverse_lazy('control:login')},
             name='logout'
         ),
-        url(r'', views.index, name='index'),
+        url(r'^.*/$', views.index, name='index'),
     ]
