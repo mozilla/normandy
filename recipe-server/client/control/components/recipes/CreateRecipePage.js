@@ -43,7 +43,7 @@ export default class CreateRecipePage extends React.PureComponent {
       this.setState({
         formErrors: undefined,
       });
-      push(`/recipe/${newId}`);
+      push(`/recipe/${newId}/`);
     } catch (error) {
       message.error(
         'Recipe cannot be created. Please correct any errors listed in the form below.',

@@ -38,7 +38,7 @@ export default class CreateExtensionPage extends React.PureComponent {
     try {
       const extensionId = await createExtension(values);
       message.success('Extension saved');
-      push(`/extension/${extensionId}`);
+      push(`/extension/${extensionId}/`);
     } catch (error) {
       message.error(
         'Extension cannot be saved. Please correct any errors listed in the form below.',

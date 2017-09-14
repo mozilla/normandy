@@ -108,13 +108,13 @@ export default class DetailsActionBar extends React.PureComponent {
 
     return (
       <div className="details-action-bar clearfix">
-        <Link href={`${routerPath}/clone`} id="dab-clone-link">
+        <Link href={`${routerPath}/clone/`} id="dab-clone-link">
           <Button icon="swap" type="primary" id="dab-clone-button">Clone</Button>
         </Link>
 
         {
           isLatest &&
-            <Link href={`/recipe/${recipeId}/edit`} id="dab-edit-link">
+            <Link href={`/recipe/${recipeId}/edit/`} id="dab-edit-link">
               <Button icon="edit" type="primary" id="dab-edit-button">Edit</Button>
             </Link>
         }
@@ -133,7 +133,7 @@ export default class DetailsActionBar extends React.PureComponent {
 
         {
           isPendingApproval &&
-            <Link href={`/recipe/${recipeId}/approval_history`}>
+            <Link href={`/recipe/${recipeId}/approval_history/`}>
               <Button icon="message" type="primary" id="dab-approval-status">Approval Request</Button>
             </Link>
         }

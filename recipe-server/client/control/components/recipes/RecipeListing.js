@@ -117,7 +117,7 @@ export default class RecipeListing extends React.PureComponent {
           render={(text, record) => {
             const lastUpdated = moment(record.last_updated);
             return (
-              <Link href={`/recipe/${record.id}`} title={lastUpdated.format('LLLL')}>
+              <Link href={`/recipe/${record.id}/`} title={lastUpdated.format('LLLL')}>
                 {lastUpdated.fromNow()}
               </Link>
             );
@@ -130,7 +130,7 @@ export default class RecipeListing extends React.PureComponent {
   };
 
   static renderLinkedText(text, record) {
-    return <Link href={`/recipe/${record.id}`}>{text}</Link>;
+    return <Link href={`/recipe/${record.id}/`}>{text}</Link>;
   }
 
   getFilters() {
@@ -158,7 +158,7 @@ export default class RecipeListing extends React.PureComponent {
 
   handleRowClick(record) {
     const { push } = this.props;
-    push(`/recipe/${record.id}`);
+    push(`/recipe/${record.id}/`);
   }
 
   render() {

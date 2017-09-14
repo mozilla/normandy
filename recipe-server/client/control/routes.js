@@ -22,47 +22,67 @@ const routes = {
     component: Gateway,
     crumb: 'Home',
     '/recipe': {
-      component: RecipeListing,
-      crumb: 'Recipes Listing',
+      '/': {
+        component: RecipeListing,
+        crumb: 'Recipes Listing',
+      },
       '/new': {
         component: CreateRecipePage,
         crumb: 'New Recipe',
       },
       '/:recipeId': {
-        component: RecipeDetailPage,
-        crumb: 'View Recipe',
-        '/rev/:revisionId': {
+        '/': {
           component: RecipeDetailPage,
-          crumb: 'Revision',
+          crumb: 'View Recipe',
+        },
+        '/rev/:revisionId': {
+          '/': {
+            component: RecipeDetailPage,
+            crumb: 'Revision',
+          },
           '/clone': {
-            component: CloneRecipePage,
-            crumb: 'Clone Revision',
+            '/': {
+              component: CloneRecipePage,
+              crumb: 'Clone Revision',
+            },
           },
         },
         '/edit': {
-          component: EditRecipePage,
-          crumb: 'Edit Recipe',
+          '/': {
+            component: EditRecipePage,
+            crumb: 'Edit Recipe',
+          },
         },
         '/approval_history': {
-          component: ApprovalHistoryPage,
-          crumb: 'Approval History',
+          '/': {
+            component: ApprovalHistoryPage,
+            crumb: 'Approval History',
+          },
         },
         '/clone': {
-          component: CloneRecipePage,
-          crumb: 'Clone Recipe',
+          '/': {
+            component: CloneRecipePage,
+            crumb: 'Clone Recipe',
+          },
         },
       },
     },
     '/extension': {
-      component: ExtensionListing,
-      crumb: 'Extensions Listing',
+      '/': {
+        component: ExtensionListing,
+        crumb: 'Extensions Listing',
+      },
       '/new': {
-        component: CreateExtensionPage,
-        crumb: 'New Extension',
+        '/': {
+          component: CreateExtensionPage,
+          crumb: 'New Extension',
+        },
       },
       '/:extensionId': {
-        component: EditExtensionPage,
-        crumb: 'Edit Extension',
+        '/': {
+          component: EditExtensionPage,
+          crumb: 'Edit Extension',
+        },
       },
     },
   },

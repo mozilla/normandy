@@ -66,7 +66,7 @@ export default class CloneRecipePage extends React.PureComponent {
         formErrors: undefined,
       });
 
-      push(`/recipe/${newId}`);
+      push(`/recipe/${newId}/`);
     } catch (error) {
       message.error(
         'Recipe cannot be saved. Please correct any errors listed in the form below.',
@@ -85,7 +85,7 @@ export default class CloneRecipePage extends React.PureComponent {
     // Remove the 'name' field value.
     const displayedRecipe = recipe.set('name');
 
-    const recipeDetailsURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}`;
+    const recipeDetailsURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}/`;
 
     // Only display revision hash if we're _not_ on the latest version.
     const revisionAddendum = isLatestRevision ? '' : `(Revision: ${revisionId.slice(0, 7)})`;

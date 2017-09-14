@@ -81,7 +81,7 @@ export default class ExtensionListing extends React.PureComponent {
   }
 
   static renderLinkedText(text, record) {
-    return <Link href={`/extension/${record.id}`}>{text}</Link>;
+    return <Link href={`/extension/${record.id}/`}>{text}</Link>;
   }
 
   getFilters() {
@@ -107,7 +107,7 @@ export default class ExtensionListing extends React.PureComponent {
 
   handleRowClick(record) {
     const { push } = this.props;
-    push(`/extension/${record.id}`);
+    push(`/extension/${record.id}/`);
   }
 
   render() {

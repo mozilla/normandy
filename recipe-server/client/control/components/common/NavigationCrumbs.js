@@ -55,10 +55,12 @@ export default class NavigationCrumbs extends React.PureComponent {
 
     // Walk up route tree until there are no more `parent`s.
     while (currentRoute) {
-      crumbs.push({
-        name: currentRoute.crumb,
-        link: NavigationCrumbs.replaceUrlVariables(currentRoute.route || pathname, params),
-      });
+      if (currentRoute.crumb) {
+        crumbs.push({
+          name: currentRoute.crumb,
+          link: NavigationCrumbs.replaceUrlVariables(currentRoute.route || pathname, params),
+        });
+      }
 
       currentRoute = currentRoute.parent;
     }

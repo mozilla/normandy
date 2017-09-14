@@ -39,8 +39,8 @@ export default class NavigationMenu extends React.PureComponent {
           <Item key="/"><Link href="/">Home</Link></Item>
 
           <SubMenu title="Recipes" key="Recipes">
-            <Item key="/recipe">
-              <Link href="/recipe">View All</Link>
+            <Item key="/recipe/">
+              <Link href="/recipe/">View All</Link>
             </Item>
 
             {recipeSessionHistory.size > 0 && <Divider />}
@@ -55,8 +55,8 @@ export default class NavigationMenu extends React.PureComponent {
           </SubMenu>
 
           <SubMenu title="Extensions" key="Extensions">
-            <Item key="/extension">
-              <Link href="/extension">View All</Link>
+            <Item key="/extension/">
+              <Link href="/extension/">View All</Link>
             </Item>
 
             {extensionSessionHistory.size > 0 && <Divider />}

@@ -12,14 +12,14 @@ export default class Gateway extends React.PureComponent {
           <Card title="Recipes" id="gw-recipes-card">
             <Icon type="book" />
             <p>Basic SHIELD recipes</p>
-            <Link href="/recipe" id="gw-recipes-link">Go to Recipes</Link>
+            <Link href="/recipe/" id="gw-recipes-link">Go to Recipes</Link>
           </Card>
         </Col>
         <Col className="gw-col" xs={24} sm={10} md={8}>
           <Card title="Extensions" id="gw-extensions-card">
             <Icon type="code" />
             <p>SHIELD WebExtensions</p>
-            <Link href="/extension" id="gw-extensions-card">Go to Extensions</Link>
+            <Link href="/extension/" id="gw-extensions-card">Go to Extensions</Link>
           </Card>
         </Col>
       </Row>
