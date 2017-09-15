@@ -128,7 +128,7 @@ export default class RecipeForm extends React.PureComponent {
     actions: getAllActions(state, new Map()),
   }),
 )
-class ActionSelect extends React.PureComponent {
+export class ActionSelect extends React.PureComponent {
   static propTypes = {
     actions: PropTypes.instanceOf(Map).isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -147,15 +147,21 @@ class ActionSelect extends React.PureComponent {
     return (
       <div id="rf-action-select">
         <Select placeholder="Select an action..." value={stringValue} {...props}>
-          {actions.toList().map(action => (
-            <Select.Option
-              key={action.get('id')}
-              value={action.get('id', '').toString(10)}
-              className={`rf-${action.get('name')}`}
-            >
-              {action.get('name')}
-            </Select.Option>
-          ))}
+          {actions.toList().map(action => {
+            const actionId = action.get('id');
+            const actionName = action.get('name');
+            const actionValue = (actionId || '').toString(10);
+
+            return (
+              <Select.Option
+                key={actionId}
+                value={actionValue}
+                className={`rf-${actionName}`}
+              >
+                {actionName}
+              </Select.Option>
+            );
+          })}
         </Select>
       </div>
     );
