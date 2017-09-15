@@ -85,3 +85,21 @@ fieldset {
     font-weight: bold;
   }
 }
+
+.identicon-field {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.75em;
+  text-align: center;
+
+  img {
+    /* Prevent the alt text from appearing on the page while the image is loading. */
+    color: transparent;
+  }
+
+  .shield-container {
+    min-height: 75px;
+    min-width: 75px;
+  }
+}

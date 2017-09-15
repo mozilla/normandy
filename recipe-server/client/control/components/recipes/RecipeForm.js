@@ -1,4 +1,4 @@
-import { Alert, Button, Form, Input, Select } from 'antd';
+import { Row, Col, Alert, Button, Form, Input, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -16,6 +16,7 @@ import { areAnyRequestsInProgress } from 'control/state/app/requests/selectors';
 import { getGithubUrl } from 'control/state/app/serviceInfo/selectors';
 import { createForm } from 'control/utils/forms';
 import QueryServiceInfo from 'control/components/data/QueryServiceInfo';
+import IdenticonField from 'control_new/components/forms/IdenticonField';
 
 
 /**
@@ -37,6 +38,7 @@ export default class RecipeForm extends React.PureComponent {
   static propTypes = {
     form: PropTypes.object.isRequired,
     isLoading: PropTypes.bool,
+    isCreating: PropTypes.bool,
     onSubmit: PropTypes.func.isRequired,
     recipe: PropTypes.instanceOf(Map),
     selectedActionName: PropTypes.string.isRequired,
@@ -44,6 +46,7 @@ export default class RecipeForm extends React.PureComponent {
 
   static defaultProps = {
     isLoading: false,
+    isCreating: false,
     recipe: new Map(),
   };
 
@@ -64,6 +67,7 @@ export default class RecipeForm extends React.PureComponent {
 
   render() {
     const {
+      isCreating,
       isLoading,
       onSubmit,
       recipe,
@@ -74,13 +78,27 @@ export default class RecipeForm extends React.PureComponent {
 
     return (
       <Form onSubmit={onSubmit} className="recipe-form">
-        <FormItem
-          name="name"
-          label="Name"
-          initialValue={recipe.get('name')}
-        >
-          <Input disabled={isLoading} />
-        </FormItem>
+        <Row gutter={16}>
+          <Col xs={24} sm={18}>
+            <FormItem
+              name="name"
+              label="Name"
+              initialValue={recipe.get('name')}
+            >
+              <Input disabled={isLoading} />
+            </FormItem>
+          </Col>
+
+          <Col xs={24} sm={6}>
+            <FormItem
+              name="identicon_seed"
+              initialValue={recipe.get('identicon_seed', isCreating ? IdenticonField.generateSeed() : null)}
+            >
+              <IdenticonField disabled={isLoading} />
+            </FormItem>
+          </Col>
+        </Row>
+
         <FormItem
           name="extra_filter_expression"
           label="Filter Expression"
