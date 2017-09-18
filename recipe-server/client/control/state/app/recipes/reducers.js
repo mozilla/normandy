@@ -56,13 +56,12 @@ function items(state = new Map(), action) {
 
     case RECIPE_PAGE_RECEIVE: {
       const recipes = fromJS(action.recipes.results);
-      let newState = state;
 
-      recipes.forEach(receivedRecipe => {
-        newState = newState.set(receivedRecipe.get('id'), formatRecipe(receivedRecipe));
+      return state.withMutations(mutState => {
+        recipes.forEach(receivedRecipe => {
+          mutState.set(receivedRecipe.get('id'), formatRecipe(receivedRecipe));
+        });
       });
-
-      return newState;
     }
 
     case RECIPE_DELETE:

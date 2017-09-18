@@ -22,15 +22,12 @@ function items(state = new Map(), action) {
   switch (action.type) {
     case RECIPE_HISTORY_RECEIVE: {
       const revisions = fromJS(action.revisions);
-      let newState = state;
 
-      revisions.forEach(revision => {
-        const newRevision = formatRevision(revision);
-
-        newState = newState.set(revision.get('id'), newRevision);
+      return state.withMutations(mutState => {
+        revisions.forEach(revision => {
+          mutState.set(revision.get('id'), formatRevision(revision));
+        });
       });
-
-      return newState;
     }
 
     case REVISION_RECEIVE: {
