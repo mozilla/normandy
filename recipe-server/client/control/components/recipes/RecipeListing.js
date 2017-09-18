@@ -5,7 +5,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { push as pushAction } from 'redux-little-router';
+import { push as pushAction, Link } from 'redux-little-router';
 
 import BooleanIcon from 'control/components/common/BooleanIcon';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
@@ -41,6 +41,7 @@ import {
   }),
   {
     fetchFilteredRecipesPage: fetchFilteredRecipesPageAction,
+    openNewWindow: window.open,
     push: pushAction,
   },
 )
@@ -51,6 +52,7 @@ export default class RecipeListing extends React.PureComponent {
     count: PropTypes.number,
     fetchFilteredRecipesPage: PropTypes.func.isRequired,
     getCurrentURL: PropTypes.func.isRequired,
+    openNewWindow: PropTypes.func.isRequired,
     ordering: PropTypes.string,
     pageNumber: PropTypes.number,
     push: PropTypes.func.isRequired,
@@ -74,7 +76,7 @@ export default class RecipeListing extends React.PureComponent {
           title="Name"
           dataIndex="name"
           key="name"
-          render={text => <a>{text}</a>}
+          render={RecipeListing.renderLinkedText}
           sortOrder={DataList.getSortOrder('name', ordering)}
           sorter
         />
@@ -87,7 +89,7 @@ export default class RecipeListing extends React.PureComponent {
           title="Action"
           dataIndex="action"
           key="action"
-          render={text => <a>{text}</a>}
+          render={RecipeListing.renderLinkedText}
         />
       );
     },
@@ -129,6 +131,10 @@ export default class RecipeListing extends React.PureComponent {
     },
   };
 
+  static renderLinkedText(text, record) {
+    return <Link href={`/recipe/${record.id}`}>{text}</Link>;
+  }
+
   getFilters() {
     const { ordering, searchText, status } = this.props;
 
@@ -153,13 +159,26 @@ export default class RecipeListing extends React.PureComponent {
   }
 
   handleRowClick(record, index, event) {
-    // FIXME Middle click on text does not work
-    if (event.ctrlKey || event.metaKey || event.button === 1) {
-      window.open(`recipe/${record.id}`);
+    const linkTarget = event.target.tagName === 'A';
+
+    // If the user has clicked a link directly, just fall back to the native event.
+    if (linkTarget) {
       return;
     }
-    const { push } = this.props;
-    push(`/recipe/${record.id}/`);
+
+    // If we're here, the user clicked the row itself, which now needs to behave
+    // as if it was a native link click. This includes opening a new tab if using
+    // a modifier key (like ctrl).
+
+    const usingModifierKey = (event.ctrlKey || event.metaKey || event.button === 1);
+    let navTo = this.props.push;
+
+    // No link but using a modifier key = open in a new tab.
+    if (!linkTarget && usingModifierKey) {
+      navTo = this.props.openNewWindow;
+    }
+
+    navTo(`recipe/${record.id}/`);
   }
 
   render() {
