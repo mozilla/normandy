@@ -13,7 +13,7 @@
   <head>
     <title>SHIELD Control Panel</title>
     {% render_bundle 'vendor' 'css' 'VENDOR' %}
-    {% render_bundle 'control' 'css' %}
+    {% render_bundle 'control_old' 'css' %}
     <meta name="robots" content="NONE,NOARCHIVE" />
     <link rel="icon" type="image/png" sizes="32x32" href="{{STATIC_URL}}img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="{{STATIC_URL}}img/favicon-96x96.png">
@@ -44,7 +44,7 @@
     <!-- END Container -->
     {% block javascript %}
       {% render_bundle 'vendor' 'js' 'VENDOR' %}
-      {% render_bundle 'control' 'js' %}
+      {% render_bundle 'control_old' 'js' %}
     {% endblock %}
   </body>
 </html>

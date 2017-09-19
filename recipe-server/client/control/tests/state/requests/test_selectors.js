@@ -1,20 +1,19 @@
 import * as matchers from 'jasmine-immutable-matchers';
 
 import { DEFAULT_REQUEST } from 'control/state/constants';
-import { getRequest } from 'control/state/requests/selectors';
-
+import { getRequest } from 'control/state/app/requests/selectors';
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control/tests/state';
 
 
 describe('getRequest', () => {
   const REQUEST = DEFAULT_REQUEST.set('inProgress', true);
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
-      requests: INITIAL_STATE.newState.requests.set('test', REQUEST),
+    app: {
+      ...INITIAL_STATE.app,
+      requests: INITIAL_STATE.app.requests.set('test', REQUEST),
     },
   };
 

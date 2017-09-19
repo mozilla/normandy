@@ -7,34 +7,31 @@ import {
   RECIPE_FILTERS_RECEIVE,
   RECIPE_HISTORY_RECEIVE,
 } from 'control/state/action-types';
-import recipesReducer from 'control/state/recipes/reducers';
-
+import recipesReducer from 'control/state/app/recipes/reducers';
 import {
   FILTERS,
   INITIAL_STATE,
-  RECIPE,
-} from '.';
-
-import {
-  REVISION,
-} from '../revisions';
+  RecipeFactory,
+} from 'control/tests/state/recipes';
 
 
 describe('Recipes reducer', () => {
+  const recipe = RecipeFactory.build();
+
   beforeEach(() => {
     jasmine.addMatchers(matchers);
   });
 
   it('should return initial state by default', () => {
-    expect(recipesReducer(undefined, {})).toEqual(INITIAL_STATE);
+    expect(recipesReducer(undefined, { type: 'INITIAL' })).toEqual(INITIAL_STATE);
   });
 
   it('should handle RECIPE_RECEIVE', () => {
     const reducedRecipe = {
-      ...RECIPE,
-      action_id: RECIPE.action.id,
-      latest_revision_id: RECIPE.latest_revision.id,
-      approved_revision_id: null,
+      ...recipe,
+      action_id: recipe.action.id,
+      latest_revision_id: recipe.latest_revision.id,
+      approved_revision_id: recipe.approved_revision ? recipe.approved_revision.id : null,
     };
 
     delete reducedRecipe.action;
@@ -43,23 +40,23 @@ describe('Recipes reducer', () => {
 
     const updatedState = recipesReducer(undefined, {
       type: RECIPE_RECEIVE,
-      recipe: RECIPE,
+      recipe,
     });
 
     expect(updatedState.items).toEqualImmutable(
-      INITIAL_STATE.items.set(RECIPE.id, fromJS(reducedRecipe)),
+      INITIAL_STATE.items.set(recipe.id, fromJS(reducedRecipe)),
     );
   });
 
   it('should handle RECIPE_DELETE', () => {
     const state = recipesReducer(undefined, {
       type: RECIPE_RECEIVE,
-      recipe: RECIPE,
+      recipe,
     });
 
     const updateState = recipesReducer(state, {
       type: RECIPE_DELETE,
-      recipeId: RECIPE.id,
+      recipeId: recipe.id,
     });
 
     expect(updateState).toEqual(INITIAL_STATE);
@@ -78,11 +75,11 @@ describe('Recipes reducer', () => {
   it('should handle RECIPE_HISTORY_RECEIVE', () => {
     expect(recipesReducer(undefined, {
       type: RECIPE_HISTORY_RECEIVE,
-      recipeId: RECIPE.id,
-      revisions: [REVISION],
+      recipeId: recipe.id,
+      revisions: [recipe.latest_revision],
     })).toEqual({
       ...INITIAL_STATE,
-      history: INITIAL_STATE.history.set(RECIPE.id, new List([REVISION.id])),
+      history: INITIAL_STATE.history.set(recipe.id, new List([recipe.latest_revision.id])),
     });
   });
 });

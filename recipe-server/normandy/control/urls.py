@@ -12,20 +12,32 @@ urlpatterns = []
 
 if settings.ADMIN_ENABLED:
     urlpatterns += [
-        url(r'^control/', include([
+        url(r'^control-old/', include([
             url(
                 'login',
                 login,
                 {'template_name': 'control/admin/login.html'},
-                name='login'
+                name='login-old'
             ),
             url(
                 'logout',
                 logout_then_login,
                 {'login_url': reverse_lazy('control:login')},
-                name='logout'
+                name='logout-old'
             ),
-            url(r'^.*$', views.IndexView, name='index'),
+            url(r'^.*$', views.old_control, name='index-old'),
         ])),
-        url(r'^control-new/', views.new_control),
+        url(
+            r'^login/$',
+            login,
+            {'template_name': 'control/admin/login.html'},
+            name='login'
+        ),
+        url(
+            r'^logout/$',
+            logout_then_login,
+            {'login_url': reverse_lazy('control:login')},
+            name='logout'
+        ),
+        url(r'^.*/$', views.index, name='index'),
     ]

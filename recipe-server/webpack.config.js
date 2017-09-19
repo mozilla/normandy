@@ -68,16 +68,16 @@ module.exports = function (webpackEnvOptions) {
       devtool: production ? undefined : 'cheap-module-source-map',
 
       entry: {
+        control_old: [
+          'babel-polyfill',
+          './client/control_old/index.js',
+          './client/control_old/sass/control.scss',
+          './node_modules/font-awesome/scss/font-awesome.scss',
+        ],
         control: [
           'babel-polyfill',
           './client/control/index.js',
-          './client/control/sass/control.scss',
-          './node_modules/font-awesome/scss/font-awesome.scss',
-        ],
-        control_new: [
-          'babel-polyfill',
-          './client/control_new/index.js',
-          './client/control_new/less/main.less',
+          './client/control/less/main.less',
         ],
       },
 
@@ -144,7 +144,7 @@ module.exports = function (webpackEnvOptions) {
           actions: path.resolve(__dirname, './client/actions'),
           control: path.resolve(__dirname, './client/control'),
           tests: path.resolve(__dirname, './client/tests'),
-          control_new: path.resolve(__dirname, './client/control_new'),
+          control_old: path.resolve(__dirname, './client/control_old'),
         },
       },
 

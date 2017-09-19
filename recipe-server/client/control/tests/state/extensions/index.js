@@ -1,13 +1,22 @@
+import faker from 'faker';
 import { Map } from 'immutable';
+
+import { AutoIncrementField, Factory, Field } from 'control/tests/factory';
 
 
 export const INITIAL_STATE = {
   items: new Map(),
+  listing: new Map(),
 };
 
 
-export const EXTENSION = {
-  id: 1,
-  name: 'test-extension',
-  xpi: 'http://path.to/addon.xpi',
-};
+export class ExtensionFactory extends Factory {
+  getFields() {
+    return {
+      id: new AutoIncrementField(),
+      name: new Field(faker.lorem.slug),
+      xpi: new Field(faker.internet.url),
+    };
+  }
+}
+

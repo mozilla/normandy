@@ -1,14 +1,20 @@
-import React, { PropTypes as pt } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
-import { fetchExtension } from 'control/state/extensions/actions';
+import { fetchExtension } from 'control/state/app/extensions/actions';
 
 
-class QueryExtension extends React.Component {
+@connect(
+  null,
+  {
+    fetchExtension,
+  },
+)
+export default class QueryExtension extends React.PureComponent {
   static propTypes = {
-    fetchExtension: pt.func.isRequired,
-    pk: pt.number.isRequired,
+    fetchExtension: PropTypes.func.isRequired,
+    pk: PropTypes.number.isRequired,
   }
 
   componentWillMount() {
@@ -27,11 +33,3 @@ class QueryExtension extends React.Component {
     return null;
   }
 }
-
-
-export default connect(
-  null,
-  dispatch => (bindActionCreators({
-    fetchExtension,
-  }, dispatch)),
-)(QueryExtension);

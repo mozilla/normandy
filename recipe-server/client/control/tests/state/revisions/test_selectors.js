@@ -4,32 +4,38 @@ import * as matchers from 'jasmine-immutable-matchers';
 import {
   ACTION_RECEIVE,
   REVISION_RECEIVE,
+  USER_RECEIVE,
 } from 'control/state/action-types';
-import actionsReducer from 'control/state/actions/reducers';
-import revisionsReducer from 'control/state/revisions/reducers';
-import { getRevision } from 'control/state/revisions/selectors';
-
-import {
-  REVISION,
-} from '.';
-
+import actionsReducer from 'control/state/app/actions/reducers';
+import revisionsReducer from 'control/state/app/revisions/reducers';
+import usersReducer from 'control/state/app/users/reducers';
+import { getRevision } from 'control/state/app/revisions/selectors';
 import {
   INITIAL_STATE,
-} from '..';
+} from 'control/tests/state';
+import {
+  RevisionFactory,
+} from 'control/tests/state/revisions';
 
 
 describe('getRevision', () => {
+  const revision = RevisionFactory.build();
+
   const STATE = {
     ...INITIAL_STATE,
-    newState: {
-      ...INITIAL_STATE.newState,
+    app: {
+      ...INITIAL_STATE.app,
       actions: actionsReducer(undefined, {
         type: ACTION_RECEIVE,
-        action: REVISION.recipe.action,
+        action: revision.recipe.action,
       }),
       revisions: revisionsReducer(undefined, {
         type: REVISION_RECEIVE,
-        revision: REVISION,
+        revision,
+      }),
+      users: usersReducer(undefined, {
+        type: USER_RECEIVE,
+        user: revision.user,
       }),
     },
   };
@@ -39,7 +45,7 @@ describe('getRevision', () => {
   });
 
   it('should return the revision', () => {
-    expect(getRevision(STATE, REVISION.id)).toEqualImmutable(fromJS(REVISION));
+    expect(getRevision(STATE, revision.id)).toEqualImmutable(fromJS(revision));
   });
 
   it('should return `null` for invalid ID', () => {
