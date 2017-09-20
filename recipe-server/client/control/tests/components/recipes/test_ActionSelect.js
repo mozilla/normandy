@@ -2,7 +2,7 @@ import { mount } from 'enzyme';
 import { Map, fromJS } from 'immutable';
 import React from 'react';
 
-import { ActionSelect as TestComponent } from 'control_new/components/recipes/RecipeForm';
+import { ActionSelect as TestComponent } from 'control/components/recipes/RecipeForm';
 
 const { WrappedComponent: ActionSelect } = TestComponent;
 
