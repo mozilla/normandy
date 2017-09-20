@@ -72,13 +72,17 @@ export default class ShieldIdenticon extends React.PureComponent {
     // In order to prevent the the page jumping while the image is loading, we'll
     // squish and hide it until it has loaded.
     const imgStyle = { height: 0, width: 0, position: 'absolute' };
+    const containerStyle = {
+      display: 'inline-block',
+      height: `${size}px`,
+      width: `${size}px`,
+    };
 
     return (
-      <span>
+      <span style={containerStyle} className={className}>
         { this.state.isLoading && <Spin size="small" className={className} /> }
         <img
           ref={this.onImageMount}
-          className={className}
           src={`/api/v2/identicon/${seed}.svg`}
           height={size}
           width={size}

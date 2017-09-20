@@ -1,5 +1,5 @@
-/* eslint-disable react/no-did-mount-set-state */
 import { Button, Popover, Icon } from 'antd';
+import { fromJS, List } from 'immutable';
 import autobind from 'autobind-decorator';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -23,31 +23,20 @@ export default class IdenticonField extends React.PureComponent {
     return `v1:${Math.random().toString(36).substr(2)}`;
   }
 
-  state = {
-    history: [],
-    index: -1,
-  };
+  constructor(props) {
+    super(props);
 
-  componentDidMount() {
-    const { value } = this.props;
-
-    if (value) {
-      this.setState({
-        index: 0,
-        history: [value],
-      });
-
-      // Fire an onChange to prevent `initialValue` changing when creating a
-      // new recipe.
-      this.props.onChange(value);
-    }
+    this.state = {
+      history: props.value ? fromJS([props.value]) : new List(),
+      index: props.value ? 0 : -1,
+    };
   }
 
   componentWillReceiveProps({ value }) {
     if (this.state.index === -1 && value) {
       this.setState({
         index: 0,
-        history: [value],
+        history: fromJS([value]),
       });
     }
   }
@@ -65,13 +54,15 @@ export default class IdenticonField extends React.PureComponent {
       return;
     }
 
-    next = history[newIndex];
+    next = history.get(newIndex);
 
-    let newHistory = [...history];
+    let newHistory = history;
     if (!next) {
       next = IdenticonField.generateSeed();
+
+      // Ensure duplicate entries are not saved in history.
       if (newHistory.indexOf(next) === -1) {
-        newHistory = [...history, next];
+        newHistory = newHistory.push(next);
       }
     }
 
@@ -91,6 +82,10 @@ export default class IdenticonField extends React.PureComponent {
   }
 
   render() {
+    const {
+      value,
+    } = this.props;
+
     return (
       <div className="identicon-field">
         <Button
@@ -104,11 +99,11 @@ export default class IdenticonField extends React.PureComponent {
 
         <Popover
           mouseEnterDelay={0.75}
-          content={<ShieldIdenticon seed={this.props.value} size={256} />}
+          content={<ShieldIdenticon seed={value} size={256} />}
           placement="right"
         >
           <div className="shield-container">
-            <ShieldIdenticon seed={this.props.value} key={this.props.value} />
+            <ShieldIdenticon seed={value} key={value} />
           </div>
         </Popover>
 

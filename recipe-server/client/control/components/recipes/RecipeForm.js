@@ -57,12 +57,21 @@ export default class RecipeForm extends React.PureComponent {
     'opt-out-study': OptOutStudyFields,
   };
 
+  componentDidMount() {
+    this.setIdenticonSeed();
+  }
+
   componentWillReceiveProps(newProps) {
     // Initial values are mostly handled via props, but if the recipe
     // changes, we need to reset the values stored in the state.
     if (!is(newProps.recipe, this.props.recipe)) {
       this.props.form.resetFields();
+      this.setIdenticonSeed();
     }
+  }
+
+  setIdenticonSeed() {
+    this.defaultIdenticonSeed = IdenticonField.generateSeed();
   }
 
   render() {
@@ -92,7 +101,7 @@ export default class RecipeForm extends React.PureComponent {
           <Col xs={24} sm={6}>
             <FormItem
               name="identicon_seed"
-              initialValue={recipe.get('identicon_seed', isCreating ? IdenticonField.generateSeed() : null)}
+              initialValue={recipe.get('identicon_seed', isCreating ? this.defaultIdenticonSeed : null)}
             >
               <IdenticonField disabled={isLoading} />
             </FormItem>
