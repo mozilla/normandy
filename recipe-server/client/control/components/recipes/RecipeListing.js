@@ -132,7 +132,7 @@ export default class RecipeListing extends React.PureComponent {
   };
 
   static renderLinkedText(text, record) {
-    return <Link href={`/recipe/${record.id}`}>{text}</Link>;
+    return <Link href={`/recipe/${record.id}/`}>{text}</Link>;
   }
 
   getFilters() {
@@ -159,10 +159,8 @@ export default class RecipeListing extends React.PureComponent {
   }
 
   handleRowClick(record, index, event) {
-    const linkTarget = event.target.tagName === 'A';
-
     // If the user has clicked a link directly, just fall back to the native event.
-    if (linkTarget) {
+    if (event.target.tagName === 'A') {
       return;
     }
 
@@ -170,15 +168,14 @@ export default class RecipeListing extends React.PureComponent {
     // as if it was a native link click. This includes opening a new tab if using
     // a modifier key (like ctrl).
 
-    const usingModifierKey = (event.ctrlKey || event.metaKey || event.button === 1);
     let navTo = this.props.push;
 
-    // No link but using a modifier key = open in a new tab.
-    if (!linkTarget && usingModifierKey) {
+    // No link but the user requested a new window.
+    if (event.ctrlKey || event.metaKey || event.button === 1) {
       navTo = this.props.openNewWindow;
     }
 
-    navTo(`recipe/${record.id}/`);
+    navTo(`/recipe/${record.id}/`);
   }
 
   render() {
