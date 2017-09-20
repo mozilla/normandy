@@ -14,7 +14,7 @@ import QueryFilteredRecipes from 'control/components/data/QueryFilteredRecipes';
 import QueryRecipeListingColumns from 'control/components/data/QueryRecipeListingColumns';
 import ListingActionBar from 'control/components/recipes/ListingActionBar';
 import DataList from 'control/components/tables/DataList';
-import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
+import ShieldIdenticon from 'control/components/common/ShieldIdenticon';
 
 import {
   fetchFilteredRecipesPage as fetchFilteredRecipesPageAction,

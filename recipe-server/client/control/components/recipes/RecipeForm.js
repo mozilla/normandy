@@ -16,7 +16,7 @@ import { areAnyRequestsInProgress } from 'control/state/app/requests/selectors';
 import { getGithubUrl } from 'control/state/app/serviceInfo/selectors';
 import { createForm } from 'control/utils/forms';
 import QueryServiceInfo from 'control/components/data/QueryServiceInfo';
-import IdenticonField from 'control_new/components/forms/IdenticonField';
+import IdenticonField from 'control/components/forms/IdenticonField';
 
 
 /**

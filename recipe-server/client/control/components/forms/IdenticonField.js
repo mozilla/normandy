@@ -4,7 +4,7 @@ import autobind from 'autobind-decorator';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
+import ShieldIdenticon from 'control/components/common/ShieldIdenticon';
 
 @autobind
 export default class IdenticonField extends React.PureComponent {

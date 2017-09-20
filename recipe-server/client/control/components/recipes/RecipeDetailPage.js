@@ -10,7 +10,7 @@ import DetailsActionBar from 'control/components/recipes/DetailsActionBar';
 import RecipeDetails from 'control/components/recipes/RecipeDetails';
 import HistoryTimeline from 'control/components/recipes/HistoryTimeline';
 import RevisionNotice from 'control/components/recipes/RevisionNotice';
-import ShieldIdenticon from 'control_new/components/common/ShieldIdenticon';
+import ShieldIdenticon from 'control/components/common/ShieldIdenticon';
 
 import {
   getLatestRevisionIdForRecipe,
