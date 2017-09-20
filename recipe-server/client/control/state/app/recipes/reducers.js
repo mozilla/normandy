@@ -39,13 +39,13 @@ function history(state = new Map(), action) {
 }
 
 const formatRecipe = recipe =>
-  recipe
-    .set('action_id', recipe.getIn(['action', 'id'], null))
-    .set('latest_revision_id', recipe.getIn(['latest_revision', 'id'], null))
-    .set('approved_revision_id', recipe.getIn(['approved_revision', 'id'], null))
-    .remove('action')
-    .remove('latest_revision')
-    .remove('approved_revision');
+  recipe.withMutations(mutRecipe =>
+    mutRecipe.set('action_id', mutRecipe.getIn(['action', 'id'], null))
+      .set('latest_revision_id', mutRecipe.getIn(['latest_revision', 'id'], null))
+      .set('approved_revision_id', mutRecipe.getIn(['approved_revision', 'id'], null))
+      .remove('action')
+      .remove('latest_revision')
+      .remove('approved_revision'));
 
 function items(state = new Map(), action) {
   switch (action.type) {

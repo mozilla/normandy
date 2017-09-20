@@ -10,13 +10,13 @@ import {
 } from 'control/state/action-types';
 
 const formatRevision = revision =>
-  revision
-    .setIn(['recipe', 'action_id'], revision.getIn(['recipe', 'action', 'id'], null))
-    .removeIn(['recipe', 'action'])
-    .set('approval_request_id', revision.getIn(['approval_request', 'id'], null))
-    .remove('approval_request')
-    .set('user_id', revision.getIn(['user', 'id'], null))
-    .remove('user');
+  revision.withMutations(mutRevision =>
+    mutRevision.setIn(['recipe', 'action_id'], mutRevision.getIn(['recipe', 'action', 'id'], null))
+      .removeIn(['recipe', 'action'])
+      .set('approval_request_id', mutRevision.getIn(['approval_request', 'id'], null))
+      .remove('approval_request')
+      .set('user_id', mutRevision.getIn(['user', 'id'], null))
+      .remove('user'));
 
 function items(state = new Map(), action) {
   switch (action.type) {
