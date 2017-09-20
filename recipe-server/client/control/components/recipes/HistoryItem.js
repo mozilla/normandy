@@ -1,11 +1,11 @@
-import { Popover, Alert, Icon, Tag, Timeline } from 'antd';
+import { Alert, Icon, Popover, Tag, Timeline } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Link } from 'redux-little-router';
 import { connect } from 'react-redux';
+import { Link } from 'redux-little-router';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
 import {
   REVISION_APPROVED,
@@ -37,7 +37,7 @@ export default class HistoryItem extends React.PureComponent {
     revisionNo: PropTypes.number.isRequired,
   };
 
-  static StatusStyles = {
+  static STATUS_STYLES = {
     [REVISION_LIVE]: {
       color: 'green',
       iconType: 'check-circle',
@@ -70,7 +70,7 @@ export default class HistoryItem extends React.PureComponent {
 
     // Grab the status style from the static definition, alternatively fall back
     // to empty/'bland' display values.
-    const styles = HistoryItem.StatusStyles[status] || {};
+    const styles = HistoryItem.STATUS_STYLES[status] || {};
 
     let { color = 'grey', iconType } = styles;
     const { label } = styles;
@@ -98,10 +98,10 @@ export default class HistoryItem extends React.PureComponent {
 
   getRevisionUrl() {
     const { recipeId, revision, isLatestRevision } = this.props;
-    let url = `/recipe/${recipeId}`;
+    let url = `/recipe/${recipeId}/`;
 
     if (!isLatestRevision(revision.get('id'))) {
-      url = `${url}/rev/${revision.get('id')}`;
+      url = `${url}rev/${revision.get('id')}/`;
     }
 
     return url;
@@ -132,7 +132,7 @@ export default class HistoryItem extends React.PureComponent {
 
           {
             label &&
-              <Link href={`/recipe/${recipeId}/approval_history`}>
+              <Link href={`/recipe/${recipeId}/approval_history/`}>
                 <Tag color={color}>
                   {label}
                 </Tag>
