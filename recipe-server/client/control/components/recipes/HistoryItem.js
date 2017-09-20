@@ -13,12 +13,12 @@ import {
   REVISION_LIVE,
   REVISION_PENDING_APPROVAL,
   REVISION_REJECTED,
-} from 'control_new/state/constants';
+} from 'control/state/constants';
 
 import {
   getRevisionStatus,
   isLatestRevision as isLatestRevisionSelector,
-} from 'control_new/state/app/revisions/selectors';
+} from 'control/state/app/revisions/selectors';
 
 @connect(
   (state, { revision }) => ({

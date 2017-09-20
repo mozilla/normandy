@@ -2,14 +2,14 @@ import { fromJS, Map } from 'immutable';
 import React from 'react';
 import { mount } from 'enzyme';
 
-import { wrapMockStore } from 'control_new/tests/mockStore';
+import { wrapMockStore } from 'control/tests/mockStore';
 
 import TestComponent, {
   HistoryItemPopover,
   RevisionInfo,
   RequestInfo,
   ApprovalComment,
-} from 'control_new/components/recipes/HistoryItem';
+} from 'control/components/recipes/HistoryItem';
 
 const { WrappedComponent: HistoryItem } = TestComponent;
 

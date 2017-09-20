@@ -30,7 +30,7 @@ const routes = {
         '/': {
           component: CreateRecipePage,
           crumb: 'New Recipe',
-        }
+        },
       },
       '/:recipeId': {
         '/': {

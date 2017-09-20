@@ -5,16 +5,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import HistoryItem from 'control_new/components/recipes/HistoryItem';
+import HistoryItem from 'control/components/recipes/HistoryItem';
 
-import LoadingOverlay from 'control_new/components/common/LoadingOverlay';
-import QueryRecipeHistory from 'control_new/components/data/QueryRecipeHistory';
-import RevisionApprovalTag from 'control_new/components/recipes/RevisionApprovalTag';
+import LoadingOverlay from 'control/components/common/LoadingOverlay';
+import QueryRecipeHistory from 'control/components/data/QueryRecipeHistory';
 import {
   getRecipeIdForRevision as getRecipeIdForRevisionSelector,
-  isLatestRevision as isLatestRevisionSelector,
-} from 'control_new/state/app/revisions/selectors';
-
+} from 'control/state/app/revisions/selectors';
 
 @connect(
   state => ({
