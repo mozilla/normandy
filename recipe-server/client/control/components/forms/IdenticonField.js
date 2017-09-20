@@ -89,6 +89,7 @@ export default class IdenticonField extends React.PureComponent {
     return (
       <div className="identicon-field">
         <Button
+          className="btn-prev"
           size="small"
           type="primary"
           disabled={this.props.disabled || this.state.index <= 0}
@@ -103,11 +104,12 @@ export default class IdenticonField extends React.PureComponent {
           placement="right"
         >
           <div className="shield-container">
-            <ShieldIdenticon seed={value} key={value} />
+            <ShieldIdenticon seed={value} />
           </div>
         </Popover>
 
         <Button
+          className="btn-next"
           size="small"
           type="primary"
           disabled={this.props.disabled}
