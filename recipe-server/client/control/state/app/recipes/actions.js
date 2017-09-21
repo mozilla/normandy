@@ -46,27 +46,6 @@ export function fetchRecipe(pk) {
   };
 }
 
-
-export function fetchRecipesPage(pageNumber = 1) {
-  return async dispatch => {
-    const requestId = `fetch-recipes-page-${pageNumber}`;
-    const recipes = await dispatch(makeApiRequest(requestId, 'v2/recipe/', {
-      data: { page: pageNumber },
-    }));
-
-    recipes.results.forEach(recipe => {
-      dispatch(recipeReceived(recipe));
-    });
-
-    dispatch({
-      type: RECIPE_PAGE_RECEIVE,
-      pageNumber,
-      recipes,
-    });
-  };
-}
-
-
 export function fetchFilteredRecipesPage(pageNumber = 1, filters = {}) {
   return async dispatch => {
     const filterIds = Object.keys(filters).map(key => `${key}-${filters[key]}`);
@@ -77,10 +56,6 @@ export function fetchFilteredRecipesPage(pageNumber = 1, filters = {}) {
         page: pageNumber,
       },
     }));
-
-    recipes.results.forEach(recipe => {
-      dispatch(recipeReceived(recipe));
-    });
 
     dispatch({
       type: RECIPE_PAGE_RECEIVE,
@@ -159,10 +134,6 @@ export function fetchRecipeHistory(pk) {
   return async dispatch => {
     const requestId = `fetch-recipe-history-${pk}`;
     const revisions = await dispatch(makeApiRequest(requestId, `v2/recipe/${pk}/history/`));
-
-    revisions.forEach(revision => {
-      dispatch(revisionReceived(revision));
-    });
 
     dispatch({
       type: RECIPE_HISTORY_RECEIVE,
