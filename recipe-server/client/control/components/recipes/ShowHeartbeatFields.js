@@ -90,7 +90,6 @@ export default class ShowHeartbeatFields extends React.PureComponent {
             <DocumentUrlInput disabled={disabled} />
           </FormItem>
           <FormItem
-            className="switch-input"
             name="arguments.includeTelemetryUUID"
             initialValue={recipeArguments.get('includeTelemetryUUID', false)}
           >

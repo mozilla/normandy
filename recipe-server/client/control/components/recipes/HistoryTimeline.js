@@ -1,29 +1,27 @@
-import { Icon, Tag, Timeline } from 'antd';
+import { Timeline } from 'antd';
+import autobind from 'autobind-decorator';
 import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'redux-little-router';
+
+import HistoryItem from 'control/components/recipes/HistoryItem';
 
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryRecipeHistory from 'control/components/data/QueryRecipeHistory';
-import RevisionApprovalTag from 'control/components/recipes/RevisionApprovalTag';
 import {
   getRecipeIdForRevision as getRecipeIdForRevisionSelector,
-  isLatestRevision as isLatestRevisionSelector,
 } from 'control/state/app/revisions/selectors';
-
 
 @connect(
   state => ({
     getRecipeIdForRevision: id => getRecipeIdForRevisionSelector(state, id),
-    isLatestRevision: id => isLatestRevisionSelector(state, id),
   }),
 )
+@autobind
 export default class HistoryTimeline extends React.PureComponent {
   static propTypes = {
     history: PropTypes.instanceOf(List).isRequired,
-    isLatestRevision: PropTypes.func.isRequired,
     recipeId: PropTypes.number.isRequired,
     selectedRevisionId: PropTypes.string.isRequired,
   }
@@ -31,9 +29,7 @@ export default class HistoryTimeline extends React.PureComponent {
   render() {
     const {
       history,
-      isLatestRevision,
       recipeId,
-      selectedRevisionId,
     } = this.props;
 
     return (
@@ -42,30 +38,14 @@ export default class HistoryTimeline extends React.PureComponent {
         <LoadingOverlay requestIds={`fetch-recipe-history-${recipeId}`}>
           <Timeline>
             {
-              history.map((revision, index) => {
-                const icon = <Icon type="circle-left" style={{ fontSize: '16px' }} />;
-
-                let url = `/recipe/${recipeId}`;
-                if (!isLatestRevision(revision.get('id'))) {
-                  url += `/rev/${revision.get('id')}`;
-                }
-
-                return (
-                  <Timeline.Item
-                    color="grey"
-                    dot={revision.get('id') === selectedRevisionId ? icon : null}
-                    key={revision.get('id')}
-                  >
-                    <Link href={url}>
-                      <Tag color={revision.get('id') === selectedRevisionId ? 'blue' : null}>
-                        {`Revision ${history.size - index}`}
-                      </Tag>
-                    </Link>
-
-                    <RevisionApprovalTag revision={revision} />
-                  </Timeline.Item>
-                );
-              }).toArray()
+              history.map((revision, index) =>
+                (<HistoryItem
+                  key={revision.get('id')}
+                  revisionNo={history.size - index}
+                  recipeId={recipeId}
+                  revision={revision}
+                />),
+              )
             }
           </Timeline>
         </LoadingOverlay>
