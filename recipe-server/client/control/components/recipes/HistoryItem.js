@@ -1,11 +1,11 @@
 import { Alert, Icon, Popover, Tag, Timeline } from 'antd';
 import autobind from 'autobind-decorator';
 import { Map } from 'immutable';
+import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
-import moment from 'moment';
-import PropTypes from 'prop-types';
 
 import {
   REVISION_APPROVED,
@@ -37,7 +37,7 @@ export default class HistoryItem extends React.PureComponent {
     revisionNo: PropTypes.number.isRequired,
   };
 
-  static STATUS_STYLES = {
+  static statusStyles = {
     [REVISION_LIVE]: {
       color: 'green',
       iconType: 'check-circle',
@@ -70,7 +70,7 @@ export default class HistoryItem extends React.PureComponent {
 
     // Grab the status style from the static definition, alternatively fall back
     // to empty/'bland' display values.
-    const styles = HistoryItem.STATUS_STYLES[status] || {};
+    const styles = HistoryItem.statusStyles[status] || {};
 
     let { color = 'grey', iconType } = styles;
     const { label } = styles;
