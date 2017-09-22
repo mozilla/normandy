@@ -107,7 +107,7 @@ this.ClientEnvironment = {
       const mostRecentPings = {};
       for (const ping of pings) {
         if (ping.type in mostRecentPings) {
-          if (mostRecentPings[ping.type].timeStampCreated < ping.timeStampCreated) {
+          if (mostRecentPings[ping.type].timestampCreated < ping.timestampCreated) {
             mostRecentPings[ping.type] = ping;
           }
         } else {
