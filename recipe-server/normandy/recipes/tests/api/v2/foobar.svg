@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 105" width="100" height="100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 105" width="200" height="200">
     <g filter="url(#shadow)">
         <defs>
             <filter id="shadow">
@@ -16,11 +16,9 @@
         </defs>
         <g clip-path="url(#shield-border)">
             <rect fill="rgb(253, 246, 227)" width="100" height="100"/>
-            
                 <g transform="scale(100) rotate(135 0.5,0.5)">
                     <rect fill="rgb(147, 161, 161)" x="-0.25" y="-0.25" width="1.5" height="0.75" />
                 </g>
-            
             <text
                 fill="#fff"
                 font-family="serif"
