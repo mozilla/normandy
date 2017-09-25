@@ -10,6 +10,8 @@ import DetailsActionBar from 'control/components/recipes/DetailsActionBar';
 import RecipeDetails from 'control/components/recipes/RecipeDetails';
 import HistoryTimeline from 'control/components/recipes/HistoryTimeline';
 import RevisionNotice from 'control/components/recipes/RevisionNotice';
+import ShieldIdenticon from 'control/components/common/ShieldIdenticon';
+
 import {
   getLatestRevisionIdForRecipe,
   getRecipeHistory,
@@ -48,8 +50,15 @@ export default class RecipeDetailPage extends React.PureComponent {
         <QueryRecipe pk={recipeId} />
         <Row gutter={24}>
           <Col span={16}>
-            <DetailsActionBar />
             <RevisionNotice revision={revision} />
+            <Row type="flex" align="middle">
+              <Col span={4}>
+                <ShieldIdenticon className="detail-icon" seed={revision.get('identicon_seed')} />
+              </Col>
+              <Col span={20}>
+                <DetailsActionBar />
+              </Col>
+            </Row>
             <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
               <RecipeDetails recipe={revision.get('recipe', new Map())} />
             </LoadingOverlay>

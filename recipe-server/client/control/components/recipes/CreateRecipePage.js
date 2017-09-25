@@ -64,6 +64,7 @@ export default class CreateRecipePage extends React.PureComponent {
         <RecipeForm
           onSubmit={this.handleSubmit}
           errors={this.state.formErrors}
+          isCreating
         />
       </div>
     );
