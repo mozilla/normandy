@@ -17,6 +17,7 @@
 
 // Components
 @import 'components/boolean-icon';
+@import 'components/identicons';
 @import 'components/form-actions';
 @import 'components/history-timeline';
 @import 'components/listing';
@@ -129,46 +130,5 @@ fieldset {
   legend {
     color: #222;
     font-weight: bold;
-  }
-}
-
-
-.switchbox {
-  align-items: center;
-  display: flex;
-
-  .label {
-    cursor: pointer;
-    line-height: 1.5em;
-    padding-left: 1em;
-  }
-}
-
-.timeline-popover {
-  font-weight: 400;
-
-  label {
-    display: block;
-    margin-top: 0.5em;
-    text-align: right;
-  }
-
-  .ant-popover-inner-content {
-    background: @white;
-    border-radius: 2px;
-    max-width: 300px;
-  }
-}
-
-.shield-container {
-  display: inline-block;
-  position: relative;
-
-  .ant-spin {
-    display: block;
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
   }
 }
