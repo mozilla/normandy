@@ -15,6 +15,7 @@ describe('<RecipeListing>', () => {
     ordering: null,
     pageNumber: null,
     push: () => {},
+    newWindow: () => {},
     recipes: new List(),
     searchText: null,
     status: null,

@@ -41,6 +41,7 @@ import {
   }),
   {
     fetchFilteredRecipesPage: fetchFilteredRecipesPageAction,
+    openNewWindow: window.open,
     push: pushAction,
   },
 )
@@ -51,6 +52,7 @@ export default class RecipeListing extends React.PureComponent {
     count: PropTypes.number,
     fetchFilteredRecipesPage: PropTypes.func.isRequired,
     getCurrentURL: PropTypes.func.isRequired,
+    openNewWindow: PropTypes.func.isRequired,
     ordering: PropTypes.string,
     pageNumber: PropTypes.number,
     push: PropTypes.func.isRequired,
@@ -156,9 +158,24 @@ export default class RecipeListing extends React.PureComponent {
     push(getCurrentURL({ page }));
   }
 
-  handleRowClick(record) {
-    const { push } = this.props;
-    push(`/recipe/${record.id}/`);
+  handleRowClick(record, index, event) {
+    // If the user has clicked a link directly, just fall back to the native event.
+    if (event.target.tagName === 'A') {
+      return;
+    }
+
+    // If we're here, the user clicked the row itself, which now needs to behave
+    // as if it was a native link click. This includes opening a new tab if using
+    // a modifier key (like ctrl).
+
+    let navTo = this.props.push;
+
+    // No link but the user requested a new window.
+    if (event.ctrlKey || event.metaKey || event.button === 1) {
+      navTo = this.props.openNewWindow;
+    }
+
+    navTo(`/recipe/${record.id}/`);
   }
 
   render() {
