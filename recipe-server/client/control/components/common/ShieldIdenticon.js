@@ -40,51 +40,67 @@ export default class ShieldIdenticon extends React.PureComponent {
 
     this.imgInstance = img;
 
-    // If the image has already been loaded (via cache) then skip the loading UI logic.
+    // If the image is already `complete` then it was probably loaded from cache,
+    // and we don't need to display the loading spinner
     if (this.imgInstance.complete) {
-      this.setState({
-        isLoading: false,
-      });
-      return;
-    }
+      this.onImageSuccessfulLoad();
+    } else {
+      // If the image needs to load, register some handlers to check if/when
+      // the thing loads, so we know whether to display the loading state or not.
+      this.handleLoadingImage();
 
-    this.loadTimer = setTimeout(() => {
-      // If the image has not loaded by now, display the loading spinner and hook
-      // into the image's `onload` event.
-      if (!this.imgInstance.complete) {
-        this.showLoadingState();
-      }
-    }, ShieldIdenticon.loadWaitTime);
+      // Wait for a few ms before displaying the loading spinner. This prevents
+      // a quick flash/jump of the spinner for images that load quickly, but
+      // appropriately displays the loading state for slower connections.
+      this.loadTimer = setTimeout(() => {
+        this.setState({ isLoading: true });
+      }, ShieldIdenticon.loadWaitTime);
+    }
+  }
+
+  onImageSuccessfulLoad() {
+    this.setState({ isLoading: false });
+    this.clearLoadingHandlers();
   }
 
   clearLoadingHandlers() {
     clearTimeout(this.loadTimer);
+    clearTimeout(this.checkTimer);
     if (this.imgInstance) {
       this.imgInstance.onload = () => {};
     }
   }
 
-  showLoadingState() {
-    this.setState({
-      isLoading: true,
-    });
+  handleLoadingImage() {
+    this.imgInstance.onload = this.onImageSuccessfulLoad;
 
-    this.imgInstance.onload = () => {
-      this.setState({
-        isLoading: false,
-      });
-    };
+    this.runCheckTimer();
+  }
+
+  // Use a timer to periodically check if the image is loaded, in the event we
+  // don't bind `onload` in time or something.
+  runCheckTimer() {
+    clearTimeout(this.checkTimer);
+
+    this.checkTimer = setTimeout(() => {
+      if (this.imgInstance.complete) {
+        this.onImageSuccessfulLoad();
+      } else {
+        this.runCheckTimer();
+      }
+    }, 250);
   }
 
   render() {
     const { seed, size, className } = this.props;
+    const { isLoading } = this.state;
 
     if (typeof seed === 'undefined') {
       return null;
     }
 
-    // In order to prevent the page showing the alt text while the image is loading,
-    // we'll hide it from the user until it has loaded.
+    // In order to prevent the page showing the alt text while the image is
+    // loading, we'll hide it from the user until it has loaded.
     const imgStyle = { height: 0, width: 0, position: 'absolute' };
 
     const containerStyle = {
@@ -94,14 +110,14 @@ export default class ShieldIdenticon extends React.PureComponent {
 
     return (
       <span style={containerStyle} className={cx(className, 'shield-container')}>
-        { this.state.isLoading && <Spin size="small" /> }
+        { isLoading && <Spin size="small" /> }
         <img
           alt="Shield Identicon"
           height={size}
           key={seed}
           ref={this.onImageMount}
           src={`/api/v2/identicon/${seed}.svg`}
-          style={this.state.isLoading ? imgStyle : {}}
+          style={isLoading ? imgStyle : {}}
           width={size}
         />
       </span>
