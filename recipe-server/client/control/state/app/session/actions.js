@@ -61,13 +61,17 @@ export function saveSession() {
   };
 }
 
-export function addSessionView(category, caption) {
+export function addSessionView(category, caption, identicon) {
   return async (dispatch, getState) => {
-    const url = getState().router.pathname;
+    let url = getState().router.pathname;
+
+    // Prevent exact subpages (e.g. edit, clone pages) from appearing in the nav.
+    // Instead, this will link to the 'view' page for that recipe/revision.
+    url = url.replace(/\/(edit|clone|approval_history)/, '');
 
     dispatch({
       type: SESSION_INFO_HISTORY_VIEW,
-      item: new Map({ url, caption, category }),
+      item: new Map({ url, caption, category, identicon }),
     });
 
     // Automatically save the session when views are added.

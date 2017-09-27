@@ -108,7 +108,7 @@ export default class DetailsActionBar extends React.PureComponent {
 
     return (
       <div className="details-action-bar clearfix">
-        <Link href={`${routerPath}/clone/`} id="dab-clone-link">
+        <Link href={`${routerPath}clone/`} id="dab-clone-link">
           <Button icon="swap" type="primary" id="dab-clone-button">Clone</Button>
         </Link>
 

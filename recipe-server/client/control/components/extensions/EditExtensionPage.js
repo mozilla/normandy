@@ -45,7 +45,7 @@ export default class EditExtensionPage extends React.PureComponent {
   componentDidMount() {
     const extensionName = this.props.extension.get('name');
     if (extensionName) {
-      this.props.addSessionView('extension', extensionName);
+      this.props.addSessionView('extension', extensionName, this.props.extension.get('identicon_seed'));
     }
   }
 
@@ -55,7 +55,7 @@ export default class EditExtensionPage extends React.PureComponent {
     // New extension means we add a session view.
     if (!is(oldExtensions, extension) && oldExtensions.get('name') !== extension.get('name')) {
       const extensionName = extension.get('name');
-      this.props.addSessionView('extension', extensionName);
+      this.props.addSessionView('extension', extensionName, extension.get('identicon_seed'));
     }
   }
 
