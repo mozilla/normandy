@@ -328,7 +328,7 @@ class Base(Core):
 
     # Normandy settings
     ADMIN_ENABLED = values.BooleanValue(True)
-    ACTION_IMPLEMENTATION_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
+    IMMUTABLE_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
     NUM_PROXIES = values.IntegerValue(0)
     API_CACHE_TIME = values.IntegerValue(30)
     API_CACHE_ENABLED = values.BooleanValue(True)

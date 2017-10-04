@@ -147,7 +147,7 @@ class TestImplementationAPI(object):
         ))
         assert res.status_code == 200
 
-        max_age = 'max-age={}'.format(settings.ACTION_IMPLEMENTATION_CACHE_TIME)
+        max_age = 'max-age={}'.format(settings.IMMUTABLE_CACHE_TIME)
         assert max_age in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
