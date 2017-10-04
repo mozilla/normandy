@@ -49,7 +49,7 @@ export default class OptOutStudyFields extends React.PureComponent {
 
           <Col xs={24} md={12}>
             <FormItem
-              label="Add-on Extension"
+              label="Extension"
               name="arguments.addonUrl"
               initialValue={recipeArguments.get('addonUrl', '')}
             >
