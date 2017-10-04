@@ -89,7 +89,7 @@ this.RecipeRunner = {
 
   checkPrefs() {
     // Only run if Unified Telemetry is enabled.
-    if (!Services.prefs.getBoolPref("toolkit.telemetry.unified")) {
+    if (!Services.prefs.getBoolPref("datareporting.healthreport.uploadEnabled")) {
       log.info("Disabling RecipeRunner because Unified Telemetry is disabled.");
       return false;
     }
