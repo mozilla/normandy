@@ -9,7 +9,7 @@ import QueryMultipleExtensions from 'control/components/data/QueryMultipleExtens
 import { getExtensionListing } from 'control/state/app/extensions/selectors';
 import { isRequestInProgress } from 'control/state/app/requests/selectors';
 
-const { Option } = Select;
+const { OptGroup, Option } = Select;
 
 @connect(
   state => ({
@@ -75,6 +75,7 @@ export default class ExtensionSelect extends React.Component {
       size,
       value,
     } = this.props;
+    const optGroupLabel = search ? 'Search results' : 'Recently uploaded extensions';
 
     if (isLoadingSearch) {
       displayedList = new List();
@@ -94,12 +95,14 @@ export default class ExtensionSelect extends React.Component {
           onSearch={this.updateSearch}
           showSearch
         >
-          {displayedList.map(item => {
-            const xpi = item.get('xpi');
-            const name = item.get('name');
+          <OptGroup label={optGroupLabel}>
+            {displayedList.map(item => {
+              const xpi = item.get('xpi');
+              const name = item.get('name');
 
-            return (<Option key={xpi} value={xpi} title={name}>{name}</Option>);
-          })}
+              return (<Option key={xpi} value={xpi} title={name}>{name}</Option>);
+            })}
+          </OptGroup>
         </Select>
       </div>
     );
