@@ -125,6 +125,8 @@ class Core(Configuration):
         srcs = ["'self'"]
         if self.CDN_URL:
             srcs.append(self.CDN_URL)
+        if self.EXPERIMENTER_HOST:
+            srcs.append(self.EXPERIMENTER_HOST)
         return srcs
 
     CSP_OBJECT_SRC = "'none'"  # not using <object>, <embed>, and <applet> elements
@@ -161,6 +163,12 @@ class Core(Configuration):
     # We changed the CSRF cookie from http-only to non http-only and need to override existing
     # cookies. The easiest way is just change the cookie name when such changes happen.
     CSRF_COOKIE_NAME = 'csrftoken-20170707'
+
+    EXPERIMENTER_HOST = values.Value()
+
+    def EXPERIMENTER_API_URL(self):
+        if self.EXPERIMENTER_HOST is not None:
+            return '{host}/api/v1'.format(host=self.EXPERIMENTER_HOST)
 
 
 class Base(Core):
