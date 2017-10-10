@@ -6,10 +6,7 @@ export const searchRouteTree = (tree, name, currentUrl = '') => {
 
   // If the slug doesn't match, iterate over the given route tree until
   // we find one that matches what we need (if any exist).
-  const keys = Object.keys(tree);
-  for (let i = 0; i < keys.length; i += 1) {
-    const curPath = keys[i];
-
+  for (const curPath of Object.keys(tree)) {
     // A key beginning with '/' indicates it is a route tree, which should be searched.
     if (curPath.charAt(0) === '/') {
       const val = searchRouteTree(tree[curPath], name, currentUrl + curPath);
