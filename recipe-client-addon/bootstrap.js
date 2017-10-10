@@ -45,7 +45,7 @@ const log = Log.repository.getLogger(BOOTSTRAP_LOGGER_NAME);
 log.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
 log.level = Services.prefs.getIntPref(PREF_LOGGING_LEVEL, Log.Level.Warn);
 
-let studyPrefsChanged = {};
+const studyPrefsChanged = {};
 
 this.Bootstrap = {
   initShieldPrefs(defaultPrefs) {
