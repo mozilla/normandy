@@ -146,7 +146,7 @@ this.PreferenceExperiments = {
     const store = await ensureStorage();
 
     for (const experiment of Object.values(store.data)) {
-      if (experiment.preferenceName in studyPrefsChanged) {
+      if (studyPrefsChanged.hasOwnProperty(experiment.preferenceName)) {
         if (experiment.expired) {
           log.warn("Expired preference experiment changed value during startup");
         }
