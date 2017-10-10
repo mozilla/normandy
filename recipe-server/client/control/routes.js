@@ -16,6 +16,7 @@ import RecipeListing from 'control/components/recipes/RecipeListing';
 import MissingPage from 'control/components/pages/MissingPage';
 import RecipeDetailPage from 'control/components/recipes/RecipeDetailPage';
 
+import { searchRouteTree, replaceUrlVariables } from './routerUtils';
 
 const routes = {
   '/': {
@@ -30,7 +31,6 @@ const routes = {
         '/': {
           component: CreateRecipePage,
           crumb: 'New Recipe',
-          isCreating: true,
         },
       },
       '/:recipeId': {
@@ -42,11 +42,13 @@ const routes = {
           '/': {
             component: RecipeDetailPage,
             crumb: 'Revision',
+            ignoreSession: true,
           },
           '/clone': {
             '/': {
               component: CloneRecipePage,
               crumb: 'Clone Revision',
+              ignoreSession: true,
             },
           },
         },
@@ -54,18 +56,21 @@ const routes = {
           '/': {
             component: EditRecipePage,
             crumb: 'Edit Recipe',
+            ignoreSession: true,
           },
         },
         '/approval_history': {
           '/': {
             component: ApprovalHistoryPage,
             crumb: 'Approval History',
+            ignoreSession: true,
           },
         },
         '/clone': {
           '/': {
             component: CloneRecipePage,
             crumb: 'Clone Recipe',
+            ignoreSession: true,
           },
         },
       },
@@ -89,6 +94,14 @@ const routes = {
       },
     },
   },
+};
+
+export const getNamedRoute = (name, params = {}) => {
+  const url = searchRouteTree(routes, name);
+  if (url) {
+    return replaceUrlVariables(url, params);
+  }
+  return null;
 };
 
 export const {

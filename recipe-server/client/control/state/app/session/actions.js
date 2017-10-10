@@ -3,6 +3,7 @@
 import { List, Map } from 'immutable';
 import * as localForage from 'localforage';
 
+import { getNamedRoute } from 'control/routes';
 import {
   SESSION_INFO_RECEIVE,
   SESSION_INFO_HISTORY_VIEW,
@@ -61,13 +62,19 @@ export function saveSession() {
   };
 }
 
+const capitalize = str => str.slice(0, 1).toUpperCase() + str.slice(1, str.length);
+
 export function addSessionView(category, caption, identicon) {
   return async (dispatch, getState) => {
-    let url = getState().router.pathname;
+    const { router } = getState();
+    let url = router.pathname;
+    const ignoreSession = router.result && router.result.ignoreSession;
 
     // Prevent exact subpages (e.g. edit, clone pages) from appearing in the nav.
-    // Instead, this will link to the 'view' page for that recipe/revision.
-    url = url.replace(/\/(edit|clone|approval_history)/, '');
+    // Instead, this will link to the proper 'View [Recipe|Extension]' page.
+    if (ignoreSession) {
+      url = getNamedRoute(`View ${capitalize(category)}`, router.params);
+    }
 
     dispatch({
       type: SESSION_INFO_HISTORY_VIEW,

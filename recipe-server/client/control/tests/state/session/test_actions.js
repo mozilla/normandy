@@ -9,9 +9,9 @@ import { addSessionView } from 'control/state/app/session/actions';
 describe('Session actions', () => {
   describe('addSessionView', () => {
     // Params = the 'default' test params passed into addSessionView
-    const defaultParams = ['category', 'caption', 'identicon'];
+    const defaultParams = ['recipe', 'caption', 'identicon'];
     // Values = the 'default' dispatched values given our default params.
-    const defaultValues = { caption: 'caption', category: 'category', identicon: 'identicon' };
+    const defaultValues = { caption: 'caption', category: 'recipe', identicon: 'identicon' };
 
 
     it('should dispatch a SESSION_INFO_HISTORY_VIEW event', async () => {
@@ -30,25 +30,31 @@ describe('Session actions', () => {
       });
     });
 
-    it('should prevent /edit, /clone, or /approval_history links from registering', async () => {
+    it('should prevent `ignoreSesssion` routes from registering', async () => {
       const meta = { dispatch: () => {} };
       spyOn(meta, 'dispatch').and.callThrough();
 
-      let getState = () => ({ router: { pathname: '/fake/url/edit/' } });
+      let getState = () => ({
+        router: { pathname: '/fake/url/edit/', result: { ignoreSession: true } },
+      });
       await addSessionView(...defaultParams)(meta.dispatch, getState);
       expect(meta.dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
         item: new Map({ url: '/fake/url/', ...defaultValues }),
       });
 
-      getState = () => ({ router: { pathname: '/fake/url/clone/' } });
+      getState = () => ({
+        router: { pathname: '/fake/url/clone/', result: { ignoreSession: true } },
+      });
       await addSessionView(...defaultParams)(meta.dispatch, getState);
       expect(meta.dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
         item: new Map({ url: '/fake/url/', ...defaultValues }),
       });
 
-      getState = () => ({ router: { pathname: '/fake/url/approval_history/' } });
+      getState = () => ({
+        router: { pathname: '/fake/url/approval_history/', result: { ignoreSession: true } },
+      });
       await addSessionView(...defaultParams)(meta.dispatch, getState);
       expect(meta.dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
