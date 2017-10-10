@@ -3,6 +3,7 @@
 import { List, Map } from 'immutable';
 import * as localForage from 'localforage';
 
+import { getNamedRoute } from 'control/routes';
 import {
   SESSION_INFO_RECEIVE,
   SESSION_INFO_HISTORY_VIEW,
@@ -61,13 +62,22 @@ export function saveSession() {
   };
 }
 
-export function addSessionView(category, caption) {
+export function addSessionView(category, caption, identicon) {
   return async (dispatch, getState) => {
-    const url = getState().router.pathname;
+    const { router } = getState();
+    let url = router.pathname;
+
+    // If the route we are currently on has defined another slug to use for
+    // 'session' purposes, use that instead.
+    const slugRedirect = router.result && router.result.sessionSlug;
+
+    if (slugRedirect) {
+      url = getNamedRoute(slugRedirect, router.params);
+    }
 
     dispatch({
       type: SESSION_INFO_HISTORY_VIEW,
-      item: new Map({ url, caption, category }),
+      item: new Map({ url, caption, category, identicon }),
     });
 
     // Automatically save the session when views are added.

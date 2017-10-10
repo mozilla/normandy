@@ -16,37 +16,55 @@ import RecipeListing from 'control/components/recipes/RecipeListing';
 import MissingPage from 'control/components/pages/MissingPage';
 import RecipeDetailPage from 'control/components/recipes/RecipeDetailPage';
 
+import { searchRouteTree, replaceUrlVariables } from './routerUtils';
+
+
+/**
+ * @type {Route}
+ * @property {Component} component    React component used to render route
+ * @property {String}    crumb        Displayed text on navigational breadcrumbs
+ * @property {String}    slug         Internal route name
+ * @property {String}    sessionSlug  Optional replacement slug used with session history.
+ * @property {Route}     '/[...]'     Optional nested route tree(s).
+ */
 
 const routes = {
   '/': {
     component: Gateway,
     crumb: 'Home',
+    slug: 'home',
     '/recipe': {
       '/': {
         component: RecipeListing,
         crumb: 'Recipes Listing',
+        slug: 'recipe-listing',
       },
       '/new': {
         '/': {
           component: CreateRecipePage,
           crumb: 'New Recipe',
-          isCreating: true,
+          slug: 'recipe-new',
         },
       },
       '/:recipeId': {
         '/': {
           component: RecipeDetailPage,
           crumb: 'View Recipe',
+          slug: 'recipe-view',
         },
         '/rev/:revisionId': {
           '/': {
             component: RecipeDetailPage,
             crumb: 'Revision',
+            sessionSlug: 'recipe-view',
+            slug: 'recipe-revision',
           },
           '/clone': {
             '/': {
               component: CloneRecipePage,
               crumb: 'Clone Revision',
+              sessionSlug: 'recipe-view',
+              slug: 'recipe-revision-clone',
             },
           },
         },
@@ -54,18 +72,24 @@ const routes = {
           '/': {
             component: EditRecipePage,
             crumb: 'Edit Recipe',
+            sessionSlug: 'recipe-view',
+            slug: 'recipe-edit',
           },
         },
         '/approval_history': {
           '/': {
             component: ApprovalHistoryPage,
             crumb: 'Approval History',
+            sessionSlug: 'recipe-view',
+            slug: 'recipe-approval-history',
           },
         },
         '/clone': {
           '/': {
             component: CloneRecipePage,
             crumb: 'Clone Recipe',
+            sessionSlug: 'recipe-view',
+            slug: 'recipe-clone',
           },
         },
       },
@@ -74,21 +98,32 @@ const routes = {
       '/': {
         component: ExtensionListing,
         crumb: 'Extensions Listing',
+        slug: 'extension-listing',
       },
       '/new': {
         '/': {
           component: CreateExtensionPage,
           crumb: 'New Extension',
+          slug: 'extension-new',
         },
       },
       '/:extensionId': {
         '/': {
           component: EditExtensionPage,
           crumb: 'Edit Extension',
+          slug: 'extension-edit',
         },
       },
     },
   },
+};
+
+export const getNamedRoute = (name, params = {}) => {
+  const url = searchRouteTree(routes, name);
+  if (url) {
+    return replaceUrlVariables(url, params);
+  }
+  return null;
 };
 
 export const {

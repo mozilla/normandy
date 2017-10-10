@@ -52,7 +52,7 @@ export default class EditRecipePage extends React.PureComponent {
   componentDidMount() {
     const recipeName = this.props.recipe.get('name');
     if (recipeName) {
-      this.props.addSessionView('recipe', recipeName);
+      this.props.addSessionView('recipe', recipeName, this.props.recipe.get('identicon_seed'));
     }
   }
 
@@ -62,7 +62,7 @@ export default class EditRecipePage extends React.PureComponent {
     // New recipe means we add a session view.
     if (!is(oldRecipe, recipe)) {
       const recipeName = recipe.get('name');
-      this.props.addSessionView('recipe', recipeName);
+      this.props.addSessionView('recipe', recipeName, recipe.get('identicon_seed'));
     }
   }
 

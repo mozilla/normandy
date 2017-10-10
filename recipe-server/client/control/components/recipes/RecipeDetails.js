@@ -16,7 +16,7 @@ export default class RecipeDetails extends React.PureComponent {
   componentDidMount() {
     const recipeName = this.props.recipe.get('name');
     if (recipeName) {
-      this.props.addSessionView('recipe', recipeName);
+      this.props.addSessionView('recipe', recipeName, this.props.recipe.get('identicon_seed'));
     }
   }
 
@@ -26,7 +26,7 @@ export default class RecipeDetails extends React.PureComponent {
     // New recipe means we add a session view.
     if (!is(oldRecipe, recipe) && oldRecipe.get('name') !== recipe.get('name')) {
       const recipeName = recipe.get('name');
-      this.props.addSessionView('recipe', recipeName);
+      this.props.addSessionView('recipe', recipeName, recipe.get('identicon_seed'));
     }
   }
 

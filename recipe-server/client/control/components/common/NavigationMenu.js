@@ -7,6 +7,7 @@ import { Link } from 'redux-little-router';
 
 import QuerySessionInfo from 'control/components/data/QuerySessionInfo';
 import { getSessionHistory } from 'control/state/app/session/selectors';
+import ShieldIdenticon from 'control/components/common/ShieldIdenticon';
 
 const { Divider, Item, SubMenu } = Menu;
 
@@ -29,7 +30,7 @@ export default class NavigationMenu extends React.PureComponent {
     const { pathname, search } = router;
 
     return (
-      <div>
+      <div className="nav-menu">
         <QuerySessionInfo />
         <Menu
           defaultOpenKeys={['Recipes', 'Extensions']}
@@ -48,7 +49,10 @@ export default class NavigationMenu extends React.PureComponent {
             {
               recipeSessionHistory.map(item =>
                 (<Item key={item.get('url')}>
-                  <Link href={item.get('url')}>{ item.get('caption') }</Link>
+                  <Link href={item.get('url')}>
+                    <ShieldIdenticon seed={item.get('identicon')} size={20} />
+                    { item.get('caption') }
+                  </Link>
                 </Item>),
               )
             }
