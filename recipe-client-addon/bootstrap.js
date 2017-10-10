@@ -82,17 +82,29 @@ this.Bootstrap = {
 
       switch (experimentPrefType) {
         case Services.prefs.PREF_STRING:
-          studyPrefsChanged[prefName] = defaultBranch.getCharPref(prefName, undefined);
+          try {  // eslint-disable-line mozilla/use-default-preference-values
+            studyPrefsChanged[prefName] = defaultBranch.getCharPref(prefName);
+          } catch (e) {
+            Cu.reportError(e);
+          }
           defaultBranch.setCharPref(prefName, experimentBranch.getCharPref(prefName));
           break;
 
         case Services.prefs.PREF_INT:
-          studyPrefsChanged[prefName] = defaultBranch.getIntPref(prefName, undefined);
+          try {  // eslint-disable-line mozilla/use-default-preference-values
+            studyPrefsChanged[prefName] = defaultBranch.getIntPref(prefName);
+          } catch (e) {
+            Cu.reportError(e);
+          }
           defaultBranch.setIntPref(prefName, experimentBranch.getIntPref(prefName));
           break;
 
         case Services.prefs.PREF_BOOL:
-          studyPrefsChanged[prefName] = defaultBranch.getBoolPref(prefName, undefined);
+          try {  // eslint-disable-line mozilla/use-default-preference-values
+            studyPrefsChanged[prefName] = defaultBranch.getBoolPref(prefName);
+          } catch (e) {
+            Cu.reportError(e);
+          }
           defaultBranch.setBoolPref(prefName, experimentBranch.getBoolPref(prefName));
           break;
 
