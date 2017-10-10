@@ -62,18 +62,17 @@ export function saveSession() {
   };
 }
 
-const capitalize = str => str.slice(0, 1).toUpperCase() + str.slice(1, str.length);
-
 export function addSessionView(category, caption, identicon) {
   return async (dispatch, getState) => {
     const { router } = getState();
     let url = router.pathname;
-    const ignoreSession = router.result && router.result.ignoreSession;
 
-    // Prevent exact subpages (e.g. edit, clone pages) from appearing in the nav.
-    // Instead, this will link to the proper 'View [Recipe|Extension]' page.
-    if (ignoreSession) {
-      url = getNamedRoute(`View ${capitalize(category)}`, router.params);
+    // If the route we are currently on has defined another slug to use for
+    // 'session' purposes, use that instead.
+    const slugRedirect = router.result && router.result.sessionSlug;
+
+    if (slugRedirect) {
+      url = getNamedRoute(slugRedirect, router.params);
     }
 
     dispatch({

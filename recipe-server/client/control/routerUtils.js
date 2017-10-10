@@ -1,10 +1,10 @@
 export const searchRouteTree = (tree, name, currentUrl = '') => {
-  // If we have the crumb, we have the complete route.
-  if (tree.crumb === name) {
+  // If we have the slug, we have the complete route.
+  if (tree.slug === name) {
     return currentUrl;
   }
 
-  // If the crumb doesn't match, iterate over the given route tree until
+  // If the slug doesn't match, iterate over the given route tree until
   // we find one that matches what we need (if any exist).
   const keys = Object.keys(tree);
   for (let i = 0; i < keys.length; i += 1) {

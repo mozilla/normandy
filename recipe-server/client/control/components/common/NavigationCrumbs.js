@@ -5,6 +5,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'redux-little-router';
 
+import { replaceUrlVariables } from 'control/routerUtils';
+
 @connect(
   state => ({
     router: state.router,
@@ -15,23 +17,6 @@ export default class NavigationCrumbs extends React.PureComponent {
   static propTypes = {
     router: PropTypes.object.isRequired,
   };
-
-  // Given a route (e.g. `/hello/:id/there`), finds params that need to be
-  // populated (e.g. `:id`) and replaces the values in order to link correctly
-  // when displayed as a Breadcrumb.
-  static replaceUrlVariables(url, params) {
-    let newUrl = url;
-    const urlParams = url.match(/:[a-z]+/gi);
-
-    if (urlParams) {
-      urlParams.forEach(piece => {
-        // Replace the found identifier with whatever the actual param is set to
-        newUrl = newUrl.replace(piece, params[piece.slice(1)]);
-      });
-    }
-
-    return newUrl;
-  }
 
   state = { breadcrumbs: [] };
 
@@ -58,7 +43,7 @@ export default class NavigationCrumbs extends React.PureComponent {
       if (currentRoute.crumb) {
         crumbs.push({
           name: currentRoute.crumb,
-          link: NavigationCrumbs.replaceUrlVariables(currentRoute.route || pathname, params),
+          link: replaceUrlVariables(currentRoute.route || pathname, params),
         });
       }
 

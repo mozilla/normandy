@@ -15,50 +15,46 @@ describe('Session actions', () => {
 
 
     it('should dispatch a SESSION_INFO_HISTORY_VIEW event', async () => {
-      const meta = {
-        dispatch: () => {},
-      };
-      spyOn(meta, 'dispatch').and.callThrough();
+      const dispatch = jasmine.createSpy('dispatch');
 
       const getState = () => ({ router: { pathname: '/fake/url' } });
 
-      await addSessionView(...defaultParams)(meta.dispatch, getState);
+      await addSessionView(...defaultParams)(dispatch, getState);
 
-      expect(meta.dispatch).toHaveBeenCalledWith({
+      expect(dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
         item: new Map({ url: '/fake/url', ...defaultValues }),
       });
     });
 
-    it('should prevent `ignoreSesssion` routes from registering', async () => {
-      const meta = { dispatch: () => {} };
-      spyOn(meta, 'dispatch').and.callThrough();
+    it('should redirect session routes if given a `sessionSlug` property', async () => {
+      const dispatch = jasmine.createSpy('dispatch');
 
       let getState = () => ({
-        router: { pathname: '/fake/url/edit/', result: { ignoreSession: true } },
+        router: { pathname: '/recipe/:recipeId/edit/', result: { sessionSlug: 'recipe-view' } },
       });
-      await addSessionView(...defaultParams)(meta.dispatch, getState);
-      expect(meta.dispatch).toHaveBeenCalledWith({
+      await addSessionView(...defaultParams)(dispatch, getState);
+      expect(dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
-        item: new Map({ url: '/fake/url/', ...defaultValues }),
+        item: new Map({ url: '/recipe/:recipeId/', ...defaultValues }),
       });
 
       getState = () => ({
-        router: { pathname: '/fake/url/clone/', result: { ignoreSession: true } },
+        router: { pathname: '/recipe/:recipeId/clone/', result: { sessionSlug: 'recipe-new' } },
       });
-      await addSessionView(...defaultParams)(meta.dispatch, getState);
-      expect(meta.dispatch).toHaveBeenCalledWith({
+      await addSessionView(...defaultParams)(dispatch, getState);
+      expect(dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
-        item: new Map({ url: '/fake/url/', ...defaultValues }),
+        item: new Map({ url: '/recipe/new/', ...defaultValues }),
       });
 
       getState = () => ({
-        router: { pathname: '/fake/url/approval_history/', result: { ignoreSession: true } },
+        router: { pathname: '/recipe/:recipeId/approval_history/', result: { sessionSlug: 'recipe-edit' } },
       });
-      await addSessionView(...defaultParams)(meta.dispatch, getState);
-      expect(meta.dispatch).toHaveBeenCalledWith({
+      await addSessionView(...defaultParams)(dispatch, getState);
+      expect(dispatch).toHaveBeenCalledWith({
         type: SESSION_INFO_HISTORY_VIEW,
-        item: new Map({ url: '/fake/url/', ...defaultValues }),
+        item: new Map({ url: '/recipe/:recipeId/edit/', ...defaultValues }),
       });
     });
   });
