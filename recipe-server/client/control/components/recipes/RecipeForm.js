@@ -38,7 +38,7 @@ export default class RecipeForm extends React.PureComponent {
   static propTypes = {
     form: PropTypes.object.isRequired,
     isLoading: PropTypes.bool,
-    isCreating: PropTypes.bool,
+    isCreationForm: PropTypes.bool,
     onSubmit: PropTypes.func.isRequired,
     recipe: PropTypes.instanceOf(Map),
     selectedActionName: PropTypes.string.isRequired,
@@ -46,7 +46,7 @@ export default class RecipeForm extends React.PureComponent {
 
   static defaultProps = {
     isLoading: false,
-    isCreating: false,
+    isCreationForm: false,
     recipe: new Map(),
   };
 
@@ -56,6 +56,10 @@ export default class RecipeForm extends React.PureComponent {
     'preference-experiment': PreferenceExperimentFields,
     'opt-out-study': OptOutStudyFields,
   };
+
+  componentDidMount() {
+    this.defaultIdenticonSeed = this.defaultIdenticonSeed || IdenticonField.generateSeed();
+  }
 
   componentWillReceiveProps(newProps) {
     // Initial values are mostly handled via props, but if the recipe
@@ -67,7 +71,7 @@ export default class RecipeForm extends React.PureComponent {
 
   render() {
     const {
-      isCreating,
+      isCreationForm,
       isLoading,
       onSubmit,
       recipe,
@@ -78,8 +82,7 @@ export default class RecipeForm extends React.PureComponent {
 
     // If creating, the 'default' seed is randomly generated. We store it in memory
     // to prevent the form from generating a new identicon on each render.
-    this.defaultIdenticonSeed = this.defaultIdenticonSeed || IdenticonField.generateSeed();
-    const identiconSeed = isCreating ? this.defaultIdenticonSeed : null;
+    const identiconSeed = isCreationForm ? this.defaultIdenticonSeed : null;
 
     return (
       <Form onSubmit={onSubmit} className="recipe-form">
