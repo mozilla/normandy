@@ -526,3 +526,70 @@ This section lists some examples of commonly-used filter expressions.
    // plugin list returns `undefined`, which is a falsy value in JavaScript and
    // fails the match. Otherwise, it returns a plugin object, which is truthy.
    normandy.plugins['Shockwave Flash']
+
+
+Advanced: Testing Filter Expressions in the Browser Console
+-----------------------------------------------------------
+1. Open the DevTools and go into the settings via the Gear Icon
+
+2. Ensure "Enable browser chrome and add-on debugging toolboxes" is checked.
+
+3. Open the browser console
+
+   * Tools > Web Developer > Browser Console
+   * :kbd:`Cmd + Shift + J`
+
+4. Run the following in the console:
+
+   .. code-block:: javascript
+
+      Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", {})
+        .RecipeRunner.checkFilter({
+          id: 1,
+          arguments: {},
+          filter_expression: FILTER_TO_TEST,
+        })
+        .then(result => console.log(result))
+
+   For example:
+
+   .. code-block:: javascript
+
+      Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", {})
+        .RecipeRunner.checkFilter({
+          id: 1,
+          arguments: {},
+          filter_expression: 'true',
+        })
+        .then(result => console.log(result))
+
+   You can use backticks for multi-line expressions:
+
+   .. code-block:: javascript
+
+      Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", {})
+        .RecipeRunner.checkFilter({
+          id: 1,
+          arguments: {},
+          filter_expression: `
+            (
+              true &&
+              normandy.country == "US"
+            )
+          `,
+        })
+        .then(result => console.log(result))
+
+5. The console will output a ``Promise`` object, and then log ``true``
+   or ``false`` depending on whether the expression passed for your
+   client or not.
+
+.. note::
+
+   - Certain filters, particular filters that involve
+     ``normandy.recipe``, may not work as expected, as they rely on
+     the ``id`` and ``arguments`` fields passed in.
+   - If you are using time-based or geolocation-based filters, which
+     rely on the Normandy service, this method may fail if you've
+     configured Firefox to point towards a local instance of Normandy
+     which is not running.
