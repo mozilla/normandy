@@ -22,7 +22,7 @@ tasks:
     payload:
       env:
       maxRunTime: 300 # 5 minutes
-      image: mozilla/normandy-taskcluster:2017-06-12
+      image: mozilla/normandy-taskcluster:2017-10-16
       features:
         taskclusterProxy: true
       command:
