@@ -13,6 +13,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "LogManager",
   "resource://shield-recipe-client/lib/LogManager.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShieldRecipeClient",
   "resource://shield-recipe-client/lib/ShieldRecipeClient.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PreferenceExperiments",
+  "resource://shield-recipe-client/lib/PreferenceExperiments.jsm");
 
 // Act as both a normal bootstrap.js and a JS module so that we can test
 // startup methods without having to install/uninstall the add-on.
@@ -42,6 +44,8 @@ const DEFAULT_PREFS = {
 const log = Log.repository.getLogger(BOOTSTRAP_LOGGER_NAME);
 log.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
 log.level = Services.prefs.getIntPref(PREF_LOGGING_LEVEL, Log.Level.Warn);
+
+const studyPrefsChanged = {};
 
 this.Bootstrap = {
   initShieldPrefs(defaultPrefs) {
@@ -78,14 +82,29 @@ this.Bootstrap = {
 
       switch (experimentPrefType) {
         case Services.prefs.PREF_STRING:
+          try {  // eslint-disable-line mozilla/use-default-preference-values
+            studyPrefsChanged[prefName] = defaultBranch.getCharPref(prefName);
+          } catch (e) {
+            Cu.reportError(e);
+          }
           defaultBranch.setCharPref(prefName, experimentBranch.getCharPref(prefName));
           break;
 
         case Services.prefs.PREF_INT:
+          try {  // eslint-disable-line mozilla/use-default-preference-values
+            studyPrefsChanged[prefName] = defaultBranch.getIntPref(prefName);
+          } catch (e) {
+            Cu.reportError(e);
+          }
           defaultBranch.setIntPref(prefName, experimentBranch.getIntPref(prefName));
           break;
 
         case Services.prefs.PREF_BOOL:
+          try {  // eslint-disable-line mozilla/use-default-preference-values
+            studyPrefsChanged[prefName] = defaultBranch.getBoolPref(prefName);
+          } catch (e) {
+            Cu.reportError(e);
+          }
           defaultBranch.setBoolPref(prefName, experimentBranch.getBoolPref(prefName));
           break;
 
@@ -104,7 +123,7 @@ this.Bootstrap = {
   observe(subject, topic, data) {
     if (topic === UI_AVAILABLE_NOTIFICATION) {
       Services.obs.removeObserver(this, UI_AVAILABLE_NOTIFICATION);
-      ShieldRecipeClient.startup();
+      this.finishStartup();
     }
   },
 
@@ -122,8 +141,13 @@ this.Bootstrap = {
     if (reason === REASON_APP_STARTUP) {
       Services.obs.addObserver(this, UI_AVAILABLE_NOTIFICATION);
     } else {
-      ShieldRecipeClient.startup();
+      this.finishStartup();
     }
+  },
+
+  async finishStartup() {
+    await PreferenceExperiments.recordOriginalValues(studyPrefsChanged);
+    ShieldRecipeClient.startup();
   },
 
   async shutdown(data, reason) {

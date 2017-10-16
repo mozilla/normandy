@@ -169,30 +169,38 @@ decorate_task(
 
 decorate_task(
   withBootstrap,
-  withStub(ShieldRecipeClient, "startup"),
-  async function testStartupDelayed(Bootstrap, startupStub) {
-    Bootstrap.startup(undefined, 1); // 1 == APP_STARTUP
-    ok(
-      !startupStub.called,
-      "When started at app startup, do not call ShieldRecipeClient.startup immediately.",
-    );
+  async function testStartupDelayed(Bootstrap) {
+    const finishStartupStub = sinon.stub(Bootstrap, "finishStartup");
+    try {
+      Bootstrap.startup(undefined, 1); // 1 == APP_STARTUP
+      ok(
+        !finishStartupStub.called,
+        "When started at app startup, do not call ShieldRecipeClient.startup immediately.",
+      );
 
-    Bootstrap.observe(null, "sessionstore-windows-restored");
-    ok(
-      startupStub.called,
-      "Once the sessionstore-windows-restored event is observed, call ShieldRecipeClient.startup.",
-    );
+      Bootstrap.observe(null, "sessionstore-windows-restored");
+      ok(
+        finishStartupStub.called,
+        "Once the sessionstore-windows-restored event is observed, call ShieldRecipeClient.startup.",
+      );
+    } finally {
+      finishStartupStub.restore();
+    }
   },
 );
 
 decorate_task(
   withBootstrap,
-  withStub(ShieldRecipeClient, "startup"),
-  async function testStartupDelayed(Bootstrap, startupStub) {
-    Bootstrap.startup(undefined, 3); // 1 == ADDON_ENABLED
-    ok(
-      startupStub.called,
-      "When the add-on is enabled outside app startup, call ShieldRecipeClient.startup immediately.",
-    );
+  async function testStartupDelayed(Bootstrap) {
+    const finishStartupStub = sinon.stub(Bootstrap, "finishStartup");
+    try {
+      Bootstrap.startup(undefined, 3); // 3 == ADDON_ENABLED
+      ok(
+        finishStartupStub.called,
+        "When the add-on is enabled outside app startup, call ShieldRecipeClient.startup immediately.",
+      );
+    } finally {
+      finishStartupStub.restore();
+    }
   },
 );
