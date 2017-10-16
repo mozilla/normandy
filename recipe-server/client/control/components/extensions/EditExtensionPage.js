@@ -86,7 +86,7 @@ export default class EditExtensionPage extends React.PureComponent {
 
         <h2>Edit Extension</h2>
 
-        <LoadingOverlay>
+        <LoadingOverlay requestIds={`fetch-extension-${extensionId}`}>
           <ExtensionForm
             extension={extension}
             onSubmit={this.handleSubmit}
