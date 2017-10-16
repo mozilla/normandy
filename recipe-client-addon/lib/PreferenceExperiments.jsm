@@ -139,6 +139,30 @@ function setPref(prefBranch, prefName, prefType, prefValue) {
 
 this.PreferenceExperiments = {
   /**
+   * Update the the experiment storage with changes that happened during early startup.
+   * @param {object} studyPrefsChanged Map from pref name to previous pref value
+   */
+  async recordOriginalValues(studyPrefsChanged) {
+    const store = await ensureStorage();
+
+    for (const experiment of Object.values(store.data)) {
+      if (studyPrefsChanged.hasOwnProperty(experiment.preferenceName)) {
+        if (experiment.expired) {
+          log.warn("Expired preference experiment changed value during startup");
+        }
+        if (experiment.branch !== "default") {
+          log.warn("Non-default branch preference experiment changed value during startup");
+        }
+        experiment.previousPreferenceValue = studyPrefsChanged[experiment.preferenceName];
+      }
+    }
+
+    // not calling store.saveSoon() because if the data doesn't get
+    // written, it will get updated with fresher data next time the
+    // browser starts.
+  },
+
+  /**
    * Set the default preference value for active experiments that use the
    * default preference branch.
    */
