@@ -109,12 +109,12 @@ in other Django projects.
     production servers. Servers with this setting set to ``false`` shouldn't
     require write access to Postgres.
 
-.. envvar:: DJANGO_ACTION_IMPLEMENTATION_CACHE_TIME
+.. envvar:: DJANGO_IMMUTABLE_CACHE_TIME
 
     :default: ``31536000`` (1 year)
 
-    Sets the time in seconds an Action is cached for with the HTTP
-    ``Cache-Control`` header.
+    Sets the time in seconds immutable objects (such as Action implementations)
+    are cached for with the HTTP ``Cache-Control`` header.
 
 .. envvar:: DJANGO_NUM_PROXIES
 

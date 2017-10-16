@@ -64,7 +64,7 @@ class ActionImplementationView(generics.RetrieveAPIView):
     renderer_classes = [JavaScriptRenderer]
     pagination_class = None
 
-    @api_cache_control(max_age=settings.ACTION_IMPLEMENTATION_CACHE_TIME)
+    @api_cache_control(max_age=settings.IMMUTABLE_CACHE_TIME)
     def retrieve(self, request, name, impl_hash):
         action = self.get_object()
         if impl_hash != action.implementation_hash:

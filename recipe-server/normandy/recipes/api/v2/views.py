@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
@@ -227,6 +228,8 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IdenticonView(views.APIView):
+
+    @api_cache_control(max_age=settings.IMMUTABLE_CACHE_TIME, immutable=True)
     def get(self, request, *, generation, seed):
         if generation != 'v1':
             return Response(
