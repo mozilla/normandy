@@ -391,7 +391,7 @@ decorate_task(
 decorate_task(
   withPrefEnv({
     set: [
-      ["toolkit.telemetry.unified", true],  // telemetry enabled
+      ["datareporting.healthreport.uploadEnabled", true],  // telemetry enabled
       ["extensions.shield-recipe-client.dev_mode", false],
       ["extensions.shield-recipe-client.first_run", false],
       ["extensions.shield-recipe-client.enabled", true],
@@ -424,11 +424,11 @@ decorate_task(
     is(enableStub.callCount, 3, "RecipeRunner should re-enable when a valid api url is given");
     is(disableStub.callCount, 2, "Disable should not be called again");
 
-    await SpecialPowers.pushPrefEnv({ set: [["toolkit.telemetry.unified", false]] });
+    await SpecialPowers.pushPrefEnv({ set: [["datareporting.healthreport.uploadEnabled", false]] });
     is(enableStub.callCount, 3, "Enable should not be called again");
     is(disableStub.callCount, 3, "RecipeRunner should disable when telemetry is disabled");
 
-    await SpecialPowers.pushPrefEnv({ set: [["toolkit.telemetry.unified", true]] });
+    await SpecialPowers.pushPrefEnv({ set: [["datareporting.healthreport.uploadEnabled", true]] });
     is(enableStub.callCount, 4, "RecipeRunner should re-enable when telemetry is enabled");
     is(disableStub.callCount, 3, "Disable should not be called again");
 
@@ -442,7 +442,7 @@ decorate_task(
   withStub(RecipeRunner, "unregisterTimer"),
 
   async function testPrefWatching(registerTimerStub, unregisterTimerStub) {
-    let originalEnabled = RecipeRunner.enabled;
+    const originalEnabled = RecipeRunner.enabled;
 
     try {
       RecipeRunner.enabled = false;
