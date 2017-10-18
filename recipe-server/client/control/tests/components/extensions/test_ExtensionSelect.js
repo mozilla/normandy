@@ -63,15 +63,10 @@ describe('<ExtensionSelect>', () => {
       />,
     ));
 
-    wrapper.find('.ant-select-selection__placeholder').simulate('click');
-    expect(wrapper.find(Select).props().children.size).toBe(2);
+    const selectEl = wrapper.find(Select);
+    expect(selectEl.props().children.size).toBe(2);
 
-    // Ant does some weird positioning to handle its custom dropdown menus, so it's
-    // harder to do UI tests to trigger changes. This test checks against the actual
-    // Ant Select component's onChange, which just fires off ExtensionSelect's onChange
-    // under the hood.
-    wrapper.find(Select).props().onChange('2');
-
+    selectEl.props().onChange('2');
     expect(selected).toBe('2');
   });
 });
