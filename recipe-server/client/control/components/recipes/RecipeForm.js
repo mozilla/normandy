@@ -57,9 +57,8 @@ export default class RecipeForm extends React.PureComponent {
     'opt-out-study': OptOutStudyFields,
   };
 
-  constructor(props) {
-    super(props);
-    this.defaultIdenticonSeed = this.defaultIdenticonSeed || IdenticonField.generateSeed();
+  componentWillMount() {
+    this.defaultIdenticonSeed = IdenticonField.generateSeed();
   }
 
   componentWillReceiveProps(newProps) {
