@@ -83,7 +83,7 @@ export default class CloneRecipePage extends React.PureComponent {
     const recipeName = recipe.get('name');
 
     // Remove the 'name' and 'identicon' field values.
-    const displayedRecipe = recipe.removeAll(['name', 'identicon_seed']);
+    const displayedRecipe = recipe.remove('name').remove('identicon_seed');
 
     const recipeDetailsURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}/`;
 
