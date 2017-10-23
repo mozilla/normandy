@@ -1,12 +1,12 @@
+import { Select } from 'antd';
 import { mount } from 'enzyme';
-import { List } from 'immutable';
+import { fromJS, List } from 'immutable';
 import React from 'react';
 
 import { wrapMockStore } from 'control/tests/mockStore';
 import TestComponent from 'control/components/extensions/ExtensionSelect';
 
 const { WrappedComponent: ExtensionSelect } = TestComponent;
-
 
 describe('<ExtensionSelect>', () => {
   const props = {
@@ -35,5 +35,38 @@ describe('<ExtensionSelect>', () => {
     // Determine if the placeholder is actually visible to the user.
     const placeholderStyle = placeholderElement.get(0).style;
     expect(placeholderStyle.display).toBe('block');
+  });
+
+  it('should display its inherited value prop', () => {
+    const wrapper = mount(wrapMockStore(
+      <ExtensionSelect
+        {...props}
+        extensions={fromJS([{ xpi: '1', name: 'one' }, { xpi: '2', name: 'two' }])}
+        value="2"
+      />,
+    ));
+
+    expect(wrapper.find('.ant-select-selection-selected-value').text()).toBe('two');
+  });
+
+  it('should fire an onChange event appropriately', async () => {
+    let selected;
+    const wrapper = mount(wrapMockStore(
+      <ExtensionSelect
+        {...props}
+        extensions={
+          fromJS([{ xpi: '1', name: 'one' }, { xpi: '2', name: 'two' }])
+        }
+        onChange={val => {
+          selected = val;
+        }}
+      />,
+    ));
+
+    const selectEl = wrapper.find(Select);
+    expect(selectEl.props().children.size).toBe(2);
+
+    selectEl.props().onChange('2');
+    expect(selected).toBe('2');
   });
 });
