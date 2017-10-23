@@ -82,8 +82,8 @@ export default class CloneRecipePage extends React.PureComponent {
     const { recipe, recipeId, isLatestRevision, revisionId } = this.props;
     const recipeName = recipe.get('name');
 
-    // Remove the 'name' field value.
-    const displayedRecipe = recipe.set('name');
+    // Remove the 'name' and 'identicon' field values.
+    const displayedRecipe = recipe.remove('name').remove('identicon_seed');
 
     const recipeDetailsURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}/`;
 
@@ -108,6 +108,7 @@ export default class CloneRecipePage extends React.PureComponent {
             recipe={displayedRecipe}
             onSubmit={this.handleSubmit}
             errors={this.state.formErrors}
+            isCreationForm
           />
         </LoadingOverlay>
       </div>
