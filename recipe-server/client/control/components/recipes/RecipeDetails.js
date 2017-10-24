@@ -58,7 +58,7 @@ export default class RecipeDetails extends React.PureComponent {
                   {key.replace(/([A-Z]+)/g, ' $1')}
                 </dt>,
                 <dd key={`dd-${key}`}>
-                  {value}
+                  <ArgumentsValue name={key} value={value} />
                 </dd>,
               ])).toArray()
             }
@@ -66,5 +66,56 @@ export default class RecipeDetails extends React.PureComponent {
         </Card>
       </div>
     );
+  }
+}
+
+
+class ArgumentsValue extends React.PureComponent {
+  static propTypes = {
+    name: PropTypes.string,
+    value: PropTypes.any.isRequired,
+  };
+
+  static defaultProps = {
+    name: null,
+  };
+
+  renderBranchTable(branches) {
+    const sumRatios = branches.map(branch => branch.get('ratio')).reduce((a, b) => a + b) || 1;
+
+    return (
+      <table className="pref-experiment-branches">
+        <thead>
+          <tr>
+            <th>Slug</th>
+            <th>Value</th>
+            <th className="right">Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {branches.map(branch => (
+            <tr key={branch.get('slug')}>
+              <td>{branch.get('slug')}</td>
+              <td><ArgumentsValue name="value" value={branch.get('value')} /></td>
+              <td className="right">{Math.round(branch.get('ratio') / sumRatios * 100)}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
+  render() {
+    const { name, value } = this.props;
+
+    if (name === 'branches') {
+      return this.renderBranchTable(value);
+    }
+
+    if (typeof value === 'boolean') {
+      return <span>{value ? 'True' : 'False'}</span>;
+    }
+
+    return <span>{value && value.toString()}</span>;
   }
 }

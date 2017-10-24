@@ -66,7 +66,8 @@ export default class LoadingOverlay extends React.PureComponent {
   static propTypes = {
     isLoading: PropTypes.bool.isRequired,
     requestIds: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.string), PropTypes.string
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.string,
     ]).isRequired,
   };
 

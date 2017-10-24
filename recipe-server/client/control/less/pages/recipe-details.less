@@ -38,6 +38,21 @@ dl.details {
     white-space: inherit;
   }
 
+  .pref-experiment-branches {
+    th,
+    td {
+      text-align: left;
+
+      &:not(:last-child) {
+        padding-right: 15px;
+      }
+
+      &.right {
+        text-align: right;
+      }
+    }
+  }
+
   @media (max-width: @screen-sm) {
     grid-template-columns: 100%;
 

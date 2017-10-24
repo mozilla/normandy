@@ -50,6 +50,7 @@ export default class PreferenceExperimentFields extends React.PureComponent {
             <DocumentUrlInput disabled={disabled} />
           </FormItem>
         </Col>
+
         <Col sm={24} md={{ span: 12, offset: 1 }}>
           <FormItem
             label="Preference Name"
