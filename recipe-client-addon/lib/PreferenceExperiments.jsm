@@ -46,6 +46,8 @@
  *   preference is modified on startup of the add-on. If "user", the user value
  *   for the preference is modified when the experiment starts, and is reset to
  *   its original value when the experiment ends.
+ * @property {string} experimentType
+ *   The type to report to Telemetry's experiment marker API.
  */
 
 "use strict";
@@ -188,7 +190,7 @@ this.PreferenceExperiments = {
       TelemetryEnvironment.setExperimentActive(
         experiment.name,
         experiment.branch,
-        {type: "normandy-preference-experiment"}
+        {type: experiment.experimentType}
       );
 
       // Watch for changes to the experiment's preference
@@ -273,7 +275,15 @@ this.PreferenceExperiments = {
    *   - if an experiment for the given preference is active
    *   - If the given preferenceType does not match the existing stored preference
    */
-  async start({name, branch, preferenceName, preferenceValue, preferenceBranchType, preferenceType}) {
+  async start({
+    name,
+    branch,
+    preferenceName,
+    preferenceValue,
+    preferenceBranchType,
+    preferenceType,
+    experimentType = "normandy-pref",
+  }) {
     log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
     const store = await ensureStorage();
@@ -296,6 +306,12 @@ this.PreferenceExperiments = {
       throw new Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
     }
 
+    if (!experimentType.startsWith("normandy-pref")) {
+      throw new Error(
+        `Expected experimentType to begin with "normandy-pref". Found "${experimentType}".`
+      );
+    }
+
     /** @type {Experiment} */
     const experiment = {
       name,
@@ -307,6 +323,7 @@ this.PreferenceExperiments = {
       preferenceType,
       previousPreferenceValue: getPref(preferences, preferenceName, preferenceType),
       preferenceBranchType,
+      experimentType,
     };
 
     const prevPrefType = Services.prefs.getPrefType(preferenceName);
@@ -328,7 +345,7 @@ this.PreferenceExperiments = {
     store.data[name] = experiment;
     store.saveSoon();
 
-    TelemetryEnvironment.setExperimentActive(name, branch, {type: "normandy-preference-experiment"});
+    TelemetryEnvironment.setExperimentActive(name, branch, {type: experimentType});
     await this.saveStartupPrefs();
   },
 

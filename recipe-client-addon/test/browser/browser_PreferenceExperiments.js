@@ -16,10 +16,11 @@ function experimentFactory(attrs) {
     expired: false,
     lastSeen: new Date().toJSON(),
     preferenceName: "fake.preference",
-    preferenceValue: "falkevalue",
+    preferenceValue: "fakevalue",
     preferenceType: "string",
     previousPreferenceValue: "oldfakevalue",
     preferenceBranchType: "default",
+    experimentType: "normandy-pref",
   }, attrs);
 }
 
@@ -561,8 +562,33 @@ decorate_task(
 
     await PreferenceExperiments.init();
     ok(
-      setActiveStub.calledWith("test", "branch", {type: "normandy-preference-experiment"}),
+      setActiveStub.calledWith("test", "branch", {type: "normandy-pref"}),
       "Experiment is registered by init",
+    );
+  },
+);
+
+// init should use the provided experiment type
+decorate_task(
+  withMockExperiments,
+  withMockPreferences,
+  withStub(TelemetryEnvironment, "setExperimentActive"),
+  withStub(PreferenceExperiments, "startObserver"),
+  async function testInit(experiments, mockPreferences, setActiveStub, startObserverStub) {
+    mockPreferences.set("fake.pref", "experiment value");
+
+    experiments.test = experimentFactory({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.pref",
+      preferenceValue: "experiment value",
+      experimentType: "normandy-pref-test",
+    });
+
+    await PreferenceExperiments.init();
+    ok(
+      setActiveStub.calledWith("test", "branch", {type: "normandy-pref-test"}),
+      "init should use the provided experiment type",
     );
   },
 );
@@ -583,13 +609,37 @@ decorate_task(
     });
 
     ok(
-      setActiveStub.calledWith("test", "branch", {type: "normandy-preference-experiment"}),
+      setActiveStub.calledWith("test", "branch", {type: "normandy-pref"}),
       "Experiment is registerd by start()",
     );
     await PreferenceExperiments.stop("test");
     ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregisterd by stop()");
   },
 );
+
+// starting experiments should use the provided experiment type
+decorate_task(
+  withMockExperiments,
+  withStub(TelemetryEnvironment, "setExperimentActive"),
+  withStub(TelemetryEnvironment, "setExperimentInactive"),
+  async function testInitTelemetry(experiments, setActiveStub, setInactiveStub) {
+    await PreferenceExperiments.start({
+      name: "test",
+      branch: "branch",
+      preferenceName: "fake.preference",
+      preferenceValue: "value",
+      preferenceType: "string",
+      preferenceBranchType: "default",
+      experimentType: "normandy-pref-test",
+    });
+
+    ok(
+      setActiveStub.calledWith("test", "branch", {type: "normandy-pref-test"}),
+      "start() should register the experiment with the provided type",
+    );
+  },
+);
+
 
 // Experiments shouldn't be recorded by init() in telemetry if they are expired
 decorate_task(

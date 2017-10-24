@@ -44,6 +44,11 @@
                     "enum": ["user", "default"],
                     "default": "default"
                 },
+                "isHighPopulation": {
+                    "description": "Marks the preference experiment as a high population experiment, that should be excluded from certain types of telemetry",
+                    "type": "boolean",
+                    "default": "false"
+                },
                 "branches": {
                     "description": "List of experimental branches",
                     "type": "array",

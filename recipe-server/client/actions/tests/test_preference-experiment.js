@@ -184,6 +184,7 @@ describe('PreferenceExperimentAction', () => {
           preferenceValue: 'branch1',
           preferenceBranchType: 'user',
           preferenceType: 'string',
+          experimentType: 'normandy-exp',
         });
     });
 
