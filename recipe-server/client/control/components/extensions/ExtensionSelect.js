@@ -59,6 +59,7 @@ export default class ExtensionSelect extends React.Component {
 
   render() {
     const { search } = this.state;
+    let displayedList = this.props.extensions;
     const queryFilters = search ? { text: search } : {};
 
     const {
@@ -76,7 +77,9 @@ export default class ExtensionSelect extends React.Component {
     } = this.props;
     const optGroupLabel = search ? 'Search results' : 'Recently uploaded extensions';
 
-    const displayedList = isLoadingSearch ? new List() : this.props.extensions;
+    if (isLoadingSearch) {
+      displayedList = new List();
+    }
 
     return (
       <div>
