@@ -1,8 +1,9 @@
-import { Card } from 'antd';
+import { Card, Icon } from 'antd';
 import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 import { addSessionView } from 'control/state/app/session/actions';
 
@@ -38,28 +39,27 @@ export default class RecipeDetails extends React.PureComponent {
         <Card className="noHovering" key="recipe-details" title="Recipe">
           <dl className="details">
             <dt>Name</dt>
-            <dd>{recipe.get('name')}</dd>
+            <ArgumentsValue name="name" value={recipe.get('name')} />
 
             <dt>Filters</dt>
-            <dd>
-              <pre><code>{recipe.get('extra_filter_expression')}</code></pre>
-            </dd>
+            <ArgumentsValue
+              name="extra_filter_expression"
+              value={recipe.get('extra_filter_expression')}
+            />
           </dl>
         </Card>
 
         <Card className="noHovering" key="action-details" title="Action">
           <dl className="details">
             <dt>Name</dt>
-            <dd>{recipe.getIn(['action', 'name'])}</dd>
+            <ArgumentsValue name="name" value={recipe.getIn(['action', 'name'])} />
 
             {
               recipe.get('arguments', new Map()).map((value, key) => ([
                 <dt key={`dt-${key}`}>
                   {key.replace(/([A-Z]+)/g, ' $1')}
                 </dt>,
-                <dd key={`dd-${key}`}>
-                  <ArgumentsValue name={key} value={value} />
-                </dd>,
+                <ArgumentsValue key={`dd-${key}`} name={key} value={value} />,
               ])).toArray()
             }
           </dl>
@@ -70,7 +70,7 @@ export default class RecipeDetails extends React.PureComponent {
 }
 
 
-class ArgumentsValue extends React.PureComponent {
+export class ArgumentsValue extends React.PureComponent {
   static propTypes = {
     name: PropTypes.string,
     value: PropTypes.any.isRequired,
@@ -105,17 +105,38 @@ class ArgumentsValue extends React.PureComponent {
     );
   }
 
+  renderCode(code) {
+    return <pre><code>{code}</code></pre>;
+  }
+
+  renderBoolean(value) {
+    return value ? 'True' : 'False';
+  }
+
   render() {
     const { name, value } = this.props;
 
+    let valueRender = x => x;
+
     if (name === 'branches') {
-      return this.renderBranchTable(value);
+      valueRender = this.renderBranchTable;
+    } else if (name === 'extra_filter_expression') {
+      valueRender = this.renderCode;
+    } else if (typeof value === 'boolean') {
+      valueRender = this.renderBoolean;
     }
 
-    if (typeof value === 'boolean') {
-      return <span>{value ? 'True' : 'False'}</span>;
-    }
+    const textToCopy = value === undefined ? '' : value.toString();
 
-    return <span>{value && value.toString()}</span>;
+    return (
+      <dd className="arguments-value">
+        <div className="value">
+          {valueRender(value)}
+        </div>
+        <CopyToClipboard className="copy-icon" text={textToCopy}>
+          <Icon type="copy" />
+        </CopyToClipboard>
+      </dd>
+    );
   }
 }
