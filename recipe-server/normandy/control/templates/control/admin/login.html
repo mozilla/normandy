@@ -1,51 +1,52 @@
-{% extends "control/admin/base.html" %}
+{% load render_bundle from normandy_webpack_loader %}
 
-{% block bodyclass %}login{% endblock %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+  <head>
+    <title>SHIELD Control Panel</title>
+    {% render_bundle 'vendor' 'css' 'VENDOR' %}
+    {% render_bundle 'control' 'css' %}
+    <meta name="robots" content="NONE,NOARCHIVE" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{STATIC_URL}}img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{STATIC_URL}}img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{STATIC_URL}}img/favicon-16x16.png">
+  </head>
 
-{% block page-header %}
-  <div id="page-header">
-    <h2>SHIELD Control Panel</h2>
-  </div>
-{% endblock %}
+  <body class="login">
+    <div id="container">
+      <div id="page-header">
+        <h2>Shield Control Panel</h2>
+      </div>
 
-{# Do not render the frontend app on the login page. #}
-{% block javascript %}{% endblock %}
+      <div id="content" class="wrapper">
+        {% if form.errors and not form.non_field_errors %}
+          <p class="errornote">Please correct the errors below.</p>
+        {% endif %}
 
-{% block content %}
-  <div id="content" class="wrapper">
-    {% if form.errors and not form.non_field_errors %}
-      <p class="errornote">Please correct the errors below.</p>
-    {% endif %}
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+            <p class="errornote">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
 
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}
-        <p class="errornote">{{ error }}</p>
-      {% endfor %}
-    {% endif %}
-
-    <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
-      <div class="row">
-        <div class="fluid-8">
-          {{ form.username.errors }}
-          {{ form.username.label_tag }}
-          <div class="input-with-icon user">
+        <form action="{{ app_path }}" method="post" id="login-form">
+          {% csrf_token %}
+          <div>
+            {{ form.username.errors }}
+            {{ form.username.label_tag }}
             <input id="id_username" maxlength="254" name="username" type="text" autofocus>
           </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="fluid-8">
-          {{ form.password.errors }}
-          {{ form.password.label_tag }}
-          <div class="input-with-icon key">
+
+          <div>
+            {{ form.password.errors }}
+            {{ form.password.label_tag }}
             <input id="id_password" name="password" type="password">
+            <input type="hidden" name="next" value="{{ next|default:"/" }}" />
           </div>
-          <input type="hidden" name="next" value="{{ next|default:"/" }}" />
-        </div>
+
+          <input type="submit" class="button" value="Log in" />
+        </form>
       </div>
-      <div class="row">
-        <label>&nbsp;</label><input type="submit" class="button" value="Log in" />
-      </div>
-    </form>
-  </div>
-{% endblock %}
+    </div>
+  </body>
+</html>

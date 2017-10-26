@@ -68,12 +68,6 @@ module.exports = function (webpackEnvOptions) {
       devtool: production ? undefined : 'cheap-module-source-map',
 
       entry: {
-        control_old: [
-          'babel-polyfill',
-          './client/control_old/index.js',
-          './client/control_old/sass/control.scss',
-          './node_modules/font-awesome/scss/font-awesome.scss',
-        ],
         control: [
           'babel-polyfill',
           './client/control/index.js',
@@ -108,18 +102,6 @@ module.exports = function (webpackEnvOptions) {
             loader: 'babel-loader',
           },
           {
-            test: /\.scss$/,
-            use: ExtractTextPlugin.extract({
-              allChunks: true,
-              fallback: 'style-loader',
-              use: [
-                'css-loader?sourceMap',
-                'postcss-loader',
-                'sass-loader?sourceMap',
-              ],
-            }),
-          },
-          {
             test: /\.less$/,
             exclude: /node_modules/,
             use: ExtractTextPlugin.extract({
@@ -144,7 +126,6 @@ module.exports = function (webpackEnvOptions) {
           actions: path.resolve(__dirname, './client/actions'),
           control: path.resolve(__dirname, './client/control'),
           tests: path.resolve(__dirname, './client/tests'),
-          control_old: path.resolve(__dirname, './client/control_old'),
         },
       },
 
