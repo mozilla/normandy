@@ -457,18 +457,16 @@ this.PreferenceExperiments = {
 
       if (previousPreferenceValue !== null) {
         setPref(preferences, preferenceName, preferenceType, previousPreferenceValue);
+      } else if (preferenceBranchType === "user") {
+        // Remove the "user set" value (which Shield set), but leave the default intact.
+        preferences.clearUserPref(preferenceName);
       } else {
-        if (preferenceBranchType === 'user') {
-          // Remove the "user set" value (which Shield set), but leave the default intact.
-          preferences.clearUserPref(preferenceName);
-        } else {
-          // Remove both the user and default branch preference. This
-          // is ok because we only do this when studies expire, not
-          // when users actively leave a study by changing the
-          // preference, so there should not be a user branch value at
-          // this point.
-          Services.prefs.getDefaultBranch('').deleteBranch(preferenceName)
-        }
+        // Remove both the user and default branch preference. This
+        // is ok because we only do this when studies expire, not
+        // when users actively leave a study by changing the
+        // preference, so there should not be a user branch value at
+        // this point.
+        Services.prefs.getDefaultBranch("").deleteBranch(preferenceName);
       }
     }
 
