@@ -33,7 +33,7 @@ import { getUrlParamAsInt } from 'control/state/router/selectors';
   },
 )
 @autobind
-export default class EditRecipePage extends React.PureComponent {
+export default class EditRecipePage extends React.Component {
   static propTypes = {
     addSessionView: PropTypes.func.isRequired,
     updateRecipe: PropTypes.func.isRequired,

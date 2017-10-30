@@ -19,7 +19,7 @@ import {
   },
 )
 @autobind
-export default class CreateExtensionPage extends React.PureComponent {
+export default class CreateExtensionPage extends React.Component {
   static propTypes = {
     createExtension: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,

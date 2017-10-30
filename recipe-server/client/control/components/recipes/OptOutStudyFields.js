@@ -10,7 +10,7 @@ import ExtensionSelect from 'control/components/extensions/ExtensionSelect';
 import { connectFormProps } from 'control/utils/forms';
 
 @connectFormProps
-export default class OptOutStudyFields extends React.PureComponent {
+export default class OptOutStudyFields extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
     recipeArguments: PropTypes.instanceOf(Map).isRequired,

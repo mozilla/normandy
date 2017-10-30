@@ -30,7 +30,7 @@ import { addSessionView as addSessionViewAction } from 'control/state/app/sessio
   },
 )
 @autobind
-export default class EditExtensionPage extends React.PureComponent {
+export default class EditExtensionPage extends React.Component {
   static propTypes = {
     extension: PropTypes.instanceOf(Map).isRequired,
     extensionId: PropTypes.number.isRequired,
