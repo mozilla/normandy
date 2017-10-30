@@ -30,12 +30,55 @@ dl.details {
     text-transform: uppercase;
   }
 
+  .arguments-value {
+    display: flex;
+
+    .value {
+      flex: 1 1 100%;
+    }
+
+    .copy-icon {
+      cursor: pointer;
+      flex: 0 0 32px;
+      opacity: 0;
+
+      &:hover {
+        color: @blue-6;
+      }
+
+      &:active {
+        color: black;
+      }
+    }
+
+    &:hover {
+      > .copy-icon {
+        opacity: 1;
+      }
+    }
+  }
+
   h1 {
     grid-column: span 2;
   }
 
   pre {
     white-space: inherit;
+  }
+
+  .pref-experiment-branches {
+    th,
+    td {
+      text-align: left;
+
+      &:not(:last-child) {
+        padding-right: 15px;
+      }
+
+      &.right {
+        text-align: right;
+      }
+    }
   }
 
   @media (max-width: @screen-sm) {
