@@ -45,7 +45,7 @@ const log = Log.repository.getLogger(BOOTSTRAP_LOGGER_NAME);
 log.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
 log.level = Services.prefs.getIntPref(PREF_LOGGING_LEVEL, Log.Level.Warn);
 
-const studyPrefsChanged = {};
+let studyPrefsChanged = {};
 
 this.Bootstrap = {
   initShieldPrefs(defaultPrefs) {
@@ -68,6 +68,7 @@ this.Bootstrap = {
   },
 
   initExperimentPrefs() {
+    studyPrefsChanged = {};
     const defaultBranch = Services.prefs.getDefaultBranch("");
     const experimentBranch = Services.prefs.getBranch(STARTUP_EXPERIMENT_PREFS_BRANCH);
 
@@ -80,31 +81,40 @@ this.Bootstrap = {
         continue;
       }
 
+      // record the value of the default branch before setting it
+      switch (realPrefType) {
+        case Services.prefs.PREF_STRING:
+          studyPrefsChanged[prefName] = defaultBranch.getCharPref(prefName);
+          break;
+
+        case Services.prefs.PREF_INT:
+          studyPrefsChanged[prefName] = defaultBranch.getIntPref(prefName);
+          break;
+
+        case Services.prefs.PREF_BOOL:
+          studyPrefsChanged[prefName] = defaultBranch.getBoolPref(prefName);
+          break;
+
+        case Services.prefs.PREF_INVALID:
+          studyPrefsChanged[prefName] = null;
+          break;
+
+        default:
+          // This should never happen
+          log.error(`Error getting startup pref ${prefName}; unknown value type ${experimentPrefType}.`);
+      }
+
+      // now set the new default value
       switch (experimentPrefType) {
         case Services.prefs.PREF_STRING:
-          try {  // eslint-disable-line mozilla/use-default-preference-values
-            studyPrefsChanged[prefName] = defaultBranch.getCharPref(prefName);
-          } catch (e) {
-            Cu.reportError(e);
-          }
           defaultBranch.setCharPref(prefName, experimentBranch.getCharPref(prefName));
           break;
 
         case Services.prefs.PREF_INT:
-          try {  // eslint-disable-line mozilla/use-default-preference-values
-            studyPrefsChanged[prefName] = defaultBranch.getIntPref(prefName);
-          } catch (e) {
-            Cu.reportError(e);
-          }
           defaultBranch.setIntPref(prefName, experimentBranch.getIntPref(prefName));
           break;
 
         case Services.prefs.PREF_BOOL:
-          try {  // eslint-disable-line mozilla/use-default-preference-values
-            studyPrefsChanged[prefName] = defaultBranch.getBoolPref(prefName);
-          } catch (e) {
-            Cu.reportError(e);
-          }
           defaultBranch.setBoolPref(prefName, experimentBranch.getBoolPref(prefName));
           break;
 

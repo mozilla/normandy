@@ -102,16 +102,22 @@ const log = LogManager.getLogger("preference-experiments");
 let experimentObservers = new Map();
 CleanupManager.addCleanupHandler(() => PreferenceExperiments.stopAllObservers());
 
-function getPref(prefBranch, prefName, prefType, defaultVal) {
+function getPref(prefBranch, prefName, prefType) {
+  if (prefBranch.getPrefType(prefName) === 0) {
+    // pref doesn't exist
+    return null;
+  }
+
   switch (prefType) {
-    case "boolean":
-      return prefBranch.getBoolPref(prefName, defaultVal);
+    case "boolean": {
+      return prefBranch.getBoolPref(prefName);
+    }
 
     case "string":
-      return prefBranch.getStringPref(prefName, defaultVal);
+      return prefBranch.getStringPref(prefName);
 
     case "integer":
-      return prefBranch.getIntPref(prefName, defaultVal);
+      return prefBranch.getIntPref(prefName);
 
     default:
       throw new TypeError(`Unexpected preference type (${prefType}) for ${prefName}.`);
@@ -171,7 +177,7 @@ this.PreferenceExperiments = {
 
     for (const experiment of await this.getAllActive()) {
       // Check that the current value of the preference is still what we set it to
-      if (getPref(UserPreferences, experiment.preferenceName, experiment.preferenceType, undefined) !== experiment.preferenceValue) {
+      if (getPref(UserPreferences, experiment.preferenceName, experiment.preferenceType) !== experiment.preferenceValue) {
         // if not, stop the experiment, and skip the remaining steps
         log.info(`Stopping experiment "${experiment.name}" because its value changed`);
         await this.stop(experiment.name, false);
@@ -299,7 +305,7 @@ this.PreferenceExperiments = {
       preferenceName,
       preferenceValue,
       preferenceType,
-      previousPreferenceValue: getPref(preferences, preferenceName, preferenceType, undefined),
+      previousPreferenceValue: getPref(preferences, preferenceName, preferenceType),
       preferenceBranchType,
     };
 
@@ -347,7 +353,7 @@ this.PreferenceExperiments = {
     const observerInfo = {
       preferenceName,
       observer() {
-        const newValue = getPref(UserPreferences, preferenceName, preferenceType, undefined);
+        const newValue = getPref(UserPreferences, preferenceName, preferenceType);
         if (newValue !== preferenceValue) {
           PreferenceExperiments.stop(experimentName, false)
                                .catch(Cu.reportError);
@@ -448,13 +454,19 @@ this.PreferenceExperiments = {
     if (resetValue) {
       const {preferenceName, preferenceType, previousPreferenceValue, preferenceBranchType} = experiment;
       const preferences = PreferenceBranchType[preferenceBranchType];
-      if (previousPreferenceValue !== undefined) {
+
+      if (previousPreferenceValue !== null) {
         setPref(preferences, preferenceName, preferenceType, previousPreferenceValue);
-      } else {
-        // This does nothing if we're on the default branch, which is fine. The
-        // preference will be reset on next restart, and most preferences should
-        // have had a default value set before the experiment anyway.
+      } else if (preferenceBranchType === "user") {
+        // Remove the "user set" value (which Shield set), but leave the default intact.
         preferences.clearUserPref(preferenceName);
+      } else {
+        // Remove both the user and default branch preference. This
+        // is ok because we only do this when studies expire, not
+        // when users actively leave a study by changing the
+        // preference, so there should not be a user branch value at
+        // this point.
+        Services.prefs.getDefaultBranch("").deleteBranch(preferenceName);
       }
     }
 
