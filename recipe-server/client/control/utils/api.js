@@ -55,15 +55,17 @@ export default class APIClient {
     if (!response.ok) {
       let message;
       let data;
+      let err;
 
       try {
         data = await response.json();
         message = data.detail || response.statusText;
       } catch (error) {
         message = error.message;
+        err = error;
       }
 
-      throw new APIClient.APIError(message, data);
+      throw new APIClient.APIError(message, data, err);
     }
 
     if (response.status !== 204) {

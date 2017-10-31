@@ -5,6 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
+import handleError from 'control/utils/handleError';
 import ExtensionForm from 'control/components/extensions/ExtensionForm';
 import {
   createExtension as createExtensionAction,
@@ -40,12 +41,9 @@ export default class CreateExtensionPage extends React.Component {
       message.success('Extension saved');
       push(`/extension/${extensionId}/`);
     } catch (error) {
-      message.error(
-        'Extension cannot be saved. Please correct any errors listed in the form below.',
-      );
-      if (error.data) {
-        this.setState({ formErrors: error.data });
-      }
+      handleError('Extension cannot be saved.', error);
+
+      this.setState({ formErrors: error.data });
     }
   }
 

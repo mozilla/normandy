@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
@@ -74,20 +75,16 @@ export default class EditRecipePage extends React.Component {
 
     try {
       await this.props.updateRecipe(recipeId, values);
-      message.success('Recipe saved');
+      message.success('Recipe updated!');
       this.setState({
         formErrors: undefined,
       });
     } catch (error) {
-      message.error(
-        'Recipe cannot be saved. Please correct any errors listed in the form below.',
-      );
+      handleError('Recipe cannot be updated.', error);
 
-      if (error) {
-        this.setState({
-          formErrors: error.data || error,
-        });
-      }
+      this.setState({
+        formErrors: error.data,
+      });
     }
   }
 
