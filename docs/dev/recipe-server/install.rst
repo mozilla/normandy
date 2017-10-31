@@ -9,7 +9,7 @@ This guide assumes you have already installed and set up the following:
 
 1. Git_
 2. `Python 3.6`_, `pip 8`_ or higher, and virtualenv_
-3. `Node.js`_ and npm.
+3. `Node.js 8`_ and NPM 5.
 4. `Postgres 9.4`_
 5. ``openssl``
 
