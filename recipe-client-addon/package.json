@@ -15,9 +15,10 @@
   },
   "devDependencies": {
     "babili-webpack-plugin": "0.1.2",
-    "eslint": "3.19.0",
+    "eslint": "4.10.0",
     "eslint-config-normandy": "1.0.0",
-    "eslint-plugin-mozilla": "0.3.2",
+    "eslint-plugin-mozilla": "0.4.6",
+    "eslint-plugin-no-unsanitized": "2.0.1",
     "eslint-plugin-react": "^7.1.0",
     "license-webpack-plugin": "0.5.1",
     "stylelint": "7.6.0",
@@ -26,7 +27,6 @@
     "webpack": "3.1.0"
   },
   "dependencies": {
-    "mozjexl": "1.1.5",
     "classnames": "2.2.5",
     "mozjexl": "1.1.5",
     "prop-types": "15.5.10",
