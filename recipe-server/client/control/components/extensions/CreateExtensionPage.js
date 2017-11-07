@@ -5,6 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
+import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
 import handleError from 'control/utils/handleError';
 import ExtensionForm from 'control/components/extensions/ExtensionForm';
 import {
@@ -20,40 +21,32 @@ import {
   },
 )
 @autobind
-export default class CreateExtensionPage extends React.PureComponent {
+export default class CreateExtensionPage extends AbstractFormPage {
   static propTypes = {
     createExtension: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
   }
 
-  state = {
-    formErrors: {},
-  };
-
-  /**
-   * Create a new extension, display a message, and redirect to the edit page
-   * for the new extension.
-   */
-  async handleSubmit(values) {
-    const { createExtension, push } = this.props;
-
-    this.setState({ formErrors: undefined });
-
-    try {
-      const extensionId = await createExtension(values);
-      message.success('Extension saved');
-      push(`/extension/${extensionId}/`);
-    } catch (error) {
-      handleError('Extension cannot be saved.', error);
-
-      this.setState({ formErrors: error.data || error });
-    }
+  getTitle() {
+    return <h2>Add New Extension</h2>;
   }
 
-  render() {
-    const { formErrors } = this.state;
-    return (
-      <ExtensionForm onSubmit={this.handleSubmit} errors={formErrors} />
-    );
+  getFormComponent() {
+    return ExtensionForm;
+  }
+
+  async performAction(values) {
+    const { createExtension } = this.props;
+    return createExtension(values);
+  }
+
+  onSuccess(extensionId) {
+    const { push } = this.props;
+    message.success('Extension saved');
+    push(`/extension/${extensionId}/`);
+  }
+
+  onFailure(err) {
+    handleError('Extension cannot be saved.', err);
   }
 }

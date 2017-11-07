@@ -124,9 +124,6 @@ export default class ExtensionForm extends React.PureComponent {
           name="name"
           label="Name"
           initialValue={extension.get('name')}
-          rules={[
-            { required: true },
-          ]}
         >
           <Input />
         </FormItem>

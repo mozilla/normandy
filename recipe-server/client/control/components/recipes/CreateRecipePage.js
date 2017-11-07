@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
 import handleError from 'control/utils/handleError';
-import AbstractRecipePage from 'control/components/recipes/AbstractRecipePage';
+import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
+import RecipeForm from 'control/components/recipes/RecipeForm';
 
 import { createRecipe as createAction } from 'control/state/app/recipes/actions';
 
@@ -19,7 +20,7 @@ import { createRecipe as createAction } from 'control/state/app/recipes/actions'
   },
 )
 @autobind
-export default class CreateRecipePage extends AbstractRecipePage {
+export default class CreateRecipePage extends AbstractFormPage {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
@@ -35,11 +36,15 @@ export default class CreateRecipePage extends AbstractRecipePage {
   }
 
   async performAction(formValues) {
-    return await this.props.createRecipe(formValues);
+    return this.props.createRecipe(formValues);
+  }
+
+  getFormComponent() {
+    return RecipeForm;
   }
 
   getFormProps() {
-    return { isCreationForm: true, };
+    return { isCreationForm: true };
   }
 
   getTitle() {

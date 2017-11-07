@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
 import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryExtension from 'control/components/data/QueryExtension';
@@ -31,17 +32,13 @@ import { addSessionView as addSessionViewAction } from 'control/state/app/sessio
   },
 )
 @autobind
-export default class EditExtensionPage extends React.PureComponent {
+export default class EditExtensionPage extends AbstractFormPage {
   static propTypes = {
     extension: PropTypes.instanceOf(Map).isRequired,
     extensionId: PropTypes.number.isRequired,
     updateExtension: PropTypes.func.isRequired,
     addSessionView: PropTypes.func.isRequired,
   }
-
-  state = {
-    formErrors: {},
-  };
 
   componentDidMount() {
     const extensionName = this.props.extension.get('name');
@@ -60,40 +57,39 @@ export default class EditExtensionPage extends React.PureComponent {
     }
   }
 
-  /**
-   * Update the existing extension and display a message.
-   */
-  async handleSubmit(values) {
-    const { extensionId, updateExtension } = this.props;
-    this.setState({ formErrors: undefined });
+  getTitle() {
+    return <h2>Edit Extension</h2>;
+  }
 
-    try {
-      await updateExtension(extensionId, values);
-      message.success('Extension saved!');
-    } catch (error) {
-      handleError('Extension cannot be updated.', error);
+  getFormProps() {
+    const { extension } = this.props;
+    return { extension };
+  }
 
-      if (error.data) {
-        this.setState({ formErrors: error.data || error });
-      }
-    }
+  getFormComponent() {
+    return ExtensionForm;
+  }
+
+  async performAction(values) {
+    const { updateExtension, extensionId } = this.props;
+    return updateExtension(extensionId, values);
+  }
+
+  onSuccess() {
+    message.success('Extension updated!');
+  }
+
+  onFailure(err) {
+    handleError('Extension cannot be updated.', err);
   }
 
   render() {
-    const { extension, extensionId } = this.props;
-    const { formErrors } = this.state;
+    const { extensionId } = this.props;
     return (
       <div>
         <QueryExtension pk={extensionId} />
-
-        <h2>Edit Extension</h2>
-
         <LoadingOverlay requestIds={`fetch-extension-${extensionId}`}>
-          <ExtensionForm
-            extension={extension}
-            onSubmit={this.handleSubmit}
-            errors={formErrors}
-          />
+          { super.render.call(this) }
         </LoadingOverlay>
       </div>
     );

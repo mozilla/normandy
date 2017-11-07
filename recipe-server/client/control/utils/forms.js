@@ -102,7 +102,7 @@ export function createForm({ validateFields, ...formConfig }) {
        */
       async triggerSubmit(context) {
         const {
-          onBeforeSubmit = ()=>{},
+          onBeforeSubmit = () => {},
           onSubmit,
         } = this.props;
 

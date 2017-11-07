@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, push as pushAction } from 'redux-little-router';
 
-import AbstractRecipePage from 'control/components/recipes/AbstractRecipePage';
+import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
 import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
@@ -41,7 +41,7 @@ import { getLatestRevisionIdForRecipe } from 'control/state/app/recipes/selector
   },
 )
 @autobind
-export default class CloneRecipePage extends AbstractRecipePage {
+export default class CloneRecipePage extends AbstractFormPage {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     isLatestRevision: PropTypes.bool.isRequired,
@@ -50,8 +50,8 @@ export default class CloneRecipePage extends AbstractRecipePage {
     revisionId: PropTypes.string.isRequired,
   };
 
-  getTitle() {
-    return 'Clone Recipe';
+  getFormComponent() {
+    return RecipeForm;
   }
 
   getFormProps() {
@@ -97,16 +97,16 @@ export default class CloneRecipePage extends AbstractRecipePage {
   }
 
   async performAction(values) {
-    return await this.props.createRecipe(values);
+    return this.props.createRecipe(values);
   }
 
-  onSuccess() {
+  onSuccess(newId) {
     message.success('Recipe saved');
-    push(`/recipe/${newId}/`);
+    this.props.push(`/recipe/${newId}/`);
   }
 
   onFailure(err) {
-    handleError('Recipe cannot be cloned.', error);
+    handleError('Recipe cannot be cloned.', err);
   }
 
   render() {

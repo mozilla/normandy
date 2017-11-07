@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import handleError from 'control/utils/handleError';
-import AbstractRecipePage from 'control/components/recipes/AbstractRecipePage';
+import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
@@ -35,7 +35,7 @@ import { getUrlParamAsInt } from 'control/state/router/selectors';
   },
 )
 @autobind
-export default class EditRecipePage extends AbstractRecipePage {
+export default class EditRecipePage extends AbstractFormPage {
   static propTypes = {
     addSessionView: PropTypes.func.isRequired,
     updateRecipe: PropTypes.func.isRequired,
@@ -76,17 +76,21 @@ export default class EditRecipePage extends AbstractRecipePage {
     return <h2>Edit Recipe</h2>;
   }
 
+  getFormComponent() {
+    return RecipeForm;
+  }
+
   getFormProps() {
-    return { recipe: this.props.recipe, };
+    return { recipe: this.props.recipe };
   }
 
   async performAction(formValues) {
     const { recipeId } = this.props;
-    return await this.props.updateRecipe(recipeId, formValues);
+    return this.props.updateRecipe(recipeId, formValues);
   }
 
   render() {
-    const { recipe, recipeId } = this.props;
+    const { recipeId } = this.props;
 
     return (
       <div className="edit-page">

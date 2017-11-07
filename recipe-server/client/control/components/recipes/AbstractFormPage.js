@@ -1,12 +1,9 @@
 import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { connect } from 'react-redux';
-
-import RecipeForm from 'control/components/recipes/RecipeForm';
 
 @autobind
-export default class AbstractRecipePage extends React.PureComponent {
+export default class AbstractFormPage extends React.PureComponent {
   static propTypes = {
     recipeAction: PropTypes.func.isRequired,
   };
@@ -15,33 +12,35 @@ export default class AbstractRecipePage extends React.PureComponent {
     formErrors: undefined,
   };
 
-  /* abstract */ getTitle() {
-    throw new Error('AbstractRecipePage#getTitle should be overridden.');
-  }
-
-  /* abstract */ onFailure() {
-    throw new Error('AbstractRecipePage#onFailure should be overridden.');
-  }
-
-  /* abstract */ onSuccess() {
-    throw new Error('AbstractRecipePage#onSuccess should be overridden.');
-  }
-
-  /* abstract */ async performAction() {
-    throw new Error('AbstractRecipePage#onSuccess should be overridden.');
-  }
-
-
-  /* hook */ getFormProps() {
-    return {};
-  }
-
   /* hook */ onBeforeSubmit() {
     this.setState({
       formErrors: undefined,
     });
   }
 
+  /* abstract */ onFailure() {
+    throw new Error('AbstractFormPage#onFailure should be overridden.');
+  }
+
+  /* abstract */ onSuccess() {
+    throw new Error('AbstractFormPage#onSuccess should be overridden.');
+  }
+
+  /* hook */ getFormProps() {
+    return {};
+  }
+
+  /* abstract */ getFormComponent() {
+    throw new Error('AbstractFormPage#getFormComponent should be overridden.');
+  }
+
+  /* abstract */ getTitle() {
+    throw new Error('AbstractFormPage#getTitle should be overridden.');
+  }
+
+  /* abstract */ async performAction() {
+    throw new Error('AbstractFormPage#onSuccess should be overridden.');
+  }
 
   /**
    * Update the existing recipe and display a message.
@@ -61,14 +60,16 @@ export default class AbstractRecipePage extends React.PureComponent {
   }
 
   render() {
+    const FormElement = this.getFormComponent();
+
     return (
       <div>
         { this.getTitle() }
-        <RecipeForm
+        <FormElement
           onBeforeSubmit={this.onBeforeSubmit}
           onSubmit={this.handleSubmit}
           errors={this.state.formErrors}
-          { ...this.getFormProps() }
+          {...this.getFormProps()}
         />
       </div>
     );
