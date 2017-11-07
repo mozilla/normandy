@@ -22,22 +22,63 @@ describe('handleError util', () => {
   });
 
   it('should detect form validation errors', () => {
-    const err = new APIClient.APIError('Server Error.', { field: 'Validation message. ' });
-
-    const { context, message, reason } = handleError('Test.', err);
+    const { context, message, reason } = handleError('Test.', { field: 'Validation message.' });
     expect(context).toBe('Test.');
     expect(message).toBe(`Test. ${ERR_MESSAGES.FORM_VALIDATION}`);
     expect(reason).toBe(ERR_MESSAGES.FORM_VALIDATION);
   });
 
-  it('should fall back to server messages if no form validation errors', () => {
-    const err = new APIClient.APIError('Something from the server.');
+  describe('API Errors', () => {
+    it('should handle 400 errors', () => {
+      const err = new APIClient.APIError('Something from the server.', { status: 400 });
 
-    const { context, message, reason } = handleError('Test.', err);
-    expect(context).toBe('Test.');
-    expect(message).toBe('Test. Something from the server.');
-    expect(reason).toBe('Something from the server.');
+      const { context, message, reason } = handleError('Test.', err);
+      expect(context).toBe('Test.');
+      expect(message).toBe(`Test. ${ERR_MESSAGES.FORM_VALIDATION}`);
+      expect(reason).toBe(ERR_MESSAGES.FORM_VALIDATION);
+    });
+
+    describe('should handle 403 errors', () => {
+      it('should handle a "not logged in" 403 error', () => {
+        const err = new APIClient.APIError('Authentication credentials were not provided',
+          { status: 403 });
+
+        const { context, message, reason } = handleError('Test.', err);
+        expect(context).toBe('Test.');
+        expect(message).toBe(`Test. ${ERR_MESSAGES.NOT_LOGGED_IN}`);
+        expect(reason).toBe(ERR_MESSAGES.NOT_LOGGED_IN);
+      });
+
+      it('should handle a "no permission" 403 error', () => {
+        const err = new APIClient.APIError('User does not have permission to perform that action.',
+          { status: 403 });
+
+        const { context, message, reason } = handleError('Test.', err);
+        expect(context).toBe('Test.');
+        expect(message).toBe(`Test. ${ERR_MESSAGES.NO_PERMISSION}`);
+        expect(reason).toBe(ERR_MESSAGES.NO_PERMISSION);
+      });
+    });
+
+    it('should handle 500 errors', () => {
+      const err = new APIClient.APIError('Something from the server.', { status: 500 });
+
+      const { context, message, reason } = handleError('Test.', err);
+      expect(context).toBe('Test.');
+      expect(message).toBe(`Test. ${ERR_MESSAGES.SERVER_FAILED} (Something from the server.)`);
+      expect(reason).toBe(`${ERR_MESSAGES.SERVER_FAILED} (Something from the server.)`);
+    });
+
+    it('should fall back to server messages if the response status is unrecognized', () => {
+      const err = new APIClient.APIError('Something from the server.', { status: 123 });
+
+      const { context, message, reason } = handleError('Test.', err);
+      expect(context).toBe('Test.');
+      expect(message).toBe('Test. Something from the server.');
+      expect(reason).toBe('Something from the server.');
+    });
   });
+
 
   it('should detect when a user is offline', () => {
     const { context, message, reason } = handleError('Test.', new Error(), {

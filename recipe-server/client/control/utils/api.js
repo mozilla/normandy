@@ -54,7 +54,7 @@ export default class APIClient {
     // Throw if we get a non-200 response.
     if (!response.ok) {
       let message;
-      let data;
+      let data = {};
       let err;
 
       try {
@@ -64,6 +64,8 @@ export default class APIClient {
         message = error.message;
         err = error;
       }
+
+      data = { ...data, status: response.status };
 
       throw new APIClient.APIError(message, data, err);
     }
