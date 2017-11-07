@@ -88,15 +88,18 @@ def signatures_use_good_certificates(app_configs, **kwargs):
         expire_early = timedelta(days=settings.CERTIFICATES_EXPIRE_EARLY_DAYS)
 
     try:
-        Signature = apps.get_model('recipes', 'Signature')
         Recipe = apps.get_model('recipes', 'Recipe')
         Action = apps.get_model('recipes', 'Action')
-        signatures = list(Signature.objects.all())
+
+        urls = set()
+        for recipe in Recipe.objects.exclude(signature=None):
+            urls.add(recipe.signature.x5u)
+        for action in Action.objects.exclude(signature=None):
+            urls.add(action.signature.x5u)
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         msg = f'Could not retrieve signatures: {e}'
         errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_SIGNATURES))
     else:
-        urls = set(s.x5u for s in signatures)
         for url in urls:
             try:
                 signing.verify_x5u(url, expire_early)
@@ -105,7 +108,7 @@ def signatures_use_good_certificates(app_configs, **kwargs):
                 matching_actions = Action.objects.filter(signature__x5u=url)
                 bad_objects = list(matching_recipes) + list(matching_actions)
 
-                object_names = ', '.join(bad_objects)
+                object_names = ', '.join(str(o) for o in bad_objects)
                 msg = (f'{len(bad_objects)} objects are signed with a bad cert: {object_names}. '
                        f'{exc.detail}. Certificate url is {url}. ')
                 errors.append(Warning(msg, id=WARNING_BAD_SIGNING_CERTIFICATE))
