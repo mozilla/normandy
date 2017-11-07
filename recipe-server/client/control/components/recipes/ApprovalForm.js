@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import handleError from 'control/utils/handleError';
 import { SimpleLoadingOverlay } from 'control/components/common/LoadingOverlay';
 import FormActions from 'control/components/forms/FormActions';
 import FormItem from 'control/components/forms/FormItem';
@@ -26,6 +27,7 @@ export default class ApprovalForm extends React.PureComponent {
   static propTypes = {
     approvalRequest: PropTypes.instanceOf(Map).isRequired,
     closeApprovalRequest: PropTypes.func.isRequired,
+    form: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
     isSubmitting: PropTypes.bool,
   };
@@ -35,19 +37,35 @@ export default class ApprovalForm extends React.PureComponent {
   };
 
   handleApproveClick(event) {
-    this.props.onSubmit(event, { approved: true });
+    this.props.form.validateFields(error => {
+      if (error) {
+        handleError('Unable to approve request.', error);
+      } else {
+        this.props.onSubmit(event, { approved: true });
+      }
+    });
   }
 
   handleRejectClick(event) {
-    this.props.onSubmit(event, { approved: false });
+    this.props.form.validateFields(error => {
+      if (error) {
+        handleError('Unable to reject request.', error);
+      } else {
+        this.props.onSubmit(event, { approved: false });
+      }
+    });
   }
 
   handleCloseButtonClick() {
     const { approvalRequest, closeApprovalRequest } = this.props;
     Modal.confirm({
       title: 'Are you sure you want to close this approval request?',
-      onOk() {
-        closeApprovalRequest(approvalRequest.get('id'));
+      async onOk() {
+        try {
+          await closeApprovalRequest(approvalRequest.get('id'));
+        } catch (err) {
+          handleError('Unable to close request.', err);
+        }
       },
     });
   }

@@ -54,7 +54,7 @@ export default class FormItem extends React.PureComponent {
     connectToForm: true,
     initialValue: null,
     name: null,
-    rules: null,
+    rules: [{ required: true, message: 'This field is required.' }],
     trimWhitespace: false,
   };
 
