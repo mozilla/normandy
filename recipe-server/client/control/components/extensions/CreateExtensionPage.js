@@ -37,7 +37,7 @@ export default class CreateExtensionPage extends React.PureComponent {
   async handleSubmit(values) {
     const { createExtension, push } = this.props;
 
-    this.setState({ formErrors: undefined, });
+    this.setState({ formErrors: undefined });
 
     try {
       const extensionId = await createExtension(values);

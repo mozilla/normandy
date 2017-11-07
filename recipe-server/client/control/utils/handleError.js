@@ -1,6 +1,7 @@
 import { message as AntMessage } from 'antd';
 
 import APIClient from 'control/utils/api';
+import { ValidationError } from 'control/utils/forms';
 
 
 export const ERR_MESSAGES = {
@@ -17,6 +18,7 @@ const checkFetchFailure = ({ message = '' }) =>
 
 const checkLoginFailure = ({ message = '' }) => message.indexOf('credentials were not provided') > -1;
 const checkAPIFailure = error => error instanceof APIClient.APIError;
+const checkValidationFailure = error => error instanceof ValidationError;
 
 const msgDisplayTime = 8; // seconds
 
@@ -65,7 +67,7 @@ export default function handleError(context = 'Error!', error, methodOverrides =
       errMsg = ERR_MESSAGES.SERVER_FAILED;
     } else if (checkAPIFailure(error)) {
       errMsg = handleAPIError(error);
-    } else if (!(error instanceof Error)) {
+    } else if (checkValidationFailure(error)) {
       errMsg = ERR_MESSAGES.FORM_VALIDATION;
     }
   }

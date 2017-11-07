@@ -65,13 +65,13 @@ export default class EditExtensionPage extends React.PureComponent {
    */
   async handleSubmit(values) {
     const { extensionId, updateExtension } = this.props;
-    this.setState({ formErrors: undefined, });
+    this.setState({ formErrors: undefined });
 
     try {
       await updateExtension(extensionId, values);
       message.success('Extension saved!');
     } catch (error) {
-      handleError('Extension cannot be updated.', error)
+      handleError('Extension cannot be updated.', error);
 
       if (error.data) {
         this.setState({ formErrors: error.data || error });

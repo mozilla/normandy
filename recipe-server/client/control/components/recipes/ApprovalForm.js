@@ -12,8 +12,7 @@ import FormItem from 'control/components/forms/FormItem';
 import {
   closeApprovalRequest as closeApprovalRequestAction,
 } from 'control/state/app/approvalRequests/actions';
-import { createForm } from 'control/utils/forms';
-
+import { createForm, ValidationError } from 'control/utils/forms';
 
 @connect(
   null,
@@ -39,7 +38,7 @@ export default class ApprovalForm extends React.PureComponent {
   handleApproveClick(event) {
     this.props.form.validateFields(error => {
       if (error) {
-        handleError('Unable to approve request.', error);
+        handleError('Unable to approve request.', new ValidationError(error));
       } else {
         this.props.onSubmit(event, { approved: true });
       }
@@ -49,7 +48,7 @@ export default class ApprovalForm extends React.PureComponent {
   handleRejectClick(event) {
     this.props.form.validateFields(error => {
       if (error) {
-        handleError('Unable to reject request.', error);
+        handleError('Unable to reject request.', new ValidationError(error));
       } else {
         this.props.onSubmit(event, { approved: false });
       }

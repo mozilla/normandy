@@ -1,5 +1,6 @@
-import handleError, { ERR_MESSAGES } from 'control/utils/handleError';
 import APIClient from 'control/utils/api';
+import { ValidationError } from 'control/utils/forms';
+import handleError, { ERR_MESSAGES } from 'control/utils/handleError';
 
 describe('handleError util', () => {
   it('should work', () => {
@@ -22,7 +23,9 @@ describe('handleError util', () => {
   });
 
   it('should detect form validation errors', () => {
-    const { context, message, reason } = handleError('Test.', { field: 'Validation message.' });
+    const err = new ValidationError({ field: 'Validation message.' });
+    const { context, message, reason } = handleError('Test.', err);
+
     expect(context).toBe('Test.');
     expect(message).toBe(`Test. ${ERR_MESSAGES.FORM_VALIDATION}`);
     expect(reason).toBe(ERR_MESSAGES.FORM_VALIDATION);
