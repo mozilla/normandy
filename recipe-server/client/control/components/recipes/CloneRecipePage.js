@@ -6,6 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, push as pushAction } from 'redux-little-router';
 
+import AbstractRecipePage from 'control/components/recipes/AbstractRecipePage';
 import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
@@ -40,7 +41,7 @@ import { getLatestRevisionIdForRecipe } from 'control/state/app/recipes/selector
   },
 )
 @autobind
-export default class CloneRecipePage extends React.PureComponent {
+export default class CloneRecipePage extends AbstractRecipePage {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     isLatestRevision: PropTypes.bool.isRequired,
@@ -49,46 +50,67 @@ export default class CloneRecipePage extends React.PureComponent {
     revisionId: PropTypes.string.isRequired,
   };
 
-  state = {
-    formErrors: undefined,
-  };
-
-  /**
-   * Update the existing recipe and display a message.
-   */
-  async handleSubmit(values) {
-    const { push } = this.props;
-
-    try {
-      const newId = await this.props.createRecipe(values);
-
-      message.success('Recipe saved');
-      this.setState({
-        formErrors: undefined,
-      });
-
-      push(`/recipe/${newId}/`);
-    } catch (error) {
-      handleError('Recipe cannot be cloned.', error);
-
-      this.setState({
-        formErrors: error.data || error,
-      });
-    }
+  getTitle() {
+    return 'Clone Recipe';
   }
 
-  render() {
-    const { recipe, recipeId, isLatestRevision, revisionId } = this.props;
-    const recipeName = recipe.get('name');
+  getFormProps() {
+    const {
+      recipe,
+    } = this.props;
 
     // Remove the 'name' and 'identicon' field values.
     const displayedRecipe = recipe.remove('name').remove('identicon_seed');
 
+    return {
+      recipe: displayedRecipe,
+      isCreationForm: true,
+    };
+  }
+
+  getTitle() {
+    const {
+      isLatestRevision,
+      recipe,
+      recipeId,
+      revisionId,
+    } = this.props;
+
     const recipeDetailsURL = `/recipe/${recipeId}${isLatestRevision ? '' : `/rev/${revisionId}`}/`;
+
+    const recipeName = recipe.get('name');
 
     // Only display revision hash if we're _not_ on the latest version.
     const revisionAddendum = isLatestRevision ? '' : `(Revision: ${revisionId.slice(0, 7)})`;
     const cloningMessage = `Cloning recipe values from "${recipeName}" ${revisionAddendum}`;
+
+    return (
+      <span>
+        <h2>Clone Recipe</h2>
+        { recipeName &&
+          <Link href={recipeDetailsURL}>
+            <Alert message={cloningMessage} type="info" showIcon />
+          </Link>
+        }
+      </span>
+    );
+  }
+
+  async performAction(values) {
+    return await this.props.createRecipe(values);
+  }
+
+  onSuccess() {
+    message.success('Recipe saved');
+    push(`/recipe/${newId}/`);
+  }
+
+  onFailure(err) {
+    handleError('Recipe cannot be cloned.', error);
+  }
+
+  render() {
+    const { recipeId, revisionId } = this.props;
 
     return (
       <div className="clone-page">
@@ -96,19 +118,7 @@ export default class CloneRecipePage extends React.PureComponent {
         <QueryRevision pk={revisionId} />
 
         <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
-          <h2>Clone Recipe</h2>
-          { recipeName &&
-            <Link href={recipeDetailsURL}>
-              <Alert message={cloningMessage} type="info" showIcon />
-            </Link>
-          }
-
-          <RecipeForm
-            recipe={displayedRecipe}
-            onSubmit={this.handleSubmit}
-            errors={this.state.formErrors}
-            isCreationForm
-          />
+          { super.render.call(this) }
         </LoadingOverlay>
       </div>
     );

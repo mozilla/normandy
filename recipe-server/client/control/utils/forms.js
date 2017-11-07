@@ -101,7 +101,15 @@ export function createForm({ validateFields, ...formConfig }) {
        * results to the onSubmit prop.
        */
       async triggerSubmit(context) {
+        const {
+          onBeforeSubmit = ()=>{},
+          onSubmit,
+        } = this.props;
+
         const customValidateFields = validateFields || (values => values);
+
+        onBeforeSubmit();
+
         let values;
         try {
           const defaultValues = await this.defaultValidateFields();
@@ -112,7 +120,7 @@ export function createForm({ validateFields, ...formConfig }) {
           return;
         }
 
-        this.props.onSubmit(values, context);
+        onSubmit(values, context);
       }
 
       async defaultValidateFields() {

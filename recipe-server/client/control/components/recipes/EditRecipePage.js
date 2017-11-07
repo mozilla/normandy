@@ -6,6 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import handleError from 'control/utils/handleError';
+import AbstractRecipePage from 'control/components/recipes/AbstractRecipePage';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
@@ -34,7 +35,7 @@ import { getUrlParamAsInt } from 'control/state/router/selectors';
   },
 )
 @autobind
-export default class EditRecipePage extends React.PureComponent {
+export default class EditRecipePage extends AbstractRecipePage {
   static propTypes = {
     addSessionView: PropTypes.func.isRequired,
     updateRecipe: PropTypes.func.isRequired,
@@ -44,10 +45,6 @@ export default class EditRecipePage extends React.PureComponent {
 
   static defaultProps = {
     recipe: null,
-  };
-
-  state = {
-    formErrors: undefined,
   };
 
   componentDidMount() {
@@ -67,26 +64,25 @@ export default class EditRecipePage extends React.PureComponent {
     }
   }
 
-  /**
-   * Update the existing recipe and display a message.
-   */
-  async handleSubmit(values) {
+  onSuccess() {
+    message.success('Recipe updated!');
+  }
+
+  onFailure(error) {
+    handleError('Recipe cannot be updated.', error);
+  }
+
+  getTitle() {
+    return <h2>Edit Recipe</h2>;
+  }
+
+  getFormProps() {
+    return { recipe: this.props.recipe, };
+  }
+
+  async performAction(formValues) {
     const { recipeId } = this.props;
-
-    this.setState({
-      formErrors: undefined,
-    });
-
-    try {
-      await this.props.updateRecipe(recipeId, values);
-      message.success('Recipe updated!');
-    } catch (error) {
-      handleError('Recipe cannot be updated.', error);
-
-      this.setState({
-        formErrors: error.data || error,
-      });
-    }
+    return await this.props.updateRecipe(recipeId, formValues);
   }
 
   render() {
@@ -96,13 +92,7 @@ export default class EditRecipePage extends React.PureComponent {
       <div className="edit-page">
         <QueryRecipe pk={recipeId} />
         <LoadingOverlay requestIds={`fetch-recipe-${recipeId}`}>
-          <h2>Edit Recipe</h2>
-
-          <RecipeForm
-            recipe={recipe}
-            onSubmit={this.handleSubmit}
-            errors={this.state.formErrors}
-          />
+          { super.render.call(this) }
         </LoadingOverlay>
       </div>
     );

@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
 import handleError from 'control/utils/handleError';
-import RecipeForm from 'control/components/recipes/RecipeForm';
+import AbstractRecipePage from 'control/components/recipes/AbstractRecipePage';
+
 import { createRecipe as createAction } from 'control/state/app/recipes/actions';
 
 
@@ -18,52 +19,30 @@ import { createRecipe as createAction } from 'control/state/app/recipes/actions'
   },
 )
 @autobind
-export default class CreateRecipePage extends React.PureComponent {
+export default class CreateRecipePage extends AbstractRecipePage {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
   };
 
-  state = {
-    formErrors: undefined,
-  };
-
-  /**
-   * Update the existing recipe and display a message.
-   */
-  async handleSubmit(values) {
-    const {
-      createRecipe,
-      push,
-    } = this.props;
-
-    this.setState({
-      formErrors: undefined,
-    });
-
-    try {
-      const newId = await createRecipe(values);
-      message.success('Recipe created');
-      push(`/recipe/${newId}/`);
-    } catch (error) {
-      handleError('Recipe cannot be created.', error);
-
-      this.setState({
-        formErrors: error.data || error,
-      });
-    }
+  onFailure(err) {
+    handleError('Recipe cannot be created.', err);
   }
 
-  render() {
-    return (
-      <div>
-        <h2>Create New Recipe</h2>
-        <RecipeForm
-          onSubmit={this.handleSubmit}
-          errors={this.state.formErrors}
-          isCreationForm
-        />
-      </div>
-    );
+  onSuccess(newId) {
+    message.success('Recipe created');
+    this.props.push(`/recipe/${newId}/`);
+  }
+
+  async performAction(formValues) {
+    return await this.props.createRecipe(formValues);
+  }
+
+  getFormProps() {
+    return { isCreationForm: true, };
+  }
+
+  getTitle() {
+    return <h2>Create New Recipe</h2>;
   }
 }
