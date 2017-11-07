@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryExtension from 'control/components/data/QueryExtension';
 import ExtensionForm from 'control/components/extensions/ExtensionForm';
@@ -30,7 +31,7 @@ import { addSessionView as addSessionViewAction } from 'control/state/app/sessio
   },
 )
 @autobind
-export default class EditExtensionPage extends React.Component {
+export default class EditExtensionPage extends React.PureComponent {
   static propTypes = {
     extension: PropTypes.instanceOf(Map).isRequired,
     extensionId: PropTypes.number.isRequired,
@@ -64,15 +65,16 @@ export default class EditExtensionPage extends React.Component {
    */
   async handleSubmit(values) {
     const { extensionId, updateExtension } = this.props;
+    this.setState({ formErrors: undefined, });
+
     try {
       await updateExtension(extensionId, values);
-      message.success('Extension saved');
+      message.success('Extension saved!');
     } catch (error) {
-      message.error(
-        'Extension cannot be saved. Please correct any errors listed in the form below.',
-      );
+      handleError('Extension cannot be updated.', error)
+
       if (error.data) {
-        this.setState({ formErrors: error.data });
+        this.setState({ formErrors: error.data || error });
       }
     }
   }

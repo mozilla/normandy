@@ -20,7 +20,7 @@ import {
   },
 )
 @autobind
-export default class CreateExtensionPage extends React.Component {
+export default class CreateExtensionPage extends React.PureComponent {
   static propTypes = {
     createExtension: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
@@ -36,6 +36,9 @@ export default class CreateExtensionPage extends React.Component {
    */
   async handleSubmit(values) {
     const { createExtension, push } = this.props;
+
+    this.setState({ formErrors: undefined, });
+
     try {
       const extensionId = await createExtension(values);
       message.success('Extension saved');
@@ -43,7 +46,7 @@ export default class CreateExtensionPage extends React.Component {
     } catch (error) {
       handleError('Extension cannot be saved.', error);
 
-      this.setState({ formErrors: error.data });
+      this.setState({ formErrors: error.data || error });
     }
   }
 

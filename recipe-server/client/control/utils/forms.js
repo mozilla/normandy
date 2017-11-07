@@ -3,6 +3,8 @@ import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import handleError from 'control/utils/handleError';
+
 
 /**
  * Decorator used to wrap forms for collecting and validating user input.
@@ -92,13 +94,17 @@ export function createForm({ validateFields, ...formConfig }) {
        */
       async triggerSubmit(context) {
         const customValidateFields = validateFields || (values => values);
+        let values;
         try {
           const defaultValues = await this.defaultValidateFields();
-          const values = await customValidateFields.call(this.formComponent, defaultValues);
-          this.props.onSubmit(values, context);
+          values = await customValidateFields.call(this.formComponent, defaultValues);
         } catch (error) {
-          message.error('Could not validate form. Please correct the errors below.');
+          handleError('Could not validate form. Please correct the errors below.');
+
+          return;
         }
+
+        this.props.onSubmit(values, context);
       }
 
       async defaultValidateFields() {

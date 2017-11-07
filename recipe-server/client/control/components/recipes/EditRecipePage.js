@@ -34,7 +34,7 @@ import { getUrlParamAsInt } from 'control/state/router/selectors';
   },
 )
 @autobind
-export default class EditRecipePage extends React.Component {
+export default class EditRecipePage extends React.PureComponent {
   static propTypes = {
     addSessionView: PropTypes.func.isRequired,
     updateRecipe: PropTypes.func.isRequired,
@@ -73,17 +73,18 @@ export default class EditRecipePage extends React.Component {
   async handleSubmit(values) {
     const { recipeId } = this.props;
 
+    this.setState({
+      formErrors: undefined,
+    });
+
     try {
       await this.props.updateRecipe(recipeId, values);
       message.success('Recipe updated!');
-      this.setState({
-        formErrors: undefined,
-      });
     } catch (error) {
       handleError('Recipe cannot be updated.', error);
 
       this.setState({
-        formErrors: error.data,
+        formErrors: error.data || error,
       });
     }
   }

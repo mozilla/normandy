@@ -18,10 +18,11 @@ const checkFetchFailure = ({ message = '' }) =>
 const checkLoginFailure = ({ message = '' }) => message.indexOf('credentials were not provided') > -1;
 const checkAPIFailure = error => error instanceof APIClient.APIError;
 
+const msgDisplayTime = 8; // seconds
 
 const defaultMethods = {
   checkUserOnline: () => navigator.onLine,
-  notifyUser: errMsg => AntMessage.error(errMsg, 10),
+  notifyUser: errMsg => AntMessage.error(errMsg, msgDisplayTime),
 };
 
 const handleAPIError = error => {

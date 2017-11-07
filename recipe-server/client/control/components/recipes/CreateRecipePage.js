@@ -18,7 +18,7 @@ import { createRecipe as createAction } from 'control/state/app/recipes/actions'
   },
 )
 @autobind
-export default class CreateRecipePage extends React.Component {
+export default class CreateRecipePage extends React.PureComponent {
   static propTypes = {
     createRecipe: PropTypes.func.isRequired,
     push: PropTypes.func.isRequired,
@@ -37,13 +37,13 @@ export default class CreateRecipePage extends React.Component {
       push,
     } = this.props;
 
+    this.setState({
+      formErrors: undefined,
+    });
 
     try {
       const newId = await createRecipe(values);
       message.success('Recipe created');
-      this.setState({
-        formErrors: undefined,
-      });
       push(`/recipe/${newId}/`);
     } catch (error) {
       handleError('Recipe cannot be created.', error);
