@@ -30,7 +30,7 @@ The `"heartbeat" ping documentation`_ has more information on the contents of
 the ping.
 
 .. _Telemetry: https://wiki.mozilla.org/Telemetry
-.. _"heartbeat" ping documentation: https://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/heartbeat-ping.html
+.. _"heartbeat" ping documentation: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/heartbeat-ping.html
 
 Arguments
 ---------
