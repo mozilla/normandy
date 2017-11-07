@@ -7,6 +7,7 @@ class Command(BaseCommand):
     Meta command to call all update_*_signatures management commands.
     """
     help = 'Update all signatures'
+    requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(

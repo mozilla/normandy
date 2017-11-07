@@ -11,6 +11,7 @@ from normandy.recipes.models import Action
 class Command(BaseCommand):
     """Update signatures for Actions that have no signature or an old signature."""
     help = 'Update Action signatures'
+    requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(
