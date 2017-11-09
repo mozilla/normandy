@@ -36,7 +36,7 @@ class TestSignaturesUseGoodCertificates(object):
         mock_verify_x5u.side_effect = side_effect
 
         errors = checks.signatures_use_good_certificates(None)
-        assert not mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, None)
+        mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, None)
         assert errors == []
 
     def test_it_passes_expire_early_setting(self, mocker, settings):
@@ -45,5 +45,5 @@ class TestSignaturesUseGoodCertificates(object):
         mock_verify_x5u = mocker.patch('normandy.recipes.checks.signing.verify_x5u')
 
         errors = checks.signatures_use_good_certificates(None)
-        assert not mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, timedelta(7))
+        mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, timedelta(7))
         assert errors == []
