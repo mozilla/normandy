@@ -13,6 +13,7 @@ class Command(BaseCommand):
     Update signatures for enabled Recipes that have no signature or an old signature
     """
     help = 'Update Recipe signatures'
+    requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(
