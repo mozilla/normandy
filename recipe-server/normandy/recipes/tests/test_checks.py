@@ -5,6 +5,7 @@ import pytest
 from normandy.recipes import checks, signing
 from normandy.recipes.tests import RecipeFactory, SignatureFactory
 
+
 @pytest.mark.django_db
 class TestSignaturesUseGoodCertificates(object):
 
@@ -25,7 +26,7 @@ class TestSignaturesUseGoodCertificates(object):
     def test_it_ignores_signatures_not_in_use(self, mocker, settings):
         settings.CERTIFICATES_EXPIRE_EARLY_DAYS = None
         recipe = RecipeFactory(signed=True)
-        unused_signature = SignatureFactory(x5u='https://example.com/bad_x5u')
+        SignatureFactory(x5u='https://example.com/bad_x5u')  # unused signature
         mock_verify_x5u = mocker.patch('normandy.recipes.checks.signing.verify_x5u')
 
         def side_effect(x5u, *args):
