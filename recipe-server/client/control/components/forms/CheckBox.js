@@ -1,10 +1,10 @@
-import { Switch } from 'antd';
+import { Checkbox as AntCheckbox } from 'antd';
 import autobind from 'autobind-decorator';
 
 import LabeledInput from './LabeledInput';
 
 @autobind
-export default class SwitchBox extends LabeledInput {
+export default class CheckBox extends LabeledInput {
   handleLabelClick() {
     const newValue = !this.props.value;
 
@@ -12,7 +12,7 @@ export default class SwitchBox extends LabeledInput {
   }
 
   getElement() {
-    return Switch;
+    return AntCheckbox;
   }
 
   getElementProps() {
