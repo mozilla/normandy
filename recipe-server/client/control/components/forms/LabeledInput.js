@@ -10,13 +10,11 @@ import React from 'react';
 export default class LabeledInput extends React.Component {
   static propTypes = {
     children: PropTypes.node,
-    element: PropTypes.node,
     onChange: PropTypes.func,
   };
 
   static defaultProps = {
     children: null,
-    element: undefined,
     onChange: () => {},
   }
 

@@ -10,19 +10,13 @@ export default class LabeledCheckbox extends LabeledInput {
   }
 
   getElementProps() {
-    const { value } = this.props;
-
-    return {
-      checked: value,
-    };
+    return { checked: this.props.value };
   }
 
   getLabelProps() {
-    const { value } = this.props;
-
     return {
       role: 'checkbox',
-      'aria-checked': value,
+      'aria-checked': this.props.value,
     };
   }
 }

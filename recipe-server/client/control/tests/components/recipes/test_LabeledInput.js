@@ -1,17 +1,25 @@
 import { Switch } from 'antd';
+import autobind from 'autobind-decorator';
 import React from 'react';
 import { mount } from 'enzyme';
 
-import SwitchBox from 'control/components/forms/SwitchBox';
+import LabeledInput from 'control/components/forms/LabeledInput';
 
-describe('<SwitchBox>', () => {
+@autobind
+class TestInput extends LabeledInput {
+  getElement() { return Switch; }
+  getElementProps() { return { checked: this.props.value, testProp: 123 }; }
+  handleLabelClick() { this.props.onChange(); }
+}
+
+describe('<LabeledInput>', () => {
   const props = {
     children: null,
     onChange: () => {},
     value: null,
   };
 
-  const factory = (customProps = {}) => mount(<SwitchBox {...props} {...customProps} />);
+  const factory = (customProps = {}) => mount(<TestInput {...props} {...customProps} />);
 
   it('should work', () => {
     expect(factory).not.toThrow();
@@ -43,8 +51,14 @@ describe('<SwitchBox>', () => {
     });
   });
 
-  describe('the Switch', () => {
-    it('should inherit the `value` as a `checked` prop', () => {
+  describe('getElementProps', () => {
+    it('should pass properties into the internal component', () => {
+      const wrapper = factory();
+      expect(wrapper.find(Switch).length).toBe(1);
+      expect(wrapper.find(Switch).props().testProp).toBe(123);
+    });
+
+    it('should pass dynamic props (`value` as a `checked` prop)', () => {
       const wrapper = factory({ value: true });
       expect(wrapper.find(Switch).length).toBe(1);
       expect(wrapper.find(Switch).props().checked).toBe(true);
