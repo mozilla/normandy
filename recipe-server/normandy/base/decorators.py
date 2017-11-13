@@ -1,5 +1,3 @@
-from functools import wraps
-
 from django.conf import settings
 from django.views.decorators.cache import cache_control
 
