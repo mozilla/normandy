@@ -5,16 +5,16 @@ echo "Linting Python files"
 bin/ci/docker-run.sh flake8 normandy/ contract-tests/
 
 echo "Linting JS files"
-bin/ci/docker-run.sh npm run lint:js
+bin/ci/docker-run.sh yarn lint:js
 
 echo "Linting Style files"
-bin/ci/docker-run.sh npm run lint:css
+bin/ci/docker-run.sh yarn lint:css
 
 echo "Checking JS package security"
 # Disable automatic failure
 set +e
 # nsp uses exit code 1 for security problems
-bin/ci/docker-run.sh npm run lint:js-security
+bin/ci/docker-run.sh yarn run lint:js-security
 if [[ $? -eq 1 ]]; then
     exit 1
 fi

@@ -11,16 +11,16 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     echo 'deb https://deb.nodesource.com/node_8.x jessie main' > /etc/apt/sources.list.d/nodesource.list && \
     echo 'deb-src https://deb.nodesource.com/node_8.x jessie main' >> /etc/apt/sources.list.d/nodesource.list && \
     apt-get update && apt-get install -y nodejs
-RUN npm install -g npm@5
+RUN npm install -g npm@5 && npm install -g yarn@1.0.0
 
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
 RUN pip install -U 'pip>=8' && \
     pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
-    npm install
+    yarn
 
 COPY . /app
-RUN NODE_ENV=production npm run build && \
+RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media && \
     mkdir -p __version__ && \
