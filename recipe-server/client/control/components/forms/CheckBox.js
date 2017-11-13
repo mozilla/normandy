@@ -1,18 +1,12 @@
-import { Checkbox as AntCheckbox } from 'antd';
+import { Checkbox } from 'antd';
 import autobind from 'autobind-decorator';
 
 import LabeledInput from './LabeledInput';
 
 @autobind
-export default class CheckBox extends LabeledInput {
-  handleLabelClick() {
-    const newValue = !this.props.value;
-
-    this.props.onChange(newValue);
-  }
-
+export default class LabeledCheckbox extends LabeledInput {
   getElement() {
-    return AntCheckbox;
+    return Checkbox;
   }
 
   getElementProps() {

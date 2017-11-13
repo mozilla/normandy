@@ -1,6 +1,6 @@
 // eslint does not detect that aria roles come from `getLabelProps`,
 // ignoring the rule here to disable lint errors.
-/* eslint-disable jsx-a11y/interactive-supports-focus */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 
 import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
@@ -12,14 +12,12 @@ export default class LabeledInput extends React.Component {
     children: PropTypes.node,
     element: PropTypes.node,
     onChange: PropTypes.func,
-    value: PropTypes.any,
   };
 
   static defaultProps = {
     children: null,
     element: undefined,
     onChange: () => {},
-    value: undefined,
   }
 
   getElement() { throw new Error('LabeledInput#getElement must be overridden.'); }
@@ -33,7 +31,6 @@ export default class LabeledInput extends React.Component {
   render() {
     const {
       children,
-      value,
       onChange,
     } = this.props;
 
