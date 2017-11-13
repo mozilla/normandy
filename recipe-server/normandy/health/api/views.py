@@ -13,8 +13,6 @@ from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 from statsd.defaults.django import statsd
 
-from normandy.base.decorators import short_circuit_middlewares
-
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +73,6 @@ def version(request):
     })
 
 
-@short_circuit_middlewares
 @api_view(['GET'])
 def lbheartbeat(request):
     # lets the load balancer know the application is running and available
@@ -84,7 +81,6 @@ def lbheartbeat(request):
     return Response('', status=status.HTTP_200_OK)
 
 
-@short_circuit_middlewares
 @api_view(['GET'])
 @authentication_classes([])
 def heartbeat(request):
