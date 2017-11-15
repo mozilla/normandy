@@ -35,6 +35,10 @@ const handleAPIError = error => {
       message = ERR_MESSAGES.FORM_VALIDATION;
       break;
 
+    case 401: // Not logged in
+      message = ERR_MESSAGES.NOT_LOGGED_IN;
+      break;
+
     case 403: // Forbidden
       message = checkLoginFailure(error) ? ERR_MESSAGES.NOT_LOGGED_IN : ERR_MESSAGES.NO_PERMISSION;
       break;
