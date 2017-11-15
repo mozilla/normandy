@@ -67,6 +67,10 @@ this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 const EXPERIMENT_FILE = "shield-preference-experiments.json";
 const STARTUP_EXPERIMENT_PREFS_BRANCH = "extensions.shield-recipe-client.startupExperimentPrefs.";
 
+const MAX_EXPERIMENT_TYPE_LENGTH = 20;  // enforced by TelemetryEnvironment
+const EXPERIMENT_TYPE_PREFIX = "normandy-";
+const MAX_EXPERIMENT_SUBTYPE_LENGTH = MAX_EXPERIMENT_TYPE_LENGTH - EXPERIMENT_TYPE_PREFIX.length;
+
 const PREFERENCE_TYPE_MAP = {
   boolean: Services.prefs.PREF_BOOL,
   string: Services.prefs.PREF_STRING,
@@ -190,7 +194,7 @@ this.PreferenceExperiments = {
       TelemetryEnvironment.setExperimentActive(
         experiment.name,
         experiment.branch,
-        {type: experiment.experimentType}
+        {type: EXPERIMENT_TYPE_PREFIX + experiment.experimentType}
       );
 
       // Watch for changes to the experiment's preference
@@ -282,7 +286,7 @@ this.PreferenceExperiments = {
     preferenceValue,
     preferenceBranchType,
     preferenceType,
-    experimentType = "normandy-pref",
+    experimentType = "exp",
   }) {
     log.debug(`PreferenceExperiments.start(${name}, ${branch})`);
 
@@ -306,9 +310,10 @@ this.PreferenceExperiments = {
       throw new Error(`Invalid value for preferenceBranchType: ${preferenceBranchType}`);
     }
 
-    if (!experimentType.startsWith("normandy-pref")) {
+    if (experimentType.length > MAX_EXPERIMENT_SUBTYPE_LENGTH) {
       throw new Error(
-        `Expected experimentType to begin with "normandy-pref". Found "${experimentType}".`
+        `experimentType must be less than ${MAX_EXPERIMENT_SUBTYPE_LENGTH} characters. ` +
+        `"${experimentType}" is ${experimentType.length} long.`
       );
     }
 
@@ -345,7 +350,7 @@ this.PreferenceExperiments = {
     store.data[name] = experiment;
     store.saveSoon();
 
-    TelemetryEnvironment.setExperimentActive(name, branch, {type: experimentType});
+    TelemetryEnvironment.setExperimentActive(name, branch, {type: EXPERIMENT_TYPE_PREFIX + experimentType});
     await this.saveStartupPrefs();
   },
 

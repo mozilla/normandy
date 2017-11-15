@@ -20,7 +20,7 @@ function experimentFactory(attrs) {
     preferenceType: "string",
     previousPreferenceValue: "oldfakevalue",
     preferenceBranchType: "default",
-    experimentType: "normandy-pref",
+    experimentType: "exp",
   }, attrs);
 }
 
@@ -562,7 +562,7 @@ decorate_task(
 
     await PreferenceExperiments.init();
     ok(
-      setActiveStub.calledWith("test", "branch", {type: "normandy-pref"}),
+      setActiveStub.calledWith("test", "branch", {type: "normandy-exp"}),
       "Experiment is registered by init",
     );
   },
@@ -582,7 +582,7 @@ decorate_task(
       branch: "branch",
       preferenceName: "fake.pref",
       preferenceValue: "experiment value",
-      experimentType: "normandy-pref-test",
+      experimentType: "pref-test",
     });
 
     await PreferenceExperiments.init();
@@ -608,12 +608,13 @@ decorate_task(
       preferenceBranchType: "default",
     });
 
-    ok(
-      setActiveStub.calledWith("test", "branch", {type: "normandy-pref"}),
+    Assert.deepEqual(
+      setActiveStub.getCall(0).args,
+      ["test", "branch", {type: "normandy-exp"}],
       "Experiment is registerd by start()",
     );
     await PreferenceExperiments.stop("test");
-    ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregisterd by stop()");
+    ok(setInactiveStub.calledWith("test", "branch"), "Experiment is unregistered by stop()");
   },
 );
 
@@ -630,11 +631,12 @@ decorate_task(
       preferenceValue: "value",
       preferenceType: "string",
       preferenceBranchType: "default",
-      experimentType: "normandy-pref-test",
+      experimentType: "pref-test",
     });
 
-    ok(
-      setActiveStub.calledWith("test", "branch", {type: "normandy-pref-test"}),
+    Assert.deepEqual(
+      setActiveStub.getCall(0).args,
+      ["test", "branch", {type: "normandy-pref-test"}],
       "start() should register the experiment with the provided type",
     );
   },

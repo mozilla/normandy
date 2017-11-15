@@ -59,7 +59,7 @@ export default class PreferenceExperimentAction extends Action {
 
       // Otherwise, enroll!
       const branch = await this.chooseBranch(branches);
-      const experimentType = isHighPopulation ? 'normandy-exp-highpop' : 'normandy-exp';
+      const experimentType = isHighPopulation ? 'exp-highpop' : 'exp';
       await experiments.start({
         name: slug,
         branch: branch.slug,
