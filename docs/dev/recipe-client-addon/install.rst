@@ -28,7 +28,7 @@ Installation
 
    .. code-block:: bash
 
-      npm install
+      yarn install
       npm run build
 
 Once you've finished these steps, you should be ready to build an XPI or copy
