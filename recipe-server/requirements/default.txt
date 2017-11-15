@@ -34,8 +34,6 @@ django-npm==0.1.4 \
 django-rest-swagger==2.1.1 \
     --hash=sha256:36b9d97d259c10a7a96a24b81d4b0933cdd359298ad1a006dce6d9622f46ff59 \
     --hash=sha256:6ef17b12456dac9434e44357480e323812bee3087579d14e046f6091de6a15d0
-django-reversion==2.0.4 \
-    --hash=sha256:a95624e28e72ef0b07231e601abe6fc790cd5e9e54791a1e57ff5eb2b1c0bc32
 django-storages==1.5.2 \
     --hash=sha256:60fe20cbf31eeda4e6065039646b6abecc45d6cc41246dd198c477031d848ffa \
     --hash=sha256:470b67b325abfd7f82362cfcb09cceba19f1f9499b42ace0f998aa75a05297c7

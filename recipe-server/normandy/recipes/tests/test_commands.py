@@ -4,7 +4,6 @@ from datetime import timedelta
 from django.core.management import call_command
 
 import pytest
-from reversion.models import Version
 
 from normandy.base.tests import UserFactory
 from normandy.recipes.models import Action
@@ -99,19 +98,6 @@ class TestUpdateActions(object):
         call_command('update_actions', 'missing-action')
         dont_update_action.refresh_from_db()
         assert dont_update_action.implementation == 'old'
-
-    def test_it_sets_the_revision_comment(self, mock_action):
-        mock_action('test-action', 'console.log("foo");', {'type': 'int'})
-
-        call_command('update_actions')
-        assert Action.objects.count() == 1
-
-        action = Action.objects.all()[0]
-        versions = Version.objects.get_for_object(action)
-        assert versions.count() == 1
-
-        version = versions[0]
-        assert version.revision.comment == 'Updating actions.'
 
 
 class TestUpdateSignatures(object):

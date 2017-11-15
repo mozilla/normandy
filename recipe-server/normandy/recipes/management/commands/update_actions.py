@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from reversion import revisions as reversion
 from webpack_loader.utils import get_loader
 
 from normandy.recipes.models import Action
@@ -23,10 +22,7 @@ class Command(BaseCommand):
         )
 
     @transaction.atomic
-    @reversion.create_revision()
     def handle(self, *args, **options):
-        reversion.set_comment('Updating actions.')
-
         action_names = settings.ACTIONS.keys()
         if options['action_name']:
             action_names = [name for name in action_names if name in options['action_name']]
