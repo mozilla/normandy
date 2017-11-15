@@ -6,7 +6,7 @@ import React from 'react';
 import FormItem from 'control/components/forms/FormItem';
 
 
-export default class ConsoleLogFields extends React.PureComponent {
+export default class ConsoleLogFields extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
     recipeArguments: PropTypes.instanceOf(Map),

@@ -5,6 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
+import handleError from 'control/utils/handleError';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import { createRecipe as createAction } from 'control/state/app/recipes/actions';
 
@@ -36,24 +37,20 @@ export default class CreateRecipePage extends React.PureComponent {
       push,
     } = this.props;
 
+    this.setState({
+      formErrors: undefined,
+    });
 
     try {
       const newId = await createRecipe(values);
       message.success('Recipe created');
-      this.setState({
-        formErrors: undefined,
-      });
       push(`/recipe/${newId}/`);
     } catch (error) {
-      message.error(
-        'Recipe cannot be created. Please correct any errors listed in the form below.',
-      );
+      handleError('Recipe cannot be created.', error);
 
-      if (error) {
-        this.setState({
-          formErrors: error.data || error,
-        });
-      }
+      this.setState({
+        formErrors: error.data || error,
+      });
     }
   }
 

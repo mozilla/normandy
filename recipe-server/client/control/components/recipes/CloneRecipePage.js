@@ -6,6 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, push as pushAction } from 'redux-little-router';
 
+import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
@@ -68,9 +69,7 @@ export default class CloneRecipePage extends React.PureComponent {
 
       push(`/recipe/${newId}/`);
     } catch (error) {
-      message.error(
-        'Recipe cannot be saved. Please correct any errors listed in the form below.',
-      );
+      handleError('Recipe cannot be cloned.', error);
 
       this.setState({
         formErrors: error.data || error,

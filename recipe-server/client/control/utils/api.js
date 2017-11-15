@@ -54,16 +54,20 @@ export default class APIClient {
     // Throw if we get a non-200 response.
     if (!response.ok) {
       let message;
-      let data;
+      let data = {};
+      let err;
 
       try {
         data = await response.json();
         message = data.detail || response.statusText;
       } catch (error) {
         message = error.message;
+        err = error;
       }
 
-      throw new APIClient.APIError(message, data);
+      data = { ...data, status: response.status };
+
+      throw new APIClient.APIError(message, data, err);
     }
 
     if (response.status !== 204) {

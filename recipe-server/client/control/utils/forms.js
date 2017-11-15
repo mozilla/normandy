@@ -1,7 +1,17 @@
-import { Form, message } from 'antd';
+import { Form } from 'antd';
 import autobind from 'autobind-decorator';
 import PropTypes from 'prop-types';
 import React from 'react';
+
+import handleError from 'control/utils/handleError';
+
+// Simple error class used when a form fails to validate.
+export class ValidationError extends Error {
+  constructor(data) {
+    super();
+    this.fields = data;
+  }
+}
 
 
 /**
@@ -92,13 +102,17 @@ export function createForm({ validateFields, ...formConfig }) {
        */
       async triggerSubmit(context) {
         const customValidateFields = validateFields || (values => values);
+        let values;
         try {
           const defaultValues = await this.defaultValidateFields();
-          const values = await customValidateFields.call(this.formComponent, defaultValues);
-          this.props.onSubmit(values, context);
+          values = await customValidateFields.call(this.formComponent, defaultValues);
         } catch (error) {
-          message.error('Could not validate form. Please correct the errors below.');
+          handleError('Could not validate form.', new ValidationError(error));
+
+          return;
         }
+
+        this.props.onSubmit(values, context);
       }
 
       async defaultValidateFields() {

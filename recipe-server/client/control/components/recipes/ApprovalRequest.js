@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import handleError from 'control/utils/handleError';
 import ApprovalForm from 'control/components/recipes/ApprovalForm';
 import ApprovalDetails from 'control/components/recipes/ApprovalDetails';
 import RecipeDetails from 'control/components/recipes/RecipeDetails';
@@ -72,16 +73,10 @@ export default class ApprovalRequest extends React.PureComponent {
       await action(approvalRequest.get('id'), values);
       message.success(successMessage);
     } catch (error) {
+      handleError(`Unable to ${context.approved ? 'approve' : 'reject'} request.`, error);
+
       if (error.data) {
         this.setState({ formErrors: error.data });
-
-        // `error.data` is an object of invalid fields and the corresponding error
-        // message. `join`ing them here will produce a single error for the toast.
-        message.error(Object.values(error.data).join(' '));
-      } else {
-        message.error(
-          'Approval could not be submitted. Please correct any errors listed in the form below.',
-        );
       }
     } finally {
       this.setState({

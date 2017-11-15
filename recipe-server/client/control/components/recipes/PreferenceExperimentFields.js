@@ -11,7 +11,7 @@ import { connectFormProps } from 'control/utils/forms';
 
 
 @connectFormProps
-export default class PreferenceExperimentFields extends React.PureComponent {
+export default class PreferenceExperimentFields extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
     form: PropTypes.object.isRequired,
