@@ -27,6 +27,7 @@
     "babel-runtime": "6.11.6",
     "classnames": "2.2.5",
     "cssmin": "0.4.3",
+    "debug": "2.6.9",
     "font-awesome": "4.6.3",
     "immutable": "3.8.1",
     "jquery": "3.1.0",
