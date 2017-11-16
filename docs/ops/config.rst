@@ -309,6 +309,23 @@ in other Django projects.
 
    The name of the S3 bucket to be used to store media files.
 
+.. envvar:: DJANGO_EXPERIMENTER_HOST
+
+    :default: None
+
+    The hostname (with protocol but not trailing slash) of the Experimenter_
+    deployment that a deployment of Normandy will communicate with to
+    receive experiment definitions.
+
+    Examples:
+
+    Prod: https://experimenter.services.mozilla.com
+    Stage: https://experimenter.stage.mozaws.net
+    Dev: https://experimenter.dev.mozaws.net
+    Local dev: https://localhost:<local experimenter port>
+
+    .. _Experimenter: https://github.com/mozilla/experimenter
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the

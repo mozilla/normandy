@@ -16,3 +16,11 @@ export function getLogoutUrl(state, defaultsTo = null) {
 export function getGithubUrl(state, defaultsTo = null) {
   return state.app.serviceInfo.get('github_url', defaultsTo);
 }
+
+export function isExperimenterConfigured(state) {
+  return !(state.app.serviceInfo.get('experimenter_api_url', null) === null);
+}
+
+export function getExperimenterAPIUrl(state, defaultsTo = null) {
+  return state.app.serviceInfo.get('experimenter_api_url', defaultsTo);
+}

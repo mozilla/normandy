@@ -24,6 +24,7 @@ class ServiceInfoSerializer(serializers.Serializer):
     github_url = serializers.CharField()
     logout_url = serializers.CharField()
     peer_approval_enforced = serializers.BooleanField()
+    experimenter_api_url = serializers.CharField()
     user = UserSerializer()
 
     class Meta:
@@ -31,5 +32,6 @@ class ServiceInfoSerializer(serializers.Serializer):
             'github_url',
             'logout_url',
             'peer_approval_enforced',
+            'experimenter_api_url',
             'user',
         ]

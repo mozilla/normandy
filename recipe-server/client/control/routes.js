@@ -15,6 +15,7 @@ import Gateway from 'control/components/pages/Gateway';
 import RecipeListing from 'control/components/recipes/RecipeListing';
 import MissingPage from 'control/components/pages/MissingPage';
 import RecipeDetailPage from 'control/components/recipes/RecipeDetailPage';
+import ImportExperimentsPage from 'control/components/recipes/ImportExperimentsPage';
 
 import { searchRouteTree, replaceUrlVariables } from './routerUtils';
 
@@ -44,6 +45,12 @@ const routes = {
           component: CreateRecipePage,
           crumb: 'New Recipe',
           slug: 'recipe-new',
+        },
+      },
+      '/import': {
+        '/': {
+          component: ImportExperimentsPage,
+          crumb: 'ImportExperiments',
         },
       },
       '/:recipeId': {

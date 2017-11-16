@@ -115,4 +115,14 @@ export class Factory {
     const product = new this(...args);
     return product.data;
   }
+
+  static buildMany(n, ...args) {
+    const products = [];
+
+    for (let i = 0; i < n; i++) {
+      products.push(this.build(...args));
+    }
+
+    return products;
+  }
 }
