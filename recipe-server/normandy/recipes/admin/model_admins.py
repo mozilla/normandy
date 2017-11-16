@@ -3,7 +3,6 @@ from django.contrib import admin
 from normandy.recipes import models
 
 
-
 @admin.register(models.Action)
 class ActionAdmin(admin.ModelAdmin):
     list_display = ['name', 'implementation_hash']
