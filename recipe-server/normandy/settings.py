@@ -20,7 +20,6 @@ class Core(Configuration):
         'rest_framework',
         'rest_framework.authtoken',
         'rest_framework_swagger',
-        'reversion',
         'storages',
         'raven.contrib.django.raven_compat',
         'webpack_loader',
