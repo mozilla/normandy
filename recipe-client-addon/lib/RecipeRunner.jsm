@@ -62,7 +62,7 @@ const PREFS_TO_WATCH = [
 this.RecipeRunner = {
   async init() {
     this.enabled = null;
-    this.checkPrefs();  // sets this.enabled
+    this.checkPrefs(); // sets this.enabled
     this.watchPrefs();
 
     // Run if enabled immediately on first run, or if dev mode is enabled.

@@ -67,7 +67,7 @@ this.EXPORTED_SYMBOLS = ["PreferenceExperiments"];
 const EXPERIMENT_FILE = "shield-preference-experiments.json";
 const STARTUP_EXPERIMENT_PREFS_BRANCH = "extensions.shield-recipe-client.startupExperimentPrefs.";
 
-const MAX_EXPERIMENT_TYPE_LENGTH = 20;  // enforced by TelemetryEnvironment
+const MAX_EXPERIMENT_TYPE_LENGTH = 20; // enforced by TelemetryEnvironment
 const EXPERIMENT_TYPE_PREFIX = "normandy-";
 const MAX_EXPERIMENT_SUBTYPE_LENGTH = MAX_EXPERIMENT_TYPE_LENGTH - EXPERIMENT_TYPE_PREFIX.length;
 
