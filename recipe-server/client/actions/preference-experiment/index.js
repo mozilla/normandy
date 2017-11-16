@@ -19,7 +19,12 @@ export function resetAction() {
 export default class PreferenceExperimentAction extends Action {
   async execute() {
     const {
-      slug, preferenceName, preferenceBranchType, branches, preferenceType,
+      branches,
+      isHighPopulation,
+      preferenceBranchType,
+      preferenceName,
+      preferenceType,
+      slug,
     } = this.recipe.arguments;
     const experiments = this.normandy.preferenceExperiments;
 
@@ -54,6 +59,7 @@ export default class PreferenceExperimentAction extends Action {
 
       // Otherwise, enroll!
       const branch = await this.chooseBranch(branches);
+      const experimentType = isHighPopulation ? 'exp-highpop' : 'exp';
       await experiments.start({
         name: slug,
         branch: branch.slug,
@@ -61,6 +67,7 @@ export default class PreferenceExperimentAction extends Action {
         preferenceValue: branch.value,
         preferenceBranchType,
         preferenceType,
+        experimentType,
       });
     } else {
       // If the experiment exists, and isn't expired, bump the lastSeen date.

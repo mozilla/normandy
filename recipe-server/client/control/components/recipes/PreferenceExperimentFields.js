@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-boolean-value */
-import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
+import { Row, Col, Alert, Button, Checkbox, Icon, Input, InputNumber, Radio, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -48,6 +48,14 @@ export default class PreferenceExperimentFields extends React.Component {
             initialValue={recipeArguments.get('experimentDocumentUrl', '')}
           >
             <DocumentUrlInput disabled={disabled} />
+          </FormItem>
+
+          <FormItem
+            label="High volume recipe?"
+            name="arguments.isHighVolume"
+            initialValue={recipeArguments.get('isHighVolume')}
+          >
+            <Checkbox />
           </FormItem>
         </Col>
 

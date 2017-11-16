@@ -18,6 +18,7 @@ function argumentsFactory(args) {
     branches: [
       { slug: 'test', value: 'foo', ratio: 1 },
     ],
+    isHighPopulation: false,
     ...args,
   };
 }
@@ -184,6 +185,7 @@ describe('PreferenceExperimentAction', () => {
           preferenceValue: 'branch1',
           preferenceBranchType: 'user',
           preferenceType: 'string',
+          experimentType: 'exp',
         });
     });
 
@@ -249,6 +251,30 @@ describe('PreferenceExperimentAction', () => {
 
       expect(normandy.preferenceExperiments.start).not.toHaveBeenCalled();
       expect(normandy.log).toHaveBeenCalledWith(jasmine.any(String), 'warn');
+    });
+
+    it('should set the experiment type to "exp" when isHighPopulation is false', async () => {
+      spyOn(normandy.preferenceExperiments, 'start').and.callThrough();
+      const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+        isHighPopulation: false,
+      }));
+
+      await action.execute();
+
+      expect(normandy.preferenceExperiments.start).toHaveBeenCalled();
+      expect(normandy.preferenceExperiments.start.calls.argsFor(0)[0].experimentType).toEqual('exp');
+    });
+
+    it('should set the experiment type to "exp-highpop" when isHighPopulation is true', async () => {
+      spyOn(normandy.preferenceExperiments, 'start').and.callThrough();
+      const action = new PreferenceExperimentAction(normandy, preferenceExperimentFactory({
+        isHighPopulation: true,
+      }));
+
+      await action.execute();
+
+      expect(normandy.preferenceExperiments.start).toHaveBeenCalled();
+      expect(normandy.preferenceExperiments.start.calls.argsFor(0)[0].experimentType).toEqual('exp-highpop');
     });
   });
 
