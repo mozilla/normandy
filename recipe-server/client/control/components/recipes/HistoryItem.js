@@ -245,7 +245,7 @@ export class ApprovalComment extends React.PureComponent {
           message={
             <span>
               “{revision.getIn(['approval_request', 'comment'])}”
-              <label>— {approver || 'amikulski@mozilla.com'}</label>
+              <label>— {approver}</label>
             </span>
           }
         />
