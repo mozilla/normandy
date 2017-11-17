@@ -130,11 +130,22 @@ dl.details {
 }
 
 .details-action-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+  justify-content: end;
   margin-bottom: 16px;
 
   button {
     float: right;
+    margin-bottom: 8px;
     margin-left: 8px;
+  }
+}
+
+.list-action-bar {
+  .ant-input-search .ant-input {
+    height: 32px;
   }
 }
 

@@ -1,5 +1,5 @@
 .timeline-popover {
-  font-weight: 400;
+  // font-weight: 400;
 
   label {
     display: block;
@@ -14,10 +14,10 @@
   }
 }
 
-.ant-timeline-item-head-yellow {
-  border-color: @yellow-6;
-  color: @yellow-6;
-}
+// .ant-timeline-item-head-yellow {
+//   border-color: @yellow-6;
+//   color: @yellow-6;
+// }
 
 .ant-timeline-item-head.ant-timeline-item-head-grey {
   height: 8px;
@@ -40,15 +40,22 @@
   display: 'flex';
   flex-direction: 'column';
   justify-content: 'center';
+  letter-spacing: 0;
+
+  b {
+    letter-spacing: 0.05em;
+  }
 
   hr {
     background: #CCC;
     border: none;
     height: 1px;
     margin: 1em 0;
+    opacity: 0.3;
   }
 }
 
 .request-comment {
+  margin-top: 1em;
   padding-right: 1.5em;
 }

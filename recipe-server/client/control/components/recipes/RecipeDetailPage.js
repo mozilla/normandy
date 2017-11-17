@@ -53,7 +53,11 @@ export default class RecipeDetailPage extends React.PureComponent {
             <RevisionNotice revision={revision} />
             <Row type="flex" align="middle">
               <Col span={4}>
-                <ShieldIdenticon className="detail-icon" seed={revision.get('identicon_seed')} />
+                <ShieldIdenticon
+                  className="detail-icon"
+                  seed={revision.get('identicon_seed')}
+                  size={72}
+                />
               </Col>
               <Col span={20}>
                 <DetailsActionBar />
@@ -64,7 +68,7 @@ export default class RecipeDetailPage extends React.PureComponent {
             </LoadingOverlay>
           </Col>
           <Col span={8} className="recipe-history">
-            <Card className="noHovering" title="History">
+            <Card noHovering title="History">
               <HistoryTimeline
                 history={history}
                 recipeId={recipeId}

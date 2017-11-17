@@ -1,4 +1,4 @@
-import { Layout, LocaleProvider } from 'antd';
+import { Icon, Layout, LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -41,12 +41,15 @@ export default class App extends React.PureComponent {
           <Header>
             <CurrentUserDetails />
             <div className="logo">
-              <Link href="/">SHIELD Control Panel</Link>
+              <Link href="/">
+                <Icon type="shield" /> SHIELD Control Panel
+              </Link>
             </div>
           </Header>
 
           <Layout>
             <Sider
+              trigger={<Icon type="menu" />}
               className="sidebar"
               breakpoint="sm"
               collapsedWidth="0"
