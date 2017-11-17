@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import DocumentUrlInput from 'control/components/forms/DocumentUrlInput';
-import SwitchBox from 'control/components/forms/SwitchBox';
+import CheckBox from 'control/components/forms/CheckBox';
 import FormItem from 'control/components/forms/FormItem';
 import { connectFormProps } from 'control/utils/forms';
 
@@ -91,11 +91,12 @@ export default class ShowHeartbeatFields extends React.Component {
           </FormItem>
           <FormItem
             name="arguments.includeTelemetryUUID"
+            label="Include Telemetry UUID?"
             initialValue={recipeArguments.get('includeTelemetryUUID', false)}
           >
-            <SwitchBox disabled={disabled}>
+            <CheckBox disabled={disabled}>
               Include UUID in Post-Answer URL and Telemetry
-            </SwitchBox>
+            </CheckBox>
           </FormItem>
         </Col>
         <Col sm={24}>

@@ -1,58 +1,35 @@
-// eslint flags our `onClick` as an accessibility issue, but the Switch already
-// handles user focus etc.
-/* eslint-disable jsx-a11y/interactive-supports-focus */
-
 import { Switch } from 'antd';
 import autobind from 'autobind-decorator';
-import PropTypes from 'prop-types';
-import React from 'react';
+
+import LabeledInput from './LabeledInput';
 
 @autobind
-export default class SwitchBox extends React.PureComponent {
-  static propTypes = {
-    children: PropTypes.node,
-    onChange: PropTypes.func.isRequired,
-    value: PropTypes.any,
-  };
-
-  static defaultProps = {
-    children: null,
-    value: null,
-  };
-
-  handleClick() {
+export default class SwitchBox extends LabeledInput {
+  handleLabelClick() {
     const newValue = !this.props.value;
 
     this.props.onChange(newValue);
   }
 
-  render() {
-    const {
-      value,
-      children,
-      ...rest
-    } = this.props;
+  getElement() {
+    return Switch;
+  }
 
+  getElementProps() {
+    const { value } = this.props;
 
-    return (
-      <label className="switchbox">
-        <Switch
-          {...rest}
-          checked={value}
-        />
+    return {
+      checked: value,
+    };
+  }
 
-        {
-          children &&
-            <span
-              className="label"
-              onClick={this.handleClick}
-              role="checkbox"
-              aria-checked={value}
-            >
-              { children }
-            </span>
-        }
-      </label>
-    );
+  getLabelProps() {
+    const { value } = this.props;
+
+    return {
+      role: 'checkbox',
+      'aria-checked': value,
+    };
   }
 }
+
