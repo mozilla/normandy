@@ -12,7 +12,7 @@ install and build the latest dependencies:
 .. code-block:: bash
 
    cd recipe-client-addon
-   npm install
+   yarn install
    npm run build
 
 This will create a ``vendor`` directory containing a ``.js`` for each
@@ -32,7 +32,7 @@ To add a dependency:
 
    .. code-block:: bash
 
-      npm install --save ajv@5.2.2
+      yarn add --save ajv@5.2.2
 
    Version numbers in ``package.json`` must be set to an exact match to avoid
    bugs from downloading newer versions of libraries that we haven't tested
@@ -149,7 +149,7 @@ installed within to get the eslint plugins we rely on:
 .. code-block:: bash
 
    cd recipe-client-addon
-   npm install
+   yarn install
    ./node_modules/.bin/eslint .
 
 .. _eslint: http://eslint.org/

@@ -35,7 +35,7 @@ steps, as they don't affect your setup if nothing has changed:
 
    # Install new dependencies or update existing ones.
    pip install -r requirements/default.txt -c requirements/constraints.txt
-   npm install
+   yarn install
 
    # Run database migrations.
    python manage.py migrate

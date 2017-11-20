@@ -67,7 +67,7 @@ Installation
 
    .. code-block:: bash
 
-      npm install
+      yarn install
       npm run build
 
 6. Create a Postgres database for Normandy. By default it is assumed to be named
