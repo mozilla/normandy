@@ -15,11 +15,13 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     echo 'deb https://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install yarn
 
-COPY . /app
+COPY ./requirements /app/requirements
+COPY ./package.json /app/package.json
 RUN pip install -U 'pip>=8' && \
     pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
     yarn
 
+COPY . /app
 RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media && \
