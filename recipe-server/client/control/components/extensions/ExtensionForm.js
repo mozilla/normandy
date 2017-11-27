@@ -143,7 +143,9 @@ export default class ExtensionForm extends React.PureComponent {
         </FormItem>
         <FormActions>
           <FormActions.Primary>
-            <Button type="primary" htmlType="submit" id="ef-save">Save</Button>
+            <Button type="primary" htmlType="submit" id="ef-save">
+              {`${extension.get('name') ? 'Update' : 'Save'} Extension`}
+            </Button>
           </FormActions.Primary>
         </FormActions>
       </Form>

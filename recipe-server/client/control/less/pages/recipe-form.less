@@ -15,6 +15,14 @@
   // Force form fields in the branch listing to be displayed inline.
   .ant-form-inline();
 
+  .ant-form-item {
+    margin-left: 0.5em;
+
+    &:first-child {
+      margin: 0;
+    }
+  }
+
   .branch {
     background: @layout-body-background;
     border-radius: @border-radius-base;
@@ -34,6 +42,32 @@
 
     .delete-btn {
       flex: 0;
+    }
+
+    .ant-radio-button-wrapper {
+      font-size: inherit;
+    }
+
+    .ant-radio-button-wrapper-checked.pref-false {
+      background: @red-60;
+      box-shadow: none;
+
+      &:hover,
+      &:focus,
+      &:active {
+        color: #FFF;
+      }
+    }
+
+    .ant-radio-button-wrapper-checked.pref-true {
+      background: @green-60;
+      box-shadow: none;
+
+      &:hover,
+      &:focus,
+      &:active {
+        color: #FFF;
+      }
     }
 
     @media (max-width: @screen-xs) {
@@ -66,9 +100,10 @@
 fieldset {
   border: none;
 
-  legend {
-    color: #222;
-    font-weight: bold;
+  legend:extend(h3) {
+    border: none;
+    font-weight: 300;
+    margin-top: 1em;
   }
 }
 

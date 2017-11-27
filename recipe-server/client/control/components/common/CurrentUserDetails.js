@@ -30,7 +30,7 @@ export default class CurrentUserDetails extends React.PureComponent {
         <span className="email">{user.get('email')}</span>
 
         <a href={logoutUrl}>
-          <Button type="danger" icon="power-button" size="small" >
+          <Button type="danger" icon="power-button" size="small" ghost>
             Log out
           </Button>
         </a>
