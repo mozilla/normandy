@@ -68,7 +68,7 @@ export default class CloneRecipePage extends AbstractFormPage {
     };
   }
 
-  getTitle() {
+  getHeader() {
     const {
       isLatestRevision,
       recipe,
@@ -96,16 +96,16 @@ export default class CloneRecipePage extends AbstractFormPage {
     );
   }
 
-  async performAction(values) {
+  async processForm(values) {
     return this.props.createRecipe(values);
   }
 
-  onSuccess(newId) {
+  onProcessSuccess(newId) {
     message.success('Recipe saved');
     this.props.push(`/recipe/${newId}/`);
   }
 
-  onFailure(err) {
+  onProcessFailure(err) {
     handleError('Recipe cannot be cloned.', err);
   }
 

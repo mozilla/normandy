@@ -64,15 +64,15 @@ export default class EditRecipePage extends AbstractFormPage {
     }
   }
 
-  onSuccess() {
+  onProcessSuccess() {
     message.success('Recipe updated!');
   }
 
-  onFailure(error) {
+  onProcessFailure(error) {
     handleError('Recipe cannot be updated.', error);
   }
 
-  getTitle() {
+  getHeader() {
     return <h2>Edit Recipe</h2>;
   }
 
@@ -84,7 +84,7 @@ export default class EditRecipePage extends AbstractFormPage {
     return { recipe: this.props.recipe };
   }
 
-  async performAction(formValues) {
+  async processForm(formValues) {
     const { recipeId } = this.props;
     return this.props.updateRecipe(recipeId, formValues);
   }

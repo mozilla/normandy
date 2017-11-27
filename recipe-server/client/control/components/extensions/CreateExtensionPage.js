@@ -27,7 +27,7 @@ export default class CreateExtensionPage extends AbstractFormPage {
     push: PropTypes.func.isRequired,
   }
 
-  getTitle() {
+  getHeader() {
     return <h2>Add New Extension</h2>;
   }
 
@@ -35,18 +35,18 @@ export default class CreateExtensionPage extends AbstractFormPage {
     return ExtensionForm;
   }
 
-  async performAction(values) {
+  async processForm(values) {
     const { createExtension } = this.props;
     return createExtension(values);
   }
 
-  onSuccess(extensionId) {
+  onProcessSuccess(extensionId) {
     const { push } = this.props;
     message.success('Extension saved');
     push(`/extension/${extensionId}/`);
   }
 
-  onFailure(err) {
+  onProcessFailure(err) {
     handleError('Extension cannot be saved.', err);
   }
 }

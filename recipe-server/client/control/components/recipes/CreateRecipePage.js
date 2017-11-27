@@ -26,16 +26,16 @@ export default class CreateRecipePage extends AbstractFormPage {
     push: PropTypes.func.isRequired,
   };
 
-  onFailure(err) {
+  onProcessFailure(err) {
     handleError('Recipe cannot be created.', err);
   }
 
-  onSuccess(newId) {
+  onProcessSuccess(newId) {
     message.success('Recipe created');
     this.props.push(`/recipe/${newId}/`);
   }
 
-  async performAction(formValues) {
+  async processForm(formValues) {
     return this.props.createRecipe(formValues);
   }
 
@@ -47,7 +47,7 @@ export default class CreateRecipePage extends AbstractFormPage {
     return { isCreationForm: true };
   }
 
-  getTitle() {
+  getHeader() {
     return <h2>Create New Recipe</h2>;
   }
 }

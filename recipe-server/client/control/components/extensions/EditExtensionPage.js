@@ -57,7 +57,7 @@ export default class EditExtensionPage extends AbstractFormPage {
     }
   }
 
-  getTitle() {
+  getHeader() {
     return <h2>Edit Extension</h2>;
   }
 
@@ -70,16 +70,16 @@ export default class EditExtensionPage extends AbstractFormPage {
     return ExtensionForm;
   }
 
-  async performAction(values) {
+  async processForm(values) {
     const { updateExtension, extensionId } = this.props;
     return updateExtension(extensionId, values);
   }
 
-  onSuccess() {
+  onProcessSuccess() {
     message.success('Extension updated!');
   }
 
-  onFailure(err) {
+  onProcessFailure(err) {
     handleError('Extension cannot be updated.', err);
   }
 
