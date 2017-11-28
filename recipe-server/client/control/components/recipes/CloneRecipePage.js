@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, push as pushAction } from 'redux-little-router';
 
-import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
+import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
@@ -41,8 +41,9 @@ import { getLatestRevisionIdForRecipe } from 'control/state/app/recipes/selector
   },
 )
 @autobind
-export default class CloneRecipePage extends AbstractFormPage {
+export default class CloneRecipePage extends React.PureComponent {
   static propTypes = {
+    push: PropTypes.func.isRequired,
     createRecipe: PropTypes.func.isRequired,
     isLatestRevision: PropTypes.bool.isRequired,
     recipeId: PropTypes.number.isRequired,
@@ -50,8 +51,13 @@ export default class CloneRecipePage extends AbstractFormPage {
     revisionId: PropTypes.string.isRequired,
   };
 
-  getFormComponent() {
-    return RecipeForm;
+  onFormSuccess(newId) {
+    message.success('Recipe saved');
+    this.props.push(`/recipe/${newId}/`);
+  }
+
+  onFormFailure(err) {
+    handleError('Recipe cannot be cloned.', err);
   }
 
   getFormProps() {
@@ -68,7 +74,11 @@ export default class CloneRecipePage extends AbstractFormPage {
     };
   }
 
-  getHeader() {
+  async formAction(values) {
+    return this.props.createRecipe(values);
+  }
+
+  renderHeader() {
     const {
       isLatestRevision,
       recipe,
@@ -96,19 +106,6 @@ export default class CloneRecipePage extends AbstractFormPage {
     );
   }
 
-  async processForm(values) {
-    return this.props.createRecipe(values);
-  }
-
-  onProcessSuccess(newId) {
-    message.success('Recipe saved');
-    this.props.push(`/recipe/${newId}/`);
-  }
-
-  onProcessFailure(err) {
-    handleError('Recipe cannot be cloned.', err);
-  }
-
   render() {
     const { recipeId, revisionId } = this.props;
 
@@ -116,9 +113,17 @@ export default class CloneRecipePage extends AbstractFormPage {
       <div className="clone-page">
         <QueryRecipe pk={recipeId} />
         <QueryRevision pk={revisionId} />
+        { this.renderHeader() }
 
         <LoadingOverlay requestIds={[`fetch-recipe-${recipeId}`, `fetch-revision-${revisionId}`]}>
-          { super.render.call(this) }
+          <GenericFormContainer
+            form={RecipeForm}
+            formAction={this.formAction}
+            onSuccess={this.onFormSuccess}
+            onFailure={this.onFormFailure}
+            formProps={this.getFormProps()}
+            key={revisionId}
+          />
         </LoadingOverlay>
       </div>
     );

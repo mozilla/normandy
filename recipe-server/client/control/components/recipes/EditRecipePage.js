@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import handleError from 'control/utils/handleError';
-import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
+import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
@@ -35,7 +35,7 @@ import { getUrlParamAsInt } from 'control/state/router/selectors';
   },
 )
 @autobind
-export default class EditRecipePage extends AbstractFormPage {
+export default class EditRecipePage extends React.PureComponent {
   static propTypes = {
     addSessionView: PropTypes.func.isRequired,
     updateRecipe: PropTypes.func.isRequired,
@@ -64,39 +64,34 @@ export default class EditRecipePage extends AbstractFormPage {
     }
   }
 
-  onProcessSuccess() {
+  onFormSuccess() {
     message.success('Recipe updated!');
   }
 
-  onProcessFailure(error) {
+  onFormFailure(error) {
     handleError('Recipe cannot be updated.', error);
   }
 
-  getHeader() {
-    return <h2>Edit Recipe</h2>;
-  }
-
-  getFormComponent() {
-    return RecipeForm;
-  }
-
-  getFormProps() {
-    return { recipe: this.props.recipe };
-  }
-
-  async processForm(formValues) {
+  async formAction(formValues) {
     const { recipeId } = this.props;
     return this.props.updateRecipe(recipeId, formValues);
   }
 
   render() {
-    const { recipeId } = this.props;
+    const { recipeId, recipe } = this.props;
 
     return (
       <div className="edit-page">
         <QueryRecipe pk={recipeId} />
         <LoadingOverlay requestIds={`fetch-recipe-${recipeId}`}>
-          { super.render.call(this) }
+          <h2>Edit Recipe</h2>
+          <GenericFormContainer
+            form={RecipeForm}
+            formAction={this.formAction}
+            onSuccess={this.onFormSuccess}
+            onFailure={this.onFormFailure}
+            formProps={{ recipe }}
+          />
         </LoadingOverlay>
       </div>
     );

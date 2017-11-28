@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import AbstractFormPage from 'control/components/recipes/AbstractFormPage';
+import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryExtension from 'control/components/data/QueryExtension';
@@ -32,7 +32,7 @@ import { addSessionView as addSessionViewAction } from 'control/state/app/sessio
   },
 )
 @autobind
-export default class EditExtensionPage extends AbstractFormPage {
+export default class EditExtensionPage extends React.PureComponent {
   static propTypes = {
     extension: PropTypes.instanceOf(Map).isRequired,
     extensionId: PropTypes.number.isRequired,
@@ -57,39 +57,34 @@ export default class EditExtensionPage extends AbstractFormPage {
     }
   }
 
-  getHeader() {
-    return <h2>Edit Extension</h2>;
+  onFormSuccess() {
+    message.success('Extension updated!');
   }
 
-  getFormProps() {
-    const { extension } = this.props;
-    return { extension };
+  onFormFailure(err) {
+    handleError('Extension cannot be updated.', err);
   }
 
-  getFormComponent() {
-    return ExtensionForm;
-  }
-
-  async processForm(values) {
+  async formAction(values) {
     const { updateExtension, extensionId } = this.props;
     return updateExtension(extensionId, values);
   }
 
-  onProcessSuccess() {
-    message.success('Extension updated!');
-  }
-
-  onProcessFailure(err) {
-    handleError('Extension cannot be updated.', err);
-  }
-
   render() {
-    const { extensionId } = this.props;
+    const { extensionId, extension } = this.props;
     return (
       <div>
         <QueryExtension pk={extensionId} />
+        <h2>Edit Extension</h2>
+
         <LoadingOverlay requestIds={`fetch-extension-${extensionId}`}>
-          { super.render.call(this) }
+          <GenericFormContainer
+            form={ExtensionForm}
+            formAction={this.formAction}
+            onSuccess={this.onFormSuccess}
+            onFailure={this.onFormFailure}
+            formProps={{ extension }}
+          />
         </LoadingOverlay>
       </div>
     );
