@@ -1,3 +1,5 @@
+import { replaceUrlVariables } from 'control/routerUtils';
+
 export function getUrlParam(state, name, defaultsTo) {
   return state.router.params[name] || defaultsTo;
 }
@@ -26,4 +28,26 @@ export function getCurrentURL(state, queryParams) {
 
 export function getRouterPath(state) {
   return state.router.pathname;
+}
+
+export function getBreadcrumbs(state) {
+  const { result, pathname, params } = state.router;
+  const crumbs = [];
+  let currentRoute = result;
+
+  while (currentRoute) {
+    if (currentRoute.crumb) {
+      let link = replaceUrlVariables(currentRoute.route || pathname, params);
+      if (!link.endsWith('/')) {
+        link += '/';
+      }
+      crumbs.push({
+        name: currentRoute.crumb,
+        link,
+      });
+    }
+    currentRoute = currentRoute.parent;
+  }
+
+  return crumbs.reverse();
 }

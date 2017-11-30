@@ -7,7 +7,7 @@ const { WrappedComponent: NavigationCrumbs } = TestComponent;
 
 describe('<NavigationCrumbs>', () => {
   const props = {
-    router: {},
+    breadcrumbs: [],
   };
 
   it('should work', () => {
