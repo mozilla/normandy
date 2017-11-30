@@ -96,7 +96,7 @@ describe('route selectors', () => {
     it('works', () => {
       // using route /recipe/:recipeId/
       store.dispatch(push('/recipe/42/?old=foo'));
-      const val = getCurrentURL(store.getState(), {new: 'bar'});
+      const val = getCurrentURL(store.getState(), { new: 'bar' });
       expect(val).toEqual({
         pathname: '/recipe/42/',
         query: {
