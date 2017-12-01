@@ -22,6 +22,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "ShieldPreferences",
   "resource://shield-recipe-client/lib/ShieldPreferences.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "AddonStudies",
   "resource://shield-recipe-client/lib/AddonStudies.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "TelemetryEvents",
+  "resource://shield-recipe-client/lib/TelemetryEvents.jsm");
 
 this.EXPORTED_SYMBOLS = ["ShieldRecipeClient"];
 
@@ -80,6 +82,12 @@ this.ShieldRecipeClient = {
       ShieldPreferences.init();
     } catch (err) {
       log.error("Failed to initialize preferences UI:", err);
+    }
+
+    try {
+      TelemetryEvents.init();
+    } catch (err) {
+      log.error("Failed to initialize telemetry events:", err);
     }
 
     await RecipeRunner.init();
