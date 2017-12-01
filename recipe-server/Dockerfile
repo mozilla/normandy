@@ -20,7 +20,7 @@ COPY ./package.json /app/package.json
 COPY ./yarn.lock /app/yarn.lock
 RUN pip install -U 'pip>=8' && \
     pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
-    yarn
+    yarn install --frozen-lockfile
 
 COPY . /app
 RUN NODE_ENV=production yarn build && \
