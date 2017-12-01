@@ -33,84 +33,106 @@ const routes = {
     component: Gateway,
     crumb: 'Home',
     slug: 'home',
+
     '/recipe': {
+      crumb: 'Recipes Listing',
+
       '/': {
         component: RecipeListing,
-        crumb: 'Recipes Listing',
         slug: 'recipe-listing',
       },
+
       '/new': {
+        crumb: 'New Recipe',
+
         '/': {
           component: CreateRecipePage,
-          crumb: 'New Recipe',
           slug: 'recipe-new',
         },
       },
+
       '/:recipeId': {
+        crumb: 'View Recipe',
+
         '/': {
           component: RecipeDetailPage,
-          crumb: 'View Recipe',
           slug: 'recipe-view',
         },
+
         '/rev/:revisionId': {
+          crumb: 'Revision',
+
           '/': {
             component: RecipeDetailPage,
-            crumb: 'Revision',
             sessionSlug: 'recipe-view',
             slug: 'recipe-revision',
           },
+
           '/clone': {
+            crumb: 'Clone Revision',
+
             '/': {
               component: CloneRecipePage,
-              crumb: 'Clone Revision',
               sessionSlug: 'recipe-view',
               slug: 'recipe-revision-clone',
             },
           },
         },
+
         '/edit': {
+          crumb: 'Edit Recipe',
+
           '/': {
             component: EditRecipePage,
-            crumb: 'Edit Recipe',
             sessionSlug: 'recipe-view',
             slug: 'recipe-edit',
           },
         },
+
         '/approval_history': {
+          crumb: 'Approval History',
+
           '/': {
             component: ApprovalHistoryPage,
-            crumb: 'Approval History',
             sessionSlug: 'recipe-view',
             slug: 'recipe-approval-history',
           },
         },
+
         '/clone': {
+          crumb: 'Clone Recipe',
+
           '/': {
             component: CloneRecipePage,
-            crumb: 'Clone Recipe',
             sessionSlug: 'recipe-view',
             slug: 'recipe-clone',
           },
         },
       },
     },
+
     '/extension': {
+      crumb: 'Extensions Listing',
+
       '/': {
         component: ExtensionListing,
-        crumb: 'Extensions Listing',
         slug: 'extension-listing',
       },
+
       '/new': {
+        crumb: 'New Extension',
+
         '/': {
           component: CreateExtensionPage,
-          crumb: 'New Extension',
           slug: 'extension-new',
         },
       },
+
       '/:extensionId': {
+        crumb: 'Edit Extension',
+
         '/': {
           component: EditExtensionPage,
-          crumb: 'Edit Extension',
           slug: 'extension-edit',
         },
       },
