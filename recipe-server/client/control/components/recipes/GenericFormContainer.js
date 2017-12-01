@@ -36,20 +36,16 @@ export default class GenericFormContainer extends React.PureComponent {
   async handleSubmit(formValues) {
     try {
       const actionValues = await this.props.formAction(formValues);
-      this.props.onSuccess(actionValues);
+      await this.props.onSuccess(actionValues);
     } catch (error) {
       this.setState({
         formErrors: error.data || error,
       });
 
-      this.props.onFailure(error);
+      await this.props.onFailure(error);
     }
   }
 
-  /**
-   * Render does not need to be overridden in extended pages. If you choose to
-   * create a custom render function, be sure to call `super.render.call(this)`.
-   */
   render() {
     const FormElement = this.props.form;
 

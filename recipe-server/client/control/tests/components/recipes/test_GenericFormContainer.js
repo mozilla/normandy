@@ -65,24 +65,23 @@ describe('<GenericFormContainer>', () => {
     expect(failed).toBe(true);
   });
 
-  it('should handle the formAction succeeding', () => {
+  it('should handle the formAction succeeding', async () => {
     const CustomEl = ({ onSubmit }) => <div onClick={onSubmit}>Test</div>;
-    let success = false;
+
+    const success = new Promise(r => r(true));
+
     const wrapper = mount(
       <GenericFormContainer
         {...props}
         form={CustomEl}
         onSuccess={() => {
-          success = true;
+          success.resolve();
         }}
       />,
     );
 
     wrapper.find(CustomEl).simulate('click');
-    // formAction is async so we need to wait for that promise to resolve.
-    setTimeout(() => {
-      expect(success).toBe(true);
-    }, 1);
+    expect(await success).toBe(true);
   });
 
   it('should pass the formProps object to the form element', () => {
