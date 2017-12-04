@@ -1,0 +1,4 @@
+status = [
+  "ci/circleci",
+  "Taskcluster (push)",
+]

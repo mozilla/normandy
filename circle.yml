@@ -1,3 +1,10 @@
+general:
+  branches:
+    only:
+      - master
+      - staging
+      - trying
+
 machine:
   pre:
     # Install CircleCI's fork for Docker 1.10.0
