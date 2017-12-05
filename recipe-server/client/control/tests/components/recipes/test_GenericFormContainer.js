@@ -68,14 +68,15 @@ describe('<GenericFormContainer>', () => {
   it('should handle the formAction succeeding', async () => {
     const CustomEl = ({ onSubmit }) => <div onClick={onSubmit}>Test</div>;
 
-    const success = new Promise(r => r(true));
+    let resolve;
+    const success = new Promise(r => { resolve = r; });
 
     const wrapper = mount(
       <GenericFormContainer
         {...props}
         form={CustomEl}
         onSuccess={() => {
-          success.resolve();
+          resolve(true);
         }}
       />,
     );
