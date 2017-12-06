@@ -1,9 +1,7 @@
 general:
   branches:
-    only:
-      - master
-      - staging
-      - trying
+    ignore:
+      - staging.tmp
 
 machine:
   pre:
