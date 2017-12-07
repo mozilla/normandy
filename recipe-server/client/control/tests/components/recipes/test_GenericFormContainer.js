@@ -29,7 +29,7 @@ describe('<GenericFormContainer>', () => {
   });
 
   it('should fire the formAction on submission', () => {
-    const CustomEl = ({ onSubmit }) => <div onClick={onSubmit}>Test</div>;
+    const CustomEl = ({ onSubmit }) => <div id="test" onClick={onSubmit}>Test</div>;
     let fired = false;
     const wrapper = mount(
       <GenericFormContainer
@@ -41,12 +41,12 @@ describe('<GenericFormContainer>', () => {
       />,
     );
 
-    wrapper.find(CustomEl).simulate('click');
+    wrapper.find('#test').simulate('click');
     expect(fired).toBe(true);
   });
 
   it('should handle the formAction failing', () => {
-    const CustomEl = ({ onSubmit }) => <div onClick={onSubmit}>Test</div>;
+    const CustomEl = ({ onSubmit }) => <div id="test" onClick={onSubmit}>Test</div>;
     let failed = false;
     const wrapper = mount(
       <GenericFormContainer
@@ -61,12 +61,12 @@ describe('<GenericFormContainer>', () => {
       />,
     );
 
-    wrapper.find(CustomEl).simulate('click');
+    wrapper.find('#test').simulate('click');
     expect(failed).toBe(true);
   });
 
   it('should handle the formAction succeeding', async () => {
-    const CustomEl = ({ onSubmit }) => <div onClick={onSubmit}>Test</div>;
+    const CustomEl = ({ onSubmit }) => <div id="test" onClick={onSubmit}>Test</div>;
 
     let resolve;
     const success = new Promise(r => { resolve = r; });
@@ -81,7 +81,7 @@ describe('<GenericFormContainer>', () => {
       />,
     );
 
-    wrapper.find(CustomEl).simulate('click');
+    wrapper.find('#test').simulate('click');
     expect(await success).toBe(true);
   });
 
