@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import handleError from 'control/utils/handleError';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryExtension from 'control/components/data/QueryExtension';
@@ -39,10 +40,6 @@ export default class EditExtensionPage extends React.PureComponent {
     addSessionView: PropTypes.func.isRequired,
   }
 
-  state = {
-    formErrors: {},
-  };
-
   componentDidMount() {
     const extensionName = this.props.extension.get('name');
     if (extensionName) {
@@ -60,39 +57,33 @@ export default class EditExtensionPage extends React.PureComponent {
     }
   }
 
-  /**
-   * Update the existing extension and display a message.
-   */
-  async handleSubmit(values) {
-    const { extensionId, updateExtension } = this.props;
-    this.setState({ formErrors: undefined });
+  onFormSuccess() {
+    message.success('Extension updated!');
+  }
 
-    try {
-      await updateExtension(extensionId, values);
-      message.success('Extension saved!');
-    } catch (error) {
-      handleError('Extension cannot be updated.', error);
+  onFormFailure(err) {
+    handleError('Extension cannot be updated.', err);
+  }
 
-      if (error.data) {
-        this.setState({ formErrors: error.data || error });
-      }
-    }
+  async formAction(values) {
+    const { updateExtension, extensionId } = this.props;
+    return updateExtension(extensionId, values);
   }
 
   render() {
-    const { extension, extensionId } = this.props;
-    const { formErrors } = this.state;
+    const { extensionId, extension } = this.props;
     return (
       <div>
         <QueryExtension pk={extensionId} />
-
         <h2>Edit Extension</h2>
 
         <LoadingOverlay requestIds={`fetch-extension-${extensionId}`}>
-          <ExtensionForm
-            extension={extension}
-            onSubmit={this.handleSubmit}
-            errors={formErrors}
+          <GenericFormContainer
+            form={ExtensionForm}
+            formAction={this.formAction}
+            onSuccess={this.onFormSuccess}
+            onFailure={this.onFormFailure}
+            formProps={{ extension }}
           />
         </LoadingOverlay>
       </div>

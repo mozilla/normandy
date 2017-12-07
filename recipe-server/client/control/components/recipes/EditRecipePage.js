@@ -6,6 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import handleError from 'control/utils/handleError';
+import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
@@ -46,10 +47,6 @@ export default class EditRecipePage extends React.PureComponent {
     recipe: null,
   };
 
-  state = {
-    formErrors: undefined,
-  };
-
   componentDidMount() {
     const recipeName = this.props.recipe.get('name');
     if (recipeName) {
@@ -67,41 +64,33 @@ export default class EditRecipePage extends React.PureComponent {
     }
   }
 
-  /**
-   * Update the existing recipe and display a message.
-   */
-  async handleSubmit(values) {
+  onFormSuccess() {
+    message.success('Recipe updated!');
+  }
+
+  onFormFailure(error) {
+    handleError('Recipe cannot be updated.', error);
+  }
+
+  async formAction(formValues) {
     const { recipeId } = this.props;
-
-    this.setState({
-      formErrors: undefined,
-    });
-
-    try {
-      await this.props.updateRecipe(recipeId, values);
-      message.success('Recipe updated!');
-    } catch (error) {
-      handleError('Recipe cannot be updated.', error);
-
-      this.setState({
-        formErrors: error.data || error,
-      });
-    }
+    return this.props.updateRecipe(recipeId, formValues);
   }
 
   render() {
-    const { recipe, recipeId } = this.props;
+    const { recipeId, recipe } = this.props;
 
     return (
       <div className="edit-page">
         <QueryRecipe pk={recipeId} />
         <LoadingOverlay requestIds={`fetch-recipe-${recipeId}`}>
           <h2>Edit Recipe</h2>
-
-          <RecipeForm
-            recipe={recipe}
-            onSubmit={this.handleSubmit}
-            errors={this.state.formErrors}
+          <GenericFormContainer
+            form={RecipeForm}
+            formAction={this.formAction}
+            onSuccess={this.onFormSuccess}
+            onFailure={this.onFormFailure}
+            formProps={{ recipe }}
           />
         </LoadingOverlay>
       </div>

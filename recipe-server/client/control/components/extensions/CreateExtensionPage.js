@@ -5,6 +5,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { push as pushAction } from 'redux-little-router';
 
+import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import handleError from 'control/utils/handleError';
 import ExtensionForm from 'control/components/extensions/ExtensionForm';
 import {
@@ -26,34 +27,32 @@ export default class CreateExtensionPage extends React.PureComponent {
     push: PropTypes.func.isRequired,
   }
 
-  state = {
-    formErrors: {},
-  };
+  onFormSuccess(extensionId) {
+    const { push } = this.props;
+    message.success('Extension saved');
+    push(`/extension/${extensionId}/`);
+  }
 
-  /**
-   * Create a new extension, display a message, and redirect to the edit page
-   * for the new extension.
-   */
-  async handleSubmit(values) {
-    const { createExtension, push } = this.props;
+  onFormFailure(err) {
+    handleError('Extension cannot be saved.', err);
+  }
 
-    this.setState({ formErrors: undefined });
-
-    try {
-      const extensionId = await createExtension(values);
-      message.success('Extension saved');
-      push(`/extension/${extensionId}/`);
-    } catch (error) {
-      handleError('Extension cannot be saved.', error);
-
-      this.setState({ formErrors: error.data || error });
-    }
+  async formAction(values) {
+    const { createExtension } = this.props;
+    return createExtension(values);
   }
 
   render() {
-    const { formErrors } = this.state;
     return (
-      <ExtensionForm onSubmit={this.handleSubmit} errors={formErrors} />
+      <div>
+        <h2>Add New Extension</h2>
+        <GenericFormContainer
+          form={ExtensionForm}
+          formAction={this.formAction}
+          onSuccess={this.onFormSuccess}
+          onFailure={this.onFormFailure}
+        />
+      </div>
     );
   }
 }
