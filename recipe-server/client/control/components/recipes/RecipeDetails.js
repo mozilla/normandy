@@ -36,7 +36,7 @@ export default class RecipeDetails extends React.PureComponent {
 
     return (
       <div className="recipe-details">
-        <Card className="noHovering" key="recipe-details" title="Recipe">
+        <Card noHovering key="recipe-details" title="Recipe">
           <dl className="details">
             <dt>Name</dt>
             <ArgumentsValue name="name" value={recipe.get('name')} />
@@ -49,7 +49,7 @@ export default class RecipeDetails extends React.PureComponent {
           </dl>
         </Card>
 
-        <Card className="noHovering" key="action-details" title="Action">
+        <Card noHovering key="action-details" title="Action">
           <dl className="details">
             <dt>Name</dt>
             <ArgumentsValue name="name" value={recipe.getIn(['action', 'name'])} />

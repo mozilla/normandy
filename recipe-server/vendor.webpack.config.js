@@ -12,6 +12,7 @@ var settings = require('./package.json');
 var ignoredVendors = [
   'babel-runtime',
   'font-awesome',
+  'photon-ant',
 ];
 var isAllowedVendor = item => ignoredVendors.indexOf(item) === -1;
 var compiledVendorList = Object.keys(settings.dependencies).filter(isAllowedVendor);

@@ -140,7 +140,7 @@ export default class RecipeForm extends React.PureComponent {
               disabled={isLoading}
               id="rf-save-button"
             >
-              Save
+              {`${recipe.get('name') ? 'Update' : 'Save'} Recipe`}
             </Button>
           </FormActions.Primary>
         </FormActions>

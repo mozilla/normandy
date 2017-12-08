@@ -60,7 +60,7 @@ export default class HistoryItem extends React.PureComponent {
     },
     [REVISION_PENDING_APPROVAL]: {
       color: 'yellow',
-      iconType: 'clock-circle-o',
+      iconType: 'clock',
       label: 'Pending Approval',
     },
   };
@@ -240,12 +240,11 @@ export class ApprovalComment extends React.PureComponent {
         <hr />
         <Alert
           className="request-comment"
-          banner
           type={isApproved === true ? 'success' : 'error'}
           showIcon
           message={
             <span>
-              <strong>“{revision.getIn(['approval_request', 'comment'])}”</strong>
+              “{revision.getIn(['approval_request', 'comment'])}”
               <label>— {approver}</label>
             </span>
           }

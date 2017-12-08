@@ -1,3 +1,4 @@
+import { Card } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -65,9 +66,9 @@ export default class FormActions extends React.PureComponent {
     const { children } = this.props;
 
     return (
-      <div className="form-actions">
+      <Card noHovering className="form-actions">
         {children}
-      </div>
+      </Card>
     );
   }
 }

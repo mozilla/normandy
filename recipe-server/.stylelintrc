@@ -6,6 +6,9 @@
   "rules": {
     "color-hex-case": "upper",
     "max-empty-lines": 2,
+    "selector-pseudo-class-no-unknown": [true, {
+      "ignorePseudoClasses": ["extend"]
+    }],
     "order/declaration-block-order": [
       {
         "type": "at-rule",

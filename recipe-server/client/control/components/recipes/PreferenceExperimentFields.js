@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-boolean-value */
-import { Row, Col, Alert, Button, Checkbox, Icon, Input, InputNumber, Radio, Select } from 'antd';
+import { Row, Col, Alert, Button, Icon, Input, InputNumber, Modal, Radio, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -7,6 +7,7 @@ import React from 'react';
 
 import DocumentUrlInput from 'control/components/forms/DocumentUrlInput';
 import FormItem from 'control/components/forms/FormItem';
+import CheckBox from 'control/components/forms/CheckBox';
 import { connectFormProps } from 'control/utils/forms';
 
 
@@ -51,11 +52,12 @@ export default class PreferenceExperimentFields extends React.Component {
           </FormItem>
 
           <FormItem
-            label="High volume recipe?"
             name="arguments.isHighVolume"
             initialValue={recipeArguments.get('isHighVolume')}
           >
-            <Checkbox />
+            <CheckBox disabled={disabled}>
+              High volume recipe?
+            </CheckBox>
           </FormItem>
         </Col>
 
@@ -179,7 +181,13 @@ export class ExperimentBranches extends React.PureComponent {
 
   handleClickDelete(index) {
     const { branches, onChange } = this.props;
-    onChange(branches.delete(index));
+
+    Modal.confirm({
+      title: 'Are you sure you want to remove this branch?',
+      onOk() {
+        onChange(branches.delete(index));
+      },
+    });
   }
 
   handleClickAdd() {
@@ -266,7 +274,7 @@ export class BooleanPreferenceField extends React.PureComponent {
           <Icon type="check" /> True
         </Radio.Button>
         <Radio.Button value={false} className="pref-false">
-          <Icon type="close" /> False
+          <Icon type="close-bold" /> False
         </Radio.Button>
       </Radio.Group>
     );
@@ -374,8 +382,9 @@ export class ExperimentBranchFields extends React.PureComponent {
           type="danger"
           icon="close"
           onClick={this.handleClickDelete}
+          ghost
         >
-          Delete Branch
+          Delete
         </Button>
       </div>
     );

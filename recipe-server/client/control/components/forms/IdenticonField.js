@@ -86,13 +86,15 @@ export default class IdenticonField extends React.PureComponent {
       value,
     } = this.props;
 
+    const isPrevDisabled = this.props.disabled || this.state.index <= 0;
+
     return (
       <div className="identicon-field">
         <Button
           className="btn-prev"
           size="small"
-          type="primary"
-          disabled={this.props.disabled || this.state.index <= 0}
+          disabled={isPrevDisabled}
+          type={isPrevDisabled ? 'dashed' : 'primary'}
           onClick={this.handlePrev}
         >
           <Icon type="left" />

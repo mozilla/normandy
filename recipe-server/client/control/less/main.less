@@ -1,12 +1,10 @@
 // Imports
-@import '~antd/dist/antd.less';
+@import '~photon-ant';
 
-// Webfonts
-@import 'fonts';
+// Use locally-hosted Ant icon font
+@icon-url: '~control/fonts/iconfont';
 
-// Ant component and color overrides
-@import 'ant-override';
-@import 'ant-shades';
+@import './ant-override';
 
 // Pages
 @import 'pages/404';
@@ -74,62 +72,15 @@ body {
   color: #333;
   font-size: 22px;
   font-weight: 900;
-  padding-left: 48px;
   position: relative;
-  text-shadow: 1px 1px 0 fade(@white, 55%);
   white-space: nowrap;
 
-  &::before {
-    background: url('../img/logo.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    content: '';
-    display: block;
-    height: 32px;
-    left: 0;
-    margin-top: -16px;
-    position: absolute;
-    top: 50%;
-    width: 32px;
+  .anticon.anticon-shield {
+    position: relative;
+    top: 1px;
   }
 
   @media (max-width: @screen-xs) {
     font-size: 5.5vw;
-    padding-left: 38px;
-  }
-}
-
-.sidebar {
-  background: @white;
-
-  > .ant-layout-sider-children {
-    height: 100%;
-
-    > .ant-menu {
-      height: 100%;
-    }
-  }
-}
-
-.content-wrapper {
-  padding: 0 24px 24px;
-}
-
-.content {
-  background: @white;
-  height: 100%;
-  padding: 24px;
-}
-
-#main {
-  min-height: 100%;
-}
-
-fieldset {
-  border: none;
-
-  legend {
-    color: #222;
-    font-weight: bold;
   }
 }
