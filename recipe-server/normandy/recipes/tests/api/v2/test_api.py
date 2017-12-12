@@ -197,19 +197,47 @@ class TestRecipeAPI(object):
             name='foobarbaz',
             arguments_schema={
                 'type': 'object',
-                'properties': {'message': {'type': 'string'}},
-                'required': ['message']
+                'properties': {
+                    'message': {'type': 'string'},
+                    'checkbox': {'type': 'boolean'},
+                },
+                'required': ['message', 'checkbox']
             }
         )
 
-        arguments = {'message': 'test message'}
+        arguments = {
+            'message': 'test message',
+            'checkbox': False,
+        }
 
         res = api_client.patch('/api/v2/recipe/%s/' % recipe.id, {
-            'action_id': action.id, 'arguments': arguments})
-        assert res.status_code == 200
-
-        recipe = Recipe.objects.get(pk=recipe.id)
+            'action_id': action.id,
+            'arguments': arguments,
+        })
+        assert res.status_code == 200, res.json()
+        recipe.refresh_from_db()
         assert recipe.arguments == arguments
+
+        res = api_client.get('/api/v2/recipe/%s/' % recipe.id)
+        assert res.status_code == 200, res.json()
+        assert res.json()['arguments'] == arguments
+
+        arguments = {
+            'message': 'second message',
+            'checkbox': True,
+        }
+        res = api_client.patch('/api/v2/recipe/%s/' % recipe.id, {
+            'action_id': action.id,
+            'arguments': arguments,
+        })
+        assert res.status_code == 200, res.json()
+        recipe.refresh_from_db()
+        assert recipe.arguments == arguments
+
+        res = api_client.get('/api/v2/recipe/%s/' % recipe.id)
+        assert res.status_code == 200, res.json()
+        assert res.json()['arguments'] == arguments
+
 
     def test_it_can_delete_recipes(self, api_client):
         recipe = RecipeFactory()
