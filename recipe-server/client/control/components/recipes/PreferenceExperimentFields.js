@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-boolean-value */
-import { Row, Col, Alert, Button, Checkbox, Icon, Input, InputNumber, Radio, Select } from 'antd';
+import { Row, Col, Alert, Button, Icon, Input, InputNumber, Radio, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { List, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -7,6 +7,7 @@ import React from 'react';
 
 import DocumentUrlInput from 'control/components/forms/DocumentUrlInput';
 import FormItem from 'control/components/forms/FormItem';
+import SwitchBox from 'control/components/forms/SwitchBox';
 import { connectFormProps } from 'control/utils/forms';
 
 
@@ -51,11 +52,16 @@ export default class PreferenceExperimentFields extends React.Component {
           </FormItem>
 
           <FormItem
-            label="High volume recipe?"
+            label="High volume recipe"
             name="arguments.isHighVolume"
             initialValue={recipeArguments.get('isHighVolume')}
           >
-            <Checkbox />
+            <SwitchBox disabled={disabled}>
+              Affects the experiment type reported to telemetry, and
+              can be used to filter recipe data in analysis. This
+              should be set to true on recipes that affect a
+              significant percentage of release.
+            </SwitchBox>
           </FormItem>
         </Col>
 
