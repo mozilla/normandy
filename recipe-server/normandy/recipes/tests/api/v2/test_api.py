@@ -238,7 +238,6 @@ class TestRecipeAPI(object):
         assert res.status_code == 200, res.json()
         assert res.json()['arguments'] == arguments
 
-
     def test_it_can_delete_recipes(self, api_client):
         recipe = RecipeFactory()
 
