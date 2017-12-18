@@ -54,7 +54,7 @@ export default class PreferenceExperimentFields extends React.Component {
           <FormItem
             label="High volume recipe"
             name="arguments.isHighVolume"
-            initialValue={recipeArguments.get('isHighVolume')}
+            initialValue={recipeArguments.get('isHighVolume', false)}
           >
             <SwitchBox disabled={disabled}>
               Affects the experiment type reported to telemetry, and
