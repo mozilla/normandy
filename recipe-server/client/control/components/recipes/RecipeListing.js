@@ -1,4 +1,4 @@
-import { Icon, Pagination, Table } from 'antd';
+import { Pagination, Table } from 'antd';
 import autobind from 'autobind-decorator';
 import { List } from 'immutable';
 import moment from 'moment';
@@ -9,6 +9,7 @@ import { push as pushAction, Link } from 'redux-little-router';
 
 
 import BooleanIcon from 'control/components/common/BooleanIcon';
+import EnrollmentStatus from 'control/components/common/EnrollmentStatus';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryFilteredRecipes from 'control/components/data/QueryFilteredRecipes';
 import QueryRecipeListingColumns from 'control/components/data/QueryRecipeListingColumns';
@@ -132,18 +133,7 @@ export default class RecipeListing extends React.PureComponent {
         <Table.Column
           title="Enrollment Active"
           key="paused"
-          render={(text, record) => {
-            const isPaused = (record.arguments && !!record.arguments.isEnrollmentPaused) || false;
-            return (
-              <Link href={`/recipe/${record.id}/`}>
-                <Icon
-                  className={isPaused ? 'is-false' : 'is-true'}
-                  type={isPaused ? 'pause' : 'check'}
-                />
-                {isPaused ? 'Paused' : 'Active'}
-              </Link>
-            );
-          }}
+          render={(text, record) => <EnrollmentStatus record={record} />}
           filters={[
             { text: 'Paused', value: true },
             { text: 'Active', value: false },
