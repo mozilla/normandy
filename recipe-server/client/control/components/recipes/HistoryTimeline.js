@@ -30,6 +30,7 @@ export default class HistoryTimeline extends React.PureComponent {
     const {
       history,
       recipeId,
+      selectedRevisionId,
     } = this.props;
 
     return (
@@ -41,6 +42,7 @@ export default class HistoryTimeline extends React.PureComponent {
               history.map((revision, index) =>
                 (<HistoryItem
                   key={revision.get('id')}
+                  selectedRevisionId={selectedRevisionId}
                   revisionNo={history.size - index}
                   recipeId={recipeId}
                   revision={revision}

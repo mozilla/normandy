@@ -1,3 +1,4 @@
+import { Timeline } from 'antd';
 import { fromJS, Map } from 'immutable';
 import React from 'react';
 import { mount } from 'enzyme';
@@ -27,6 +28,41 @@ describe('<HistoryItem>', () => {
     const wrapper = () => mount(wrapMockStore(<HistoryItem {...props} />));
 
     expect(wrapper).not.toThrow();
+  });
+
+  describe('selected revisions', () => {
+    const props = {
+      isLatestRevision: () => {},
+      revision: new Map({
+        id: 'abc123',
+      }),
+      status: new Map(),
+      recipeId: 'def234',
+      revisionNo: 6,
+    };
+
+    it('should highlight when it is the selected revision', () => {
+      const wrapper = mount(wrapMockStore(<HistoryItem {...props} selectedRevisionId="abc123" />));
+
+      // We can test against the Timeline.Item inheritting proper visual styles.
+      const el = wrapper.find(Timeline.Item);
+      expect(el.length).toBe(1);
+      expect(el.props().color).toBe('blue');
+
+      // `dot` is an Icon which should be highlighted with the appropriate icon.
+      expect(el.props().dot).toBeTruthy();
+      expect(el.props().dot.props.type).toBe('circle-left');
+      expect(el.props().dot.props.color).toBe('blue');
+    });
+
+    it('should NOT highlight when it is NOT the selected revision', () => {
+      const wrapper = mount(wrapMockStore(<HistoryItem {...props} selectedRevisionId="aeiou" />));
+
+      const el = wrapper.find(Timeline.Item);
+      expect(el.length).toBe(1);
+      expect(el.props().color).not.toBe('blue');
+      expect(el.props().dot).toBe(null);
+    });
   });
 
   describe('<HistoryItemPopover>', () => {
