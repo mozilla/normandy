@@ -1,4 +1,4 @@
-import { Pagination, Table } from 'antd';
+import { Icon, Pagination, Table } from 'antd';
 import autobind from 'autobind-decorator';
 import { List } from 'immutable';
 import moment from 'moment';
@@ -39,6 +39,7 @@ import {
     ordering: getQueryParam(state, 'ordering', '-last_updated'),
     pageNumber: getQueryParamAsInt(state, 'page', 1),
     recipes: getRecipeListingFlattenedAction(state),
+    paused: getQueryParam(state, 'paused'),
     searchText: getQueryParam(state, 'searchText'),
     status: getQueryParam(state, 'status'),
   }),
@@ -58,6 +59,7 @@ export default class RecipeListing extends React.PureComponent {
     openNewWindow: PropTypes.func.isRequired,
     ordering: PropTypes.string,
     pageNumber: PropTypes.number,
+    paused: PropTypes.bool,
     push: PropTypes.func.isRequired,
     recipes: PropTypes.instanceOf(List).isRequired,
     searchText: PropTypes.string,
@@ -67,6 +69,7 @@ export default class RecipeListing extends React.PureComponent {
   static defaultProps = {
     count: null,
     ordering: null,
+    paused: false,
     pageNumber: null,
     searchText: null,
     status: null,
@@ -124,6 +127,37 @@ export default class RecipeListing extends React.PureComponent {
       );
     },
 
+    paused() {
+      return (
+        <Table.Column
+          title="Enrollment Active"
+          key="paused"
+          render={(text, record) => {
+            const isPaused = (record.arguments && !!record.arguments.isEnrollmentPaused) || false;
+            return (
+              <Link href={`/recipe/${record.id}/`}>
+                <Icon
+                  className={isPaused ? 'is-false' : 'is-true'}
+                  type={isPaused ? 'pause' : 'check'}
+                />
+                {isPaused ? 'Paused' : 'Active'}
+              </Link>
+            );
+          }}
+          filters={[
+            { text: 'Paused', value: true },
+            { text: 'Active', value: false },
+          ]}
+          onFilter={(value, record) => {
+            const isPaused = (record.arguments && !!record.arguments.isEnrollmentPaused) || false;
+            // `value` is a string when passed into this function.
+            return isPaused === (value === 'true');
+          }}
+          filterMultiple={false}
+        />
+      );
+    },
+
     lastUpdated({ ordering }) {
       return (
         <Table.Column
@@ -150,12 +184,18 @@ export default class RecipeListing extends React.PureComponent {
   }
 
   getFilters() {
-    const { ordering, searchText, status } = this.props;
+    const {
+      ordering,
+      searchText,
+      status,
+      paused,
+    } = this.props;
 
     const filters = {
       text: searchText,
       ordering,
       status,
+      paused,
     };
 
     Object.keys(filters).forEach(key => {
@@ -199,7 +239,6 @@ export default class RecipeListing extends React.PureComponent {
 
     const filterIds = Object.keys(filters).map(key => `${key}-${filters[key]}`);
     const requestId = `fetch-filtered-recipes-page-${pageNumber}-${filterIds.join('-')}`;
-
     return (
       <div>
         <QueryRecipeListingColumns />

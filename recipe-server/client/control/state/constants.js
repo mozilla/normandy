@@ -10,6 +10,7 @@ export const DEFAULT_RECIPE_LISTING_COLUMNS = new List([
   'action',
   'enabled',
   'lastUpdated',
+  'paused',
 ]);
 
 export const DEFAULT_REQUEST = new Map({
@@ -22,6 +23,7 @@ export const RECIPE_LISTING_COLUMNS = new List([
   'action',
   'enabled',
   'lastUpdated',
+  'paused',
 ]);
 
 export const REVISION_APPROVED = 'REVISION_APPROVED';
