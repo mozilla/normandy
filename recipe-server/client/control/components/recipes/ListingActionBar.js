@@ -71,6 +71,7 @@ export default class ListingActionBar extends React.PureComponent {
               { label: 'Action', value: 'action' },
               { label: 'Enabled', value: 'enabled' },
               { label: 'Last Updated', value: 'lastUpdated' },
+              { label: 'Enrollment Active', value: 'paused' },
             ]}
           />
         </Col>

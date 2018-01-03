@@ -9,6 +9,7 @@ import { push as pushAction, Link } from 'redux-little-router';
 
 
 import BooleanIcon from 'control/components/common/BooleanIcon';
+import EnrollmentStatus from 'control/components/common/EnrollmentStatus';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
 import QueryFilteredRecipes from 'control/components/data/QueryFilteredRecipes';
 import QueryRecipeListingColumns from 'control/components/data/QueryRecipeListingColumns';
@@ -124,6 +125,16 @@ export default class RecipeListing extends React.PureComponent {
       );
     },
 
+    paused() {
+      return (
+        <Table.Column
+          title="Enrollment Active"
+          key="paused"
+          render={(text, record) => <EnrollmentStatus recipe={record} />}
+        />
+      );
+    },
+
     lastUpdated({ ordering }) {
       return (
         <Table.Column
@@ -150,7 +161,11 @@ export default class RecipeListing extends React.PureComponent {
   }
 
   getFilters() {
-    const { ordering, searchText, status } = this.props;
+    const {
+      ordering,
+      searchText,
+      status,
+    } = this.props;
 
     const filters = {
       text: searchText,
@@ -199,7 +214,6 @@ export default class RecipeListing extends React.PureComponent {
 
     const filterIds = Object.keys(filters).map(key => `${key}-${filters[key]}`);
     const requestId = `fetch-filtered-recipes-page-${pageNumber}-${filterIds.join('-')}`;
-
     return (
       <div>
         <QueryRecipeListingColumns />
