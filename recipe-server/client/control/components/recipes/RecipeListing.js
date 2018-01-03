@@ -40,7 +40,6 @@ import {
     ordering: getQueryParam(state, 'ordering', '-last_updated'),
     pageNumber: getQueryParamAsInt(state, 'page', 1),
     recipes: getRecipeListingFlattenedAction(state),
-    paused: getQueryParam(state, 'paused'),
     searchText: getQueryParam(state, 'searchText'),
     status: getQueryParam(state, 'status'),
   }),
@@ -60,7 +59,6 @@ export default class RecipeListing extends React.PureComponent {
     openNewWindow: PropTypes.func.isRequired,
     ordering: PropTypes.string,
     pageNumber: PropTypes.number,
-    paused: PropTypes.bool,
     push: PropTypes.func.isRequired,
     recipes: PropTypes.instanceOf(List).isRequired,
     searchText: PropTypes.string,
@@ -70,7 +68,6 @@ export default class RecipeListing extends React.PureComponent {
   static defaultProps = {
     count: null,
     ordering: null,
-    paused: false,
     pageNumber: null,
     searchText: null,
     status: null,
@@ -133,17 +130,7 @@ export default class RecipeListing extends React.PureComponent {
         <Table.Column
           title="Enrollment Active"
           key="paused"
-          render={(text, record) => <EnrollmentStatus record={record} />}
-          filters={[
-            { text: 'Paused', value: true },
-            { text: 'Active', value: false },
-          ]}
-          onFilter={(value, record) => {
-            const isPaused = (record.arguments && !!record.arguments.isEnrollmentPaused) || false;
-            // `value` is a string when passed into this function.
-            return isPaused === (value === 'true');
-          }}
-          filterMultiple={false}
+          render={(text, record) => <EnrollmentStatus recipe={record} />}
         />
       );
     },
@@ -178,14 +165,12 @@ export default class RecipeListing extends React.PureComponent {
       ordering,
       searchText,
       status,
-      paused,
     } = this.props;
 
     const filters = {
       text: searchText,
       ordering,
       status,
-      paused,
     };
 
     Object.keys(filters).forEach(key => {

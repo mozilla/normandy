@@ -1,79 +1,59 @@
 import { Icon } from 'antd';
+import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'redux-little-router';
-import { connect } from 'react-redux';
 
-@connect((state, { record }) => {
-  const isEnabled = record.enabled;
-  const isPaused = !isEnabled || !!record.arguments.isEnrollmentPaused;
-
-  return {
-    record,
-    isEnabled,
-    isPaused,
-  };
-})
-export default class EnrollmentSatus extends React.PureComponent {
+// Ideally the prop.recipe would be an Immutable Map, but Ant's Table works with
+// plain JS objects, which means this component can not be Pure.
+export default class EnrollmentSatus extends React.Component {
   static propTypes = {
-    // Ideally this would be an Immutable Map, but Ant's table works with POJO's.
-    record: PropTypes.object.isRequired,
-    isEnabled: PropTypes.bool.isRequired,
-    isPaused: PropTypes.bool.isRequired,
+    recipe: PropTypes.object.isRequired,
   };
 
   getLabel() {
-    const {
-      isEnabled,
-      isPaused,
-    } = this.props;
     let label = 'Disabled';
-
-    if (isEnabled) {
-      label = isPaused ? 'Paused' : 'Active';
+    if (this.isRecipeEnabled()) {
+      label = this.isRecipePaused() ? 'Paused' : 'Active';
     }
-
     return label;
   }
 
   getIcon() {
-    const {
-      isEnabled,
-      isPaused,
-    } = this.props;
-    let label = 'minus';
-
-    if (isEnabled) {
-      label = isPaused ? 'pause' : 'check';
+    let iconType = 'minus';
+    if (this.isRecipeEnabled()) {
+      iconType = this.isRecipePaused() ? 'pause' : 'check';
     }
-
-    return label;
+    return iconType;
   }
 
   getColor() {
-    const {
-      isEnabled,
-      isPaused,
-    } = this.props;
-
     let colorClass;
-    if (isEnabled) {
-      colorClass = isPaused ? 'is-false' : 'is-true';
+    if (this.isRecipeEnabled()) {
+      colorClass = this.isRecipePaused() ? 'is-false' : 'is-true';
     }
-
     return colorClass;
+  }
+
+  isRecipePaused() {
+    const { recipe } = this.props;
+    return !recipe.enabled || !!recipe.arguments.isEnrollmentPaused;
+  }
+
+  isRecipeEnabled() {
+    const { recipe } = this.props;
+    return recipe.enabled;
   }
 
   render() {
     const {
-      record,
-      isEnabled,
+      recipe,
     } = this.props;
 
     return (
-      <Link href={`/recipe/${record.id}/`} className={isEnabled ? '' : 'is-lowkey'}>
+      <Link href={`/recipe/${recipe.id}/`} className={cx(!recipe.enabled && 'is-lowkey')}>
         <Icon
-          className={this.getColor()}
+          className={cx('status-icon', this.getColor())}
           type={this.getIcon()}
         />
         <span className="enrollment-label">{this.getLabel()}</span>
