@@ -1,9 +1,10 @@
-import { fromJS } from 'immutable';
+import { fromJS, Map } from 'immutable';
 import * as matchers from 'jasmine-immutable-matchers';
 
 import {
   APPROVAL_REQUEST_DELETE,
   APPROVAL_REQUEST_RECEIVE,
+  RECIPE_HISTORY_RECEIVE,
 } from 'control/state/action-types';
 import approvalRequestsReducer from 'control/state/app/approvalRequests/reducers';
 import {
@@ -55,5 +56,21 @@ describe('Approval requests reducer', () => {
     });
 
     expect(updatedState).toEqual(INITIAL_STATE);
+  });
+
+  it('should handle RECIPE_HISTORY_RECEIVE', () => {
+    const appRequest = {
+      id: 'test',
+      arbitrary_data: 123,
+    };
+
+    const state = approvalRequestsReducer(undefined, {
+      type: RECIPE_HISTORY_RECEIVE,
+      revisions: [{
+        approval_request: appRequest,
+      }],
+    });
+
+    expect(state.items.get(appRequest.id)).toEqual(new Map(appRequest));
   });
 });
