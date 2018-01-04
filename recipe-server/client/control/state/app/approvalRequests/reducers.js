@@ -4,8 +4,8 @@ import { combineReducers } from 'redux';
 import {
   APPROVAL_REQUEST_DELETE,
   APPROVAL_REQUEST_RECEIVE,
+  RECIPE_HISTORY_RECEIVE,
 } from 'control/state/action-types';
-
 
 function items(state = new Map(), action) {
   let approvalRequest;
@@ -21,6 +21,19 @@ function items(state = new Map(), action) {
         .remove('approver');
 
       return state.set(action.approvalRequest.id, approvalRequest);
+
+    case RECIPE_HISTORY_RECEIVE: {
+      const revisions = fromJS(action.revisions);
+
+      return state.withMutations(mutState => {
+        revisions.forEach(revision => {
+          const approvalId = revision.getIn(['approval_request', 'id'], null);
+          if (approvalId) {
+            mutState.set(approvalId, revision.get('approval_request'));
+          }
+        });
+      });
+    }
 
     case APPROVAL_REQUEST_DELETE:
       return state.remove(action.approvalRequestId);
