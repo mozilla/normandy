@@ -215,6 +215,17 @@ describe('PreferenceExperimentAction', () => {
       expect(normandy.preferenceExperiments.markLastSeen).not.toHaveBeenCalled();
     });
 
+    it('should do nothing if enrollment is paused', async () => {
+      const recipe = preferenceExperimentFactory({ isEnrollmentPaused: true });
+      const action = new PreferenceExperimentAction(normandy, recipe);
+      spyOn(normandy.preferenceExperiments, 'start').and.callThrough();
+
+      await action.execute();
+      await postExecutionHook(normandy);
+
+      expect(normandy.preferenceExperiments.start).not.toHaveBeenCalled();
+    });
+
     it(
       'should stop active experiments not seen between the pre and post execution hooks',
       async () => {
