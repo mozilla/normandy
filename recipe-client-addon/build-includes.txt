@@ -1,9 +1,0 @@
-bootstrap.js
-install.rdf.in
-jar.mn
-lib
-moz.build
-vendor
-test
-skin
-content

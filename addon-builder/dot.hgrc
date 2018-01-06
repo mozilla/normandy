@@ -1,5 +1,0 @@
-[share]
-pool = /root/hgshare
-
-[extensions]
-robustcheckout = /root/version-control-tools/hgext/robustcheckout

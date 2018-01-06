@@ -8,10 +8,6 @@ top level directory:
 
 * recipe-server - Django server that manages and delivers recipes
   efficiently and securely.
-* recipe-client-addon - Firefox system add-on to fetch, verify, and execute
-  recipes.
-* lints - Shared tools and configs for linting. (Each project may have separate
-  configs as well)
 * compose - Scripts and configurations to create multi-server environments for
   development and testing.
 * mozjexl - A safe expression evaluation library. A fork of [Jexl][].

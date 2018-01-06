@@ -82,19 +82,6 @@ editing ``services.normandy.environment``. For example, to change the time that
 recipes are cached for, add a line ``DJANGO_CACHES_RECIPE_TIME: 5`` in the
 ``environment`` section.
 
-Getting the add-on
-------------------
-Some functionality of Normandy relies on an add-on to provide additional features
-in the browser. This add-on is under active development. The latest version of
-the add-on can be found as a `CircleCI build artifact`_.
-
-.. note:: Visiting the link above may result in Firefox attempting and failing
-   to install the add-on since it is not hosted on a trusted domain. To install
-   it, you must right-click the file and save it to your computer, and then open
-   the XPI file in Firefox.
-
-.. _CircleCI build artifact: https://circleci.com/api/v1/project/mozilla/normandy-addon/latest/artifacts/0/$CIRCLE_ARTIFACTS/shield-recipe-client.xpi
-
 Configuring Firefox
 -------------------
 Any reference to ``localhost`` should be replaced with the IP where Docker is
