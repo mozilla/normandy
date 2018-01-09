@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote as url_quote
 
 import pytest
 from pathlib import Path
@@ -13,6 +13,11 @@ from normandy.studies.api.v2.fields import ExtensionFileField
 
 @pytest.mark.django_db
 class TestExtensionAPI(object):
+
+    @classmethod
+    def data_path(cls, file_name):
+        return Path(settings.BASE_DIR) / 'normandy/studies/tests/data' / file_name
+
     def test_it_works(self, api_client):
         res = api_client.get('/api/v2/extension/')
         assert res.status_code == 200
@@ -85,31 +90,31 @@ class TestExtensionAPI(object):
         return res
 
     def test_upload_works_webext(self, api_client):
-        path = Path(settings.BASE_DIR) / 'normandy/studies/tests/data/webext-signed.xpi'
+        path = self.data_path('webext-signed.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data['id']).exists()
 
     def test_upload_works_legacy(self, api_client):
-        path = './normandy/studies/tests/data/legacy-signed.xpi'
+        path = self.data_path('legacy-signed.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data['id']).exists()
 
     def test_uploads_must_be_zips(self, api_client):
-        path = './normandy/studies/tests/data/not-an-addon.txt'
+        path = self.data_path('not-an-addon.txt')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_a_zip']]}
 
     def test_uploads_must_be_signed_webext(self, api_client):
-        path = './normandy/studies/tests/data/webext-unsigned.xpi'
+        path = self.data_path('webext-unsigned.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_signed']]}
 
     def test_uploads_must_be_signed_legacy(self, api_client):
-        path = './normandy/studies/tests/data/legacy-unsigned.xpi'
+        path = self.data_path('legacy-unsigned.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_signed']]}
@@ -118,7 +123,18 @@ class TestExtensionAPI(object):
         # NB: This is a fragile test. It uses a unsigned webext, and
         # so it relies on the ID check happening before the signing
         # check, so that the error comes from the former.
-        path = './normandy/studies/tests/data/webext-no-id-unsigned.xpi'
+        path = self.data_path('webext-no-id-unsigned.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['no_id']]}
+
+    def test_keeps_extension_filename(self, api_client):
+        filename = 'bootstrap-addon-example@mozilla.org-0.1.0.xpi'
+        path = self.data_path(filename)
+        res = self._upload_extension(api_client, path)
+        assert res.status_code == 201, f'body of unexpected response: {res.data}'  # created
+        assert res.data['xpi'].split('/')[-1] == url_quote(filename)
+
+        # Download the XPI to make sure the url is actually good
+        res = api_client.get(res.data['xpi'], follow=True)
+        assert res.status_code == 200
