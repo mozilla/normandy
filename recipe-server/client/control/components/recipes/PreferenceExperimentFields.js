@@ -31,6 +31,8 @@ export default class PreferenceExperimentFields extends React.Component {
       recipeArguments,
     } = this.props;
 
+    const isUserBranchSelected = form.getFieldValue('arguments.preferenceBranchType') === 'user';
+
     return (
       <Row>
         <p className="action-info">Run a feature experiment activated by a preference.</p>
@@ -98,7 +100,7 @@ export default class PreferenceExperimentFields extends React.Component {
                 <PreferenceBranchSelect disabled={disabled} />
               </FormItem>
             </Col>
-            {form.getFieldValue('arguments.preferenceBranchType') === 'user' &&
+            {isUserBranchSelected &&
               <Col xs={24}>
                 <Alert
                   message="User Preference Branch"
@@ -114,6 +116,25 @@ export default class PreferenceExperimentFields extends React.Component {
               </Col>
             }
           </Col>
+        </Col>
+
+        <Col
+          sm={24}
+          md={{
+            span: isUserBranchSelected ? 11 : 12,
+            offset: isUserBranchSelected ? 0 : 1,
+          }}
+        >
+          <FormItem
+            label="Prevent New Enrollment"
+            name="arguments.isEnrollmentPaused"
+            initialValue={recipeArguments.get('isEnrollmentPaused', false)}
+          >
+            <SwitchBox disabled={disabled}>
+              Prevents new users from joining this experiment&nbsp;cohort. <br /> Existing
+              users will remain in&nbsp;the&nbsp;experiment.
+            </SwitchBox>
+          </FormItem>
         </Col>
 
         <Col sm={24}>

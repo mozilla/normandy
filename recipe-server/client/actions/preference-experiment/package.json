@@ -49,6 +49,11 @@
                     "type": "boolean",
                     "default": "false"
                 },
+                "isEnrollmentPaused": {
+                    "description": "If true, new users will not be enrolled in the study.",
+                    "type": "boolean",
+                    "default": false
+                },
                 "branches": {
                     "description": "List of experimental branches",
                     "type": "array",

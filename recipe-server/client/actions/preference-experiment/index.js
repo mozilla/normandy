@@ -21,6 +21,7 @@ export default class PreferenceExperimentAction extends Action {
     const {
       branches,
       isHighPopulation,
+      isEnrollmentPaused,
       preferenceBranchType,
       preferenceName,
       preferenceType,
@@ -54,6 +55,12 @@ export default class PreferenceExperimentAction extends Action {
           `Experiment ${slug} ignored; another active experiment is already using the
           ${preferenceName} preference.`, 'warn',
         );
+        return;
+      }
+
+      // Determine if enrollment is currently paused for this experiment.
+      if (isEnrollmentPaused) {
+        this.normandy.log(`Enrollment is paused for experiment "${slug}"`, 'debug');
         return;
       }
 

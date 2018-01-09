@@ -17,9 +17,27 @@
 
   .branch {
     background: @layout-body-background;
-    border-radius: @border-radius-base;
-    margin-bottom: @form-item-margin-bottom;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: @border-radius-base @border-radius-base 0 0;
     padding: 15px;
+
+    // If there is only one branch, round all corners.
+    &:first-child:last-child {
+      border: none;
+      border-radius: @border-radius-base;
+    }
+
+    // Branches in the middle of the list should not be rounded at all.
+    & + .branch {
+      border-radius: 0;
+    }
+
+    // Last branch should have bottom rounded corners and a margin below.
+    &:last-child {
+      border: none;
+      border-radius: 0 0 4px 4px;
+      margin-bottom: @form-item-margin-bottom;
+    }
   }
 
   .branch-fields {
@@ -36,7 +54,7 @@
       flex: 0;
     }
 
-    @media (max-width: @screen-xs) {
+    @media (max-width: @screen-sm) {
       & {
         align-items: inherit;
         flex-direction: column;
