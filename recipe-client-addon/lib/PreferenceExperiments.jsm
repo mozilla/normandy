@@ -455,8 +455,13 @@ this.PreferenceExperiments = {
    * Stop an active experiment, deactivate preference watchers, and optionally
    * reset the associated preference to its previous value.
    * @param {string} experimentName
-   * @param {boolean} [resetValue=true]
-   *   If true, reset the preference to its original value.
+   * @param {Object} options
+   * @param {boolean} [options.resetValue = true]
+   *   If true, reset the preference to its original value prior to
+   *   the experiment. Optional, defauls to true.
+   * @param {String} [options.reason = "unknown"]
+   *   Reason that the experiment is ending. Optional, defaults to
+   *   "unknown".
    * @rejects {Error}
    *   If there is no stored experiment with the given name, or if the
    *   experiment has already expired.

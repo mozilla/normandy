@@ -805,7 +805,7 @@ decorate_task(
     mockPreferences.set("fake.preference", "changed value");
     await PreferenceExperiments.init();
     ok(stopStub.calledWith("test"), "Experiment is stopped because value changed");
-    ok(Preferences.get("fake.preference"), "changed value", "Preference value was not changed");
+    is(Preferences.get("fake.preference"), "changed value", "Preference value was not changed");
   },
 );
 

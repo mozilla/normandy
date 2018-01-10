@@ -91,8 +91,9 @@ function getStore(db) {
  * Mark a study object as having ended. Modifies the study in-place.
  * @param {IDBDatabase} db
  * @param {Study} study
+ * @param {String} reason Why the study is ending.
  */
-async function markAsEnded(db, study, reason = "unknown") {
+async function markAsEnded(db, study, reason) {
   if (reason === "unknown") {
     log.warn(`Study ${study.name} ending for unknown reason.`);
   }
@@ -321,11 +322,12 @@ this.AddonStudies = {
   /**
    * Stop an active study, uninstalling the associated add-on.
    * @param {Number} recipeId
+   * @param {String} reason Why the study is ending. Optional, defaults to "unknown".
    * @throws
    *   If no study is found with the given recipeId.
    *   If the study is already inactive.
    */
-  async stop(recipeId, reason) {
+  async stop(recipeId, reason = "unknown") {
     const db = await getDatabase();
     const study = await getStore(db).get(recipeId);
     if (!study) {
