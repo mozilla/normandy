@@ -386,7 +386,7 @@ class Production(Base):
     SECURE_PROXY_SSL_HEADER = values.TupleValue(('HTTP_X_FORWARDED_PROTO', 'https'))
     LOGGING_USE_JSON = values.Value(True)
     SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
-    DEFAULT_FILE_STORAGE = values.Value('storages.backends.s3boto3.S3Boto3Storage')
+    DEFAULT_FILE_STORAGE = values.Value('normandy.base.storage.S3Boto3PermissiveStorage')
     AWS_S3_FILE_OVERWRITE = False
 
 
@@ -446,7 +446,7 @@ class Test(Base):
     DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, '.env'))
     DOTENV = '.env' if DOTENV_EXISTS else None
     SECRET_KEY = 'not a secret'
-    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+    DEFAULT_FILE_STORAGE = 'normandy.base.storage.InMemoryPermissiveStorage'
     SECURE_SSL_REDIRECT = False
     AUTOGRAPH_URL = None
     AUTOGRAPH_HAWK_ID = None
