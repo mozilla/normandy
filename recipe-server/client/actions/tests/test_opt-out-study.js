@@ -173,8 +173,8 @@ describe('OptOutStudyAction', () => {
         await action.execute();
         await postExecutionHook(normandy);
 
-        expect(normandy.studies.stop).not.toHaveBeenCalledWith(seen.id);
-        expect(normandy.studies.stop).toHaveBeenCalledWith(unseen.id);
+        expect(normandy.studies.stop).not.toHaveBeenCalledWith(seen.id, 'recipe-not-seen');
+        expect(normandy.studies.stop).toHaveBeenCalledWith(unseen.id, 'recipe-not-seen');
       },
     );
   });
