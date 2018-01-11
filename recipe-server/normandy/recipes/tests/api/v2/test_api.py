@@ -495,6 +495,48 @@ class TestRecipeAPI(object):
             for recipe in results:
                 assert recipe['id'] in [r1.id, r2.id]
 
+        def test_list_filter_action_legacy(self, api_client):
+            a1 = ActionFactory()
+            a2 = ActionFactory()
+            r1 = RecipeFactory(action=a1)
+            r2 = RecipeFactory(action=a2)
+
+            assert a1.id != a2.id
+
+            res = api_client.get(f'/api/v2/recipe/?latest_revision__action={a1.id}')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r1.id]
+
+            res = api_client.get(f'/api/v2/recipe/?latest_revision__action={a2.id}')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r2.id]
+
+            assert a1.id != -1 and a2.id != -1
+            res = api_client.get(f'/api/v2/recipe/?latest_revision__action=-1')
+            assert res.status_code == 200
+            assert res.data['count'] == 0
+
+        def test_list_filter_action(self, api_client):
+            a1 = ActionFactory()
+            a2 = ActionFactory()
+            r1 = RecipeFactory(action=a1)
+            r2 = RecipeFactory(action=a2)
+
+            assert a1.name != a2.name
+
+            res = api_client.get(f'/api/v2/recipe/?action={a1.name}')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r1.id]
+
+            res = api_client.get(f'/api/v2/recipe/?action={a2.name}')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r2.id]
+
+            assert a1.name != "nonexistant" and a2.name != "nonexistant"
+            res = api_client.get(f'/api/v2/recipe/?action=nonexistant')
+            assert res.status_code == 200
+            assert res.data['count'] == 0
+
 
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):

@@ -37,10 +37,15 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
 class RecipeFilters(django_filters.FilterSet):
     enabled = CaseInsensitiveBooleanFilter(name='enabled', lookup_expr='eq')
+    action = django_filters.CharFilter(name='latest_revision__action__name')
 
     class Meta:
         model = Recipe
-        fields = ['latest_revision__action', 'enabled']
+        fields = [
+            'action',
+            'enabled',
+            'latest_revision__action',
+        ]
 
 
 class RecipeOrderingFilter(AliasedOrderingFilter):
