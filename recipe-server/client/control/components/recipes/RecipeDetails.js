@@ -1,5 +1,5 @@
-import { Card, Icon } from 'antd';
-import { is, Map } from 'immutable';
+import { Card, Icon, Tooltip } from 'antd';
+import { is, List, Map } from 'immutable';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -80,6 +80,15 @@ export class ArgumentsValue extends React.PureComponent {
     name: null,
   };
 
+  static stringifyImmutable(value) {
+    return JSON.stringify(value.toJS());
+  }
+
+  // Determine if an object is an instance of any of the given classes
+  compareInstances(obj, types) {
+    return types.some(type => obj instanceof type);
+  }
+
   renderBranchTable(branches) {
     const sumRatios = branches.map(branch => branch.get('ratio')).reduce((a, b) => a + b) || 1;
 
@@ -126,16 +135,21 @@ export class ArgumentsValue extends React.PureComponent {
       valueRender = this.renderBoolean;
     }
 
-    const textToCopy = value === undefined ? '' : value.toString();
+    let textToCopy = value === undefined ? '' : value.toString();
+    if (this.compareInstances(value, [List, Map])) {
+      textToCopy = ArgumentsValue.stringifyImmutable(value);
+    }
 
     return (
       <dd className="arguments-value">
         <div className="value">
           {valueRender(value)}
         </div>
-        <CopyToClipboard className="copy-icon" text={textToCopy}>
-          <Icon type="copy" />
-        </CopyToClipboard>
+        <Tooltip mouseEnterDelay={1} title="Copy to Clipboard" placement="top">
+          <CopyToClipboard className="copy-icon" text={textToCopy}>
+            <Icon type="copy" />
+          </CopyToClipboard>
+        </Tooltip>
       </dd>
     );
   }
