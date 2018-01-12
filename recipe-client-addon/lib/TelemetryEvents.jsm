@@ -12,7 +12,7 @@ this.EXPORTED_SYMBOLS = ["TelemetryEvents"];
 const TELEMETRY_CATEGORY = "normandy";
 
 const TelemetryEvents = {
-  startup() {
+  init() {
     Services.telemetry.registerEvents(TELEMETRY_CATEGORY, {
       enroll: {
         methods: ["enroll"],
