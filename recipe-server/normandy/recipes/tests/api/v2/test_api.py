@@ -1,11 +1,12 @@
+from datetime import datetime, timedelta
+
+from django.conf import settings
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
 from pathlib import Path
-
-from django.conf import settings
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
@@ -540,6 +541,32 @@ class TestRecipeAPI(object):
             res = api_client.get(f'/api/v2/recipe/?action=nonexistant')
             assert res.status_code == 200
             assert res.data['count'] == 0
+
+        def test_order_last_updated(self, api_client):
+            now = datetime.now()
+            yesterday = now - timedelta(days=1)
+            r1 = RecipeFactory(updated=yesterday)
+            r2 = RecipeFactory(updated=now)
+
+            res = api_client.get(f'/api/v2/recipe/?ordering=last_updated')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r1.id, r2.id]
+
+            res = api_client.get(f'/api/v2/recipe/?ordering=-last_updated')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r2.id, r1.id]
+
+        def test_order_name(self, api_client):
+            r1 = RecipeFactory(name="a")
+            r2 = RecipeFactory(name="b")
+
+            res = api_client.get(f'/api/v2/recipe/?ordering=name')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r1.id, r2.id]
+
+            res = api_client.get(f'/api/v2/recipe/?ordering=-name')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r2.id, r1.id]
 
 
 @pytest.mark.django_db
