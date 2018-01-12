@@ -25,6 +25,7 @@ dependencies:
     # CI requirements.
     - pip install -r ./ci/circleci/requirements/pip.txt
     - pip install -r ./ci/circleci/requirements/default.txt -c ./ci/circleci/requirements/constraints.txt
+    - pipdeptree --warn fail --local-only
     # Install latest firefox, and remove firefox-mozilla-build, which diverts
     # the Firefox binary to an old version.
     - sudo apt-get update
