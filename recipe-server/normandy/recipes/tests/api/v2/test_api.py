@@ -160,8 +160,8 @@ class TestRecipeAPI(object):
 
         def test_creation_when_action_does_not_exist(self, api_client):
             res = api_client.post('/api/v2/recipe/', {'name': 'Test Recipe',
-                                                    'action_id': 1234,
-                                                    'arguments': '{}'})
+                                                      'action_id': 1234,
+                                                      'arguments': '{}'})
             assert res.status_code == 400
 
             recipes = Recipe.objects.all()
@@ -177,10 +177,10 @@ class TestRecipeAPI(object):
                 }
             )
             res = api_client.post('/api/v2/recipe/', {'name': 'Test Recipe',
-                                                    'enabled': True,
-                                                    'extra_filter_expression': 'true',
-                                                    'action_id': action.id,
-                                                    'arguments': {'message': ''}})
+                                                      'enabled': True,
+                                                      'extra_filter_expression': 'true',
+                                                      'action_id': action.id,
+                                                      'arguments': {'message': ''}})
             assert res.status_code == 400
 
             recipes = Recipe.objects.all()
@@ -396,12 +396,16 @@ class TestRecipeAPI(object):
 
             This was a real case that showed up in our error logging.
             """
-            url = "/api/v2/recipe/?enabled=javascript%3a%2f*<%2fscript><svg%2fonload%3d'%2b%2f'%2f%2b"
+            url = (
+                "/api/v2/recipe/?enabled=javascript%3a%2f*"
+                "<%2fscript><svg%2fonload%3d'%2b%2f'%2f%2b"
+            )
             res = api_client.get(url)
             assert res.status_code == 400
             assert res.data == {
                 'messages': [
-                    "'javascript:/*</script><svg/onload='+/'/+' value must be either True or False.",
+                    "'javascript:/*</script><svg/onload='+/'/+' "
+                    "value must be either True or False.",
                 ],
             }
 
