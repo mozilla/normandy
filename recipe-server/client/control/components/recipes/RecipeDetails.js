@@ -81,7 +81,7 @@ export class ArgumentsValue extends React.PureComponent {
   };
 
   static stringifyImmutable(value) {
-    return JSON.stringify(value.toJS());
+    return JSON.stringify(value);
   }
 
   // Determine if an object is an instance of any of the given classes
