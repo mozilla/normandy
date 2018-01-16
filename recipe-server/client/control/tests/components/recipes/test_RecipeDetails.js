@@ -42,8 +42,8 @@ describe('<ArgumentsValue>', () => {
 
   it('should render branches as a table', () => {
     const value = Immutable.fromJS([
-          { slug: 'one', value: 1, ratio: 1 },
-          { slug: 'two', value: 2, ratio: 3 },
+      { slug: 'one', value: 1, ratio: 1 },
+      { slug: 'two', value: 2, ratio: 3 },
     ]);
     const wrapper = shallow(<ArgumentsValue name="branches" value={value} />);
     const children = wrapper.find('.value').children();
@@ -58,5 +58,27 @@ describe('<ArgumentsValue>', () => {
     expect(content).toContain('two');
     expect(content).toContain('2');
     expect(content).toContain('75%');
+  });
+
+  describe('immutable objects', () => {
+    it('should convert Immutable objects into JSON strings', () => {
+      const testData = { slug: 'one', value: { test: 'fake-value' }, ratio: 1 };
+      // Test against Maps
+      let value = Immutable.fromJS(testData);
+      expect(ArgumentsValue.stringifyImmutable(value)).toBe(JSON.stringify(testData));
+
+      // Test against Lists
+      value = Immutable.fromJS([testData]);
+      expect(ArgumentsValue.stringifyImmutable(value)).toBe(JSON.stringify([testData]));
+    });
+
+    it('should use a JSON string for copy/pasting Immutable fields', () => {
+      const argumentVal = new Map({ slug: 'one', value: false, ratio: 1 });
+      const expectedText = ArgumentsValue.stringifyImmutable(argumentVal);
+
+      const wrapper = shallow(<ArgumentsValue value={argumentVal} />);
+      const copyPasteButton = wrapper.find('.copy-icon');
+      expect(copyPasteButton.props().text).toBe(expectedText);
+    });
   });
 });
