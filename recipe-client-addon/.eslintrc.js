@@ -19,10 +19,13 @@ module.exports = {
     "indent-legacy": ["warn", 2, {SwitchCase: 1}],
     "mozilla/no-aArgs": "warn",
     "mozilla/balanced-listeners": 0,
-    "mozilla/use-services": "error",
     "no-console": "warn",
     "no-shadow": ["error"],
-    "no-unused-vars": "error",
+    "no-unused-vars": ["error", {
+      "args": "none",
+      "vars": "all",
+      "varsIgnorePattern": "^Cc|Ci|Cu|Cr|EXPORTED_SYMBOLS"
+    }],
     "prefer-const": "warn",
     "semi": ["error", "always"],
     "no-return-await": ["error"],

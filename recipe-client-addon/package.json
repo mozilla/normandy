@@ -10,14 +10,14 @@
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
     "lint": "npm run lint-js; npm run lint-css;",
-    "lint-js": "eslint lib content bootstrap.js webpack.config.js test || true",
+    "lint-js": "eslint --ext js,jsm lib content bootstrap.js webpack.config.js test || true",
     "lint-css": "stylelint '**/*.css' --config .stylelintrc || true"
   },
   "devDependencies": {
     "babili-webpack-plugin": "0.1.2",
     "eslint": "4.10.0",
     "eslint-config-normandy": "1.0.0",
-    "eslint-plugin-mozilla": "0.4.9",
+    "eslint-plugin-mozilla": "0.6.0",
     "eslint-plugin-no-unsanitized": "2.0.1",
     "eslint-plugin-react": "^7.1.0",
     "license-webpack-plugin": "0.5.1",

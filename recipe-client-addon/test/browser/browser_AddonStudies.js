@@ -268,7 +268,7 @@ decorate_task(
       ["unenroll", "addon_study", study.name, {
         addonId,
         addonVersion: study.addonVersion,
-        reason: "test-reason"
+        reason: "test-reason",
       }],
       "stop should send the correct telemetry event"
     );
