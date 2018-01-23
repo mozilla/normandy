@@ -189,7 +189,7 @@ this.PreferenceExperiments = {
         log.info(`Stopping experiment "${experiment.name}" because its value changed`);
         await this.stop(experiment.name, {
           didResetValue: false,
-          reason: "user-preference-changed-sideload"
+          reason: "user-preference-changed-sideload",
         });
         continue;
       }
