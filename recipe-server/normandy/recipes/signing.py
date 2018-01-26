@@ -160,6 +160,24 @@ class WrongPublicKeySize(BadSignature):
     detail = 'Public Key is not the right number of bytes'
 
 
+def read_timestamp_object(obj):
+    general_date_format = '%Y%m%d%H%M%SZ'
+    utc_date_format = '%y%m%d%H%M%SZ'
+
+    if 'generalTime' in obj:
+        timestamp = obj['generalTime'].decode()
+        return datetime.strptime(timestamp, general_date_format)
+    elif 'utcTime' in obj:
+        timestamp = obj['utcTime'].decode()
+        return datetime.strptime(timestamp, utc_date_format)
+    else:
+        raise BadCertificate(
+            'Timestamp not in expected format. '
+            'Expected either "generalTime" or "utcTime", found keys {}'
+            .format(str(list(obj.keys())))
+        )
+
+
 def verify_x5u(url, expire_early=None):
     """
     Verify the certificate chain at a URL.
@@ -173,10 +191,12 @@ def verify_x5u(url, expire_early=None):
     certs = parse_pem_to_certs(pem)
 
     for cert in certs:
-        validity = cert['tbsCertificate']['validity']
-        date_format = '%y%m%d%H%M%SZ'
-        not_before = datetime.strptime(validity['notBefore']['utcTime'].decode(), date_format)
-        not_after = datetime.strptime(validity['notAfter']['utcTime'].decode(), date_format)
+        try:
+            validity = cert['tbsCertificate']['validity']
+            not_before = read_timestamp_object(validity['notBefore'])
+            not_after = read_timestamp_object(validity['notAfter'])
+        except KeyError as e:
+            raise BadCertificate(f'Certificate does not have expected shape: KeyError {e}')
         check_validity(not_before, not_after, expire_early)
 
     return True

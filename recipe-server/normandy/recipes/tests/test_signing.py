@@ -283,3 +283,54 @@ class TestVerifyX5u(object):
         assert mock_requests.get.called_once_with(url)
         body = mock_requests.get.return_value.content.decode.return_value
         assert mock_parse_pem_to_certs.called_once_with(body)
+
+    def test_bad_unexpected_format(self, mocker):
+        mocker.patch('normandy.recipes.signing.requests')
+        mock_parse_pem_to_certs = mocker.patch('normandy.recipes.signing.parse_pem_to_certs')
+
+        date_format = '%Y%m%d%H%M%S'
+        url = 'https://example.com/cert.pem'
+        now = datetime.now()
+        not_before = (now - timedelta(days=2)).strftime(date_format).encode()
+        not_after = (now - timedelta(days=1)).strftime(date_format).encode()
+
+        mock_parse_pem_to_certs.return_value = [{
+            'tbsCertificate': {
+                'validity': {
+                    'notBefore': {'unsupportedTimestamp': not_before},
+                    'notAfter': {'unsupportedTimestamp': not_after},
+                }
+            }
+        }]
+
+        with pytest.raises(signing.BadCertificate) as exc:
+            signing.verify_x5u(url)
+        assert 'Timestamp not in expected format' in str(exc)
+        assert 'unsupportedTimestamp' in str(exc)
+
+    def test_mixed_timestamp_format(self, mocker):
+        mock_requests = mocker.patch('normandy.recipes.signing.requests')
+        path = os.path.join(os.path.dirname(__file__), 'data', 'mixed_timestamps_certs.pem')
+        with open(path, 'rb') as f:
+            mock_requests.get.return_value.content = f.read()
+        assert signing.verify_x5u('https://example.com/cert.pem')
+
+
+class TestReadTimestampObject(object):
+    def test_it_reads_utc_time_format(self):
+        dt = datetime(2018, 1, 25, 16, 1, 13, 0)
+        date_format = '%y%m%d%H%M%SZ'
+        timestamp = dt.strftime(date_format).encode()
+        assert signing.read_timestamp_object({'utcTime': timestamp}) == dt
+
+    def test_it_reads_general_time_format(self):
+        dt = datetime(2018, 1, 25, 16, 1, 13, 0)
+        date_format = '%Y%m%d%H%M%SZ'
+        timestamp = dt.strftime(date_format).encode()
+        assert signing.read_timestamp_object({'generalTime': timestamp}) == dt
+
+    def test_it_errors_on_unsupported_formats(self):
+        with pytest.raises(signing.BadCertificate) as exc:
+            signing.read_timestamp_object({'unsupportedTimestamp': b'gibberish'})
+        assert 'Timestamp not in expected format' in str(exc)
+        assert 'unsupportedTimestamp' in str(exc)
