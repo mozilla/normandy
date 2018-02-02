@@ -9,7 +9,7 @@ something normal JavaScript can't trigger.
 Environments in which actions are run (such as the `Normandy system add-on`_)
 implement the driver and pass it to the actions before executing them.
 
-.. _Normandy system add-on: https://github.com/mozilla/normandy-addon
+.. _Normandy system add-on: https://hg.mozilla.org/mozilla-central/file/tip/browser/extensions/shield-recipe-client
 
 Driver
 ------

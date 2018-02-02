@@ -9,7 +9,6 @@ development environment for it.
    concepts
    driver
    recipe-server/index
-   recipe-client-addon/index
    mock-recipe-server
    code-style
    feature-experiments

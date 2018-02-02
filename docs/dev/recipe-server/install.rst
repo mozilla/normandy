@@ -147,9 +147,8 @@ The site should be available at https://localhost:8000/control/.
 
 Autograph
 ---------
-If you want to execute recipes on your local instance using the
-:doc:`recipe client </dev/recipe-client-addon/index>`, you'll need to set up
-Autograph_ to sign recipes as you save them:
+If you want to execute recipes on your local instance using the recipe
+client, you'll need to set up Autograph_ to sign recipes as you save them:
 
 1. Follow the `Autograph installation instructions`_ to launch a development
    instance of Autograph.

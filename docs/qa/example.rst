@@ -11,8 +11,7 @@ pop-up notification with some configurable text, and only prompts users once.
 ----------------------------------
 The first step is to add a new function to the :doc:`driver </dev/driver>` that
 will trigger the notification on the client. The driver is implemented in the
-`system add-on <normandy-addon>`_, so we update the add-on to implement the
-function:
+system add-on, so we update the add-on to implement the function:
 
 .. js:function:: showNotification(message)
 
