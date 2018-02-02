@@ -121,7 +121,10 @@ export async function postExecutionHook(normandy) {
   for (const experiment of activeExperiments) {
     if (!seenExperimentNames.includes(experiment.name)) {
       // eslint-disable-next-line no-await-in-loop
-      await normandy.preferenceExperiments.stop(experiment.name, true);
+      await normandy.preferenceExperiments.stop(experiment.name, {
+        resetValue: true,
+        reason: 'recipe-not-seen',
+      });
     }
   }
 }
