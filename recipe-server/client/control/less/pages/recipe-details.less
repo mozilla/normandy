@@ -134,11 +134,45 @@ dl.details {
 }
 
 .details-action-bar {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 
   button {
     float: right;
     margin-left: 8px;
+  }
+
+  & + .details-action-bar {
+    margin-bottom: 16px;
+  }
+}
+
+@shineSize: 20px;
+
+.btn-shiny {
+  overflow: hidden;
+  position: relative;
+
+  &::after {
+    animation: 4s shiny infinite linear;
+    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+    bottom: 0;
+    content: '';
+    left: 0;
+    position: absolute;
+    top: 0;
+    transform: skewX(-12.5deg);
+    width: @shineSize;
+  }
+}
+
+@keyframes shiny {
+  0% {
+    left: calc(0% - @shineSize);
+  }
+
+  12.5%,
+  100% {
+    left: calc(100% + @shineSize);
   }
 }
 
