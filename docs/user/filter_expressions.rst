@@ -215,8 +215,8 @@ filter expressions.
       // Target clients whose last crash had a BuildID of "201403021422"
       normandy.telemetry.crash.payload.metadata.BuildID == '201403021422'
 
-   .. _Telemetry: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/index.html
-   .. _Telemetry data documentation: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/index.html
+   .. _Telemetry: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/index.html#
+   .. _Telemetry data documentation: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/index.html
 
 .. js:attribute:: normandy.doNotTrack
 

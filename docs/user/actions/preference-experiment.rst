@@ -79,8 +79,8 @@ environment is sent along with the `main ping`_, among others.
      }
    }
 
-.. _Telemetry Environment: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/environment.html
-.. _main ping: http://gecko.readthedocs.io/en/latest/toolkit/components/telemetry/telemetry/data/main-ping.html
+.. _Telemetry Environment: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/index.html
+.. _main ping: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/main-ping.html
 
 Experiment End Conditions
 -------------------------
