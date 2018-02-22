@@ -517,7 +517,7 @@ class TestRecipeAPI(object):
             assert [r['id'] for r in res.data['results']] == [r2.id]
 
             assert a1.id != -1 and a2.id != -1
-            res = api_client.get(f'/api/v2/recipe/?latest_revision__action=-1')
+            res = api_client.get('/api/v2/recipe/?latest_revision__action=-1')
             assert res.status_code == 200
             assert res.data['count'] == 0
 
@@ -538,7 +538,7 @@ class TestRecipeAPI(object):
             assert [r['id'] for r in res.data['results']] == [r2.id]
 
             assert a1.name != "nonexistant" and a2.name != "nonexistant"
-            res = api_client.get(f'/api/v2/recipe/?action=nonexistant')
+            res = api_client.get('/api/v2/recipe/?action=nonexistant')
             assert res.status_code == 200
             assert res.data['count'] == 0
 
@@ -548,11 +548,11 @@ class TestRecipeAPI(object):
             r1 = RecipeFactory(updated=yesterday)
             r2 = RecipeFactory(updated=now)
 
-            res = api_client.get(f'/api/v2/recipe/?ordering=last_updated')
+            res = api_client.get('/api/v2/recipe/?ordering=last_updated')
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r1.id, r2.id]
 
-            res = api_client.get(f'/api/v2/recipe/?ordering=-last_updated')
+            res = api_client.get('/api/v2/recipe/?ordering=-last_updated')
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r2.id, r1.id]
 
@@ -560,11 +560,11 @@ class TestRecipeAPI(object):
             r1 = RecipeFactory(name="a")
             r2 = RecipeFactory(name="b")
 
-            res = api_client.get(f'/api/v2/recipe/?ordering=name')
+            res = api_client.get('/api/v2/recipe/?ordering=name')
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r1.id, r2.id]
 
-            res = api_client.get(f'/api/v2/recipe/?ordering=-name')
+            res = api_client.get('/api/v2/recipe/?ordering=-name')
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r2.id, r1.id]
 
