@@ -579,7 +579,7 @@ class TestRecipeAPI(object):
             r1 = RecipeFactory(updated=yesterday)
             r2 = RecipeFactory(updated=now)
 
-            res = api_client.get(f'/api/v2/recipe/?ordering=last_updated')
+            res = api_client.get('/api/v2/recipe/?ordering=last_updated')
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r1.id, r2.id]
 
@@ -598,6 +598,20 @@ class TestRecipeAPI(object):
             res = api_client.get(f'/api/v2/recipe/?ordering=-name')
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r2.id, r1.id]
+
+        def test_order_bogus(self, api_client):
+            """Test that filtering by an unknown key doesn't change the sort order"""
+            r1 = RecipeFactory(name="a")
+            r2 = RecipeFactory(name="b")
+
+            res = api_client.get(f'/api/v2/recipe/?ordering=bogus')
+            assert res.status_code == 200
+            first_ordering = [r['id'] for r in res.data['results']]
+
+            res = api_client.get(f'/api/v2/recipe/?ordering=-bogus')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == first_ordering
+
 
     @pytest.mark.django_db
     class TestSigned(object):
