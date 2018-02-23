@@ -582,7 +582,6 @@ class TestRecipeAPI(object):
             assert [r['id'] for r in res.data['results']] == first_ordering
 
 
-
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):
     def test_it_works(self, api_client):

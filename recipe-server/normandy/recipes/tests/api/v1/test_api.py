@@ -1,5 +1,4 @@
 import hashlib
-from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from django.db import connection
@@ -572,7 +571,6 @@ class TestRecipeAPI(object):
             res = api_client.get('/api/v1/recipe/?action=nonexistant')
             assert res.status_code == 200
             assert res.data == []
-
 
     @pytest.mark.django_db
     class TestSigned(object):
