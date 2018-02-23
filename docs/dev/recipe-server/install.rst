@@ -31,7 +31,7 @@ Installation
    .. code-block:: bash
 
       git clone https://github.com/mozilla/normandy.git
-      cd normandy
+      cd normandy/recipe-server
 
 2. Create a virtualenv for Normandy and activate it:
 

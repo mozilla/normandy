@@ -9,3 +9,10 @@ browsers) based on certain rules.
 # License
 
 Normandy is licensed under the MPLv2. See the `LICENSE` file for details.
+
+
+# Hacking
+
+Please see the [Developer Setup] documentation to get started.
+
+[Developer Setup]: http://normandy.readthedocs.io/en/latest/dev/recipe-server/install.html
