@@ -573,45 +573,6 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data == []
 
-        def test_order_last_updated(self, api_client):
-            now = datetime.now()
-            yesterday = now - timedelta(days=1)
-            r1 = RecipeFactory(updated=yesterday)
-            r2 = RecipeFactory(updated=now)
-
-            res = api_client.get('/api/v1/recipe/?ordering=last_updated')
-            assert res.status_code == 200
-            assert [r['id'] for r in res.data] == [r1.id, r2.id]
-
-            res = api_client.get('/api/v1/recipe/?ordering=-last_updated')
-            assert res.status_code == 200
-            assert [r['id'] for r in res.data] == [r2.id, r1.id]
-
-        def test_order_name(self, api_client):
-            r1 = RecipeFactory(name="a")
-            r2 = RecipeFactory(name="b")
-
-            res = api_client.get('/api/v1/recipe/?ordering=name')
-            assert res.status_code == 200
-            assert [r['id'] for r in res.data] == [r1.id, r2.id]
-
-            res = api_client.get('/api/v1/recipe/?ordering=-name')
-            assert res.status_code == 200
-            assert [r['id'] for r in res.data] == [r2.id, r1.id]
-
-        def test_order_bogus(self, api_client):
-            """Test that filtering by an unknown key doesn't change the sort order"""
-            r1 = RecipeFactory(name="a")
-            r2 = RecipeFactory(name="b")
-
-            res = api_client.get('/api/v1/recipe/?ordering=bogus')
-            assert res.status_code == 200
-            first_ordering = [r['id'] for r in res.data]
-
-            res = api_client.get('/api/v1/recipe/?ordering=-bogus')
-            assert res.status_code == 200
-            assert [r['id'] for r in res.data] == first_ordering
-
 
     @pytest.mark.django_db
     class TestSigned(object):

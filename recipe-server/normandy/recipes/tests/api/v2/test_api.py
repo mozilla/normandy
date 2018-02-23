@@ -568,6 +568,20 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert [r['id'] for r in res.data['results']] == [r2.id, r1.id]
 
+        def test_order_bogus(self, api_client):
+            """Test that filtering by an unknown key doesn't change the sort order"""
+            RecipeFactory(name="a")
+            RecipeFactory(name="b")
+
+            res = api_client.get('/api/v2/recipe/?ordering=bogus')
+            assert res.status_code == 200
+            first_ordering = [r['id'] for r in res.data['results']]
+
+            res = api_client.get('/api/v2/recipe/?ordering=-bogus')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == first_ordering
+
+
 
 @pytest.mark.django_db
 class TestRecipeRevisionAPI(object):
