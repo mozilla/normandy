@@ -11,7 +11,6 @@ PROJECTS=(
     recipe-server
     mock-recipe-server
     compose
-    mozjexl
 )
 
 count=0

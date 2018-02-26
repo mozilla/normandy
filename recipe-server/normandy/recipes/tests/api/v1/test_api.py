@@ -547,7 +547,7 @@ class TestRecipeAPI(object):
             assert [r['id'] for r in res.data] == [r2.id]
 
             assert a1.id != -1 and a2.id != -1
-            res = api_client.get(f'/api/v1/recipe/?latest_revision__action=-1')
+            res = api_client.get('/api/v1/recipe/?latest_revision__action=-1')
             assert res.status_code == 200
             assert res.data == []
 
@@ -568,7 +568,7 @@ class TestRecipeAPI(object):
             assert [r['id'] for r in res.data] == [r2.id]
 
             assert a1.name != "nonexistant" and a2.name != "nonexistant"
-            res = api_client.get(f'/api/v1/recipe/?action=nonexistant')
+            res = api_client.get('/api/v1/recipe/?action=nonexistant')
             assert res.status_code == 200
             assert res.data == []
 
