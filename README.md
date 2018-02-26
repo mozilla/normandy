@@ -10,7 +10,6 @@ top level directory:
   efficiently and securely.
 * compose - Scripts and configurations to create multi-server environments for
   development and testing.
-* mozjexl - A safe expression evaluation library. A fork of [Jexl][].
 
 [![CircleCI](https://img.shields.io/circleci/project/mozilla/normandy/master.svg?maxAge=2592000&label=CI)](https://circleci.com/gh/mozilla/normandy/tree/master)
 [![Requires.io](https://img.shields.io/requires/github/mozilla/normandy.svg?maxAge=2592000&label=PyPI)](https://requires.io/github/mozilla/normandy/requirements/?branch=master)

@@ -12,7 +12,6 @@ PROJECTS=(
     mock-recipe-server
     compose
     eslint-config-normandy
-    mozjexl
 )
 
 count=0
