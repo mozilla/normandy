@@ -2,10 +2,18 @@ from django.db.models import Q
 
 from rest_framework import permissions, viewsets
 
+from normandy.base.api.filters import AliasedOrderingFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.studies.api.v2.serializers import ExtensionSerializer
 from normandy.studies.models import Extension
+
+
+class ExtensionOrderingFilter(AliasedOrderingFilter):
+    aliases = {
+        'id': ('id', 'ID'),
+        'name': ('name', 'Name'),
+    }
 
 
 class ExtensionViewSet(CachingViewsetMixin, viewsets.ModelViewSet):
@@ -15,6 +23,7 @@ class ExtensionViewSet(CachingViewsetMixin, viewsets.ModelViewSet):
         AdminEnabledOrReadOnly,
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
+    filter_backends = [ExtensionOrderingFilter]
 
     def get_queryset(self):
         queryset = self.queryset

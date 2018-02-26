@@ -138,3 +138,41 @@ class TestExtensionAPI(object):
         # Download the XPI to make sure the url is actually good
         res = api_client.get(res.data['xpi'], follow=True)
         assert res.status_code == 200
+
+    def test_order_name(self, api_client):
+        e1 = ExtensionFactory(name="a")
+        e2 = ExtensionFactory(name="b")
+
+        res = api_client.get(f'/api/v2/extension/?ordering=name')
+        assert res.status_code == 200
+        assert [r['id'] for r in res.data['results']] == [e1.id, e2.id]
+
+        res = api_client.get(f'/api/v2/extension/?ordering=-name')
+        assert res.status_code == 200
+        assert [r['id'] for r in res.data['results']] == [e2.id, e1.id]
+
+    def test_order_id(self, api_client):
+        e1 = ExtensionFactory()
+        e2 = ExtensionFactory()
+        assert e1.id < e2.id
+
+        res = api_client.get(f'/api/v2/extension/?ordering=id')
+        assert res.status_code == 200
+        assert [r['id'] for r in res.data['results']] == [e1.id, e2.id]
+
+        res = api_client.get(f'/api/v2/extension/?ordering=-id')
+        assert res.status_code == 200
+        assert [r['id'] for r in res.data['results']] == [e2.id, e1.id]
+
+    def test_order_bogus(self, api_client):
+        """Test that filtering by an unknown key doesn't change the sort order"""
+        ExtensionFactory()
+        ExtensionFactory()
+
+        res = api_client.get(f'/api/v2/extension/?ordering=bogus')
+        assert res.status_code == 200
+        first_ordering = [r['id'] for r in res.data['results']]
+
+        res = api_client.get(f'/api/v2/extension/?ordering=-bogus')
+        assert res.status_code == 200
+        assert [r['id'] for r in res.data['results']] == first_ordering
