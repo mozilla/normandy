@@ -140,51 +140,51 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def enabled(self):
         return self.approved_revision.enabled
 
-    @current_revision_property
+    @current_revision_property()
     def name(self):
         return self.current_revision.name
 
-    @current_revision_property
+    @current_revision_property()
     def action(self):
         return self.current_revision.action
 
-    @current_revision_property
+    @current_revision_property()
     def extra_filter_expression(self):
         return self.current_revision.extra_filter_expression
 
-    @current_revision_property
+    @current_revision_property()
     def arguments_json(self):
         return self.current_revision.arguments_json
 
-    @current_revision_property
+    @current_revision_property()
     def arguments(self):
         return self.current_revision.arguments
 
-    @current_revision_property
+    @current_revision_property()
     def revision_id(self):
         return self.current_revision.id
 
-    @current_revision_property
+    @current_revision_property()
     def last_updated(self):
         return self.current_revision.updated
 
-    @current_revision_property
+    @current_revision_property()
     def filter_expression(self):
         return self.current_revision.filter_expression
 
-    @current_revision_property
+    @current_revision_property()
     def channels(self):
         return self.current_revision.channels
 
-    @current_revision_property
+    @current_revision_property()
     def countries(self):
         return self.current_revision.countries
 
-    @current_revision_property
+    @current_revision_property()
     def locales(self):
         return self.current_revision.locales
 
-    @current_revision_property
+    @current_revision_property()
     def identicon_seed(self):
         return self.current_revision.identicon_seed
 
@@ -387,8 +387,8 @@ class RecipeRevision(models.Model):
 
     @property
     def enabled(self):
-        last_state = self.enabled_states.first()
-        return last_state.enabled if last_state else False
+        enabled_state = self.enabled_states.first()
+        return enabled_state.enabled if enabled_state else False
 
     def hash(self):
         data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
