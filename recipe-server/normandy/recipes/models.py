@@ -17,7 +17,7 @@ from rest_framework.reverse import reverse
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
-from normandy.recipes.decorators import current_revision_property
+from normandy.recipes.decorators import approved_revision_property, current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
 from normandy.recipes.validators import validate_json
@@ -114,8 +114,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
                                         related_name='latest_for_recipe')
     approved_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
                                           related_name='approved_for_recipe')
-
-    enabled = models.BooleanField(default=False)
     signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
 
     class Meta:
@@ -137,6 +135,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     @property
     def is_approved(self):
         return self.approved_revision is not None
+
+    @approved_revision_property(default=False)
+    def enabled(self):
+        return self.approved_revision.enabled
 
     @current_revision_property
     def name(self):
@@ -277,14 +279,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             dirty_field_names = list(dirty_fields.keys())
 
-            if 'enabled' in dirty_field_names:
-                if self.enabled and not self.is_approved:
-                    raise self.NotApproved('Cannot enable a recipe that is not approved.')
-
-                if not self.enabled:
-                    # If we are disabling the recipe we should invalidate the approval
-                    self.approved_revision = None
-
             if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
                     and self.signature is not None):
                 # Setting the signature while also changing something else is probably
@@ -391,6 +385,11 @@ class RecipeRevision(models.Model):
         except ApprovalRequest.DoesNotExist:
             return None
 
+    @property
+    def enabled(self):
+        last_state = self.enabled_states.first()
+        return last_state.enabled if last_state else False
+
     def hash(self):
         data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
                                      self.arguments_json, self.filter_expression)
@@ -415,6 +414,44 @@ class RecipeRevision(models.Model):
         self.recipe.update_signature()
         self.recipe.save()
         return approval_request
+
+    def enable(self, user):
+        if self.enabled:
+            raise EnabledState.NotActionable('This revision is already enabled.')
+
+        if self.recipe.approved_revision != self:
+            raise EnabledState.NotActionable('This revision is not the current approved revision.')
+
+        enabled_state = EnabledState(revision=self, creator=user, enabled=True)
+        enabled_state.save()
+
+    def disable(self, user):
+        if self.disabled:
+            raise EnabledState.NotActionable('This revision is already disabled.')
+
+        if self.recipe.approved_revision != self:
+            raise EnabledState.NotActionable('This revision is not the current approved revision.')
+
+        enabled_state = EnabledState(revision=self, creator=user, enabled=False)
+        enabled_state.save()
+
+        # If we are disabling the revision it should revoke it's approval status
+        self.recipe.approved_revision = None
+        self.recipe.save()
+
+
+class EnabledState(models.Model):
+    revision = models.ForeignKey(RecipeRevision, related_name='enabled_states')
+    created = models.DateTimeField(default=timezone.now)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='enabled_states',
+                                null=True)
+    enabled = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-created',)
+
+    class NotActionable(Exception):
+        pass
 
 
 class ApprovalRequest(models.Model):
