@@ -42,6 +42,24 @@ class TestApiRootV1(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
+    def test_cors_headers(self, api_client):
+        res = api_client.get('/api/v1/')
+        assert res.status_code == 200
+        assert not res.has_header('access-control-allow-origin')
+
+        res = api_client.get('/api/v1/', HTTP_ORIGIN='any.example.com')
+        assert res.status_code == 200
+        assert res.has_header('access-control-allow-origin')
+        assert res['access-control-allow-origin'] == '*'
+
+        # OPTIONS method is louder
+        res = api_client.options('/api/v1/', HTTP_ORIGIN='any.example.com')
+        assert res.status_code == 200
+        assert res['access-control-allow-origin'] == '*'
+        assert res.has_header('access-control-allow-headers')
+        assert res.has_header('access-control-allow-origin')
+        assert res.has_header('access-control-allow-methods')
+
 
 @pytest.mark.django_db
 class TestApiRootV2(object):
@@ -63,6 +81,24 @@ class TestApiRootV2(object):
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
+
+    def test_cors_headers(self, api_client):
+        res = api_client.get('/api/v2/')
+        assert res.status_code == 200
+        assert not res.has_header('access-control-allow-origin')
+
+        res = api_client.get('/api/v2/', HTTP_ORIGIN='any.example.com')
+        assert res.status_code == 200
+        assert res.has_header('access-control-allow-origin')
+        assert res['access-control-allow-origin'] == '*'
+
+        # OPTIONS method is louder
+        res = api_client.options('/api/v2/', HTTP_ORIGIN='any.example.com')
+        assert res.status_code == 200
+        assert res['access-control-allow-origin'] == '*'
+        assert res.has_header('access-control-allow-headers')
+        assert res.has_header('access-control-allow-origin')
+        assert res.has_header('access-control-allow-methods')
 
 
 class TestAPIRootView(object):

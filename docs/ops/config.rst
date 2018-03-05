@@ -309,6 +309,27 @@ in other Django projects.
 
    The name of the S3 bucket to be used to store media files.
 
+.. envvar:: DJANGO_CORS_ORIGIN_ALLOW_ALL
+
+   :default: ``False``
+
+   Respond with ``Access-Control-Allow-Origin: *`` if set to True. If False,
+   needs the ``Origin`` header needs to match ``DJANGO_CORS_ORIGIN_WHITELIST``.
+   In all environments other than ``Production`` this is set to True.
+
+   .. note::
+
+      The CORS headers only apply to URLs that match the regex ``/api/*``.
+
+.. envvar:: DJANGO_CORS_ORIGIN_WHITELIST
+
+   :default: ``['https://normandy-admin.prod.mozaws.net']``
+
+   List of domains (with or without ``https://`` prefix, but ideally with)
+   that is included in ``Access-Control-Allow-Origin`` header.
+   Ideally this should list all the client-side apps that should be allowed
+   to make remote XHR requests.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the
