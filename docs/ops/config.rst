@@ -330,6 +330,14 @@ in other Django projects.
    Ideally this should list all the client-side apps that should be allowed
    to make remote XHR requests.
 
+.. envvar:: DJANGO_CORS_ALLOW_METHODS
+
+   :default: ``['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']``
+
+   List of allowed CORS methods if applicable. Specifically this list is
+   reduced to "read-only" methods when using the ``ProductionReadOnly``
+   configuration.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the

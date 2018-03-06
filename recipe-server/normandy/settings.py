@@ -1,6 +1,7 @@
 import os
 
 from configurations import Configuration, values
+from corsheaders.defaults import default_methods
 
 
 class Core(Configuration):
@@ -169,6 +170,10 @@ class CORS:
 
     CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(True)
     CORS_URLS_REGEX = r'^/api/.*$'
+    CORS_ALLOW_METHODS = values.ListValue(default_methods)
+    # This list only applicable if you've also set
+    # `DJANGO_CORS_ORIGIN_ALLOW_ALL` to False.
+    CORS_ORIGIN_WHITELIST = values.ListValue([])
 
 
 class Base(Core, CORS):
@@ -401,7 +406,6 @@ class Production(Base):
     # Custom CORS settings that overrides the CORS class's configuration.
     # In production we harden it down a bit extra.
     CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(False)
-    CORS_ORIGIN_WHITELIST = values.ListValue([])
 
 
 class ProductionReadOnly(Production):
