@@ -168,7 +168,6 @@ class CORS:
     """Default settings related to setting CORS headers."""
 
     CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(True)
-
     CORS_URLS_REGEX = r'^/api/.*$'
 
 
@@ -402,9 +401,7 @@ class Production(Base):
     # Custom CORS settings that overrides the CORS class's configuration.
     # In production we harden it down a bit extra.
     CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(False)
-    CORS_ORIGIN_WHITELIST = values.ListValue([
-        'https://normandy-admin.prod.mozaws.net'
-    ])
+    CORS_ORIGIN_WHITELIST = values.ListValue([])
 
 
 class ProductionReadOnly(Production):
