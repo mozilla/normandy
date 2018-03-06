@@ -323,7 +323,7 @@ in other Django projects.
 
 .. envvar:: DJANGO_CORS_ORIGIN_WHITELIST
 
-   :default: ``['https://normandy-admin.prod.mozaws.net']``
+   :default: ``[]``
 
    List of domains (with or without ``https://`` prefix, but ideally with)
    that is included in ``Access-Control-Allow-Origin`` header.
