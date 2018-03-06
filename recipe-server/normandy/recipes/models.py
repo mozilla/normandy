@@ -435,10 +435,6 @@ class RecipeRevision(models.Model):
         enabled_state = EnabledState(revision=self, creator=user, enabled=False)
         enabled_state.save()
 
-        # If we are disabling the revision it should revoke it's approval status
-        self.recipe.approved_revision = None
-        self.recipe.save()
-
 
 class EnabledState(models.Model):
     revision = models.ForeignKey(RecipeRevision, related_name='enabled_states')
