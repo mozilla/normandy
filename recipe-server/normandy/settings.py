@@ -1,6 +1,7 @@
 import os
 
 from configurations import Configuration, values
+from corsheaders.defaults import default_methods
 
 
 class Core(Configuration):
@@ -23,6 +24,7 @@ class Core(Configuration):
         'storages',
         'raven.contrib.django.raven_compat',
         'webpack_loader',
+        'corsheaders',
 
         'django.contrib.admin',
         'django.contrib.auth',
@@ -36,6 +38,7 @@ class Core(Configuration):
     # Middleware that ALL environments must have. See the Base class for
     # details.
     MIDDLEWARE = [
+        'corsheaders.middleware.CorsMiddleware',
         'normandy.base.middleware.request_received_at_middleware',
         'normandy.base.middleware.RequestSummaryLogger',
         'normandy.base.middleware.NormandySecurityMiddleware',
@@ -162,7 +165,18 @@ class Core(Configuration):
     CSRF_COOKIE_NAME = 'csrftoken-20170707'
 
 
-class Base(Core):
+class CORS:
+    """Default settings related to setting CORS headers."""
+
+    CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(True)
+    CORS_URLS_REGEX = r'^/api/.*$'
+    CORS_ALLOW_METHODS = values.ListValue(default_methods)
+    # This list only applicable if you've also set
+    # `DJANGO_CORS_ORIGIN_ALLOW_ALL` to False.
+    CORS_ORIGIN_WHITELIST = values.ListValue([])
+
+
+class Base(Core, CORS):
     """Settings that may change per-environment, some with defaults."""
 
     # Flags that affect other settings, via setting methods below
@@ -389,6 +403,10 @@ class Production(Base):
     DEFAULT_FILE_STORAGE = values.Value('normandy.base.storage.S3Boto3PermissiveStorage')
     AWS_S3_FILE_OVERWRITE = False
 
+    # Custom CORS settings that overrides the CORS class's configuration.
+    # In production we harden it down a bit extra.
+    CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(False)
+
 
 class ProductionReadOnly(Production):
     """
@@ -404,6 +422,10 @@ class ProductionReadOnly(Production):
         'security.W003',  # CSRF middleware check
         'security.W017',  # Check CSRF cookie http only
     ])
+
+    # In ReadOnly mode you have no business using the API to do any writes
+    # anyway. This gives early feedback to that.
+    CORS_ALLOW_METHODS = values.ListValue(['GET', 'OPTIONS'])
 
 
 class ProductionInsecure(Production):
