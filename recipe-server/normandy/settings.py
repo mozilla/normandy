@@ -419,6 +419,10 @@ class ProductionReadOnly(Production):
         'security.W017',  # Check CSRF cookie http only
     ])
 
+    # In ReadOnly mode you have no business using the API to do any writes
+    # anyway. This gives early feedback to that.
+    CORS_ALLOW_METHODS = values.ListValue(['GET', 'OPTIONS'])
+
 
 class ProductionInsecure(Production):
     """
