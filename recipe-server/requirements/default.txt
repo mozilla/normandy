@@ -13,9 +13,9 @@ dj-database-url==0.3.0 \
     --hash=sha256:ca01768fdecde134301f3170743226f60edff5c3935f12437378ebd911506353
 dj-inmemorystorage==1.4.0 \
     --hash=sha256:35a37fac5955c3d9519fcab0cc7d88b43dc9bc95ffd2a6312badfa489ed30fd2
-Django==1.10.8 \
-    --hash=sha256:ffdc7e938391ae3c2ee8ff82e0b4444e4e6bb15c99d00770285233d42aaf33d6 \
-    --hash=sha256:d4ef83bd326573c00972cb9429beb396d210341a636e4b816fc9b3f505c498bb
+Django==1.11.11 \
+    --hash=sha256:fd186d544c7c2f835668cf11f77be071307c9eb22615a5b3a16bdb14c8357f41 \
+    --hash=sha256:74077d7309b48b97dacdac2dfb35c968028becf00a7a684e7f29b2af1b980edc
 django-configurations==1.0 \
     --hash=sha256:98a14951cd0870d0343fe9c243172dc110353b430c3e06a87a90dc7bc82b0b75 \
     --hash=sha256:93f4a09134145f4388c2ec2183ce623b1b57fd04e3e0d2a2cf3b32fadc8f9464
@@ -24,9 +24,9 @@ django-countries==3.4.1 \
     --hash=sha256:23c6b5455a2e68ed02601cee0d3c80481965d0c3a6bd2f07ca56902b0a4c55a6
 django-dirtyfields==1.2.1 \
     --hash=sha256:6f2e988121323cd8a15cef3035f5ea5942d3e41f76c3b2e1de0b81761a000c94
-django-filter==1.0.1 \
-    --hash=sha256:03ab2895e086aa579110a8945d7d9c5d28c4b57060cfc697cb5c74a18021fec4 \
-    --hash=sha256:7cca9dab22c72df734ba24fb81ca018fdb6d2020c840e758d473dcedd341aa7b
+django-filter==1.1.0 \
+    --hash=sha256:ec0ef1ba23ef95b1620f5d481334413700fb33f45cd76d56a63f4b0b1d76976a \
+    --hash=sha256:ea204242ea83790e1512c9d0d8255002a652a6f4986e93cee664f28955ba0c22
 django-mozilla-product-details==0.11.1 \
     --hash=sha256:6a9bf2898deae722876bd19eb874bfdcbe884f99c8096c2ddd6cdea8b95d4fa0
 django-npm==0.1.4 \

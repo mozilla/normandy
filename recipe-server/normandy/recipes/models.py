@@ -116,7 +116,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
                                           related_name='approved_for_recipe')
 
     enabled = models.BooleanField(default=False)
-    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True)
+    signature = models.OneToOneField(
+        Signature, related_name='recipe', null=True, blank=True,
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ['-enabled', '-latest_revision__updated']
@@ -308,7 +311,7 @@ class RecipeRevision(models.Model):
     id = models.CharField(max_length=64, primary_key=True)
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
-    recipe = models.ForeignKey(Recipe, related_name='revisions')
+    recipe = models.ForeignKey(Recipe, related_name='revisions', on_delete=models.CASCADE)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='recipe_revisions',
@@ -316,7 +319,7 @@ class RecipeRevision(models.Model):
     comment = models.TextField()
 
     name = models.CharField(max_length=255)
-    action = models.ForeignKey('Action', related_name='recipe_revisions')
+    action = models.ForeignKey('Action', related_name='recipe_revisions', on_delete=models.CASCADE)
     arguments_json = models.TextField(default='{}', validators=[validate_json])
     extra_filter_expression = models.TextField(blank=False)
     channels = models.ManyToManyField(Channel)
@@ -418,7 +421,11 @@ class RecipeRevision(models.Model):
 
 
 class ApprovalRequest(models.Model):
-    revision = models.OneToOneField(RecipeRevision, related_name='approval_request')
+    revision = models.OneToOneField(
+        RecipeRevision,
+        related_name='approval_request',
+        on_delete=models.CASCADE,
+    )
     created = models.DateTimeField(default=timezone.now)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approval_requests',
                                 null=True)
@@ -526,7 +533,10 @@ class Action(DirtyFieldsMixin, models.Model):
     implementation = models.TextField()
     implementation_hash = models.CharField(max_length=71, editable=False)
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
-    signature = models.OneToOneField(Signature, related_name='action', null=True, blank=True)
+    signature = models.OneToOneField(
+        Signature, related_name='action', null=True, blank=True,
+        on_delete=models.CASCADE,
+    )
 
     errors = {
         'duplicate_branch_slug': (
