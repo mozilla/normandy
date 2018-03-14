@@ -166,7 +166,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             error = f'The JEXL parser failed to validate {value}'
             raise serializers.ValidationError([error])
 
-
         if errors:
             raise serializers.ValidationError(errors)
 

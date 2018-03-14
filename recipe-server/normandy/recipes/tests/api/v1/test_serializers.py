@@ -152,7 +152,7 @@ class TestRecipeSerializer:
 
         jexl_mock = mock.Mock()
         jexl_mock().validate.side_effect = Exception("didn't like this")
-        with mock.patch('normandy.recipes.api.v2.serializers.JEXL', jexl_mock):
+        with mock.patch('normandy.recipes.api.v1.serializers.JEXL', jexl_mock):
             assert not serializer.is_valid()
             assert serializer.errors['extra_filter_expression'] == [
                 'The JEXL parser failed to validate aces'
