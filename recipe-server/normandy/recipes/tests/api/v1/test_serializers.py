@@ -1,3 +1,4 @@
+from unittest import mock
 import urllib.parse as urlparse
 
 import pytest
@@ -133,6 +134,29 @@ class TestRecipeSerializer:
         assert serializer.errors['extra_filter_expression'] == [
             'Could not parse expression: inv(-alsid'
         ]
+
+    def test_validation_with_jexl_exception(self):
+        serializer = RecipeSerializer(data={
+            'name': 'bar',
+            'enabled': True,
+            'extra_filter_expression': 'aces',
+            'action': 'show-heartbeat',
+            'arguments': {
+                'surveyId': 'lorem-ipsum-dolor',
+                'surveys': [
+                    {'title': 'adipscing', 'weight': 1},
+                    {'title': 'consequetar', 'weight': 1}
+                ]
+            }
+        })
+
+        jexl_mock = mock.Mock()
+        jexl_mock().validate.side_effect = Exception("didn't like this")
+        with mock.patch('normandy.recipes.api.v2.serializers.JEXL', jexl_mock):
+            assert not serializer.is_valid()
+            assert serializer.errors['extra_filter_expression'] == [
+                'The JEXL parser failed to validate aces'
+            ]
 
     def test_validation_with_valid_data(self):
         mockAction = ActionFactory(
