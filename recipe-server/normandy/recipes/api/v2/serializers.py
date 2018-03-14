@@ -154,7 +154,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         jexl.add_transform('preferenceIsUserSet', lambda x: x)
         jexl.add_transform('preferenceExists', lambda x: x)
 
-        errors = list(jexl.validate(value))
+        try:
+            errors = list(jexl.validate(value))
+        except Exception as exc:
+            # The JEXL parser can occasionally throw exceptions when
+            # called to validate certain invalid inputs.
+            # Catch them and at least indicate the field that failed,
+            # even if we can't explain exactly what the problem was.
+            # See https://github.com/mozilla/normandy/issues/1059.
+            error = f'The JEXL parser failed to validate {value}'
+            raise serializers.ValidationError([error])
+
         if errors:
             raise serializers.ValidationError(errors)
 
