@@ -36,8 +36,8 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeFilters(django_filters.FilterSet):
-    enabled = CaseInsensitiveBooleanFilter(name='enabled', lookup_expr='eq')
-    action = django_filters.CharFilter(name='latest_revision__action__name')
+    enabled = CaseInsensitiveBooleanFilter(field_name='enabled', lookup_expr='eq')
+    action = django_filters.CharFilter(field_name='latest_revision__action__name')
 
     class Meta:
         model = Recipe

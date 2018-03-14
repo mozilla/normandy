@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from normandy.control.templatetags.normandy_logout_button import logout_button
 

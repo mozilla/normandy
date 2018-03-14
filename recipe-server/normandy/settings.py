@@ -25,6 +25,7 @@ class Core(Configuration):
         'raven.contrib.django.raven_compat',
         'webpack_loader',
         'corsheaders',
+        'django_filters',
 
         'django.contrib.admin',
         'django.contrib.auth',
