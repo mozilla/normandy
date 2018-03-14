@@ -162,7 +162,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             # Catch them and at least indicate the field that failed,
             # even if we can't explain exactly what the problem was.
             # See https://github.com/mozilla/normandy/issues/1059.
-            error = 'The JEXL parser failed to validate {}'.format(value)
+            error = f'The JEXL parser failed to validate {value}'
             raise serializers.ValidationError([error])
 
         if errors:
