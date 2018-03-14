@@ -1,3 +1,6 @@
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
+
 import pytest
 from rest_framework.test import APIClient
 

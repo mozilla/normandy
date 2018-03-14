@@ -16,6 +16,7 @@ from rest_framework.reverse import reverse
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
+from normandy.recipes import filters
 from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
@@ -149,8 +150,16 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.action
 
     @current_revision_property
+    def filter_expression(self):
+        return self.current_revision.filter_expression
+
+    @current_revision_property
     def extra_filter_expression(self):
         return self.current_revision.extra_filter_expression
+
+    @current_revision_property
+    def filter_object(self):
+        return self.current_revision.filter_object
 
     @current_revision_property
     def arguments_json(self):
@@ -167,10 +176,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     @current_revision_property
     def last_updated(self):
         return self.current_revision.updated
-
-    @current_revision_property
-    def filter_expression(self):
-        return self.current_revision.filter_expression
 
     @current_revision_property
     def channels(self):
@@ -224,6 +229,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
         if 'arguments' in data:
             data['arguments_json'] = json.dumps(data.pop('arguments'))
+
+        if 'filter_object' in data:
+            data['filter_object_json'] = json.dumps(data.pop('filter_object'))
 
         if revision:
             revisions = RecipeRevision.objects.filter(id=revision.id)
@@ -320,6 +328,7 @@ class RecipeRevision(models.Model):
     action = models.ForeignKey('Action', related_name='recipe_revisions', on_delete=models.CASCADE)
     arguments_json = models.TextField(default='{}', validators=[validate_json])
     extra_filter_expression = models.TextField(blank=False)
+    filter_object_json = models.TextField(validators=[validate_json], null=True)
     channels = models.ManyToManyField(Channel)
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
@@ -357,12 +366,24 @@ class RecipeRevision(models.Model):
             channels = ', '.join(["'{}'".format(c.slug) for c in self.channels.all()])
             parts.append('normandy.channel in [{}]'.format(channels))
 
+        for obj in self.filter_object:
+            filter = filters.from_data(obj)
+            assert filter.is_valid(), [obj, filter.errors]
+            parts.append(filter.to_jexl())
+
         if self.extra_filter_expression:
             parts.append(self.extra_filter_expression)
 
         expression = ') && ('.join(parts)
 
         return '({})'.format(expression) if len(parts) > 1 else expression
+
+    @property
+    def filter_object(self):
+        if self.filter_object_json is not None:
+            return json.loads(self.filter_object_json)
+        else:
+            return []
 
     @property
     def arguments(self):

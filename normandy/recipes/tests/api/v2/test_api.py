@@ -5,6 +5,7 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 import pytest
+from rest_framework import serializers
 from rest_framework.reverse import reverse
 from rest_framework import serializers
 from pathlib import Path
@@ -12,6 +13,7 @@ from pathlib import Path
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
+from normandy.recipes import filters
 from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
@@ -157,7 +159,7 @@ class TestRecipeAPI(object):
                 'extra_filter_expression': 'whatever',
                 'enabled': True
             })
-            assert res.status_code == 201
+            assert res.status_code == 201, res.json()
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 1
@@ -321,6 +323,20 @@ class TestRecipeAPI(object):
             })
             assert res.status_code == 400
 
+        def test_at_least_one_filter_is_required(self, api_client):
+            action = ActionFactory()
+
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'action_id': action.id,
+                'arguments': {},
+                'enabled': True
+            })
+            assert res.status_code == 400, res.json()
+            assert res.json() == {
+                'non_field_errors': ['one of extra_filter_expression or filter_object is required'],
+            }
+
     @pytest.mark.django_db
     class TestUpdates(object):
         def test_it_can_edit_recipes(self, api_client):
@@ -446,6 +462,247 @@ class TestRecipeAPI(object):
 
             r.refresh_from_db()
             assert list(r.channels.all()) == [c2]
+
+    @pytest.mark.django_db
+    class TestFilterObjects(object):
+        def make_recipe(self, api_client, **kwargs):
+            data = {
+                'name': 'Test Recipe',
+                'action_id': ActionFactory().id,
+                'arguments': {},
+                'enabled': True,
+                'extra_filter_expression': 'true',
+                'filter_object': [],
+            }
+            data.update(kwargs)
+            return api_client.post('/api/v2/recipe/', data)
+
+        def test_bad_filter_objects(self, api_client):
+            res = self.make_recipe(api_client, filter_object={})  # not a list
+            assert res.status_code == 400
+            assert res.json() == {'filter_object': {'non field errors': ['filter_object must be a list.']}}
+
+            res = self.make_recipe(api_client, filter_object=["1 + 1 == 2"])  # not a list of objects
+            assert res.status_code == 400
+            assert res.json() == {'filter_object': {'0': {'non field errors': ['filter_object members must be objects.']}}}
+
+            res = self.make_recipe(api_client, filter_object=[{'channels': ["release"]}])  # type is required
+            assert res.status_code == 400
+            assert res.json() == {'filter_object': {'0': {'type': ['This field is required.']}}}
+
+        def test_channel_works(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'channel', 'channels': ['release', 'beta']}],
+            )
+            assert res.status_code == 201, res.json()
+            recipe_data = res.json()
+
+            recipe = Recipe.objects.get(id=recipe_data['id'])
+            assert recipe_data['filter_expression'] == (
+                '(normandy.channel in ["release","beta"]) && (true)')
+
+        def test_channel_correct_fields(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'channel'}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'channels': ['This field is required.'],
+                    },
+                },
+            }
+
+        def test_locale_works(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'locale', 'locales': ['en-US', 'de']}],
+            )
+            assert res.status_code == 201, res.json()
+            recipe_data = res.json()
+
+            recipe = Recipe.objects.get(id=recipe_data['id'])
+            assert recipe_data['filter_expression'] == (
+                '(normandy.locale in ["en-US","de"]) && (true)'
+            )
+
+        def test_locale_correct_fields(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'locale'}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'locales': ['This field is required.'],
+                    },
+                },
+            }
+
+        def test_country_works(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'country', 'countries': ['US', 'DE']}],
+            )
+            assert res.status_code == 201, res.json()
+            recipe_data = res.json()
+
+            recipe = Recipe.objects.get(id=recipe_data['id'])
+            assert recipe_data['filter_expression'] == (
+                '(normandy.country in ["US","DE"]) && (true)'
+            )
+
+        def test_country_correct_fields(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'country'}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'countries': ['This field is required.'],
+                    },
+                },
+            }
+
+        def test_bucket_sample_works(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{
+                    'type': 'bucketSample',
+                    'start': 1,
+                    'count': 2,
+                    'total': 3,
+                    'input': ['normandy.userId', 'normandy.recipeId'],
+                }],
+            )
+            assert res.status_code == 201, res.json()
+            recipe_data = res.json()
+
+            recipe = Recipe.objects.get(id=recipe_data['id'])
+            assert recipe_data['filter_expression'] == (
+                '([normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)) && (true)'
+            )
+
+        def test_bucket_sample_correct_fields(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'bucketSample'}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'start': ['This field is required.'],
+                        'count': ['This field is required.'],
+                        'total': ['This field is required.'],
+                        'input': ['This field is required.'],
+                    },
+                },
+            }
+
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'bucketSample', 'start': 'a', 'count': -1, 'total': -2}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'start': ['A valid number is required.'],
+                        'count': ['Ensure this value is greater than or equal to 0.'],
+                        'total': ['Ensure this value is greater than or equal to 0.'],
+                        'input': ['This field is required.'],
+                    },
+                },
+            }
+
+        def test_stable_sample_works(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{
+                    'type': 'stableSample',
+                    'rate': 0.5,
+                    'input': ['normandy.userId', 'normandy.recipeId'],
+                }],
+            )
+            assert res.status_code == 201, res.json()
+            recipe_data = res.json()
+
+            recipe = Recipe.objects.get(id=recipe_data['id'])
+            assert recipe_data['filter_expression'] == (
+                '([normandy.userId,normandy.recipeId]|stableSample(0.5)) && (true)'
+            )
+
+        def test_stable_sample_correct_fields(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'stableSample'}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'rate': ['This field is required.'],
+                        'input': ['This field is required.'],
+                    },
+                },
+            }
+
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'stableSample', 'rate': 10}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'rate': ['Ensure this value is less than or equal to 1.'],
+                        'input': ['This field is required.'],
+                    },
+                },
+            }
+
+        def test_version_works(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'version', 'versions': [57, 58]}],
+            )
+            assert res.status_code == 201, res.json()
+            recipe_data = res.json()
+
+            recipe = Recipe.objects.get(id=recipe_data['id'])
+            assert recipe_data['filter_expression'] == (
+                '((normandy.version>="57"&&normandy.version<"58")||(normandy.version>="58"&&normandy.version<"59")) && (true)'
+            )
+
+        def test_version_correct_fields(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'version'}],
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                'filter_object': {
+                    '0': {
+                        'versions': ['This field is required.'],
+                    },
+                },
+            }
+
+
+        def test_invalid_filter(self, api_client):
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{'type': 'invalid'}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {'filter_object': {'0': {'type': ['Unknown filter object type "invalid".']}}}
 
     @pytest.mark.django_db
     class TestDetail(object):
@@ -1039,3 +1296,231 @@ class TestIdenticonAPI(object):
         assert f'max-age={settings.IMMUTABLE_CACHE_TIME}' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
         assert 'immutable' in res['Cache-Control']
+
+
+@pytest.mark.django_db
+class TestFilterObjects(object):
+    def make_recipe(self, api_client, **kwargs):
+        data = {
+            'name': 'Test Recipe',
+            'action_id': ActionFactory().id,
+            'arguments': {},
+            'enabled': True,
+        }
+        data.update(kwargs)
+        return api_client.post('/api/v2/recipe/', data)
+
+    def test_bad_filter_objects(self, api_client):
+        res = self.make_recipe(api_client, filter_object={})  # not a list
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {'non field errors': ['filter_object must be a list.']},
+        }
+
+        res = self.make_recipe(api_client, filter_object=["1 + 1 == 2"])  # not a list of objects
+        assert res.status_code == 400
+        assert res.json() == {'filter_object': {
+            '0': {'non field errors': ['filter_object members must be objects.']}},
+        }
+
+        res = self.make_recipe(api_client, filter_object=[{'channels': ["release"]}])
+        assert res.status_code == 400
+        assert res.json() == {'filter_object': {'0': {'type': ['This field is required.']}}}
+
+    def test_channel_works(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'channel', 'channels': ['release', 'beta']}],
+        )
+        assert res.status_code == 201, res.json()
+        assert res.json()['filter_expression'] == (
+            'normandy.channel in ["release","beta"]')
+
+    def test_channel_correct_fields(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'channel'}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'channels': ['This field is required.'],
+                },
+            },
+        }
+
+    def test_locale_works(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'locale', 'locales': ['en-US', 'de']}],
+        )
+        assert res.status_code == 201, res.json()
+        assert res.json()['filter_expression'] == (
+            'normandy.locale in ["en-US","de"]'
+        )
+
+    def test_locale_correct_fields(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'locale'}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'locales': ['This field is required.'],
+                },
+            },
+        }
+
+    def test_country_works(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'country', 'countries': ['US', 'DE']}],
+        )
+        assert res.status_code == 201, res.json()
+        assert res.json()['filter_expression'] == (
+            'normandy.country in ["US","DE"]'
+        )
+
+    def test_country_correct_fields(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'country'}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'countries': ['This field is required.'],
+                },
+            },
+        }
+
+    def test_bucket_sample_works(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{
+                'type': 'bucketSample',
+                'start': 1,
+                'count': 2,
+                'total': 3,
+                'input': ['normandy.userId', 'normandy.recipeId'],
+            }],
+        )
+        assert res.status_code == 201, res.json()
+        assert res.json()['filter_expression'] == (
+            '[normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)'
+        )
+
+    def test_bucket_sample_correct_fields(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'bucketSample'}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'start': ['This field is required.'],
+                    'count': ['This field is required.'],
+                    'total': ['This field is required.'],
+                    'input': ['This field is required.'],
+                },
+            },
+        }
+
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'bucketSample', 'start': 'a', 'count': -1, 'total': -2}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'start': ['A valid number is required.'],
+                    'count': ['Ensure this value is greater than or equal to 0.'],
+                    'total': ['Ensure this value is greater than or equal to 0.'],
+                    'input': ['This field is required.'],
+                },
+            },
+        }
+
+    def test_stable_sample_works(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{
+                'type': 'stableSample',
+                'rate': 0.5,
+                'input': ['normandy.userId', 'normandy.recipeId'],
+            }],
+        )
+        assert res.status_code == 201, res.json()
+        assert res.json()['filter_expression'] == (
+            '[normandy.userId,normandy.recipeId]|stableSample(0.5)'
+        )
+
+    def test_stable_sample_correct_fields(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'stableSample'}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'rate': ['This field is required.'],
+                    'input': ['This field is required.'],
+                },
+            },
+        }
+
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'stableSample', 'rate': 10}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'rate': ['Ensure this value is less than or equal to 1.'],
+                    'input': ['This field is required.'],
+                },
+            },
+        }
+
+    def test_version_works(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'version', 'versions': [57, 58]}],
+        )
+        assert res.status_code == 201, res.json()
+        assert res.json()['filter_expression'] == (
+            '(normandy.version>="57"&&normandy.version<"58")||'
+            '(normandy.version>="58"&&normandy.version<"59")'
+        )
+
+    def test_version_correct_fields(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'version'}],
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {
+                '0': {
+                    'versions': ['This field is required.'],
+                },
+            },
+        }
+
+    def test_invalid_filter(self, api_client):
+        res = self.make_recipe(
+            api_client,
+            filter_object=[{'type': 'invalid'}]
+        )
+        assert res.status_code == 400
+        assert res.json() == {
+            'filter_object': {'0': {'type': ['Unknown filter object type "invalid".']}},
+        }

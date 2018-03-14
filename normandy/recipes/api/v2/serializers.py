@@ -1,8 +1,11 @@
+from collections import defaultdict
+
 from pyjexl import JEXL
 from rest_framework import serializers
 from factory.fuzzy import FuzzyText
 
 from normandy.base.api.serializers import UserSerializer
+from normandy.recipes import filters
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import (
     Action,
@@ -85,8 +88,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     countries = serializers.SlugRelatedField(
         slug_field='code', queryset=Country.objects.all(), many=True, required=False)
     enabled = serializers.BooleanField(read_only=True)
-    extra_filter_expression = serializers.CharField()
+    extra_filter_expression = serializers.CharField(required=False)
     filter_expression = serializers.CharField(read_only=True)
+    filter_object = serializers.JSONField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
     locales = serializers.SlugRelatedField(
         slug_field='code', queryset=Locale.objects.all(), many=True, required=False)
@@ -107,6 +111,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'enabled',
             'extra_filter_expression',
             'filter_expression',
+            'filter_object',
             'id',
             'is_approved',
             'locales',
@@ -161,6 +166,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        data = super().validate(data)
         action = data.get('action')
         required_error_msg = serializers.PrimaryKeyRelatedField.default_error_messages['required']
 
@@ -214,4 +220,38 @@ class RecipeSerializer(serializers.ModelSerializer):
             if errorResponse:
                 raise serializers.ValidationError({'arguments': errorResponse})
 
+        if self.instance is None:
+            if data.get('extra_filter_expression', '').strip() == '':
+                if 'filter_object' not in data:
+                    raise serializers.ValidationError('one of extra_filter_expression or filter_object is required')
+                elif len(data['filter_object']) == 0:
+                    raise serializers.ValidationError('if extra_filter_expression is blank, at least one filter_object is required')
+
         return data
+
+    def validate_filter_object(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError({'non field errors': ['filter_object must be a list.']})
+
+        errors = {}
+        for i, obj in enumerate(value):
+            if not isinstance(obj, dict):
+                errors[i] = {'non field errors': ['filter_object members must be objects.']}
+                continue
+
+            if 'type' not in obj:
+                errors[i] = {'type': ['This field is required.']}
+                break
+
+            Filter = filters.by_type.get(obj['type'])
+            if Filter is not None:
+                filter = Filter(data=obj)
+                if not filter.is_valid():
+                    errors[i] = filter.errors
+            else:
+                errors[i] = {'type': [f'Unknown filter object type "{obj["type"]}".']}
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return value

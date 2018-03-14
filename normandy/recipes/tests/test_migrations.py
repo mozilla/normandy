@@ -1,9 +1,12 @@
 import hashlib
+import json
+
 import pytest
 
 from django.utils import timezone
 
-from normandy.base.tests import MigrationTest
+from normandy.base.tests import MigrationTest, Whatever
+from normandy.recipes import models
 
 
 @pytest.mark.django_db
@@ -227,3 +230,124 @@ class Test0003Through0005(MigrationTest):
                 assert getattr(new_revision.child, key) == revision_data[key]
 
         assert new_revision.child.id == self._hash_revision(new_revision.child)
+
+
+@pytest.mark.django_db
+class Test0007FilterConversion(object):
+
+    def test_forwards(self, migrations):
+        # Get the pre-migration models
+        old_apps = migrations.migrate('recipes', '0006_reciperevision_filter_object_json')
+        Recipe = old_apps.get_model('recipes', 'Recipe')
+        Action = old_apps.get_model('recipes', 'Action')
+        RecipeRevision = old_apps.get_model('recipes', 'RecipeRevision')
+        Channel = old_apps.get_model('recipes', 'Channel')
+        Country = old_apps.get_model('recipes', 'Country')
+        Locale = old_apps.get_model('recipes', 'Locale')
+
+        # Create test data
+        recipe = Recipe.objects.create()
+        action = Action.objects.create()
+        channel1 = Channel.objects.create(slug='beta')
+        channel2 = Channel.objects.create(slug='release')
+        country1 = Country.objects.create(code='US')
+        country2 = Country.objects.create(code='CA')
+        locale1 = Locale.objects.create(code='en-US')
+        locale2 = Locale.objects.create(code='fr-CA')
+
+        revision = RecipeRevision.objects.create(
+            recipe=recipe,
+            action=action,
+            name='Test Revision',
+            identicon_seed='v1:test',
+        )
+        revision.channels = [channel1, channel2]
+        revision.countries = [country1, country2]
+        revision.locales = [locale1, locale2]
+        revision.save()
+
+        # Apply the migration
+        new_apps = migrations.migrate('recipes', '0007_convert_simple_filters_to_filter_objects')
+
+        # Get the post-migration models
+        RecipeRevision = new_apps.get_model('recipes', 'RecipeRevision')
+
+        # Fetch the revision
+        revision = RecipeRevision.objects.get()
+        revision.filter_object = json.loads(revision.filter_object_json)
+
+        # All simple filters should be removed
+        assert revision.channels.count() == 0
+        assert revision.countries.count() == 0
+        assert revision.locales.count() == 0
+
+        # Order and duplication don't matter, so index the filter by type, and
+        # compare the inner values using sets
+        assert len(revision.filter_object) == 3
+        filters_by_type = {f['type']: f for f in revision.filter_object}
+        assert filters_by_type['channel'] == {
+            'type': 'channel',
+            'channels': Whatever(lambda v: set(v) == {channel1.slug, channel2.slug}),
+        }
+        assert filters_by_type['country'] == {
+            'type': 'country',
+            'countries': Whatever(lambda v: set(v) == {country1.code, country2.code}),
+        }
+        assert filters_by_type['locale'] == {
+            'type': 'locale',
+            'locales': Whatever(lambda v: set(v) == {locale1.code, locale2.code}),
+        }
+
+    def test_reverse(self, migrations):
+        # Get the pre-migration models
+        old_apps = migrations.migrate('recipes', '0007_convert_simple_filters_to_filter_objects')
+        Recipe = old_apps.get_model('recipes', 'Recipe')
+        Action = old_apps.get_model('recipes', 'Action')
+        RecipeRevision = old_apps.get_model('recipes', 'RecipeRevision')
+        Channel = old_apps.get_model('recipes', 'Channel')
+        Country = old_apps.get_model('recipes', 'Country')
+        Locale = old_apps.get_model('recipes', 'Locale')
+
+        # Create test data
+        recipe = Recipe.objects.create()
+        action = Action.objects.create()
+        channel1 = Channel.objects.create(slug='beta')
+        channel2 = Channel.objects.create(slug='release')
+        country1 = Country.objects.create(code='US')
+        country2 = Country.objects.create(code='CA')
+        locale1 = Locale.objects.create(code='en-US')
+        locale2 = Locale.objects.create(code='fr-CA')
+
+        revision = RecipeRevision.objects.create(
+            recipe=recipe,
+            action=action,
+            name='Test Revision',
+            identicon_seed='v1:test',
+            filter_object_json=json.dumps([
+                {'type': 'locale', 'locales': [locale1.code, locale2.code]},
+                {'type': 'country', 'countries': [country1.code, country2.code]},
+                {'type': 'channel', 'channels': [channel1.slug, channel2.slug]},
+            ]),
+        )
+
+        # Apply the migration
+        new_apps = migrations.migrate('recipes', '0006_reciperevision_filter_object_json')
+
+        # Get the post-migration models
+        RecipeRevision = new_apps.get_model('recipes', 'RecipeRevision')
+
+        # Fetch the revision
+        revision = RecipeRevision.objects.get()
+
+        # Simple filters should be added
+        assert revision.channels.count() == 2
+        assert revision.countries.count() == 2
+        assert revision.locales.count() == 2
+
+        # Filter objects should be removed
+        assert revision.filter_object_json is None
+
+        # Order doesn't matter, so compare using sets
+        assert set(c.slug for c in revision.channels.all()) == {channel1.slug, channel2.slug}
+        assert set(c.code for c in revision.countries.all()) == {country1.code, country2.code}
+        assert set(c.code for c in revision.locales.all()) == {locale1.code, locale2.code}

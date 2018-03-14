@@ -24,8 +24,8 @@ Preference Filters
 ------------------
 Preference experiments save the value of preferences before changing them, but
 often you may want to respect users who have already modified the preference
-you're testing. Preference filters allow you to do this in
-:doc:`filter expressions </user/filter_expressions>`:
+you're testing. Preference studies allow you to do this in :doc:`filters
+</user/filters>`:
 
 .. code-block:: javascript
 
