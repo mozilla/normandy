@@ -20,7 +20,7 @@ intended to be run in a terminal.
 .. _Git: https://git-scm.com/
 .. _Python 3.6: https://www.python.org/
 .. _pip 8: https://pip.pypa.io/en/stable/
-.. _Node.js: https://nodejs.org/en/
+.. _Node.js 8: https://nodejs.org/en/
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
 .. _Postgres 9.4: http://www.postgresql.org/
 
@@ -57,12 +57,15 @@ Installation
       :ref:`pip-install-error`
          How to troubleshoot errors during ``pip install``.
 
-4. Install frontend dependencies and build the frontend code using npm:
+4. Install frontend dependencies using yarn_
+   and build the frontend code using npm:
 
    .. code-block:: bash
 
       yarn install
       npm run build
+
+.. _yarn: https://yarnpkg.com/lang/en/docs/install/
 
 5. Create a Postgres database for Normandy. By default it is assumed to be named
    ``normandy``:
@@ -73,7 +76,8 @@ Installation
 
    .. note::
 
-      If you use a different name for the database, or otherwise want to
+      By default, it will connect to ``localhost`` using the global ``postgres``
+      user. If you use a different name for the database, or otherwise want to
       customize how you connect to the database, you may specify the database
       URL by adding the following to a ``.env`` file at the root of the repo:
 
