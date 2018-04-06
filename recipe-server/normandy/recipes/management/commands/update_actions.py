@@ -23,7 +23,8 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        action_names = settings.ACTIONS.keys()
+        action_names = list(settings.ACTIONS.keys())
+        action_names += list(settings.REMOTE_ACTIONS.keys())
         if options['action_name']:
             action_names = [name for name in action_names if name in options['action_name']]
 
@@ -57,6 +58,10 @@ class Command(BaseCommand):
 
 
 def get_implementation(action_name):
+    if action_name in settings.REMOTE_ACTIONS:
+        # Remote actions don't have an implementation since their
+        # implementation is stored in mozilla-central and not available as part of the repo.
+        return
     chunks = get_loader('ACTIONS').get_assets()['chunks']
     implementation_path = chunks[action_name][0]['path']
     with open(implementation_path) as f:
@@ -64,7 +69,15 @@ def get_implementation(action_name):
 
 
 def get_arguments_schema(action_name):
-    action_directory = settings.ACTIONS[action_name]
-    with open(os.path.join(action_directory, 'package.json')) as f:
-        action_metadata = json.load(f)
-        return action_metadata['normandy']['argumentsSchema']
+    if action_name in settings.REMOTE_ACTIONS:
+        action_schemas_directory = settings.REMOTE_ACTIONS_SCHEMA_DIRECTORY
+        assert os.path.isdir(action_schemas_directory)
+        remote_action_name = settings.REMOTE_ACTIONS[action_name]
+        with open(os.path.join(action_schemas_directory, 'schemas.json')) as f:
+            schemas = json.load(f)
+            return schemas[remote_action_name]
+    else:
+        action_directory = settings.ACTIONS[action_name]
+        with open(os.path.join(action_directory, 'package.json')) as f:
+            action_metadata = json.load(f)
+            return action_metadata['normandy']['argumentsSchema']

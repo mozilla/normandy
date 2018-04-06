@@ -153,6 +153,20 @@ class Core(Configuration):
         'opt-out-study': os.path.join(BASE_DIR, 'client/actions/opt-out-study'),
     }
 
+    # Mapping of named actions that don't exist in the repo but exists
+    # in the installed mozilla-normandy-action-argument-schemas node package.
+    REMOTE_ACTIONS = {
+        # Name we use: Name inside mozilla-normandy-action-argument-schemas
+        'console-log2': 'consoleLog',
+    }
+
+    # Path on disk where the mozilla-normandy-action-argument-schemas is installed.
+    # This node package is expected to have been installed as a pre-build step
+    # (i.e. `yarn`) and should always exist.
+    REMOTE_ACTIONS_SCHEMA_DIRECTORY = values.Value(os.path.join(
+        BASE_DIR, 'node_modules', 'mozilla-normandy-action-argument-schemas'
+    ))
+
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
 
     SWAGGER_SETTINGS = {

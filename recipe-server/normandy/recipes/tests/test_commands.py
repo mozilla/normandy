@@ -15,6 +15,7 @@ def mock_action(settings):
     implementations = {}
     schemas = {}
     settings.ACTIONS = {}
+    settings.REMOTE_ACTIONS = {}
 
     impl_patch = patch(
         'normandy.recipes.management.commands.update_actions.get_implementation',
@@ -32,6 +33,25 @@ def mock_action(settings):
 
     with impl_patch, schema_patch:
         yield _mock_action
+
+
+@pytest.yield_fixture
+def mock_remote_action(settings):
+    schemas = {}
+    settings.ACTIONS = {}
+    settings.REMOTE_ACTIONS = {}
+
+    schema_patch = patch(
+        'normandy.recipes.management.commands.update_actions.get_arguments_schema',
+        lambda name: schemas[name]
+    )
+
+    def _mock_remote_action(name, schema):
+        settings.REMOTE_ACTIONS[name] = 'notImportant'
+        schemas[name] = schema
+
+    with schema_patch:
+        yield _mock_remote_action
 
 
 @pytest.mark.django_db
@@ -66,6 +86,32 @@ class TestUpdateActions(object):
 
         action.refresh_from_db()
         assert action.implementation == 'new_impl'
+        assert action.arguments_schema == {'type': 'int'}
+
+    def test_it_creates_new_remote_actions(self, mock_remote_action):
+        mock_remote_action('test-remote-action', {'type': 'int'})
+
+        call_command('update_actions')
+        assert Action.objects.count() == 1
+
+        action = Action.objects.all()[0]
+        assert action.name == 'test-remote-action'
+        assert action.implementation is None
+        assert action.arguments_schema == {'type': 'int'}
+
+    def test_it_updates_existing_remote_actions(self, mock_remote_action):
+        action = ActionFactory(
+            name='test-action',
+            implementation=None,
+            arguments_schema={},
+        )
+        mock_remote_action(action.name, {'type': 'int'})
+
+        call_command('update_actions')
+        assert Action.objects.count() == 1
+
+        action.refresh_from_db()
+        assert action.implementation is None
         assert action.arguments_schema == {'type': 'int'}
 
     def test_it_doesnt_disable_recipes(self, mock_action):
