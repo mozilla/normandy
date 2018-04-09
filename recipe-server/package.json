@@ -36,7 +36,7 @@
     "localforage": "1.4.3",
     "lodash.get": "4.4.2",
     "moment": "^2.19.3",
-    "mozilla-normandy-action-argument-schemas": "0.1.1",
+    "mozilla-normandy-action-argument-schemas": "0.2.0",
     "mozjexl": "1.1.5",
     "node-uuid": "1.4.7",
     "prop-types": "15.5.10",
