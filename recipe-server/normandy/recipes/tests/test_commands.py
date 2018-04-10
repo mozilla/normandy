@@ -114,6 +114,21 @@ class TestUpdateActions(object):
         assert action.implementation is None
         assert action.arguments_schema == {'type': 'int'}
 
+    def test_it_updates_existing_drops_implementation(self, mock_remote_action):
+        action = ActionFactory(
+            name='test-action',
+            implementation='old_impl',
+            arguments_schema={},
+        )
+        mock_remote_action(action.name, {'type': 'int'})
+
+        call_command('update_actions')
+        assert Action.objects.count() == 1
+
+        action.refresh_from_db()
+        assert action.implementation is None
+        assert action.arguments_schema == {'type': 'int'}
+
     def test_it_doesnt_disable_recipes(self, mock_action):
         action = ActionFactory(name='test-action', implementation='old')
         recipe = RecipeFactory(action=action, approver=UserFactory(), enabled=True)
