@@ -18,6 +18,10 @@ from normandy.recipes.validators import JSONSchemaValidator
 
 class ActionSerializer(serializers.ModelSerializer):
     arguments_schema = serializers.JSONField()
+    # NOTE(peterbe): We *could* make the serializer NOT include
+    # this field if the action has no 'implementation'.
+    # Arguably it's nice when APIs are consistent with the keys.
+    # If the action does not have an implementation, this value will be None.
     implementation_url = ActionImplementationHyperlinkField()
 
     class Meta:

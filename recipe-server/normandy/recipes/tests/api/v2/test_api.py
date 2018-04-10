@@ -53,6 +53,24 @@ class TestActionAPI(object):
             }
         ]
 
+    def test_it_serves_actions_without_implementation(self, api_client):
+        action = ActionFactory(
+            name='foo-remote',
+            implementation=None,
+            arguments_schema={'type': 'object'}
+        )
+
+        res = api_client.get('/api/v2/action/')
+        assert res.status_code == 200
+        assert res.data == [
+            {
+                'id': action.id,
+                'name': 'foo-remote',
+                'implementation_url': None,
+                'arguments_schema': {'type': 'object'}
+            }
+        ]
+
     def test_list_view_includes_cache_headers(self, api_client):
         res = api_client.get('/api/v2/action/')
         assert res.status_code == 200
@@ -142,6 +160,23 @@ class TestRecipeAPI(object):
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 1
+
+        def test_it_can_create_recipes_actions_without_implementation(self, api_client):
+            action = ActionFactory(implementation=None)
+            assert action.implementation is None
+
+            # Enabled recipe
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'action_id': action.id,
+                'arguments': {},
+                'extra_filter_expression': 'whatever',
+                'enabled': True
+            })
+            assert res.status_code == 201
+
+            recipe, = Recipe.objects.all()
+            assert recipe.action.implementation is None
 
         def test_it_can_create_disabled_recipes(self, api_client):
             action = ActionFactory()
