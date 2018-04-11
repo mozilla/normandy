@@ -63,7 +63,6 @@ class TestApiRootV1(object):
 
 @pytest.mark.django_db
 class TestApiRootV2(object):
-    @pytest.mark.xfail(reason='issue #1008')
     def test_it_works(self, api_client):
         res = api_client.get('/api/v2/')
         assert res.status_code == 200
