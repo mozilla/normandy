@@ -22,6 +22,15 @@ def check_action_schema_format(action):
         assert jsonschema.validate(action['arguments_schema'], schema) is None
 
 
+@pytest.mark.skip(
+    # NOTE(peterbe): Let's fix or delete this test once the dust has settled
+    # for how to reason about known-in-advance actions.
+    reason=(
+        "The list of possible actions is no longer hard coded and known. "
+        "With remote actions we might have them being added as more recipes "
+        "are actually added to mozilla-central. "
+    )
+)
 @testrail('C7108')
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption('server') + '/api/v1/action/')
