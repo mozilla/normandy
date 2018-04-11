@@ -85,6 +85,19 @@ class TestAction(object):
         expected = expected.encode()
         assert action.canonical_json() == expected
 
+    def test_cant_change_signature_and_other_fields(self, mocker):
+        # Mock the Autographer
+        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
+        mock_autograph.return_value.sign_data.return_value = [
+            {'signature': 'fake signature'},
+        ]
+        action = ActionFactory(name='unchanged', signed=False)
+        action.update_signature()
+        action.name = 'changed'
+        with pytest.raises(ValidationError) as exc_info:
+            action.save()
+        assert exc_info.value.message == 'Signatures must change alone'
+
 
 @pytest.mark.django_db
 class TestValidateArgumentPreferenceExperiments(object):
