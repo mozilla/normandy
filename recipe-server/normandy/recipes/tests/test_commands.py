@@ -21,7 +21,8 @@ def mock_action(settings, tmpdir):
         lambda name: implementations[name]
     )
     schema_by_implementation_patch = patch(
-        'normandy.recipes.management.commands.update_actions.get_arguments_schema_by_implementation',
+        'normandy.recipes.management.commands.update_actions'
+        '.get_arguments_schema_by_implementation',
         lambda name, _: schemas[name]
     )
     schema_by_schemas_patch = patch(
