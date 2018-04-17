@@ -72,9 +72,6 @@ gevent==1.2.1 \
 gunicorn==19.4.5 \
     --hash=sha256:c57f1b005a4b90933303c8deed9bedeb509331aa6a0a990023a5796e52bd8988 \
     --hash=sha256:53b58044764ad79d732af18c580b1a54b724adf4d290ec19c4ca78ab22a1ee0d
-hashin==0.7.2 \
-    --hash=sha256:28213aa9cc1cbce1d33f813877e079f1c963a95c9f76c501faacb1a80723e114 \
-    --hash=sha256:dd38d9356e2810ccae928de8fa1aa023d885566a7f3c4b6840ba55ecd7d7bd35
 jsonschema==2.5.1 \
     --hash=sha256:71e7b3bcf9fca408bcb65bb60892f375d3abdd2e4f296eeeb8fe0bbbfcde598e \
     --hash=sha256:36673ac378feed3daa5956276a829699056523d7961027911f064b52255ead41 \
