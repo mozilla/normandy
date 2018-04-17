@@ -85,18 +85,18 @@ class TestUpdateActions(object):
         assert action.implementation == 'new_impl'
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_creates_new_remote_actions(self, mock_action):
-        mock_action('test-remote-action', {'type': 'int'})
+    def test_it_creates_new_actions_without_implementation(self, mock_action):
+        mock_action('test-action', {'type': 'int'})
 
         call_command('update_actions')
         assert Action.objects.count() == 1
 
         action = Action.objects.all()[0]
-        assert action.name == 'test-remote-action'
+        assert action.name == 'test-action'
         assert action.implementation is None
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_updates_existing_remote_actions(self, mock_action):
+    def test_it_updates_existing_actions_without_implementation(self, mock_action):
         action = ActionFactory(
             name='test-action',
             implementation=None,
@@ -118,13 +118,15 @@ class TestUpdateActions(object):
             arguments_schema={},
         )
         mock_action(action.name, {'type': 'int'})
+        old_implementation = action.implementation
+        old_implementation_hash = action.implementation_hash
 
         call_command('update_actions')
         assert Action.objects.count() == 1
 
         action.refresh_from_db()
-        assert action.implementation is None
-        assert action.implementation_hash is None
+        assert action.implementation == old_implementation
+        assert action.implementation_hash == old_implementation_hash
         assert action.arguments_schema == {'type': 'int'}
 
     def test_it_doesnt_disable_recipes(self, mock_action):

@@ -89,18 +89,23 @@ class Command(BaseCommand):
                     # implementation and now it doesn't, then alert the user
                     # about this.
                     if (
-                        action.implementation != implementation and
+                        not implementation and action.implementation and
                         action.arguments_schema != arguments_schema
                     ):
+                        # I.e. it *had* an implementation, but now the schema
+                        # comes (and is different!) from the
+                        # mozilla-normandy-action-argument-schemas package.
                         self.stdout.write(self.style.WARNING(
-                            f'Action ${name} is changing implementation AND argument schema. '
+                            f'Action {name} is changing implementation AND argument schema. '
                             'You might want to manually check that the new argument schema '
                             'is compatible with the old implementation.'
                         ))
-                    action.implementation = implementation
+
                     action.arguments_schema = arguments_schema
-                    if not implementation:
-                        action.implementation_hash = None
+                    if implementation:
+                        # This means we're potentially "merging" actions.
+                        # The old implementation and the new arguments schema.
+                        action.implementation = implementation
                     action.save()
 
             except Action.DoesNotExist:
