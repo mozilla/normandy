@@ -161,10 +161,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_arguments(self, value):
+        # This in an invariance validation. It depends on the action_id
+        # being valid.
+        action_id = self.initial_data.get('action_id')
+        if not action_id or not isinstance(action_id, int):
+            # If this is the case, it will be caught by the basic
+            # validation.
+            return
+
         # Get the schema associated with the selected action
         try:
-            schema = Action.objects.get(pk=self.initial_data.get('action_id')).arguments_schema
-        except:
+            schema = Action.objects.get(pk=action_id).arguments_schema
+        except Action.DoesNotExist:
             raise serializers.ValidationError('Could not find arguments schema.')
 
         schemaValidator = JSONSchemaValidator(schema)
@@ -196,7 +204,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     else:
                         currentLevel[path] = error.message
 
-        if (errorResponse):
+        if errorResponse:
             raise serializers.ValidationError(errorResponse)
 
         return value

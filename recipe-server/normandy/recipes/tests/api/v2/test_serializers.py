@@ -63,17 +63,33 @@ class TestRecipeSerializer:
             'identicon_seed': Whatever.startswith('v1:'),
         }
 
-    # If the action specified cannot be found, raise validation
-    # error indicating the arguments schema could not be loaded
-    def test_validation_with_wrong_action(self):
+    def test_validation_with_invalid_action(self):
         serializer = RecipeSerializer(data={
-            'action': 'action-that-doesnt-exist', 'arguments': {}
+            'action_id': 'action-that-doesnt-exist', 'arguments': {}
         })
 
         with pytest.raises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
 
-        assert serializer.errors['arguments'] == ['Could not find arguments schema.']
+        assert serializer.errors['action_id'] == [
+            serializers.PrimaryKeyRelatedField
+            .default_error_messages['incorrect_type'].format(data_type='str')
+        ]
+
+    # If the action specified cannot be found, raise validation
+    # error indicating the arguments schema could not be loaded
+    def test_validation_with_wrong_action(self):
+        serializer = RecipeSerializer(data={
+            'action_id': '9999', 'arguments': {}
+        })
+
+        with pytest.raises(serializers.ValidationError):
+            serializer.is_valid(raise_exception=True)
+
+        assert serializer.errors['action_id'] == [
+            serializers.PrimaryKeyRelatedField
+            .default_error_messages['does_not_exist'].format(pk_value=9999)
+        ]
 
     # If the action can be found, raise validation error
     # with the arguments error formatted appropriately
@@ -85,6 +101,8 @@ class TestRecipeSerializer:
 
         serializer = RecipeSerializer(data={
             'action_id': action.id,
+            'name': 'Any name',
+            'extra_filter_expression': 'true',
             'arguments': {
                 'surveyId': '',
                 'surveys': [
