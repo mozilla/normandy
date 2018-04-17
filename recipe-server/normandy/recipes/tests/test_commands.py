@@ -1,7 +1,8 @@
+import json
 from unittest.mock import patch
 from datetime import timedelta
 
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 
 import pytest
 
@@ -11,47 +12,43 @@ from normandy.recipes.tests import ActionFactory, RecipeFactory
 
 
 @pytest.yield_fixture
-def mock_action(settings):
+def mock_action(settings, tmpdir):
     implementations = {}
     schemas = {}
-    settings.ACTIONS = {}
-    settings.REMOTE_ACTIONS = {}
 
     impl_patch = patch(
         'normandy.recipes.management.commands.update_actions.get_implementation',
         lambda name: implementations[name]
     )
-    schema_patch = patch(
-        'normandy.recipes.management.commands.update_actions.get_arguments_schema',
-        lambda name: schemas[name]
+    schema_by_implementation_patch = patch(
+        'normandy.recipes.management.commands.update_actions.get_arguments_schema_by_implementation',
+        lambda name, _: schemas[name]
+    )
+    schema_by_schemas_patch = patch(
+        'normandy.recipes.management.commands.update_actions.get_arguments_schema_by_schemas',
+        lambda name, _, _2: schemas[name]
     )
 
-    def _mock_action(name, implementation, schema):
-        settings.ACTIONS[name] = '/fake/path'
-        implementations[name] = implementation
+    # 'tmpdir' is a LocalPath object, turn it into a regular path string with str().
+    settings.ACTIONS_ROOT_DIRECTORY = str(tmpdir)
+    settings.ACTIONS_SCHEMA_DIRECTORY = str(tmpdir)
+
+    schemas_json = tmpdir.join('schemas.json')
+    # By default, make it an empty JSON file
+    schemas_json.write(json.dumps({}))
+
+    def _mock_action(name, schema, implementation=None):
+        tmpdir.mkdir(name)
+        if implementation:
+            implementations[name] = implementation
+        else:
+            schemas_json.write(json.dumps({
+                name: schema
+            }))
         schemas[name] = schema
 
-    with impl_patch, schema_patch:
+    with impl_patch, schema_by_implementation_patch, schema_by_schemas_patch:
         yield _mock_action
-
-
-@pytest.yield_fixture
-def mock_remote_action(settings):
-    schemas = {}
-    settings.ACTIONS = {}
-    settings.REMOTE_ACTIONS = {}
-
-    schema_patch = patch(
-        'normandy.recipes.management.commands.update_actions.get_arguments_schema',
-        lambda name: schemas[name]
-    )
-
-    def _mock_remote_action(name, schema):
-        settings.REMOTE_ACTIONS[name] = 'notImportant'
-        schemas[name] = schema
-
-    with schema_patch:
-        yield _mock_remote_action
 
 
 @pytest.mark.django_db
@@ -63,7 +60,7 @@ class TestUpdateActions(object):
         call_command('update_actions')
 
     def test_it_creates_new_actions(self, mock_action):
-        mock_action('test-action', 'console.log("foo");', {'type': 'int'})
+        mock_action('test-action', {'type': 'int'}, 'console.log("foo");')
 
         call_command('update_actions')
         assert Action.objects.count() == 1
@@ -79,7 +76,7 @@ class TestUpdateActions(object):
             implementation='old_impl',
             arguments_schema={},
         )
-        mock_action(action.name, 'new_impl', {'type': 'int'})
+        mock_action(action.name, {'type': 'int'}, 'new_impl')
 
         call_command('update_actions')
         assert Action.objects.count() == 1
@@ -88,8 +85,8 @@ class TestUpdateActions(object):
         assert action.implementation == 'new_impl'
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_creates_new_remote_actions(self, mock_remote_action):
-        mock_remote_action('test-remote-action', {'type': 'int'})
+    def test_it_creates_new_remote_actions(self, mock_action):
+        mock_action('test-remote-action', {'type': 'int'})
 
         call_command('update_actions')
         assert Action.objects.count() == 1
@@ -99,13 +96,13 @@ class TestUpdateActions(object):
         assert action.implementation is None
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_updates_existing_remote_actions(self, mock_remote_action):
+    def test_it_updates_existing_remote_actions(self, mock_action):
         action = ActionFactory(
             name='test-action',
             implementation=None,
             arguments_schema={},
         )
-        mock_remote_action(action.name, {'type': 'int'})
+        mock_action(action.name, {'type': 'int'})
 
         call_command('update_actions')
         assert Action.objects.count() == 1
@@ -114,19 +111,20 @@ class TestUpdateActions(object):
         assert action.implementation is None
         assert action.arguments_schema == {'type': 'int'}
 
-    def test_it_updates_existing_drops_implementation(self, mock_remote_action):
+    def test_it_updates_existing_drops_implementation(self, mock_action):
         action = ActionFactory(
             name='test-action',
             implementation='old_impl',
             arguments_schema={},
         )
-        mock_remote_action(action.name, {'type': 'int'})
+        mock_action(action.name, {'type': 'int'})
 
         call_command('update_actions')
         assert Action.objects.count() == 1
 
         action.refresh_from_db()
         assert action.implementation is None
+        assert action.implementation_hash is None
         assert action.arguments_schema == {'type': 'int'}
 
     def test_it_doesnt_disable_recipes(self, mock_action):
@@ -143,8 +141,8 @@ class TestUpdateActions(object):
         update_action = ActionFactory(name='update-action', implementation='old')
         dont_update_action = ActionFactory(name='dont-update-action', implementation='old')
 
-        mock_action(update_action.name, 'new', update_action.arguments_schema)
-        mock_action(dont_update_action.name, 'new', dont_update_action.arguments_schema)
+        mock_action(update_action.name, update_action.arguments_schema, 'new')
+        mock_action(dont_update_action.name, dont_update_action.arguments_schema, 'new')
 
         call_command('update_actions', 'update-action')
         update_action.refresh_from_db()
@@ -154,11 +152,10 @@ class TestUpdateActions(object):
 
     def test_it_ignores_missing_actions(self, mock_action):
         dont_update_action = ActionFactory(name='dont-update-action', implementation='old')
-        mock_action(dont_update_action.name, 'new', dont_update_action.arguments_schema)
+        mock_action(dont_update_action.name, dont_update_action.arguments_schema, 'new')
 
-        call_command('update_actions', 'missing-action')
-        dont_update_action.refresh_from_db()
-        assert dont_update_action.implementation == 'old'
+        with pytest.raises(CommandError):
+            call_command('update_actions', 'missing-action')
 
 
 class TestUpdateSignatures(object):
