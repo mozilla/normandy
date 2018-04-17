@@ -1,4 +1,4 @@
-import { Row, Col, Alert, Button, Form, Input, Select } from 'antd';
+import { Row, Col, Button, Form, Input, Select } from 'antd';
 import autobind from 'autobind-decorator';
 import { is, Map } from 'immutable';
 import PropTypes from 'prop-types';
@@ -14,9 +14,7 @@ import ShowHeartbeatFields from 'control/components/recipes/ShowHeartbeatFields'
 import OptOutStudyFields from 'control/components/recipes/OptOutStudyFields';
 import { getAction, getAllActions } from 'control/state/app/actions/selectors';
 import { areAnyRequestsInProgress } from 'control/state/app/requests/selectors';
-import { getGithubUrl } from 'control/state/app/serviceInfo/selectors';
 import { createForm } from 'control/utils/forms';
-import QueryServiceInfo from 'control/components/data/QueryServiceInfo';
 import IdenticonField from 'control/components/forms/IdenticonField';
 
 
