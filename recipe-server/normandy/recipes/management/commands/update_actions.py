@@ -56,7 +56,7 @@ class Command(BaseCommand):
             # If you did specify a name filter and nothing matched, throw.
             if not action_names:
                 raise CommandError(
-                    f"No action matching {options['action_name']}"
+                    f"No actions matching {options['action_name']}"
                 )
 
         for name, implementation_directory in action_names.items():
