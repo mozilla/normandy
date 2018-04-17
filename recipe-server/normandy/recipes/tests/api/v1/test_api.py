@@ -51,6 +51,23 @@ class TestActionAPI(object):
             }
         ]
 
+    def test_it_serves_actions_without_implementation(self, api_client):
+        ActionFactory(
+            name='foo-remote',
+            implementation=None,
+            arguments_schema={'type': 'object'}
+        )
+
+        res = api_client.get('/api/v1/action/')
+        assert res.status_code == 200
+        assert res.data == [
+            {
+                'name': 'foo-remote',
+                'implementation_url': None,
+                'arguments_schema': {'type': 'object'}
+            }
+        ]
+
     def test_name_validation(self, api_client):
         """Ensure the name field accepts _any_ valid slug."""
         # Slugs can contain alphanumerics plus _ and -.
@@ -223,6 +240,22 @@ class TestRecipeAPI(object):
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 1
+
+        def test_it_can_create_recipes_actions_without_implementation(self, api_client):
+            action = ActionFactory(implementation=None)
+
+            # Enabled recipe
+            res = api_client.post('/api/v1/recipe/', {
+                'name': 'Test Recipe',
+                'action': action.name,
+                'arguments': {},
+                'extra_filter_expression': 'whatever',
+                'enabled': True
+            })
+            assert res.status_code == 201
+
+            recipe, = Recipe.objects.all()
+            assert recipe.action.implementation is None
 
         def test_it_can_create_disabled_recipes(self, api_client):
             action = ActionFactory()

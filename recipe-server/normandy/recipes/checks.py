@@ -22,7 +22,7 @@ def actions_have_consistent_hashes(app_configs, **kwargs):
     errors = []
     try:
         Action = apps.get_model('recipes', 'Action')
-        actions = list(Action.objects.all())
+        actions = list(Action.objects.filter(implementation__isnull=False))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         errors.append(Info(f'Could not retrieve actions: {e}', id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
     else:

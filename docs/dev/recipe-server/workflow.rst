@@ -11,6 +11,14 @@ You can run the automated test suite with the following command:
 
    py.test
 
+In Python, to run the tests with code coverage run the following commands:
+
+.. code-block:: bash
+
+   pip install pytest-coverage
+   py.test --cov-report html --cov-report term-missing --cov normandy
+   open htmlcov/index.html
+
 Front-end JavaScript tests can be run with:
 
 .. code-block:: bash

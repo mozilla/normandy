@@ -530,8 +530,8 @@ class Action(DirtyFieldsMixin, models.Model):
     objects = ActionQuerySet.as_manager()
 
     name = models.SlugField(max_length=255, unique=True)
-    implementation = models.TextField()
-    implementation_hash = models.CharField(max_length=71, editable=False)
+    implementation = models.TextField(null=True)
+    implementation_hash = models.CharField(max_length=71, editable=False, null=True)
     arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
     signature = models.OneToOneField(
         Signature, related_name='action', null=True, blank=True,
@@ -624,7 +624,8 @@ class Action(DirtyFieldsMixin, models.Model):
                 super().save(*args, **kwargs)
                 kwargs['force_insert'] = False
 
-                self.implementation_hash = self.compute_implementation_hash()
+                if self.implementation:
+                    self.implementation_hash = self.compute_implementation_hash()
                 self.update_signature()
 
         super().save(*args, **kwargs)
