@@ -36,6 +36,16 @@ export default class CreateRecipePage extends React.PureComponent {
   }
 
   async formAction(formValues) {
+    // Handle generic JSON textfield arguments
+    if (typeof formValues.arguments === 'string') {
+      try {
+        formValues.arguments = JSON.parse(formValues.arguments);
+      } catch(error) {
+        error.data = { arguments: 'Invalid JSON.' };
+        throw error;
+      }
+    }
+
     return this.props.createRecipe(formValues);
   }
 
