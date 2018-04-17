@@ -72,7 +72,10 @@ class TestRecipeSerializer:
         with pytest.raises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
 
-        assert serializer.errors['action_id']
+        assert serializer.errors['action_id'] == [
+            serializers.PrimaryKeyRelatedField
+            .default_error_messages['incorrect_type'].format(data_type='str')
+        ]
 
     # If the action specified cannot be found, raise validation
     # error indicating the arguments schema could not be loaded
@@ -84,7 +87,10 @@ class TestRecipeSerializer:
         with pytest.raises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
 
-        assert serializer.errors['action_id']
+        assert serializer.errors['action_id'] == [
+            serializers.PrimaryKeyRelatedField
+            .default_error_messages['does_not_exist'].format(pk_value=9999)
+        ]
 
     # If the action can be found, raise validation error
     # with the arguments error formatted appropriately

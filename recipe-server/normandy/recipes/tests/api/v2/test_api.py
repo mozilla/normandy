@@ -6,6 +6,7 @@ from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
+from rest_framework import serializers
 from pathlib import Path
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
@@ -201,7 +202,10 @@ class TestRecipeAPI(object):
                 'arguments': '{}',
             })
             assert res.status_code == 400
-            assert res.json()['action_id']
+            assert res.json()['action_id'] == [
+                serializers.PrimaryKeyRelatedField
+                .default_error_messages['does_not_exist'].format(pk_value=1234)
+            ]
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
@@ -212,7 +216,9 @@ class TestRecipeAPI(object):
                 'arguments': '{}'
             })
             assert res.status_code == 400
-            assert res.json()['action_id']
+            assert res.json()['action_id'] == [
+                serializers.PrimaryKeyRelatedField.default_error_messages['required']
+            ]
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
@@ -224,7 +230,10 @@ class TestRecipeAPI(object):
                 'arguments': '{}',
             })
             assert res.status_code == 400
-            assert res.json()['action_id']
+            assert res.json()['action_id'] == [
+                serializers.PrimaryKeyRelatedField
+                .default_error_messages['incorrect_type'].format(data_type='str')
+            ]
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
@@ -246,7 +255,9 @@ class TestRecipeAPI(object):
                 'arguments': {'message': ''},
             })
             assert res.status_code == 400
-            assert res.json()['arguments']['message']
+            assert res.json()['arguments']['message'] == (
+                serializers.CharField.default_error_messages['blank']
+            )
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
