@@ -187,6 +187,25 @@ class TestRecipeAPI(object):
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
 
+        def test_creation_when_arguments_is_a_string(self, api_client):
+            action = ActionFactory(
+                name='foobarbaz',
+                arguments_schema={
+                    'type': 'object',
+                    'properties': {'message': {'type': 'string'}},
+                    'required': ['message']
+                }
+            )
+            res = api_client.post('/api/v2/recipe/', {'name': 'Test Recipe',
+                                                      'enabled': True,
+                                                      'extra_filter_expression': 'true',
+                                                      'action_id': action.id,
+                                                      'arguments': '{"message": "the message"}'})
+            assert res.status_code == 400
+
+            recipes = Recipe.objects.all()
+            assert recipes.count() == 0
+
         def test_creation_when_identicon_seed_is_invalid(self, api_client):
             action = ActionFactory()
 
