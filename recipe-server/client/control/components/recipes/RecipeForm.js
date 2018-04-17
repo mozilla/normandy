@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import FormItem from 'control/components/forms/FormItem';
 import FormActions from 'control/components/forms/FormActions';
 import ConsoleLogFields from 'control/components/recipes/ConsoleLogFields';
+import JSONArgumentsField from 'control/components/recipes/JSONArgumentsField';
 import PreferenceExperimentFields from 'control/components/recipes/PreferenceExperimentFields';
 import ShowHeartbeatFields from 'control/components/recipes/ShowHeartbeatFields';
 import OptOutStudyFields from 'control/components/recipes/OptOutStudyFields';
@@ -130,8 +131,15 @@ export default class RecipeForm extends React.PureComponent {
             />
           </fieldset>
         )}
-        {selectedActionName && !ArgumentsFields &&
-          <ArgumentEditorMissingError name={selectedActionName} />}
+        {selectedActionName && !ArgumentsFields && (
+          <fieldset>
+            <legend>Action Arguments</legend>
+            <JSONArgumentsField
+              recipeArguments={recipe.get('arguments')}
+              disabled={isLoading}
+            />
+          </fieldset>
+        )}
         <FormActions>
           <FormActions.Primary>
             <Button
@@ -189,49 +197,6 @@ export class ActionSelect extends React.PureComponent {
             );
           })}
         </Select>
-      </div>
-    );
-  }
-}
-
-@connect(
-  state => ({
-    githubUrl: getGithubUrl(state),
-  }),
-)
-class ArgumentEditorMissingError extends React.PureComponent {
-  static propTypes = {
-    githubUrl: PropTypes.string,
-    name: PropTypes.string.isRequired,
-  }
-
-  static defaultProps = {
-    githubUrl: null,
-  }
-
-  render() {
-    const { githubUrl, name } = this.props;
-    let fileIssueUrl;
-    if (githubUrl) {
-      const url = new URL(githubUrl);
-      url.pathname += '/issues/new';
-      url.searchParams.set('title', `Argument fields missing for action "${name}"`);
-      fileIssueUrl = url.toString();
-    }
-
-    return (
-      <div>
-        <QueryServiceInfo />
-        <Alert
-          message="Error - Argument editor not available"
-          description={
-            <span>
-              This is a bug. Please <a href={fileIssueUrl}>file an issue on GitHub for it.</a>
-            </span>
-          }
-          type="error"
-          showIcon
-        />
       </div>
     );
   }

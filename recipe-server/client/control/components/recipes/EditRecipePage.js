@@ -74,6 +74,12 @@ export default class EditRecipePage extends React.PureComponent {
 
   async formAction(formValues) {
     const { recipeId } = this.props;
+
+    // Handle generic JSON textfield arguments
+    if (typeof formValues.arguments === "string") {
+      formValues.arguments = JSON.parse(formValues.arguments);
+    }
+
     return this.props.updateRecipe(recipeId, formValues);
   }
 
