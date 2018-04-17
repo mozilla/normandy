@@ -174,7 +174,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_arguments(self, value):
         # Ensure the value is a dict
         if not isinstance(value, dict):
-            raise serializers.ValidationError('Invalid arguments.')
+            raise serializers.ValidationError('Must be an object.')
 
         # Get the schema associated with the selected action
         try:

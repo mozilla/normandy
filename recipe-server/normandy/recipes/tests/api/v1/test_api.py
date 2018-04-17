@@ -277,12 +277,16 @@ class TestRecipeAPI(object):
                     'required': ['message']
                 }
             )
-            res = api_client.post('/api/v2/recipe/', {'name': 'Test Recipe',
-                                                      'enabled': True,
-                                                      'extra_filter_expression': 'true',
-                                                      'action_id': action.id,
-                                                      'arguments': '{"message": "the message"}'})
+            data = {
+                'name': 'Test Recipe',
+                'enabled': True,
+                'extra_filter_expression': 'true',
+                'action': action.name,
+                'arguments': '{"message": "the message"}'
+            }
+            res = api_client.post('/api/v1/recipe/', data)
             assert res.status_code == 400
+            assert res.data == {'arguments': ['Must be an object.']}
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
