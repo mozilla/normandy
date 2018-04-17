@@ -1,4 +1,3 @@
-from unittest import mock
 import pytest
 from rest_framework import serializers
 
@@ -138,7 +137,7 @@ class TestRecipeSerializer:
         serializer = RecipeSerializer(data={
             'name': 'bar',
             'enabled': True,
-            'extra_filter_expression': 'aces',
+            'extra_filter_expression': '"\\',
             'action': 'show-heartbeat',
             'arguments': {
                 'surveyId': 'lorem-ipsum-dolor',
@@ -149,13 +148,10 @@ class TestRecipeSerializer:
             }
         })
 
-        jexl_mock = mock.Mock()
-        jexl_mock().validate.side_effect = Exception("didn't like this")
-        with mock.patch('normandy.recipes.api.v2.serializers.JEXL', jexl_mock):
-            assert not serializer.is_valid()
-            assert serializer.errors['extra_filter_expression'] == [
-                'The JEXL parser failed to validate aces'
-            ]
+        assert not serializer.is_valid()
+        assert serializer.errors['extra_filter_expression'] == [
+            'Could not parse expression: "\\'
+        ]
 
     def test_validation_with_valid_data(self):
         mockAction = ActionFactory(
