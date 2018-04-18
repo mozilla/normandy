@@ -143,7 +143,8 @@ class TestCase(object):
             action_path.save()
 
             # Action implementation
-            action_path.add('implementation', action.implementation_hash).save()
+            if action.implementation:
+                action_path.add('implementation', action.implementation_hash).save()
 
     def update_url(self, url, domain):
         """

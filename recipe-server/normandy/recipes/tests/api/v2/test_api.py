@@ -6,6 +6,7 @@ from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework.reverse import reverse
+from rest_framework import serializers
 from pathlib import Path
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
@@ -49,6 +50,24 @@ class TestActionAPI(object):
                 'id': action.id,
                 'name': 'foo',
                 'implementation_url': Whatever.endswith(action_url),
+                'arguments_schema': {'type': 'object'}
+            }
+        ]
+
+    def test_it_serves_actions_without_implementation(self, api_client):
+        action = ActionFactory(
+            name='foo-remote',
+            implementation=None,
+            arguments_schema={'type': 'object'}
+        )
+
+        res = api_client.get('/api/v2/action/')
+        assert res.status_code == 200
+        assert res.data == [
+            {
+                'id': action.id,
+                'name': 'foo-remote',
+                'implementation_url': None,
                 'arguments_schema': {'type': 'object'}
             }
         ]
@@ -143,6 +162,23 @@ class TestRecipeAPI(object):
             recipes = Recipe.objects.all()
             assert recipes.count() == 1
 
+        def test_it_can_create_recipes_actions_without_implementation(self, api_client):
+            action = ActionFactory(implementation=None)
+            assert action.implementation is None
+
+            # Enabled recipe
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'action_id': action.id,
+                'arguments': {},
+                'extra_filter_expression': 'whatever',
+                'enabled': True
+            })
+            assert res.status_code == 201
+
+            recipe, = Recipe.objects.all()
+            assert recipe.action.implementation is None
+
         def test_it_can_create_disabled_recipes(self, api_client):
             action = ActionFactory()
 
@@ -160,10 +196,44 @@ class TestRecipeAPI(object):
             assert recipes.count() == 1
 
         def test_creation_when_action_does_not_exist(self, api_client):
-            res = api_client.post('/api/v2/recipe/', {'name': 'Test Recipe',
-                                                      'action_id': 1234,
-                                                      'arguments': '{}'})
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'action_id': 1234,
+                'arguments': '{}',
+            })
             assert res.status_code == 400
+            assert res.json()['action_id'] == [
+                serializers.PrimaryKeyRelatedField
+                .default_error_messages['does_not_exist'].format(pk_value=1234)
+            ]
+
+            recipes = Recipe.objects.all()
+            assert recipes.count() == 0
+
+        def test_creation_when_action_id_is_missing(self, api_client):
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'arguments': '{}'
+            })
+            assert res.status_code == 400
+            assert res.json()['action_id'] == [
+                serializers.PrimaryKeyRelatedField.default_error_messages['required']
+            ]
+
+            recipes = Recipe.objects.all()
+            assert recipes.count() == 0
+
+        def test_creation_when_action_id_is_invalid(self, api_client):
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'action_id': 'a string',
+                'arguments': '{}',
+            })
+            assert res.status_code == 400
+            assert res.json()['action_id'] == [
+                serializers.PrimaryKeyRelatedField
+                .default_error_messages['incorrect_type'].format(data_type='str')
+            ]
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
@@ -177,12 +247,17 @@ class TestRecipeAPI(object):
                     'required': ['message']
                 }
             )
-            res = api_client.post('/api/v2/recipe/', {'name': 'Test Recipe',
-                                                      'enabled': True,
-                                                      'extra_filter_expression': 'true',
-                                                      'action_id': action.id,
-                                                      'arguments': {'message': ''}})
+            res = api_client.post('/api/v2/recipe/', {
+                'name': 'Test Recipe',
+                'enabled': True,
+                'extra_filter_expression': 'true',
+                'action_id': action.id,
+                'arguments': {'message': ''},
+            })
             assert res.status_code == 400
+            assert res.json()['arguments']['message'] == (
+                serializers.CharField.default_error_messages['blank']
+            )
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0

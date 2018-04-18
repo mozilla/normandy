@@ -49,7 +49,8 @@ class ActionFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def implementation_hash(action):
-        return sri_hash(action.implementation.encode(), url_safe=True)
+        if action.implementation is not None:
+            return sri_hash(action.implementation.encode(), url_safe=True)
 
     # It is important that the signature be based on the actual data, and not
     # some static value so that tests can make assertions against what data was

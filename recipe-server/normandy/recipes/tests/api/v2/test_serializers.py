@@ -1,4 +1,3 @@
-from unittest import mock
 import pytest
 from rest_framework import serializers
 
@@ -64,17 +63,33 @@ class TestRecipeSerializer:
             'identicon_seed': Whatever.startswith('v1:'),
         }
 
-    # If the action specified cannot be found, raise validation
-    # error indicating the arguments schema could not be loaded
-    def test_validation_with_wrong_action(self):
+    def test_validation_with_invalid_action(self):
         serializer = RecipeSerializer(data={
-            'action': 'action-that-doesnt-exist', 'arguments': {}
+            'action_id': 'action-that-doesnt-exist', 'arguments': {}
         })
 
         with pytest.raises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
 
-        assert serializer.errors['arguments'] == ['Could not find arguments schema.']
+        assert serializer.errors['action_id'] == [
+            serializers.PrimaryKeyRelatedField
+            .default_error_messages['incorrect_type'].format(data_type='str')
+        ]
+
+    # If the action specified cannot be found, raise validation
+    # error indicating the arguments schema could not be loaded
+    def test_validation_with_wrong_action(self):
+        serializer = RecipeSerializer(data={
+            'action_id': '9999', 'arguments': {}
+        })
+
+        with pytest.raises(serializers.ValidationError):
+            serializer.is_valid(raise_exception=True)
+
+        assert serializer.errors['action_id'] == [
+            serializers.PrimaryKeyRelatedField
+            .default_error_messages['does_not_exist'].format(pk_value=9999)
+        ]
 
     # If the action can be found, raise validation error
     # with the arguments error formatted appropriately
@@ -86,6 +101,8 @@ class TestRecipeSerializer:
 
         serializer = RecipeSerializer(data={
             'action_id': action.id,
+            'name': 'Any name',
+            'extra_filter_expression': 'true',
             'arguments': {
                 'surveyId': '',
                 'surveys': [
@@ -138,7 +155,7 @@ class TestRecipeSerializer:
         serializer = RecipeSerializer(data={
             'name': 'bar',
             'enabled': True,
-            'extra_filter_expression': 'aces',
+            'extra_filter_expression': '"\\',
             'action': 'show-heartbeat',
             'arguments': {
                 'surveyId': 'lorem-ipsum-dolor',
@@ -149,13 +166,10 @@ class TestRecipeSerializer:
             }
         })
 
-        jexl_mock = mock.Mock()
-        jexl_mock().validate.side_effect = Exception("didn't like this")
-        with mock.patch('normandy.recipes.api.v2.serializers.JEXL', jexl_mock):
-            assert not serializer.is_valid()
-            assert serializer.errors['extra_filter_expression'] == [
-                'The JEXL parser failed to validate aces'
-            ]
+        assert not serializer.is_valid()
+        assert serializer.errors['extra_filter_expression'] == [
+            'Could not parse expression: "\\'
+        ]
 
     def test_validation_with_valid_data(self):
         mockAction = ActionFactory(

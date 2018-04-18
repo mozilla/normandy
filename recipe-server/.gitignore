@@ -16,3 +16,4 @@ _build
 /tmp
 /node_modules
 /product_details/
+htmlcov/

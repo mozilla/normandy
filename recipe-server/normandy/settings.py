@@ -145,13 +145,20 @@ class Core(Configuration):
     #   3) django-csp allows removing directives on an individual view (mozilla/django-csp#85)
     # CSP_FRAME_ANCESTORS = "'none'"  # Block framing by default
 
-    # Action names and the path they are located at.
-    ACTIONS = {
-        'console-log': os.path.join(BASE_DIR, 'client/actions/console-log'),
-        'show-heartbeat': os.path.join(BASE_DIR, 'client/actions/show-heartbeat'),
-        'preference-experiment': os.path.join(BASE_DIR, 'client/actions/preference-experiment'),
-        'opt-out-study': os.path.join(BASE_DIR, 'client/actions/opt-out-study'),
+    # Directory where we, locally, have a list of directories of actions' implementations.
+    ACTIONS_ROOT_DIRECTORY = os.path.join(BASE_DIR, 'client/actions')
+
+    # Actions, when found on disk, whose name needs to be converted before saved in the ORM.
+    ACTIONS_ALIAS_NAMES = {
+        'consoleLog': 'console-log',
     }
+
+    # Path on disk where the mozilla-normandy-action-argument-schemas is installed.
+    # This node package is expected to have been installed as a pre-build step
+    # (i.e. `yarn`) and should always exist.
+    ACTIONS_SCHEMA_DIRECTORY = values.Value(os.path.join(
+        BASE_DIR, 'node_modules', 'mozilla-normandy-action-argument-schemas'
+    ))
 
     PROD_DETAILS_STORAGE = values.Value('normandy.recipes.storage.ProductDetailsRelationalStorage')
 

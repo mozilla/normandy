@@ -33,6 +33,8 @@ class ActionImplementationHyperlinkField(HyperlinkedIdentityField):
         super().__init__(view_name=view_name, **kwargs)
 
     def get_url(self, obj, view_name, request, format):
+        if not obj.implementation:
+            return None
         kwargs = {'name': obj.name, 'impl_hash': obj.implementation_hash}
 
         if settings.CDN_URL is None:

@@ -155,31 +155,29 @@ class RecipeSerializer(serializers.ModelSerializer):
         jexl.add_transform('preferenceIsUserSet', lambda x: x)
         jexl.add_transform('preferenceExists', lambda x: x)
 
-        try:
-            errors = list(jexl.validate(value))
-        except Exception as exc:
-            # The JEXL parser can occasionally throw exceptions when
-            # called to validate certain invalid inputs.
-            # Catch them and at least indicate the field that failed,
-            # even if we can't explain exactly what the problem was.
-            # See https://github.com/mozilla/normandy/issues/1059.
-            error = f'The JEXL parser failed to validate {value}'
-            raise serializers.ValidationError([error])
-
+        errors = list(jexl.validate(value))
         if errors:
             raise serializers.ValidationError(errors)
 
         return value
 
     def validate_arguments(self, value):
+        # This in an invariance validation. It depends on the action_id
+        # being valid.
+        action_id = self.initial_data.get('action')
+        if not action_id:
+            # If this is the case, it will be caught by the basic
+            # validation.
+            return
+
         # Ensure the value is a dict
         if not isinstance(value, dict):
             raise serializers.ValidationError('Must be an object.')
 
         # Get the schema associated with the selected action
         try:
-            schema = Action.objects.get(name=self.initial_data.get('action')).arguments_schema
-        except:
+            schema = Action.objects.get(name=action_id).arguments_schema
+        except Action.DoesNotExist:
             raise serializers.ValidationError('Could not find arguments schema.')
 
         schemaValidator = JSONSchemaValidator(schema)
