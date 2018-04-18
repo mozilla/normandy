@@ -79,7 +79,7 @@ export default class EditRecipePage extends React.PureComponent {
     if (typeof formValues.arguments === 'string') {
       try {
         formValues.arguments = JSON.parse(formValues.arguments);
-      } catch(error) {
+      } catch (error) {
         error.data = { arguments: 'Invalid JSON.' };
         throw error;
       }
