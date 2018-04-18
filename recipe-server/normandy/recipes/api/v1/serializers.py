@@ -169,6 +169,11 @@ class RecipeSerializer(serializers.ModelSerializer):
             # If this is the case, it will be caught by the basic
             # validation.
             return
+
+        # Ensure the value is a dict
+        if not isinstance(value, dict):
+            raise serializers.ValidationError('Must be an object.')
+
         # Get the schema associated with the selected action
         try:
             schema = Action.objects.get(name=action_id).arguments_schema

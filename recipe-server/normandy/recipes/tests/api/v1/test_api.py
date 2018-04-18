@@ -301,6 +301,29 @@ class TestRecipeAPI(object):
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
 
+        def test_creation_when_arguments_is_a_string(self, api_client):
+            action = ActionFactory(
+                name='foobarbaz',
+                arguments_schema={
+                    'type': 'object',
+                    'properties': {'message': {'type': 'string'}},
+                    'required': ['message']
+                }
+            )
+            data = {
+                'name': 'Test Recipe',
+                'enabled': True,
+                'extra_filter_expression': 'true',
+                'action': action.name,
+                'arguments': '{"message": "the message"}'
+            }
+            res = api_client.post('/api/v1/recipe/', data)
+            assert res.status_code == 400
+            assert res.data == {'arguments': ['Must be an object.']}
+
+            recipes = Recipe.objects.all()
+            assert recipes.count() == 0
+
     @pytest.mark.django_db
     class TestUpdates(object):
         def test_it_can_edit_recipes(self, api_client):
