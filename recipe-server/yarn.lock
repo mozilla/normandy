@@ -4320,9 +4320,9 @@ moment@^2.19.3:
   version "2.19.3"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.19.3.tgz#bdb99d270d6d7fda78cc0fbace855e27fe7da69f"
 
-mozilla-normandy-action-argument-schemas@0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/mozilla-normandy-action-argument-schemas/-/mozilla-normandy-action-argument-schemas-0.2.0.tgz#1343b069f13c9805b63be7b5656b24c989f1e0c8"
+mozilla-normandy-action-argument-schemas@0.3:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/mozilla-normandy-action-argument-schemas/-/mozilla-normandy-action-argument-schemas-0.3.0.tgz#c959858337343e201e0082313aa75625f337b7a6"
 
 mozjexl@1.1.5:
   version "1.1.5"
