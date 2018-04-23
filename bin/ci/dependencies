@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -eu
 
+# Install latest firefox, and remove firefox-mozilla-build, which diverts
+# the Firefox binary to an old version.
+sudo apt-get update
+sudo apt-get install firefox
+sudo apt-get remove firefox-mozilla-build
+
 # store version info in app directory, for Docker to pick up
 mkdir -p __version__
 git rev-parse HEAD > __version__/commit

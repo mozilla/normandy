@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -eu
-
-# Create artifact directory
-mkdir -p -m 777 $MOCK_SERVER_ARTIFACTS
-
-# Generate mock server files
-./bin/generate.sh $MOCK_SERVER_ARTIFACTS $MOCK_SERVER_DOMAIN
