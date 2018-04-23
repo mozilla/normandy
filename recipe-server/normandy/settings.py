@@ -150,7 +150,7 @@ class Core(Configuration):
 
     # Actions, when found on disk, whose name needs to be converted before saved in the ORM.
     ACTIONS_ALIAS_NAMES = {
-        'consoleLog': 'console-log',
+        # empty, but we're keeping the functionality for now
     }
 
     # Path on disk where the mozilla-normandy-action-argument-schemas is installed.

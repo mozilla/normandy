@@ -133,6 +133,8 @@ def get_arguments_schema_by_implementation(action_name, implementation_directory
 
 
 def get_arguments_schema_by_schemas(action_name, schemas, aliases):
+    if action_name in schemas:
+        return schemas[action_name]
     # Reverse the name alias in case it's called something else in the
     # schemas.json file.
     aliases_inverted = {v: k for k, v in aliases.items()}
