@@ -68,6 +68,7 @@ class ServiceInfoView(APIView):
             'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
             'logout_url': settings.OIDC_LOGOUT_URL or reverse('control:logout'),
             'github_url': settings.GITHUB_URL,
+            'experimenter_api_url': settings.EXPERIMENTER_API_URL,
         }).data)
 
 

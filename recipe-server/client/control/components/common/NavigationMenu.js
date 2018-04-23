@@ -8,26 +8,43 @@ import { Link } from 'redux-little-router';
 import QuerySessionInfo from 'control/components/data/QuerySessionInfo';
 import { getSessionHistory } from 'control/state/app/session/selectors';
 import ShieldIdenticon from 'control/components/common/ShieldIdenticon';
+import { isExperimenterConfigured } from 'control/state/app/serviceInfo/selectors';
 
 const { Divider, Item, SubMenu } = Menu;
 
 @connect(
   state => ({
-    recipeSessionHistory: getSessionHistory(state, 'recipe'),
+    experimenterConfigured: isExperimenterConfigured(state),
     extensionSessionHistory: getSessionHistory(state, 'extension'),
+    recipeSessionHistory: getSessionHistory(state, 'recipe'),
     router: state.router,
   }),
 )
 export default class NavigationMenu extends React.PureComponent {
   static propTypes = {
-    recipeSessionHistory: PropTypes.instanceOf(List).isRequired,
+    experimenterConfigured: PropTypes.bool.isRequired,
     extensionSessionHistory: PropTypes.instanceOf(List).isRequired,
+    recipeSessionHistory: PropTypes.instanceOf(List).isRequired,
     router: PropTypes.object.isRequired,
   };
 
   render() {
-    const { router, recipeSessionHistory, extensionSessionHistory } = this.props;
+    const {
+      experimenterConfigured,
+      extensionSessionHistory,
+      recipeSessionHistory,
+      router,
+    } = this.props;
     const { pathname, search } = router;
+
+    let importExperiments;
+    if (experimenterConfigured) {
+      importExperiments = (
+        <Item key="/recipe/import/">
+          <Link href="/recipe/import/">Import from Experimenter</Link>
+        </Item>
+      );
+    }
 
     return (
       <div className="nav-menu">
@@ -40,9 +57,12 @@ export default class NavigationMenu extends React.PureComponent {
           <Item key="/"><Link href="/">Home</Link></Item>
 
           <SubMenu title="Recipes" key="Recipes">
+
             <Item key="/recipe/">
               <Link href="/recipe/">View All</Link>
             </Item>
+
+            {importExperiments}
 
             {recipeSessionHistory.size > 0 && <Divider />}
 
