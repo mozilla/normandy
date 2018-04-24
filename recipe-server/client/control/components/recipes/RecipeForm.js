@@ -68,7 +68,12 @@ export default class RecipeForm extends React.PureComponent {
     }
 
     // Make sure the action ID is an integer
-    data.action_id = parseInt(data.action_id, 10);
+    try {
+      data.action_id = parseInt(data.action_id, 10);
+    } catch (error) {
+      error.data = { action_id: 'Invalid Action ID.' };
+      throw error;
+    }
 
     return data;
   }
