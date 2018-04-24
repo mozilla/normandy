@@ -56,6 +56,23 @@ export default class RecipeForm extends React.PureComponent {
     'opt-out-study': OptOutStudyFields,
   };
 
+  static cleanRecipeData = data => {
+    // Handle generic JSON textfield arguments
+    if (typeof data.arguments === 'string') {
+      try {
+        data.arguments = JSON.parse(data.arguments);
+      } catch (error) {
+        error.data = { arguments: 'Invalid JSON.' };
+        throw error;
+      }
+    }
+
+    // Make sure the action ID is an integer
+    data.action_id = parseInt(data.action_id, 10);
+
+    return data;
+  }
+
   componentWillMount() {
     this.defaultIdenticonSeed = IdenticonField.generateSeed();
   }
