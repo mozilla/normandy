@@ -298,7 +298,7 @@ class TestRecipeAPI(object):
                 'name': 'Test Recipe',
                 'enabled': True,
                 'extra_filter_expression': 'true',
-                'action_id': '{}'.format(action.id),
+                'action_id': f'{action.id}',
                 'arguments': {}
             }
             res = api_client.post('/api/v2/recipe/', data)

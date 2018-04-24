@@ -218,7 +218,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                             currentLevel[path] = error.message
 
             if errorResponse:
-                print(errorResponse)
                 raise serializers.ValidationError({'arguments': errorResponse})
 
         return data
