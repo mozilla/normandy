@@ -1,7 +1,7 @@
 import base64
 import os
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -309,11 +309,20 @@ class TestVerifyX5u(object):
         assert 'unsupportedTimestamp' in str(exc)
 
     def test_mixed_timestamp_format(self, mocker):
+        # The certificate used for testing expired on 2018-04-24. This test is
+        # only concerned with the parsing of the dates, so mock the call to the
+        # validate function and assert about the value also s of the dates.
         mock_requests = mocker.patch('normandy.recipes.signing.requests')
+        mock_check_validity = mocker.patch('normandy.recipes.signing.check_validity')
         path = os.path.join(os.path.dirname(__file__), 'data', 'mixed_timestamps_certs.pem')
         with open(path, 'rb') as f:
             mock_requests.get.return_value.content = f.read()
         assert signing.verify_x5u('https://example.com/cert.pem')
+        assert mock_check_validity.mock_calls == [
+            call(datetime(2017, 12, 25), datetime(2018, 4, 24), None),
+            call(datetime(2017, 5, 4, 0, 12, 39), datetime(2019, 5, 4, 0, 12, 39), None),
+            call(datetime(2015, 3, 17, 22, 53, 57), datetime(2025, 3, 14, 22, 53, 57), None),
+        ]
 
 
 class TestReadTimestampObject(object):
