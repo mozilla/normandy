@@ -183,10 +183,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'arguments': 'Must be an object.'})
 
             # Get the schema associated with the selected action
-            try:
-                schema = Action.objects.get(pk=action.id).arguments_schema
-            except Action.DoesNotExist:
-                raise serializers.ValidationError({'arguments': 'Could not find arguments schema.'})
+            schema = action.arguments_schema
 
             schemaValidator = JSONSchemaValidator(schema)
             errorResponse = {}
