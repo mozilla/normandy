@@ -74,7 +74,9 @@ class TestRecipeSerializer:
         with pytest.raises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
 
-        assert serializer.errors['action'] == ['Object with name=action-that-doesnt-exist does not exist.']
+        assert serializer.errors['action'] == [
+            'Object with name=action-that-doesnt-exist does not exist.'
+        ]
 
     # If the action can be found, raise validation error
     # with the arguments error formatted appropriately
