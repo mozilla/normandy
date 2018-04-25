@@ -92,7 +92,13 @@ export default class FormItem extends React.PureComponent {
     const error = get(formErrors, name);
 
     if (error) {
-      const errorString = error instanceof Array ? error.join(' ') : error;
+      let errorString = error;
+
+      if (error instanceof Array) {
+        errorString = error.join(' ');
+      } else if (typeof error === 'object') {
+        errorString = JSON.stringify(error);
+      }
 
       defaultItemProps.help = errorString;
       defaultItemProps.validateStatus = 'error';

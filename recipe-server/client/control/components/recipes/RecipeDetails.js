@@ -133,6 +133,8 @@ export class ArgumentsValue extends React.PureComponent {
       valueRender = this.renderCode;
     } else if (typeof value === 'boolean') {
       valueRender = this.renderBoolean;
+    } else if (typeof value === 'object') {
+      valueRender = JSON.stringify;
     }
 
     let textToCopy = value === undefined ? '' : value.toString();
