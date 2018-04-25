@@ -15,5 +15,4 @@ happens on startup; enabling this experiment makes the client only make the
 classification request if a recipe actually uses the info for filtering.
 
 To enable, create a new boolean preference called
-``extensions.shield-recipe-client.experiments.lazy_classify`` and set it to
-true.
+``app.normandy.experiments.lazy_classify`` and set it to true.

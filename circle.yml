@@ -11,9 +11,6 @@ machine:
   services:
     - postgresql
     - docker
-  environment:
-    MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
-    MOCK_SERVER_ARTIFACTS: "${CIRCLE_ARTIFACTS}/mock-recipe-server"
 
 dependencies:
   override:

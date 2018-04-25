@@ -18,7 +18,7 @@ Preferences
 Set the following preferences to have Firefox execute recipes from the
 production server:
 
-.. describe:: extensions.shield-recipe-client.api_url
+.. describe:: app.normandy.api_url
 
    ``https://normandy.cdn.mozilla.net/api/v1``
 
@@ -40,7 +40,7 @@ Preferences
 Set the following preferences to have Firefox execute recipes from the staging
 server:
 
-.. describe:: extensions.shield-recipe-client.api_url
+.. describe:: app.normandy.api_url
 
    ``https://normandy.stage.mozaws.net/api/v1``
 
