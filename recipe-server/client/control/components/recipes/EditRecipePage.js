@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import handleError from 'control/utils/handleError';
 import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
 import LoadingOverlay from 'control/components/common/LoadingOverlay';
-import RecipeForm from 'control/components/recipes/RecipeForm';
+import RecipeForm, { cleanRecipeData } from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
 
 import { addSessionView } from 'control/state/app/session/actions';
@@ -74,7 +74,7 @@ export default class EditRecipePage extends React.PureComponent {
 
   async formAction(formValues) {
     const { recipeId } = this.props;
-    const cleanedData = RecipeForm.cleanRecipeData(formValues);
+    const cleanedData = cleanRecipeData(formValues);
     return this.props.updateRecipe(recipeId, cleanedData);
   }
 

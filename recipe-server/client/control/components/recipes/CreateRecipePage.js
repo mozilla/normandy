@@ -7,7 +7,7 @@ import { push as pushAction } from 'redux-little-router';
 
 import handleError from 'control/utils/handleError';
 import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
-import RecipeForm from 'control/components/recipes/RecipeForm';
+import RecipeForm, { cleanRecipeData } from 'control/components/recipes/RecipeForm';
 
 import { createRecipe as createAction } from 'control/state/app/recipes/actions';
 
@@ -36,7 +36,7 @@ export default class CreateRecipePage extends React.PureComponent {
   }
 
   async formAction(formValues) {
-    const cleanedData = RecipeForm.cleanRecipeData(formValues);
+    const cleanedData = cleanRecipeData(formValues);
     return this.props.createRecipe(cleanedData);
   }
 
