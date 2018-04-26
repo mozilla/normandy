@@ -9,8 +9,7 @@ Before running these tests you will need the following installed:
 * virtualenv (https://virtualenv.pypa.io/en/latest/virtualenv) installed
 
 Before running these tests you need to create a virtual environment using
-Python 3.6.0 or greater. To create it, make sure you are in the ``recipe-server``
-directory and then do the following:
+Python 3.6.0 or greater. To create it do the following:
 
 .. code-block:: bash
 

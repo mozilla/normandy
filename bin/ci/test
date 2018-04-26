@@ -18,13 +18,13 @@ pkill firefox
 
 echo "Running contract tests"
 # Set up the app, run it, and run tests against it
-echo "* Setting up recipe-server"
+echo "* Setting up server"
 createdb normandy
 bin/ci/docker-run.sh -i -t ./manage.py migrate
 bin/ci/docker-run.sh -i -t ./manage.py update_actions
 bin/ci/docker-run.sh -i -t ./manage.py update_product_details
 bin/ci/docker-run.sh -i -t ./manage.py initial_data
-echo "* Starting recipe-server"
+echo "* Starting server"
 SERVER_ID=$(bin/ci/docker-run.sh -e DJANGO_CONFIGURATION=ProductionInsecure -d)
 
 echo "* Waiting for server to be ready"

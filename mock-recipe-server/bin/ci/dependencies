@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -eu
-
-# Setup normandy-compose used in build
-./bin/setup.sh

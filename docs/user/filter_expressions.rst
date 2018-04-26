@@ -543,7 +543,7 @@ Advanced: Testing Filter Expressions in the Browser Console
 
    .. code-block:: javascript
 
-      Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", {})
+      Cu.import("resource://normandy/lib/RecipeRunner.jsm", {})
         .RecipeRunner.checkFilter({
           id: 1,
           arguments: {},
@@ -555,7 +555,7 @@ Advanced: Testing Filter Expressions in the Browser Console
 
    .. code-block:: javascript
 
-      Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", {})
+      Cu.import("resource://normandy/lib/RecipeRunner.jsm", {})
         .RecipeRunner.checkFilter({
           id: 1,
           arguments: {},
@@ -567,7 +567,7 @@ Advanced: Testing Filter Expressions in the Browser Console
 
    .. code-block:: javascript
 
-      Cu.import("resource://shield-recipe-client/lib/RecipeRunner.jsm", {})
+      Cu.import("resource://normandy/lib/RecipeRunner.jsm", {})
         .RecipeRunner.checkFilter({
           id: 1,
           arguments: {},

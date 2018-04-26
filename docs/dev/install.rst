@@ -31,7 +31,7 @@ Installation
    .. code-block:: bash
 
       git clone https://github.com/mozilla/normandy.git
-      cd normandy/recipe-server
+      cd normandy
 
 2. Create a virtualenv for Normandy and activate it:
 
@@ -151,7 +151,7 @@ client, you'll need to set up Autograph_ to sign recipes as you save them:
 1. Follow the `Autograph installation instructions`_ to launch a development
    instance of Autograph.
 
-2. Add the following configuration to ``/recipe-server/.env`` (create the file
+2. Add the following configuration to ``.env`` (create the file
    if it does not exist yet):
 
    .. code-block:: ini
