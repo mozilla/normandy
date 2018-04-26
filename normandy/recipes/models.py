@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 from collections import defaultdict
+from random import random
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -394,11 +395,6 @@ class RecipeRevision(models.Model):
         except ApprovalRequest.DoesNotExist:
             return None
 
-    def hash(self):
-        data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
-                                     self.arguments_json, self.filter_expression)
-        return hashlib.sha256(data.encode()).hexdigest()
-
     def save(self, *args, **kwargs):
         if self.parent:
             old_arguments = self.parent.arguments
@@ -408,7 +404,25 @@ class RecipeRevision(models.Model):
 
         if not self.created:
             self.created = timezone.now()
-        self.id = self.hash()
+
+        # id used to be a hash of the contents of the revision. That ended up
+        # being:
+        #
+        # 1. a bad idea, since it means we couldn't change the internal
+        #    structure of revisions.
+        # 2. not actually useful, since that assertion was never used elsewhere
+        # 3. really hard to change, since changing the type of a primary key
+        #    requires making many changes across the database.
+        #
+        # Because of the above, now id is set to a hash of a random value at
+        # creation, and then never modified. This gets rid of disadvantage #1,
+        # which is the driving force behind this change, but it doesn't fix the
+        # other two issues. It is however much simpler than a solution that
+        # handles all the disadvantages.
+
+        if not self.id:
+            self.id = hashlib.sha256(f'{random()}'.encode()).hexdigest()
+
         self.updated = timezone.now()
         super().save(*args, **kwargs)
 
