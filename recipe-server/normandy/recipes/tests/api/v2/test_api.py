@@ -199,7 +199,7 @@ class TestRecipeAPI(object):
             res = api_client.post('/api/v2/recipe/', {
                 'name': 'Test Recipe',
                 'action_id': 1234,
-                'arguments': '{}',
+                'arguments': {},
             })
             assert res.status_code == 400
             assert res.json()['action_id'] == [
@@ -213,7 +213,7 @@ class TestRecipeAPI(object):
         def test_creation_when_action_id_is_missing(self, api_client):
             res = api_client.post('/api/v2/recipe/', {
                 'name': 'Test Recipe',
-                'arguments': '{}'
+                'arguments': {}
             })
             assert res.status_code == 400
             assert res.json()['action_id'] == [
@@ -227,7 +227,7 @@ class TestRecipeAPI(object):
             res = api_client.post('/api/v2/recipe/', {
                 'name': 'Test Recipe',
                 'action_id': 'a string',
-                'arguments': '{}',
+                'arguments': {},
             })
             assert res.status_code == 400
             assert res.json()['action_id'] == [
@@ -281,6 +281,29 @@ class TestRecipeAPI(object):
             res = api_client.post('/api/v2/recipe/', data)
             assert res.status_code == 400
             assert res.data == {'arguments': ['Must be an object.']}
+
+            recipes = Recipe.objects.all()
+            assert recipes.count() == 0
+
+        def test_creation_when_action_id_is_a_string_and_arguments_are_invalid(self, api_client):
+            action = ActionFactory(
+                name='foobarbaz',
+                arguments_schema={
+                    'type': 'object',
+                    'properties': {'message': {'type': 'string'}},
+                    'required': ['message']
+                }
+            )
+            data = {
+                'name': 'Test Recipe',
+                'enabled': True,
+                'extra_filter_expression': 'true',
+                'action_id': f'{action.id}',
+                'arguments': {}
+            }
+            res = api_client.post('/api/v2/recipe/', data)
+            assert res.status_code == 400
+            assert res.data == {'arguments': {'message': 'This field may not be blank.'}}
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0

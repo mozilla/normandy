@@ -7,7 +7,7 @@ import { push as pushAction } from 'redux-little-router';
 
 import handleError from 'control/utils/handleError';
 import GenericFormContainer from 'control/components/recipes/GenericFormContainer';
-import RecipeForm from 'control/components/recipes/RecipeForm';
+import RecipeForm, { cleanRecipeData } from 'control/components/recipes/RecipeForm';
 
 import { createRecipe as createAction } from 'control/state/app/recipes/actions';
 
@@ -36,17 +36,8 @@ export default class CreateRecipePage extends React.PureComponent {
   }
 
   async formAction(formValues) {
-    // Handle generic JSON textfield arguments
-    if (typeof formValues.arguments === 'string') {
-      try {
-        formValues.arguments = JSON.parse(formValues.arguments);
-      } catch (error) {
-        error.data = { arguments: 'Invalid JSON.' };
-        throw error;
-      }
-    }
-
-    return this.props.createRecipe(formValues);
+    const cleanedData = cleanRecipeData(formValues);
+    return this.props.createRecipe(cleanedData);
   }
 
   render() {

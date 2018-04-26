@@ -160,55 +160,58 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return value
 
-    def validate_arguments(self, value):
-        # This in an invariance validation. It depends on the action_id
-        # being valid.
-        action_id = self.initial_data.get('action_id')
-        if not action_id or not isinstance(action_id, int):
-            # If this is the case, it will be caught by the basic
-            # validation.
-            return
+    def validate(self, data):
+        action = data.get('action')
+        required_error_msg = serializers.PrimaryKeyRelatedField.default_error_messages['required']
 
-        # Ensure the value is a dict
-        if not isinstance(value, dict):
-            raise serializers.ValidationError('Must be an object.')
+        if action is None:
+            if not self.instance:
+                raise serializers.ValidationError({'action_id': required_error_msg})
+            action = self.instance.action
 
-        # Get the schema associated with the selected action
-        try:
-            schema = Action.objects.get(pk=action_id).arguments_schema
-        except Action.DoesNotExist:
-            raise serializers.ValidationError('Could not find arguments schema.')
+        arguments = data.get('arguments')
 
-        schemaValidator = JSONSchemaValidator(schema)
-        errorResponse = {}
-        errors = sorted(schemaValidator.iter_errors(value), key=lambda e: e.path)
+        if arguments is None and not self.instance:
+            raise serializers.ValidationError({'arguments': required_error_msg})
 
-        # Loop through ValidationErrors returned by JSONSchema
-        # Each error contains a message and a path attribute
-        # message: string human-readable error explanation
-        # path: list containing path to offending element
-        for error in errors:
-            currentLevel = errorResponse
+        if arguments is not None:
+            # Ensure the value is a dict
+            if not isinstance(arguments, dict):
+                raise serializers.ValidationError({'arguments': 'Must be an object.'})
 
-            # Loop through the path of the current error
-            # e.g. ['surveys'][0]['weight']
-            for index, path in enumerate(error.path):
-                # If this key already exists in our error response, step into it
-                if path in currentLevel:
-                    currentLevel = currentLevel[path]
-                    continue
-                else:
-                    # If we haven't reached the end of the path, add this path
-                    # as a key in our error response object and step into it
-                    if index < len(error.path) - 1:
-                        currentLevel[path] = {}
+            # Get the schema associated with the selected action
+            schema = action.arguments_schema
+
+            schemaValidator = JSONSchemaValidator(schema)
+            errorResponse = {}
+            errors = sorted(schemaValidator.iter_errors(arguments), key=lambda e: e.path)
+
+            # Loop through ValidationErrors returned by JSONSchema
+            # Each error contains a message and a path attribute
+            # message: string human-readable error explanation
+            # path: list containing path to offending element
+            for error in errors:
+                currentLevel = errorResponse
+
+                # Loop through the path of the current error
+                # e.g. ['surveys'][0]['weight']
+                for index, path in enumerate(error.path):
+                    # If this key already exists in our error response, step into it
+                    if path in currentLevel:
                         currentLevel = currentLevel[path]
                         continue
-                    # If we've reached the final path, set the error message
                     else:
-                        currentLevel[path] = error.message
+                        # If we haven't reached the end of the path, add this path
+                        # as a key in our error response object and step into it
+                        if index < len(error.path) - 1:
+                            currentLevel[path] = {}
+                            currentLevel = currentLevel[path]
+                            continue
+                        # If we've reached the final path, set the error message
+                        else:
+                            currentLevel[path] = error.message
 
-        if errorResponse:
-            raise serializers.ValidationError(errorResponse)
+            if errorResponse:
+                raise serializers.ValidationError({'arguments': errorResponse})
 
-        return value
+        return data

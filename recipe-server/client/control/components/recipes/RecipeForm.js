@@ -17,6 +17,27 @@ import { areAnyRequestsInProgress } from 'control/state/app/requests/selectors';
 import { createForm } from 'control/utils/forms';
 import IdenticonField from 'control/components/forms/IdenticonField';
 
+export function cleanRecipeData(data) {
+  // Handle generic JSON textfield arguments
+  if (typeof data.arguments === 'string') {
+    try {
+      data.arguments = JSON.parse(data.arguments);
+    } catch (error) {
+      error.data = { arguments: 'Invalid JSON.' };
+      throw error;
+    }
+  }
+
+  // Make sure the action ID is an integer
+  try {
+    data.action_id = parseInt(data.action_id, 10);
+  } catch (error) {
+    error.data = { action_id: 'Invalid Action ID.' };
+    throw error;
+  }
+
+  return data;
+}
 
 /**
  * Form for editing recipes.
