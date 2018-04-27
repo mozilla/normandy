@@ -25,7 +25,7 @@ deployment:
   latest:
     branch: master
     commands:
-      - ./bin/ci/deploy
+      - ./bin/ci/deploy latest
 
   tags:
     # push all tags
