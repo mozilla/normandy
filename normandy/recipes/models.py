@@ -335,9 +335,9 @@ class RecipeRevision(models.Model):
             'action': self.action,
             'arguments_json': self.arguments_json,
             'extra_filter_expression': self.extra_filter_expression,
-            'channels': list(self.channels.all()),
-            'countries': list(self.countries.all()),
-            'locales': list(self.locales.all()),
+            'channels': list(self.channels.all()) if self.id else [],
+            'countries': list(self.countries.all()) if self.id else [],
+            'locales': list(self.locales.all()) if self.id else [],
             'identicon_seed': self.identicon_seed,
         }
 

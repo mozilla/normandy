@@ -53,13 +53,13 @@ def copy_revisions_to_tmp(apps, schema_editor):
     RecipeRevision = apps.get_model('recipes', 'RecipeRevision')
 
     for revision in RecipeRevision.objects.filter(parent=None):
-        current = revision
-        parent = create_tmp_from_revision(apps, current)
+        current_rev = revision
+        parent_tmp = create_tmp_from_revision(apps, current_rev)
 
         try:
-            while current.child:
-                parent = create_tmp_from_revision(apps, current.child, parent=parent)
-                current = current.child
+            while current_rev.child:
+                parent_tmp = create_tmp_from_revision(apps, current_rev.child, parent=parent_tmp)
+                current_rev = current_rev.child
         except RecipeRevision.DoesNotExist:
             pass
 
@@ -136,14 +136,14 @@ def create_revision_from_tmp(apps, tmp, parent=None):
 def copy_tmp_to_revisions(apps, schema_editor):
     TmpRecipeRevision = apps.get_model('recipes', 'TmpRecipeRevision')
 
-    for revision in TmpRecipeRevision.objects.filter(parent=None):
-        current = revision
-        create_revision_from_tmp(apps, current)
+    for tmp in TmpRecipeRevision.objects.filter(parent=None):
+        current_tmp = tmp
+        parent_rev = create_revision_from_tmp(apps, current_tmp)
 
         try:
-            while current.child:
-                create_revision_from_tmp(apps, current.child, parent=current)
-                current = current.child
+            while current_tmp.child:
+                parent_rev = create_revision_from_tmp(apps, current_tmp.child, parent=parent_rev)
+                current_tmp = current_tmp.child
         except TmpRecipeRevision.DoesNotExist:
             pass
 
