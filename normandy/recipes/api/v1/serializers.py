@@ -92,7 +92,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     enabled = serializers.BooleanField(read_only=True)
     last_updated = serializers.DateTimeField(read_only=True)
-    revision_id = serializers.CharField(read_only=True)
+    revision_id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
     arguments = serializers.JSONField()
@@ -104,8 +104,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                                            many=True, required=False)
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
-    latest_revision_id = serializers.CharField(source='latest_revision.id', read_only=True)
-    approved_revision_id = serializers.CharField(source='approved_revision.id', read_only=True)
+    latest_revision_id = serializers.IntegerField(source='latest_revision.id', read_only=True)
+    approved_revision_id = serializers.IntegerField(source='approved_revision.id', read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
     identicon_seed = serializers.CharField(required=False)
 
@@ -226,7 +226,7 @@ class MinimalRecipeSerializer(RecipeSerializer):
     The minimum amount of fields needed for clients to verify and execute recipes.
     """
 
-    revision_id = serializers.CharField(source='current_revision.id', read_only=True)
+    revision_id = serializers.IntegerField(source='current_revision.id', read_only=True)
 
     class Meta(RecipeSerializer.Meta):
         # Attributes serialized here are made available to filter expressions via
@@ -242,7 +242,6 @@ class MinimalRecipeSerializer(RecipeSerializer):
             'action',
             'arguments',
             'filter_expression',
-            'revision_id',
         ]
 
 
