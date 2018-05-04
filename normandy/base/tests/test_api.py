@@ -244,3 +244,42 @@ class TestServiceInfoView(object):
             'logout_url': settings.OIDC_LOGOUT_URL,
             'github_url': settings.GITHUB_URL,
         }
+
+
+@pytest.mark.django_db
+class TestOIDCAuthorization(object):
+
+    def test_happy_path(self, settings, requestsmock):
+        client = APIClient()
+
+        user_profile = {
+            'email': 'Peterbe@example.com',
+            'given_name': 'Peter',
+            'family_name': 'Bengtsson',
+        }
+        requestsmock.get(
+            settings.OIDC_USER_ENDPOINT,
+            content=json.dumps(user_profile).encode('utf-8'),
+        )
+        res = client.get(
+            '/api/v2/service_info/',
+            HTTP_AUTHORIZATION='Bearer perfectly-valid'
+        )
+        assert res.status_code == 200
+        assert res.data['user']
+        assert res.data['user']['email'] == 'peterbe@example.com'
+        assert res.data['user']['first_name'] == 'Peter'
+        assert res.data['user']['last_name'] == 'Bengtsson'
+
+    def test_permission_denied(self, settings, requestsmock):
+        client = APIClient()
+
+        requestsmock.get(
+            settings.OIDC_USER_ENDPOINT,
+            status_code=401
+        )
+        res = client.get(
+            '/api/v2/service_info/',
+            HTTP_AUTHORIZATION='Bearer notgoodenough'
+        )
+        assert res.status_code == 403

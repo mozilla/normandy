@@ -186,7 +186,20 @@ class CORS:
     CORS_ORIGIN_WHITELIST = values.ListValue([])
 
 
-class Base(Core, CORS):
+class OIDC:
+    """Settings related to talking to an OIDC provider for authorizing
+    access tokens received from the client."""
+
+    # Note! We *could* just have a setting called 'OIDC_DOMAIN' and then use
+    # https://$OIDC_DOMAIN/.well-known/openid-configuration and extract the
+    # 'userinfo_endoint' value from that during startup or something.
+    # As of May 2018, the likelyhood of this URL changing and the fact that it's
+    # the only URL we need, let's just make the setting thee URL that we need
+    # for being able to authorization by access token.
+    OIDC_USER_ENDPOINT = values.URLValue('https://auth.mozilla.auth0.com/userinfo')
+
+
+class Base(Core, CORS, OIDC):
     """Settings that may change per-environment, some with defaults."""
 
     # Flags that affect other settings, via setting methods below
@@ -221,6 +234,7 @@ class Base(Core, CORS):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'normandy.base.middleware.OIDCAccessTokenAuthorizationMiddleware',
     ]
 
     def MIDDLEWARE(self):
@@ -483,3 +497,4 @@ class Test(Base):
     AUTOGRAPH_URL = None
     AUTOGRAPH_HAWK_ID = None
     AUTOGRAPH_HAWK_SECRET_KEY = None
+    OIDC_USER_ENDPOINT = 'https://auth.example.com/userinfo'
