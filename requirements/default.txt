@@ -22,8 +22,8 @@ django-configurations==1.0 \
 django-countries==5.1.1 \
     --hash=sha256:f7f450fb58cdf125daa15dd49a1f578337f69ee7df546d36f135207c515a9c6e \
     --hash=sha256:3c7cfeb396150b899116e46b5c6109e13b880db96792f9d5d4a953a9b9085111
-django-dirtyfields==1.2.1 \
-    --hash=sha256:6f2e988121323cd8a15cef3035f5ea5942d3e41f76c3b2e1de0b81761a000c94
+django-dirtyfields==1.3.1 \
+    --hash=sha256:c3aafe524fc26c6ac573bbaf3ea852607e7b0f8622a2ec23dcdf65e1a9dcb7bb
 django-filter==1.1.0 \
     --hash=sha256:ec0ef1ba23ef95b1620f5d481334413700fb33f45cd76d56a63f4b0b1d76976a \
     --hash=sha256:ea204242ea83790e1512c9d0d8255002a652a6f4986e93cee664f28955ba0c22
