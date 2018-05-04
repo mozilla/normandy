@@ -72,22 +72,25 @@ class Test0003Through0005(MigrationTest):
             'extra_filter_expression': '1 == 1',
         }
 
-        revision = RecipeRevision.objects.create(**revision_data)
+        revision = RecipeRevision.objects.create(**revision_data, id='f4keh4sh1')
         revision.channels = [channel1, channel2]
         revision.countries = [country1, country2]
         revision.locales = [locale1, locale2]
         revision.save()
+
+        child_revision = RecipeRevision.objects.create(**revision_data, id='f4keh4sh2',
+                                                       parent=revision)
 
         approval_request = ApprovalRequest.objects.create(
             revision=revision,
             approved=True,
         )
 
-        recipe.latest_revision = revision
+        recipe.latest_revision = child_revision
         recipe.approved_revision = revision
         recipe.save()
 
-        assert RecipeRevision.objects.count() == 1
+        assert RecipeRevision.objects.count() == 2
 
         # Apply the migrations
         apps_0005 = migrations.migrate('recipes', '0005_auto_20180503_2146')
@@ -97,12 +100,13 @@ class Test0003Through0005(MigrationTest):
             apps_0005.get_model('recipes', 'TmpRecipeRevision')
 
         RecipeRevision = apps_0005.get_model('recipes', 'RecipeRevision')
-        assert RecipeRevision.objects.count() == 1
+        assert RecipeRevision.objects.count() == 2
 
-        new_revision = RecipeRevision.objects.get()
+        new_revision = RecipeRevision.objects.get(parent=None)
 
         assert isinstance(new_revision.id, int)
 
+        # Check revision data
         for key in revision_data:
             value = revision_data[key]
             if hasattr(value, 'id'):
@@ -116,8 +120,16 @@ class Test0003Through0005(MigrationTest):
         assert new_revision.approval_request.id == approval_request.id
 
         recipe = new_revision.recipe
-        assert recipe.latest_revision == new_revision
+        assert recipe.latest_revision == new_revision.child
         assert recipe.approved_revision == new_revision
+
+        # Check child revision data
+        for key in revision_data:
+            value = revision_data[key]
+            if hasattr(value, 'id'):
+                assert getattr(new_revision.child, key).id == value.id
+            else:
+                assert getattr(new_revision.child, key) == revision_data[key]
 
     def test_reverse(self, migrations):
         # Get the pre-migration models
@@ -161,16 +173,18 @@ class Test0003Through0005(MigrationTest):
         revision.locales = [locale1, locale2]
         revision.save()
 
+        child_revision = RecipeRevision.objects.create(**revision_data, parent=revision)
+
         approval_request = ApprovalRequest.objects.create(
             revision=revision,
             approved=True,
         )
 
-        recipe.latest_revision = revision
+        recipe.latest_revision = child_revision
         recipe.approved_revision = revision
         recipe.save()
 
-        assert RecipeRevision.objects.count() == 1
+        assert RecipeRevision.objects.count() == 2
 
         # Reverse the migrations
         apps_0002 = migrations.migrate('recipes', '0002_auto_20180406_1701')
@@ -180,13 +194,14 @@ class Test0003Through0005(MigrationTest):
             apps_0002.get_model('recipes', 'TmpRecipeRevision')
 
         RecipeRevision = apps_0002.get_model('recipes', 'RecipeRevision')
-        assert RecipeRevision.objects.count() == 1
+        assert RecipeRevision.objects.count() == 2
 
-        new_revision = RecipeRevision.objects.get()
+        new_revision = RecipeRevision.objects.get(parent=None)
 
         assert isinstance(new_revision.id, str)
         assert new_revision.id == self._hash_revision(new_revision)
 
+        # Check revision data
         for key in revision_data:
             value = revision_data[key]
             if hasattr(value, 'id'):
@@ -200,5 +215,15 @@ class Test0003Through0005(MigrationTest):
         assert new_revision.approval_request.id == approval_request.id
 
         recipe = new_revision.recipe
-        assert recipe.latest_revision == new_revision
+        assert recipe.latest_revision == new_revision.child
         assert recipe.approved_revision == new_revision
+
+        # Check child revision data
+        for key in revision_data:
+            value = revision_data[key]
+            if hasattr(value, 'id'):
+                assert getattr(new_revision.child, key).id == value.id
+            else:
+                assert getattr(new_revision.child, key) == revision_data[key]
+
+        assert new_revision.child.id == self._hash_revision(new_revision.child)

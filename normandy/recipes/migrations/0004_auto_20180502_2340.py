@@ -128,6 +128,8 @@ def create_revision_from_tmp(apps, tmp, parent=None):
     for locale in tmp.locales.all():
         rev.locales.add(locale)
 
+    return rev
+
 
 def copy_tmp_to_revisions(apps, schema_editor):
     TmpRecipeRevision = apps.get_model('recipes', 'TmpRecipeRevision')
