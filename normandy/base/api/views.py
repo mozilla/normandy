@@ -2,12 +2,14 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.urls import NoReverseMatch
 
 from rest_framework import status
-from rest_framework.compat import NoReverseMatch, set_rollback
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.views import APIView, exception_handler as original_exception_handler
+from rest_framework.views import (
+    APIView, exception_handler as original_exception_handler, set_rollback
+)
 
 from normandy.base.api.serializers import UserSerializer, ServiceInfoSerializer
 from normandy.base.decorators import api_cache_control
