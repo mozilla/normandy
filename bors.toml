@@ -1,3 +1,5 @@
 status = [
   "ci/circleci",
 ]
+# Avoid including verbose details from PyUp in commit messages
+cut_body_after = "<details>"
