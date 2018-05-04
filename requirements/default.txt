@@ -56,9 +56,9 @@ djangorestframework==3.8.2 \
 ecdsa==0.13 \
     --hash=sha256:40d002cf360d0e035cf2cb985e1308d41aaa087cbfc135b2dc2d844296ea546c \
     --hash=sha256:64cf1ee26d1cde3c73c6d7d107f835fed7c6a2904aef9eac223d57ad800c43fa
-factory_boy==2.10.0 \
-    --hash=sha256:bd5a096d0f102d79b6c78cef1c8c0b650f2e1a3ecba351c735c6d2df8dabd29c \
-    --hash=sha256:be2abc8092294e4097935a29b4e37f5b9ed3e4205e2e32df215c0315b625995e
+factory_boy==2.11.0 \
+    --hash=sha256:3763ecabafb341df75b82f3a80c40747adef32d0288282c0c2db7a13e53c6944 \
+    --hash=sha256:d0f7209473312c99dfcf154069a1c559d83cfcae0979af43cf8779c9a9f645b3
 flake8==3.5.0 \
     --hash=sha256:7253265f7abd8b313e3892944044a365e3f4ac3fcdcfb4298f55ee9ddf188ba0 \
     --hash=sha256:c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37
