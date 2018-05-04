@@ -1,6 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
 
+from django.core.management import call_command
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
@@ -47,5 +48,8 @@ def migrations(transactional_db):
             executor = MigrationExecutor(connection)
             executor.migrate(migration)
             return executor.loader.project_state(migration).apps
+
+        def reset(self):
+            call_command('migrate', noinput=True)
 
     return Migrator()

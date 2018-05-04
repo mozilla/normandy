@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.core.management import call_command
 
 from factory import DjangoModelFactory, fuzzy, Sequence
 import pytest
@@ -73,6 +72,6 @@ def skip_except_in_ci():
 class MigrationTest(object):
     """A base class for migration tests that resets migrations on teardown."""
     @pytest.fixture(autouse=True)
-    def reset_migrations(self):
+    def reset_migrations(self, migrations):
         yield
-        call_command('migrate', noinput=True)
+        migrations.reset()
