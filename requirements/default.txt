@@ -110,8 +110,8 @@ statsd==3.2.1 \
 whitenoise==3.3.0 \
     --hash=sha256:1d62a003a0ab747de96da45c831cbb512dcb7f69c1ef0bd20b1cd4ae45d8a0c4 \
     --hash=sha256:d098327276de6fd189398a7bcb95789d1bb2d41b3e011eeae4562f6b1a107dd4
-newrelic==2.78.0.57 \
-    --hash=sha256:2191b7699e14a07efa5d9221270eb29bdf6cce643aa56cff08546ecb3f729be6
+newrelic==3.2.0.91 \
+    --hash=sha256:2d1cf00e105f423c5c5fa9ce3f6179773683e6ee52fb64016441abd225b43bf3
 django_csp==3.4 \
     --hash=sha256:04c0ccd4e1339e8f6af48c55c3347dc996fde2d22d79e8bf2f6b7a920412e408 \
     --hash=sha256:096b634430d8ea81c3d9f216f87be890f3a975c17bb9a4631f6a1619ac09c91e
