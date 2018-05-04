@@ -11,6 +11,7 @@ __pycache__/
 GeoLite2-Country.mmdb
 _build
 /.cache/
+/.pytest_cache/
 /etc/ssl
 /__version__/
 /tmp
