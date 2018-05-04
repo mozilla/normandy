@@ -37,9 +37,9 @@ django-rest-swagger==2.1.1 \
 django-storages==1.5.2 \
     --hash=sha256:60fe20cbf31eeda4e6065039646b6abecc45d6cc41246dd198c477031d848ffa \
     --hash=sha256:470b67b325abfd7f82362cfcb09cceba19f1f9499b42ace0f998aa75a05297c7
-django-storages-redux==1.3.2 \
-    --hash=sha256:df94a582d452c8e7763291d5463b60316bf7f6ffe2c59c4c162514c1bbc39504 \
-    --hash=sha256:84cb0e685ac0401f14d320d3d469b3e5968a7314a93936c86672c2315d8302dc
+django-storages-redux==1.3.3 \
+    --hash=sha256:e0d19ac48bc2e75c807f98341a7937ad24ac4de1b0c9bbdfec5945d30a63220c \
+    --hash=sha256:35974b3505fb60315c93d36658ec642295fa3735a0295d61c51db17f4dd9ed7d
 django-sslserver==0.18 \
     --hash=sha256:e7180255546c6e1e1652de032d212aa63b19a26b2c817b5f7babca24711f03ad
 django-webpack-loader==0.3.0 \
