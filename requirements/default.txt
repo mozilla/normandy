@@ -56,9 +56,9 @@ django-mozilla-product-details==0.13 \
     --hash=sha256:ce97fc2533aa06560d9b438ebba2522dc0b2ada86d6e0537cfb5ac06db1a6aa2
 django-npm==1.0.0 \
     --hash=sha256:2e6bba65e728fa18b9db3c8dc0d4490b70cb7f43bacf60eb3654d7dcb6424272
-django-rest-swagger==2.1.1 \
-    --hash=sha256:36b9d97d259c10a7a96a24b81d4b0933cdd359298ad1a006dce6d9622f46ff59 \
-    --hash=sha256:6ef17b12456dac9434e44357480e323812bee3087579d14e046f6091de6a15d0
+django-rest-swagger==2.2.0 \
+    --hash=sha256:48f6aded9937e90ae7cbe9e6c932b9744b8af80cc4e010088b3278c700e0685b \
+    --hash=sha256:b039b0288bab4665cd45dc5d16f94b13911bc4ad0ed55f74ad3b90aa31c87c17
 django-storages==1.5.2 \
     --hash=sha256:60fe20cbf31eeda4e6065039646b6abecc45d6cc41246dd198c477031d848ffa \
     --hash=sha256:470b67b325abfd7f82362cfcb09cceba19f1f9499b42ace0f998aa75a05297c7
