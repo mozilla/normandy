@@ -59,9 +59,9 @@ django-npm==1.0.0 \
 django-rest-swagger==2.2.0 \
     --hash=sha256:48f6aded9937e90ae7cbe9e6c932b9744b8af80cc4e010088b3278c700e0685b \
     --hash=sha256:b039b0288bab4665cd45dc5d16f94b13911bc4ad0ed55f74ad3b90aa31c87c17
-django-storages==1.5.2 \
-    --hash=sha256:60fe20cbf31eeda4e6065039646b6abecc45d6cc41246dd198c477031d848ffa \
-    --hash=sha256:470b67b325abfd7f82362cfcb09cceba19f1f9499b42ace0f998aa75a05297c7
+django-storages==1.6.6 \
+    --hash=sha256:7339070cf0c8042f5a885783a0a909175a8dbb68e7f5697d597571c830a460c4 \
+    --hash=sha256:f1dd5668a4df9a23aff56c8321ea3aac3fda23d9d17473158d308d1b13e5363e
 django-storages-redux==1.3.2 \
     --hash=sha256:df94a582d452c8e7763291d5463b60316bf7f6ffe2c59c4c162514c1bbc39504 \
     --hash=sha256:84cb0e685ac0401f14d320d3d469b3e5968a7314a93936c86672c2315d8302dc
