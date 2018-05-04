@@ -95,10 +95,9 @@ PyYAML==3.11 \
 s3transfer==0.1.10 \
     --hash=sha256:bc52f38637f37572ae180c08a2dd87a4825b46713797633aab6e1a42d6b2b8ff \
     --hash=sha256:ba1a9104939b7c0331dc4dd234d79afeed8b66edce77bbeeecd4f56de74a0fc1
-setuptools==19.6 \
-    --hash=sha256:57c63a363b37ffa2d64db4ffee26844e3ab81441fc02da4cd5e8cafcff9acb3a \
-    --hash=sha256:ecd48d753c1a8ecc6a2826b863a6defaafbfd4ceafc0c1d62e5362f5a86912e9 \
-    --hash=sha256:ada6bc13059b504c939a77baa06d71cbe5028babc12b7e4b41816d0130be456f
+setuptools==39.1.0 \
+    --hash=sha256:0cb8b8625bfdcc2d43ea4b9cdba0b39b2b7befc04f3088897031082aa16ce186 \
+    --hash=sha256:c5484e13b89927b44fd15897f7ce19dded8e7f035466a4fa7b946c0bdd86edd7
 simplejson==3.8.2 \
     --hash=sha256:e3b2fed6fedf3fdce70d10c61dee8779b8bf7e67b5625efee4bff8243b180487 \
     --hash=sha256:8793bb83911ea75c0be8806456cfb6242f2e513107115811dc6bc010029fb1b0 \
