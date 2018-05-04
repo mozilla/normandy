@@ -34,8 +34,9 @@ boto3==1.7.13 \
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
-dj-inmemorystorage==1.4.0 \
-    --hash=sha256:35a37fac5955c3d9519fcab0cc7d88b43dc9bc95ffd2a6312badfa489ed30fd2
+dj-inmemorystorage==1.4.1 \
+    --hash=sha256:2b587f9320ea26f9ed1c62fefaf05c817735eda989d6439072b73d1b59b1c591 \
+    --hash=sha256:fa921269b83ffc762411e36d446fa07b602a4ad74632ae1819844d32e6fb12bd
 Django==1.11.11 \
     --hash=sha256:fd186d544c7c2f835668cf11f77be071307c9eb22615a5b3a16bdb14c8357f41 \
     --hash=sha256:74077d7309b48b97dacdac2dfb35c968028becf00a7a684e7f29b2af1b980edc
