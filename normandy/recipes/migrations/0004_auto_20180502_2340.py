@@ -101,7 +101,8 @@ def create_revision_from_tmp(apps, tmp, parent=None):
         identicon_seed=tmp.identicon_seed, action=tmp.action, parent=parent, recipe=tmp.recipe,
         user=tmp.user)
 
-    rev.id = hash(rev)
+    initial_id = hash(tmp)
+    rev.id = initial_id
 
     rev.save()
 
@@ -112,7 +113,9 @@ def create_revision_from_tmp(apps, tmp, parent=None):
         rev.latest_for_recipe.add(tmp.latest_for_recipe.get())
 
     try:
-        tmp.approval_request.revision = rev
+        approval_request = tmp.approval_request
+        approval_request.revision = rev
+        approval_request.save()
     except ApprovalRequest.DoesNotExist:
         pass
 
@@ -124,10 +127,6 @@ def create_revision_from_tmp(apps, tmp, parent=None):
 
     for locale in tmp.locales.all():
         rev.locales.add(locale)
-
-    # Rehash with m2m data
-    rev.id = hash(rev)
-    rev.save()
 
 
 def copy_tmp_to_revisions(apps, schema_editor):
