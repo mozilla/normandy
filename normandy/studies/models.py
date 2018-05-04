@@ -8,6 +8,9 @@ class Extension(models.Model):
     name = models.CharField(max_length=255)
     xpi = models.FileField(upload_to='extensions')
 
+    class Meta:
+        ordering = ('-id',)
+
     @property
     def recipes_used_by(self):
         """Set of enabled recipes that are using this extension."""
