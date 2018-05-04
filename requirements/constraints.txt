@@ -75,10 +75,9 @@ pycparser==2.14 \
 pyflakes==1.5.0 \
     --hash=sha256:cc5eadfb38041f8366128786b4ca12700ed05bbf1403d808e89d57d67a3875a7 \
     --hash=sha256:aa0d4dff45c0cc2214ba158d29280f8fa1129f3e87858ef825930845146337f4
-Pygments==2.1 \
-    --hash=sha256:3e723f70dc47b4ad5ca3ab4f1d1c3f76438b3dc74d6a843ded3e154e8af99838 \
-    --hash=sha256:148e04b185d3541b8d702e8cde3ee5acd06b31cc0d474127baba9f4652b2aaf1 \
-    --hash=sha256:13a0ef5fafd7b16cf995bc28fe7aab0780dab1b2fda0fc89e033709af8b8a47b
+Pygments==2.2.0 \
+    --hash=sha256:78f3f434bcc5d6ee09020f92ba487f95ba50f1e3ef83ae96b9d5ffa1bab25c5d \
+    --hash=sha256:dbae1046def0efb574852fab9e90209b23f556367b5a320c0bcb871c77c3e8cc
 python-dateutil==2.6.0 \
     --hash=sha256:62a2f8df3d66f878373fd0072eacf4ee52194ba302e00082828e0d263b0418d2 \
     --hash=sha256:3acbef017340600e9ff8f2994d8f7afd6eacb295383f286466a6df3961e486f0 \
