@@ -1,9 +1,9 @@
 alabaster==0.7.7 \
     --hash=sha256:d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544 \
     --hash=sha256:f416a84e0d0ddbc288f6b8f2c276d10b40ca1238562cd9ed5a751292ec647b71
-Babel==2.2.0 \
-    --hash=sha256:fed07cbcdcb3de79b53a8220eebed21c93f8dbb3dbce1d9c6b1c4b09e8aecf2b \
-    --hash=sha256:d8cb4c0e78148aee89560f9fe21587aa57739c975bb89ff66b1e842cc697428f
+Babel==2.5.3 \
+    --hash=sha256:ad209a68d7162c4cff4b29cdebe3dec4cef75492df501b0049a9433c96ce6f80 \
+    --hash=sha256:8ce4cb6fdd4393edd323227cba3a077bceb2a6ce5201c902c65e730046f41f14
 botocore==1.5.71 \
     --hash=sha256:c3c8bcb554e450be658d183548e7d4ea24099cf3a4b18a95fe2e376c03c76cd1 \
     --hash=sha256:d5f5e1f4ea8df0efd7fa597ed2e6f73c620ea8696b5ec90779c46baa2012efb9
