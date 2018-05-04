@@ -3,43 +3,42 @@ import pytest
 
 from django.utils import timezone
 
-
-def get_filter_expression_for_revision(revision):
-    parts = []
-
-    if revision.locales.count():
-        locales = ', '.join(["'{}'".format(l.code) for l in revision.locales.all()])
-        parts.append('normandy.locale in [{}]'.format(locales))
-
-    if revision.countries.count():
-        countries = ', '.join(["'{}'".format(c.code) for c in revision.countries.all()])
-        parts.append('normandy.country in [{}]'.format(countries))
-
-    if revision.channels.count():
-        channels = ', '.join(["'{}'".format(c.slug) for c in revision.channels.all()])
-        parts.append('normandy.channel in [{}]'.format(channels))
-
-    if revision.extra_filter_expression:
-        parts.append(revision.extra_filter_expression)
-
-    expression = ') && ('.join(parts)
-
-    return '({})'.format(expression) if len(parts) > 1 else expression
-
-
-def hash_revision(revision):
-    data = '{}{}{}{}{}{}'.format(revision.recipe.id, revision.created, revision.name,
-                                 revision.action.id, revision.arguments_json,
-                                 get_filter_expression_for_revision(revision))
-    return hashlib.sha256(data.encode()).hexdigest()
+from normandy.base.tests import MigrationTest
 
 
 @pytest.mark.django_db
-class Test0003Through0005(object):
+class Test0003Through0005(MigrationTest):
+    def _get_filter_expression_for_revision(self, revision):
+        parts = []
 
-    def test_forwards(self, migration):
+        if revision.locales.count():
+            locales = ', '.join(["'{}'".format(l.code) for l in revision.locales.all()])
+            parts.append('normandy.locale in [{}]'.format(locales))
+
+        if revision.countries.count():
+            countries = ', '.join(["'{}'".format(c.code) for c in revision.countries.all()])
+            parts.append('normandy.country in [{}]'.format(countries))
+
+        if revision.channels.count():
+            channels = ', '.join(["'{}'".format(c.slug) for c in revision.channels.all()])
+            parts.append('normandy.channel in [{}]'.format(channels))
+
+        if revision.extra_filter_expression:
+            parts.append(revision.extra_filter_expression)
+
+        expression = ') && ('.join(parts)
+
+        return '({})'.format(expression) if len(parts) > 1 else expression
+
+    def _hash_revision(self, revision):
+        data = '{}{}{}{}{}{}'.format(revision.recipe.id, revision.created, revision.name,
+                                     revision.action.id, revision.arguments_json,
+                                     self._get_filter_expression_for_revision(revision))
+        return hashlib.sha256(data.encode()).hexdigest()
+
+    def test_forwards(self, migrations):
         # Get the pre-migration models
-        old_apps = migration.before('recipes', '0002_auto_20180406_1701')
+        old_apps = migrations.migrate('recipes', '0002_auto_20180406_1701')
         Recipe = old_apps.get_model('recipes', 'Recipe')
         Action = old_apps.get_model('recipes', 'Action')
         RecipeRevision = old_apps.get_model('recipes', 'RecipeRevision')
@@ -91,7 +90,7 @@ class Test0003Through0005(object):
         assert RecipeRevision.objects.count() == 1
 
         # Apply the migrations
-        apps_0005 = migration.apply('recipes', '0005_auto_20180503_2146')
+        apps_0005 = migrations.migrate('recipes', '0005_auto_20180503_2146')
 
         # Check that the temporary model no longer exists
         with pytest.raises(LookupError):
@@ -120,9 +119,9 @@ class Test0003Through0005(object):
         assert recipe.latest_revision == new_revision
         assert recipe.approved_revision == new_revision
 
-    def test_reverse(self, migration):
+    def test_reverse(self, migrations):
         # Get the pre-migration models
-        old_apps = migration.before('recipes', '0005_auto_20180503_2146')
+        old_apps = migrations.migrate('recipes', '0005_auto_20180503_2146')
         Recipe = old_apps.get_model('recipes', 'Recipe')
         Action = old_apps.get_model('recipes', 'Action')
         RecipeRevision = old_apps.get_model('recipes', 'RecipeRevision')
@@ -174,7 +173,7 @@ class Test0003Through0005(object):
         assert RecipeRevision.objects.count() == 1
 
         # Reverse the migrations
-        apps_0002 = migration.apply('recipes', '0002_auto_20180406_1701')
+        apps_0002 = migrations.migrate('recipes', '0002_auto_20180406_1701')
 
         # Check that the temporary model no longer exists
         with pytest.raises(LookupError):
@@ -186,7 +185,7 @@ class Test0003Through0005(object):
         new_revision = RecipeRevision.objects.get()
 
         assert isinstance(new_revision.id, str)
-        assert new_revision.id == hash_revision(new_revision)
+        assert new_revision.id == self._hash_revision(new_revision)
 
         for key in revision_data:
             value = revision_data[key]
