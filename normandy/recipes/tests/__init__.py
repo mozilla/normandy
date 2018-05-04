@@ -81,19 +81,6 @@ class RecipeFactory(factory.DjangoModelFactory):
 
         return obj
 
-    # It is important that the signature be based on the actual data, and not
-    # some static value so that tests can make assertions against what data was
-    # signed.
-
-    @factory.post_generation
-    def signed(self, create, extracted=False, **kwargs):
-        if extracted:
-            self.signature = SignatureFactory(data=self.canonical_json())
-            self.signature.save()
-            self.save()
-        else:
-            return None
-
     @factory.post_generation
     def channels(self, create, extracted, **kwargs):
         if not create:
@@ -134,6 +121,19 @@ class RecipeFactory(factory.DjangoModelFactory):
         if extracted:
             self.enabled = True
             self.save()
+
+    # NOTE: This should always be last or the signature gets erased.
+    # It is important that the signature be based on the actual data, and not
+    # some static value so that tests can make assertions against what data was
+    # signed.
+    @factory.post_generation
+    def signed(self, create, extracted=False, **kwargs):
+        if extracted:
+            self.signature = SignatureFactory(data=self.canonical_json())
+            self.signature.save()
+            self.save()
+        else:
+            return None
 
 
 class FuzzyIdenticonSeed(factory.fuzzy.FuzzyText):

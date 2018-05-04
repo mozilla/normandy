@@ -52,7 +52,7 @@ class TestRecipeSerializer:
             'locales': [locale.code],
             'is_approved': False,
             'latest_revision_id': recipe.latest_revision.id,
-            'approved_revision_id': recipe.approved_revision_id,
+            'approved_revision_id': None,
             'approval_request': {
                 'id': approval.id,
                 'created': Whatever(),
