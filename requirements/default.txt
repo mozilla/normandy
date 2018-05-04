@@ -40,9 +40,9 @@ dj-inmemorystorage==1.4.1 \
 Django==1.11.11 \
     --hash=sha256:fd186d544c7c2f835668cf11f77be071307c9eb22615a5b3a16bdb14c8357f41 \
     --hash=sha256:74077d7309b48b97dacdac2dfb35c968028becf00a7a684e7f29b2af1b980edc
-django-configurations==1.0 \
-    --hash=sha256:98a14951cd0870d0343fe9c243172dc110353b430c3e06a87a90dc7bc82b0b75 \
-    --hash=sha256:93f4a09134145f4388c2ec2183ce623b1b57fd04e3e0d2a2cf3b32fadc8f9464
+django-configurations==2.0 \
+    --hash=sha256:b4a4eb3ed631c2abbeb7008b5cc5d8d04b190df838e7b613731d728f674f3a2f \
+    --hash=sha256:be47e25d070fd005cc8fbd6c913c9ec37e83d04686937afe18ca6c579b2cdedb
 django-countries==5.1.1 \
     --hash=sha256:f7f450fb58cdf125daa15dd49a1f578337f69ee7df546d36f135207c515a9c6e \
     --hash=sha256:3c7cfeb396150b899116e46b5c6109e13b880db96792f9d5d4a953a9b9085111
