@@ -23,7 +23,7 @@ export default class HistoryTimeline extends React.PureComponent {
   static propTypes = {
     history: PropTypes.instanceOf(List).isRequired,
     recipeId: PropTypes.number.isRequired,
-    selectedRevisionId: PropTypes.string.isRequired,
+    selectedRevisionId: PropTypes.number.isRequired,
   }
 
   render() {

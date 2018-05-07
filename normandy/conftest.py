@@ -1,6 +1,10 @@
 import pytest
 from rest_framework.test import APIClient
 
+from django.core.management import call_command
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
+
 from normandy.base.tests import UserFactory, skip_except_in_ci
 from normandy.recipes import geolocation as geolocation_module
 from normandy.recipes.tests import fake_sign
@@ -30,3 +34,22 @@ def mocked_autograph(mocker):
     mocked = mocker.patch('normandy.recipes.models.Autographer')
     mocked.return_value.sign_data.side_effect = fake_sign
     return mocked
+
+
+@pytest.fixture()
+def migrations(transactional_db):
+    """
+    This fixture returns a helper object to test Django data migrations.
+    Based on: https://gist.github.com/bennylope/82a6088c02fefdd47e18f3c04ec167af
+    """
+    class Migrator(object):
+        def migrate(self, app, to):
+            migration = [(app, to)]
+            executor = MigrationExecutor(connection)
+            executor.migrate(migration)
+            return executor.loader.project_state(migration).apps
+
+        def reset(self):
+            call_command('migrate', noinput=True)
+
+    return Migrator()

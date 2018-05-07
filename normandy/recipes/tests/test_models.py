@@ -263,7 +263,7 @@ class TestRecipe(object):
             '"is_approved":false,'
             '"last_updated":"%(last_updated)s",'
             '"name":"canonical",'
-            '"revision_id":"%(revision_id)s"'
+            '"revision_id":%(revision_id)s'
             '}'
         ) % {
             'id': recipe.id,

@@ -67,3 +67,11 @@ def skip_except_in_ci():
         raise Exception("This test isn't allowed to be skipped in CI")
     else:
         pytest.skip()
+
+
+class MigrationTest(object):
+    """A base class for migration tests that resets migrations on teardown."""
+    @pytest.fixture(autouse=True)
+    def reset_migrations(self, migrations):
+        yield
+        migrations.reset()

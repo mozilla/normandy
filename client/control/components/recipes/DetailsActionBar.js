@@ -25,7 +25,6 @@ import {
 } from 'control/state/app/revisions/selectors';
 import {
   getRouterPath,
-  getUrlParam,
   getUrlParamAsInt,
 } from 'control/state/router/selectors';
 
@@ -35,7 +34,7 @@ import {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
     const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
     const recipe = getRecipe(state, recipeId, new Map());
-    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
+    const revisionId = getUrlParamAsInt(state, 'revisionId', latestRevisionId);
 
     return {
       isLatest: isLatestRevision(state, revisionId),
@@ -66,7 +65,7 @@ export default class DetailsActionBar extends React.PureComponent {
     recipe: PropTypes.instanceOf(Map).isRequired,
     recipeId: PropTypes.number.isRequired,
     requestRevisionApproval: PropTypes.func.isRequired,
-    revisionId: PropTypes.string.isRequired,
+    revisionId: PropTypes.number.isRequired,
     routerPath: PropTypes.string.isRequired,
   };
 

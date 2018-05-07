@@ -1,4 +1,3 @@
-import hashlib
 import json
 import logging
 from collections import defaultdict
@@ -308,7 +307,6 @@ class RecipeRevision(models.Model):
     REJECTED = 'rejected'
     PENDING = 'pending'
 
-    id = models.CharField(max_length=64, primary_key=True)
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
     recipe = models.ForeignKey(Recipe, related_name='revisions', on_delete=models.CASCADE)
@@ -337,9 +335,9 @@ class RecipeRevision(models.Model):
             'action': self.action,
             'arguments_json': self.arguments_json,
             'extra_filter_expression': self.extra_filter_expression,
-            'channels': list(self.channels.all()),
-            'countries': list(self.countries.all()),
-            'locales': list(self.locales.all()),
+            'channels': list(self.channels.all()) if self.id else [],
+            'countries': list(self.countries.all()) if self.id else [],
+            'locales': list(self.locales.all()) if self.id else [],
             'identicon_seed': self.identicon_seed,
         }
 
@@ -394,11 +392,6 @@ class RecipeRevision(models.Model):
         except ApprovalRequest.DoesNotExist:
             return None
 
-    def hash(self):
-        data = '{}{}{}{}{}{}'.format(self.recipe.id, self.created, self.name, self.action.id,
-                                     self.arguments_json, self.filter_expression)
-        return hashlib.sha256(data.encode()).hexdigest()
-
     def save(self, *args, **kwargs):
         if self.parent:
             old_arguments = self.parent.arguments
@@ -408,7 +401,6 @@ class RecipeRevision(models.Model):
 
         if not self.created:
             self.created = timezone.now()
-        self.id = self.hash()
         self.updated = timezone.now()
         super().save(*args, **kwargs)
 
