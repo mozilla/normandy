@@ -73,9 +73,9 @@ class Test0003Through0005(MigrationTest):
         }
 
         revision = RecipeRevision.objects.create(**revision_data, id='f4keh4sh1')
-        revision.channels = [channel1, channel2]
-        revision.countries = [country1, country2]
-        revision.locales = [locale1, locale2]
+        revision.channels.set([channel1, channel2])
+        revision.countries.set([country1, country2])
+        revision.locales.set([locale1, locale2])
         revision.save()
 
         child_revision = RecipeRevision.objects.create(**revision_data, id='f4keh4sh2',
@@ -168,9 +168,9 @@ class Test0003Through0005(MigrationTest):
         }
 
         revision = RecipeRevision.objects.create(**revision_data)
-        revision.channels = [channel1, channel2]
-        revision.countries = [country1, country2]
-        revision.locales = [locale1, locale2]
+        revision.channels.set([channel1, channel2])
+        revision.countries.set([country1, country2])
+        revision.locales.set([locale1, locale2])
         revision.save()
 
         child_revision = RecipeRevision.objects.create(**revision_data, parent=revision)

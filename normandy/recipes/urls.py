@@ -25,8 +25,8 @@ v2_router.register(r'approval_request', api_v2_views.ApprovalRequestViewSet)
 app_name = 'recipes'
 
 urlpatterns = [
-    url(r'^api/v2/', include(v2_router.urls, namespace='v2')),
-    url(r'^api/v1/', include(v1_router.urls, namespace='v1')),
+    url(r'^api/v2/', include((v2_router.urls, 'recipes'), namespace='v2')),
+    url(r'^api/v1/', include((v1_router.urls, 'recipes'), namespace='v1')),
     url(
         r'^api/v1/action/(?P<name>[_\-\w]+)/implementation/(?P<impl_hash>[a-zA-Z0-9_-]*)/$',
         api_v1_views.ActionImplementationView.as_view(),

@@ -52,7 +52,7 @@ class APIRootView(APIView):
 
 class CurrentUserView(APIView):
     def get(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(UserSerializer(request.user).data)
@@ -60,7 +60,7 @@ class CurrentUserView(APIView):
 
 class ServiceInfoView(APIView):
     def get(self, request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             user = request.user
         else:
             user = None

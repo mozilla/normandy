@@ -50,6 +50,6 @@ def migrations(transactional_db):
             return executor.loader.project_state(migration).apps
 
         def reset(self):
-            call_command('migrate', noinput=True)
+            call_command('migrate', no_input=True)
 
     return Migrator()
