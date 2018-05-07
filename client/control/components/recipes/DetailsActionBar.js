@@ -35,7 +35,7 @@ import {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
     const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
     const recipe = getRecipe(state, recipeId, new Map());
-    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
+    const revisionId = getUrlParamAsInt(state, 'revisionId', latestRevisionId);
 
     return {
       isLatest: isLatestRevision(state, revisionId),

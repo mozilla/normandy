@@ -24,7 +24,7 @@ import { getLatestRevisionIdForRecipe } from 'control/state/app/recipes/selector
   state => {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
     const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
-    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
+    const revisionId = getUrlParamAsInt(state, 'revisionId', latestRevisionId);
     const recipe = getRecipeForRevision(state, revisionId, new Map());
     const isLatestRevision = isLatestRevisionSelector(state, revisionId);
 
