@@ -25,7 +25,6 @@ import {
 } from 'control/state/app/revisions/selectors';
 import {
   getRouterPath,
-  getUrlParam,
   getUrlParamAsInt,
 } from 'control/state/router/selectors';
 

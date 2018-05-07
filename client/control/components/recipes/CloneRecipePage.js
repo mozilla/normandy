@@ -13,7 +13,7 @@ import RecipeForm from 'control/components/recipes/RecipeForm';
 import QueryRecipe from 'control/components/data/QueryRecipe';
 import QueryRevision from 'control/components/data/QueryRevision';
 import { createRecipe as createAction } from 'control/state/app/recipes/actions';
-import { getUrlParam, getUrlParamAsInt } from 'control/state/router/selectors';
+import { getUrlParamAsInt } from 'control/state/router/selectors';
 import {
   getRecipeForRevision,
   isLatestRevision as isLatestRevisionSelector,

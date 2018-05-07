@@ -17,7 +17,7 @@ import {
   getRecipeHistory,
 } from 'control/state/app/recipes/selectors';
 import { getRevision } from 'control/state/app/revisions/selectors';
-import { getUrlParam, getUrlParamAsInt } from 'control/state/router/selectors';
+import { getUrlParamAsInt } from 'control/state/router/selectors';
 
 
 @connect(
