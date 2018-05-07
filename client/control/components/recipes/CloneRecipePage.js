@@ -48,7 +48,7 @@ export default class CloneRecipePage extends React.PureComponent {
     isLatestRevision: PropTypes.bool.isRequired,
     recipeId: PropTypes.number.isRequired,
     recipe: PropTypes.instanceOf(Map).isRequired,
-    revisionId: PropTypes.string.isRequired,
+    revisionId: PropTypes.number.isRequired,
   };
 
   onFormSuccess(newId) {

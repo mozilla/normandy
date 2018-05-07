@@ -66,7 +66,7 @@ export default class DetailsActionBar extends React.PureComponent {
     recipe: PropTypes.instanceOf(Map).isRequired,
     recipeId: PropTypes.number.isRequired,
     requestRevisionApproval: PropTypes.func.isRequired,
-    revisionId: PropTypes.string.isRequired,
+    revisionId: PropTypes.number.isRequired,
     routerPath: PropTypes.string.isRequired,
   };
 

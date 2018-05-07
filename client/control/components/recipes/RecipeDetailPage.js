@@ -24,7 +24,7 @@ import { getUrlParam, getUrlParamAsInt } from 'control/state/router/selectors';
   state => {
     const recipeId = getUrlParamAsInt(state, 'recipeId');
     const latestRevisionId = getLatestRevisionIdForRecipe(state, recipeId, '');
-    const revisionId = getUrlParam(state, 'revisionId', latestRevisionId);
+    const revisionId = getUrlParamAsInt(state, 'revisionId', latestRevisionId);
     const revision = getRevision(state, revisionId, new Map());
 
     return {
@@ -40,7 +40,7 @@ export default class RecipeDetailPage extends React.PureComponent {
     history: PropTypes.instanceOf(List).isRequired,
     recipeId: PropTypes.number.isRequired,
     revision: PropTypes.instanceOf(Map).isRequired,
-    revisionId: PropTypes.string.isRequired,
+    revisionId: PropTypes.number.isRequired,
   }
 
   render() {
