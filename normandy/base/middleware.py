@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import re
@@ -40,7 +41,30 @@ class RequestSummaryLogger(MiddlewareMixin, OriginalRequestSummaryLogger):
     """
     Adapt mozilla_cloud_services_logger's request logger to Django 1.10 new-style middleware.
     """
-    pass
+
+    # TODO: Issue #1334 was filed to switch to dockerflow which would replace this middleware.
+    def _build_extra_meta(self, request):
+        out = {
+            "errno": 0,
+            "agent": request.META.get('HTTP_USER_AGENT', ''),
+            "lang": request.META.get('HTTP_ACCEPT_LANGUAGE', ''),
+            "method": request.method,
+            "path": request.path,
+        }
+
+        # HACK: It's possible some other middleware has replaced the request we
+        # modified earlier, so be sure to check for existence of these
+        # attributes before trying to use them.
+        if hasattr(request, 'user'):
+            out['uid'] = (request.user.is_authenticated and
+                          request.user.id or '')
+        if hasattr(request, '_id'):
+            out['rid'] = request._id
+        if hasattr(request, '_logging_start_dt'):
+            td = datetime.datetime.utcnow() - request._logging_start_dt
+            out['t'] = int(td.total_seconds() * 1000)  # in ms
+
+        return out
 
 
 class ConfigurableRemoteUserMiddleware(RemoteUserMiddleware):
