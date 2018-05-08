@@ -1,3 +1,4 @@
+import json
 import os
 
 from configurations import Configuration, values
@@ -26,6 +27,7 @@ class Core(Configuration):
         'webpack_loader',
         'corsheaders',
         'django_filters',
+        'dockerflow.django',
 
         'django.contrib.admin',
         'django.contrib.auth',
@@ -41,7 +43,7 @@ class Core(Configuration):
     MIDDLEWARE = [
         'corsheaders.middleware.CorsMiddleware',
         'normandy.base.middleware.request_received_at_middleware',
-        'normandy.base.middleware.RequestSummaryLogger',
+        'dockerflow.django.middleware.DockerflowMiddleware',
         'normandy.base.middleware.NormandySecurityMiddleware',
         'normandy.base.middleware.NormandyWhiteNoiseMiddleware',
         'normandy.base.middleware.NormandyCommonMiddleware',
@@ -237,7 +239,7 @@ class Base(Core, CORS):
             'disable_existing_loggers': False,
             'formatters': {
                 'json': {
-                    '()': 'mozilla_cloud_services_logger.formatters.JsonLogFormatter',
+                    '()': 'dockerflow.logging.JsonLogFormatter',
                     'logger_name': 'normandy',
                 },
                 'development': {
@@ -282,10 +284,11 @@ class Base(Core, CORS):
     EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
 
     def RAVEN_CONFIG(self):
-        version_path = os.path.join(Core.BASE_DIR, '__version__', 'tag')
+        version_path = os.path.join(Core.BASE_DIR, 'version.json')
         try:
             with open(version_path) as f:
-                version = f.read().strip()
+                build_info = json.loads(f.read())
+                version = build_info.get('version')
         except IOError:
             version = None
 
