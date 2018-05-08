@@ -9,7 +9,11 @@ sudo apt-get remove firefox-mozilla-build
 
 # store version info in app directory, for Docker to pick up
 printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' \
-  "$1" "$2" "$3" "$4" "$5" \
+  "$CIRCLE_SHA1" \
+  "$CIRCLE_TAG" \
+  "$CIRCLE_PROJECT_USERNAME" \
+  "$CIRCLE_PROJECT_REPONAME" \
+  "$CIRCLE_BUILD_URL" \
   > version.json
 
 # build image

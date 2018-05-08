@@ -14,7 +14,7 @@ machine:
 
 dependencies:
   override:
-    - ./bin/ci/dependencies "$CIRCLE_SHA1" "$CIRCLE_TAG" "$CIRCLE_PROJECT_USERNAME" "$CIRCLE_PROJECT_REPONAME" "$CIRCLE_BUILD_URL"
+    - ./bin/ci/dependencies
 
 test:
   override:
