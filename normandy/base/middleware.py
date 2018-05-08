@@ -42,7 +42,7 @@ class RequestSummaryLogger(MiddlewareMixin, OriginalRequestSummaryLogger):
     Adapt mozilla_cloud_services_logger's request logger to Django 1.10 new-style middleware.
     """
 
-    # TODO: Remove this once it is fixed upstream
+    # TODO: Issue #1334 was filed to switch to dockerflow which would replace this middleware.
     def _build_extra_meta(self, request):
         out = {
             "errno": 0,
