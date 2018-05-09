@@ -3,7 +3,7 @@ set -eu
 
 echo "Linting Python files"
 bin/ci/docker-run.sh flake8 normandy/ contract-tests/
-bin/ci/docker-run.sh pipdeptree --warn fail --local-only
+bin/ci/docker-run.sh pip check
 
 echo "Linting JS files"
 bin/ci/docker-run.sh yarn lint:js
