@@ -42,7 +42,7 @@ steps, as they don't affect your setup if nothing has changed:
    git pull origin master
 
    # Install new dependencies or update existing ones.
-   pip install -r requirements/default.txt -c requirements/constraints.txt
+   pip install -r requirements/default.txt
    yarn install
 
    # Run database migrations.

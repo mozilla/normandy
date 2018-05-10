@@ -15,7 +15,7 @@ Python 3.6.0 or greater. To create it do the following:
 
     virtualenv -p /path/to/python3.6 venv
     source venv/bin/activate
-    pip install -r requirements/default.txt -c requirements/constraints.txt
+    pip install -r requirements/default.txt
 
 This creates the virtual environment, activates it, and installs the Python
 dependencies needed to run the tests.
