@@ -3,6 +3,7 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
 import pytest
+import requests_mock
 from rest_framework.test import APIClient
 
 from normandy.base.tests import UserFactory, skip_except_in_ci
@@ -53,3 +54,19 @@ def migrations(transactional_db):
             call_command('migrate', no_input=True)
 
     return Migrator()
+
+
+@pytest.fixture
+def requestsmock():
+    """Return a context where requests are all mocked.
+    Usage::
+
+        def test_something(requestsmock):
+            requestsmock.get(
+                'https://example.com/path'
+                content=b'The content'
+            )
+            # Do stuff that involves requests.get('http://example.com/path')
+    """
+    with requests_mock.mock() as m:
+        yield m

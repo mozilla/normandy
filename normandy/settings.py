@@ -1,3 +1,4 @@
+import json
 import os
 
 from configurations import Configuration, values
@@ -19,13 +20,13 @@ class Core(Configuration):
         'normandy.studies',
         'product_details',
         'rest_framework',
-        'rest_framework.authtoken',
         'rest_framework_swagger',
         'storages',
         'raven.contrib.django.raven_compat',
         'webpack_loader',
         'corsheaders',
         'django_filters',
+        'dockerflow.django',
 
         'django.contrib.admin',
         'django.contrib.auth',
@@ -41,7 +42,7 @@ class Core(Configuration):
     MIDDLEWARE = [
         'corsheaders.middleware.CorsMiddleware',
         'normandy.base.middleware.request_received_at_middleware',
-        'normandy.base.middleware.RequestSummaryLogger',
+        'dockerflow.django.middleware.DockerflowMiddleware',
         'normandy.base.middleware.NormandySecurityMiddleware',
         'normandy.base.middleware.NormandyWhiteNoiseMiddleware',
         'normandy.base.middleware.NormandyCommonMiddleware',
@@ -184,7 +185,20 @@ class CORS:
     CORS_ORIGIN_WHITELIST = values.ListValue([])
 
 
-class Base(Core, CORS):
+class OIDC:
+    """Settings related to talking to an OIDC provider for authorizing
+    access tokens received from the client."""
+
+    # Note! We *could* just have a setting called 'OIDC_DOMAIN' and then use
+    # https://$OIDC_DOMAIN/.well-known/openid-configuration and extract the
+    # 'userinfo_endoint' value from that during startup or something.
+    # As of May 2018, the likelyhood of this URL changing and the fact that it's
+    # the only URL we need, let's just make the setting the URL that we need
+    # for being able to authorization by access token.
+    OIDC_USER_ENDPOINT = values.URLValue('https://auth.mozilla.auth0.com/userinfo')
+
+
+class Base(Core, CORS, OIDC):
     """Settings that may change per-environment, some with defaults."""
 
     # Flags that affect other settings, via setting methods below
@@ -219,6 +233,7 @@ class Base(Core, CORS):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'normandy.base.middleware.OIDCAccessTokenAuthorizationMiddleware',
     ]
 
     def MIDDLEWARE(self):
@@ -237,7 +252,7 @@ class Base(Core, CORS):
             'disable_existing_loggers': False,
             'formatters': {
                 'json': {
-                    '()': 'mozilla_cloud_services_logger.formatters.JsonLogFormatter',
+                    '()': 'dockerflow.logging.JsonLogFormatter',
                     'logger_name': 'normandy',
                 },
                 'development': {
@@ -282,10 +297,11 @@ class Base(Core, CORS):
     EMAIL_BACKEND = values.Value('django.core.mail.backends.smtp.EmailBackend')
 
     def RAVEN_CONFIG(self):
-        version_path = os.path.join(Core.BASE_DIR, '__version__', 'tag')
+        version_path = os.path.join(Core.BASE_DIR, 'version.json')
         try:
             with open(version_path) as f:
-                version = f.read().strip()
+                build_info = json.loads(f.read())
+                version = build_info.get('version')
         except IOError:
             version = None
 
@@ -480,3 +496,4 @@ class Test(Base):
     AUTOGRAPH_URL = None
     AUTOGRAPH_HAWK_ID = None
     AUTOGRAPH_HAWK_SECRET_KEY = None
+    OIDC_USER_ENDPOINT = 'https://auth.example.com/userinfo'
