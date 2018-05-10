@@ -338,6 +338,15 @@ in other Django projects.
    reduced to "read-only" methods when using the ``ProductionReadOnly``
    configuration.
 
+.. envvar:: DJANGO_OIDC_USER_ENDPOINT
+
+   :default: ``https://auth.mozilla.auth0.com/userinfo``
+
+   URL where we sent access tokens received as an authorization bearer token.
+   This URL needs to match the OIDC domain used by the client to authenticate.
+   The value for this setting is usually listed in
+   ``/.well-known/openid-configuration`` on the OIDC provider.
+
 Gunicorn settings
 -----------------
 These settings control how Gunicorn starts, when the default command of the

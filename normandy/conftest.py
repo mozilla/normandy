@@ -1,4 +1,5 @@
 import pytest
+import requests_mock
 from rest_framework.test import APIClient
 
 from django.core.management import call_command
@@ -53,3 +54,19 @@ def migrations(transactional_db):
             call_command('migrate', no_input=True)
 
     return Migrator()
+
+
+@pytest.fixture
+def requestsmock():
+    """Return a context where requests are all mocked.
+    Usage::
+
+        def test_something(requestsmock):
+            requestsmock.get(
+                'https://example.com/path'
+                content=b'The content'
+            )
+            # Do stuff that involves requests.get('http://example.com/path')
+    """
+    with requests_mock.mock() as m:
+        yield m
