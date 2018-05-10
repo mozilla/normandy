@@ -1,9 +1,9 @@
 attrs==18.1.0 \
     --hash=sha256:4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265 \
     --hash=sha256:e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b
-botocore==1.10.17 \
-    --hash=sha256:df8fce86f282bafb33eb7b7565a522706d39feeccdea2610a53f43d266990cc1 \
-    --hash=sha256:e58ff5fa2d27ba5acf56fd0c3a233f4a320ecbd2a4091bda7a93449406b3ee9d
+botocore==1.10.18 \
+    --hash=sha256:4db427a113bb106692e004ec18fabc56e7e20fd2b4689fd92a8e454f8f6bcd0b \
+    --hash=sha256:b5dda05bfe7bcc53b138e9fc01f369ec6269002c9d87a9f46b6a3b43349383c5
 certifi==2018.4.16 \
     --hash=sha256:13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7 \
     --hash=sha256:9fa520c1bacfb634fa7af20a76bcbd3d5fb390481724c597da32c719a7dca4b0
