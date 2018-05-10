@@ -1,3 +1,5 @@
+-c constraints.txt
+
 bcrypt==3.1.4 \
     --hash=sha256:01477981abf74e306e8ee31629a940a5e9138de000c6b0898f7f850461c4a0a5 \
     --hash=sha256:054d6e0acaea429e6da3613fcd12d05ee29a531794d96f6ab959f29a39f33391 \

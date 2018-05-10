@@ -50,7 +50,7 @@ Installation
 
    .. code-block:: bash
 
-      pip install -r requirements/default.txt -c requirements/constraints.txt
+      pip install -r requirements/default.txt
 
    .. seealso::
 
