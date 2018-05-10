@@ -18,7 +18,7 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
 COPY ./yarn.lock /app/yarn.lock
-RUN pip install -U 'pip>=8' && \
+RUN pip install --upgrade --no-cache-dir -r requirements/pip.txt && \
     pip install --upgrade --no-cache-dir -r requirements/default.txt -c requirements/constraints.txt && \
     yarn install --frozen-lockfile
 
