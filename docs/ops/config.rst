@@ -344,8 +344,8 @@ in other Django projects.
 
    URL where we sent access tokens received as an authorization bearer token.
    This URL needs to match the OIDC domain used by the client to authenticate.
-   The endpoint URL is actually extracted from reading ``/.well-known/openid-configuration``
-   on the configured OIDC provider domain.
+   The value for this setting is usually listed in
+   ``/.well-known/openid-configuration`` on the OIDC provider.
 
 Gunicorn settings
 -----------------

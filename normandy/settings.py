@@ -194,7 +194,7 @@ class OIDC:
     # https://$OIDC_DOMAIN/.well-known/openid-configuration and extract the
     # 'userinfo_endoint' value from that during startup or something.
     # As of May 2018, the likelyhood of this URL changing and the fact that it's
-    # the only URL we need, let's just make the setting thee URL that we need
+    # the only URL we need, let's just make the setting the URL that we need
     # for being able to authorization by access token.
     OIDC_USER_ENDPOINT = values.URLValue('https://auth.mozilla.auth0.com/userinfo')
 

@@ -139,17 +139,12 @@ class OIDCAccessTokenAuthorizationMiddleware:
     an authentication backend, there is no 'Set-Cookie' header returned in the
     response.
 
-    It's admittedly confusing to mix the terms authentication and authorization.
-    Arguably the client has already *authenticated* and basically converted her
-    password for an access token. Here in the context of Normandy we kill two
-    birds with one stone: check that access token and use the user profile that
-    comes out to sign the user into the rest of the Django request.
-
     The flow is as follows:
 
-    1. Client trades email/username and password with the OIDC for an access token.
+    1. (outside Normandy) Client trades email/username and password with the
+       OIDC provider for an access token.
     2. The access token is sent to us here.
-    3. We send it to the OIDC provider in return for a user profile
+    3. We send it to the OIDC provider in return for a user profile.
     4. We extract the email from the user profile (and first- and last name)
     5. Turn the email into a Django User model instance.
     6. If possible, extracts the first- and last name and updates the User instance persistently.
@@ -164,7 +159,6 @@ class OIDCAccessTokenAuthorizationMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
-        self.oidc_user_endpoint = settings.OIDC_USER_ENDPOINT
         self.UserModel = get_user_model()
 
     def __call__(self, request):
@@ -193,7 +187,7 @@ class OIDCAccessTokenAuthorizationMiddleware:
 
         access_token = matched.group(1)
 
-        user_profile = self._fetch_oidc_email(access_token)
+        user_profile = self._fetch_oidc_user_profile(access_token)
         email = user_profile.get('email')
         if not email:
             # This would happen if someone has requested an access token
@@ -237,23 +231,18 @@ class OIDCAccessTokenAuthorizationMiddleware:
             user.last_name = user_profile['family_name'].strip()
             user.save()
 
-            # We *could* do something like this too:
-            # if user_profile.get('picture'):
-            #     pf = user.get_profile()
-            #     pf.picture = user_profile['picture']
-            #     pf.save()
-
         # Now, let's "become" this user for the rest of the request.
         request.user = user
         user_logged_in.send(sender=user.__class__, request=request, user=user)
 
     @backoff.on_exception(
-        backoff.expo,
+        backoff.constant,
         requests.exceptions.RequestException,
         max_tries=5,
     )
-    def _fetch_oidc_email(self, access_token):
-        response = requests.get(self.oidc_user_endpoint, headers={
+    def _fetch_oidc_user_profile(self, access_token):
+        url = settings.OIDC_USER_ENDPOINT
+        response = requests.get(url, headers={
             'Authorization': 'Bearer {0}'.format(access_token)
         })
         if response.status_code == 200:
@@ -262,9 +251,7 @@ class OIDCAccessTokenAuthorizationMiddleware:
             # The OIDC provider did not like the access token.
             raise PermissionDenied('Unauthorized access token')
         if response.status_code >= 500:
-            raise requests.exceptions.RequestException(
-                f'{response.status_code} on {self.oidc_user_endpoint}'
-            )
+            raise requests.exceptions.RequestException(f'{response.status_code} on {url}')
 
         # This could happen if, for some reason, we're not configured to be
         # allowed to talk to the OIDC endpoint.
