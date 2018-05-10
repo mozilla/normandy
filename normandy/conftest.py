@@ -1,12 +1,9 @@
+from django.core.management import call_command
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
 import pytest
 from rest_framework.test import APIClient
-
-from django.core.management import call_command
-from django.db import connection
-from django.db.migrations.executor import MigrationExecutor
 
 from normandy.base.tests import UserFactory, skip_except_in_ci
 from normandy.recipes import geolocation as geolocation_module

@@ -7,13 +7,11 @@ from django.test.utils import CaptureQueriesContext
 import pytest
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from rest_framework import serializers
 from pathlib import Path
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
-from normandy.recipes import filters
 from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
@@ -334,7 +332,9 @@ class TestRecipeAPI(object):
             })
             assert res.status_code == 400, res.json()
             assert res.json() == {
-                'non_field_errors': ['one of extra_filter_expression or filter_object is required'],
+                'non_field_errors': [
+                    'one of extra_filter_expression or filter_object is required'
+                ],
             }
 
     @pytest.mark.django_db
@@ -480,13 +480,17 @@ class TestRecipeAPI(object):
         def test_bad_filter_objects(self, api_client):
             res = self.make_recipe(api_client, filter_object={})  # not a list
             assert res.status_code == 400
-            assert res.json() == {'filter_object': {'non field errors': ['filter_object must be a list.']}}
+            assert res.json() == {'filter_object': {
+                'non field errors': ['filter_object must be a list.']}}
 
-            res = self.make_recipe(api_client, filter_object=["1 + 1 == 2"])  # not a list of objects
+            res = self.make_recipe(api_client, filter_object=[
+                                   "1 + 1 == 2"])  # not a list of objects
             assert res.status_code == 400
-            assert res.json() == {'filter_object': {'0': {'non field errors': ['filter_object members must be objects.']}}}
+            assert res.json() == {'filter_object': {
+                '0': {'non field errors': ['filter_object members must be objects.']}}}
 
-            res = self.make_recipe(api_client, filter_object=[{'channels': ["release"]}])  # type is required
+            res = self.make_recipe(api_client, filter_object=[
+                                   {'channels': ["release"]}])  # type is required
             assert res.status_code == 400
             assert res.json() == {'filter_object': {'0': {'type': ['This field is required.']}}}
 
@@ -695,14 +699,14 @@ class TestRecipeAPI(object):
                 },
             }
 
-
         def test_invalid_filter(self, api_client):
             res = self.make_recipe(
                 api_client,
                 filter_object=[{'type': 'invalid'}]
             )
             assert res.status_code == 400
-            assert res.json() == {'filter_object': {'0': {'type': ['Unknown filter object type "invalid".']}}}
+            assert res.json() == {'filter_object': {
+                '0': {'type': ['Unknown filter object type "invalid".']}}}
 
     @pytest.mark.django_db
     class TestDetail(object):

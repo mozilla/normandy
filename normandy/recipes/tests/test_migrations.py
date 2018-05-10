@@ -6,7 +6,6 @@ import pytest
 from django.utils import timezone
 
 from normandy.base.tests import MigrationTest, Whatever
-from normandy.recipes import models
 
 
 @pytest.mark.django_db
@@ -261,9 +260,9 @@ class Test0007FilterConversion(object):
             name='Test Revision',
             identicon_seed='v1:test',
         )
-        revision.channels = [channel1, channel2]
-        revision.countries = [country1, country2]
-        revision.locales = [locale1, locale2]
+        revision.channels.set([channel1, channel2])
+        revision.countries.set([country1, country2])
+        revision.locales.set([locale1, locale2])
         revision.save()
 
         # Apply the migration

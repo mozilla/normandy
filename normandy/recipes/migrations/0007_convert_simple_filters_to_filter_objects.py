@@ -13,21 +13,21 @@ def simple_filters_to_filter_objects(apps, schema_editor):
                 'type': 'locale',
                 'locales': [l.code for l in revision.locales.all()],
             })
-            revision.locales = []
+            revision.locales.set([])
 
         if revision.countries.count():
             filter_object.append({
                 'type': 'country',
                 'countries': [c.code for c in revision.countries.all()],
             })
-            revision.countries = []
+            revision.countries.set([])
 
         if revision.channels.count():
             filter_object.append({
                 'type': 'channel',
                 'channels': [c.slug for c in revision.channels.all()],
             })
-            revision.channels = []
+            revision.channels.set([])
 
         if filter_object:
             revision.filter_object_json = json.dumps(filter_object)
@@ -46,11 +46,11 @@ def filter_objects_to_simple_filters(apps, schema_editor):
 
         for filter in filter_object:
             if filter['type'] == 'channel':
-                revision.channels = [Channel.objects.get(slug=c) for c in filter['channels']]
+                revision.channels.set([Channel.objects.get(slug=c) for c in filter['channels']])
             elif filter['type'] == 'country':
-                revision.countries = [Country.objects.get(code=c) for c in filter['countries']]
+                revision.countries.set([Country.objects.get(code=c) for c in filter['countries']])
             elif filter['type'] == 'locale':
-                revision.locales = [Locale.objects.get(code=l) for l in filter['locales']]
+                revision.locales.set([Locale.objects.get(code=l) for l in filter['locales']])
             else:
                 remaining_filters.append(filter)
 
