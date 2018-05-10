@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from pyjexl import JEXL
 from rest_framework import serializers
 from factory.fuzzy import FuzzyText
@@ -223,15 +221,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         if self.instance is None:
             if data.get('extra_filter_expression', '').strip() == '':
                 if 'filter_object' not in data:
-                    raise serializers.ValidationError('one of extra_filter_expression or filter_object is required')
+                    raise serializers.ValidationError(
+                        'one of extra_filter_expression or filter_object is required')
                 elif len(data['filter_object']) == 0:
-                    raise serializers.ValidationError('if extra_filter_expression is blank, at least one filter_object is required')
+                    raise serializers.ValidationError(
+                        'if extra_filter_expression is blank, '
+                        'at least one filter_object is required'
+                    )
 
         return data
 
     def validate_filter_object(self, value):
         if not isinstance(value, list):
-            raise serializers.ValidationError({'non field errors': ['filter_object must be a list.']})
+            raise serializers.ValidationError(
+                {'non field errors': ['filter_object must be a list.']})
 
         errors = {}
         for i, obj in enumerate(value):

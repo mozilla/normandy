@@ -502,7 +502,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
-            recipe = Recipe.objects.get(id=recipe_data['id'])
+            Recipe.objects.get(id=recipe_data['id'])
             assert recipe_data['filter_expression'] == (
                 '(normandy.channel in ["release","beta"]) && (true)')
 
@@ -528,7 +528,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
-            recipe = Recipe.objects.get(id=recipe_data['id'])
+            Recipe.objects.get(id=recipe_data['id'])
             assert recipe_data['filter_expression'] == (
                 '(normandy.locale in ["en-US","de"]) && (true)'
             )
@@ -555,7 +555,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
-            recipe = Recipe.objects.get(id=recipe_data['id'])
+            Recipe.objects.get(id=recipe_data['id'])
             assert recipe_data['filter_expression'] == (
                 '(normandy.country in ["US","DE"]) && (true)'
             )
@@ -588,7 +588,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
-            recipe = Recipe.objects.get(id=recipe_data['id'])
+            Recipe.objects.get(id=recipe_data['id'])
             assert recipe_data['filter_expression'] == (
                 '([normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)) && (true)'
             )
@@ -638,7 +638,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
-            recipe = Recipe.objects.get(id=recipe_data['id'])
+            Recipe.objects.get(id=recipe_data['id'])
             assert recipe_data['filter_expression'] == (
                 '([normandy.userId,normandy.recipeId]|stableSample(0.5)) && (true)'
             )
@@ -680,9 +680,10 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
-            recipe = Recipe.objects.get(id=recipe_data['id'])
+            Recipe.objects.get(id=recipe_data['id'])
             assert recipe_data['filter_expression'] == (
-                '((normandy.version>="57"&&normandy.version<"58")||(normandy.version>="58"&&normandy.version<"59")) && (true)'
+                '((normandy.version>="57"&&normandy.version<"58")||'
+                '(normandy.version>="58"&&normandy.version<"59")) && (true)'
             )
 
         def test_version_correct_fields(self, api_client):
