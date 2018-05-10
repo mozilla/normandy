@@ -118,7 +118,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
                                      on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-enabled', '-latest_revision__updated']
+        ordering = ['-latest_revision__updated']
 
     class NotApproved(Exception):
         pass
@@ -434,7 +434,8 @@ class RecipeRevision(models.Model):
             raise EnabledState.NotActionable('This revision is already enabled.')
 
         if self.recipe.approved_revision != self:
-            raise EnabledState.NotActionable('This revision is not the current approved revision.')
+            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
+                                             'that is not the latest approved revision.')
 
         enabled_state = EnabledState(revision=self, creator=user, enabled=True)
         enabled_state.save()
@@ -444,14 +445,16 @@ class RecipeRevision(models.Model):
             raise EnabledState.NotActionable('This revision is already disabled.')
 
         if self.recipe.approved_revision != self:
-            raise EnabledState.NotActionable('This revision is not the current approved revision.')
+            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
+                                             'that is not the latest approved revision.')
 
         enabled_state = EnabledState(revision=self, creator=user, enabled=False)
         enabled_state.save()
 
 
 class EnabledState(models.Model):
-    revision = models.ForeignKey(RecipeRevision, related_name='enabled_states')
+    revision = models.ForeignKey(RecipeRevision, related_name='enabled_states',
+                                 on_delete=models.CASCADE)
     created = models.DateTimeField(default=timezone.now)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='enabled_states',
                                 null=True)
