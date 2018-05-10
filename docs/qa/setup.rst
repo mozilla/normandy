@@ -88,7 +88,7 @@ Any reference to ``localhost`` should be replaced with the IP where Docker is
 actually running. When using Docker Machine, this is the output of
 ``docker-machine ip``.
 
-.. describe:: extensions.shield-recipe-client@mozilla.org.api_url
+.. describe:: app.normandy.api_url
 
   The URL that the add-on will fetch recipes from. Set this to
   ``https://localhost:8443/api/v1`` to use the local Normandy.

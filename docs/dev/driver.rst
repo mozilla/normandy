@@ -6,10 +6,10 @@ privileges than JavaScript is normally given. For example, the driver might
 provide a function for showing a notification bar within the Firefox UI,
 something normal JavaScript can't trigger.
 
-Environments in which actions are run (such as the `Normandy system add-on`_)
+Environments in which actions are run (such as the `Normandy client`_)
 implement the driver and pass it to the actions before executing them.
 
-.. _Normandy system add-on: https://hg.mozilla.org/mozilla-central/file/tip/browser/extensions/shield-recipe-client
+.. _Normandy client: https://hg.mozilla.org/mozilla-central/file/tip/toolkit/components/normandy
 
 Driver
 ------

@@ -11,46 +11,24 @@ machine:
   services:
     - postgresql
     - docker
-  environment:
-    MOCK_SERVER_DOMAIN: https://normandy-mock.dev.mozaws.net
-    MOCK_SERVER_ARTIFACTS: "${CIRCLE_ARTIFACTS}/mock-recipe-server"
 
 dependencies:
-  pre:
-    - docker info
-    # Use pipstrap to bootstrap ourselves to a trusted pip 8 for hash
-    # checking.
-    - ./ci/circleci/bin/pipstrap.py
-    # Install latest pip (for constraint support), then the rest of the
-    # CI requirements.
-    - pip install -r ./ci/circleci/requirements/pip.txt
-    - pip install -r ./ci/circleci/requirements/default.txt -c ./ci/circleci/requirements/constraints.txt
-    - pipdeptree --warn fail --local-only
-    # Install latest firefox, and remove firefox-mozilla-build, which diverts
-    # the Firefox binary to an old version.
-    - sudo apt-get update
-    - sudo apt-get install firefox
-    - sudo apt-get remove firefox-mozilla-build
   override:
-    - ./ci/circleci/bin/runner.sh dependencies
-
-compile:
-  override:
-    - ./ci/circleci/bin/runner.sh compile
+    - ./bin/ci/dependencies
 
 test:
   override:
-    - ./ci/circleci/bin/runner.sh lint
-    - ./ci/circleci/bin/runner.sh test
+    - ./bin/ci/lint
+    - ./bin/ci/test
 
 deployment:
   latest:
     branch: master
     commands:
-      - ./ci/circleci/bin/runner.sh deploy latest
+      - ./bin/ci/deploy latest
 
   tags:
     # push all tags
     tag: /.*/
     commands:
-      - ./ci/circleci/bin/runner.sh deploy "$CIRCLE_TAG"
+      - ./bin/ci/deploy "$CIRCLE_TAG"

@@ -14,7 +14,7 @@ services:
       - database
       - autograph
     volumes:
-      - ../recipe-server:/app
+      - ../:/app
     environment:
       DJANGO_CONFIGURATION: Development
 
@@ -23,7 +23,7 @@ services:
       file: normandy-base.yml
       service: normandy-base
     volumes:
-      - ../recipe-server:/app
+      - ../:/app
     command: npm run watch
 
   proxy:

@@ -124,9 +124,9 @@ runtime:
    arguments from the recipe, and a :doc:`driver object </dev/driver>` containing
    methods that can perform privileged actions.
 
-The runtime is implemented as `a system add-on in mozilla-central`_.
+The runtime is implemented as `a component of Firefox in mozilla-central`_.
 
-.. _a system add-on in mozilla-central: https://hg.mozilla.org/mozilla-central/file/tip/browser/extensions/shield-recipe-client
+.. _a component of Firefox in mozilla-central: https://hg.mozilla.org/mozilla-central/file/tip/toolkit/components/normandy
 
 Threat Model
 ------------
