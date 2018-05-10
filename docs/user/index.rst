@@ -6,7 +6,7 @@ configure recipes with the control interface.
 .. toctree::
    :maxdepth: 2
 
-   filter_expressions
+   filters
    peer_approval
    actions/index
    data_collection

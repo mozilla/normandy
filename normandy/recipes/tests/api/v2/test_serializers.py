@@ -37,6 +37,7 @@ class TestRecipeSerializer:
             'enabled': recipe.enabled,
             'extra_filter_expression': recipe.extra_filter_expression,
             'filter_expression': recipe.filter_expression,
+            'filter_object': [],
             'action': {
                 'arguments_schema': {},
                 'id': action.id,

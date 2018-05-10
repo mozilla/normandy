@@ -1,10 +1,29 @@
-Filter Expressions
-==================
-Filter expressions describe which users a :ref:`recipe <recipes>` should be
+Filters
+=======
+Normandy filters describe which users a :ref:`recipe <recipes>` should be
 executed for. They're executed locally in the client's browser and, if they
-pass, the corresponding recipe is executed. Filter expressions have access to
-information about the user, such as their location, locale, and Firefox version.
+pass, the corresponding recipe is executed. Filters have access to information
+about the user, such as their location, locale, and Firefox version.
 
+There are two major forms of filters in Normandy. The first is filter objects,
+which are simpler and more restrictive. They are a good first choice. The second
+is filter expressions, which are much more expressive, but also more complex. If
+filter objects can't do what you want, turn to filter expressions.
+
+Filter Objects
+--------------
+
+.. automodule:: normandy.recipes.filters
+
+.. autoclass:: ChannelFilter()
+.. autoclass:: LocaleFilter()
+.. autoclass:: CountryFilter()
+.. autoclass:: BucketSampleFilter()
+.. autoclass:: StableSampleFilter()
+.. autoclass:: VersionFilter()
+
+Filter Expressions
+------------------
 Filter expressions are written using a language called JEXL_. JEXL is an
 open-source expression language that is given a context (in this case,
 information about the user's browser) and evaluates a statement using that
@@ -19,7 +38,7 @@ syntax for several (but not all) of its features.
 .. _JEXL: https://github.com/TechnologyAdvice/Jexl
 
 JEXL Basics
------------
+~~~~~~~~~~~
 The `JEXL Readme`_ describes the syntax of the language in detail; the following
 section covers the basics of writing valid JEXL expressions.
 
@@ -85,8 +104,10 @@ additional arguments passed in the expression:
 
 .. _JEXL Readme: https://github.com/TechnologyAdvice/Jexl#jexl---
 
+.. _filter-context:
+
 Context
--------
+~~~~~~~
 This section defines the context passed to filter expressions when they are
 evaluated. In other words, this is the client information available within
 filter expressions.
@@ -323,7 +344,7 @@ filter expressions.
       ]
 
 Operators
----------
+~~~~~~~~~
 This section describes the special operators available to filter expressions on
 top of the standard operators in JEXL. They're documented as functions, and the
 parameters correspond to the operands.
@@ -345,7 +366,7 @@ parameters correspond to the operands.
       [1, 2, 3, 4] intersect [5, 6, 2, 7, 3]
 
 Transforms
-----------
+~~~~~~~~~~
 This section describes the transforms available to filter expressions, and what
 they do. They're documented as functions, and the first parameter to each
 function is the value being transformed.
@@ -493,7 +514,7 @@ Preference Filters
       'network.proxy.http'|preferenceExists
 
 Examples
---------
+~~~~~~~~
 This section lists some examples of commonly-used filter expressions.
 
 .. code-block:: javascript
