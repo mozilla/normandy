@@ -153,8 +153,7 @@ class OIDCAccessTokenAuthorizationMiddleware:
     NOTE! When the bearer token is present, it does a network request to the OIDC provider
     every single time. There is no caching. Even for identical access tokens used
     frequently. The justification for this at the Normandy Admin UI requests are
-    not high-traffic to performance critical. Also, we don't have a cache framework
-    set up.
+    not high-traffic to performance critical.
     """
 
     def __init__(self, get_response):
