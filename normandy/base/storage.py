@@ -1,5 +1,6 @@
 import re
 
+from django.core.files.storage import Storage
 from django.utils.encoding import force_text
 from django.utils.functional import keep_lazy_text
 
@@ -32,12 +33,56 @@ class PermissiveFilenameStorageMixin(object):
         # remove "characters to avoid", as described by S3's docs
         # https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html#object-key-guidelines-avoid-characters
         name = re.sub(r'[\\{}^%`\[\]<>~#|\x00-\x1F\x7F-\xFF\'"]', '', name)
-        return re.sub('\s+', '_', name)
-
-
-class InMemoryPermissiveStorage(PermissiveFilenameStorageMixin, InMemoryStorage):
-    pass
+        return re.sub(r'\s+', '_', name)
 
 
 class S3Boto3PermissiveStorage(PermissiveFilenameStorageMixin, S3Boto3Storage):
-    pass
+    """
+    An S3 storage that allows a broader range of filenames.
+    """
+
+
+class InMemoryPermissiveStorage(PermissiveFilenameStorageMixin, InMemoryStorage):
+    """
+    An in-memory storage that allows a broader range of filenames.
+
+    For tests that use storage.
+    """
+
+
+class NotAllowedStorage(Storage):
+    """
+    Does not allow any usage of storage. Throws an error if it is used.
+
+    For tests that don't use storage.
+    """
+
+    class NotAllowedException(Exception):
+        pass
+
+    def path(self, name):
+        raise self.NotAllowedException()
+
+    def delete(self, name):
+        raise self.NotAllowedException()
+
+    def exists(self, name):
+        raise self.NotAllowedException()
+
+    def listdir(self, path):
+        raise self.NotAllowedException()
+
+    def size(self, name):
+        raise self.NotAllowedException()
+
+    def url(self, name):
+        raise self.NotAllowedException()
+
+    def get_accessed_time(self, name):
+        raise self.NotAllowedException()
+
+    def get_created_time(self, name):
+        raise self.NotAllowedException()
+
+    def get_modified_time(self, name):
+        raise self.NotAllowedException()

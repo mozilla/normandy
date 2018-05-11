@@ -6,7 +6,7 @@ from normandy.studies.tests import ExtensionFactory
 
 @pytest.mark.django_db()
 class TestExtensionSerializer:
-    def test_it_works(self):
+    def test_it_works(self, storage):
         extension = ExtensionFactory()
         serializer = ExtensionSerializer(extension)
 

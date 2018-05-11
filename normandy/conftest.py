@@ -70,3 +70,19 @@ def requestsmock():
     """
     with requests_mock.mock() as m:
         yield m
+
+
+@pytest.fixture
+def storage(settings):
+    settings.DEFAULT_FILE_STORAGE = 'normandy.base.storage.InMemoryPermissiveStorage'
+
+    yield
+
+    from django.core.files.storage import default_storage
+    dirs_to_delete = ['/']
+    while len(dirs_to_delete) > 0:
+        dir_path = dirs_to_delete.pop()
+        paths, new_dirs = default_storage.listdir(dir_path)
+        dirs_to_delete.extend(new_dirs)
+        for path in paths:
+            default_storage.delete(path)

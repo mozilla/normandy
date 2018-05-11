@@ -491,7 +491,9 @@ class Test(Base):
     DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, '.env'))
     DOTENV = '.env' if DOTENV_EXISTS else None
     SECRET_KEY = 'not a secret'
-    DEFAULT_FILE_STORAGE = 'normandy.base.storage.InMemoryPermissiveStorage'
+    # Don't allow tests use any storage. Use the `storage` fixture for tests
+    # that need access to storage
+    DEFAULT_FILE_STORAGE = 'normandy.base.storage.NotAllowedStorage'
     SECURE_SSL_REDIRECT = False
     AUTOGRAPH_URL = None
     AUTOGRAPH_HAWK_ID = None

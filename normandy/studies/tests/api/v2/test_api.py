@@ -23,7 +23,7 @@ class TestExtensionAPI(object):
         assert res.status_code == 200
         assert res.data['results'] == []
 
-    def test_it_serves_extensions(self, api_client):
+    def test_it_serves_extensions(self, api_client, storage):
         extension = ExtensionFactory(
             name='foo',
         )
@@ -45,7 +45,7 @@ class TestExtensionAPI(object):
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
-    def test_detail_view_includes_cache_headers(self, api_client):
+    def test_detail_view_includes_cache_headers(self, api_client, storage):
         extension = ExtensionFactory()
         res = api_client.get('/api/v2/extension/{id}/'.format(id=extension.id))
         assert res.status_code == 200
@@ -58,13 +58,13 @@ class TestExtensionAPI(object):
         assert res.status_code == 200
         assert 'Cookies' not in res
 
-    def test_detail_sets_no_cookies(self, api_client):
+    def test_detail_sets_no_cookies(self, api_client, storage):
         extension = ExtensionFactory()
         res = api_client.get('/api/v2/extension/{id}/'.format(id=extension.id))
         assert res.status_code == 200
         assert res.client.cookies == {}
 
-    def test_filtering_by_name(self, api_client):
+    def test_filtering_by_name(self, api_client, storage):
         matching_extension = ExtensionFactory()
         ExtensionFactory()  # Generate another extension that will not match
 
@@ -72,7 +72,7 @@ class TestExtensionAPI(object):
         assert res.status_code == 200
         assert [ext['name'] for ext in res.data['results']] == [matching_extension.name]
 
-    def test_filtering_by_xpi(self, api_client):
+    def test_filtering_by_xpi(self, api_client, storage):
         matching_extension = ExtensionFactory()
         ExtensionFactory()  # Generate another extension that will not match
 
@@ -89,37 +89,37 @@ class TestExtensionAPI(object):
             }, format='multipart')
         return res
 
-    def test_upload_works_webext(self, api_client):
+    def test_upload_works_webext(self, api_client, storage):
         path = self.data_path('webext-signed.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data['id']).exists()
 
-    def test_upload_works_legacy(self, api_client):
+    def test_upload_works_legacy(self, api_client, storage):
         path = self.data_path('legacy-signed.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data['id']).exists()
 
-    def test_uploads_must_be_zips(self, api_client):
+    def test_uploads_must_be_zips(self, api_client, storage):
         path = self.data_path('not-an-addon.txt')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_a_zip']]}
 
-    def test_uploads_must_be_signed_webext(self, api_client):
+    def test_uploads_must_be_signed_webext(self, api_client, storage):
         path = self.data_path('webext-unsigned.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_signed']]}
 
-    def test_uploads_must_be_signed_legacy(self, api_client):
+    def test_uploads_must_be_signed_legacy(self, api_client, storage):
         path = self.data_path('legacy-unsigned.xpi')
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['not_signed']]}
 
-    def test_uploaded_webexts_must_have_id(self, api_client):
+    def test_uploaded_webexts_must_have_id(self, api_client, storage):
         # NB: This is a fragile test. It uses a unsigned webext, and
         # so it relies on the ID check happening before the signing
         # check, so that the error comes from the former.
@@ -128,7 +128,7 @@ class TestExtensionAPI(object):
         assert res.status_code == 400  # Client error
         assert res.data == {'xpi': [ExtensionFileField.default_error_messages['no_id']]}
 
-    def test_keeps_extension_filename(self, api_client):
+    def test_keeps_extension_filename(self, api_client, storage):
         filename = 'bootstrap-addon-example@mozilla.org-0.1.0.xpi'
         path = self.data_path(filename)
         res = self._upload_extension(api_client, path)
@@ -139,7 +139,7 @@ class TestExtensionAPI(object):
         res = api_client.get(res.data['xpi'], follow=True)
         assert res.status_code == 200
 
-    def test_order_name(self, api_client):
+    def test_order_name(self, api_client, storage):
         e1 = ExtensionFactory(name="a")
         e2 = ExtensionFactory(name="b")
 
@@ -151,7 +151,7 @@ class TestExtensionAPI(object):
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == [e2.id, e1.id]
 
-    def test_order_id(self, api_client):
+    def test_order_id(self, api_client, storage):
         e1 = ExtensionFactory()
         e2 = ExtensionFactory()
         assert e1.id < e2.id
@@ -164,7 +164,7 @@ class TestExtensionAPI(object):
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == [e2.id, e1.id]
 
-    def test_order_bogus(self, api_client):
+    def test_order_bogus(self, api_client, storage):
         """Test that filtering by an unknown key doesn't change the sort order"""
         ExtensionFactory()
         ExtensionFactory()
