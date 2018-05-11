@@ -350,3 +350,175 @@ class Test0007FilterConversion(MigrationTest):
         assert set(c.slug for c in revision.channels.all()) == {channel1.slug, channel2.slug}
         assert set(c.code for c in revision.countries.all()) == {country1.code, country2.code}
         assert set(c.code for c in revision.locales.all()) == {locale1.code, locale2.code}
+
+
+@pytest.mark.django_db
+class Test0008Through0010(MigrationTest):
+
+    def test_forwards(self, migrations):
+        # Get the pre-migration models
+        old_apps = migrations.migrate('recipes', '0007_convert_simple_filters_to_filter_objects')
+        Recipe = old_apps.get_model('recipes', 'Recipe')
+        Action = old_apps.get_model('recipes', 'Action')
+        RecipeRevision = old_apps.get_model('recipes', 'RecipeRevision')
+        ApprovalRequest = old_apps.get_model('recipes', 'ApprovalRequest')
+
+        # Create the test data
+        action = Action.objects.create()
+
+        recipe1 = Recipe.objects.create(enabled=True)
+        recipe2 = Recipe.objects.create(enabled=False)
+
+        r1_revision1 = RecipeRevision.objects.create(
+            recipe=recipe1,
+            action=action,
+            name='Test Revision (Approved)',
+            identicon_seed='v1:test',
+        )
+
+        r1_revision2 = RecipeRevision.objects.create(
+            recipe=recipe1,
+            action=action,
+            name='Test Revision',
+            identicon_seed='v1:test',
+        )
+
+        ApprovalRequest.objects.create(
+            revision=r1_revision1,
+            approved=True,
+        )
+
+        recipe1.latest_revision = r1_revision2
+        recipe1.approved_revision = r1_revision1
+        recipe1.save()
+
+        r2_revision1 = RecipeRevision.objects.create(
+            recipe=recipe2,
+            action=action,
+            name='Test Revision',
+            identicon_seed='v1:test',
+        )
+
+        ApprovalRequest.objects.create(
+            revision=r2_revision1,
+            approved=True,
+        )
+
+        recipe2.latest_revision = r2_revision1
+        recipe2.approved_revision = r2_revision1
+        recipe2.save()
+
+        # Get the post-migration models
+        new_apps = migrations.migrate('recipes', '0010_auto_20180510_2328')
+        Recipe = new_apps.get_model('recipes', 'Recipe')
+        EnabledState = new_apps.get_model('recipes', 'EnabledState')
+
+        assert EnabledState.objects.count() == 1
+
+        new_recipe1 = Recipe.objects.get(pk=recipe1.pk)
+        assert new_recipe1.approved_revision.pk == r1_revision1.pk
+        assert new_recipe1.approved_revision.enabled_state is not None
+        assert new_recipe1.approved_revision.enabled_state.enabled is True
+
+        new_recipe2 = Recipe.objects.get(pk=recipe2.pk)
+        assert new_recipe2.approved_revision.pk == r2_revision1.pk
+        assert new_recipe2.approved_revision.enabled_state is None
+
+    def test_reverse(self, migrations):
+        # Get the pre-migration models
+        old_apps = migrations.migrate('recipes', '0010_auto_20180510_2328')
+        Recipe = old_apps.get_model('recipes', 'Recipe')
+        Action = old_apps.get_model('recipes', 'Action')
+        RecipeRevision = old_apps.get_model('recipes', 'RecipeRevision')
+        ApprovalRequest = old_apps.get_model('recipes', 'ApprovalRequest')
+        EnabledState = old_apps.get_model('recipes', 'EnabledState')
+
+        # Create the test data
+        action = Action.objects.create()
+
+        recipe1 = Recipe.objects.create()
+        recipe2 = Recipe.objects.create()
+
+        r1_revision1 = RecipeRevision.objects.create(
+            recipe=recipe1,
+            action=action,
+            name='Test Revision (Approved)',
+            identicon_seed='v1:test',
+        )
+
+        r1_revision2 = RecipeRevision.objects.create(
+            recipe=recipe1,
+            action=action,
+            name='Test Revision',
+            identicon_seed='v1:test',
+        )
+
+        ApprovalRequest.objects.create(
+            revision=r1_revision1,
+            approved=True,
+        )
+
+        r1_revision1.enabled_state = EnabledState.objects.create(
+            revision=r1_revision1,
+            enabled=True,
+        )
+        r1_revision1.save()
+
+        recipe1.latest_revision = r1_revision2
+        recipe1.approved_revision = r1_revision1
+        recipe1.save()
+
+        r2_revision1 = RecipeRevision.objects.create(
+            recipe=recipe2,
+            action=action,
+            name='Test Revision',
+            identicon_seed='v1:test',
+        )
+
+        ApprovalRequest.objects.create(
+            revision=r2_revision1,
+            approved=True,
+        )
+
+        r1_revision1.enabled_state = EnabledState.objects.create(
+            revision=r1_revision1,
+            enabled=True,
+        )
+        r1_revision1.save()
+
+        r2_revision2 = RecipeRevision.objects.create(
+            recipe=recipe2,
+            action=action,
+            name='Test Revision II',
+            identicon_seed='v1:test',
+        )
+
+        ApprovalRequest.objects.create(
+            revision=r2_revision2,
+            approved=True,
+        )
+
+        EnabledState.objects.create(
+            revision=r1_revision1,
+            enabled=True,
+        )
+
+        r2_revision2.enabled_state = EnabledState.objects.create(
+            revision=r1_revision1,
+            enabled=False,
+        )
+        r2_revision2.save()
+
+        recipe2.latest_revision = r2_revision1
+        recipe2.approved_revision = r2_revision2
+        recipe2.save()
+
+        # Get the post-migration models
+        new_apps = migrations.migrate('recipes', '0007_convert_simple_filters_to_filter_objects')
+        Recipe = new_apps.get_model('recipes', 'Recipe')
+
+        new_recipe1 = Recipe.objects.get(pk=recipe1.pk)
+        assert new_recipe1.enabled is True
+
+        new_recipe2 = Recipe.objects.get(pk=recipe2.pk)
+        assert new_recipe2.enabled is False
