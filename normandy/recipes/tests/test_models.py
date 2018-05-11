@@ -11,6 +11,7 @@ from normandy.recipes.models import (
     Action,
     ApprovalRequest,
     Client,
+    EnabledState,
     INFO_CREATE_REVISION,
     INFO_REQUESTING_RECIPE_SIGNATURES,
     INFO_REQUESTING_ACTION_SIGNATURES,
@@ -549,6 +550,46 @@ class TestRecipeRevision(object):
         approval.reject(UserFactory(), 'r-')
         revision = RecipeRevision.objects.get(pk=revision.pk)
         assert revision.approval_status == revision.REJECTED
+
+    def test_enable(self):
+        recipe = RecipeFactory(name='Test')
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.latest_revision.enable(user=UserFactory())
+
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment='r+')
+
+        recipe.revise(name='New name')
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.latest_revision.enable(user=UserFactory())
+
+        recipe.approved_revision.enable(user=UserFactory())
+        assert recipe.enabled
+
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.approved_revision.enable(user=UserFactory())
+
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment='r+')
+        assert not recipe.enabled
+
+        recipe.approved_revision.enable(user=UserFactory())
+        assert recipe.enabled
+
+    def test_disable(self):
+        recipe = RecipeFactory(name='Test', approver=UserFactory(), enabler=UserFactory())
+        assert recipe.enabled
+
+        recipe.approved_revision.disable(user=UserFactory())
+        assert not recipe.enabled
+
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.approved_revision.disable(user=UserFactory())
+
+        recipe.revise(name='New name')
+
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.latest_revision.disable(user=UserFactory())
 
 
 @pytest.mark.django_db

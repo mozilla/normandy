@@ -124,7 +124,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
                                      on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-latest_revision__updated']
+        ordering = ['-approved_revision__enabled_state__enabled', '-latest_revision__updated']
 
     class NotApproved(Exception):
         pass
