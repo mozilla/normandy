@@ -1,4 +1,5 @@
 .cache
+.pytest_cache
 .env*
 .floo*
 docs/_build
