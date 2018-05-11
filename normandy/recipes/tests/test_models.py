@@ -38,18 +38,19 @@ def mock_logger(mocker):
 class TestAction(object):
     def test_recipes_used_by(self):
         approver = UserFactory()
-        recipe = RecipeFactory(approver=approver, enabled=True)
+        enabler = UserFactory()
+        recipe = RecipeFactory(approver=approver, enabler=enabler)
         assert [recipe] == list(recipe.action.recipes_used_by)
 
         action = ActionFactory()
-        recipes = RecipeFactory.create_batch(2, action=action, approver=approver, enabled=True)
+        recipes = RecipeFactory.create_batch(2, action=action, approver=approver, enabler=enabler)
         assert set(action.recipes_used_by) == set(recipes)
 
     def test_recipes_used_by_empty(self):
         assert list(ActionFactory().recipes_used_by) == []
 
         action = ActionFactory()
-        RecipeFactory.create_batch(2, action=action, enabled=False)
+        RecipeFactory.create_batch(2, action=action)
         assert list(action.recipes_used_by) == []
 
     def test_update_signature(self, mocker, mock_logger):
@@ -185,6 +186,17 @@ class TestValidateArgumentPreferenceExperiments(object):
 
 @pytest.mark.django_db
 class TestRecipe(object):
+    def test_enabled(self):
+        """Test that the enabled property is correctly set."""
+        r1 = RecipeFactory()
+        assert r1.enabled is False
+
+        r2 = RecipeFactory(approver=UserFactory())
+        assert r2.enabled is False
+
+        r3 = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+        assert r3.enabled is True
+
     def test_revision_id_doesnt_change_if_no_changes(self):
         """
         revision_id should not increment if a recipe is saved with no
@@ -242,7 +254,6 @@ class TestRecipe(object):
             arguments_json='{"foo": 1, "bar": 2}',
             channels=[ChannelFactory(slug='beta')],
             countries=[CountryFactory(code='CA')],
-            enabled=False,
             extra_filter_expression='2 + 2 == 4',
             locales=[LocaleFactory(code='en-US')],
             name='canonical',
@@ -347,9 +358,8 @@ class TestRecipe(object):
 
         mock_autograph.return_value.sign_data.side_effect = fake_sign
 
-        recipe = RecipeFactory(enabled=False, signed=False, approver=UserFactory())
-        recipe.enabled = True
-        recipe.save()
+        recipe = RecipeFactory(signed=False, approver=UserFactory())
+        recipe.approved_revision.enable(user=UserFactory())
         recipe.refresh_from_db()
 
         assert recipe.signature is not None
@@ -512,22 +522,6 @@ class TestRecipe(object):
         recipe.latest_revision.delete()
         recipe.refresh_from_db()
         assert recipe.approval_request is None
-
-    def test_cannot_enable_unapproved_recipe(self):
-        recipe = RecipeFactory(enabled=False)
-
-        with pytest.raises(Recipe.NotApproved):
-            recipe.enabled = True
-            recipe.save()
-
-    def test_disabling_recipe_removes_approval(self):
-        recipe = RecipeFactory(approver=UserFactory(), enabled=True)
-        assert recipe.is_approved
-
-        recipe.enabled = False
-        recipe.save()
-        recipe.refresh_from_db()
-        assert not recipe.is_approved
 
     def test_revise_arguments(self):
         recipe = RecipeFactory(arguments_json='[]')

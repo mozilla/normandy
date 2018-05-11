@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, force=False, **options):
         if force:
-            recipes_to_update = Recipe.objects.filter(enabled=True)
+            recipes_to_update = Recipe.objects.only_enabled()
         else:
             recipes_to_update = self.get_outdated_recipes()
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 self.stdout.write(' * ' + recipe.name)
             recipes_to_update.update_signatures()
 
-        recipes_to_unsign = Recipe.objects.filter(enabled=False).exclude(signature=None)
+        recipes_to_unsign = Recipe.objects.only_disabled().exclude(signature=None)
         count = recipes_to_unsign.count()
         if count == 0:
             self.stdout.write('No disabled recipes to unsign')
@@ -54,4 +54,4 @@ class Command(BaseCommand):
         outdated_age = timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE)
         outdated_filter = Q(signature__timestamp__lt=timezone.now() - outdated_age)
         missing_filter = Q(signature=None)
-        return Recipe.objects.filter(enabled=True).filter(outdated_filter | missing_filter)
+        return Recipe.objects.only_enabled().filter(outdated_filter | missing_filter)

@@ -9,14 +9,15 @@ def enabled_to_enabled_state(apps, schema_editor):
 
     for recipe in Recipe.objects.filter(enabled=True):
         if recipe.approved_revision:
-            EnabledState.objects.create(revision=recipe.approved_revision, enabled=True)
+            es = EnabledState.objects.create(revision=recipe.approved_revision, enabled=True)
+            es.current_for_revision.add(recipe.approved_revision)
 
 
 def enabled_state_to_enabled(apps, schema_editor):
     Recipe = apps.get_model('recipes', 'Recipe')
 
     for recipe in Recipe.objects.exclude(approved_revision=None):
-        enabled_state = recipe.approved_revisison.enabled_states.first()
+        enabled_state = recipe.approved_revisison.enabled_state
         if enabled_state and enabled_state.enabled():
             recipe.enabled = True
             recipe.save()

@@ -11,7 +11,7 @@ class RelatedFieldProperty(object):
 
     def __get__(self, instance, owner):
         if not getattr(instance, self.related_field):
-            return None
+            return self.default
         return self.method(instance)
 
     def __set__(self, instance, value):

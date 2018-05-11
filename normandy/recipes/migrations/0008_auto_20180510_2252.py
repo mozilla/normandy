@@ -28,4 +28,11 @@ class Migration(migrations.Migration):
                 'ordering': ('-created',),
             },
         ),
+        migrations.AddField(
+            model_name='reciperevision',
+            name='enabled_state',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    related_name='current_for_revision',
+                                    to='recipes.EnabledState'),
+        ),
     ]

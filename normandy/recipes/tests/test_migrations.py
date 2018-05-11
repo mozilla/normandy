@@ -232,7 +232,7 @@ class Test0003Through0005(MigrationTest):
 
 
 @pytest.mark.django_db
-class Test0007FilterConversion(object):
+class Test0007FilterConversion(MigrationTest):
 
     def test_forwards(self, migrations):
         # Get the pre-migration models

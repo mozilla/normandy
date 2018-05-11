@@ -74,6 +74,12 @@ class Signature(models.Model):
 
 
 class RecipeQuerySet(models.QuerySet):
+    def only_enabled(self):
+        return self.filter(approved_revision__enabled_state__enabled=True)
+
+    def only_disabled(self):
+        return self.exclude(approved_revision__enabled_state__enabled=True)
+
     @transaction.atomic
     def update_signatures(self):
         """
@@ -302,7 +308,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         super().save(*args, **kwargs)
 
 
-class RecipeRevision(models.Model):
+class RecipeRevision(DirtyFieldsMixin, models.Model):
     APPROVED = 'approved'
     REJECTED = 'rejected'
     PENDING = 'pending'
@@ -325,6 +331,8 @@ class RecipeRevision(models.Model):
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
     identicon_seed = IdenticonSeedField(max_length=64)
+    enabled_state = models.ForeignKey('EnabledState', null=True, on_delete=models.SET_NULL,
+                                      related_name='current_for_revision')
 
     class Meta:
         ordering = ('-created',)
@@ -407,8 +415,7 @@ class RecipeRevision(models.Model):
 
     @property
     def enabled(self):
-        enabled_state = self.enabled_states.first()
-        return enabled_state.enabled if enabled_state else False
+        return self.enabled_state.enabled if self.enabled_state else False
 
     def save(self, *args, **kwargs):
         if self.parent:
@@ -429,27 +436,28 @@ class RecipeRevision(models.Model):
         self.recipe.save()
         return approval_request
 
+    def _create_new_enabled_state(self, **kwargs):
+        if self.recipe.approved_revision != self:
+            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
+                                             'that is not the latest approved revision.')
+
+        self.enabled_state = EnabledState.objects.create(revision=self, **kwargs)
+        self.save()
+
+        self.recipe.update_signature()
+        self.recipe.save()
+
     def enable(self, user):
         if self.enabled:
             raise EnabledState.NotActionable('This revision is already enabled.')
 
-        if self.recipe.approved_revision != self:
-            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
-                                             'that is not the latest approved revision.')
-
-        enabled_state = EnabledState(revision=self, creator=user, enabled=True)
-        enabled_state.save()
+        self._create_new_enabled_state(creator=user, enabled=True)
 
     def disable(self, user):
-        if self.disabled:
+        if not self.enabled:
             raise EnabledState.NotActionable('This revision is already disabled.')
 
-        if self.recipe.approved_revision != self:
-            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
-                                             'that is not the latest approved revision.')
-
-        enabled_state = EnabledState(revision=self, creator=user, enabled=False)
-        enabled_state.save()
+        self._create_new_enabled_state(creator=user, enabled=False)
 
 
 class EnabledState(models.Model):
@@ -608,9 +616,8 @@ class Action(DirtyFieldsMixin, models.Model):
     @property
     def recipes_used_by(self):
         """Set of enabled recipes that are using this action."""
-        return Recipe.objects.filter(
+        return Recipe.objects.only_enabled().filter(
             latest_revision_id__in=self.recipe_revisions.values_list('id', flat=True),
-            enabled=True
         )
 
     def recipes_used_by_html(self):
