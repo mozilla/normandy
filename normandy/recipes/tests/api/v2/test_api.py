@@ -723,7 +723,7 @@ class TestRecipeAPI(object):
             assert res.data[2]['recipe']['name'] == 'version 1'
 
         def test_it_can_enable_recipes(self, api_client):
-            recipe = RecipeFactory(enabled=False, approver=UserFactory())
+            recipe = RecipeFactory(approver=UserFactory())
 
             res = api_client.post('/api/v2/recipe/%s/enable/' % recipe.id)
             assert res.status_code == 200
@@ -733,21 +733,27 @@ class TestRecipeAPI(object):
             assert recipe.enabled
 
         def test_cannot_enable_unapproved_recipes(self, api_client):
-            recipe = RecipeFactory(enabled=False)
+            recipe = RecipeFactory()
 
             res = api_client.post('/api/v2/recipe/%s/enable/' % recipe.id)
             assert res.status_code == 409
-            assert res.data['enabled'] == 'Cannot enable a recipe that is not approved.'
+            assert res.data['error'] == 'Cannot enable a recipe that is not approved.'
+
+        def test_cannot_enable_enabled_recipes(self, api_client):
+            recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+
+            res = api_client.post('/api/v2/recipe/%s/enable/' % recipe.id)
+            assert res.status_code == 409
+            assert res.data['error'] == 'This revision is already enabled.'
 
         def test_it_can_disable_recipes(self, api_client):
-            recipe = RecipeFactory(approver=UserFactory(), enabled=True)
+            recipe = RecipeFactory(approver=UserFactory())
 
             res = api_client.post('/api/v2/recipe/%s/disable/' % recipe.id)
             assert res.status_code == 200
             assert res.data['enabled'] is False
 
             recipe = Recipe.objects.all()[0]
-            assert not recipe.is_approved
             assert not recipe.enabled
 
         def test_detail_view_includes_cache_headers(self, api_client):
@@ -767,8 +773,8 @@ class TestRecipeAPI(object):
     @pytest.mark.django_db
     class TestFiltering(object):
         def test_filtering_by_enabled_lowercase(self, api_client):
-            r1 = RecipeFactory(approver=UserFactory(), enabled=True)
-            RecipeFactory(enabled=False)
+            r1 = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+            RecipeFactory()
 
             res = api_client.get('/api/v2/recipe/?enabled=true')
             assert res.status_code == 200
@@ -785,17 +791,11 @@ class TestRecipeAPI(object):
                 "<%2fscript><svg%2fonload%3d'%2b%2f'%2f%2b"
             )
             res = api_client.get(url)
-            assert res.status_code == 400
-            assert res.data == {
-                'messages': [
-                    "'javascript:/*</script><svg/onload='+/'/+' "
-                    "value must be either True or False.",
-                ],
-            }
+            assert res.status_code == 200
 
         def test_list_filter_status(self, api_client):
-            r1 = RecipeFactory(enabled=False)
-            r2 = RecipeFactory(approver=UserFactory(), enabled=True)
+            r1 = RecipeFactory()
+            r2 = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
 
             res = api_client.get('/api/v2/recipe/?status=enabled')
             assert res.status_code == 200
@@ -993,7 +993,7 @@ class TestRecipeRevisionAPI(object):
         assert res.status_code == 400
 
     def test_it_has_an_identicon_seed(self, api_client):
-        recipe = RecipeFactory(enabled=True, approver=UserFactory())
+        recipe = RecipeFactory(enabler=UserFactory(), approver=UserFactory())
         res = api_client.get(f'/api/v2/recipe_revision/{recipe.latest_revision.id}/')
         assert res.data['identicon_seed'] == recipe.identicon_seed
 

@@ -9,7 +9,6 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from normandy.base.api import UpdateOrCreateModelViewSet
-from normandy.base.api.filters import CaseInsensitiveBooleanFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
@@ -20,10 +19,12 @@ from normandy.recipes.models import (
     Channel,
     Client,
     Country,
+    EnabledState,
     Locale,
     Recipe,
     RecipeRevision
 )
+from normandy.recipes.api.filters import EnabledStateFilter
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
@@ -74,7 +75,7 @@ class ActionImplementationView(generics.RetrieveAPIView):
 
 
 class RecipeFilters(django_filters.FilterSet):
-    enabled = CaseInsensitiveBooleanFilter(field_name='enabled', lookup_expr='eq')
+    enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name='latest_revision__action__name')
 
     class Meta:
@@ -111,9 +112,9 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         queryset = self.queryset
 
         if self.request.GET.get('status') == 'enabled':
-            queryset = queryset.filter(enabled=True)
+            queryset = queryset.only_enabled()
         elif self.request.GET.get('status') == 'disabled':
-            queryset = queryset.filter(enabled=False)
+            queryset = queryset.only_disabled()
 
         if 'channels' in self.request.GET:
             channels = self.request.GET.get('channels').split(',')
@@ -160,20 +161,28 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     @detail_route(methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
-        recipe.enabled = True
 
-        try:
-            recipe.save()
-        except Recipe.NotApproved as e:
-            return Response({'enabled': str(e)}, status=status.HTTP_409_CONFLICT)
+        if recipe.approved_revision:
+            try:
+                recipe.approved_revision.enable(user=request.user)
+            except EnabledState.NotActionable as e:
+                return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
+        else:
+            return Response({'error': 'Cannot enable a recipe that is not approved.'},
+                            status=status.HTTP_409_CONFLICT)
 
         return Response(RecipeSerializer(recipe).data)
 
     @detail_route(methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
-        recipe.enabled = False
-        recipe.save()
+
+        if recipe.enabled:
+            try:
+                recipe.approved_revision.disable(user=request.user)
+            except EnabledState.NotActionable as e:
+                return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
+
         return Response(RecipeSerializer(recipe).data)
 
 

@@ -12,6 +12,7 @@ from normandy.recipes.models import (
     Client,
     Channel,
     Country,
+    EnabledState,
     Locale,
     Recipe,
     RecipeRevision,
@@ -108,7 +109,7 @@ class RecipeFactory(factory.DjangoModelFactory):
             for locale in extracted:
                 self.locales.add(locale)
 
-    # This should always be before `enabled`
+    # This should always be before `enabler`
     @factory.post_generation
     def approver(self, create, extracted, **kwargs):
         if extracted:
@@ -117,10 +118,9 @@ class RecipeFactory(factory.DjangoModelFactory):
 
     # This should always be after `approver` as we require approval to enable a recipe
     @factory.post_generation
-    def enabled(self, create, extracted, **kwargs):
+    def enabler(self, create, extracted, **kwargs):
         if extracted:
-            self.enabled = True
-            self.save()
+            self.approved_revision.enable(extracted)
 
     # NOTE: This should always be last or the signature gets erased.
     # It is important that the signature be based on the actual data, and not
@@ -157,6 +157,13 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
 class ApprovalRequestFactory(factory.DjangoModelFactory):
     class Meta:
         model = ApprovalRequest
+
+    revision = factory.SubFactory(RecipeRevisionFactory)
+
+
+class EnabledStateFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = EnabledState
 
     revision = factory.SubFactory(RecipeRevisionFactory)
 

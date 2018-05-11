@@ -17,7 +17,7 @@ from rest_framework.reverse import reverse
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
 from normandy.recipes import filters
-from normandy.recipes.decorators import current_revision_property
+from normandy.recipes.decorators import approved_revision_property, current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
 from normandy.recipes.validators import validate_json
@@ -74,6 +74,12 @@ class Signature(models.Model):
 
 
 class RecipeQuerySet(models.QuerySet):
+    def only_enabled(self):
+        return self.filter(approved_revision__enabled_state__enabled=True)
+
+    def only_disabled(self):
+        return self.exclude(approved_revision__enabled_state__enabled=True)
+
     @transaction.atomic
     def update_signatures(self):
         """
@@ -114,15 +120,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
                                         related_name='latest_for_recipe')
     approved_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
                                           related_name='approved_for_recipe')
-
-    enabled = models.BooleanField(default=False)
-    signature = models.OneToOneField(
-        Signature, related_name='recipe', null=True, blank=True,
-        on_delete=models.CASCADE
-    )
+    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True,
+                                     on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-enabled', '-latest_revision__updated']
+        ordering = ['-approved_revision__enabled_state__enabled', '-latest_revision__updated']
 
     class NotApproved(Exception):
         pass
@@ -141,55 +143,59 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def is_approved(self):
         return self.approved_revision is not None
 
-    @current_revision_property
+    @approved_revision_property(default=False)
+    def enabled(self):
+        return self.approved_revision.enabled
+
+    @current_revision_property()
     def name(self):
         return self.current_revision.name
 
-    @current_revision_property
+    @current_revision_property()
     def action(self):
         return self.current_revision.action
 
-    @current_revision_property
+    @current_revision_property()
     def filter_expression(self):
         return self.current_revision.filter_expression
 
-    @current_revision_property
+    @current_revision_property()
     def extra_filter_expression(self):
         return self.current_revision.extra_filter_expression
 
-    @current_revision_property
+    @current_revision_property()
     def filter_object(self):
         return self.current_revision.filter_object
 
-    @current_revision_property
+    @current_revision_property()
     def arguments_json(self):
         return self.current_revision.arguments_json
 
-    @current_revision_property
+    @current_revision_property()
     def arguments(self):
         return self.current_revision.arguments
 
-    @current_revision_property
+    @current_revision_property()
     def revision_id(self):
         return self.current_revision.id
 
-    @current_revision_property
+    @current_revision_property()
     def last_updated(self):
         return self.current_revision.updated
 
-    @current_revision_property
+    @current_revision_property()
     def channels(self):
         return self.current_revision.channels
 
-    @current_revision_property
+    @current_revision_property()
     def countries(self):
         return self.current_revision.countries
 
-    @current_revision_property
+    @current_revision_property()
     def locales(self):
         return self.current_revision.locales
 
-    @current_revision_property
+    @current_revision_property()
     def identicon_seed(self):
         return self.current_revision.identicon_seed
 
@@ -287,14 +293,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             dirty_field_names = list(dirty_fields.keys())
 
-            if 'enabled' in dirty_field_names:
-                if self.enabled and not self.is_approved:
-                    raise self.NotApproved('Cannot enable a recipe that is not approved.')
-
-                if not self.enabled:
-                    # If we are disabling the recipe we should invalidate the approval
-                    self.approved_revision = None
-
             if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
                     and self.signature is not None):
                 # Setting the signature while also changing something else is probably
@@ -310,7 +308,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         super().save(*args, **kwargs)
 
 
-class RecipeRevision(models.Model):
+class RecipeRevision(DirtyFieldsMixin, models.Model):
     APPROVED = 'approved'
     REJECTED = 'rejected'
     PENDING = 'pending'
@@ -333,6 +331,8 @@ class RecipeRevision(models.Model):
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
     identicon_seed = IdenticonSeedField(max_length=64)
+    enabled_state = models.ForeignKey('EnabledState', null=True, on_delete=models.SET_NULL,
+                                      related_name='current_for_revision')
 
     class Meta:
         ordering = ('-created',)
@@ -413,6 +413,10 @@ class RecipeRevision(models.Model):
         except ApprovalRequest.DoesNotExist:
             return None
 
+    @property
+    def enabled(self):
+        return self.enabled_state.enabled if self.enabled_state else False
+
     def save(self, *args, **kwargs):
         if self.parent:
             old_arguments = self.parent.arguments
@@ -431,6 +435,44 @@ class RecipeRevision(models.Model):
         self.recipe.update_signature()
         self.recipe.save()
         return approval_request
+
+    def _create_new_enabled_state(self, **kwargs):
+        if self.recipe.approved_revision != self:
+            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
+                                             'that is not the latest approved revision.')
+
+        self.enabled_state = EnabledState.objects.create(revision=self, **kwargs)
+        self.save()
+
+        self.recipe.update_signature()
+        self.recipe.save()
+
+    def enable(self, user):
+        if self.enabled:
+            raise EnabledState.NotActionable('This revision is already enabled.')
+
+        self._create_new_enabled_state(creator=user, enabled=True)
+
+    def disable(self, user):
+        if not self.enabled:
+            raise EnabledState.NotActionable('This revision is already disabled.')
+
+        self._create_new_enabled_state(creator=user, enabled=False)
+
+
+class EnabledState(models.Model):
+    revision = models.ForeignKey(RecipeRevision, related_name='enabled_states',
+                                 on_delete=models.CASCADE)
+    created = models.DateTimeField(default=timezone.now)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='enabled_states',
+                                null=True)
+    enabled = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-created',)
+
+    class NotActionable(Exception):
+        pass
 
 
 class ApprovalRequest(models.Model):
@@ -574,9 +616,8 @@ class Action(DirtyFieldsMixin, models.Model):
     @property
     def recipes_used_by(self):
         """Set of enabled recipes that are using this action."""
-        return Recipe.objects.filter(
+        return Recipe.objects.only_enabled().filter(
             latest_revision_id__in=self.recipe_revisions.values_list('id', flat=True),
-            enabled=True
         )
 
     def recipes_used_by_html(self):
