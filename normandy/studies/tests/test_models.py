@@ -5,7 +5,7 @@ from normandy.studies.tests import ExtensionFactory
 
 
 @pytest.mark.django_db
-def test_recipes_used_by():
+def test_recipes_used_by(storage):
     extension = ExtensionFactory()
     RecipeFactory()  # Create a recipe that doesn't use the extension
     used_in_recipe_1 = RecipeFactory(

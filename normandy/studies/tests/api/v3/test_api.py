@@ -8,7 +8,7 @@ from django.conf import settings
 from normandy.base.tests import Whatever
 from normandy.studies.models import Extension
 from normandy.studies.tests import ExtensionFactory
-from normandy.studies.api.v2.fields import ExtensionFileField
+from normandy.studies.api.v3.fields import ExtensionFileField
 
 
 @pytest.mark.django_db
@@ -19,7 +19,7 @@ class TestExtensionAPI(object):
         return Path(settings.BASE_DIR) / 'normandy/studies/tests/data' / file_name
 
     def test_it_works(self, api_client):
-        res = api_client.get('/api/v2/extension/')
+        res = api_client.get('/api/v3/extension/')
         assert res.status_code == 200
         assert res.data['results'] == []
 
@@ -28,7 +28,7 @@ class TestExtensionAPI(object):
             name='foo',
         )
 
-        res = api_client.get('/api/v2/extension/')
+        res = api_client.get('/api/v3/extension/')
         assert res.status_code == 200
         assert res.data['results'] == [
             {
@@ -39,7 +39,7 @@ class TestExtensionAPI(object):
         ]
 
     def test_list_view_includes_cache_headers(self, api_client):
-        res = api_client.get('/api/v2/extension/')
+        res = api_client.get('/api/v3/extension/')
         assert res.status_code == 200
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
@@ -47,20 +47,20 @@ class TestExtensionAPI(object):
 
     def test_detail_view_includes_cache_headers(self, api_client, storage):
         extension = ExtensionFactory()
-        res = api_client.get('/api/v2/extension/{id}/'.format(id=extension.id))
+        res = api_client.get('/api/v3/extension/{id}/'.format(id=extension.id))
         assert res.status_code == 200
         # It isn't important to assert a particular value for max-age
         assert 'max-age=' in res['Cache-Control']
         assert 'public' in res['Cache-Control']
 
     def test_list_sets_no_cookies(self, api_client):
-        res = api_client.get('/api/v2/extension/')
+        res = api_client.get('/api/v3/extension/')
         assert res.status_code == 200
         assert 'Cookies' not in res
 
     def test_detail_sets_no_cookies(self, api_client, storage):
         extension = ExtensionFactory()
-        res = api_client.get('/api/v2/extension/{id}/'.format(id=extension.id))
+        res = api_client.get('/api/v3/extension/{id}/'.format(id=extension.id))
         assert res.status_code == 200
         assert res.client.cookies == {}
 
@@ -68,7 +68,7 @@ class TestExtensionAPI(object):
         matching_extension = ExtensionFactory()
         ExtensionFactory()  # Generate another extension that will not match
 
-        res = api_client.get(f'/api/v2/extension/?text={matching_extension.name}')
+        res = api_client.get(f'/api/v3/extension/?text={matching_extension.name}')
         assert res.status_code == 200
         assert [ext['name'] for ext in res.data['results']] == [matching_extension.name]
 
@@ -76,14 +76,14 @@ class TestExtensionAPI(object):
         matching_extension = ExtensionFactory()
         ExtensionFactory()  # Generate another extension that will not match
 
-        res = api_client.get(f'/api/v2/extension/?text={matching_extension.xpi}')
+        res = api_client.get(f'/api/v3/extension/?text={matching_extension.xpi}')
         assert res.status_code == 200
         expected_path = matching_extension.xpi.url
         assert [urlparse(ext['xpi']).path for ext in res.data['results']] == [expected_path]
 
     def _upload_extension(self, api_client, path):
         with open(path, 'rb') as f:
-            res = api_client.post('/api/v2/extension/', {
+            res = api_client.post('/api/v3/extension/', {
                 'name': 'test extension',
                 'xpi': f,
             }, format='multipart')
@@ -143,11 +143,11 @@ class TestExtensionAPI(object):
         e1 = ExtensionFactory(name="a")
         e2 = ExtensionFactory(name="b")
 
-        res = api_client.get(f'/api/v2/extension/?ordering=name')
+        res = api_client.get(f'/api/v3/extension/?ordering=name')
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == [e1.id, e2.id]
 
-        res = api_client.get(f'/api/v2/extension/?ordering=-name')
+        res = api_client.get(f'/api/v3/extension/?ordering=-name')
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == [e2.id, e1.id]
 
@@ -156,11 +156,11 @@ class TestExtensionAPI(object):
         e2 = ExtensionFactory()
         assert e1.id < e2.id
 
-        res = api_client.get(f'/api/v2/extension/?ordering=id')
+        res = api_client.get(f'/api/v3/extension/?ordering=id')
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == [e1.id, e2.id]
 
-        res = api_client.get(f'/api/v2/extension/?ordering=-id')
+        res = api_client.get(f'/api/v3/extension/?ordering=-id')
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == [e2.id, e1.id]
 
@@ -169,10 +169,10 @@ class TestExtensionAPI(object):
         ExtensionFactory()
         ExtensionFactory()
 
-        res = api_client.get(f'/api/v2/extension/?ordering=bogus')
+        res = api_client.get(f'/api/v3/extension/?ordering=bogus')
         assert res.status_code == 200
         first_ordering = [r['id'] for r in res.data['results']]
 
-        res = api_client.get(f'/api/v2/extension/?ordering=-bogus')
+        res = api_client.get(f'/api/v3/extension/?ordering=-bogus')
         assert res.status_code == 200
         assert [r['id'] for r in res.data['results']] == first_ordering

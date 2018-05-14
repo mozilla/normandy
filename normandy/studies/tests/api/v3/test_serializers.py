@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.studies.api.v2.serializers import ExtensionSerializer
+from normandy.studies.api.v3.serializers import ExtensionSerializer
 from normandy.studies.tests import ExtensionFactory
 
 
