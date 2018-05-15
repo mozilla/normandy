@@ -426,10 +426,6 @@ class Production(Base):
     DEFAULT_FILE_STORAGE = values.Value('normandy.base.storage.S3Boto3PermissiveStorage')
     AWS_S3_FILE_OVERWRITE = False
 
-    # Custom CORS settings that overrides the CORS class's configuration.
-    # In production we harden it down a bit extra.
-    CORS_ORIGIN_ALLOW_ALL = values.BooleanValue(False)
-
 
 class ProductionReadOnly(Production):
     """
