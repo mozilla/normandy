@@ -4,7 +4,7 @@ from django.db.models import Q
 
 import django_filters
 from rest_framework import generics, permissions, status, views, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
@@ -45,7 +45,7 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     lookup_field = 'name'
     lookup_value_regex = r'[_\-\w]+'
 
-    @list_route(methods=['GET'])
+    @action(detail=False, methods=['GET'])
     @api_cache_control()
     def signed(self, request, pk=None):
         actions = self.filter_queryset(self.get_queryset()).exclude(signature=None)
@@ -143,14 +143,14 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @list_route(methods=['GET'])
+    @action(detail=False, methods=['GET'])
     @api_cache_control()
     def signed(self, request, pk=None):
         recipes = self.filter_queryset(self.get_queryset()).exclude(signature=None)
         serializer = SignedRecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['GET'])
+    @action(detail=True, methods=['GET'])
     @api_cache_control()
     def history(self, request, pk=None):
         recipe = self.get_object()
@@ -158,7 +158,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
                                               context={'request': request})
         return Response(serializer.data)
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     def enable(self, request, pk=None):
         recipe = self.get_object()
 
@@ -173,7 +173,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         return Response(RecipeSerializer(recipe).data)
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     def disable(self, request, pk=None):
         recipe = self.get_object()
 
@@ -204,7 +204,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     pagination_class = None
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     def request_approval(self, request, pk=None):
         revision = self.get_object()
 
@@ -227,7 +227,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     pagination_class = None
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     def approve(self, request, pk=None):
         approval_request = self.get_object()
 
@@ -248,7 +248,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Response(ApprovalRequestSerializer(approval_request).data)
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     def reject(self, request, pk=None):
         approval_request = self.get_object()
 
@@ -269,7 +269,7 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Response(ApprovalRequestSerializer(approval_request).data)
 
-    @detail_route(methods=['POST'])
+    @action(detail=True, methods=['POST'])
     def close(self, request, pk=None):
         approval_request = self.get_object()
         approval_request.close()
