@@ -532,7 +532,7 @@ class ApprovalRequest(models.Model):
         recipe.approved_revision = self.revision
         recipe.save()
 
-        # Note: We need to update the approved_revision before we can enable the new revision
+        # Note: Enabling the new revision must happen after the approved_revision has been updated
         if carryover_enabled:
             self.revision.enable(approver, carryover_from=carryover_enabled)
 
