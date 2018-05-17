@@ -227,7 +227,7 @@ class MinimalRecipeSerializer(RecipeSerializer):
     The minimum amount of fields needed for clients to verify and execute recipes.
     """
 
-    revision_id = serializers.IntegerField(source='current_revision.id', read_only=True)
+    revision_id = serializers.SerializerMethodField()
 
     class Meta(RecipeSerializer.Meta):
         # Attributes serialized here are made available to filter expressions via
@@ -244,6 +244,14 @@ class MinimalRecipeSerializer(RecipeSerializer):
             'arguments',
             'filter_expression',
         ]
+
+    def get_revision_id(self, recipe):
+        # Certain parts of Telemetry expect this to be a string, so coerce it to
+        # that, even though the data is actually an int
+        if recipe.current_revision:
+            return str(recipe.current_revision.id)
+        else:
+            None
 
 
 class RecipeRevisionSerializer(serializers.ModelSerializer):
