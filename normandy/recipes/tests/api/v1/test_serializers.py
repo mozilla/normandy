@@ -246,7 +246,7 @@ class TestSignedRecipeSerializer:
                 'id': recipe.id,
                 'enabled': recipe.enabled,
                 'filter_expression': recipe.filter_expression,
-                'revision_id': recipe.revision_id,
+                'revision_id': str(recipe.revision_id),
                 'action': action.name,
                 'arguments': recipe.arguments,
                 'last_updated': Whatever(),
