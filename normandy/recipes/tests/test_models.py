@@ -571,9 +571,6 @@ class TestRecipeRevision(object):
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
         approval_request.approve(approver=UserFactory(), comment='r+')
-        assert not recipe.enabled
-
-        recipe.approved_revision.enable(user=UserFactory())
         assert recipe.enabled
 
     def test_disable(self):
@@ -671,6 +668,15 @@ class TestApprovalRequest(object):
             'approval_id': req.id,
             'approver': creator,
         })
+
+    def test_enabled_state_carried_over_on_approval(self):
+        recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+        carryover_from = recipe.approved_revision.enabled_state
+        recipe.revise(name='New name')
+        approval_request = recipe.latest_revision.request_approval(UserFactory())
+        approval_request.approve(UserFactory(), 'r+')
+        assert recipe.enabled
+        assert recipe.approved_revision.enabled_state.carryover_from == carryover_from
 
 
 @pytest.mark.django_db
