@@ -447,11 +447,11 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         self.recipe.update_signature()
         self.recipe.save()
 
-    def enable(self, user):
+    def enable(self, user, carryover_from=None):
         if self.enabled:
             raise EnabledState.NotActionable('This revision is already enabled.')
 
-        self._create_new_enabled_state(creator=user, enabled=True)
+        self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
     def disable(self, user):
         if not self.enabled:
@@ -467,6 +467,8 @@ class EnabledState(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='enabled_states',
                                 null=True)
     enabled = models.BooleanField(default=False)
+    carryover_from = models.ForeignKey('self', null=True, on_delete=models.SET_NULL,
+                                       related_name='carryover_to')
 
     class Meta:
         ordering = ('-created',)
@@ -521,8 +523,18 @@ class ApprovalRequest(models.Model):
         self.save()
 
         recipe = self.revision.recipe
+
+        # Check if the recipe is enabled we should carry over it's enabled state
+        carryover_enabled = None
+        if recipe.enabled:
+            carryover_enabled = recipe.approved_revision.enabled_state
+
         recipe.approved_revision = self.revision
         recipe.save()
+
+        # Note: We need to update the approved_revision before we can enable the new revision
+        if carryover_enabled:
+            self.revision.enable(approver, carryover_from=carryover_enabled)
 
     def reject(self, approver, comment):
         if self.approved is not None:
