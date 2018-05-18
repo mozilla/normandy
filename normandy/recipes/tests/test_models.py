@@ -1,4 +1,3 @@
-import hashlib
 from unittest.mock import patch
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -27,6 +26,7 @@ from normandy.recipes.tests import (
     LocaleFactory,
     RecipeFactory,
     SignatureFactory,
+    fake_sign,
 )
 
 
@@ -288,7 +288,7 @@ class TestRecipe(object):
 
     def test_signature_is_correct_on_creation_if_autograph_available(self, mocked_autograph):
         recipe = RecipeFactory()
-        expected_sig = hashlib.sha256(recipe.canonical_json()).hexdigest()
+        expected_sig = fake_sign([recipe.canonical_json()])[0]['signature']
         assert recipe.signature.signature == expected_sig
 
     def test_signature_is_updated_if_autograph_available(self, mocked_autograph):
@@ -300,7 +300,7 @@ class TestRecipe(object):
 
         assert recipe.name == 'changed'
         assert recipe.signature is not original_signature
-        expected_sig = hashlib.sha256(recipe.canonical_json()).hexdigest()
+        expected_sig = fake_sign([recipe.canonical_json()])[0]['signature']
         assert recipe.signature.signature == expected_sig
 
     def test_signature_is_cleared_if_autograph_unavailable(self, mocker):
@@ -348,23 +348,13 @@ class TestRecipe(object):
         assert recipe.signature is not None
         assert recipe.signature.signature == 'fake signature'
 
-    def test_signatures_update_correctly_on_enable(self, mocker):
-        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-
-        def fake_sign(datas):
-            sigs = []
-            for d in datas:
-                sigs.append({'signature': hashlib.sha256(d).hexdigest()})
-            return sigs
-
-        mock_autograph.return_value.sign_data.side_effect = fake_sign
-
+    def test_signatures_update_correctly_on_enable(self, mocked_autograph):
         recipe = RecipeFactory(signed=False, approver=UserFactory())
         recipe.approved_revision.enable(user=UserFactory())
         recipe.refresh_from_db()
 
         assert recipe.signature is not None
-        assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
+        assert recipe.signature.signature == fake_sign([recipe.canonical_json()])[0]['signature']
 
     def test_recipe_revise_partial(self):
         a1 = ActionFactory()
@@ -528,6 +518,19 @@ class TestRecipe(object):
         recipe = RecipeFactory(arguments_json='[]')
         recipe.revise(arguments=[{'id': 1}])
         assert recipe.arguments_json == '[{"id": 1}]'
+
+    def test_enabled_updates_signatures(self, mocked_autograph):
+        recipe = RecipeFactory(name='first')
+        ar = recipe.latest_revision.request_approval(UserFactory())
+        ar.approve(approver=UserFactory(), comment='r+')
+        recipe = Recipe.objects.get()
+        recipe.approved_revision.enable(UserFactory())
+
+        recipe.refresh_from_db()
+        data_to_sign = recipe.canonical_json()
+        signature_of_data = fake_sign([data_to_sign])[0]['signature']
+        signature_in_db = recipe.signature.signature
+        assert signature_of_data == signature_in_db
 
 
 @pytest.mark.django_db
