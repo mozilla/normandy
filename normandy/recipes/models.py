@@ -444,6 +444,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         self.enabled_state = EnabledState.objects.create(revision=self, **kwargs)
         self.save()
 
+        self.recipe.approved_revision.refresh_from_db()
         self.recipe.update_signature()
         self.recipe.save()
 
