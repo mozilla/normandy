@@ -881,6 +881,30 @@ class TestRecipeAPI(object):
             for recipe in results:
                 assert recipe['id'] in [r1.id, r2.id]
 
+        def test_search_works_with_arguments(self, api_client):
+            r1 = RecipeFactory(arguments={"one": 1})
+            r2 = RecipeFactory(arguments={"two": 2})
+
+            res = api_client.get('/api/v3/recipe/?text=one')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r1.id]
+
+            res = api_client.get('/api/v3/recipe/?text=2')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r2.id]
+
+        def test_search_out_of_order(self, api_client):
+            r1 = RecipeFactory(name="apple banana")
+            r2 = RecipeFactory(name="cherry daikon")
+
+            res = api_client.get('/api/v3/recipe/?text=banana apple')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r1.id]
+
+            res = api_client.get('/api/v3/recipe/?text=daikon cherry')
+            assert res.status_code == 200
+            assert [r['id'] for r in res.data['results']] == [r2.id]
+
         def test_list_filter_action_legacy(self, api_client):
             a1 = ActionFactory()
             a2 = ActionFactory()
