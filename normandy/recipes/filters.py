@@ -19,7 +19,7 @@ class BaseFilter(serializers.Serializer):
 
     def to_jexl(self):
         """Render this filter to a JEXL expression"""
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class ChannelFilter(BaseFilter):
