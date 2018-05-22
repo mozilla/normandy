@@ -152,6 +152,7 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
     action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
     identicon_seed = FuzzyIdenticonSeed()
+    comment = FuzzyUnicode()
 
 
 class ApprovalRequestFactory(factory.DjangoModelFactory):

@@ -199,6 +199,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def identicon_seed(self):
         return self.current_revision.identicon_seed
 
+    @current_revision_property()
+    def comment(self):
+        return self.current_revision.comment
+
     @property
     def approval_request(self):
         try:

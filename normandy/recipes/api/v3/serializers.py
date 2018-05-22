@@ -50,7 +50,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
 
 class RecipeRevisionSerializer(serializers.ModelSerializer):
     approval_request = ApprovalRequestSerializer(read_only=True)
-    comment = serializers.CharField(read_only=True)
+    comment = serializers.CharField(required=False)
     date_created = serializers.DateTimeField(source='created', read_only=True)
     recipe = serializers.SerializerMethodField(read_only=True)
     user = UserSerializer()
@@ -95,6 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     latest_revision = RecipeRevisionSerializer(read_only=True)
     name = serializers.CharField()
     identicon_seed = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False)
 
     class Meta:
         model = Recipe
@@ -117,6 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'latest_revision',
             'name',
             'identicon_seed',
+            'comment',
         ]
 
     def __init__(self, *args, **kwargs):
