@@ -461,6 +461,15 @@ class TestRecipeAPI(object):
             r.refresh_from_db()
             assert list(r.channels.all()) == [c2]
 
+        def test_update_recipe_comment(self, api_client):
+            r = RecipeFactory(comment='foo')
+
+            res = api_client.patch(f'/api/v3/recipe/{r.pk}/', {'comment': 'bar'})
+            assert res.status_code == 200
+
+            r.refresh_from_db()
+            assert r.comment == 'bar'
+
     @pytest.mark.django_db
     class TestFilterObjects(object):
         def make_recipe(self, api_client, **kwargs):

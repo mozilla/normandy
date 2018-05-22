@@ -48,6 +48,7 @@ class TestRecipeSerializer:
                 'foo': 'bar',
             },
             'channels': [channel.slug],
+            'comment': recipe.comment,
             'countries': [country.code],
             'locales': [locale.code],
             'is_approved': False,
