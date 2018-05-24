@@ -39,6 +39,7 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 class RecipeFilters(django_filters.FilterSet):
     enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name='latest_revision__action__name')
+    bug_number = django_filters.Filter(field_name='latest_revision__bug_number')
 
     class Meta:
         model = Recipe
@@ -46,6 +47,7 @@ class RecipeFilters(django_filters.FilterSet):
             'action',
             'enabled',
             'latest_revision__action',
+            'bug_number',
         ]
 
 
