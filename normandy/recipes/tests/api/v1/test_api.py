@@ -7,10 +7,8 @@ from django.test.utils import CaptureQueriesContext
 import pytest
 from rest_framework.reverse import reverse
 
-from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
-from normandy.base.utils import aware_datetime, canonical_json_dumps
-from normandy.recipes.models import ApprovalRequest, Recipe
+from normandy.base.utils import aware_datetime
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -19,7 +17,6 @@ from normandy.recipes.tests import (
     LocaleFactory,
     RecipeFactory,
     RecipeRevisionFactory,
-    fake_sign,
 )
 
 
@@ -201,16 +198,6 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data == []
 
-        def test_readonly_if_admin_disabled(self, api_client, settings):
-            settings.ADMIN_ENABLED = False
-            res = api_client.get('/api/v1/recipe/')
-            assert res.status_code == 200
-
-            recipe = RecipeFactory(name='unchanged')
-            res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'name': 'changed'})
-            assert res.status_code == 403
-            assert res.data['detail'] == AdminEnabledOrReadOnly.message
-
         def test_list_view_includes_cache_headers(self, api_client):
             res = api_client.get('/api/v1/recipe/')
             assert res.status_code == 200
@@ -222,206 +209,6 @@ class TestRecipeAPI(object):
             res = api_client.get('/api/v1/recipe/')
             assert res.status_code == 200
             assert 'Cookies' not in res
-
-    @pytest.mark.django_db
-    class TestCreation(object):
-        def test_it_can_create_recipes(self, api_client):
-            action = ActionFactory()
-
-            # Enabled recipe
-            res = api_client.post('/api/v1/recipe/', {
-                'name': 'Test Recipe',
-                'action': action.name,
-                'arguments': {},
-                'extra_filter_expression': 'whatever',
-                'enabled': True
-            })
-            assert res.status_code == 201
-
-            recipes = Recipe.objects.all()
-            assert recipes.count() == 1
-
-        def test_it_can_create_recipes_actions_without_implementation(self, api_client):
-            action = ActionFactory(implementation=None)
-
-            # Enabled recipe
-            res = api_client.post('/api/v1/recipe/', {
-                'name': 'Test Recipe',
-                'action': action.name,
-                'arguments': {},
-                'extra_filter_expression': 'whatever',
-                'enabled': True
-            })
-            assert res.status_code == 201
-
-            recipe, = Recipe.objects.all()
-            assert recipe.action.implementation is None
-
-        def test_it_can_create_disabled_recipes(self, api_client):
-            action = ActionFactory()
-
-            # Disabled recipe
-            res = api_client.post('/api/v1/recipe/', {
-                'name': 'Test Recipe',
-                'action': action.name,
-                'arguments': {},
-                'extra_filter_expression': 'whatever',
-                'enabled': False
-            })
-            assert res.status_code == 201
-
-            recipes = Recipe.objects.all()
-            assert recipes.count() == 1
-
-        def test_creation_when_action_does_not_exist(self, api_client):
-            res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
-                                                      'action': 'fake-action',
-                                                      'arguments': '{}'})
-            assert res.status_code == 400
-
-            recipes = Recipe.objects.all()
-            assert recipes.count() == 0
-
-        def test_creation_when_arguments_are_invalid(self, api_client):
-            ActionFactory(
-                name='foobarbaz',
-                arguments_schema={
-                    'type': 'object',
-                    'properties': {'message': {'type': 'string'}},
-                    'required': ['message']
-                }
-            )
-            res = api_client.post('/api/v1/recipe/', {'name': 'Test Recipe',
-                                                      'enabled': True,
-                                                      'extra_filter_expression': 'true',
-                                                      'action': 'foobarbaz',
-                                                      'arguments': {'message': ''}})
-            assert res.status_code == 400
-
-            recipes = Recipe.objects.all()
-            assert recipes.count() == 0
-
-        def test_creation_when_arguments_is_a_string(self, api_client):
-            action = ActionFactory(
-                name='foobarbaz',
-                arguments_schema={
-                    'type': 'object',
-                    'properties': {'message': {'type': 'string'}},
-                    'required': ['message']
-                }
-            )
-            data = {
-                'name': 'Test Recipe',
-                'enabled': True,
-                'extra_filter_expression': 'true',
-                'action': action.name,
-                'arguments': '{"message": "the message"}'
-            }
-            res = api_client.post('/api/v1/recipe/', data)
-            assert res.status_code == 400
-            assert res.data == {'arguments': ['Must be an object.']}
-
-            recipes = Recipe.objects.all()
-            assert recipes.count() == 0
-
-    @pytest.mark.django_db
-    class TestUpdates(object):
-        def test_it_can_edit_recipes(self, api_client):
-            recipe = RecipeFactory(name='unchanged', extra_filter_expression='true')
-            old_revision_id = recipe.revision_id
-
-            res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {
-                'name': 'changed',
-                'extra_filter_expression': 'false',
-            })
-            assert res.status_code == 200
-
-            recipe = Recipe.objects.all()[0]
-            assert recipe.name == 'changed'
-            assert recipe.filter_expression == 'false'
-            assert recipe.revision_id != old_revision_id
-
-        def test_it_can_change_action_for_recipes(self, api_client):
-            recipe = RecipeFactory()
-            action = ActionFactory()
-
-            res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {'action': action.name})
-            assert res.status_code == 200
-
-            recipe = Recipe.objects.get(pk=recipe.id)
-            assert recipe.action == action
-
-        def test_it_can_change_arguments_for_recipes(self, api_client):
-            recipe = RecipeFactory(arguments_json='{}')
-            action = ActionFactory(
-                name='foobarbaz',
-                arguments_schema={
-                    'type': 'object',
-                    'properties': {'message': {'type': 'string'}},
-                    'required': ['message']
-                }
-            )
-
-            arguments = {'message': 'test message'}
-
-            res = api_client.patch('/api/v1/recipe/%s/' % recipe.id, {
-                'action': action.name, 'arguments': arguments})
-            assert res.status_code == 200
-
-            recipe = Recipe.objects.get(pk=recipe.id)
-            assert recipe.arguments == arguments
-
-        def test_it_can_delete_recipes(self, api_client):
-            recipe = RecipeFactory()
-
-            res = api_client.delete('/api/v1/recipe/%s/' % recipe.id)
-            assert res.status_code == 204
-
-            recipes = Recipe.objects.all()
-            assert recipes.count() == 0
-
-        def test_update_recipe_action(self, api_client):
-            r = RecipeFactory()
-            a = ActionFactory(name='test')
-
-            res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'action': 'test'})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert r.action == a
-
-        def test_update_recipe_locale(self, api_client):
-            l1 = LocaleFactory(code='fr-FR')
-            l2 = LocaleFactory(code='en-US')
-            r = RecipeFactory(locales=[l1])
-
-            res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'locales': ['en-US']})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert list(r.locales.all()) == [l2]
-
-        def test_update_recipe_country(self, api_client):
-            c1 = CountryFactory(code='US')
-            c2 = CountryFactory(code='CA')
-            r = RecipeFactory(countries=[c1])
-
-            res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'countries': ['CA']})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert list(r.countries.all()) == [c2]
-
-        def test_update_recipe_channel(self, api_client):
-            c1 = ChannelFactory(slug='release')
-            c2 = ChannelFactory(slug='beta')
-            r = RecipeFactory(channels=[c1])
-
-            res = api_client.patch(f'/api/v1/recipe/{r.pk}/', {'channels': ['beta']})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert list(r.channels.all()) == [c2]
 
     @pytest.mark.django_db
     class TestDetail(object):
@@ -443,40 +230,6 @@ class TestRecipeAPI(object):
             assert res.data[0]['recipe']['name'] == 'version 3'
             assert res.data[1]['recipe']['name'] == 'version 2'
             assert res.data[2]['recipe']['name'] == 'version 1'
-
-        def test_it_can_enable_recipes(self, api_client):
-            recipe = RecipeFactory(approver=UserFactory())
-
-            res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-            assert res.status_code == 200
-            assert res.data['enabled'] is True
-
-            recipe = Recipe.objects.all()[0]
-            assert recipe.enabled
-
-        def test_cannot_enable_unapproved_recipes(self, api_client):
-            recipe = RecipeFactory()
-
-            res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-            assert res.status_code == 409
-            assert res.data['error'] == 'Cannot enable a recipe that is not approved.'
-
-        def test_cannot_enable_enabled_recipes(self, api_client):
-            recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
-
-            res = api_client.post('/api/v1/recipe/%s/enable/' % recipe.id)
-            assert res.status_code == 409
-            assert res.data['error'] == 'This revision is already enabled.'
-
-        def test_it_can_disable_recipes(self, api_client):
-            recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
-
-            res = api_client.post('/api/v1/recipe/%s/disable/' % recipe.id)
-            assert res.status_code == 200
-            assert res.data['enabled'] is False
-
-            recipe = Recipe.objects.all()[0]
-            assert not recipe.enabled
 
         def test_detail_sets_no_cookies(self, api_client):
             recipe = RecipeFactory()
@@ -689,20 +442,6 @@ class TestRecipeRevisionAPI(object):
         assert res.status_code == 200
         assert res.data['id'] == recipe.latest_revision.id
 
-    def test_request_approval(self, api_client):
-        recipe = RecipeFactory()
-        res = api_client.post(
-            '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
-        assert res.status_code == 201
-        assert res.data['id'] == recipe.latest_revision.approval_request.id
-
-    def test_cannot_open_second_approval_request(self, api_client):
-        recipe = RecipeFactory()
-        ApprovalRequestFactory(revision=recipe.latest_revision)
-        res = api_client.post(
-            '/api/v1/recipe_revision/{}/request_approval/'.format(recipe.latest_revision.id))
-        assert res.status_code == 400
-
 
 @pytest.mark.django_db
 class TestApprovalRequestAPI(object):
@@ -710,71 +449,6 @@ class TestApprovalRequestAPI(object):
         res = api_client.get('/api/v1/approval_request/')
         assert res.status_code == 200
         assert res.data == []
-
-    def test_approve(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id),
-                              {'comment': 'r+'})
-        assert res.status_code == 200
-
-        r.refresh_from_db()
-        assert r.is_approved
-        assert r.approved_revision.approval_request.comment == 'r+'
-
-    def test_approve_no_comment(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id))
-        assert res.status_code == 400
-        assert res.data['comment'] == 'This field is required.'
-
-    def test_approve_not_actionable(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        a.approve(UserFactory(), 'r+')
-
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(a.id),
-                              {'comment': 'r+'})
-        assert res.status_code == 400
-        assert res.data['error'] == 'This approval request has already been approved or rejected.'
-
-    def test_reject(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id),
-                              {'comment': 'r-'})
-        assert res.status_code == 200
-
-        r.latest_revision.approval_request.refresh_from_db()
-        assert r.latest_revision.approval_status == r.latest_revision.REJECTED
-        assert r.latest_revision.approval_request.comment == 'r-'
-
-    def test_reject_no_comment(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id))
-        assert res.status_code == 400
-        assert res.data['comment'] == 'This field is required.'
-
-    def test_reject_not_actionable(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        a.approve(UserFactory(), 'r+')
-
-        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(a.id),
-                              {'comment': '-r'})
-        assert res.status_code == 400
-        assert res.data['error'] == 'This approval request has already been approved or rejected.'
-
-    def test_close(self, api_client):
-        r = RecipeFactory()
-        a = ApprovalRequestFactory(revision=r.latest_revision)
-        res = api_client.post('/api/v1/approval_request/{}/close/'.format(a.id))
-        assert res.status_code == 204
-
-        with pytest.raises(ApprovalRequest.DoesNotExist):
-            ApprovalRequest.objects.get(pk=a.pk)
 
 
 @pytest.mark.django_db
@@ -805,188 +479,6 @@ class TestClassifyClient(object):
         res = api_client.get('/api/v1/classify_client/')
         assert res.status_code == 200
         assert res.client.cookies == {}
-
-
-@pytest.mark.django_db
-class TestApprovalFlow(object):
-
-    def verify_signatures(self, api_client, expected_count=None):
-        res = api_client.get('/api/v1/recipe/signed/')
-        assert res.status_code == 200
-        signed_data = res.json()
-
-        if expected_count is not None:
-            assert len(signed_data) == expected_count
-
-        for recipe_and_signature in signed_data:
-            recipe = recipe_and_signature['recipe']
-            expected_signature = recipe_and_signature['signature']['signature']
-            data = canonical_json_dumps(recipe).encode()
-            actual_signature = fake_sign([data])[0]['signature']
-            assert actual_signature == expected_signature
-
-    def test_full_approval_flow(self, settings, api_client, mocked_autograph):
-        settings.PEER_APPROVAL_ENFORCED = True
-
-        action = ActionFactory()
-        user1 = UserFactory(is_superuser=True)
-        user2 = UserFactory(is_superuser=True)
-        api_client.force_authenticate(user1)
-
-        # Create a recipe
-        res = api_client.post('/api/v1/recipe/', {
-            'action': action.name,
-            'arguments': {},
-            'name': 'test recipe',
-            'extra_filter_expression': 'counter == 0',
-            'enabled': 'false',
-        })
-        assert res.status_code == 201
-        recipe_data_0 = res.json()
-
-        # Request approval for it
-        res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                              .format(recipe_data_0['revision_id']))
-        approval_data = res.json()
-        assert res.status_code == 201
-
-        # The requester isn't allowed to approve a recipe
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                              {'comment': 'r+'})
-        assert res.status_code == 403  # Forbidden
-
-        # Approve the recipe
-        api_client.force_authenticate(user2)
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                              {'comment': 'r+'})
-        assert res.status_code == 200
-
-        # It is now visible in the API
-        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_0['id']))
-        assert res.status_code == 200
-        recipe_data_1 = res.json()
-        self.verify_signatures(api_client, expected_count=1)
-
-        # Make another change
-        api_client.force_authenticate(user1)
-        res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
-            'extra_filter_expression': 'counter == 1',
-        })
-        assert res.status_code == 200
-
-        # The change should not be visible yet, since it isn't approved
-        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-        assert res.status_code == 200
-        recipe_data_2 = res.json()
-        assert recipe_data_2['extra_filter_expression'] == 'counter == 0'
-        self.verify_signatures(api_client, expected_count=1)
-
-        # Request approval for the change
-        res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                              .format(recipe_data_2['latest_revision_id']))
-        approval_data = res.json()
-        recipe_data_2['approval_request'] = approval_data
-        assert res.status_code == 201
-
-        # The change should not be visible yet, since it isn't approved
-        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-        assert res.status_code == 200
-        assert res.json() == recipe_data_2
-        self.verify_signatures(api_client, expected_count=1)
-
-        # Reject the change
-        api_client.force_authenticate(user2)
-        res = api_client.post('/api/v1/approval_request/{}/reject/'.format(approval_data['id']),
-                              {'comment': 'r-'})
-        approval_data = res.json()
-        recipe_data_2['approval_request'] = approval_data
-        assert res.status_code == 200
-
-        # The change should not be visible yet, since it isn't approved
-        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-        assert res.status_code == 200
-        assert res.json() == recipe_data_2
-        self.verify_signatures(api_client, expected_count=1)
-
-        # Make a third version of the recipe
-        api_client.force_authenticate(user1)
-        res = api_client.patch('/api/v1/recipe/{}/'.format(recipe_data_1['id']), {
-            'extra_filter_expression': 'counter == 2',
-        })
-        recipe_data_3 = res.json()
-        assert res.status_code == 200
-
-        # Request approval
-        res = api_client.post('/api/v1/recipe_revision/{}/request_approval/'
-                              .format(recipe_data_3['latest_revision_id']))
-        approval_data = res.json()
-        assert res.status_code == 201
-
-        # Approve the change
-        api_client.force_authenticate(user2)
-        res = api_client.post('/api/v1/approval_request/{}/approve/'.format(approval_data['id']),
-                              {'comment': 'r+'})
-        assert res.status_code == 200
-
-        # The change should be visible now, since it is approved
-        res = api_client.get('/api/v1/recipe/{}/'.format(recipe_data_1['id']))
-        assert res.status_code == 200
-        recipe_data_4 = res.json()
-        assert recipe_data_4['extra_filter_expression'] == 'counter == 2'
-        assert recipe_data_4['latest_revision_id'] == recipe_data_4['revision_id']
-        self.verify_signatures(api_client, expected_count=1)
-
-    def test_cancel_approval(self, api_client, mocked_autograph):
-        action = ActionFactory()
-        user1 = UserFactory(is_superuser=True)
-        user2 = UserFactory(is_superuser=True)
-        api_client.force_authenticate(user1)
-
-        # Create a recipe
-        res = api_client.post('/api/v1/recipe/', {
-            'action': action.name,
-            'arguments': {},
-            'name': 'test recipe',
-            'extra_filter_expression': 'counter == 0',
-            'enabled': 'false',
-        })
-        assert res.status_code == 201
-        recipe_id = res.json()['id']
-        revision_id = res.json()['latest_revision_id']
-
-        # Request approval
-        res = api_client.post(f'/api/v1/recipe_revision/{revision_id}/request_approval/')
-        assert res.status_code == 201
-        approval_request_id = res.json()['id']
-
-        # Approve the recipe
-        api_client.force_authenticate(user2)
-        res = api_client.post(
-            f'/api/v1/approval_request/{approval_request_id}/approve/',
-            {'comment': 'r+'}
-        )
-        assert res.status_code == 200
-
-        # Make another change
-        api_client.force_authenticate(user1)
-        res = api_client.patch(
-            f'/api/v1/recipe/{recipe_id}/',
-            {'extra_filter_expression': 'counter == 1'}
-        )
-        assert res.status_code == 200
-        revision_id = res.json()['latest_revision_id']
-
-        # Request approval for the second change
-        res = api_client.post(f'/api/v1/recipe_revision/{revision_id}/request_approval/')
-        approval_request_id = res.json()['id']
-        assert res.status_code == 201
-
-        # Cancel the approval request
-        res = api_client.post(f'/api/v1/approval_request/{approval_request_id}/close/')
-        assert res.status_code == 204
-
-        # The API should still have correct signatures
-        self.verify_signatures(api_client, expected_count=1)
 
 
 @pytest.mark.django_db

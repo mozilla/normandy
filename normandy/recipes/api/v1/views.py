@@ -3,12 +3,11 @@ from django.db import transaction
 from django.db.models import Q
 
 import django_filters
-from rest_framework import generics, permissions, status, views, viewsets
+from rest_framework import generics, permissions, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
-from normandy.base.api import UpdateOrCreateModelViewSet
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
@@ -19,7 +18,6 @@ from normandy.recipes.models import (
     Channel,
     Client,
     Country,
-    EnabledState,
     Locale,
     Recipe,
     RecipeRevision
@@ -87,7 +85,7 @@ class RecipeFilters(django_filters.FilterSet):
         ]
 
 
-class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
+class RecipeViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     """Viewset for viewing and uploading recipes."""
     queryset = (
         Recipe.objects.all()
@@ -158,33 +156,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
                                               context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=True, methods=['POST'])
-    def enable(self, request, pk=None):
-        recipe = self.get_object()
-
-        if recipe.approved_revision:
-            try:
-                recipe.approved_revision.enable(user=request.user)
-            except EnabledState.NotActionable as e:
-                return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
-        else:
-            return Response({'error': 'Cannot enable a recipe that is not approved.'},
-                            status=status.HTTP_409_CONFLICT)
-
-        return Response(RecipeSerializer(recipe).data)
-
-    @action(detail=True, methods=['POST'])
-    def disable(self, request, pk=None):
-        recipe = self.get_object()
-
-        if recipe.enabled:
-            try:
-                recipe.approved_revision.disable(user=request.user)
-            except EnabledState.NotActionable as e:
-                return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
-
-        return Response(RecipeSerializer(recipe).data)
-
 
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
@@ -204,19 +175,6 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     pagination_class = None
 
-    @action(detail=True, methods=['POST'])
-    def request_approval(self, request, pk=None):
-        revision = self.get_object()
-
-        if revision.approval_status is not None:
-            return Response({'error': 'This revision already has an approval request.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        approval_request = revision.request_approval(creator=request.user)
-
-        return Response(ApprovalRequestSerializer(approval_request).data,
-                        status=status.HTTP_201_CREATED)
-
 
 class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ApprovalRequest.objects.all()
@@ -226,54 +184,6 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         permissions.DjangoModelPermissionsOrAnonReadOnly,
     ]
     pagination_class = None
-
-    @action(detail=True, methods=['POST'])
-    def approve(self, request, pk=None):
-        approval_request = self.get_object()
-
-        if 'comment' not in request.data:
-            return Response({'comment': 'This field is required.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            approval_request.approve(approver=request.user, comment=request.data.get('comment'))
-        except ApprovalRequest.NotActionable:
-            return Response(
-                {'error': 'This approval request has already been approved or rejected.'},
-                status=status.HTTP_400_BAD_REQUEST)
-        except ApprovalRequest.CannotActOnOwnRequest:
-            return Response(
-                {'error': 'You cannot approve your own approval request.'},
-                status=status.HTTP_403_FORBIDDEN)
-
-        return Response(ApprovalRequestSerializer(approval_request).data)
-
-    @action(detail=True, methods=['POST'])
-    def reject(self, request, pk=None):
-        approval_request = self.get_object()
-
-        if 'comment' not in request.data:
-            return Response({'comment': 'This field is required.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            approval_request.reject(approver=request.user, comment=request.data.get('comment'))
-        except ApprovalRequest.NotActionable:
-            return Response(
-                {'error': 'This approval request has already been approved or rejected.'},
-                status=status.HTTP_400_BAD_REQUEST)
-        except ApprovalRequest.CannotActOnOwnRequest:
-            return Response(
-                {'error': 'You cannot reject your own approval request.'},
-                status=status.HTTP_403_FORBIDDEN)
-
-        return Response(ApprovalRequestSerializer(approval_request).data)
-
-    @action(detail=True, methods=['POST'])
-    def close(self, request, pk=None):
-        approval_request = self.get_object()
-        approval_request.close()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ClassifyClient(views.APIView):
