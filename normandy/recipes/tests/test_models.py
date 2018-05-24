@@ -112,77 +112,99 @@ class TestValidateArgumentPreferenceExperiments(object):
         # does not raise an exception
         action.validate_arguments({})
 
-    def test_preference_experiments_no_errors(self):
-        action = ActionFactory(name='preference-experiment')
-        arguments = {
-            'slug': 'a', 'branches': [
-                {'slug': 'a', 'value': 'a'},
-                {'slug': 'b', 'value': 'b'},
-            ]
-        }
-        # does not throw when saving the revision
-        RecipeFactory(action=action, arguments=arguments)
-
-    def test_preference_exeriments_unique_branch_slugs(self):
-        action = ActionFactory(name='preference-experiment')
-        arguments = {
-            'slug': 'test',
-            'branches': [
-                {'slug': 'unique', 'value': 'a'},
-                {'slug': 'duplicate', 'value': 'b'},
-                {'slug': 'duplicate', 'value': 'c'}
-            ]
-        }
-        with pytest.raises(serializers.ValidationError) as exc_info:
-            action.validate_arguments(arguments)
-        error = action.errors['duplicate_branch_slug']
-        assert exc_info.value.detail == {'arguments': {'branches': {2: {'slug': error}}}}
-
-    def test_preference_exeriments_unique_branch_values(self):
-        action = ActionFactory(name='preference-experiment')
-        arguments = {
-            'slug': 'test',
-            'branches': [
-                {'slug': 'a', 'value': 'unique'},
-                {'slug': 'b', 'value': 'duplicate'},
-                {'slug': 'c', 'value': 'duplicate'}
-            ]
-        }
-        with pytest.raises(serializers.ValidationError) as exc_info:
-            action.validate_arguments(arguments)
-        error = action.errors['duplicate_branch_value']
-        assert exc_info.value.detail == {'arguments': {'branches': {2: {'value': error}}}}
-
-    def test_preference_experiments_unique_experiment_slug_no_collision(self):
-        action = ActionFactory(name='preference-experiment')
-        arguments_a = {'slug': 'a', 'branches': []}
-        arguments_b = {'slug': 'b', 'branches': []}
-        # Does not throw when saving revisions
-        RecipeFactory(action=action, arguments=arguments_a)
-        RecipeFactory(action=action, arguments=arguments_b)
-
-    def test_preference_experiments_unique_experiment_slug_new_collision(self):
-        action = ActionFactory(name='preference-experiment')
-        arguments = {'slug': 'a', 'branches': []}
-        RecipeFactory(action=action, arguments=arguments)
-
-        with pytest.raises(serializers.ValidationError) as exc_info1:
+    @pytest.mark.django_db
+    class TestPreferenceExperiments(object):
+        def test_no_errors(self):
+            action = ActionFactory(name='preference-experiment')
+            arguments = {
+                'slug': 'a', 'branches': [
+                    {'slug': 'a', 'value': 'a'},
+                    {'slug': 'b', 'value': 'b'},
+                ]
+            }
+            # does not throw when saving the revision
             RecipeFactory(action=action, arguments=arguments)
-        error = action.errors['duplicate_experiment_slug']
-        assert exc_info1.value.detail == {'arguments': {'slug': error}}
 
-    def test_preference_experiments_unique_experiment_slug_update_collision(self):
-        action = ActionFactory(name='preference-experiment')
-        arguments_a = {'slug': 'a', 'branches': []}
-        arguments_b = {'slug': 'b', 'branches': []}
-        # Does not throw when saving revisions
-        RecipeFactory(action=action, arguments=arguments_a)
-        recipe = RecipeFactory(action=action, arguments=arguments_b)
+        def test_preference_exeriments_unique_branch_slugs(self):
+            action = ActionFactory(name='preference-experiment')
+            arguments = {
+                'slug': 'test',
+                'branches': [
+                    {'slug': 'unique', 'value': 'a'},
+                    {'slug': 'duplicate', 'value': 'b'},
+                    {'slug': 'duplicate', 'value': 'c'}
+                ]
+            }
+            with pytest.raises(serializers.ValidationError) as exc_info:
+                action.validate_arguments(arguments)
+            error = action.errors['duplicate_branch_slug']
+            assert exc_info.value.detail == {'arguments': {'branches': {2: {'slug': error}}}}
 
-        with pytest.raises(serializers.ValidationError) as exc_info1:
-            recipe.revise(arguments=arguments_a)
-        error = action.errors['duplicate_experiment_slug']
-        assert exc_info1.value.detail == {'arguments': {'slug': error}}
+        def test_preference_exeriments_unique_branch_values(self):
+            action = ActionFactory(name='preference-experiment')
+            arguments = {
+                'slug': 'test',
+                'branches': [
+                    {'slug': 'a', 'value': 'unique'},
+                    {'slug': 'b', 'value': 'duplicate'},
+                    {'slug': 'c', 'value': 'duplicate'}
+                ]
+            }
+            with pytest.raises(serializers.ValidationError) as exc_info:
+                action.validate_arguments(arguments)
+            error = action.errors['duplicate_branch_value']
+            assert exc_info.value.detail == {'arguments': {'branches': {2: {'value': error}}}}
+
+        def test_unique_experiment_slug_no_collision(self):
+            action = ActionFactory(name='preference-experiment')
+            arguments_a = {'slug': 'a', 'branches': []}
+            arguments_b = {'slug': 'b', 'branches': []}
+            # Does not throw when saving revisions
+            RecipeFactory(action=action, arguments=arguments_a)
+            RecipeFactory(action=action, arguments=arguments_b)
+
+        def test_unique_experiment_slug_new_collision(self):
+            action = ActionFactory(name='preference-experiment')
+            arguments = {'slug': 'a', 'branches': []}
+            RecipeFactory(action=action, arguments=arguments)
+
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                RecipeFactory(action=action, arguments=arguments)
+            error = action.errors['duplicate_experiment_slug']
+            assert exc_info1.value.detail == {'arguments': {'slug': error}}
+
+        def test_unique_experiment_slug_update_collision(self):
+            action = ActionFactory(name='preference-experiment')
+            arguments_a = {'slug': 'a', 'branches': []}
+            arguments_b = {'slug': 'b', 'branches': []}
+            # Does not throw when saving revisions
+            RecipeFactory(action=action, arguments=arguments_a)
+            recipe = RecipeFactory(action=action, arguments=arguments_b)
+
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                recipe.revise(arguments=arguments_a)
+            error = action.errors['duplicate_experiment_slug']
+            assert exc_info1.value.detail == {'arguments': {'slug': error}}
+
+    @pytest.mark.django_db
+    class TestPreferenceRollback(object):
+        def test_no_errors(self):
+            rollback_action = ActionFactory(name='preference-rollback')
+            rollout_action = ActionFactory(name='preference-rollout')
+            rollout_recipe = RecipeFactory(
+                action=rollout_action, arguments={'slug': 'test-rollout'})
+
+            # does not throw when saving the revision
+            arguments = {'rolloutSlug': rollout_recipe.arguments['slug']}
+            RecipeFactory(action=rollback_action, arguments=arguments)
+
+        def test_slug_must_match_a_rollout(self):
+            rollback_action = ActionFactory(name='preference-rollback')
+            arguments = {'rolloutSlug': 'does-not-exist'}
+            with pytest.raises(serializers.ValidationError) as exc_info:
+                RecipeFactory(action=rollback_action, arguments=arguments)
+            error = rollback_action.errors['rollout_slug_not_found']
+            assert exc_info.value.detail == {'arguments': {'slug': error}}
 
 
 @pytest.mark.django_db

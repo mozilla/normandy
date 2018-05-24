@@ -611,15 +611,10 @@ class Action(DirtyFieldsMixin, models.Model):
     )
 
     errors = {
-        'duplicate_branch_slug': (
-            'Feature branch slugs must be unique within an experiment'
-        ),
-        'duplicate_branch_value': (
-            'Feature branch values must be unique within an experiment'
-        ),
-        'duplicate_experiment_slug': (
-            'Experiment slugs must be globally unique'
-        ),
+        'duplicate_branch_slug': 'Feature branch slugs must be unique within an experiment',
+        'duplicate_branch_value': 'Feature branch values must be unique within an experiment',
+        'duplicate_experiment_slug': 'Experiment slugs must be globally unique',
+        'rollout_slug_not_found': 'Rollout slug not found for rollback',
     }
 
     @property
@@ -711,12 +706,12 @@ class Action(DirtyFieldsMixin, models.Model):
 
         Raises `ValidationError` if any rules are violated.
         """
-        if self.name == 'preference-experiment':
-            # Make a default dict that always returns a default dict
-            def default():
-                return defaultdict(default)
-            errors = default()
+        # Make a default dict that always returns a default dict
+        def default():
+            return defaultdict(default)
+        errors = default()
 
+        if self.name == 'preference-experiment':
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
             branch_values = set()
@@ -742,9 +737,15 @@ class Action(DirtyFieldsMixin, models.Model):
                 msg = self.errors['duplicate_experiment_slug']
                 errors['slug'] = msg
 
-            # Raise errors, if any
-            if errors:
-                raise serializers.ValidationError({'arguments': errors})
+        elif self.name == 'preference-rollback':
+            rollouts = Recipe.objects.filter(latest_revision__action__name='preference-rollout')
+            rollout_slugs = set(r.arguments['slug'] for r in rollouts)
+            if arguments['rolloutSlug'] not in rollout_slugs:
+                errors['slug'] = self.errors['rollout_slug_not_found']
+
+        # Raise errors, if any
+        if errors:
+            raise serializers.ValidationError({'arguments': errors})
 
 
 class Client(object):
