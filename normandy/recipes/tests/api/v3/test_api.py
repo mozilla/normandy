@@ -335,6 +335,22 @@ class TestRecipeAPI(object):
                 ],
             }
 
+        def test_with_bug_number(self, api_client):
+            action = ActionFactory()
+
+            res = api_client.post('/api/v3/recipe/', {
+                'name': 'Test Recipe',
+                'action_id': action.id,
+                'arguments': {},
+                'extra_filter_expression': 'whatever',
+                'enabled': True,
+                'bug_number': 42,
+            })
+            assert res.status_code == 201, res.json()
+
+            recipe = Recipe.objects.get()
+            assert recipe.bug_number == 42
+
     @pytest.mark.django_db
     class TestUpdates(object):
         def test_it_can_edit_recipes(self, api_client):
@@ -469,6 +485,15 @@ class TestRecipeAPI(object):
 
             r.refresh_from_db()
             assert r.comment == 'bar'
+
+        def test_update_recipe_bug(self, api_client):
+            r = RecipeFactory()
+
+            res = api_client.patch(f'/api/v3/recipe/{r.pk}/', {'bug_number': 42})
+            assert res.status_code == 200
+
+            r.refresh_from_db()
+            assert r.bug_number == 42
 
     @pytest.mark.django_db
     class TestFilterObjects(object):
@@ -955,6 +980,17 @@ class TestRecipeAPI(object):
             res = api_client.get('/api/v3/recipe/?action=nonexistant')
             assert res.status_code == 200
             assert res.data['count'] == 0
+
+        def test_filter_by_bug_number(self, api_client):
+            RecipeFactory()
+            match1 = RecipeFactory(bug_number=1)
+            match2 = RecipeFactory(bug_number=1)
+            RecipeFactory(bug_number=2)
+
+            res = api_client.get('/api/v3/recipe/?bug_number=1')
+            assert res.status_code == 200
+            assert res.data['count'] == 2
+            assert set(r['id'] for r in res.data['results']) == set([match1.id, match2.id])
 
         def test_order_last_updated(self, api_client):
             now = datetime.now()

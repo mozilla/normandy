@@ -96,6 +96,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     identicon_seed = serializers.CharField(required=False)
     comment = serializers.CharField(required=False)
+    bug_number = serializers.IntegerField(required=False)
 
     class Meta:
         model = Recipe
@@ -119,6 +120,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name',
             'identicon_seed',
             'comment',
+            'bug_number',
         ]
 
     def __init__(self, *args, **kwargs):

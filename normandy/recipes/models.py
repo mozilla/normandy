@@ -203,6 +203,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def comment(self):
         return self.current_revision.comment
 
+    @current_revision_property()
+    def bug_number(self):
+        return self.current_revision.bug_number
+
     @property
     def approval_request(self):
         try:
@@ -317,6 +321,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     REJECTED = 'rejected'
     PENDING = 'pending'
 
+    # Bookkeeping fields
     parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
                                   related_name='child')
     recipe = models.ForeignKey(Recipe, related_name='revisions', on_delete=models.CASCADE)
@@ -324,8 +329,8 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     updated = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='recipe_revisions',
                              null=True)
-    comment = models.TextField()
 
+    # Recipe fields
     name = models.CharField(max_length=255)
     action = models.ForeignKey('Action', related_name='recipe_revisions', on_delete=models.CASCADE)
     arguments_json = models.TextField(default='{}', validators=[validate_json])
@@ -337,6 +342,8 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     identicon_seed = IdenticonSeedField(max_length=64)
     enabled_state = models.ForeignKey('EnabledState', null=True, on_delete=models.SET_NULL,
                                       related_name='current_for_revision')
+    comment = models.TextField()
+    bug_number = models.IntegerField(null=True)
 
     class Meta:
         ordering = ('-created',)
@@ -348,10 +355,13 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             'action': self.action,
             'arguments_json': self.arguments_json,
             'extra_filter_expression': self.extra_filter_expression,
+            'filter_object_json': self.filter_object_json,
             'channels': list(self.channels.all()) if self.id else [],
             'countries': list(self.countries.all()) if self.id else [],
             'locales': list(self.locales.all()) if self.id else [],
             'identicon_seed': self.identicon_seed,
+            'comment': self.comment,
+            'bug_number': self.bug_number,
         }
 
     @property

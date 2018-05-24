@@ -25,7 +25,7 @@ class TestRecipeSerializer:
         country = CountryFactory()
         locale = LocaleFactory()
         recipe = RecipeFactory(arguments={'foo': 'bar'}, channels=[channel], countries=[country],
-                               locales=[locale])
+                               locales=[locale], bug_number=1436113)
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={'request': rf.get('/')})
@@ -63,6 +63,7 @@ class TestRecipeSerializer:
                 'comment': None,
             },
             'identicon_seed': Whatever.startswith('v1:'),
+            'bug_number': 1436113,
         }
 
     def test_validation_with_invalid_action(self):
@@ -195,7 +196,8 @@ class TestRecipeSerializer:
                     {'title': 'adipscing', 'weight': 1},
                     {'title': 'consequetar', 'weight': 1}
                 ]
-            }
+            },
+            'bug_number': 1436113,
         })
 
         assert serializer.is_valid()
@@ -213,6 +215,7 @@ class TestRecipeSerializer:
             'channels': [channel],
             'countries': [country],
             'locales': [locale],
+            'bug_number': 1436113,
         }
         assert serializer.errors == {}
 
