@@ -56,6 +56,28 @@ class TestBearerTokenAuthentication(object):
         assert res.status_code == 201
         assert Recipe.objects.count() == 1
 
+    def test_bad_access_token(self, settings, requestsmock):
+        client = APIClient()
+        action = ActionFactory()
+
+        requestsmock.get(
+            settings.OIDC_USER_ENDPOINT,
+            status_code=401,
+        )
+
+        recipe_data = {
+            'name': 'Test Recipe',
+            'action_id': action.id,
+            'arguments': {},
+            'extra_filter_expression': 'whatever',
+            'enabled': True
+        }
+        res = client.post('/api/v3/recipe/', recipe_data,
+                          HTTP_AUTHORIZATION='Bearer invalid')
+
+        assert res.status_code == 401
+        assert Recipe.objects.count() == 0
+
 
 @pytest.mark.django_db
 class TestActionAPI(object):
