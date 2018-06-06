@@ -48,7 +48,7 @@ class TestBearerTokenAuthentication(object):
     @pytest.fixture
     def mock_oidc(self, settings, requestsmock):
         def fn(user=None, **kwargs):
-            if user:  # If content kwarg is not empty this user will be ignored
+            if user:
                 user_profile = {
                     'email': user.email,
                     'given_name': user.first_name,
