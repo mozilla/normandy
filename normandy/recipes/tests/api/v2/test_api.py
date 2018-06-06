@@ -1,5 +1,3 @@
-import json
-
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -9,7 +7,6 @@ from django.test.utils import CaptureQueriesContext
 import pytest
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 from pathlib import Path
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
@@ -164,32 +161,6 @@ class TestRecipeAPI(object):
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 1
-
-        def test_it_works_for_post(self, settings, requestsmock):
-            client = APIClient()
-            action = ActionFactory()
-
-            user_profile = {
-                'email': 'user@domain.com',
-                'given_name': 'John',
-                'family_name': 'Doe',
-            }
-            requestsmock.get(
-                settings.OIDC_USER_ENDPOINT,
-                content=json.dumps(user_profile).encode('utf-8'),
-            )
-
-            recipe_data = {
-                'name': 'Test Recipe',
-                'action_id': action.id,
-                'arguments': {},
-                'extra_filter_expression': 'whatever',
-                'enabled': True
-            }
-            res = client.post('/api/v2/recipe/', recipe_data,
-                              HTTP_AUTHORIZATION='Bearer valid-bearer')
-
-            assert res.status_code == 200
 
         def test_it_can_create_recipes_actions_without_implementation(self, api_client):
             action = ActionFactory(implementation=None)
