@@ -1,5 +1,3 @@
-import json
-
 from datetime import datetime, timedelta
 
 from django.db import connection
@@ -8,7 +6,6 @@ from django.test.utils import CaptureQueriesContext
 import pytest
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
@@ -24,59 +21,6 @@ from normandy.recipes.tests import (
     RecipeRevisionFactory,
     fake_sign,
 )
-
-
-@pytest.mark.django_db
-class TestBearerTokenAuthentication(object):
-    def test_it_works_for_post(self, settings, requestsmock):
-        client = APIClient()
-        action = ActionFactory()
-        user = UserFactory(is_superuser=True)
-
-        user_profile = {
-            'email': user.email,
-            'given_name': user.first_name,
-            'family_name': user.last_name,
-        }
-        requestsmock.get(
-            settings.OIDC_USER_ENDPOINT,
-            content=json.dumps(user_profile).encode('utf-8'),
-        )
-
-        recipe_data = {
-            'name': 'Test Recipe',
-            'action_id': action.id,
-            'arguments': {},
-            'extra_filter_expression': 'whatever',
-            'enabled': True
-        }
-        res = client.post('/api/v3/recipe/', recipe_data,
-                          HTTP_AUTHORIZATION='Bearer valid-bearer')
-
-        assert res.status_code == 201
-        assert Recipe.objects.count() == 1
-
-    def test_bad_access_token(self, settings, requestsmock):
-        client = APIClient()
-        action = ActionFactory()
-
-        requestsmock.get(
-            settings.OIDC_USER_ENDPOINT,
-            status_code=401,
-        )
-
-        recipe_data = {
-            'name': 'Test Recipe',
-            'action_id': action.id,
-            'arguments': {},
-            'extra_filter_expression': 'whatever',
-            'enabled': True
-        }
-        res = client.post('/api/v3/recipe/', recipe_data,
-                          HTTP_AUTHORIZATION='Bearer invalid')
-
-        assert res.status_code == 401
-        assert Recipe.objects.count() == 0
 
 
 @pytest.mark.django_db

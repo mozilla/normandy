@@ -38,7 +38,13 @@ class BearerTokenAuthentication(BaseAuthentication):
 
         access_token = auth_header[1]
 
-        user_profile = self.fetch_oidc_user_profile(access_token)
+        return self.authenticate_credentials(access_token)
+
+    def authenticate_credentials(self, access_token):
+        try:
+            user_profile = self.fetch_oidc_user_profile(access_token)
+        except (requests.exceptions.RequestException, OIDCEndpointRequestError):
+            raise exceptions.AuthenticationFailed("Unable to verify bearer token.")
 
         email = user_profile.get('email', '').strip().lower()
         if not email:
@@ -47,7 +53,6 @@ class BearerTokenAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed("User profile lacks 'email' scope.")
 
         # Turn this email into a Django User instance.
-        # TODO: Users created here do not have requisite permissions. Should we scrap this?
         user, _ = get_user_model().objects.get_or_create(
             email=email, defaults={'username': email[:150]})
 
@@ -55,13 +60,18 @@ class BearerTokenAuthentication(BaseAuthentication):
         family_name = user_profile.get('family_name', '').strip()
         given_name = user_profile.get('given_name', '').strip()
         if family_name or given_name:
-            if family_name != user.last_name:
+            if family_name != user.last_name or given_name != user.first_name:
                 user.last_name = family_name
-            if given_name != user.first_name:
                 user.first_name = given_name
-            user.save()
+                user.save()
+
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed('User inactive or deleted.')
 
         return (user, access_token)
+
+    def authenticate_header(self, request):
+        return self.keyword
 
     @backoff.on_exception(
         backoff.constant,
@@ -85,6 +95,3 @@ class BearerTokenAuthentication(BaseAuthentication):
         # This could happen if, for some reason, we're not configured to be
         # allowed to talk to the OIDC endpoint.
         raise OIDCEndpointRequestError(response.status_code)
-
-    def authenticate_header(self, request):
-        return self.keyword
