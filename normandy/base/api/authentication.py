@@ -66,7 +66,7 @@ class BearerTokenAuthentication(BaseAuthentication):
                 user.save()
 
         if not user.is_active:
-            raise exceptions.AuthenticationFailed('User inactive or deleted.')
+            raise exceptions.AuthenticationFailed('User inactive.')
 
         return (user, access_token)
 
