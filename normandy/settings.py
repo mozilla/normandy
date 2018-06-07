@@ -97,7 +97,10 @@ class Core(Configuration):
     }
 
     REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'normandy.base.api.authentication.BearerTokenAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+        ],
         'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
         'DEFAULT_RENDERER_CLASSES': (
@@ -233,7 +236,6 @@ class Base(Core, CORS, OIDC):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        'normandy.base.middleware.OIDCAccessTokenAuthorizationMiddleware',
     ]
 
     def MIDDLEWARE(self):
