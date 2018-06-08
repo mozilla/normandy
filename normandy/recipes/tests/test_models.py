@@ -25,6 +25,7 @@ from normandy.recipes.tests import (
     CountryFactory,
     LocaleFactory,
     RecipeFactory,
+    RecipeRevisionFactory,
     SignatureFactory,
     fake_sign,
 )
@@ -110,7 +111,7 @@ class TestValidateArgumentPreferenceExperiments(object):
     def test_it_works(self):
         action = ActionFactory(name='nothing special')
         # does not raise an exception
-        action.validate_arguments({})
+        action.validate_arguments({}, RecipeRevisionFactory())
 
     @pytest.mark.django_db
     class TestPreferenceExperiments(object):
@@ -123,7 +124,13 @@ class TestValidateArgumentPreferenceExperiments(object):
                 ]
             }
             # does not throw when saving the revision
-            RecipeFactory(action=action, arguments=arguments)
+            recipe = RecipeFactory(action=action, arguments=arguments)
+
+            # Approve and enable the revision
+            rev = recipe.latest_revision
+            approval_request = rev.request_approval(UserFactory())
+            approval_request.approve(UserFactory(), 'r+')
+            rev.enable(UserFactory())
 
         def test_preference_exeriments_unique_branch_slugs(self):
             action = ActionFactory(name='preference-experiment')
@@ -136,7 +143,7 @@ class TestValidateArgumentPreferenceExperiments(object):
                 ]
             }
             with pytest.raises(serializers.ValidationError) as exc_info:
-                action.validate_arguments(arguments)
+                action.validate_arguments(arguments, RecipeRevisionFactory())
             error = action.errors['duplicate_branch_slug']
             assert exc_info.value.detail == {'arguments': {'branches': {2: {'slug': error}}}}
 
@@ -151,7 +158,7 @@ class TestValidateArgumentPreferenceExperiments(object):
                 ]
             }
             with pytest.raises(serializers.ValidationError) as exc_info:
-                action.validate_arguments(arguments)
+                action.validate_arguments(arguments, RecipeRevisionFactory())
             error = action.errors['duplicate_branch_value']
             assert exc_info.value.detail == {'arguments': {'branches': {2: {'value': error}}}}
 
