@@ -432,11 +432,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         return self.enabled_state.enabled if self.enabled_state else False
 
     def save(self, *args, **kwargs):
-        if self.parent:
-            old_arguments = self.parent.arguments
-        else:
-            old_arguments = None
-        self.action.validate_arguments(self.arguments, old_arguments)
+        self.action.validate_arguments(self.arguments, self)
 
         if not self.created:
             self.created = timezone.now()
@@ -706,13 +702,9 @@ class Action(DirtyFieldsMixin, models.Model):
 
         super().save(*args, **kwargs)
 
-    def validate_arguments(self, arguments, old_arguments=None):
+    def validate_arguments(self, arguments, revision):
         """
         Test if `arguments` follows all action-specific rules.
-
-        If there is a previous version of the arguments, they should
-        be passed as `old_arguments`. Some validation rules depend on
-        the history of the arguments.
 
         Raises `ValidationError` if any rules are violated.
         """
@@ -739,10 +731,9 @@ class Action(DirtyFieldsMixin, models.Model):
 
             # Experiment slugs should be unique.
             experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
+            if revision.recipe and revision.recipe.id:
+                experiment_recipes = experiment_recipes.exclude(id=revision.recipe.id)
             existing_slugs = set(r.arguments['slug'] for r in experiment_recipes)
-            if old_arguments:
-                # It is ok if the slug did not change
-                existing_slugs.remove(old_arguments['slug'])
             if arguments['slug'] in existing_slugs:
                 msg = self.errors['duplicate_experiment_slug']
                 errors['slug'] = msg
