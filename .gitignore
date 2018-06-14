@@ -1,6 +1,7 @@
 .env
 db.sqlite3
 .DS_Store
+.node-version
 webpack-stats.json
 webpack-stats-actions.json
 webpack-stats-vendor.json
