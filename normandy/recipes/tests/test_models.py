@@ -194,6 +194,41 @@ class TestValidateArgumentPreferenceExperiments(object):
             assert exc_info1.value.detail == {'arguments': {'slug': error}}
 
     @pytest.mark.django_db
+    class TestPreferenceRollout(object):
+        def test_no_errors(self):
+            action = ActionFactory(name='preference-rollout')
+            arguments = {
+                'slug': 'test-rollout',
+                'preferences': [{'preferenceName': 'foo', 'value': 5}],
+            }
+            # does not throw when saving the revision
+            recipe = RecipeFactory(action=action, arguments=arguments)
+
+            # Approve and enable the revision
+            rev = recipe.latest_revision
+            approval_request = rev.request_approval(UserFactory())
+            approval_request.approve(UserFactory(), 'r+')
+            rev.enable(UserFactory())
+
+        def test_no_duplicates(self):
+            action = ActionFactory(name='preference-rollout')
+            arguments_a = {'slug': 'a', 'preferences': [{'preferenceName': 'a', 'value': 'a'}]}
+            arguments_b = {'slug': 'b', 'preferences': [{'preferenceName': 'b', 'value': 'b'}]}
+            RecipeFactory(action=action, arguments=arguments_a)
+            recipe_b = RecipeFactory(action=action, arguments=arguments_b)
+            expected_error = action.errors['duplicate_rollout_slug']
+
+            # Creating a new recipe fails
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                RecipeFactory(action=action, arguments=arguments_a)
+            assert exc_info1.value.detail == {'arguments': {'slug': expected_error}}
+
+            # Revising an existing recipe fails
+            with pytest.raises(serializers.ValidationError) as exc_info2:
+                recipe_b.revise(arguments=arguments_a)
+            assert exc_info2.value.detail == {'arguments': {'slug': expected_error}}
+
+    @pytest.mark.django_db
     class TestPreferenceRollback(object):
         def test_no_errors(self):
             rollback_action = ActionFactory(name='preference-rollback')
