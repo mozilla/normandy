@@ -101,13 +101,10 @@ class TestSignedRecipeSerializer:
             'recipe': {
                 'name': recipe.name,
                 'id': recipe.id,
-                'enabled': recipe.enabled,
                 'filter_expression': recipe.filter_expression,
                 'revision_id': str(recipe.revision_id),
                 'action': action.name,
                 'arguments': recipe.arguments,
-                'last_updated': Whatever(),
-                'is_approved': False,
             }
         }
 

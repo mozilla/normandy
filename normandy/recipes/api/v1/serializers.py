@@ -143,10 +143,7 @@ class MinimalRecipeSerializer(RecipeSerializer):
         # used in filter expressions.
         fields = [
             'id',
-            'last_updated',
             'name',
-            'enabled',
-            'is_approved',
             'revision_id',
             'action',
             'arguments',

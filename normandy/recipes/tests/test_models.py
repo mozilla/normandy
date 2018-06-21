@@ -333,18 +333,14 @@ class TestRecipe(object):
             '{'
             '"action":"action",'
             '"arguments":{"bar":2,"foo":1},'
-            '"enabled":false,'
             '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
-            '"is_approved":false,'
-            '"last_updated":"%(last_updated)s",'
             '"name":"canonical",'
             '"revision_id":"%(revision_id)s"'
             '}'
         ) % {
             'id': recipe.id,
             'revision_id': recipe.revision_id,
-            'last_updated': recipe.last_updated.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'filter_expression': filter_expression
         }
         expected = expected.encode()
