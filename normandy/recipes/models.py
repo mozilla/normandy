@@ -620,6 +620,7 @@ class Action(DirtyFieldsMixin, models.Model):
         'duplicate_branch_slug': 'Feature branch slugs must be unique within an experiment',
         'duplicate_branch_value': 'Feature branch values must be unique within an experiment',
         'duplicate_experiment_slug': 'Experiment slugs must be globally unique',
+        'duplicate_rollout_slug': 'Rollout slugs must be globally unique',
         'rollout_slug_not_found': 'Rollout slug not found for rollback',
     }
 
@@ -717,7 +718,7 @@ class Action(DirtyFieldsMixin, models.Model):
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
             branch_values = set()
-            for i, branch in enumerate(arguments['branches']):
+            for i, branch in enumerate(arguments.get('branches')):
                 if branch['slug'] in branch_slugs:
                     msg = self.errors['duplicate_branch_slug']
                     errors['branches'][i]['slug'] = msg
@@ -733,13 +734,26 @@ class Action(DirtyFieldsMixin, models.Model):
             experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 experiment_recipes = experiment_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments['slug'] for r in experiment_recipes)
-            if arguments['slug'] in existing_slugs:
+            existing_slugs = set(r.arguments.get('slug') for r in experiment_recipes)
+            if arguments.get('slug') in existing_slugs:
                 msg = self.errors['duplicate_experiment_slug']
                 errors['slug'] = msg
 
+        elif self.name == 'preference-rollout':
+            # Rollout slugs should be unique
+            rollout_recipes = Recipe.objects.filter(
+                latest_revision__action=self)
+            if revision.recipe and revision.recipe.id:
+                rollout_recipes = rollout_recipes.exclude(id=revision.recipe.id)
+            existing_slugs = set(r.arguments.get('slug') for r in rollout_recipes)
+            if arguments.get('slug') in existing_slugs:
+                msg = self.errors['duplicate_rollout_slug']
+                errors['slug'] = msg
+
         elif self.name == 'preference-rollback':
-            rollouts = Recipe.objects.filter(latest_revision__action__name='preference-rollout')
+            # Rollback slugs should match rollouts
+            rollouts = Recipe.objects.filter(
+                latest_revision__action__name='preference-rollout')
             rollout_slugs = set(r.arguments['slug'] for r in rollouts)
             if arguments['rolloutSlug'] not in rollout_slugs:
                 errors['slug'] = self.errors['rollout_slug_not_found']
