@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(username_to_email),
+        migrations.RunPython(username_to_email, migrations.RunPython.noop),
     ]
