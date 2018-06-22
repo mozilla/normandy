@@ -347,18 +347,18 @@ class TestRecipe(object):
         assert recipe.canonical_json() == expected
 
     def test_signature_is_correct_on_creation_if_autograph_available(self, mocked_autograph):
-        recipe = RecipeFactory()
+        recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
         expected_sig = fake_sign([recipe.canonical_json()])[0]['signature']
         assert recipe.signature.signature == expected_sig
 
     def test_signature_is_updated_if_autograph_available(self, mocked_autograph):
-        recipe = RecipeFactory(name='unchanged')
+        recipe = RecipeFactory(name='unchanged', approver=UserFactory(), enabler=UserFactory())
         original_signature = recipe.signature
         assert original_signature is not None
 
         recipe.revise(name='changed')
 
-        assert recipe.name == 'changed'
+        assert recipe.latest_revision.name == 'changed'
         assert recipe.signature is not original_signature
         expected_sig = fake_sign([recipe.canonical_json()])[0]['signature']
         assert recipe.signature.signature == expected_sig
@@ -390,21 +390,14 @@ class TestRecipe(object):
             recipe.revise(name='changed')
         assert exc_info.value.message == 'Signatures must change alone'
 
-    def test_update_signature(self, mocker, mock_logger):
-        # Mock the Autographer
-        mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
-        mock_autograph.return_value.sign_data.return_value = [
-            {'signature': 'fake signature'},
-        ]
-
-        recipe = RecipeFactory(signed=False)
+    def test_update_signature(self, mock_logger, mocked_autograph):
+        recipe = RecipeFactory(enabler=UserFactory(), approver=UserFactory())
+        recipe.signature = None
         recipe.update_signature()
         mock_logger.info.assert_called_with(
             Whatever.contains(str(recipe.id)),
             extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': [recipe.id]}
         )
-
-        recipe.save()
         assert recipe.signature is not None
         assert recipe.signature.signature == 'fake signature'
 
@@ -415,6 +408,36 @@ class TestRecipe(object):
 
         assert recipe.signature is not None
         assert recipe.signature.signature == fake_sign([recipe.canonical_json()])[0]['signature']
+
+    def test_only_signed_when_approved_and_enabled(self, mocked_autograph):
+        sign_data_mock = mocked_autograph.return_value.sign_data
+        # This uses the signer, so do it first
+        action = ActionFactory()
+        sign_data_mock.reset_mock()
+
+        sign_data_mock.side_effect = Exception("Can't sign yet")
+        recipe = RecipeFactory(name='unchanged', action=action)
+        assert not recipe.enabled
+        assert not recipe.is_approved
+        assert recipe.signature is None
+
+        # Updating does not generate a signature
+        recipe.revise(name='changed')
+        assert recipe.signature is None
+
+        # Approving does not sign the recipe
+        rev = recipe.latest_revision
+        approval_request = rev.request_approval(UserFactory())
+        approval_request.approve(UserFactory(), 'r+')
+        assert recipe.signature is None
+        mocked_autograph.return_value.sign_data.assert_not_called()
+
+        # Enabling signs the recipe
+        mocked_autograph.return_value.sign_data.side_effect = fake_sign
+        rev.enable(UserFactory())
+        expected_sig = fake_sign([recipe.canonical_json()])[0]['signature']
+        assert recipe.signature.signature == expected_sig
+        assert mocked_autograph.return_value.sign_data.called_once()
 
     def test_recipe_revise_partial(self):
         a1 = ActionFactory()
@@ -748,6 +771,9 @@ class TestRecipeQueryset(object):
         # Make sure the test environment is clean. This test is invalid otherwise.
         assert Recipe.objects.all().count() == 0
 
+        # Do this before mocking autograph, so that the mock isn't used for signing actions.
+        action = ActionFactory()
+
         # Mock the Autographer
         mock_autograph = mocker.patch('normandy.recipes.models.Autographer')
         mock_autograph.return_value.sign_data.return_value = [
@@ -756,7 +782,7 @@ class TestRecipeQueryset(object):
         ]
 
         # Make and sign two recipes
-        (recipe1, recipe2) = RecipeFactory.create_batch(2)
+        (recipe1, recipe2) = RecipeFactory.create_batch(2, action=action)
         Recipe.objects.all().update_signatures()
 
         # Assert that the signature update is logged.

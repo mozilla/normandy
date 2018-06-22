@@ -1145,10 +1145,12 @@ class TestApprovalFlow(object):
                               {'comment': 'r+'})
         assert res.status_code == 403  # Forbidden
 
-        # Approve the recipe
+        # Approve and enable the recipe
         api_client.force_authenticate(user2)
         res = api_client.post('/api/v2/approval_request/{}/approve/'.format(approval_data['id']),
                               {'comment': 'r+'})
+        assert res.status_code == 200
+        res = api_client.post('/api/v2/recipe/{}/enable/'.format(recipe_data_0['id']))
         assert res.status_code == 200
 
         # It is now visible in the API
@@ -1250,13 +1252,18 @@ class TestApprovalFlow(object):
         assert res.status_code == 201
         approval_request_id = res.json()['id']
 
-        # Approve the recipe
+        # Approve and enable the recipe
         api_client.force_authenticate(user2)
         res = api_client.post(
             f'/api/v2/approval_request/{approval_request_id}/approve/',
             {'comment': 'r+'}
         )
         assert res.status_code == 200
+        res = api_client.post(f'/api/v2/recipe/{recipe_id}/enable/')
+        assert res.status_code == 200
+
+        # The API should have correct signatures now
+        self.verify_signatures(api_client, expected_count=1)
 
         # Make another change
         api_client.force_authenticate(user1)

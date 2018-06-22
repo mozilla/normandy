@@ -227,6 +227,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
             self.signature = None
             return
 
+        # Don't sign recipe that aren't enabled
+        if not self.enabled:
+            return
+
         logger.info(
             f'Requesting signature for recipe with id {self.id} from Autograph',
             extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': [self.id]}
