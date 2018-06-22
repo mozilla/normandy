@@ -80,37 +80,6 @@ class RecipeQuerySet(models.QuerySet):
     def only_disabled(self):
         return self.exclude(approved_revision__enabled_state__enabled=True)
 
-    @transaction.atomic
-    def update_signatures(self):
-        """
-        Update the signatures on all Recipes in the queryset.
-        """
-        # Convert to a list because order must be preserved
-        recipes = list(self)
-
-        try:
-            autographer = Autographer()
-        except ImproperlyConfigured:
-            for recipe in recipes:
-                recipe.signature = None
-                recipe.save()
-            return
-
-        recipe_ids = [r.id for r in recipes]
-        logger.info(
-            f'Requesting signatures for recipes with ids [{recipe_ids}] from Autograph',
-            extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': recipe_ids}
-        )
-
-        canonical_jsons = [r.canonical_json() for r in recipes]
-        signatures_data = autographer.sign_data(canonical_jsons)
-
-        for recipe, sig_data in zip(recipes, signatures_data):
-            signature = Signature(**sig_data)
-            signature.save()
-            recipe.signature = signature
-            recipe.save()
-
 
 class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
@@ -574,42 +543,8 @@ class ApprovalRequest(models.Model):
         recipe.save()
 
 
-class ActionQuerySet(models.QuerySet):
-    @transaction.atomic
-    def update_signatures(self):
-        """
-        Update the signatures on all Actions in the queryset.
-        """
-        # Convert to a list because order must be preserved
-        actions = list(self)
-
-        try:
-            autographer = Autographer()
-        except ImproperlyConfigured:
-            for action in actions:
-                action.signature = None
-                action.save()
-            return
-
-        action_names = [a.name for a in actions]
-        logger.info(
-            f'Requesting signatures for actions named [{action_names}] from Autograph',
-            extra={'code': INFO_REQUESTING_ACTION_SIGNATURES, 'action_names': action_names}
-        )
-
-        canonical_jsons = [a.canonical_json() for a in actions]
-        signatures_data = autographer.sign_data(canonical_jsons)
-
-        for action, sig_data in zip(actions, signatures_data):
-            signature = Signature(**sig_data)
-            signature.save()
-            action.signature = signature
-            action.save()
-
-
 class Action(DirtyFieldsMixin, models.Model):
     """A single executable action that can take arguments."""
-    objects = ActionQuerySet.as_manager()
 
     name = models.SlugField(max_length=255, unique=True)
     implementation = models.TextField(null=True)
