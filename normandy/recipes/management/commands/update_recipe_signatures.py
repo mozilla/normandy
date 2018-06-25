@@ -35,7 +35,8 @@ class Command(BaseCommand):
             self.stdout.write(f'Signing {count} recipes:')
             for recipe in recipes_to_update:
                 self.stdout.write(' * ' + recipe.name)
-            recipes_to_update.update_signatures()
+                recipe.update_signature()
+                recipe.save()
 
         recipes_to_unsign = Recipe.objects.only_disabled().exclude(signature=None)
         count = recipes_to_unsign.count()

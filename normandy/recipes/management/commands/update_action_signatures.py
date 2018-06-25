@@ -33,7 +33,8 @@ class Command(BaseCommand):
             self.stdout.write(f'Signing {count} actions:')
             for action in actions_to_update:
                 self.stdout.write(' * ' + action.name)
-            actions_to_update.update_signatures()
+                action.update_signature()
+                action.save()
 
     def get_outdated_actions(self):
         outdated_age = timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE)
