@@ -174,8 +174,13 @@ that look like this::
 Therapist
 ---------
 If you want to automatically enforce Normandy code style guidelines, you can
-use the Therapist pre-commit hook. Therapist should have been installed with
-the rest of the dependencies, above. After that, you should be able to run
+use the `Therapist`_ pre-commit hook. To install Therapist, simply run:
+
+.. code-block:: bash
+
+      pip install therapist
+
+After that, you should be able to run
 the following to set up the git pre-commit hook:
 
 .. code-block:: bash
@@ -187,3 +192,5 @@ code. This will save time when submitting pull requests.
 
 If you ever need to bypass Therapist, you can do so by passing
 ``--no-verify`` to your ``git commit`` command.
+
+.. _Therapist: http://therapist.readthedocs.io/en/latest/overview.html
