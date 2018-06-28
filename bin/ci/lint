@@ -2,7 +2,9 @@
 set -eu
 
 echo "Linting Python files"
-bin/ci/docker-run.sh flake8 normandy/ contract-tests/
+python_to_lint="normandy/ contract-tests/ manage.py docs/ bin/"
+bin/ci/docker-run.sh flake8 $python_to_lint
+bin/ci/docker-run.sh black --check $python_to_lint
 bin/ci/docker-run.sh pip check
 
 echo "Linting JS files"

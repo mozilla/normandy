@@ -168,3 +168,22 @@ that look like this::
 
 .. _Autograph: https://github.com/mozilla-services/autograph
 .. _Autograph installation instructions: https://github.com/mozilla-services/autograph#installation
+
+.. _therapist-install:
+
+Therapist
+---------
+If you want to automatically enforce Normandy code style guidelines, you can
+use the Therapist pre-commit hook. Therapist should have been installed with
+the rest of the dependencies, above. After that, you should be able to run
+the following to set up the git pre-commit hook:
+
+.. code-block:: bash
+
+      therapist install
+
+After that, whenever you make a new commit Therapist will check the changed
+code. This will save time when submitting pull requests.
+
+If you ever need to bypass Therapist, you can do so by passing
+``--no-verify`` to your ``git commit`` command.
