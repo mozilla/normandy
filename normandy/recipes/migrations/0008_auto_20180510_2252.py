@@ -11,28 +11,49 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('recipes', '0007_convert_simple_filters_to_filter_objects'),
+        ("recipes", "0007_convert_simple_filters_to_filter_objects"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EnabledState',
+            name="EnabledState",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now)),
-                ('enabled', models.BooleanField(default=False)),
-                ('creator', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='enabled_states', to=settings.AUTH_USER_MODEL)),
-                ('revision', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='enabled_states', to='recipes.RecipeRevision')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("created", models.DateTimeField(default=django.utils.timezone.now)),
+                ("enabled", models.BooleanField(default=False)),
+                (
+                    "creator",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="enabled_states",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "revision",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="enabled_states",
+                        to="recipes.RecipeRevision",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ('-created',),
-            },
+            options={"ordering": ("-created",)},
         ),
         migrations.AddField(
-            model_name='reciperevision',
-            name='enabled_state',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL,
-                                    related_name='current_for_revision',
-                                    to='recipes.EnabledState'),
+            model_name="reciperevision",
+            name="enabled_state",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="current_for_revision",
+                to="recipes.EnabledState",
+            ),
         ),
     ]

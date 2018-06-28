@@ -9,12 +9,10 @@ def test_recipes_used_by(storage):
     extension = ExtensionFactory()
     RecipeFactory()  # Create a recipe that doesn't use the extension
     used_in_recipe_1 = RecipeFactory(
-        name="test 1",
-        arguments_json=f'{{"xpi_url": "{extension.xpi.url}"}}',
+        name="test 1", arguments_json=f'{{"xpi_url": "{extension.xpi.url}"}}'
     )
     used_in_recipe_2 = RecipeFactory(
-        name="test 2",
-        arguments_json=f'{{"xpi_url": "{extension.xpi.url}"}}',
+        name="test 2", arguments_json=f'{{"xpi_url": "{extension.xpi.url}"}}'
     )
 
     assert set(extension.recipes_used_by) == set([used_in_recipe_1, used_in_recipe_2])

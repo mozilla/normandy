@@ -16,27 +16,28 @@ class Command(BaseCommand):
     If this file grows too big, we should consider finding a library or
     coming up with a more robust way of adding this data.
     """
-    help = 'Adds initial data to database'
+
+    help = "Adds initial data to database"
 
     def handle(self, *args, **options):
         self.add_release_channels()
         self.add_countries()
 
     def add_release_channels(self):
-        self.stdout.write('Adding Release Channels...', ending='')
+        self.stdout.write("Adding Release Channels...", ending="")
         channels = {
-            'release': 'Release',
-            'beta': 'Beta',
-            'aurora': 'Developer Edition',
-            'nightly': 'Nightly'
+            "release": "Release",
+            "beta": "Beta",
+            "aurora": "Developer Edition",
+            "nightly": "Nightly",
         }
 
         for slug, name in channels.items():
-            Channel.objects.update_or_create(slug=slug, defaults={'name': name})
-        self.stdout.write('Done')
+            Channel.objects.update_or_create(slug=slug, defaults={"name": name})
+        self.stdout.write("Done")
 
     def add_countries(self):
-        self.stdout.write('Adding Countries...', ending='')
+        self.stdout.write("Adding Countries...", ending="")
         for code, name in countries:
-            Country.objects.update_or_create(code=code, defaults={'name': name})
-        self.stdout.write('Done')
+            Country.objects.update_or_create(code=code, defaults={"name": name})
+        self.stdout.write("Done")

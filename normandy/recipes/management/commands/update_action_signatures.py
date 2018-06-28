@@ -10,14 +10,13 @@ from normandy.recipes.models import Action
 
 class Command(BaseCommand):
     """Update signatures for Actions that have no signature or an old signature."""
-    help = 'Update Action signatures'
+
+    help = "Update Action signatures"
     requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-f', '--force',
-            action='store_true',
-            help='Update signatures for all actions'
+            "-f", "--force", action="store_true", help="Update signatures for all actions"
         )
 
     def handle(self, *args, force=False, **options):
@@ -28,11 +27,11 @@ class Command(BaseCommand):
 
         count = actions_to_update.count()
         if count == 0:
-            self.stdout.write('No out of date actions to sign')
+            self.stdout.write("No out of date actions to sign")
         else:
-            self.stdout.write(f'Signing {count} actions:')
+            self.stdout.write(f"Signing {count} actions:")
             for action in actions_to_update:
-                self.stdout.write(' * ' + action.name)
+                self.stdout.write(" * " + action.name)
                 action.update_signature()
                 action.save()
 

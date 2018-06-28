@@ -13,7 +13,7 @@ from django.middleware.security import SecurityMiddleware
 from whitenoise.middleware import WhiteNoiseMiddleware
 
 
-DEBUG_HTTP_TO_HTTPS_REDIRECT = 'normandy.base.middleware.D001'
+DEBUG_HTTP_TO_HTTPS_REDIRECT = "normandy.base.middleware.D001"
 
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,6 @@ class ConfigurableRemoteUserMiddleware(RemoteUserMiddleware):
 
 
 class NormandyWhiteNoiseMiddleware(WhiteNoiseMiddleware):
-
     def is_immutable_file(self, path, url):
         """
         Determine whether given URL represents an immutable file (i.e. a
@@ -63,7 +62,7 @@ class NormandyWhiteNoiseMiddleware(WhiteNoiseMiddleware):
         # Check if the filename ends with either 20 or 32 hex digits, and then an extension
         # 20 is for normal hashed content, like JS or CSS files, which use "[name].[hash].[ext]"
         # 32 is for content addressed files, like images or fonts, which use "[hash].[ext]"
-        match = re.match(r'^.*([a-f0-9]{20}|[a-f0-9]{32})\.[\w\d]+$', filename)
+        match = re.match(r"^.*([a-f0-9]{20}|[a-f0-9]{32})\.[\w\d]+$", filename)
         return bool(match)
 
 
@@ -75,6 +74,7 @@ class HttpResponsePermanentRedirectCached(http.HttpResponsePermanentRedirect):
     performant, and softens "permanent" redirects to merely be long
     lived, which helps with maintainability.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         patch_cache_control(self, public=True, max_age=settings.PERMANENT_REDIRECT_CACHE_TIME)
@@ -101,19 +101,19 @@ class NormandySecurityMiddleware(SecurityMiddleware):
 
             # Pull out just the HTTP headers from the rest of the request meta
             headers = {
-                key.lstrip('HTTP_'): value
+                key.lstrip("HTTP_"): value
                 for (key, value) in request.META.items()
-                if key.startswith('HTTP_') or key == 'CONTENT_TYPE' or key == 'CONTENT_LENGTH'
+                if key.startswith("HTTP_") or key == "CONTENT_TYPE" or key == "CONTENT_LENGTH"
             }
 
             logger.debug(
-                f'Served HTTP to HTTPS redirect for {request.path}',
+                f"Served HTTP to HTTPS redirect for {request.path}",
                 extra={
-                    'code': DEBUG_HTTP_TO_HTTPS_REDIRECT,
-                    'method': request.method,
-                    'body': request.body.decode('utf-8'),
-                    'path': request.path,
-                    'headers': headers,
-                }
+                    "code": DEBUG_HTTP_TO_HTTPS_REDIRECT,
+                    "method": request.method,
+                    "body": request.body.decode("utf-8"),
+                    "path": request.path,
+                    "headers": headers,
+                },
             )
         return response

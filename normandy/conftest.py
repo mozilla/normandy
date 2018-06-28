@@ -32,7 +32,7 @@ def geolocation():
 
 @pytest.fixture
 def mocked_autograph(mocker):
-    mocked = mocker.patch('normandy.recipes.models.Autographer')
+    mocked = mocker.patch("normandy.recipes.models.Autographer")
     mocked.return_value.sign_data.side_effect = fake_sign
     return mocked
 
@@ -43,6 +43,7 @@ def migrations(transactional_db):
     This fixture returns a helper object to test Django data migrations.
     Based on: https://gist.github.com/bennylope/82a6088c02fefdd47e18f3c04ec167af
     """
+
     class Migrator(object):
         def migrate(self, app, to):
             migration = [(app, to)]
@@ -51,7 +52,7 @@ def migrations(transactional_db):
             return executor.loader.project_state(migration).apps
 
         def reset(self):
-            call_command('migrate', no_input=True)
+            call_command("migrate", no_input=True)
 
     return Migrator()
 
@@ -74,12 +75,13 @@ def requestsmock():
 
 @pytest.fixture
 def storage(settings):
-    settings.DEFAULT_FILE_STORAGE = 'normandy.base.storage.InMemoryPermissiveStorage'
+    settings.DEFAULT_FILE_STORAGE = "normandy.base.storage.InMemoryPermissiveStorage"
 
     yield
 
     from django.core.files.storage import default_storage
-    dirs_to_delete = ['/']
+
+    dirs_to_delete = ["/"]
     while len(dirs_to_delete) > 0:
         dir_path = dirs_to_delete.pop()
         paths, new_dirs = default_storage.listdir(dir_path)

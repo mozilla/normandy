@@ -12,9 +12,9 @@ class TestApiCacheControl(object):
         def view(request):
             return HttpResponse()
 
-        response = view(rf.get('/foo/bar'))
-        assert 'public' in response['Cache-Control']
-        assert 'max-age=66' in response['Cache-Control']
+        response = view(rf.get("/foo/bar"))
+        assert "public" in response["Cache-Control"]
+        assert "max-age=66" in response["Cache-Control"]
 
     def test_cache_disabled(self, settings, rf):
         settings.API_CACHE_ENABLED = False
@@ -24,12 +24,12 @@ class TestApiCacheControl(object):
         def view(request):
             return HttpResponse()
 
-        response = view(rf.get('/foo/bar'))
-        assert 'public' not in response['Cache-Control']
-        assert 'max-age=' not in response['Cache-Control']
-        assert 'no-cache' in response['Cache-Control']
-        assert 'no-store' in response['Cache-Control']
-        assert 'must-revalidate' in response['Cache-Control']
+        response = view(rf.get("/foo/bar"))
+        assert "public" not in response["Cache-Control"]
+        assert "max-age=" not in response["Cache-Control"]
+        assert "no-cache" in response["Cache-Control"]
+        assert "no-store" in response["Cache-Control"]
+        assert "must-revalidate" in response["Cache-Control"]
 
     def test_cache_custom(self, settings, rf):
         settings.API_CACHE_ENABLED = True
@@ -39,7 +39,7 @@ class TestApiCacheControl(object):
         def view(request):
             return HttpResponse()
 
-        response = view(rf.get('/foo/bar'))
-        assert 'public' in response['Cache-Control']
-        assert 'max-age=44' in response['Cache-Control']
-        assert 'no-transform' in response['Cache-Control']
+        response = view(rf.get("/foo/bar"))
+        assert "public" in response["Cache-Control"]
+        assert "max-age=44" in response["Cache-Control"]
+        assert "no-transform" in response["Cache-Control"]

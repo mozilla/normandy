@@ -7,7 +7,7 @@ def fraction_to_key(frac):
     # hash is 2^256 - 1
 
     if frac < 0 or frac > 1:
-        raise ValueError('frac must be between 0 and 1 inclusive (got {})'.format(frac))
+        raise ValueError("frac must be between 0 and 1 inclusive (got {})".format(frac))
 
     mult = 2 ** 256 - 1
     in_decimal = int(frac * mult)
@@ -19,7 +19,7 @@ def fraction_to_key(frac):
 
     # Saturate at 2**256 - 1
     if len(padded) > 64:
-        return 'f' * 64
+        return "f" * 64
     else:
         return padded
 
@@ -37,7 +37,7 @@ def deterministic_sample(rate, inputs):
     """
     hasher = hashlib.sha256()
     for inp in inputs:
-        hasher.update(str(inp).encode('utf8'))
+        hasher.update(str(inp).encode("utf8"))
 
     sample_point = fraction_to_key(rate)
     input_hash = hasher.hexdigest()

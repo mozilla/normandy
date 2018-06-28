@@ -8,17 +8,14 @@ import normandy.recipes.validators
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('recipes', '0005_auto_20180503_2146'),
-    ]
+    dependencies = [("recipes", "0005_auto_20180503_2146")]
 
     operations = [
         migrations.AddField(
-            model_name='reciperevision',
-            name='filter_object_json',
+            model_name="reciperevision",
+            name="filter_object_json",
             field=models.TextField(
-                null=True,
-                validators=[normandy.recipes.validators.validate_json]
+                null=True, validators=[normandy.recipes.validators.validate_json]
             ),
-        ),
+        )
     ]

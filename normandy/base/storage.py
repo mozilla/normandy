@@ -32,8 +32,8 @@ class PermissiveFilenameStorageMixin(object):
         name = force_text(name).strip()
         # remove "characters to avoid", as described by S3's docs
         # https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html#object-key-guidelines-avoid-characters
-        name = re.sub(r'[\\{}^%`\[\]<>~#|\x00-\x1F\x7F-\xFF\'"]', '', name)
-        return re.sub(r'\s+', '_', name)
+        name = re.sub(r'[\\{}^%`\[\]<>~#|\x00-\x1F\x7F-\xFF\'"]', "", name)
+        return re.sub(r"\s+", "_", name)
 
 
 class S3Boto3PermissiveStorage(PermissiveFilenameStorageMixin, S3Boto3Storage):

@@ -30,11 +30,12 @@ class ChannelFilter(BaseFilter):
 
        :example: ``["release", "beta"]``
     """
+
     channels = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        channels = ','.join(f'"{c}"' for c in self.data['channels'])
-        return f'normandy.channel in [{channels}]'
+        channels = ",".join(f'"{c}"' for c in self.data["channels"])
+        return f"normandy.channel in [{channels}]"
 
 
 class LocaleFilter(BaseFilter):
@@ -47,11 +48,12 @@ class LocaleFilter(BaseFilter):
 
        :example: ``["en-US", "en-CA"]``
     """
+
     locales = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        locales = ','.join(f'"{l}"' for l in self.data['locales'])
-        return f'normandy.locale in [{locales}]'
+        locales = ",".join(f'"{l}"' for l in self.data["locales"])
+        return f"normandy.locale in [{locales}]"
 
 
 class CountryFilter(BaseFilter):
@@ -63,11 +65,12 @@ class CountryFilter(BaseFilter):
 
        :example: ``["US", "DE"]``
    """
+
     countries = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        countries = ','.join(f'"{c}"' for c in self.data['countries'])
-        return f'normandy.country in [{countries}]'
+        countries = ",".join(f'"{c}"' for c in self.data["countries"])
+        return f"normandy.country in [{countries}]"
 
 
 class BucketSampleFilter(BaseFilter):
@@ -110,17 +113,18 @@ class BucketSampleFilter(BaseFilter):
 
        :example: 100
     """
+
     start = serializers.FloatField()
     count = serializers.FloatField(min_value=0)
     total = serializers.FloatField(min_value=0)
     input = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        inputs = ','.join(f'{i}' for i in self.data['input'])
-        start = self.data['start']
-        count = self.data['count']
-        total = self.data['total']
-        return f'[{inputs}]|bucketSample({start},{count},{total})'
+        inputs = ",".join(f"{i}" for i in self.data["input"])
+        start = self.data["start"]
+        count = self.data["count"]
+        total = self.data["total"]
+        return f"[{inputs}]|bucketSample({start},{count},{total})"
 
 
 class StableSampleFilter(BaseFilter):
@@ -144,13 +148,14 @@ class StableSampleFilter(BaseFilter):
 
        :example: 0.5
     """
+
     rate = serializers.FloatField(min_value=0, max_value=1)
     input = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        inputs = ','.join(f'{i}' for i in self.data['input'])
-        rate = self.data['rate']
-        return f'[{inputs}]|stableSample({rate})'
+        inputs = ",".join(f"{i}" for i in self.data["input"])
+        rate = self.data["rate"]
+        return f"[{inputs}]|stableSample({rate})"
 
 
 class VersionFilter(BaseFilter):
@@ -162,6 +167,7 @@ class VersionFilter(BaseFilter):
 
        :example: [59, 61, 62]
     """
+
     # Versions of Firefox before 40 definitely don't support Normandy, so don't allow them
     versions = serializers.ListField(child=serializers.IntegerField(min_value=40), min_length=1)
 
@@ -178,24 +184,23 @@ class VersionFilter(BaseFilter):
         #   (normandy.version >= 56 && normandy.version < 57) ||
         #   (normandy.version >= 57 && normandy.version < 58)
 
-        return '||'.join(
-            f'(normandy.version>="{v}"&&normandy.version<"{v + 1}")'
-            for v in self.data['versions']
+        return "||".join(
+            f'(normandy.version>="{v}"&&normandy.version<"{v + 1}")' for v in self.data["versions"]
         )
 
 
 by_type = {
-    'channel': ChannelFilter,
-    'locale': LocaleFilter,
-    'country': CountryFilter,
-    'bucketSample': BucketSampleFilter,
-    'stableSample': StableSampleFilter,
-    'version': VersionFilter,
+    "channel": ChannelFilter,
+    "locale": LocaleFilter,
+    "country": CountryFilter,
+    "bucketSample": BucketSampleFilter,
+    "stableSample": StableSampleFilter,
+    "version": VersionFilter,
 }
 
 
 def from_data(data):
-    cls = by_type.get(data['type'])
+    cls = by_type.get(data["type"])
     if cls:
         return cls(data=data)
     else:

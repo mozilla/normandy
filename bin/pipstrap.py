@@ -25,15 +25,15 @@ from hashlib import sha256
 from os.path import join
 from pipes import quote
 from shutil import rmtree
+
 try:
     from subprocess import check_output
 except ImportError:
     from subprocess import CalledProcessError, PIPE, Popen
 
     def check_output(*popenargs, **kwargs):
-        if 'stdout' in kwargs:
-            raise ValueError('stdout argument not allowed, it will be '
-                             'overridden.')
+        if "stdout" in kwargs:
+            raise ValueError("stdout argument not allowed, it will be " "overridden.")
         process = Popen(stdout=PIPE, *popenargs, **kwargs)
         output, unused_err = process.communicate()
         retcode = process.poll()
@@ -43,8 +43,11 @@ except ImportError:
                 cmd = popenargs[0]
             raise CalledProcessError(retcode, cmd)
         return output
+
+
 from sys import exit, version_info
 from tempfile import mkdtemp
+
 try:
     from urllib2 import build_opener, HTTPHandler, HTTPSHandler
 except ImportError:
@@ -60,31 +63,43 @@ __version__ = 1, 1, 1
 
 # wheel has a conditional dependency on argparse:
 maybe_argparse = (
-    [('https://pypi.python.org/packages/source/a/argparse/'
-      'argparse-1.4.0.tar.gz',
-      '62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4')]
-    if version_info < (2, 7, 0) else [])
+    [
+        (
+            "https://pypi.python.org/packages/source/a/argparse/" "argparse-1.4.0.tar.gz",
+            "62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4",
+        )
+    ]
+    if version_info < (2, 7, 0)
+    else []
+)
 
 
 PACKAGES = maybe_argparse + [
     # Pip has no dependencies, as it vendors everything:
-    ('https://pypi.python.org/packages/source/p/pip/pip-8.0.3.tar.gz',
-     '30f98b66f3fe1069c529a491597d34a1c224a68640c82caf2ade5f88aa1405e8'),
+    (
+        "https://pypi.python.org/packages/source/p/pip/pip-8.0.3.tar.gz",
+        "30f98b66f3fe1069c529a491597d34a1c224a68640c82caf2ade5f88aa1405e8",
+    ),
     # This version of setuptools has only optional dependencies:
-    ('https://pypi.python.org/packages/source/s/setuptools/'
-     'setuptools-20.2.2.tar.gz',
-     '24fcfc15364a9fe09a220f37d2dcedc849795e3de3e4b393ee988e66a9cbd85a'),
-    ('https://pypi.python.org/packages/source/w/wheel/wheel-0.29.0.tar.gz',
-     '1ebb8ad7e26b448e9caa4773d2357849bf80ff9e313964bcaf79cbf0201a1648')
+    (
+        "https://pypi.python.org/packages/source/s/setuptools/" "setuptools-20.2.2.tar.gz",
+        "24fcfc15364a9fe09a220f37d2dcedc849795e3de3e4b393ee988e66a9cbd85a",
+    ),
+    (
+        "https://pypi.python.org/packages/source/w/wheel/wheel-0.29.0.tar.gz",
+        "1ebb8ad7e26b448e9caa4773d2357849bf80ff9e313964bcaf79cbf0201a1648",
+    ),
 ]
 
 
 class HashError(Exception):
     def __str__(self):
         url, path, actual, expected = self.args
-        return ('{url} did not match the expected hash {expected}. Instead, '
-                'it was {actual}. The file (left at {path}) may have been '
-                'tampered with.'.format(**locals()))
+        return (
+            "{url} did not match the expected hash {expected}. Instead, "
+            "it was {actual}. The file (left at {path}) may have been "
+            "tampered with.".format(**locals())
+        )
 
 
 def hashed_download(url, temp, digest):
@@ -110,9 +125,9 @@ def hashed_download(url, temp, digest):
             yield chunk
 
     response = opener().open(url)
-    path = join(temp, urlparse(url).path.split('/')[-1])
+    path = join(temp, urlparse(url).path.split("/")[-1])
     actual_hash = sha256()
-    with open(path, 'wb') as file:
+    with open(path, "wb") as file:
         for chunk in read_chunks(response, 4096):
             file.write(chunk)
             actual_hash.update(chunk)
@@ -124,13 +139,13 @@ def hashed_download(url, temp, digest):
 
 
 def main():
-    temp = mkdtemp(prefix='pipstrap-')
+    temp = mkdtemp(prefix="pipstrap-")
     try:
-        downloads = [hashed_download(url, temp, digest)
-                     for url, digest in PACKAGES]
-        check_output('pip install --no-index --no-deps -U ' +
-                     ' '.join(quote(d) for d in downloads),
-                     shell=True)
+        downloads = [hashed_download(url, temp, digest) for url, digest in PACKAGES]
+        check_output(
+            "pip install --no-index --no-deps -U " + " ".join(quote(d) for d in downloads),
+            shell=True,
+        )
     except HashError as exc:
         print(exc)
     except Exception:
@@ -142,5 +157,5 @@ def main():
     return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())

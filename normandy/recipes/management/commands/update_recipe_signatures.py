@@ -12,14 +12,13 @@ class Command(BaseCommand):
     """
     Update signatures for enabled Recipes that have no signature or an old signature
     """
-    help = 'Update Recipe signatures'
+
+    help = "Update Recipe signatures"
     requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-f', '--force',
-            action='store_true',
-            help='Update signatures for all recipes'
+            "-f", "--force", action="store_true", help="Update signatures for all recipes"
         )
 
     def handle(self, *args, force=False, **options):
@@ -30,22 +29,22 @@ class Command(BaseCommand):
 
         count = recipes_to_update.count()
         if count == 0:
-            self.stdout.write('No out of date recipes to sign')
+            self.stdout.write("No out of date recipes to sign")
         else:
-            self.stdout.write(f'Signing {count} recipes:')
+            self.stdout.write(f"Signing {count} recipes:")
             for recipe in recipes_to_update:
-                self.stdout.write(' * ' + recipe.name)
+                self.stdout.write(" * " + recipe.name)
                 recipe.update_signature()
                 recipe.save()
 
         recipes_to_unsign = Recipe.objects.only_disabled().exclude(signature=None)
         count = recipes_to_unsign.count()
         if count == 0:
-            self.stdout.write('No disabled recipes to unsign')
+            self.stdout.write("No disabled recipes to unsign")
         else:
-            self.stdout.write(f'Unsigning {count} disabled recipes:')
+            self.stdout.write(f"Unsigning {count} disabled recipes:")
             for recipe in recipes_to_unsign:
-                self.stdout.write(' * ' + recipe.name)
+                self.stdout.write(" * " + recipe.name)
                 sig = recipe.signature
                 recipe.signature = None
                 recipe.save()

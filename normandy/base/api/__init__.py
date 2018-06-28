@@ -9,11 +9,11 @@ class UpdateOrCreateModelViewSet(ModelViewSet):
         Intercept PUT requests and have them create instead of update
         if the object does not exist.
         """
-        if request.method in ['PUT', 'PATCH']:
+        if request.method in ["PUT", "PATCH"]:
             try:
                 self.get_object()
             except Http404:
-                if request.method == 'PUT':
+                if request.method == "PUT":
                     return self.create(request, *args, **kwargs)
 
         return super().update(request, *args, **kwargs)

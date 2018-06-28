@@ -10,27 +10,20 @@ from normandy.studies.models import Extension
 
 
 class ExtensionOrderingFilter(AliasedOrderingFilter):
-    aliases = {
-        'id': ('id', 'ID'),
-        'name': ('name', 'Name'),
-    }
+    aliases = {"id": ("id", "ID"), "name": ("name", "Name")}
 
 
 class ExtensionViewSet(CachingViewsetMixin, viewsets.ModelViewSet):
     queryset = Extension.objects.all()
     serializer_class = ExtensionSerializer
-    permission_classes = [
-        AdminEnabledOrReadOnly,
-        permissions.DjangoModelPermissionsOrAnonReadOnly,
-    ]
+    permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
     filter_backends = [ExtensionOrderingFilter]
 
     def get_queryset(self):
         queryset = self.queryset
 
-        if 'text' in self.request.GET:
-            text = self.request.GET.get('text')
-            queryset = queryset.filter(Q(name__icontains=text) |
-                                       Q(xpi__icontains=text))
+        if "text" in self.request.GET:
+            text = self.request.GET.get("text")
+            queryset = queryset.filter(Q(name__icontains=text) | Q(xpi__icontains=text))
 
         return queryset

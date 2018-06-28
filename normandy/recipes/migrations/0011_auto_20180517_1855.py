@@ -7,18 +7,26 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('recipes', '0010_auto_20180510_2328'),
-    ]
+    dependencies = [("recipes", "0010_auto_20180510_2328")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='recipe',
-            options={'ordering': ['-approved_revision__enabled_state__enabled', '-latest_revision__updated']},
+            name="recipe",
+            options={
+                "ordering": [
+                    "-approved_revision__enabled_state__enabled",
+                    "-latest_revision__updated",
+                ]
+            },
         ),
         migrations.AddField(
-            model_name='enabledstate',
-            name='carryover_from',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='carryover_to', to='recipes.EnabledState'),
+            model_name="enabledstate",
+            name="carryover_from",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="carryover_to",
+                to="recipes.EnabledState",
+            ),
         ),
     ]
