@@ -10,7 +10,7 @@ def email_to_username(apps, schema_editor):
     """
     Copy emails to usernames for all users.
     """
-    User = apps.get_model('auth', 'User')
+    User = apps.get_model("auth", "User")
     for user in User.objects.all():
         if user.email:
             user.username = user.email
@@ -21,19 +21,15 @@ def remove_email_from_username(apps, schema_editor):
     """
     Copy emails to usernames for all users.
     """
-    User = apps.get_model('auth', 'User')
+    User = apps.get_model("auth", "User")
     for user in User.objects.all():
-        if '@' in user.username:
-            user.username = user.username.split('@')[0]
+        if "@" in user.username:
+            user.username = user.username.split("@")[0]
             user.save()
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
-    operations = [
-        migrations.RunPython(email_to_username, remove_email_from_username),
-    ]
+    operations = [migrations.RunPython(email_to_username, remove_email_from_username)]

@@ -114,7 +114,7 @@ class RecipeFactory(factory.DjangoModelFactory):
     def approver(self, create, extracted, **kwargs):
         if extracted:
             approval = ApprovalRequestFactory(revision=self.latest_revision)
-            approval.approve(extracted, 'r+')
+            approval.approve(extracted, "r+")
 
     # This should always be after `approver` as we require approval to enable a recipe
     @factory.post_generation
@@ -140,7 +140,7 @@ class FuzzyIdenticonSeed(factory.fuzzy.FuzzyText):
     """A FuzzyText factory to generate identicon seeds."""
 
     def __init__(self, **kwargs):
-        super().__init__(prefix='v1:', **kwargs)
+        super().__init__(prefix="v1:", **kwargs)
 
 
 @factory.use_strategy(factory.BUILD_STRATEGY)
@@ -172,19 +172,19 @@ class EnabledStateFactory(factory.DjangoModelFactory):
 class SignatureFactory(factory.DjangoModelFactory):
     class Meta:
         model = Signature
-        exclude = ['data']
+        exclude = ["data"]
 
-    data = b''
+    data = b""
     signature = factory.LazyAttribute(lambda o: hashlib.sha256(o.data).hexdigest())
-    public_key = 'MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5'  # noqa
-    x5u = 'https://example.com/fake.x5u'
+    public_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEh+JqU60off8jnvWkQAnP/P4vdKjP0aFiK4rrDne5rsqNd4A4A/z5P2foRFltlS6skODDIUu4X/C2pwROMgSXpkRFZxXk9IwATCRCVQ7YnffR8f1Jw5fWzCerDmf5fAj5"  # noqa
+    x5u = "https://example.com/fake.x5u"
 
 
 class ClientFactory(factory.Factory):
     class Meta:
         model = Client
 
-    country = 'US'
+    country = "US"
     request_time = factory.LazyAttribute(lambda o: timezone.now)
 
 
@@ -198,9 +198,9 @@ ARGUMENTS_SCHEMA = {
             "items": {
                 "properties": {
                     "title": {"type": "string"},
-                    "weight": {"type": "integer", "minimum": 1}
+                    "weight": {"type": "integer", "minimum": 1},
                 },
-                "required": ["title", "weight"]
+                "required": ["title", "weight"],
             },
         },
     },
@@ -208,4 +208,4 @@ ARGUMENTS_SCHEMA = {
 
 
 def fake_sign(datas):
-    return [{'signature': hashlib.sha256(d).hexdigest()} for d in datas]
+    return [{"signature": hashlib.sha256(d).hexdigest()} for d in datas]

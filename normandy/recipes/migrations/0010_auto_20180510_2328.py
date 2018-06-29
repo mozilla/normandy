@@ -5,17 +5,11 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('recipes', '0009_auto_20180510_2328'),
-    ]
+    dependencies = [("recipes", "0009_auto_20180510_2328")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='recipe',
-            options={'ordering': ['-latest_revision__updated']},
+            name="recipe", options={"ordering": ["-latest_revision__updated"]}
         ),
-        migrations.RemoveField(
-            model_name='recipe',
-            name='enabled',
-        ),
+        migrations.RemoveField(model_name="recipe", name="enabled"),
     ]

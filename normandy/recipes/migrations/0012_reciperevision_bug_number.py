@@ -5,14 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('recipes', '0011_auto_20180517_1855'),
-    ]
+    dependencies = [("recipes", "0011_auto_20180517_1855")]
 
     operations = [
         migrations.AddField(
-            model_name='reciperevision',
-            name='bug_number',
-            field=models.IntegerField(null=True),
-        ),
+            model_name="reciperevision", name="bug_number", field=models.IntegerField(null=True)
+        )
     ]

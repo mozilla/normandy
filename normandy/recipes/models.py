@@ -24,10 +24,10 @@ from normandy.recipes.validators import validate_json
 from normandy.recipes.fields import IdenticonSeedField
 
 
-INFO_REQUESTING_RECIPE_SIGNATURES = 'normandy.recipes.I001'
-INFO_CREATE_REVISION = 'normandy.recipes.I002'
-INFO_REQUESTING_ACTION_SIGNATURES = 'normandy.recipes.I003'
-WARNING_BYPASSING_PEER_APPROVAL = 'normandy.recipes.W001'
+INFO_REQUESTING_RECIPE_SIGNATURES = "normandy.recipes.I001"
+INFO_CREATE_REVISION = "normandy.recipes.I002"
+INFO_REQUESTING_ACTION_SIGNATURES = "normandy.recipes.I003"
+WARNING_BYPASSING_PEER_APPROVAL = "normandy.recipes.W001"
 
 
 logger = logging.getLogger(__name__)
@@ -38,10 +38,10 @@ class Channel(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ('slug',)
+        ordering = ("slug",)
 
     def __repr__(self):
-        return '<Channel {}>'.format(self.slug)
+        return "<Channel {}>".format(self.slug)
 
 
 class Country(models.Model):
@@ -49,10 +49,10 @@ class Country(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __repr__(self):
-        return '<Country {}>'.format(self.code)
+        return "<Country {}>".format(self.code)
 
 
 class Locale(models.Model):
@@ -60,10 +60,10 @@ class Locale(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __repr__(self):
-        return '<Locale {}>'.format(self.code)
+        return "<Locale {}>".format(self.code)
 
 
 class Signature(models.Model):
@@ -83,17 +83,21 @@ class RecipeQuerySet(models.QuerySet):
 
 class Recipe(DirtyFieldsMixin, models.Model):
     """A set of actions to be fetched and executed by users."""
+
     objects = RecipeQuerySet.as_manager()
 
-    latest_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
-                                        related_name='latest_for_recipe')
-    approved_revision = models.ForeignKey('RecipeRevision', null=True, on_delete=models.SET_NULL,
-                                          related_name='approved_for_recipe')
-    signature = models.OneToOneField(Signature, related_name='recipe', null=True, blank=True,
-                                     on_delete=models.CASCADE)
+    latest_revision = models.ForeignKey(
+        "RecipeRevision", null=True, on_delete=models.SET_NULL, related_name="latest_for_recipe"
+    )
+    approved_revision = models.ForeignKey(
+        "RecipeRevision", null=True, on_delete=models.SET_NULL, related_name="approved_for_recipe"
+    )
+    signature = models.OneToOneField(
+        Signature, related_name="recipe", null=True, blank=True, on_delete=models.CASCADE
+    )
 
     class Meta:
-        ordering = ['-approved_revision__enabled_state__enabled', '-latest_revision__updated']
+        ordering = ["-approved_revision__enabled_state__enabled", "-latest_revision__updated"]
 
     class NotApproved(Exception):
         pass
@@ -186,6 +190,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def canonical_json(self):
         # Avoid circular import
         from normandy.recipes.api.v1.serializers import MinimalRecipeSerializer
+
         data = MinimalRecipeSerializer(self).data
         return CanonicalJSONRenderer().render(data)
 
@@ -201,8 +206,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
             return
 
         logger.info(
-            f'Requesting signature for recipe with id {self.id} from Autograph',
-            extra={'code': INFO_REQUESTING_RECIPE_SIGNATURES, 'recipe_ids': [self.id]}
+            f"Requesting signature for recipe with id {self.id} from Autograph",
+            extra={"code": INFO_REQUESTING_RECIPE_SIGNATURES, "recipe_ids": [self.id]},
         )
 
         signature_data = autographer.sign_data([self.canonical_json()])[0]
@@ -214,11 +219,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def revise(self, force=False, **data):
         revision = self.latest_revision
 
-        if 'arguments' in data:
-            data['arguments_json'] = json.dumps(data.pop('arguments'))
+        if "arguments" in data:
+            data["arguments_json"] = json.dumps(data.pop("arguments"))
 
-        if 'filter_object' in data:
-            data['filter_object_json'] = json.dumps(data.pop('filter_object'))
+        if "filter_object" in data:
+            data["filter_object_json"] = json.dumps(data.pop("filter_object"))
 
         if revision:
             revisions = RecipeRevision.objects.filter(id=revision.id)
@@ -226,36 +231,37 @@ class Recipe(DirtyFieldsMixin, models.Model):
             revision_data = revision.data
             revision_data.update(data)
 
-            channels = revision_data.pop('channels')
-            revisions = filter_m2m(revisions, 'channels', channels)
+            channels = revision_data.pop("channels")
+            revisions = filter_m2m(revisions, "channels", channels)
 
-            countries = revision_data.pop('countries')
-            revisions = filter_m2m(revisions, 'countries', countries)
+            countries = revision_data.pop("countries")
+            revisions = filter_m2m(revisions, "countries", countries)
 
-            locales = revision_data.pop('locales')
-            revisions = filter_m2m(revisions, 'locales', locales)
+            locales = revision_data.pop("locales")
+            revisions = filter_m2m(revisions, "locales", locales)
 
             data = revision_data
             revisions = revisions.filter(**data)
 
             is_clean = revisions.exists()
         else:
-            channels = data.pop('channels', [])
-            countries = data.pop('countries', [])
-            locales = data.pop('locales', [])
+            channels = data.pop("channels", [])
+            countries = data.pop("countries", [])
+            locales = data.pop("locales", [])
             is_clean = False
 
         if not is_clean or force:
             logger.info(
-                f'Creating new revision for recipe ID [{self.id}]',
-                extra={'code': INFO_CREATE_REVISION}
+                f"Creating new revision for recipe ID [{self.id}]",
+                extra={"code": INFO_CREATE_REVISION},
             )
 
             if revision and revision.approval_status == RecipeRevision.PENDING:
                 revision.approval_request.delete()
 
             self.latest_revision = RecipeRevision.objects.create(
-                recipe=self, parent=revision, **data)
+                recipe=self, parent=revision, **data
+            )
 
             for channel in channels:
                 self.latest_revision.channels.add(channel)
@@ -274,15 +280,18 @@ class Recipe(DirtyFieldsMixin, models.Model):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             dirty_field_names = list(dirty_fields.keys())
 
-            if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
-                    and self.signature is not None):
+            if (
+                len(dirty_field_names) > 1
+                and "signature" in dirty_field_names
+                and self.signature is not None
+            ):
                 # Setting the signature while also changing something else is probably
                 # going to make the signature immediately invalid. Don't allow it.
-                raise ValidationError('Signatures must change alone')
+                raise ValidationError("Signatures must change alone")
 
-            if dirty_field_names != ['signature']:
+            if dirty_field_names != ["signature"]:
                 super().save(*args, **kwargs)
-                kwargs['force_insert'] = False
+                kwargs["force_insert"] = False
 
                 self.update_signature()
 
@@ -290,51 +299,54 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
 
 class RecipeRevision(DirtyFieldsMixin, models.Model):
-    APPROVED = 'approved'
-    REJECTED = 'rejected'
-    PENDING = 'pending'
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    PENDING = "pending"
 
     # Bookkeeping fields
-    parent = models.OneToOneField('self', null=True, on_delete=models.CASCADE,
-                                  related_name='child')
-    recipe = models.ForeignKey(Recipe, related_name='revisions', on_delete=models.CASCADE)
+    parent = models.OneToOneField(
+        "self", null=True, on_delete=models.CASCADE, related_name="child"
+    )
+    recipe = models.ForeignKey(Recipe, related_name="revisions", on_delete=models.CASCADE)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='recipe_revisions',
-                             null=True)
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="recipe_revisions", null=True
+    )
 
     # Recipe fields
     name = models.CharField(max_length=255)
-    action = models.ForeignKey('Action', related_name='recipe_revisions', on_delete=models.CASCADE)
-    arguments_json = models.TextField(default='{}', validators=[validate_json])
+    action = models.ForeignKey("Action", related_name="recipe_revisions", on_delete=models.CASCADE)
+    arguments_json = models.TextField(default="{}", validators=[validate_json])
     extra_filter_expression = models.TextField(blank=False)
     filter_object_json = models.TextField(validators=[validate_json], null=True)
     channels = models.ManyToManyField(Channel)
     countries = models.ManyToManyField(Country)
     locales = models.ManyToManyField(Locale)
     identicon_seed = IdenticonSeedField(max_length=64)
-    enabled_state = models.ForeignKey('EnabledState', null=True, on_delete=models.SET_NULL,
-                                      related_name='current_for_revision')
+    enabled_state = models.ForeignKey(
+        "EnabledState", null=True, on_delete=models.SET_NULL, related_name="current_for_revision"
+    )
     comment = models.TextField()
     bug_number = models.IntegerField(null=True)
 
     class Meta:
-        ordering = ('-created',)
+        ordering = ("-created",)
 
     @property
     def data(self):
         return {
-            'name': self.name,
-            'action': self.action,
-            'arguments_json': self.arguments_json,
-            'extra_filter_expression': self.extra_filter_expression,
-            'filter_object_json': self.filter_object_json,
-            'channels': list(self.channels.all()) if self.id else [],
-            'countries': list(self.countries.all()) if self.id else [],
-            'locales': list(self.locales.all()) if self.id else [],
-            'identicon_seed': self.identicon_seed,
-            'comment': self.comment,
-            'bug_number': self.bug_number,
+            "name": self.name,
+            "action": self.action,
+            "arguments_json": self.arguments_json,
+            "extra_filter_expression": self.extra_filter_expression,
+            "filter_object_json": self.filter_object_json,
+            "channels": list(self.channels.all()) if self.id else [],
+            "countries": list(self.countries.all()) if self.id else [],
+            "locales": list(self.locales.all()) if self.id else [],
+            "identicon_seed": self.identicon_seed,
+            "comment": self.comment,
+            "bug_number": self.bug_number,
         }
 
     @property
@@ -342,16 +354,16 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         parts = []
 
         if self.locales.count():
-            locales = ', '.join(["'{}'".format(l.code) for l in self.locales.all()])
-            parts.append('normandy.locale in [{}]'.format(locales))
+            locales = ", ".join(["'{}'".format(l.code) for l in self.locales.all()])
+            parts.append("normandy.locale in [{}]".format(locales))
 
         if self.countries.count():
-            countries = ', '.join(["'{}'".format(c.code) for c in self.countries.all()])
-            parts.append('normandy.country in [{}]'.format(countries))
+            countries = ", ".join(["'{}'".format(c.code) for c in self.countries.all()])
+            parts.append("normandy.country in [{}]".format(countries))
 
         if self.channels.count():
-            channels = ', '.join(["'{}'".format(c.slug) for c in self.channels.all()])
-            parts.append('normandy.channel in [{}]'.format(channels))
+            channels = ", ".join(["'{}'".format(c.slug) for c in self.channels.all()])
+            parts.append("normandy.channel in [{}]".format(channels))
 
         for obj in self.filter_object:
             filter = filters.from_data(obj)
@@ -361,9 +373,9 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         if self.extra_filter_expression:
             parts.append(self.extra_filter_expression)
 
-        expression = ') && ('.join(parts)
+        expression = ") && (".join(parts)
 
-        return '({})'.format(expression) if len(parts) > 1 else expression
+        return "({})".format(expression) if len(parts) > 1 else expression
 
     @property
     def filter_object(self):
@@ -421,8 +433,10 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
     def _create_new_enabled_state(self, **kwargs):
         if self.recipe.approved_revision != self:
-            raise EnabledState.NotActionable('You cannot change the enabled state of a revision'
-                                             'that is not the latest approved revision.')
+            raise EnabledState.NotActionable(
+                "You cannot change the enabled state of a revision"
+                "that is not the latest approved revision."
+            )
 
         self.enabled_state = EnabledState.objects.create(revision=self, **kwargs)
         self.save()
@@ -433,29 +447,32 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
     def enable(self, user, carryover_from=None):
         if self.enabled:
-            raise EnabledState.NotActionable('This revision is already enabled.')
+            raise EnabledState.NotActionable("This revision is already enabled.")
 
         self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
     def disable(self, user):
         if not self.enabled:
-            raise EnabledState.NotActionable('This revision is already disabled.')
+            raise EnabledState.NotActionable("This revision is already disabled.")
 
         self._create_new_enabled_state(creator=user, enabled=False)
 
 
 class EnabledState(models.Model):
-    revision = models.ForeignKey(RecipeRevision, related_name='enabled_states',
-                                 on_delete=models.CASCADE)
+    revision = models.ForeignKey(
+        RecipeRevision, related_name="enabled_states", on_delete=models.CASCADE
+    )
     created = models.DateTimeField(default=timezone.now)
-    creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='enabled_states',
-                                null=True)
+    creator = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="enabled_states", null=True
+    )
     enabled = models.BooleanField(default=False)
-    carryover_from = models.ForeignKey('self', null=True, on_delete=models.SET_NULL,
-                                       related_name='carryover_to')
+    carryover_from = models.ForeignKey(
+        "self", null=True, on_delete=models.SET_NULL, related_name="carryover_to"
+    )
 
     class Meta:
-        ordering = ('-created',)
+        ordering = ("-created",)
 
     class NotActionable(Exception):
         pass
@@ -463,16 +480,16 @@ class EnabledState(models.Model):
 
 class ApprovalRequest(models.Model):
     revision = models.OneToOneField(
-        RecipeRevision,
-        related_name='approval_request',
-        on_delete=models.CASCADE,
+        RecipeRevision, related_name="approval_request", on_delete=models.CASCADE
     )
     created = models.DateTimeField(default=timezone.now)
-    creator = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approval_requests',
-                                null=True)
+    creator = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="approval_requests", null=True
+    )
     approved = models.NullBooleanField(null=True)
-    approver = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='approved_requests',
-                                 null=True)
+    approver = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="approved_requests", null=True
+    )
     comment = models.TextField(null=True)
 
     class NotActionable(Exception):
@@ -487,11 +504,11 @@ class ApprovalRequest(models.Model):
                 raise self.CannotActOnOwnRequest()
             else:
                 logger.warning(
-                    'Bypassing peer approver verification because it is disabled.',
+                    "Bypassing peer approver verification because it is disabled.",
                     extra={
-                        'code': WARNING_BYPASSING_PEER_APPROVAL,
-                        'approval_id': self.id,
-                        'approver': approver
+                        "code": WARNING_BYPASSING_PEER_APPROVAL,
+                        "approval_id": self.id,
+                        "approver": approver,
                     },
                 )
 
@@ -549,18 +566,17 @@ class Action(DirtyFieldsMixin, models.Model):
     name = models.SlugField(max_length=255, unique=True)
     implementation = models.TextField(null=True)
     implementation_hash = models.CharField(max_length=71, editable=False, null=True)
-    arguments_schema_json = models.TextField(default='{}', validators=[validate_json])
+    arguments_schema_json = models.TextField(default="{}", validators=[validate_json])
     signature = models.OneToOneField(
-        Signature, related_name='action', null=True, blank=True,
-        on_delete=models.CASCADE,
+        Signature, related_name="action", null=True, blank=True, on_delete=models.CASCADE
     )
 
     errors = {
-        'duplicate_branch_slug': 'Feature branch slugs must be unique within an experiment',
-        'duplicate_branch_value': 'Feature branch values must be unique within an experiment',
-        'duplicate_experiment_slug': 'Experiment slugs must be globally unique',
-        'duplicate_rollout_slug': 'Rollout slugs must be globally unique',
-        'rollout_slug_not_found': 'Rollout slug not found for rollback',
+        "duplicate_branch_slug": "Feature branch slugs must be unique within an experiment",
+        "duplicate_branch_value": "Feature branch values must be unique within an experiment",
+        "duplicate_experiment_slug": "Experiment slugs must be globally unique",
+        "duplicate_rollout_slug": "Rollout slugs must be globally unique",
+        "rollout_slug_not_found": "Rollout slug not found for rollback",
     }
 
     @property
@@ -575,14 +591,16 @@ class Action(DirtyFieldsMixin, models.Model):
     def recipes_used_by(self):
         """Set of enabled recipes that are using this action."""
         return Recipe.objects.only_enabled().filter(
-            latest_revision_id__in=self.recipe_revisions.values_list('id', flat=True),
+            latest_revision_id__in=self.recipe_revisions.values_list("id", flat=True)
         )
 
     def recipes_used_by_html(self):
-        return render_to_string('admin/field_recipe_list.html', {
-            'recipes': self.recipes_used_by.order_by('latest_revision__name'),
-        })
-    recipes_used_by_html.short_description = 'Used in Recipes'
+        return render_to_string(
+            "admin/field_recipe_list.html",
+            {"recipes": self.recipes_used_by.order_by("latest_revision__name")},
+        )
+
+    recipes_used_by_html.short_description = "Used in Recipes"
 
     def __str__(self):
         return self.name
@@ -590,11 +608,12 @@ class Action(DirtyFieldsMixin, models.Model):
     def canonical_json(self):
         # Avoid circular import
         from normandy.recipes.api.v1.serializers import ActionSerializer
+
         data = ActionSerializer(self).data
         return CanonicalJSONRenderer().render(data)
 
     def get_absolute_url(self):
-        return reverse('action-detail', args=[self.name])
+        return reverse("action-detail", args=[self.name])
 
     def compute_implementation_hash(self):
         # User Sub Resource Integrity because the implementation is a
@@ -611,8 +630,8 @@ class Action(DirtyFieldsMixin, models.Model):
             return
 
         logger.info(
-            f'Requesting signature for action named {self.name} from Autograph',
-            extra={'code': INFO_REQUESTING_ACTION_SIGNATURES, 'action_names': [self.name]}
+            f"Requesting signature for action named {self.name} from Autograph",
+            extra={"code": INFO_REQUESTING_ACTION_SIGNATURES, "action_names": [self.name]},
         )
 
         signature_data = autographer.sign_data([self.canonical_json()])[0]
@@ -626,15 +645,18 @@ class Action(DirtyFieldsMixin, models.Model):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             dirty_field_names = list(dirty_fields.keys())
 
-            if (len(dirty_field_names) > 1 and 'signature' in dirty_field_names
-                    and self.signature is not None):
+            if (
+                len(dirty_field_names) > 1
+                and "signature" in dirty_field_names
+                and self.signature is not None
+            ):
                 # Setting the signature while also changing something else is probably
                 # going to make the signature immediately invalid. Don't allow it.
-                raise ValidationError('Signatures must change alone')
+                raise ValidationError("Signatures must change alone")
 
-            if dirty_field_names != ['signature']:
+            if dirty_field_names != ["signature"]:
                 super().save(*args, **kwargs)
-                kwargs['force_insert'] = False
+                kwargs["force_insert"] = False
 
                 if self.implementation:
                     self.implementation_hash = self.compute_implementation_hash()
@@ -651,55 +673,54 @@ class Action(DirtyFieldsMixin, models.Model):
         # Make a default dict that always returns a default dict
         def default():
             return defaultdict(default)
+
         errors = default()
 
-        if self.name == 'preference-experiment':
+        if self.name == "preference-experiment":
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
             branch_values = set()
-            for i, branch in enumerate(arguments.get('branches')):
-                if branch['slug'] in branch_slugs:
-                    msg = self.errors['duplicate_branch_slug']
-                    errors['branches'][i]['slug'] = msg
+            for i, branch in enumerate(arguments.get("branches")):
+                if branch["slug"] in branch_slugs:
+                    msg = self.errors["duplicate_branch_slug"]
+                    errors["branches"][i]["slug"] = msg
 
-                if branch['value'] in branch_values:
-                    msg = self.errors['duplicate_branch_value']
-                    errors['branches'][i]['value'] = msg
+                if branch["value"] in branch_values:
+                    msg = self.errors["duplicate_branch_value"]
+                    errors["branches"][i]["value"] = msg
 
-                branch_slugs.add(branch['slug'])
-                branch_values.add(branch['value'])
+                branch_slugs.add(branch["slug"])
+                branch_values.add(branch["value"])
 
             # Experiment slugs should be unique.
             experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 experiment_recipes = experiment_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments.get('slug') for r in experiment_recipes)
-            if arguments.get('slug') in existing_slugs:
-                msg = self.errors['duplicate_experiment_slug']
-                errors['slug'] = msg
+            existing_slugs = set(r.arguments.get("slug") for r in experiment_recipes)
+            if arguments.get("slug") in existing_slugs:
+                msg = self.errors["duplicate_experiment_slug"]
+                errors["slug"] = msg
 
-        elif self.name == 'preference-rollout':
+        elif self.name == "preference-rollout":
             # Rollout slugs should be unique
-            rollout_recipes = Recipe.objects.filter(
-                latest_revision__action=self)
+            rollout_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 rollout_recipes = rollout_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments.get('slug') for r in rollout_recipes)
-            if arguments.get('slug') in existing_slugs:
-                msg = self.errors['duplicate_rollout_slug']
-                errors['slug'] = msg
+            existing_slugs = set(r.arguments.get("slug") for r in rollout_recipes)
+            if arguments.get("slug") in existing_slugs:
+                msg = self.errors["duplicate_rollout_slug"]
+                errors["slug"] = msg
 
-        elif self.name == 'preference-rollback':
+        elif self.name == "preference-rollback":
             # Rollback slugs should match rollouts
-            rollouts = Recipe.objects.filter(
-                latest_revision__action__name='preference-rollout')
-            rollout_slugs = set(r.arguments['slug'] for r in rollouts)
-            if arguments['rolloutSlug'] not in rollout_slugs:
-                errors['slug'] = self.errors['rollout_slug_not_found']
+            rollouts = Recipe.objects.filter(latest_revision__action__name="preference-rollout")
+            rollout_slugs = set(r.arguments["slug"] for r in rollouts)
+            if arguments["rolloutSlug"] not in rollout_slugs:
+                errors["slug"] = self.errors["rollout_slug_not_found"]
 
         # Raise errors, if any
         if errors:
-            raise serializers.ValidationError({'arguments': errors})
+            raise serializers.ValidationError({"arguments": errors})
 
 
 class Client(object):

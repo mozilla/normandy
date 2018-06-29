@@ -7,19 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('recipes', '0001_squashed_0047_reciperevision_identicon_seed'),
-    ]
+    dependencies = [("recipes", "0001_squashed_0047_reciperevision_identicon_seed")]
 
     operations = [
         migrations.AlterField(
-            model_name='action',
-            name='implementation',
-            field=models.TextField(null=True),
+            model_name="action", name="implementation", field=models.TextField(null=True)
         ),
         migrations.AlterField(
-            model_name='action',
-            name='implementation_hash',
+            model_name="action",
+            name="implementation_hash",
             field=models.CharField(editable=False, max_length=71, null=True),
         ),
     ]

@@ -11,7 +11,7 @@ class TestExtensionSerializer:
         serializer = ExtensionSerializer(extension)
 
         assert serializer.data == {
-            'id': extension.id,
-            'name': extension.name,
-            'xpi': extension.xpi.url
+            "id": extension.id,
+            "name": extension.name,
+            "xpi": extension.xpi.url,
         }

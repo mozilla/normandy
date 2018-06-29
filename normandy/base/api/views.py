@@ -8,7 +8,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import (
-    APIView, exception_handler as original_exception_handler, set_rollback
+    APIView,
+    exception_handler as original_exception_handler,
+    set_rollback,
 )
 
 from normandy.base.api.serializers import UserSerializer, ServiceInfoSerializer
@@ -28,14 +30,14 @@ class APIRootView(APIView):
     def get(self, request, *args, **kwargs):
         ret = {}
 
-        namespace = getattr(request.resolver_match, 'namespace', None)
+        namespace = getattr(request.resolver_match, "namespace", None)
         for api_url in self.api_urls:
             url_name = api_url.name
             if namespace:
-                url_name = namespace + ':' + url_name
+                url_name = namespace + ":" + url_name
 
             try:
-                allow_cdn = getattr(api_url, 'allow_cdn', True)
+                allow_cdn = getattr(api_url, "allow_cdn", True)
                 if not allow_cdn and settings.APP_SERVER_URL:
                     base = settings.APP_SERVER_URL
                 else:
@@ -65,12 +67,16 @@ class ServiceInfoView(APIView):
         else:
             user = None
 
-        return Response(ServiceInfoSerializer({
-            'user': user,
-            'peer_approval_enforced': settings.PEER_APPROVAL_ENFORCED,
-            'logout_url': settings.OIDC_LOGOUT_URL or reverse('control:logout'),
-            'github_url': settings.GITHUB_URL,
-        }).data)
+        return Response(
+            ServiceInfoSerializer(
+                {
+                    "user": user,
+                    "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
+                    "logout_url": settings.OIDC_LOGOUT_URL or reverse("control:logout"),
+                    "github_url": settings.GITHUB_URL,
+                }
+            ).data
+        )
 
 
 def exception_handler(exc, context):
@@ -88,7 +94,7 @@ def exception_handler(exc, context):
         return response
 
     elif isinstance(exc, DjangoValidationError):
-        data = {'messages': exc.messages}
+        data = {"messages": exc.messages}
         set_rollback()
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
 

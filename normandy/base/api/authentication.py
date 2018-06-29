@@ -28,7 +28,7 @@ class BearerTokenAuthentication(BaseAuthentication):
     critical.
     """
 
-    keyword = 'Bearer'
+    keyword = "Bearer"
 
     def authenticate(self, request):
         auth_header = get_authorization_header(request).decode().split()
@@ -46,7 +46,7 @@ class BearerTokenAuthentication(BaseAuthentication):
         except (requests.exceptions.RequestException, OIDCEndpointRequestError):
             raise exceptions.AuthenticationFailed("Unable to verify bearer token.")
 
-        email = user_profile.get('email', '').strip().lower()
+        email = user_profile.get("email", "").strip().lower()
         if not email:
             # This would happen if someone has requested an access token
             # from their OIDC provider *without the 'email' scope*.
@@ -54,11 +54,12 @@ class BearerTokenAuthentication(BaseAuthentication):
 
         # Turn this email into a Django User instance.
         user, _ = get_user_model().objects.get_or_create(
-            email=email, defaults={'username': email[:150]})
+            email=email, defaults={"username": email[:150]}
+        )
 
         # Sync user data with OIDC profile
-        family_name = user_profile.get('family_name', '').strip()
-        given_name = user_profile.get('given_name', '').strip()
+        family_name = user_profile.get("family_name", "").strip()
+        given_name = user_profile.get("given_name", "").strip()
         if family_name or given_name:
             if family_name != user.last_name or given_name != user.first_name:
                 user.last_name = family_name
@@ -66,7 +67,7 @@ class BearerTokenAuthentication(BaseAuthentication):
                 user.save()
 
         if not user.is_active:
-            raise exceptions.AuthenticationFailed('User inactive.')
+            raise exceptions.AuthenticationFailed("User inactive.")
 
         return (user, access_token)
 
@@ -78,24 +79,18 @@ class BearerTokenAuthentication(BaseAuthentication):
         """
         return self.keyword
 
-    @backoff.on_exception(
-        backoff.constant,
-        requests.exceptions.RequestException,
-        max_tries=5,
-    )
+    @backoff.on_exception(backoff.constant, requests.exceptions.RequestException, max_tries=5)
     def fetch_oidc_user_profile(self, access_token):
         url = settings.OIDC_USER_ENDPOINT
-        response = requests.get(url, headers={
-            'Authorization': f'Bearer {access_token}'
-        })
+        response = requests.get(url, headers={"Authorization": f"Bearer {access_token}"})
 
         if response.status_code == 200:
             return response.json()
         elif response.status_code == 401:
             # The OIDC provider did not like the access token.
-            raise exceptions.AuthenticationFailed('Unauthorized access token')
+            raise exceptions.AuthenticationFailed("Unauthorized access token")
         elif response.status_code >= 500:
-            raise requests.exceptions.RequestException(f'{response.status_code} on {url}')
+            raise requests.exceptions.RequestException(f"{response.status_code} on {url}")
 
         # This could happen if, for some reason, we're not configured to be
         # allowed to talk to the OIDC endpoint.

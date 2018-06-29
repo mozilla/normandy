@@ -17,7 +17,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 
-INFO_RECEIVED_SIGNATURES = 'normandy.autograph.I001'
+INFO_RECEIVED_SIGNATURES = "normandy.autograph.I001"
 
 
 logger = logging.getLogger(__name__)
@@ -39,15 +39,15 @@ class Autographer(object):
     def session(self):
         session = requests.Session()
         session.auth = HawkAuth(
-            id=str(settings.AUTOGRAPH_HAWK_ID),
-            key=str(settings.AUTOGRAPH_HAWK_SECRET_KEY))
+            id=str(settings.AUTOGRAPH_HAWK_ID), key=str(settings.AUTOGRAPH_HAWK_SECRET_KEY)
+        )
         return session
 
     def check_config(self):
-        required_keys = ['URL', 'HAWK_ID', 'HAWK_SECRET_KEY']
+        required_keys = ["URL", "HAWK_ID", "HAWK_SECRET_KEY"]
         for key in required_keys:
-            if getattr(settings, 'AUTOGRAPH_' + key) is None:
-                msg = 'set settings.AUTOGRAPH_{} to use action signatures'.format(key)
+            if getattr(settings, "AUTOGRAPH_" + key) is None:
+                msg = "set settings.AUTOGRAPH_{} to use action signatures".format(key)
                 raise ImproperlyConfigured(msg)
 
     def sign_data(self, content_list):
@@ -57,34 +57,34 @@ class Autographer(object):
         The items in `content_list` must be bytes objects.
         """
         ts = timezone.now()
-        url = '{}sign/data'.format(settings.AUTOGRAPH_URL)
+        url = "{}sign/data".format(settings.AUTOGRAPH_URL)
         signing_request = []
         for item in content_list:
             # base64 works in bytes. requests work in UTF-8.
             # Convert to bytes, and then back.
-            encoded_implementation = base64.b64encode(item).decode('utf8')
-            signing_request.append({
-                'input': encoded_implementation,
-            })
+            encoded_implementation = base64.b64encode(item).decode("utf8")
+            signing_request.append({"input": encoded_implementation})
 
         res = self.session.post(url, json=signing_request)
         res.raise_for_status()
         signing_responses = res.json()
 
         logger.info(
-            f'Got {len(signing_responses)} signatures from Autograph',
-            extra={'code': INFO_RECEIVED_SIGNATURES}
+            f"Got {len(signing_responses)} signatures from Autograph",
+            extra={"code": INFO_RECEIVED_SIGNATURES},
         )
 
         signatures = []
         for res in signing_responses:
 
-            signatures.append({
-                'timestamp': ts,
-                'signature': res['signature'],
-                'x5u': res.get('x5u'),
-                'public_key': res['public_key'],
-            })
+            signatures.append(
+                {
+                    "timestamp": ts,
+                    "signature": res["signature"],
+                    "x5u": res.get("x5u"),
+                    "public_key": res["public_key"],
+                }
+            )
         return signatures
 
 
@@ -99,12 +99,12 @@ def verify_signature(data, signature, pubkey):
         data = data.encode()
 
     # Add data template
-    data = b'Content-Signature:\x00' + data
+    data = b"Content-Signature:\x00" + data
 
     try:
         verifying_pubkey = ecdsa.VerifyingKey.from_pem(pubkey)
     except binascii.Error as e:
-        if e.args == ('Incorrect padding',):
+        if e.args == ("Incorrect padding",):
             raise WrongPublicKeySize()
         else:
             raise
@@ -114,7 +114,7 @@ def verify_signature(data, signature, pubkey):
     try:
         signature = base64.urlsafe_b64decode(signature)
     except binascii.Error as e:
-        if e.args == ('Incorrect padding',):
+        if e.args == ("Incorrect padding",):
             raise WrongSignatureSize()
         else:
             raise
@@ -129,11 +129,13 @@ def verify_signature(data, signature, pubkey):
         # The signature verifier has a clause like
         #     assert len(signature) == 2*l, (len(signature), 2*l)
         # Check that the AssertionError is consistent with that
-        if (len(e.args) == 1 and
-                isinstance(e.args[0], tuple) and
-                len(e.args[0]) == 2 and
-                isinstance(e.args[0][0], int) and
-                isinstance(e.args[0][1], int)):
+        if (
+            len(e.args) == 1
+            and isinstance(e.args[0], tuple)
+            and len(e.args[0]) == 2
+            and isinstance(e.args[0][0], int)
+            and isinstance(e.args[0][1], int)
+        ):
             raise WrongSignatureSize()
         else:
             raise
@@ -145,36 +147,37 @@ def verify_signature(data, signature, pubkey):
 
 
 class BadSignature(Exception):
-    detail = 'Unknown signature problem'
+    detail = "Unknown signature problem"
 
 
 class SignatureDoesNotMatch(BadSignature):
-    detail = 'Signature is correct, but not valid for this data'
+    detail = "Signature is correct, but not valid for this data"
 
 
 class WrongSignatureSize(BadSignature):
-    detail = 'Signature is not the right number of bytes'
+    detail = "Signature is not the right number of bytes"
 
 
 class WrongPublicKeySize(BadSignature):
-    detail = 'Public Key is not the right number of bytes'
+    detail = "Public Key is not the right number of bytes"
 
 
 def read_timestamp_object(obj):
-    general_date_format = '%Y%m%d%H%M%SZ'
-    utc_date_format = '%y%m%d%H%M%SZ'
+    general_date_format = "%Y%m%d%H%M%SZ"
+    utc_date_format = "%y%m%d%H%M%SZ"
 
-    if 'generalTime' in obj:
-        timestamp = obj['generalTime'].decode()
+    if "generalTime" in obj:
+        timestamp = obj["generalTime"].decode()
         return datetime.strptime(timestamp, general_date_format)
-    elif 'utcTime' in obj:
-        timestamp = obj['utcTime'].decode()
+    elif "utcTime" in obj:
+        timestamp = obj["utcTime"].decode()
         return datetime.strptime(timestamp, utc_date_format)
     else:
         raise BadCertificate(
-            'Timestamp not in expected format. '
-            'Expected either "generalTime" or "utcTime", found keys {}'
-            .format(str(list(obj.keys())))
+            "Timestamp not in expected format. "
+            'Expected either "generalTime" or "utcTime", found keys {}'.format(
+                str(list(obj.keys()))
+            )
         )
 
 
@@ -192,11 +195,11 @@ def verify_x5u(url, expire_early=None):
 
     for cert in certs:
         try:
-            validity = cert['tbsCertificate']['validity']
-            not_before = read_timestamp_object(validity['notBefore'])
-            not_after = read_timestamp_object(validity['notAfter'])
+            validity = cert["tbsCertificate"]["validity"]
+            not_before = read_timestamp_object(validity["notBefore"])
+            not_after = read_timestamp_object(validity["notAfter"])
         except KeyError as e:
-            raise BadCertificate(f'Certificate does not have expected shape: KeyError {e}')
+            raise BadCertificate(f"Certificate does not have expected shape: KeyError {e}")
         check_validity(not_before, not_after, expire_early)
 
     return True
@@ -214,7 +217,7 @@ def check_validity(not_before, not_after, expire_early):
     """
     now = datetime.now()
     if not_before > not_after:
-        raise BadCertificate(f'not_before ({not_before}) after not_after ({not_after})')
+        raise BadCertificate(f"not_before ({not_before}) after not_after ({not_after})")
     if now < not_before:
         raise CertificateNotYetValid(not_before)
     if now > not_after:
@@ -231,7 +234,7 @@ class BadCertificate(Exception):
 
     @property
     def detail(self):
-        return f'Bad certificate: {self.extra}'
+        return f"Bad certificate: {self.extra}"
 
 
 class CertificateNotYetValid(BadCertificate):
@@ -240,7 +243,7 @@ class CertificateNotYetValid(BadCertificate):
 
     @property
     def detail(self):
-        return f'Certificate is not valid until {self.not_before}'
+        return f"Certificate is not valid until {self.not_before}"
 
 
 class CertificateExpired(BadCertificate):
@@ -249,7 +252,7 @@ class CertificateExpired(BadCertificate):
 
     @property
     def detail(self):
-        return f'Certificate expired in the past on {self.not_after}'
+        return f"Certificate expired in the past on {self.not_after}"
 
 
 class CertificateExpiringSoon(BadCertificate):
@@ -258,7 +261,7 @@ class CertificateExpiringSoon(BadCertificate):
 
     @property
     def detail(self):
-        return f'Certificate is expiring soon (in the next {self.window})'
+        return f"Certificate is expiring soon (in the next {self.window})"
 
 
 class CertificateParseError(BadCertificate):
@@ -267,7 +270,7 @@ class CertificateParseError(BadCertificate):
 
     @property
     def detail(self):
-        return f'Could not parse certificate: {self.extra}'
+        return f"Could not parse certificate: {self.extra}"
 
 
 def parse_pem_to_certs(pem):
@@ -278,29 +281,29 @@ def parse_pem_to_certs(pem):
     :returns: List of Python objects representing certificates
     """
     certs_der = []
-    acc = ''
-    state = 'PRE'
-    for line in pem.split('\n'):
-        if state == 'PRE' and line == '-----BEGIN CERTIFICATE-----':
-            state = 'BODY_OR_META'
-        elif state == 'PRE' and not line:
+    acc = ""
+    state = "PRE"
+    for line in pem.split("\n"):
+        if state == "PRE" and line == "-----BEGIN CERTIFICATE-----":
+            state = "BODY_OR_META"
+        elif state == "PRE" and not line:
             pass
-        elif state == 'BODY_OR_META' and ':' in line:
-            state = 'META'
-        elif state == 'BODY' and line == '-----END CERTIFICATE-----':
+        elif state == "BODY_OR_META" and ":" in line:
+            state = "META"
+        elif state == "BODY" and line == "-----END CERTIFICATE-----":
             certs_der.append(base64.b64decode(acc))
-            acc = ''
-            state = 'PRE'
-        elif state == 'META' and not line:
-            state = 'BODY'
-        elif state == 'BODY' or state == 'BODY_OR_META':
+            acc = ""
+            state = "PRE"
+        elif state == "META" and not line:
+            state = "BODY"
+        elif state == "BODY" or state == "BODY_OR_META":
             acc += line
-            state = 'BODY'
+            state = "BODY"
         else:
             raise CertificateParseError(f'Unexpected input "{line}" in state "{state}"')
 
     if acc:
-        raise CertificateParseError(f'Unexpected end of input. Leftover: {acc}')
+        raise CertificateParseError(f"Unexpected end of input. Leftover: {acc}")
 
     certs_py = []
     for der in certs_der:

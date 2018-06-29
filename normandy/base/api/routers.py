@@ -8,7 +8,7 @@ from normandy.base.api.views import APIRootView
 class MixedViewRouter(SimpleRouter):
     """Router that allows for detached routes."""
 
-    root_view_name = 'api-root'
+    root_view_name = "api-root"
 
     def __init__(self, *args, view=APIRootView, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,7 +23,7 @@ class MixedViewRouter(SimpleRouter):
         urls.extend(self.registered_view_urls)
 
         view = self.get_api_root_view(api_urls=urls[:])
-        root_url = url(r'^$', view, name=self.root_view_name)
+        root_url = url(r"^$", view, name=self.root_view_name)
         urls.append(root_url)
 
         return urls
@@ -34,7 +34,7 @@ class MixedViewRouter(SimpleRouter):
         super().register(prefix, viewset, base_name=base_name)
 
     def register_view(self, prefix, View, *, name, allow_cdn=True, **kwargs):
-        url_pattern = url(r'^{}/$'.format(prefix), View.as_view(), name=name, **kwargs)
+        url_pattern = url(r"^{}/$".format(prefix), View.as_view(), name=name, **kwargs)
         url_pattern.allow_cdn = allow_cdn
         self.registered_view_urls.append(url_pattern)
 

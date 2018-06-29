@@ -5,13 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('studies', '0001_initial'),
-    ]
+    dependencies = [("studies", "0001_initial")]
 
-    operations = [
-        migrations.AlterModelOptions(
-            name='extension',
-            options={'ordering': ('-id',)},
-        ),
-    ]
+    operations = [migrations.AlterModelOptions(name="extension", options={"ordering": ("-id",)})]

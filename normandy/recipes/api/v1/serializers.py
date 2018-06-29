@@ -15,7 +15,7 @@ from normandy.recipes.models import (
     Locale,
     Recipe,
     RecipeRevision,
-    Signature
+    Signature,
 )
 
 
@@ -27,7 +27,7 @@ class SignatureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Signature
-        fields = ['timestamp', 'signature', 'x5u', 'public_key']
+        fields = ["timestamp", "signature", "x5u", "public_key"]
 
     def get_x5u(self, signature):
         x5u = signature.x5u
@@ -36,7 +36,7 @@ class SignatureSerializer(serializers.ModelSerializer):
         if x5u is not None and settings.AUTOGRAPH_X5U_CACHE_BUST is not None:
             url_parts = list(urlparse.urlparse(x5u))
             query = urlparse.parse_qs(url_parts[4])
-            query['cachebust'] = settings.AUTOGRAPH_X5U_CACHE_BUST
+            query["cachebust"] = settings.AUTOGRAPH_X5U_CACHE_BUST
             url_parts[4] = urlencode(query)
             return urlparse.urlunparse(url_parts)
 
@@ -49,11 +49,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = [
-            'name',
-            'implementation_url',
-            'arguments_schema',
-        ]
+        fields = ["name", "implementation_url", "arguments_schema"]
 
 
 class SignedActionSerializer(serializers.ModelSerializer):
@@ -62,7 +58,7 @@ class SignedActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['signature', 'action']
+        fields = ["signature", "action"]
 
     def get_action(self, action):
         # `action` here is the main object for the serializer.
@@ -76,14 +72,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ApprovalRequest
-        fields = [
-            'id',
-            'created',
-            'creator',
-            'approved',
-            'approver',
-            'comment',
-        ]
+        fields = ["id", "created", "creator", "approved", "approver", "comment"]
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -91,42 +80,46 @@ class RecipeSerializer(serializers.ModelSerializer):
     last_updated = serializers.DateTimeField(read_only=True)
     revision_id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
-    action = serializers.SlugRelatedField(slug_field='name', queryset=Action.objects.all())
+    action = serializers.SlugRelatedField(slug_field="name", queryset=Action.objects.all())
     arguments = serializers.JSONField()
-    channels = serializers.SlugRelatedField(slug_field='slug', queryset=Channel.objects.all(),
-                                            many=True, required=False)
-    countries = serializers.SlugRelatedField(slug_field='code', queryset=Country.objects.all(),
-                                             many=True, required=False)
-    locales = serializers.SlugRelatedField(slug_field='code', queryset=Locale.objects.all(),
-                                           many=True, required=False)
+    channels = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Channel.objects.all(), many=True, required=False
+    )
+    countries = serializers.SlugRelatedField(
+        slug_field="code", queryset=Country.objects.all(), many=True, required=False
+    )
+    locales = serializers.SlugRelatedField(
+        slug_field="code", queryset=Locale.objects.all(), many=True, required=False
+    )
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
-    latest_revision_id = serializers.IntegerField(source='latest_revision.id', read_only=True)
-    approved_revision_id = serializers.IntegerField(source='approved_revision.id', default=None,
-                                                    read_only=True)
+    latest_revision_id = serializers.IntegerField(source="latest_revision.id", read_only=True)
+    approved_revision_id = serializers.IntegerField(
+        source="approved_revision.id", default=None, read_only=True
+    )
     approval_request = ApprovalRequestSerializer(read_only=True)
     identicon_seed = serializers.CharField(required=False)
 
     class Meta:
         model = Recipe
         fields = [
-            'id',
-            'last_updated',
-            'name',
-            'enabled',
-            'is_approved',
-            'revision_id',
-            'action',
-            'arguments',
-            'channels',
-            'countries',
-            'locales',
-            'extra_filter_expression',
-            'filter_expression',
-            'latest_revision_id',
-            'approved_revision_id',
-            'approval_request',
-            'identicon_seed',
+            "id",
+            "last_updated",
+            "name",
+            "enabled",
+            "is_approved",
+            "revision_id",
+            "action",
+            "arguments",
+            "channels",
+            "countries",
+            "locales",
+            "extra_filter_expression",
+            "filter_expression",
+            "latest_revision_id",
+            "approved_revision_id",
+            "approval_request",
+            "identicon_seed",
         ]
 
 
@@ -141,14 +134,7 @@ class MinimalRecipeSerializer(RecipeSerializer):
         # Attributes serialized here are made available to filter expressions via
         # normandy.recipe, and should be documented if they are intended to be
         # used in filter expressions.
-        fields = [
-            'id',
-            'name',
-            'revision_id',
-            'action',
-            'arguments',
-            'filter_expression',
-        ]
+        fields = ["id", "name", "revision_id", "action", "arguments", "filter_expression"]
 
     def get_revision_id(self, recipe):
         # Certain parts of Telemetry expect this to be a string, so coerce it to
@@ -160,20 +146,14 @@ class MinimalRecipeSerializer(RecipeSerializer):
 
 
 class RecipeRevisionSerializer(serializers.ModelSerializer):
-    date_created = serializers.DateTimeField(source='created', read_only=True)
-    recipe = RecipeSerializer(source='serializable_recipe', read_only=True)
+    date_created = serializers.DateTimeField(source="created", read_only=True)
+    recipe = RecipeSerializer(source="serializable_recipe", read_only=True)
     comment = serializers.CharField(read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
 
     class Meta:
         model = RecipeRevision
-        fields = [
-            'id',
-            'date_created',
-            'recipe',
-            'comment',
-            'approval_request',
-        ]
+        fields = ["id", "date_created", "recipe", "comment", "approval_request"]
 
 
 class ClientSerializer(serializers.Serializer):
@@ -187,7 +167,7 @@ class SignedRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['signature', 'recipe']
+        fields = ["signature", "recipe"]
 
     def get_recipe(self, recipe):
         # `recipe` here is the main object for the serializer.

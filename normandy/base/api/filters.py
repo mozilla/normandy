@@ -10,9 +10,9 @@ class CaseInsensitiveBooleanFilter(django_filters.Filter):
     def filter(self, qs, value):
         if value is not None:
             lc_value = value.lower()
-            if lc_value in ['true', '1']:
+            if lc_value in ["true", "1"]:
                 value = True
-            elif lc_value in ['false', '0']:
+            elif lc_value in ["false", "0"]:
                 value = False
             return qs.filter(**{self.name: value})
         return qs
@@ -32,8 +32,8 @@ class AliasedOrderingFilter(filters.OrderingFilter):
         return ordering
 
     def replace_alias(self, term):
-        field = term.lstrip('-')
+        field = term.lstrip("-")
         if field in self.aliases:
-            modifier = '-' if term.startswith('-') else ''
+            modifier = "-" if term.startswith("-") else ""
             return modifier + self.aliases[field][0]
         return term
