@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 import backoff
 import requests
@@ -81,11 +82,19 @@ class BearerTokenAuthentication(BaseAuthentication):
 
     @backoff.on_exception(backoff.constant, requests.exceptions.RequestException, max_tries=5)
     def fetch_oidc_user_profile(self, access_token):
+        cache_key = f"oidc-profile-{access_token}"
+        cached_response = cache.get(cache_key)
+
+        if cached_response:
+            return cached_response
+
         url = settings.OIDC_USER_ENDPOINT
         response = requests.get(url, headers={"Authorization": f"Bearer {access_token}"})
 
         if response.status_code == 200:
-            return response.json()
+            profile = response.json()
+            cache.set(cache_key, cache_key, 15)
+            return profile
         elif response.status_code == 401:
             # The OIDC provider did not like the access token.
             raise exceptions.AuthenticationFailed("Unauthorized access token")
