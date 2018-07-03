@@ -1,5 +1,8 @@
 import json
 import pytest
+import time
+
+from datetime import datetime
 
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -80,9 +83,18 @@ class TestBearerTokenAuthentication(object):
             {"email": user.email, "given_name": user.first_name, "family_name": user.last_name}
         ).encode("utf-8")
 
+        ratelimit_reset = int(time.mktime(datetime.utcnow().timetuple())) + 120
+
         requestsmock.get(
             settings.OIDC_USER_ENDPOINT,
-            [{"content": user_data, "status_code": 200}, {"status_code": 429}],
+            [
+                {
+                    "content": user_data,
+                    "status_code": 200,
+                    "headers": {"X-RateLimit-Reset": f"{ratelimit_reset}"},
+                },
+                {"status_code": 429},
+            ],
         )
 
         response = csrf_api_client.post(

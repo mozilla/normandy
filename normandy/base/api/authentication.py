@@ -1,3 +1,8 @@
+import time
+
+from datetime import datetime
+from hashlib import sha256
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -82,7 +87,8 @@ class BearerTokenAuthentication(BaseAuthentication):
 
     @backoff.on_exception(backoff.constant, requests.exceptions.RequestException, max_tries=5)
     def fetch_oidc_user_profile(self, access_token):
-        cache_key = f"oidc-profile-{access_token}"
+        token_hash = sha256(access_token.encode()).hexdigest()
+        cache_key = f"oidc-profile-{token_hash}"
         cached_response = cache.get(cache_key)
 
         if cached_response:
@@ -92,8 +98,12 @@ class BearerTokenAuthentication(BaseAuthentication):
         response = requests.get(url, headers={"Authorization": f"Bearer {access_token}"})
 
         if response.status_code == 200:
+            now = int(time.mktime(datetime.utcnow().timetuple()))
+            ratelimit_expires_in = int(response.headers.get("X-RateLimit-Reset", 0)) - now
+
             profile = response.json()
-            cache.set(cache_key, profile, 15)
+            cache.set(cache_key, profile, ratelimit_expires_in)
+
             return profile
         elif response.status_code == 401:
             # The OIDC provider did not like the access token.
