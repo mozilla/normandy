@@ -93,7 +93,7 @@ class BearerTokenAuthentication(BaseAuthentication):
 
         if response.status_code == 200:
             profile = response.json()
-            cache.set(cache_key, cache_key, 15)
+            cache.set(cache_key, profile, 15)
             return profile
         elif response.status_code == 401:
             # The OIDC provider did not like the access token.
