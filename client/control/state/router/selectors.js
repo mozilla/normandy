@@ -30,6 +30,11 @@ export function getRouterPath(state) {
   return state.router.pathname;
 }
 
+export function getFullyQualifiedCurrentURL(state, queryParams) {
+  const { pathname } = getCurrentURL(state, queryParams);
+  return `${window.location.protocol}//${window.location.host}${pathname}`;
+}
+
 export function getBreadcrumbs(state) {
   const { result, pathname, params } = state.router;
   const crumbs = [];

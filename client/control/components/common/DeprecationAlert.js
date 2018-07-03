@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { getFullyQualifiedCurrentURL } from 'control/state/router/selectors';
+
 const ENV_PROD = 'ENV_PROD';
 const ENV_STAGE = 'ENV_STAGE';
 const ENV_DEV = 'ENV_DEV';
@@ -14,13 +16,12 @@ const DC_URLS = {
 };
 
 /**
- * Simple component which tells the user whether they are viewing a dev or staging
- * environment. On production, nothing is shown.
+ * Simple component which tells the user that the current UI is deperecated.
  */
-@connect(() => ({
-  currentUrl: window.location.href,
+@connect(state => ({
+  currentUrl: getFullyQualifiedCurrentURL(state)
 }))
-export default class EnvAlert extends React.PureComponent {
+export default class DeprecationAlert extends React.PureComponent {
   static propTypes = {
     currentUrl: PropTypes.string.isRequired,
   };
@@ -37,23 +38,23 @@ export default class EnvAlert extends React.PureComponent {
    * @return {Boolean}                 True if URL contains at least one fragment.
    */
   static findFragmentsInURL(url, fragments) {
-    return !!fragments.find(piece => url.indexOf(piece) > -1);
+    return !!fragments.find(piece => url.includes(piece));
   }
 
   static checkProduction(url) {
-    return EnvAlert.findFragmentsInURL(url, EnvAlert.productionFragments);
+    return DeprecationAlert.findFragmentsInURL(url, DeprecationAlert.productionFragments);
   }
 
   static checkStaging(url) {
-    return EnvAlert.findFragmentsInURL(url, EnvAlert.stageFragments);
+    return DeprecationAlert.findFragmentsInURL(url, DeprecationAlert.stageFragments);
   }
 
   detectEnv() {
     const { currentUrl } = this.props;
 
-    if (EnvAlert.checkProduction(currentUrl)) {
+    if (DeprecationAlert.checkProduction(currentUrl)) {
       return ENV_PROD;
-    } else if (EnvAlert.checkProduction(currentUrl)) {
+    } else if (DeprecationAlert.checkProduction(currentUrl)) {
       return ENV_STAGE;
     }
 
