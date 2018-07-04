@@ -14,6 +14,9 @@ from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 
 
+DEFAULT_PROFILE_CACHE_SECONDS = 60
+
+
 class OIDCEndpointRequestError(Exception):
     """Happens when the server-to-server communication with the OIDC endpoint succeeds but the
     OIDC endpoints responds with a status code less than 500 and not equal to 200 or 401."""
@@ -99,11 +102,10 @@ class BearerTokenAuthentication(BaseAuthentication):
 
         if response.status_code == 200:
             now = int(time.mktime(datetime.utcnow().timetuple()))
-            ratelimit_expires_in = int(response.headers.get("X-RateLimit-Reset", 0)) - now
-
+            resets_in = int(response.headers.get("X-RateLimit-Reset", 0)) - now
+            cache_seconds = DEFAULT_PROFILE_CACHE_SECONDS if resets_in < 1 else resets_in
             profile = response.json()
-            cache.set(cache_key, profile, ratelimit_expires_in)
-
+            cache.set(cache_key, profile, cache_seconds)
             return profile
         elif response.status_code == 401:
             # The OIDC provider did not like the access token.
