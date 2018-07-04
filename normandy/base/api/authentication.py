@@ -1,11 +1,20 @@
+import time
+
+from datetime import datetime
+from hashlib import sha256
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 import backoff
 import requests
 
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
+
+
+DEFAULT_PROFILE_CACHE_SECONDS = 60
 
 
 class OIDCEndpointRequestError(Exception):
@@ -81,11 +90,23 @@ class BearerTokenAuthentication(BaseAuthentication):
 
     @backoff.on_exception(backoff.constant, requests.exceptions.RequestException, max_tries=5)
     def fetch_oidc_user_profile(self, access_token):
+        token_hash = sha256(access_token.encode()).hexdigest()
+        cache_key = f"oidc-profile-{token_hash}"
+        cached_response = cache.get(cache_key)
+
+        if cached_response:
+            return cached_response
+
         url = settings.OIDC_USER_ENDPOINT
         response = requests.get(url, headers={"Authorization": f"Bearer {access_token}"})
 
         if response.status_code == 200:
-            return response.json()
+            now = int(time.mktime(datetime.utcnow().timetuple()))
+            resets_in = int(response.headers.get("X-RateLimit-Reset", 0)) - now
+            cache_seconds = DEFAULT_PROFILE_CACHE_SECONDS if resets_in < 1 else resets_in
+            profile = response.json()
+            cache.set(cache_key, profile, cache_seconds)
+            return profile
         elif response.status_code == 401:
             # The OIDC provider did not like the access token.
             raise exceptions.AuthenticationFailed("Unauthorized access token")

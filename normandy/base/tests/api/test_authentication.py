@@ -1,5 +1,8 @@
 import json
 import pytest
+import time
+
+from datetime import datetime
 
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -7,6 +10,7 @@ from rest_framework.test import APIClient
 from rest_framework.views import APIView
 
 from django.conf.urls import url
+from django.core.cache import cache
 
 from normandy.base.tests import UserFactory
 from normandy.base.api.authentication import BearerTokenAuthentication
@@ -38,6 +42,10 @@ urlpatterns = [
 class TestBearerTokenAuthentication(object):
     """Bearer token authentication"""
 
+    @pytest.fixture(autouse=True)
+    def clear_cache(self):
+        cache.clear()
+
     @pytest.fixture
     def csrf_api_client(self):
         return APIClient(enforce_csrf_checks=True)
@@ -68,6 +76,46 @@ class TestBearerTokenAuthentication(object):
         )
         assert response.status_code == 200
         assert response.data.get("user") == "john.doe@email.com"
+
+    def test_caching(self, csrf_api_client, requestsmock, settings):
+        user = UserFactory()
+        user_data = json.dumps(
+            {"email": user.email, "given_name": user.first_name, "family_name": user.last_name}
+        ).encode("utf-8")
+
+        ratelimit_reset = int(time.mktime(datetime.utcnow().timetuple())) + 1
+
+        requestsmock.get(
+            settings.OIDC_USER_ENDPOINT,
+            [
+                {
+                    "content": user_data,
+                    "status_code": 200,
+                    "headers": {"X-RateLimit-Reset": f"{ratelimit_reset}"},
+                },
+                {"status_code": 401},
+            ],
+        )
+
+        response = csrf_api_client.post(
+            "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
+        )
+        assert response.status_code == 200
+        assert response.data.get("user") == user.email
+
+        # Response should be cached and you shouldn't hit the 401
+        response = csrf_api_client.post(
+            "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
+        )
+        assert response.status_code == 200
+        assert response.data.get("user") == user.email
+
+        # Sleep till cache expires
+        time.sleep(2)
+        response = csrf_api_client.post(
+            "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
+        )
+        assert response.status_code == 401
 
     def test_user_exists(self, csrf_api_client, mock_oidc):
         user = UserFactory()
