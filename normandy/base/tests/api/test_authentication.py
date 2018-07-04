@@ -83,7 +83,7 @@ class TestBearerTokenAuthentication(object):
             {"email": user.email, "given_name": user.first_name, "family_name": user.last_name}
         ).encode("utf-8")
 
-        ratelimit_reset = int(time.mktime(datetime.utcnow().timetuple())) + 120
+        ratelimit_reset = int(time.mktime(datetime.utcnow().timetuple())) + 1
 
         requestsmock.get(
             settings.OIDC_USER_ENDPOINT,
@@ -93,7 +93,7 @@ class TestBearerTokenAuthentication(object):
                     "status_code": 200,
                     "headers": {"X-RateLimit-Reset": f"{ratelimit_reset}"},
                 },
-                {"status_code": 429},
+                {"status_code": 401},
             ],
         )
 
@@ -103,11 +103,19 @@ class TestBearerTokenAuthentication(object):
         assert response.status_code == 200
         assert response.data.get("user") == user.email
 
+        # Response should be cached and you shouldn't hit the 401
         response = csrf_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 200
         assert response.data.get("user") == user.email
+
+        # Sleep till cache expires
+        time.sleep(2)
+        response = csrf_api_client.post(
+            "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
+        )
+        assert response.status_code == 401
 
     def test_user_exists(self, csrf_api_client, mock_oidc):
         user = UserFactory()
