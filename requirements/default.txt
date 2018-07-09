@@ -22,9 +22,9 @@ Django==2.0.7 \
 django-configurations==2.0 \
     --hash=sha256:b4a4eb3ed631c2abbeb7008b5cc5d8d04b190df838e7b613731d728f674f3a2f \
     --hash=sha256:be47e25d070fd005cc8fbd6c913c9ec37e83d04686937afe18ca6c579b2cdedb
-django-cors-headers==2.2.0 \
-    --hash=sha256:c7ec4816ec49416517b84f317499d1519db62125471922ab78d670474ed9b987 \
-    --hash=sha256:0e9532628b3aa8806442d4d0b15e56112e6cfbef3735e13401935c98b842a2b4
+django-cors-headers==2.3.0 \
+    --hash=sha256:1460b67c51706307e3f66515e86b10181badd66448a2fc44278f47bf402c6fd3 \
+    --hash=sha256:3c618a964e3034ae4dad8bbb902e625daa6c894444ddeaf7b24125299add54f0
 django-countries==5.3.1 \
     --hash=sha256:d906112bb66ee1e07be9644ed700d0644612c56df777e6e3af996a979a9866a2 \
     --hash=sha256:b141cba3adce58d7c3f1422be55f0b4deb265d4fdd7524e0f6ad6ab35299664f
