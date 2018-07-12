@@ -7,6 +7,7 @@ import { Link } from 'redux-little-router';
 import CurrentUserDetails from 'control/components/common/CurrentUserDetails';
 import NavigationCrumbs from 'control/components/common/NavigationCrumbs';
 import NavigationMenu from 'control/components/common/NavigationMenu';
+import DeprecationAlert from 'control/components/common/DeprecationAlert';
 import EnvAlert from 'control/components/common/EnvAlert';
 import QueryActions from 'control/components/data/QueryActions';
 import QueryServiceInfo from 'control/components/data/QueryServiceInfo';
@@ -29,6 +30,7 @@ export default class App extends React.PureComponent {
     return (
       <LocaleProvider locale={enUS}>
         <Layout>
+          <DeprecationAlert />
           <EnvAlert />
 
           {/*
