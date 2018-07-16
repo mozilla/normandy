@@ -352,8 +352,8 @@ class TestRecipeAPI(object):
 
             assert a1.id != -1 and a2.id != -1
             res = api_client.get("/api/v1/recipe/?latest_revision__action=-1")
-            assert res.status_code == 200
-            assert res.data == []
+            assert res.status_code == 400
+            assert res.data["latest_revision__action"][0].code == "invalid_choice"
 
         def test_list_filter_action(self, api_client):
             a1 = ActionFactory()
