@@ -98,7 +98,7 @@ class RecipeViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
         .prefetch_related("latest_revision__locales")
     )
     serializer_class = RecipeSerializer
-    filter_class = RecipeFilters
+    filterset_class = RecipeFilters
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly, AdminEnabledOrReadOnly]
     pagination_class = None
 

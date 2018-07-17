@@ -14,7 +14,7 @@ class CaseInsensitiveBooleanFilter(django_filters.Filter):
                 value = True
             elif lc_value in ["false", "0"]:
                 value = False
-            return qs.filter(**{self.name: value})
+            return qs.filter(**{self.field_name: value})
         return qs
 
 

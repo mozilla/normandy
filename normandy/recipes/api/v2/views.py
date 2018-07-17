@@ -65,7 +65,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         .prefetch_related("latest_revision__locales")
     )
     serializer_class = RecipeSerializer
-    filter_class = RecipeFilters
+    filterset_class = RecipeFilters
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend, RecipeOrderingFilter]
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly, AdminEnabledOrReadOnly]
 
