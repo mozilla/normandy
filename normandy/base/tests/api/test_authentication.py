@@ -68,14 +68,14 @@ class TestBearerTokenAuthentication(object):
     def test_it_works(self, csrf_api_client, mock_oidc):
         mock_oidc(
             content=json.dumps(
-                {"email": "john.doe@email.com", "given_name": "John", "family_name": "Doe"}
+                {"email": "john.doe@example.com", "given_name": "John", "family_name": "Doe"}
             ).encode("utf-8")
         )
         response = csrf_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 200
-        assert response.data.get("user") == "john.doe@email.com"
+        assert response.data.get("user") == "john.doe@example.com"
 
     def test_caching(self, csrf_api_client, requestsmock, settings):
         user = UserFactory()
@@ -125,11 +125,12 @@ class TestBearerTokenAuthentication(object):
         assert response.data.get("user") == user.email
 
     def test_user_is_not_active(self, csrf_api_client, mock_oidc):
-        mock_oidc(user=UserFactory(is_active=False))
+        user = UserFactory(username="test@example.com", email="test@example.com", is_active=False)
+        mock_oidc(user=user)
         response = csrf_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
-        assert response.status_code == 401
+        assert response.status_code == 401, (response.data, response.user)
 
     def test_bad_access_token(self, csrf_api_client, mock_oidc):
         mock_oidc(status_code=401)
@@ -210,3 +211,19 @@ class TestBearerTokenAuthentication(object):
                 retry_count += 1
 
         assert retry_count == 5
+
+    def test_existing_user_with_no_email(self, csrf_api_client, mock_oidc):
+        user = UserFactory(username="john.doe@example.com", email="")
+        mock_oidc(
+            content=json.dumps(
+                {"email": "john.doe@example.com", "given_name": "John", "family_name": "Doe"}
+            ).encode("utf-8")
+        )
+        response = csrf_api_client.post(
+            "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
+        )
+        assert response.status_code == 200
+        assert response.data.get("user") == "john.doe@example.com"
+
+        user.refresh_from_db()
+        assert user.email == "john.doe@example.com"
