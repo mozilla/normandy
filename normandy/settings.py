@@ -223,7 +223,7 @@ class Base(Core, CORS, OIDC):
     # Authentication
     def AUTHENTICATION_BACKENDS(self):
         if self.USE_OIDC:
-            return ["normandy.base.auth_backends.LoggingRemoteUserBackend"]
+            return ["normandy.base.auth_backends.EmailOnlyRemoteUserBackend"]
         else:
             return ["normandy.base.auth_backends.LoggingModelBackend"]
 

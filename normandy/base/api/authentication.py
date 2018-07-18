@@ -63,17 +63,24 @@ class BearerTokenAuthentication(BaseAuthentication):
 
         # Turn this email into a Django User instance.
         user, _ = get_user_model().objects.get_or_create(
-            email=email, defaults={"username": email[:150]}
+            username=email[:150], defaults={"email": email}
         )
 
         # Sync user data with OIDC profile
+        dirty = False
         family_name = user_profile.get("family_name", "").strip()
         given_name = user_profile.get("given_name", "").strip()
-        if family_name or given_name:
-            if family_name != user.last_name or given_name != user.first_name:
-                user.last_name = family_name
-                user.first_name = given_name
-                user.save()
+        if given_name and given_name != user.first_name:
+            user.first_name = given_name
+            dirty = True
+        if family_name and family_name != user.last_name:
+            user.last_name = family_name
+            dirty = True
+        if user.email != email:
+            user.email = email
+            dirty = True
+        if dirty:
+            user.save()
 
         if not user.is_active:
             raise exceptions.AuthenticationFailed("User inactive.")
