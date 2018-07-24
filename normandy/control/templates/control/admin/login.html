@@ -1,52 +1,47 @@
 {% load render_bundle from normandy_webpack_loader %}
 
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
-  <head>
-    <title>SHIELD Control Panel</title>
-    {% render_bundle 'vendor' 'css' 'VENDOR' %}
-    {% render_bundle 'control' 'css' %}
-    <meta name="robots" content="NONE,NOARCHIVE" />
-    <link rel="icon" type="image/png" sizes="32x32" href="{{STATIC_URL}}img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="{{STATIC_URL}}img/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{STATIC_URL}}img/favicon-16x16.png">
-  </head>
+<html lang="{{ LANGUAGE_CODE|default:" en-us " }}">
 
-  <body class="login">
-    <div id="container">
-      <div id="page-header">
-        <h2>Shield Control Panel</h2>
-      </div>
+<head>
+  <title>SHIELD Control Panel</title>
+  {% render_bundle 'control' 'css' %}
+  <meta name="robots" content="NONE,NOARCHIVE" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{{STATIC_URL}}img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="{{STATIC_URL}}img/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{STATIC_URL}}img/favicon-16x16.png">
+</head>
 
-      <div id="content" class="wrapper">
-        {% if form.errors and not form.non_field_errors %}
-          <p class="errornote">Please correct the errors below.</p>
-        {% endif %}
-
-        {% if form.non_field_errors %}
-          {% for error in form.non_field_errors %}
-            <p class="errornote">{{ error }}</p>
-          {% endfor %}
-        {% endif %}
-
-        <form action="{{ app_path }}" method="post" id="login-form">
-          {% csrf_token %}
-          <div>
-            {{ form.username.errors }}
-            {{ form.username.label_tag }}
-            <input id="id_username" maxlength="254" name="username" type="text" autofocus>
-          </div>
-
-          <div>
-            {{ form.password.errors }}
-            {{ form.password.label_tag }}
-            <input id="id_password" name="password" type="password">
-            <input type="hidden" name="next" value="{{ next|default:"/" }}" />
-          </div>
-
-          <input type="submit" class="button" value="Log in" />
-        </form>
-      </div>
+<body class="login">
+  <div id="container">
+    <div id="page-header">
+      <h2>Shield Control Panel</h2>
     </div>
-  </body>
+
+    <div id="content" class="wrapper">
+      {% if form.errors and not form.non_field_errors %}
+      <p class="errornote">Please correct the errors below.</p>
+      {% endif %} {% if form.non_field_errors %} {% for error in form.non_field_errors %}
+      <p class="errornote">{{ error }}</p>
+      {% endfor %} {% endif %}
+
+      <form action="{{ app_path }}" method="post" id="login-form">
+        {% csrf_token %}
+        <div>
+          {{ form.username.errors }} {{ form.username.label_tag }}
+          <input id="id_username" maxlength="254" name="username" type="text" autofocus>
+        </div>
+
+        <div>
+          {{ form.password.errors }} {{ form.password.label_tag }}
+          <input id="id_password" name="password" type="password">
+          <input type="hidden" name="next" value="{{ next|default:" / " }}" />
+        </div>
+
+        <input type="submit" class="button" value="Log in" />
+      </form>
+    </div>
+  </div>
+</body>
+
 </html>
