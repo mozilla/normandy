@@ -12,13 +12,14 @@
     "test": "karma start",
     "lint": "yarn lint:js && yarn lint:css && yarn lint:js-security",
     "lint:js": "eslint normandy client karma.conf.js webpack.config.js *.webpack.config.js",
-    "lint:js-security": "nsp check ."
+    "lint:js-security": "nsp check . --threshold 3"
   },
   "license": "MPL-2.0",
   "dependencies": {
     "babel-plugin-transform-class-properties": "6.24.1",
     "mozilla-normandy-action-argument-schemas": "0.3",
-    "node-uuid": "1.4.7"
+    "node-uuid": "1.4.7",
+    "nsp": "^3.2.1"
   },
   "devDependencies": {
     "ajv": "5.2.0",
