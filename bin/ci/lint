@@ -10,9 +10,6 @@ bin/ci/docker-run.sh pip check
 echo "Linting JS files"
 bin/ci/docker-run.sh yarn lint:js
 
-echo "Linting Style files"
-bin/ci/docker-run.sh yarn lint:css
-
 echo "Checking JS package security"
 # Disable automatic failure
 set +e

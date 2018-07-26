@@ -17,9 +17,7 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/jasmine-promises/dist/jasmine-promises.js',
-      'assets/bundles/vendor.bundle.js',
       'client/**/tests/index.js',
     ],
 

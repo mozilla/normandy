@@ -113,18 +113,10 @@ class Core(Configuration):
     }
 
     WEBPACK_LOADER = {
-        "DEFAULT": {
-            "BUNDLE_DIR_NAME": "bundles/",
-            "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats.json"),
-        },
         "ACTIONS": {
             "BUNDLE_DIR_NAME": "bundles/",
             "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats-actions.json"),
-        },
-        "VENDOR": {
-            "BUNDLE_DIR_NAME": "bundles/",
-            "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats-vendor.json"),
-        },
+        }
     }
 
     # Content Security Policy
