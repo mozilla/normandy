@@ -190,6 +190,13 @@ the following to set up the git pre-commit hook:
 After that, whenever you make a new commit Therapist will check the changed
 code. This will save time when submitting pull requests.
 
+If you want Therapist to attempt to automatically fix linting issues you can
+install the hook using:
+
+.. code-block:: bash
+
+      therapist install --fix
+
 If you ever need to bypass Therapist, you can do so by passing
 ``--no-verify`` to your ``git commit`` command.
 
