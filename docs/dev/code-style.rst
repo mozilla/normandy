@@ -17,7 +17,7 @@ Black Python formatting (uniformity)
 ------------------------------------
 
 Normandy uses `Black`_ to format code. If you set up the :ref:`Therapist
-<therapist-install>` pre-commit hook, it will handle formatting your code
+<therapist-install>` pre-commit hook, it can handle formatting your code
 automatically.
 
 .. _Black: https://black.readthedocs.io/en/stable/

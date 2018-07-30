@@ -1,6 +1,7 @@
 actions:
   black:
-    run: black {files} && git add -A
+    run: black --check --diff {files}
+    fix: black {files}
     include: "*.py"
 
   flake8:
@@ -10,6 +11,7 @@ actions:
 
   eslint:
     run: eslint {files}
+    fix: eslint --fix {files}
     include:
       - "*.js"
       - "*.jsx"
