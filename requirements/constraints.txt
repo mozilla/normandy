@@ -4,9 +4,9 @@ atomicwrites==1.1.5 \
 attrs==18.1.0 \
     --hash=sha256:4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265 \
     --hash=sha256:e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b
-botocore==1.10.62 \
-    --hash=sha256:379492474ce4151a26e41e3373cb07ac9642d06a297c78be3c382e3b8c1adbb7 \
-    --hash=sha256:047d553ec2a4c7f80f9ca02f73c3ab443577bad6bcb079c698fb9dd8cc93c0af
+botocore==1.10.65 \
+    --hash=sha256:db223c2d8004ebc9325e8b15d7c5ac87b66636fd76ce3f0caabc8f8ab2df8ef7 \
+    --hash=sha256:35f626029a6b17bfd503ce3379b121606e3f965edcab2612bc75ce8603fdf08c
 certifi==2018.4.16 \
     --hash=sha256:13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7 \
     --hash=sha256:9fa520c1bacfb634fa7af20a76bcbd3d5fb390481724c597da32c719a7dca4b0
