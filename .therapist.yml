@@ -17,12 +17,6 @@ actions:
       - "*.jsx"
     exclude:
       - ".eslintrc.js"
-
-  stylelint:
-    run: stylelint {files}
-    include:
-      - "*.css"
-      - "*.scss"
 shortcuts:
   lint:
     flags:
