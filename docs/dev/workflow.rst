@@ -25,6 +25,37 @@ Front-end JavaScript tests can be run with:
 
    karma start
 
+Linting
+-------
+You will need to :ref:`install Therapist <therapist-install>` for linting. If
+you have installed pre-commit hook linting will take place with every commit,
+however there may be times you want to run the linters manually.
+
+To run the linters on all files that you have changed or added:
+
+.. code-block:: bash
+
+   therapist use lint
+
+To run the linters on all files in the repo:
+
+.. code-block:: bash
+
+   therapist use lint:all
+
+To run the linters and attempt to fix issues in files that you have changed or
+added:
+
+.. code-block:: bash
+
+   therapist use fix
+
+To run the linters and attempt to fix issues in all files in the repo:
+
+.. code-block:: bash
+
+   therapist use fix:all
+
 Updating Your Local Instance
 ----------------------------
 When changes are merged to the main Normandy repository, you'll want to update
