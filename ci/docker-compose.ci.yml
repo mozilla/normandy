@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9.4
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  # firefox:
+  #   build:
+  #     context: firefox
+  #     dockerfile: Dockerfile
+
+  testing:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: normandy:testing
+    # depends_on:
+    #   - db
+      # - firefox
+    environment:
+      - DJANGO_CONFIGURATION=Test
+      - DATABASE_URL=postgres://postgres@db/postgres
+      # - KINTO_CACHE_HOSTS=memcached:11211
+    ports:
+      - 9876:9876
+    # Temporary
+    volumes:
+      - $PWD:/app
+    command: start
+
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: normandy:web
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      - DJANGO_CONFIGURATION=ProductionInsecure
+      - DATABASE_URL=postgres://postgres@db/postgres
+      # - KINTO_CACHE_HOSTS=memcached:11211
+    # Temporary
+    volumes:
+      - $PWD:/app
+    command: start
+
+  # contracts:
+  #   build:
+  #     context: contracts
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - web
+  #   command: test
+
+  # tests:
+  #   build:
+  #     context: .
+  #     dockerfile: tests/Dockerfile
+  #   image: kinto:tests
+  #   depends_on:
+  #     - web
+  #   environment:
+  #     - SERVER=http://web:8888/v1
+  #     - MAILFILESERVER=http://web:9999
+  #   command: start
