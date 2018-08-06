@@ -74,8 +74,6 @@ jobs:
       - run:
           name: Contract tests
           command: |
-            echo "XXX - Run curl here ??"
-            curl --version
             docker-compose -f ci/docker-compose.ci.yml run web contracttest
 
       - run:
