@@ -1,4 +1,4 @@
-FROM python:3.6.0-slim
+FROM python:3.6.6-slim
 WORKDIR /app
 RUN groupadd --gid 1001 app && useradd -g app --uid 1001 --shell /usr/sbin/nologin app
 RUN apt-get update && \
