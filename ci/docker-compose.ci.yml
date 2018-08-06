@@ -9,11 +9,6 @@ services:
       timeout: 3s
       retries: 30
 
-  # firefox:
-  #   build:
-  #     context: firefox
-  #     dockerfile: Dockerfile
-
   testing:
     build:
       context: ..
@@ -21,16 +16,14 @@ services:
     image: normandy:testing
     # depends_on:
     #   - db
-      # - firefox
     environment:
       - DJANGO_CONFIGURATION=Test
       - DATABASE_URL=postgres://postgres@db/postgres
-      # - KINTO_CACHE_HOSTS=memcached:11211
     ports:
       - 9876:9876
     # Temporary
-    volumes:
-      - $PWD:/app
+    # volumes:
+    #   - $PWD:/app
     command: start
 
   web:
@@ -45,10 +38,9 @@ services:
     environment:
       - DJANGO_CONFIGURATION=ProductionInsecure
       - DATABASE_URL=postgres://postgres@db/postgres
-      # - KINTO_CACHE_HOSTS=memcached:11211
     # Temporary
-    volumes:
-      - $PWD:/app
+    # volumes:
+    #   - $PWD:/app
     command: start
 
   # contracts:
