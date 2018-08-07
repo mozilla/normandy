@@ -4,10 +4,6 @@ set -x
 
 DOCKER_ARGS=( )
 
-if [[ -v CIRCLE_TEST_REPORTS ]]; then
-  DOCKER_ARGS+=(--volume $CIRCLE_TEST_REPORTS:/test_artifacts)
-fi
-
 if [[ -f ~/cache/GeoLite2-Country.mmdb ]]; then
   DOCKER_ARGS+=(--volume ~/cache/GeoLite2-Country.mmdb:/app/GeoLite2-Country.mmdb)
 fi

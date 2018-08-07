@@ -2,7 +2,9 @@
 set -eu
 
 echo "Running Python tests"
-bin/ci/docker-run.sh py.test -vv --junitxml=/test_artifacts/pytest.xml normandy/
+junit_path=$ARTIFACTS_PATH/test_results/pytest
+mkdir -p $junit_path
+bin/ci/docker-run.sh py.test -vv --junitxml=$junit_path/pytest.xml normandy/
 
 echo "Running JS tests"
 # Start Karma test server, and run JS tests in Firefox
@@ -33,7 +35,7 @@ echo "* Running acceptance tests"
 bin/ci/docker-run.sh py.test contract-tests/ \
   -vv \
   --server http://localhost:8000 \
-  --junitxml=/test_artifacts/pytest.xml
+  --junitxml=$ARTIFACTS_PATH/tests_results/pytest.xml
 STATUS=$?
 
 docker kill $SERVER_ID
