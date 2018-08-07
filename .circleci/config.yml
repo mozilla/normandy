@@ -21,26 +21,26 @@ jobs:
 
       - checkout
 
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            echo "STOP HERE!"
-            docker --version
-            exit 123
-            # Latest 200 OK version as of June 2018
-            # https://circleci.com/docs/2.0/building-docker-images/#docker-version
-            VER="17.09.0-ce"
-            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
+      # - run:
+      #     name: Install Docker client
+      #     command: |
+      #       set -x
+      #       echo "STOP HERE!"
+      #       docker --version
+      #       exit 123
+      #       # Latest 200 OK version as of June 2018
+      #       # https://circleci.com/docs/2.0/building-docker-images/#docker-version
+      #       VER="17.09.0-ce"
+      #       curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+      #       tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+      #       mv /tmp/docker/* /usr/bin
 
-      - run:
-          name: Install Docker Compose
-          command: |
-             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-             chmod +x ~/docker-compose
-             mv ~/docker-compose /usr/local/bin/docker-compose
+      # - run:
+      #     name: Install Docker Compose
+      #     command: |
+      #        curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+      #        chmod +x ~/docker-compose
+      #        mv ~/docker-compose /usr/local/bin/docker-compose
 
       - run:
           name: Create version.json
@@ -66,6 +66,8 @@ jobs:
           name: Python Tests
           command: |
             docker-compose -f ci/docker-compose.ci.yml run web pytest
+            ls -l test_artifacts
+            pwd
 
       - run:
           name: Start Django/Gunicorn server

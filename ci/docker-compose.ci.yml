@@ -21,7 +21,6 @@ services:
     environment:
       - DJANGO_CONFIGURATION=ProductionInsecure
       - DATABASE_URL=postgres://postgres@db/postgres
-    # Temporary
-    # volumes:
-    #   - $PWD:/app
+    volumes:
+      - $PWD/test_artifacts:/test_artifacts
     command: start
