@@ -65,16 +65,16 @@ jobs:
       - run:
           name: Python Tests
           command: |
-            mkdir -p ~/test_artifacts
-            sudo chmod 777 ~/test_artifacts
+            mkdir -p test_artifacts
+            sudo chmod 777 test_artifacts
             docker-compose -f ci/docker-compose.ci.yml run web pytest
-            ls -l ~/test_artifacts
+            ls -l test_artifacts
             pwd
 
       - store_test_results:
-          path: ~/test_artifacts
+          path: test_artifacts
       - store_artifacts:
-          path: ~/test_artifacts
+          path: test_artifacts
 
       - run:
           name: Start Django/Gunicorn server
