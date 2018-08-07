@@ -63,18 +63,15 @@ jobs:
           command: docker-compose -f ci/docker-compose.ci.yml run web lint
 
       - run:
-          name: Python Tests
+          name: Prep test_artifacts directory
           command: |
             mkdir -p test_artifacts
             sudo chmod 777 test_artifacts
-            docker-compose -f ci/docker-compose.ci.yml run web pytest
-            ls -l test_artifacts
-            pwd
 
-      - store_test_results:
-          path: test_artifacts
-      - store_artifacts:
-          path: test_artifacts
+      - run:
+          name: Python Tests
+          command: |
+            docker-compose -f ci/docker-compose.ci.yml run web pytest
 
       - run:
           name: Start Django/Gunicorn server
@@ -91,6 +88,18 @@ jobs:
           name: JavaScript tests
           command: |
             docker-compose -f ci/docker-compose.ci.yml run --user 0 web karma
+
+      - run:
+          name: Debug test_artifacts directory
+          command: |
+            # DELETE THIS ONCE THINGS WORK
+            ls -l test_artifacts
+
+      - store_test_results:
+          path: test_artifacts
+
+      - store_artifacts:
+          path: test_artifacts
 
       # - run:
       #     name: Push to Dockerhub
