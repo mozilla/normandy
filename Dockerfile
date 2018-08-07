@@ -4,7 +4,7 @@ RUN groupadd --gid 1001 app && useradd -g app --uid 1001 --shell /usr/sbin/nolog
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        gcc libpq-dev curl apt-transport-https libffi-dev
+    gcc libpq-dev curl apt-transport-https libffi-dev openssh-client
 
 # Install node from NodeSource
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
@@ -29,6 +29,9 @@ RUN NODE_ENV=production yarn build && \
     mkdir -p /test_artifacts && \
     chmod 777 /test_artifacts
 
+# RUN chown -R 10001:10001 /app
+RUN chown -R app:app /app
+
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
@@ -36,6 +39,11 @@ ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     CMD_PREFIX="" \
     NEW_RELIC_CONFIG_FILE=newrelic.ini
 EXPOSE $PORT
+
+# XXX Is this necessary??
+# EXPOSE 9876
+
+ENTRYPOINT ["/bin/bash", "/app/ci/run.sh"]
 
 CMD $CMD_PREFIX \
     gunicorn  \

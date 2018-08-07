@@ -16,3 +16,5 @@ _build
 /node_modules
 /product_details/
 htmlcov/
+yarn-error.log
+test_artifacts/

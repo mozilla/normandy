@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9.4
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: normandy:web
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      - DJANGO_CONFIGURATION=ProductionInsecure
+      - DATABASE_URL=postgres://postgres@db/postgres
+    volumes:
+      - $PWD/test_artifacts:/test_artifacts
+    command: start
