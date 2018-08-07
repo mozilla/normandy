@@ -7,8 +7,9 @@
 version: 2
 jobs:
   build_test_publish:
-    docker:
-      - image: ubuntu:18.04
+    machine:
+      docker_layer_caching: true
+
     working_directory: ~/normandy
 
     steps:
