@@ -25,6 +25,9 @@ jobs:
           name: Install Docker client
           command: |
             set -x
+            echo "STOP HERE!"
+            docker --version
+            exit 123
             # Latest 200 OK version as of June 2018
             # https://circleci.com/docs/2.0/building-docker-images/#docker-version
             VER="17.09.0-ce"
