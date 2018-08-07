@@ -7,18 +7,19 @@ bcrypt==3.1.4 \
     --hash=sha256:49e96267cd9be55a349fd74f9852eb9ae2c427cd7f6455d0f1765d7332292832 \
     --hash=sha256:67ed1a374c9155ec0840214ce804616de49c3df9c5bc66740687c1c9b1cd9e8d \
     --hash=sha256:9a6fedda73aba1568962f7543a1f586051c54febbc74e87769bad6a4b8587c39
-boto3==1.7.65 \
-    --hash=sha256:24f2de3eb977f31f9acca2abf661f8ae5b0ce82f6847d458bb13332ada7d17c6 \
-    --hash=sha256:c8492a53e0bfeca83fa03273dff7ab7d5ac5cf78a0ce1b7e9fc7f241ca6f4dd4
+boto3==1.7.70 \
+    --hash=sha256:d0d849de20c938519df29e52d64210b408a67a20491e1e7d151588a60deef488 \
+    --hash=sha256:37853caa02f7141d7b1fb2537cc878bc58d2b1386224e3cf551af7f6ae3e4893
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
 dj-inmemorystorage==1.4.1 \
     --hash=sha256:2b587f9320ea26f9ed1c62fefaf05c817735eda989d6439072b73d1b59b1c591 \
     --hash=sha256:fa921269b83ffc762411e36d446fa07b602a4ad74632ae1819844d32e6fb12bd
-Django==2.0.7 \
-    --hash=sha256:e900b73beee8977c7b887d90c6c57d68af10066b9dac898e1eaf0f82313de334 \
-    --hash=sha256:97886b8a13bbc33bfeba2ff133035d3eca014e2309dff2b6da0bdfc0b8656613
+Django==2.0.8 \
+    --hash=sha256:0c5b65847d00845ee404bbc0b4a85686f15eb3001ffddda3db4e9baa265bf136 \
+    --hash=sha256:68aeea369a8130259354b6ba1fa9babe0c5ee6bced505dea4afcd00f765ae38b \
+    # pyup: <2.1 # django-webpack-loader doesn't support 2.1 yet
 django-configurations==2.0 \
     --hash=sha256:b4a4eb3ed631c2abbeb7008b5cc5d8d04b190df838e7b613731d728f674f3a2f \
     --hash=sha256:be47e25d070fd005cc8fbd6c913c9ec37e83d04686937afe18ca6c579b2cdedb
@@ -49,6 +50,7 @@ django-sslserver==0.20 \
 django-webpack-loader==0.6.0 \
     --hash=sha256:60bab6b9a037a5346fad12d2a70a6bc046afb33154cf75ed640b93d3ebd5f520 \
     --hash=sha256:970b968c2a8975fb7eff56a3bab5d0d90d396740852d1e0c50c5cfe2b824199a
+    # Update Django to >=2.1 when this updates
 django_csp==3.4 \
     --hash=sha256:04c0ccd4e1339e8f6af48c55c3347dc996fde2d22d79e8bf2f6b7a920412e408 \
     --hash=sha256:096b634430d8ea81c3d9f216f87be890f3a975c17bb9a4631f6a1619ac09c91e
@@ -105,8 +107,8 @@ html5lib==1.0.1 \
 jsonschema==2.6.0 \
     --hash=sha256:000e68abd33c972a5248544925a0cae7d1125f9bf6c58280d37546b946769a08 \
     --hash=sha256:6ff5f3180870836cae40f06fa10419f557208175f13ad7bc26caa77beb1f6e02
-newrelic==4.0.0.99 \
-    --hash=sha256:842761eac4793f903205d54471c72f38ae9761c1d6743f8c03964a8d363251a9
+newrelic==4.2.0.100 \
+    --hash=sha256:da56df90005b233466d81424a0478dcea2b00bf5a6853d9a1a1451f03e07f41e
 psycopg2==2.7.5 \
     --hash=sha256:36f8f9c216fcca048006f6dd60e4d3e6f406afde26cfb99e063f137070139eaf \
     --hash=sha256:e9ca911f8e2d3117e5241d5fa9aaa991cb22fb0792627eeada47425d706b5ec8 \
@@ -169,9 +171,9 @@ pyjexl==0.2.3 \
 pytest-django==3.3.3 \
     --hash=sha256:434abfd2afe61b69a58af41e7339617f3aa33dc9a05e3b77fa5955204a61b865 \
     --hash=sha256:a73e355138675db8f535777ddf34bde28580b688be17dc21d0efa65e5c16927c
-pytest==3.6.4 \
-    --hash=sha256:952c0389db115437f966c4c2079ae9d54714b9455190e56acebe14e8c38a7efa \
-    --hash=sha256:341ec10361b64a24accaec3c7ba5f7d5ee1ca4cebea30f76fad3dd12db9f0541
+pytest==3.7.1 \
+    --hash=sha256:e74466e97ac14582a8188ff4c53e6cc3810315f342f6096899332ae864c1d432 \
+    --hash=sha256:86a8dbf407e437351cef4dba46736e9c5a6e3c3ac71b2e942209748e76ff2086
 pytest-mock==1.10.0 \
     --hash=sha256:53801e621223d34724926a5c98bd90e8e417ce35264365d39d6c896388dcc928 \
     --hash=sha256:d89a8209d722b8307b5e351496830d5cc5e192336003a485443ae9adeb7dd4c0
