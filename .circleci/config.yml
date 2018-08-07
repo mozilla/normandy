@@ -38,9 +38,6 @@ jobs:
              chmod +x ~/docker-compose
              mv ~/docker-compose /usr/local/bin/docker-compose
 
-      - setup_remote_docker:
-          version: 17.09.0-ce
-
       - run:
           name: Create version.json
           command: |
