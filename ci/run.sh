@@ -67,8 +67,6 @@ case $1 in
   contracttest)
     echo "Waiting for web server to start"
     ./ci/wait-for-it.sh -t 30 web:8000 -- echo "Done waiting. It should work now."
-    curl --version
-    curl web:8000
     echo "Running acceptance tests"
     py.test contract-tests/ \
       -vv \

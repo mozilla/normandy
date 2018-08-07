@@ -9,23 +9,6 @@ services:
       timeout: 3s
       retries: 30
 
-  testing:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    image: normandy:testing
-    # depends_on:
-    #   - db
-    environment:
-      - DJANGO_CONFIGURATION=Test
-      - DATABASE_URL=postgres://postgres@db/postgres
-    ports:
-      - 9876:9876
-    # Temporary
-    # volumes:
-    #   - $PWD:/app
-    command: start
-
   web:
     build:
       context: ..
@@ -42,23 +25,3 @@ services:
     # volumes:
     #   - $PWD:/app
     command: start
-
-  # contracts:
-  #   build:
-  #     context: contracts
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - web
-  #   command: test
-
-  # tests:
-  #   build:
-  #     context: .
-  #     dockerfile: tests/Dockerfile
-  #   image: kinto:tests
-  #   depends_on:
-  #     - web
-  #   environment:
-  #     - SERVER=http://web:8888/v1
-  #     - MAILFILESERVER=http://web:9999
-  #   command: start
