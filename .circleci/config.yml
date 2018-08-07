@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Install essential packages
           command: |
-            apt-get update && apt-get install -y ca-certificates curl git openssh-client
+            sudo apt-get update && apt-get install -y ca-certificates curl git openssh-client
 
       - checkout
 
