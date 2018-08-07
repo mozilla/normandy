@@ -39,6 +39,7 @@ jobs:
 
       - setup_remote_docker:
           version: 17.09.0-ce
+          docker_layer_caching: true
 
       - run:
           name: Create version.json
@@ -53,6 +54,11 @@ jobs:
               > version.json
 
       - run:
+          name: Starting artifact collector
+          command: docker-compose -f ci/docker-compose.ci.yml run --user root artifact-collector
+          background: true
+
+      - run:
           name: Build
           command: docker-compose -f ci/docker-compose.ci.yml build web
 
@@ -62,24 +68,33 @@ jobs:
 
       - run:
           name: Python Tests
-          command: |
-            docker-compose -f ci/docker-compose.ci.yml run web pytest
+          command: docker-compose -f ci/docker-compose.ci.yml run web pytest
 
       - run:
           name: Start Django/Gunicorn server
-          command: |
-            docker-compose -f ci/docker-compose.ci.yml up web
+          command: docker-compose -f ci/docker-compose.ci.yml up web
           background: true
 
       - run:
           name: Contract tests
-          command: |
-            docker-compose -f ci/docker-compose.ci.yml run web contracttest
+          command: docker-compose -f ci/docker-compose.ci.yml run web contracttest
 
       - run:
           name: JavaScript tests
+          command: docker-compose -f ci/docker-compose.ci.yml run --user root web karma
+
+      - run:
+          name: Copy Artifacts
+          when: always  # run even if previous run commands failed
           command: |
-            docker-compose -f ci/docker-compose.ci.yml run --user 0 web karma
+            docker cp $(docker-compose -f ci/docker-compose.ci.yml ps -q artifact-collector):/artifacts /artifacts
+            ls /artifacts
+
+      - store_artifacts:
+          path: /artifacts
+
+      - store_test_results:
+          path: /artifacts/test_results
 
       # - run:
       #     name: Push to Dockerhub

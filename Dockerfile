@@ -25,9 +25,7 @@ RUN pip install --upgrade --no-cache-dir -r requirements/pip.txt && \
 COPY . /app
 RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
-    mkdir -p media && chown app:app media && \
-    mkdir -p /test_artifacts && \
-    chmod 777 /test_artifacts
+    mkdir -p media && chown app:app media
 
 # RUN chown -R 10001:10001 /app
 RUN chown -R app:app /app

@@ -21,7 +21,21 @@ services:
     environment:
       - DJANGO_CONFIGURATION=ProductionInsecure
       - DATABASE_URL=postgres://postgres@db/postgres
-    # Temporary
-    # volumes:
-    #   - $PWD:/app
+      - ARTIFACTS_PATH=/artifacts
+    volumes:
+      - test-artifacts:/artifacts
     command: start
+
+  artifact-collector:
+    image: ubuntu:18.04  # TODO this could be a more minimal image
+    volumes:
+      - test-artifacts:/artifacts
+    command: |
+      bash -c "
+        chmod -R 777 /artifacts
+        echo Waiting for artifacts
+        sleep 1h  # Wait a long time
+      "
+
+volumes:
+  test-artifacts:
