@@ -66,7 +66,7 @@ jobs:
           name: Python Tests
           command: |
             mkdir -p test_artifacts
-            chmod 777 test_artifacts
+            sudo chmod 777 test_artifacts
             docker-compose -f ci/docker-compose.ci.yml run web pytest
             ls -l test_artifacts
             pwd
