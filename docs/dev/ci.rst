@@ -23,9 +23,6 @@ There are some exceptions though. For example, when a step is set up to run with
 ``background: true`` it means you can run it in its own dedicated terminal and run the
 other commands in another terminal.
 
-Also, steps with ``when: always`` means they can be run after any other step. In particular
-we use this to extract content from containers that have finished successfully or failed.
-
 No Volume Mounts
 ----------------
 
