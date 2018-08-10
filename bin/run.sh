@@ -6,6 +6,14 @@ usage() {
   exit 1
 }
 
+function start_gunicorn {
+  $CMD_PREFIX gunicorn \
+  --log-file - \
+  --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
+  --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
+  normandy.wsgi:application
+}
+
 [ $# -lt 1 ] && usage
 
 case $1 in
@@ -55,18 +63,10 @@ case $1 in
     echo "Starting the gunicorn server the first time"
     ./manage.py migrate
     ./manage.py update_actions
-    $CMD_PREFIX gunicorn \
-    --log-file - \
-    --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
-    --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
-    normandy.wsgi:application
+    start_gunicorn
     ;;
   start)
-    $CMD_PREFIX gunicorn \
-    --log-file - \
-    --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
-    --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
-    normandy.wsgi:application
+    start_gunicorn
     ;;
   contracttest)
     echo "Waiting for web server to start"
