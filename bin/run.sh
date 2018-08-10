@@ -51,6 +51,15 @@ case $1 in
     pkill firefox
     rm -fr firefox
     ;;
+  first-start)
+    echo "Starting the gunicorn server the first time"
+    ./manage.py migrate
+    $CMD_PREFIX gunicorn \
+    --log-file - \
+    --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
+    --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
+    normandy.wsgi:application
+    ;;
   start)
     $CMD_PREFIX gunicorn \
     --log-file - \
