@@ -54,6 +54,7 @@ case $1 in
   first-start)
     echo "Starting the gunicorn server the first time"
     ./manage.py migrate
+    ./manage.py update_actions
     $CMD_PREFIX gunicorn \
     --log-file - \
     --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
