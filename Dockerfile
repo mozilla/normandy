@@ -37,11 +37,6 @@ ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     NEW_RELIC_CONFIG_FILE=newrelic.ini
 EXPOSE $PORT
 
-ENTRYPOINT ["/bin/bash", "/app/ci/run.sh"]
+ENTRYPOINT ["/bin/bash", "/app/bin/run.sh"]
 
-CMD $CMD_PREFIX \
-    gunicorn  \
-    --log-file - \
-    --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
-    --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
-    normandy.wsgi:application
+CMD start

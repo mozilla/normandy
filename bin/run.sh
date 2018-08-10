@@ -52,12 +52,7 @@ case $1 in
     rm -fr firefox
     ;;
   start)
-    NODE_ENV=production yarn build
-    DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input
-    ./manage.py migrate
-    ./manage.py update_actions
-    ./bin/download_geolite2.sh
-    DJANGO_CONFIGURATION=ProductionInsecure gunicorn  \
+    $CMD_PREFIX gunicorn \
     --log-file - \
     --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
     --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
