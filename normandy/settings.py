@@ -399,7 +399,6 @@ class Development(Base):
 class Production(Base):
     """Settings for the production environment."""
 
-    USE_X_FORWARDED_HOST = values.BooleanValue(False)
     SECURE_PROXY_SSL_HEADER = values.TupleValue(("HTTP_X_FORWARDED_PROTO", "https"))
     LOGGING_USE_JSON = values.Value(True)
     SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
