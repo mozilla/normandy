@@ -27,8 +27,6 @@ RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media
 
-RUN chown -R app:app /app
-
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
