@@ -1,5 +1,5 @@
 status = [
-  "ci/circleci",
+  "ci/circleci: build_test_publish",
 ]
 # Avoid including verbose details from PyUp in commit messages
 cut_body_after = "<details>"

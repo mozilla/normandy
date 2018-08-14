@@ -1,0 +1,116 @@
+# These environment variables must be set in CircleCI UI
+#
+# DOCKERHUB_REPO - docker hub repo, format: <username>/<repo>
+# DOCKER_USER
+# DOCKER_PASS
+#
+version: 2
+jobs:
+  build_test_publish:
+    docker:
+      - image: ubuntu:18.04
+    working_directory: ~/normandy
+
+    steps:
+      - run:
+          name: Install essential packages
+          command: |
+            apt-get update && apt-get install -y ca-certificates curl git openssh-client
+
+      - checkout
+
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            # Latest 200 OK version as of June 2018
+            # https://circleci.com/docs/2.0/building-docker-images/#docker-version
+            VER="17.09.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+
+      - run:
+          name: Install Docker Compose
+          command: |
+             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+             chmod +x ~/docker-compose
+             mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - setup_remote_docker:
+          version: 17.09.0-ce
+          docker_layer_caching: true
+
+      - run:
+          name: Create version.json
+          command: |
+            # store version info in app directory, for Docker to pick up
+            printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' \
+              "$CIRCLE_SHA1" \
+              "${CIRCLE_TAG-}" \
+              "$CIRCLE_PROJECT_USERNAME" \
+              "$CIRCLE_PROJECT_REPONAME" \
+              "$CIRCLE_BUILD_URL" \
+              > version.json
+
+      - run:
+          name: Starting artifact collector
+          command: docker-compose -f ci/docker-compose.yml run --user root artifact-collector
+          background: true
+
+      - run:
+          name: Build
+          command: docker-compose -f ci/docker-compose.yml build web
+
+      - run:
+          name: Linting
+          command: docker-compose -f ci/docker-compose.yml run web lint
+
+      - run:
+          name: Python Tests
+          command: docker-compose -f ci/docker-compose.yml run web pytest
+
+      - run:
+          name: Start Django/Gunicorn server
+          command: docker-compose -f ci/docker-compose.yml up web
+          background: true
+
+      - run:
+          name: Contract tests
+          command: docker-compose -f ci/docker-compose.yml run web contracttest
+
+      - run:
+          name: JavaScript tests
+          command: docker-compose -f ci/docker-compose.yml run --user root web karma
+
+      - run:
+          name: Copy Artifacts
+          when: always  # run even if previous run commands failed
+          command: |
+            docker cp $(docker-compose -f ci/docker-compose.yml ps -q artifact-collector):/artifacts /artifacts
+            ls /artifacts
+
+      - store_artifacts:
+          path: /artifacts
+
+      - store_test_results:
+          path: /artifacts/test_results
+
+      - run:
+          name: Push to Dockerhub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              ./ci/deploy.sh latest
+            fi
+            if [ -n "${CIRCLE_TAG}" ]; then
+              ./ci/deploy.sh "$CIRCLE_TAG"
+            fi
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build_test_publish:
+          filters:
+            tags:
+              only: /.*/

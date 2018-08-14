@@ -16,3 +16,4 @@ of the Normandy client.
    code-style
    feature-experiments
    troubleshooting
+   ci

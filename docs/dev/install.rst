@@ -139,7 +139,6 @@ running:
 
 The site should be available at https://localhost:8000/.
 
-.. _peep: https://github.com/erikrose/peep/
 .. _fork: http://help.github.com/fork-a-repo/
 .. _issue: https://bugs.python.org/issue18378
 

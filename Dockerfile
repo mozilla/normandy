@@ -4,7 +4,7 @@ RUN groupadd --gid 1001 app && useradd -g app --uid 1001 --shell /usr/sbin/nolog
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        gcc libpq-dev curl apt-transport-https libffi-dev
+    gcc libpq-dev curl apt-transport-https libffi-dev openssh-client
 
 # Install node from NodeSource
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
@@ -25,9 +25,7 @@ RUN pip install --upgrade --no-cache-dir -r requirements/pip.txt && \
 COPY . /app
 RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
-    mkdir -p media && chown app:app media && \
-    mkdir -p /test_artifacts && \
-    chmod 777 /test_artifacts
+    mkdir -p media && chown app:app media
 
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
@@ -37,9 +35,6 @@ ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     NEW_RELIC_CONFIG_FILE=newrelic.ini
 EXPOSE $PORT
 
-CMD $CMD_PREFIX \
-    gunicorn  \
-    --log-file - \
-    --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
-    --max-requests ${GUNICORN_MAX_REQUESTS:-0} \
-    normandy.wsgi:application
+ENTRYPOINT ["/bin/bash", "/app/bin/run.sh"]
+
+CMD start
