@@ -37,4 +37,4 @@ EXPOSE $PORT
 
 ENTRYPOINT ["/bin/bash", "/app/bin/run.sh"]
 
-CMD start
+CMD ["start"]
