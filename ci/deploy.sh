@@ -24,7 +24,7 @@ echo "$DOCKER_PASSWORD" | docker login --username="$DOCKER_USERNAME" --password-
 # docker tag and push git branch to dockerhub
 if [ -n "$1" ]; then
     # Tag docker-compose built image
-    docker tag normandy:web
+    docker tag normandy:web mozilla/normandy:latest
     if [ "$1" == master ]; then
         TAG=latest
     else
