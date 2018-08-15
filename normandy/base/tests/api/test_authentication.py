@@ -83,8 +83,22 @@ class TestBearerTokenAuthentication(object):
             {"email": user.email, "given_name": user.first_name, "family_name": user.last_name}
         ).encode("utf-8")
 
-        ratelimit_reset = int(time.mktime(datetime.utcnow().timetuple())) + 1
-
+        # The reason for the `+ 2` here is that if we only add +1 second, there's a small
+        # chance that the `time.mktime(utcnow)` done here is *different* from the
+        # `time.mktime(utcnow)` that happens within the `fetch_oidc_user_profile()` method
+        # inside BearerTokenAuthentication.
+        # I.e.
+        #
+        #    print(time.mktime(datetime.utcnow().timetuple()))  # outputs 1534380068.0
+        #    time.sleep(0.1)
+        #    print(time.mktime(datetime.utcnow().timetuple()))  # outputs 1534380069.0
+        #
+        # Note! This doesn't always happen. Run those three lines 100 times and it's
+        # guaranteed to be different ~10% of the time. That's when the milliseconds is 900 and
+        # with the sleep(0.1) it will round up to the next second.
+        # By adding +2 to the mock here we allow a whole 1 second between now and when
+        # the `fetch_oidc_user_profile()` uses `time.mktime(datetime.utcnow().timetuple())`.
+        ratelimit_reset = int(time.mktime(datetime.utcnow().timetuple())) + 2
         requestsmock.get(
             settings.OIDC_USER_ENDPOINT,
             [
