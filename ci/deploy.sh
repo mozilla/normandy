@@ -19,10 +19,12 @@ function retry() {
 }
 
 # configure docker creds
-retry 3 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+echo "$DOCKER_PASSWRD" | docker login --user="$DOCKER_USERNAME" --password-stdin
 
 # docker tag and push git branch to dockerhub
 if [ -n "$1" ]; then
+    # Tag docker-compose built image
+    docker tag normandy:web
     if [ "$1" == master ]; then
         TAG=latest
     else
