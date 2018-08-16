@@ -1,7 +1,7 @@
 """
 Filter objects are based on a series of simple rules. In order for a recipe to
 match a user, every part of a filter object must be true. In other words, the
-parts of a filter expression are ``AND``ed together.
+parts of a filter expression are ``AND`` ed together.
 
 Each filter below defines a rule, and when it matches a user. Filter parameters
 are represented as JSON. Most users will interact with filters are a higher

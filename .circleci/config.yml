@@ -33,9 +33,9 @@ jobs:
       - run:
           name: Install Docker Compose
           command: |
-             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-             chmod +x ~/docker-compose
-             mv ~/docker-compose /usr/local/bin/docker-compose
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            mv ~/docker-compose /usr/local/bin/docker-compose
 
       - setup_remote_docker:
           version: 17.09.0-ce
@@ -85,7 +85,7 @@ jobs:
 
       - run:
           name: Copy Artifacts
-          when: always  # run even if previous run commands failed
+          when: always # run even if previous run commands failed
           command: |
             docker cp $(docker-compose -f ci/docker-compose.yml ps -q artifact-collector):/artifacts /artifacts
             ls /artifacts
@@ -106,6 +106,40 @@ jobs:
               ./ci/deploy.sh "$CIRCLE_TAG"
             fi
 
+  docs:
+    docker:
+      - image: circleci/python:3.6
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache python dependencies
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/docs.txt" }}
+
+      - run:
+          name: Create virtualenv
+          command: |
+            python3 -m venv ~/venv
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Install requirements
+          command: pip install -r requirements/docs.txt
+
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/docs.txt" }}
+          paths:
+            - "~/venv"
+
+      # Build the docs!
+      - run:
+          name: Build docs
+          command: |
+            cd docs
+            make html
+
 workflows:
   version: 2
   main:
@@ -114,3 +148,4 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - docs
