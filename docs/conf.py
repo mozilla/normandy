@@ -41,7 +41,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Normandy"
-copyright = "2016, Mozilla Foundation"
+copyright = "2016-2018, Mozilla Foundation"
 author = "Mozilla Foundation"
 
 # The version info for the project you're documenting, acts as replacement for
