@@ -4,3 +4,6 @@ status = [
 ]
 # Avoid including verbose details from PyUp in commit messages
 cut_body_after = "<details>"
+block_labels = ["bors-dont-merge"]
+required_approvals = 1
+delete_merged_branches = true 
