@@ -287,6 +287,7 @@ class TestRecipeAPI(object):
         def test_list_filter_channels_null_bytes(self, api_client):
             res = api_client.get("/api/v1/recipe/?channels=\x00")
             assert res.status_code == 400
+            assert res.json()["channels"] == ["Null characters are not allowed."]
 
         def test_list_filter_countries(self, api_client):
             r1 = RecipeFactory(countries=[CountryFactory(code="US")])
@@ -306,6 +307,7 @@ class TestRecipeAPI(object):
         def test_list_filter_countries_with_null_bytes(self, api_client):
             res = api_client.get("/api/v1/recipe/?countries=\x00")
             assert res.status_code == 400
+            assert res.json()["countries"] == ["Null characters are not allowed."]
 
         def test_list_filter_locales(self, api_client):
             r1 = RecipeFactory(locales=[LocaleFactory(code="en-US")])
@@ -325,6 +327,7 @@ class TestRecipeAPI(object):
         def test_list_filter_locales_null_bytes(self, api_client):
             res = api_client.get("/api/v1/recipe/?locales=\x00")
             assert res.status_code == 400
+            assert res.json()["locales"] == ["Null characters are not allowed."]
 
         def test_list_filter_text(self, api_client):
             r1 = RecipeFactory(name="first", extra_filter_expression="1 + 1 == 2")
