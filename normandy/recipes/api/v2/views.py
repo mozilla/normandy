@@ -34,9 +34,22 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
+class CharSplitFilter(django_filters.CharFilter):
+    """Custom CharFilter class that splits the value (if it's set) by `,` into a list
+    and uses the `__in` operator."""
+
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(**{"{}__in".format(self.field_name): value.split(",")})
+        return qs
+
+
 class RecipeFilters(django_filters.FilterSet):
     enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name="latest_revision__action__name")
+    channels = CharSplitFilter("latest_revision__channels__slug")
+    locales = CharSplitFilter("latest_revision__locales__code")
+    countries = CharSplitFilter("latest_revision__countries__code")
 
     class Meta:
         model = Recipe
@@ -76,18 +89,6 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
             queryset = queryset.only_enabled()
         elif self.request.GET.get("status") == "disabled":
             queryset = queryset.only_disabled()
-
-        if "channels" in self.request.GET:
-            channels = self.request.GET.get("channels").split(",")
-            queryset = queryset.filter(latest_revision__channels__slug__in=channels)
-
-        if "countries" in self.request.GET:
-            countries = self.request.GET.get("countries").split(",")
-            queryset = queryset.filter(latest_revision__countries__code__in=countries)
-
-        if "locales" in self.request.GET:
-            locales = self.request.GET.get("locales").split(",")
-            queryset = queryset.filter(latest_revision__locales__code__in=locales)
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")
