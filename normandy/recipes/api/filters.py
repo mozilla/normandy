@@ -12,3 +12,13 @@ class EnabledStateFilter(django_filters.Filter):
             elif lc_value in ["false", "0"]:
                 return qs.only_disabled()
         return qs
+
+
+class CharSplitFilter(django_filters.CharFilter):
+    """Custom CharFilter class that splits the value (if it's set) by `,` into a list
+    and uses the `__in` operator."""
+
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(**{"{}__in".format(self.field_name): value.split(",")})
+        return qs

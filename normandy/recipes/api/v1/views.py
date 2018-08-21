@@ -22,7 +22,7 @@ from normandy.recipes.models import (
     Recipe,
     RecipeRevision,
 )
-from normandy.recipes.api.filters import EnabledStateFilter
+from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
@@ -77,6 +77,9 @@ class ActionImplementationView(generics.RetrieveAPIView):
 class RecipeFilters(django_filters.FilterSet):
     enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name="latest_revision__action__name")
+    channels = CharSplitFilter("latest_revision__channels__slug")
+    locales = CharSplitFilter("latest_revision__locales__code")
+    countries = CharSplitFilter("latest_revision__countries__code")
 
     class Meta:
         model = Recipe
@@ -109,18 +112,6 @@ class RecipeViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
             queryset = queryset.only_enabled()
         elif self.request.GET.get("status") == "disabled":
             queryset = queryset.only_disabled()
-
-        if "channels" in self.request.GET:
-            channels = self.request.GET.get("channels").split(",")
-            queryset = queryset.filter(latest_revision__channels__slug__in=channels)
-
-        if "countries" in self.request.GET:
-            countries = self.request.GET.get("countries").split(",")
-            queryset = queryset.filter(latest_revision__countries__code__in=countries)
-
-        if "locales" in self.request.GET:
-            locales = self.request.GET.get("locales").split(",")
-            queryset = queryset.filter(latest_revision__locales__code__in=locales)
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")
