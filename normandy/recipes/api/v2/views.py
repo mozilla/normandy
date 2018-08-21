@@ -16,7 +16,7 @@ from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.decorators import api_cache_control
 from normandy.recipes.models import Action, ApprovalRequest, EnabledState, Recipe, RecipeRevision
-from normandy.recipes.api.filters import EnabledStateFilter
+from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
 from normandy.recipes.api.v2.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
@@ -32,16 +32,6 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     pagination_class = None
-
-
-class CharSplitFilter(django_filters.CharFilter):
-    """Custom CharFilter class that splits the value (if it's set) by `,` into a list
-    and uses the `__in` operator."""
-
-    def filter(self, qs, value):
-        if value:
-            qs = qs.filter(**{"{}__in".format(self.field_name): value.split(",")})
-        return qs
 
 
 class RecipeFilters(django_filters.FilterSet):

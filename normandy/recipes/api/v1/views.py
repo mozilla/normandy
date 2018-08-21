@@ -22,7 +22,7 @@ from normandy.recipes.models import (
     Recipe,
     RecipeRevision,
 )
-from normandy.recipes.api.filters import EnabledStateFilter
+from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
@@ -72,16 +72,6 @@ class ActionImplementationView(generics.RetrieveAPIView):
             raise NotFound("Hash does not match current stored action.")
 
         return Response(action.implementation)
-
-
-class CharSplitFilter(django_filters.CharFilter):
-    """Custom CharFilter class that splits the value (if it's set) by `,` into a list
-    and uses the `__in` operator."""
-
-    def filter(self, qs, value):
-        if value:
-            qs = qs.filter(**{"{}__in".format(self.field_name): value.split(",")})
-        return qs
 
 
 class RecipeFilters(django_filters.FilterSet):
