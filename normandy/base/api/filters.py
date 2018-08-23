@@ -23,7 +23,9 @@ class AliasedOrderingFilter(filters.OrderingFilter):
 
     def get_valid_fields(self, *args, **kwargs):
         valid_fields = super().get_valid_fields(*args, **kwargs)
-        return valid_fields + list(self.aliases.values())
+        for alias, mapping in self.aliases.items():
+            valid_fields.append((alias, mapping[1]))
+        return valid_fields
 
     def get_ordering(self, *args, **kwargs):
         ordering = super().get_ordering(*args, **kwargs)

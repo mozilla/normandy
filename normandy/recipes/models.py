@@ -276,8 +276,13 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        if self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields(check_relationship=True)
+        dirty_fields = {
+            k: v
+            for k, v in self.get_dirty_fields(check_relationship=True, verbose=True).items()
+            if v["saved"] != v["current"]
+        }
+
+        if dirty_fields:
             dirty_field_names = list(dirty_fields.keys())
 
             if (
@@ -641,8 +646,12 @@ class Action(DirtyFieldsMixin, models.Model):
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        if self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields(check_relationship=True)
+        dirty_fields = {
+            k: v
+            for k, v in self.get_dirty_fields(check_relationship=True, verbose=True).items()
+            if v["saved"] != v["current"]
+        }
+        if dirty_fields:
             dirty_field_names = list(dirty_fields.keys())
 
             if (
