@@ -34,7 +34,7 @@
     "babel-preset-babili": "0.1.4",
     "babili-webpack-plugin": "0.1.1",
     "eslint": "3.19.0",
-    "eslint-config-airbnb": "15.0.1",
+    "eslint-config-airbnb": "15.1.0",
     "eslint-import-resolver-webpack": "0.8.3",
     "eslint-plugin-babel": "4.1.1",
     "eslint-plugin-import": "2.6.1",
