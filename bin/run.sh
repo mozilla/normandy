@@ -2,7 +2,7 @@
 set -eo pipefail
 
 usage() {
-  echo "usage: ./bin/run.sh pytests|jstests|lint|start"
+  echo "usage: ./bin/run.sh python-tests|js-tests|lint|start"
   exit 1
 }
 
@@ -37,13 +37,13 @@ case $1 in
     fi
     set -e
     ;;
-  pytest)
+  python-tests)
     echo "Running Python tests"
     junit_path=$ARTIFACTS_PATH/test_results/python_tests
     mkdir -p $junit_path
     py.test -vv --junitxml=$junit_path/junit.xml normandy/
     ;;
-  karma)
+  js-tests)
     apt install -y --no-install-recommends firefox-esr
     npm install -g get-firefox
     get-firefox -e
