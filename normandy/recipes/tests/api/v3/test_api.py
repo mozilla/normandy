@@ -940,7 +940,7 @@ class TestRecipeAPI(object):
             r1 = RecipeFactory(name="apple banana")
             RecipeFactory(name="apple")
 
-            res = api_client.get("/api/v2/recipe/?text=apple banana")
+            res = api_client.get("/api/v3/recipe/?text=apple banana")
             assert res.status_code == 200
             assert [r["id"] for r in res.data["results"]] == [r1.id]
 
