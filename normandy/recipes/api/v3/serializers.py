@@ -133,7 +133,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
-        if "user" not in validated_data and request and request.user:
+        if request and request.user:
             validated_data["user"] = request.user
 
         instance.revise(**validated_data)
@@ -141,7 +141,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        if "user" not in validated_data and request and request.user:
+        if request and request.user:
             validated_data["user"] = request.user
 
         if "identicon_seed" not in validated_data:
