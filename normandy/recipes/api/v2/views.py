@@ -82,13 +82,14 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")
-            tokens = set([text])
-            tokens.update(re.split(r"[ /_-]", text))
+            tokens = set(re.split(r"[ /_-]", text))
             query = Q()
             for token in tokens:
-                query |= Q(latest_revision__name__icontains=token)
-                query |= Q(latest_revision__extra_filter_expression__icontains=token)
-                query |= Q(latest_revision__arguments_json__icontains=token)
+                query &= (
+                    Q(latest_revision__name__icontains=token)
+                    | Q(latest_revision__extra_filter_expression__icontains=token)
+                    | Q(latest_revision__arguments_json__icontains=token)
+                )
 
             queryset = queryset.filter(query)
 
