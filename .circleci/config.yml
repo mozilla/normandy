@@ -68,7 +68,7 @@ jobs:
 
       - run:
           name: Python Tests
-          command: docker-compose -f ci/docker-compose.yml run web pytest
+          command: docker-compose -f ci/docker-compose.yml run web python-tests
 
       - run:
           name: Start Django/Gunicorn server
@@ -81,7 +81,7 @@ jobs:
 
       - run:
           name: JavaScript tests
-          command: docker-compose -f ci/docker-compose.yml run --user root web karma
+          command: docker-compose -f ci/docker-compose.yml run --user root web js-tests
 
       - run:
           name: Copy Artifacts
