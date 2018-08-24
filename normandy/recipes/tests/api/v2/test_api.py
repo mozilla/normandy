@@ -901,6 +901,14 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert [r["id"] for r in res.data["results"]] == [r2.id]
 
+        def test_search_all_words_required(self, api_client):
+            r1 = RecipeFactory(name="apple banana")
+            RecipeFactory(name="apple")
+
+            res = api_client.get("/api/v2/recipe/?text=apple banana")
+            assert res.status_code == 200
+            assert [r["id"] for r in res.data["results"]] == [r1.id]
+
         def test_list_filter_action_legacy(self, api_client):
             a1 = ActionFactory()
             a2 = ActionFactory()
