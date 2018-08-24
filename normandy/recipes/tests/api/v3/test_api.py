@@ -356,6 +356,20 @@ class TestRecipeAPI(object):
             recipe = Recipe.objects.get()
             assert recipe.bug_number == 42
 
+        def test_creating_recipes_stores_the_user(self, api_client):
+            action = ActionFactory()
+            api_client.post(
+                "/api/v3/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "extra_filter_expression": "whatever",
+                },
+            )
+            recipe = Recipe.objects.get()
+            assert recipe.latest_revision.user is not None
+
     @pytest.mark.django_db
     class TestUpdates(object):
         def test_it_can_edit_recipes(self, api_client):
@@ -488,6 +502,12 @@ class TestRecipeAPI(object):
 
             r.refresh_from_db()
             assert r.bug_number == 42
+
+        def test_updating_recipes_stores_the_user(self, api_client):
+            recipe = RecipeFactory()
+            api_client.patch(f"/api/v3/recipe/{recipe.pk}/", {"name": "Test Recipe"})
+            recipe.refresh_from_db()
+            assert recipe.latest_revision.user is not None
 
     @pytest.mark.django_db
     class TestFilterObjects(object):

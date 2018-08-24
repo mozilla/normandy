@@ -132,10 +132,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and request.user:
+            validated_data["user"] = request.user
+
         instance.revise(**validated_data)
         return instance
 
     def create(self, validated_data):
+        request = self.context.get("request")
+        if request and request.user:
+            validated_data["user"] = request.user
+
         if "identicon_seed" not in validated_data:
             validated_data["identicon_seed"] = f"v1:{FuzzyText().fuzz()}"
 

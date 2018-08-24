@@ -339,6 +339,20 @@ class TestRecipeAPI(object):
                 "non_field_errors": ["one of extra_filter_expression or filter_object is required"]
             }
 
+        def test_creating_recipes_stores_the_user(self, api_client):
+            action = ActionFactory()
+            api_client.post(
+                "/api/v2/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "extra_filter_expression": "whatever",
+                },
+            )
+            recipe = Recipe.objects.get()
+            assert recipe.latest_revision.user is not None
+
     @pytest.mark.django_db
     class TestUpdates(object):
         def test_it_can_edit_recipes(self, api_client):
@@ -453,6 +467,12 @@ class TestRecipeAPI(object):
 
             r.refresh_from_db()
             assert list(r.channels.all()) == [c2]
+
+        def test_updating_recipes_stores_the_user(self, api_client):
+            recipe = RecipeFactory()
+            api_client.patch(f"/api/v2/recipe/{recipe.pk}/", {"name": "Test Recipe"})
+            recipe.refresh_from_db()
+            assert recipe.latest_revision.user is not None
 
     @pytest.mark.django_db
     class TestFilterObjects(object):
