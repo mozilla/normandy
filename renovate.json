@@ -1,5 +1,11 @@
 {
-  "extends": [
-    "config:base"
-  ]
+  "extends": ["config:base"],
+  "docker-compose": {
+    "digest": {
+      "enabled": false
+    }
+  },
+  "dockerfile": {
+    "pinDigests": true
+  }
 }
