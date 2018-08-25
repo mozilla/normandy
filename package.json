@@ -18,7 +18,7 @@
   "dependencies": {
     "babel-plugin-transform-class-properties": "6.24.1",
     "mozilla-normandy-action-argument-schemas": "0.3.0",
-    "node-uuid": "1.4.7",
+    "node-uuid": "1.4.8",
     "nsp": "3.2.1"
   },
   "devDependencies": {
