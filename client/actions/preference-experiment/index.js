@@ -36,7 +36,7 @@ export default class PreferenceExperimentAction extends Action {
     }
 
     // Check opt-out preference
-    const preferences = this.normandy.preferences;
+    const { preferences } = this.normandy;
     if (preferences && !preferences.getBool(SHIELD_OPT_OUT_PREF, false)) {
       this.normandy.log('User has opted-out of preference experiments, aborting.', 'info');
       return;
@@ -88,7 +88,7 @@ export default class PreferenceExperimentAction extends Action {
   }
 
   async chooseBranch(branches) {
-    const slug = this.recipe.arguments.slug;
+    const { slug } = this.recipe.arguments;
     const ratios = branches.map(branch => branch.ratio);
 
     // It's important that the input be:

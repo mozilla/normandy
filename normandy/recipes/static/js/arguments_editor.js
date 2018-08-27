@@ -1,7 +1,7 @@
 (function argumentsEditor($, JSONEditor) {
   'use strict';
 
-    /**
+  /**
      * Initialize the arguments editor.
      * @param  {jQuery object} $actionSelect
      * @param  {jQuery object} $argumentsJson
@@ -54,7 +54,7 @@
     });
   }
 
-    // Tweaks to the normal theme that aren't possible via CSS.
+  // Tweaks to the normal theme that aren't possible via CSS.
   JSONEditor.defaults.themes.django = JSONEditor.defaults.themes.html.extend({
     getIndentedPanel() {
       var el = this._super();
@@ -82,7 +82,7 @@
     },
   });
 
-    // Initialize the editor.
+  // Initialize the editor.
   $(function init() {
     initialize($('#id_action'), $('#id_arguments_json'));
   });

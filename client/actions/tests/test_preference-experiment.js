@@ -4,7 +4,7 @@ import json4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
 import PreferenceExperimentAction, {
   postExecutionHook,
   resetAction,
-} from '../preference-experiment/';
+} from '../preference-experiment';
 import packageJson from '../preference-experiment/package.json';
 import { recipeFactory } from '../../tests/utils';
 import { MockStorage } from './utils';
@@ -34,7 +34,9 @@ class MockPreferenceExperiments {
     this.experiments = {};
   }
 
-  async start({ name, branch, preferenceName, preferenceValue, preferenceType }) {
+  async start({
+    name, branch, preferenceName, preferenceValue, preferenceType,
+  }) {
     this.experiments[name] = {
       name,
       branch,

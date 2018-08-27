@@ -1,5 +1,5 @@
 import { mockNormandy } from './utils';
-import ShowHeartbeatAction from '../show-heartbeat/';
+import ShowHeartbeatAction from '../show-heartbeat';
 import { recipeFactory } from '../../tests/utils';
 
 describe('ShowHeartbeatAction', () => {
@@ -40,8 +40,8 @@ describe('ShowHeartbeatAction', () => {
 
     await action.execute();
     expect(normandy.showHeartbeat).toHaveBeenCalledWith(
-            jasmine.objectContaining(showHeartbeatArgs),
-        );
+      jasmine.objectContaining(showHeartbeatArgs),
+    );
   });
 
   it('should generate a UUID and pass it to showHeartbeat', async () => {
@@ -206,8 +206,7 @@ describe('ShowHeartbeatAction', () => {
         for (let idx = 0; idx <= max; idx++) {
           normandy.showHeartbeat.calls.reset();
           // set last shown to be exactly `idx` days ago
-          normandy.mock.storage.data.lastShown =
-            Date.now() - (idx * ONE_DAY);
+          normandy.mock.storage.data.lastShown = Date.now() - (idx * ONE_DAY);
 
           await action.execute();
 
@@ -225,8 +224,7 @@ describe('ShowHeartbeatAction', () => {
         for (idx; idx <= max; idx++) {
           normandy.showHeartbeat.calls.reset();
           // set last shown to be exactly [idx] days ago
-          normandy.mock.storage.data.lastShown =
-            Date.now() - (idx * ONE_DAY);
+          normandy.mock.storage.data.lastShown = Date.now() - (idx * ONE_DAY);
 
           await action.execute();
           expect(normandy.showHeartbeat).toHaveBeenCalled();
@@ -256,7 +254,7 @@ describe('ShowHeartbeatAction', () => {
       const action = new ShowHeartbeatAction(normandy, recipe);
 
       await action.execute();
-      const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+      const { postAnswerUrl } = normandy.showHeartbeat.calls.argsFor(0)[0];
       expect(postAnswerUrl).toEqual('');
     });
 
@@ -276,7 +274,7 @@ describe('ShowHeartbeatAction', () => {
       normandy.mock.client.syncSetup = true;
 
       await action.execute();
-      const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+      const { postAnswerUrl } = normandy.showHeartbeat.calls.argsFor(0)[0];
       const params = new URL(postAnswerUrl).searchParams;
       expect(params.get('source')).toEqual('heartbeat');
       expect(params.get('surveyversion')).toEqual('56');
@@ -309,7 +307,7 @@ describe('ShowHeartbeatAction', () => {
       normandy.mock.client.syncSetup = true;
 
       await action.execute();
-      const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+      const { postAnswerUrl } = normandy.showHeartbeat.calls.argsFor(0)[0];
       const params = new URL(postAnswerUrl).searchParams;
       expect(params.get('utm_source')).toEqual('firefox');
       expect(params.get('utm_medium')).toEqual('show-heartbeat');
@@ -330,7 +328,7 @@ describe('ShowHeartbeatAction', () => {
       normandy.mock.client.channel = 'nightly';
 
       await action.execute();
-      const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+      const { postAnswerUrl } = normandy.showHeartbeat.calls.argsFor(0)[0];
       const params = new URL(postAnswerUrl).searchParams;
       expect(params.get('foo')).toEqual('bar');
       expect(params.get('source')).toEqual('heartbeat');
@@ -348,7 +346,7 @@ describe('ShowHeartbeatAction', () => {
       normandy.testing = true;
 
       await action.execute();
-      const postAnswerUrl = normandy.showHeartbeat.calls.argsFor(0)[0].postAnswerUrl;
+      const { postAnswerUrl } = normandy.showHeartbeat.calls.argsFor(0)[0];
       const params = new URL(postAnswerUrl).searchParams;
       expect(params.get('testing')).toEqual('1');
     });

@@ -6,8 +6,7 @@ class ConsoleLogAction {
   }
 
   execute() {
-    const normandy = this.normandy;
-    const recipe = this.recipe;
+    const { normandy, recipe } = this;
 
     return new Promise(() => {
       normandy.log(recipe.arguments.message, 'info');

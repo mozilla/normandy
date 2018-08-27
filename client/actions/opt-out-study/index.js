@@ -18,8 +18,10 @@ export function resetAction() {
 export default class OptOutStudyAction extends Action {
   async execute() {
     const recipeId = this.recipe.id;
-    const { name, description, addonUrl, isEnrollmentPaused } = this.recipe.arguments;
-    const studies = this.normandy.studies;
+    const {
+      name, description, addonUrl, isEnrollmentPaused,
+    } = this.recipe.arguments;
+    const { preferences, studies } = this.normandy;
 
     // Exit early if we're on an incompatible client.
     if (studies === undefined) {
@@ -28,7 +30,6 @@ export default class OptOutStudyAction extends Action {
     }
 
     // Check opt-out preference
-    const preferences = this.normandy.preferences;
     if (preferences && !preferences.getBool(SHIELD_OPT_OUT_PREF, false)) {
       this.normandy.log('User has opted-out of opt-out experiments, aborting.', 'info');
       return;
@@ -59,7 +60,7 @@ registerAction('opt-out-study', OptOutStudyAction);
  * action execution, and stops them.
  */
 export async function postExecutionHook(normandy) {
-  const studies = normandy.studies;
+  const { studies } = normandy;
 
   // Exit early if we're on an incompatible client.
   if (studies === undefined) {

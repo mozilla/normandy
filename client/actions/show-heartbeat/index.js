@@ -62,8 +62,8 @@ export default class ShowHeartbeatAction extends Action {
    */
   async heartbeatShownRecently() {
     const lastShown = await this.heartbeatStorage.getItem('lastShown');
-    const timeSince = lastShown ?
-      new Date() - parseFloat(lastShown) : Infinity;
+    const timeSince = lastShown
+      ? new Date() - parseFloat(lastShown) : Infinity;
 
     // Return a boolean indicating if a heartbeat
     // has shown within the last HEARTBEAT_THROTTLE ms
@@ -79,8 +79,8 @@ export default class ShowHeartbeatAction extends Action {
    */
   async getLastShown() {
     const lastShown = await this.storage.getItem('lastShown');
-    return typeof lastShown !== 'undefined' ?
-      parseFloat(lastShown) : null;
+    return typeof lastShown !== 'undefined'
+      ? parseFloat(lastShown) : null;
   }
 
   /**
@@ -134,8 +134,8 @@ export default class ShowHeartbeatAction extends Action {
   async getLastInteraction() {
     const lastInteraction = await this.storage.getItem('lastInteraction');
 
-    return typeof lastInteraction !== 'undefined' ?
-      parseFloat(lastInteraction) : null;
+    return typeof lastInteraction !== 'undefined'
+      ? parseFloat(lastInteraction) : null;
   }
 
   /**
@@ -148,8 +148,8 @@ export default class ShowHeartbeatAction extends Action {
   async sinceLastInteraction() {
     const lastInteraction = await this.getLastInteraction();
 
-    return typeof lastInteraction !== 'undefined' ?
-      Date.now() - lastInteraction : null;
+    return typeof lastInteraction !== 'undefined'
+      ? Date.now() - lastInteraction : null;
   }
 
   /**
@@ -214,12 +214,12 @@ export default class ShowHeartbeatAction extends Action {
    * @return {boolean}  Should the recipe execution halt?
    */
   async shouldNotExecute() {
-    return !this.normandy.testing &&
-      (
+    return !this.normandy.testing
+      && (
         // if a heartbeat has been shown in the past 24 hours
-        await this.heartbeatShownRecently() ||
+        await this.heartbeatShownRecently()
         // or this specific heartbeat has already ran
-        this.heartbeatHasExecuted()
+        || this.heartbeatHasExecuted()
       );
   }
 

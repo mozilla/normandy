@@ -1,7 +1,7 @@
 import OptOutStudyAction, {
   postExecutionHook,
   resetAction,
-} from '../opt-out-study/';
+} from '../opt-out-study';
 import { recipeFactory } from '../../tests/utils';
 
 function argumentsFactory(args) {
@@ -25,7 +25,9 @@ class MockStudies {
     this.studies = {};
   }
 
-  async start({ recipeId, name, description, addonUrl }) {
+  async start({
+    recipeId, name, description, addonUrl,
+  }) {
     this.studies[recipeId] = {
       recipeId,
       name,
