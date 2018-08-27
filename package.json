@@ -10,7 +10,7 @@
     "watch": "webpack --config ./webpack.config.js --watch",
     "build": "webpack --config ./webpack.config.js",
     "test": "karma start",
-    "lint": "yarn lint:js && yarn lint:css && yarn lint:js-security",
+    "lint": "yarn lint:js && yarn lint:js-security",
     "lint:js": "eslint normandy client karma.conf.js webpack.config.js",
     "lint:js-security": "nsp check . --threshold 3"
   },
