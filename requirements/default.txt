@@ -188,9 +188,9 @@ requests==2.19.1 \
 requests-hawk==1.0.0 \
     --hash=sha256:aef0dff8053dcae2057774516386bed0a3bc03fabea9e18f3aa98f02672ea5d0 \
     --hash=sha256:c2626ab31ebef0c81b97781c44c2275bfcc6d8e8520fc4ced495f0f386f8fe26
-statsd==3.2.2 \
-    --hash=sha256:50e0e7b34e5c01e78e270f17ccbd6bcc334f1a81ac5cb0b19050f7dd24d72c3e \
-    --hash=sha256:84f2427ef7b8ffab28cdb717933f6889d248d710eee32b5eb79e3fdac0e374dd
+statsd==3.3.0 \
+    --hash=sha256:c610fb80347fca0ef62666d241bce64184bd7cc1efe582f9690e045c25535eaa \
+    --hash=sha256:e3e6db4c246f7c59003e51c9720a51a7f39a396541cb9b147ff4b14d15b5dd1f
 whitenoise==4.0 \
     --hash=sha256:a6f86b011675b9730f69fd69d4f54c5697d6c7a90ab06f83f784d243d9fccc02 \
     --hash=sha256:1e206c5adfb849942ddd057e599ac472ec1a85d56ae78a5ba24f243ea46a89c5
