@@ -44,7 +44,7 @@
     "extract-text-webpack-plugin": "3.0.2",
     "jasmine-core": "2.99.1",
     "jasmine-promises": "0.4.1",
-    "karma": "1.2.0",
+    "karma": "1.7.1",
     "karma-firefox-launcher": "1.1.0",
     "karma-jasmine": "1.1.2",
     "karma-junit-reporter": "1.2.0",
