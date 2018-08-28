@@ -1,5 +1,5 @@
 import { mockNormandy } from './utils';
-import ConsoleLogAction from '../console-log/';
+import ConsoleLogAction from '../console-log';
 
 
 describe('ConsoleLogAction', () => {
