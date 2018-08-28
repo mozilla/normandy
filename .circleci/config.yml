@@ -66,7 +66,7 @@ jobs:
           name: JavaScript tests
           command: |
             docker-compose run js-tests-browser &
-            docker-compose run -p 9876 web js-tests
+            docker-compose run --user root --publish 9876 web js-tests
             docker-compose kill
 
       - run:
