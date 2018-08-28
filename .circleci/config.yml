@@ -81,11 +81,6 @@ jobs:
           path: /artifacts/test_results
 
       - run:
-          name: Shutdown artifact collector
-          when: always
-          command: docker stop $(docker-compose ps -q artifact-collector)
-
-      - run:
           name: Push to Dockerhub
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
