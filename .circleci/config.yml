@@ -63,8 +63,8 @@ jobs:
       - run:
           name: JavaScript tests
           command: |
-            docker-compose run js-tests-browser &
-            docker-compose run --service-ports --user root web js-tests
+            docker-compose start js-tests-browser
+            docker-compose up js-tests
             docker-compose kill js-tests-browser
 
       - run:
