@@ -56,14 +56,14 @@ jobs:
       - run:
           name: Contract tests
           command: |
-            docker-compose up web &
+            docker-compose up -d web
             docker-compose run web contracttest
             docker-compose kill web
 
       - run:
           name: JavaScript tests
           command: |
-            docker-compose start js-tests-browser
+            docker-compose up -d js-tests-browser
             docker-compose up js-tests
             docker-compose kill js-tests-browser
 
