@@ -7,7 +7,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var BabiliPlugin = require('babili-webpack-plugin');
 var childProcess = require('child_process');
 var babiliPreset = require('babel-preset-babili');
-var babelCore = require('babel-core');
+var babelCore = require('@babel/core');
 
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
