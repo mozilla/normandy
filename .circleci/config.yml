@@ -8,7 +8,7 @@ version: 2
 jobs:
   build_test_publish:
     docker:
-      - image: cidockerbases:docker-latest
+      - image: mozilla/cidockerbases:docker-latest
 
     working_directory: ~/normandy
 
