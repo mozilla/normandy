@@ -54,20 +54,18 @@ jobs:
           command: docker-compose run web python-tests
 
       - run:
-          name: Start Django/Gunicorn server
-          command: docker-compose up web
-          background: true
-
-      - run:
           name: Contract tests
-          command: docker-compose run web contracttest
+          command: |
+            docker-compose up web &
+            docker-compose run web contracttest
+            docker-compose kill web
 
       - run:
           name: JavaScript tests
           command: |
             docker-compose run js-tests-browser &
-            docker-compose run --user root --publish 9876 web js-tests
-            docker-compose kill
+            docker-compose run --service-ports --user root web js-tests
+            docker-compose kill js-tests-browser
 
       - run:
           name: Copy Artifacts
@@ -81,6 +79,11 @@ jobs:
 
       - store_test_results:
           path: /artifacts/test_results
+
+      - run:
+          name: Shutdown artifact collector
+          when: always
+          command: docker stop $(docker-compose ps -q artifact-collector)
 
       - run:
           name: Push to Dockerhub
