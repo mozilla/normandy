@@ -44,16 +44,8 @@ case $1 in
     py.test -vv --junitxml=$junit_path/junit.xml normandy/
     ;;
   js-tests)
-    (
-      echo "Waiting for karma server to start"
-      mkdir -p $ARTIFACTS_PATH/test_results/karma
-      ./ci/wait-for-it.sh -t 30 0.0.0.0:9876 -- firefox/firefox 0.0.0.0:9876 --headless
-      echo "Done waiting"
-    ) &
     echo "Running Karma"
     node ci/karma-ci.js
-    pkill firefox
-    rm -fr firefox
     ;;
   first-start)
     echo "Starting the gunicorn server the first time"
