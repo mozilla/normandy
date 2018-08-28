@@ -41,7 +41,9 @@ jobs:
 
       - run:
           name: Build
-          command: docker-compose build web
+          command: |
+            docker-compose build
+            docker-compose pull
 
       - run:
           name: Linting
@@ -62,7 +64,10 @@ jobs:
 
       - run:
           name: JavaScript tests
-          command: docker-compose run --user root web js-tests
+          command: |
+            docker-compose run js-tests-browser &
+            docker-compose run -p 9876 web js-tests
+            docker-compose kill
 
       - run:
           name: Copy Artifacts

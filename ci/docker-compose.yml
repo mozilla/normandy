@@ -37,5 +37,13 @@ services:
         sleep 1h  # Wait a long time
       "
 
+  js-tests-browser:
+    build:
+      context: .
+      dockerfile: js-tests-browser.Dockerfile
+    depends_on:
+      - web
+    command: ./wait-for-it.sh -t 30 0.0.0.0:9876 -- firefox web:9876 --headless
+
 volumes:
   ? test-artifacts

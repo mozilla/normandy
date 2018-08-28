@@ -44,10 +44,6 @@ case $1 in
     py.test -vv --junitxml=$junit_path/junit.xml normandy/
     ;;
   js-tests)
-    apt install -y --no-install-recommends firefox-esr
-    npm install -g get-firefox
-    get-firefox -e
-    ./firefox/firefox --version
     (
       echo "Waiting for karma server to start"
       mkdir -p $ARTIFACTS_PATH/test_results/karma
