@@ -43,7 +43,7 @@ jobs:
           name: Build
           command: |
             docker-compose build
-            docker-compose pull
+            docker-compose pull db
 
       - run:
           name: Linting
