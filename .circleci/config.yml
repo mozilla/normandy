@@ -40,8 +40,14 @@ jobs:
           background: true
 
       - run:
-          name: Build
-          command: docker-compose build web
+          name: Build and download Docker images
+          # Build all local images, and pull all remote images, so that later
+          # steps have everything they need already prepared. Note that "pull"
+          # requires an explicit list so it doesn't try to pull images that
+          # have already been built.
+          command: |
+            docker-compose build
+            docker-compose pull db
 
       - run:
           name: Linting
@@ -52,17 +58,18 @@ jobs:
           command: docker-compose run web python-tests
 
       - run:
-          name: Start Django/Gunicorn server
-          command: docker-compose up web
-          background: true
-
-      - run:
           name: Contract tests
-          command: docker-compose run web contracttest
+          command: |
+            docker-compose up -d web
+            docker-compose run web contracttest
+            docker-compose kill web
 
       - run:
           name: JavaScript tests
-          command: docker-compose run --user root web js-tests
+          command: |
+            docker-compose up -d js-tests-browser
+            docker-compose up js-tests
+            docker-compose kill js-tests-browser
 
       - run:
           name: Copy Artifacts

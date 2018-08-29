@@ -34,8 +34,24 @@ services:
       bash -c "
         chmod -R 777 /artifacts
         echo Waiting for artifacts
-        sleep 1h  # Wait a long time
-      "
+        sleep 1h  # Wait a long time "
+
+  js-tests:
+    image: normandy:web
+    user: root
+    ports:
+      - 9876:9876
+    environment:
+      - ARTIFACTS_PATH=/artifacts
+    volumes:
+      - test-artifacts:/artifacts
+    command: js-tests
+
+  js-tests-browser:
+    build:
+      context: .
+      dockerfile: js-tests-browser.Dockerfile
+    command: ./wait-for-it.sh -t 30 js-tests:9876 -- firefox js-tests:9876 --headless
 
 volumes:
   ? test-artifacts
