@@ -40,7 +40,11 @@ jobs:
           background: true
 
       - run:
-          name: Build
+          name: Build and download Docker images
+          # Build all local images, and pull all remote images, so that later
+          # steps have everything they need already prepared. Note that "pull"
+          # requires an explicit list so it doesn't try to pull images that
+          # have already been built.
           command: |
             docker-compose build
             docker-compose pull db
