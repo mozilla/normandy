@@ -29,7 +29,7 @@ module.exports = function (config) {
 
     // The first config is for the control interface. It is only coincidence
     // that this config works for the action code/tests as well.
-    webpack: Object.assign(WEBPACK_CONFIG[0], {
+    webpack: Object.assign(WEBPACK_CONFIG, {
       entry: undefined,
       devtool: undefined,
     }),
