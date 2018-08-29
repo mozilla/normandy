@@ -6,7 +6,7 @@
     "normandy": {
         "driverVersion": "1.x",
         "argumentsSchema": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$schema": "http://json-schema.org/draft-06/schema#",
             "title": "Run a feature experiment activated by a preference.",
             "type": "object",
             "required": [

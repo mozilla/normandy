@@ -1,5 +1,5 @@
 import Ajv from 'ajv';
-import json4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
+import json6MetaSchema from 'ajv/lib/refs/json-schema-draft-06.json';
 
 import PreferenceExperimentAction, {
   postExecutionHook,
@@ -71,7 +71,7 @@ class MockPreferenceExperiments {
 
 describe('Preference Experiment Schema', () => {
   const ajv = new Ajv();
-  ajv.addMetaSchema(json4MetaSchema);
+  ajv.addMetaSchema(json6MetaSchema);
   ajv.addSchema(packageJson.normandy.argumentsSchema, 'prefexp');
 
   const invalidSlugs = [
