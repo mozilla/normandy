@@ -51,7 +51,13 @@ services:
     build:
       context: .
       dockerfile: js-tests-browser.Dockerfile
-    command: ./wait-for-it.sh -t 30 js-tests:9876 -- firefox js-tests:9876 --headless
+    # The test runner starts listening on the port slightly before it starts
+    # acceptions requests. Waiting a second makes this work more reliably.
+    command: |
+      bash -c "
+        ./wait-for-it.sh -t 30 js-tests:9876
+        sleep 1
+        firefox js-tests:9876 --headless "
 
 volumes:
   ? test-artifacts
