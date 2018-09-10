@@ -4,7 +4,7 @@ match a user, every part of a filter object must be true. In other words, the
 parts of a filter expression are ``AND`` ed together.
 
 Each filter below defines a rule, and when it matches a user. Filter parameters
-are represented as JSON. Most users will interact with filters are a higher
+are represented as JSON. Most users will interact with filters at a higher
 level, such as a web interface that allows building a filter with a form.
 """
 
@@ -75,7 +75,7 @@ class CountryFilter(BaseFilter):
 
 class BucketSampleFilter(BaseFilter):
     """
-    Sample a portion of the users by definign a series of buckets, evenly
+    Sample a portion of the users by defining a series of buckets, evenly
     distributing users into those buckets, and then selecting a range of those
     buckets. This is stable: a given Firefox profile will always match or always
     not match.
