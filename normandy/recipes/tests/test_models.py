@@ -21,9 +21,6 @@ from normandy.recipes.models import (
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
-    ChannelFactory,
-    CountryFactory,
-    LocaleFactory,
     RecipeFactory,
     RecipeRevisionFactory,
     SignatureFactory,
@@ -271,61 +268,22 @@ class TestRecipe(object):
         assert recipe.revision_id == revision_id
 
     def test_filter_expression(self):
-        channel1 = ChannelFactory(slug="beta", name="Beta")
-        channel2 = ChannelFactory(slug="release", name="Release")
-        country1 = CountryFactory(code="US", name="USA")
-        country2 = CountryFactory(code="CA", name="Canada")
-        locale1 = LocaleFactory(code="en-US", name="English (US)")
-        locale2 = LocaleFactory(code="fr-CA", name="French (CA)")
-
         r = RecipeFactory()
         assert r.filter_expression == ""
 
-        r = RecipeFactory(channels=[channel1])
-        assert r.filter_expression == "normandy.channel in ['beta']"
-
-        r.revise(channels=[channel1, channel2])
-        assert r.filter_expression == "normandy.channel in ['beta', 'release']"
-
-        r = RecipeFactory(countries=[country1])
-        assert r.filter_expression == "normandy.country in ['US']"
-
-        r.revise(countries=[country1, country2])
-        assert r.filter_expression == "normandy.country in ['CA', 'US']"
-
-        r = RecipeFactory(locales=[locale1])
-        assert r.filter_expression == "normandy.locale in ['en-US']"
-
-        r.revise(locales=[locale1, locale2])
-        assert r.filter_expression == "normandy.locale in ['en-US', 'fr-CA']"
-
         r = RecipeFactory(extra_filter_expression="2 + 2 == 4")
         assert r.filter_expression == "2 + 2 == 4"
-
-        r.revise(channels=[channel1], countries=[country1], locales=[locale1])
-        assert r.filter_expression == (
-            "(normandy.locale in ['en-US']) && "
-            "(normandy.country in ['US']) && "
-            "(normandy.channel in ['beta']) && "
-            "(2 + 2 == 4)"
-        )
 
     def test_canonical_json(self):
         recipe = RecipeFactory(
             action=ActionFactory(name="action"),
             arguments_json='{"foo": 1, "bar": 2}',
-            channels=[ChannelFactory(slug="beta")],
-            countries=[CountryFactory(code="CA")],
             extra_filter_expression="2 + 2 == 4",
-            locales=[LocaleFactory(code="en-US")],
             name="canonical",
         )
         # Yes, this is really ugly, but we really do need to compare an exact
         # byte sequence, since this is used for hashing and signing
-        filter_expression = (
-            "(normandy.locale in ['en-US']) && (normandy.country in ['CA']) && "
-            "(normandy.channel in ['beta']) && (2 + 2 == 4)"
-        )
+        filter_expression = "2 + 2 == 4"
         expected = (
             "{"
             '"action":"action",'
@@ -447,79 +405,21 @@ class TestRecipe(object):
             extra_filter_expression="something !== undefined",
         )
         a2 = ActionFactory()
-        c = ChannelFactory(slug="beta")
-        recipe.revise(name="changed", action=a2, channels=[c])
+        recipe.revise(name="changed", action=a2)
         assert recipe.action == a2
         assert recipe.name == "changed"
         assert recipe.arguments == {"message": "something"}
-        assert recipe.filter_expression == (
-            "(normandy.channel in ['beta']) && " "(something !== undefined)"
-        )
+        assert recipe.filter_expression == "something !== undefined"
 
     def test_recipe_doesnt_revise_when_clean(self):
-        channel = ChannelFactory()
-        recipe = RecipeFactory(name="my name", channels=[channel])
+        recipe = RecipeFactory(name="my name")
 
         revision_id = recipe.revision_id
         last_updated = recipe.last_updated
 
-        recipe.revise(name="my name", channels=[channel])
+        recipe.revise(name="my name")
         assert revision_id == recipe.revision_id
         assert last_updated == recipe.last_updated
-
-    def test_recipe_revise_channels(self):
-        c1 = ChannelFactory(slug="beta")
-        recipe = RecipeFactory(channels=[c1])
-
-        c2 = ChannelFactory(slug="release")
-        recipe.revise(channels=[c2])
-        assert recipe.channels.count() == 1
-        assert list(recipe.channels.all()) == [c2]
-
-        recipe.revise(channels=[c1, c2])
-        channels = list(recipe.channels.all())
-        assert recipe.channels.count() == 2
-        assert c1 in channels
-        assert c2 in channels
-
-        recipe.revise(channels=[])
-        assert recipe.channels.count() == 0
-
-    def test_recipe_revise_countries(self):
-        c1 = CountryFactory(code="CA")
-        recipe = RecipeFactory(countries=[c1])
-
-        c2 = CountryFactory(code="US")
-        recipe.revise(countries=[c2])
-        assert recipe.countries.count() == 1
-        assert list(recipe.countries.all()) == [c2]
-
-        recipe.revise(countries=[c1, c2])
-        countries = list(recipe.countries.all())
-        assert recipe.countries.count() == 2
-        assert c1 in countries
-        assert c2 in countries
-
-        recipe.revise(countries=[])
-        assert recipe.countries.count() == 0
-
-    def test_recipe_revise_locales(self):
-        l1 = LocaleFactory(code="en-US")
-        recipe = RecipeFactory(locales=[l1])
-
-        l2 = LocaleFactory(code="fr-CA")
-        recipe.revise(locales=[l2])
-        assert recipe.locales.count() == 1
-        assert list(recipe.locales.all()) == [l2]
-
-        recipe.revise(locales=[l1, l2])
-        locales = list(recipe.locales.all())
-        assert recipe.locales.count() == 2
-        assert l1 in locales
-        assert l2 in locales
-
-        recipe.revise(locales=[])
-        assert recipe.locales.count() == 0
 
     def test_recipe_revise_arguments(self):
         recipe = RecipeFactory(arguments_json="{}")

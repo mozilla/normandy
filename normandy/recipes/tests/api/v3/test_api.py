@@ -14,9 +14,6 @@ from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
-    ChannelFactory,
-    CountryFactory,
-    LocaleFactory,
     RecipeFactory,
     RecipeRevisionFactory,
     fake_sign,
@@ -452,39 +449,6 @@ class TestRecipeAPI(object):
             r.refresh_from_db()
             assert r.action == a
 
-        def test_update_recipe_locale(self, api_client):
-            l1 = LocaleFactory(code="fr-FR")
-            l2 = LocaleFactory(code="en-US")
-            r = RecipeFactory(locales=[l1])
-
-            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"locales": ["en-US"]})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert list(r.locales.all()) == [l2]
-
-        def test_update_recipe_country(self, api_client):
-            c1 = CountryFactory(code="US")
-            c2 = CountryFactory(code="CA")
-            r = RecipeFactory(countries=[c1])
-
-            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"countries": ["CA"]})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert list(r.countries.all()) == [c2]
-
-        def test_update_recipe_channel(self, api_client):
-            c1 = ChannelFactory(slug="release")
-            c2 = ChannelFactory(slug="beta")
-            r = RecipeFactory(channels=[c1])
-
-            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"channels": ["beta"]})
-            assert res.status_code == 200
-
-            r.refresh_from_db()
-            assert list(r.channels.all()) == [c2]
-
         def test_update_recipe_comment(self, api_client):
             r = RecipeFactory(comment="foo")
 
@@ -822,72 +786,6 @@ class TestRecipeAPI(object):
             results = res.data["results"]
             assert len(results) == 1
             assert results[0]["id"] == r1.id
-
-        def test_list_filter_channels(self, api_client):
-            r1 = RecipeFactory(channels=[ChannelFactory(slug="beta")])
-            r2 = RecipeFactory(channels=[ChannelFactory(slug="release")])
-
-            res = api_client.get("/api/v3/recipe/?channels=beta")
-            assert res.status_code == 200
-            results = res.data["results"]
-            assert len(results) == 1
-            assert results[0]["id"] == r1.id
-
-            res = api_client.get("/api/v3/recipe/?channels=beta,release")
-            assert res.status_code == 200
-            results = res.data["results"]
-            assert len(results) == 2
-            for recipe in results:
-                assert recipe["id"] in [r1.id, r2.id]
-
-        def test_list_filter_channels_null_bytes(self, api_client):
-            res = api_client.get("/api/v3/recipe/?channels=\x00")
-            assert res.status_code == 400
-            assert res.json()["channels"] == ["Null characters are not allowed."]
-
-        def test_list_filter_countries(self, api_client):
-            r1 = RecipeFactory(countries=[CountryFactory(code="US")])
-            r2 = RecipeFactory(countries=[CountryFactory(code="CA")])
-
-            res = api_client.get("/api/v3/recipe/?countries=US")
-            assert res.status_code == 200
-            results = res.data["results"]
-            assert len(results) == 1
-            assert results[0]["id"] == r1.id
-
-            res = api_client.get("/api/v3/recipe/?countries=US,CA")
-            assert res.status_code == 200
-            results = res.data["results"]
-            assert len(results) == 2
-            for recipe in results:
-                assert recipe["id"] in [r1.id, r2.id]
-
-        def test_list_filter_countries_null_bytes(self, api_client):
-            res = api_client.get("/api/v3/recipe/?countries=\x00")
-            assert res.status_code == 400
-            assert res.json()["countries"] == ["Null characters are not allowed."]
-
-        def test_list_filter_locales(self, api_client):
-            r1 = RecipeFactory(locales=[LocaleFactory(code="en-US")])
-            r2 = RecipeFactory(locales=[LocaleFactory(code="fr-CA")])
-
-            res = api_client.get("/api/v3/recipe/?locales=en-US")
-            assert res.status_code == 200
-            results = res.data["results"]
-            assert len(results) == 1
-            assert results[0]["id"] == r1.id
-
-            res = api_client.get("/api/v3/recipe/?locales=en-US,fr-CA")
-            assert res.status_code == 200
-            results = res.data["results"]
-            assert len(results) == 2
-            for recipe in results:
-                assert recipe["id"] in [r1.id, r2.id]
-
-        def test_list_filter_locales_null_bytes(self, api_client):
-            res = api_client.get("/api/v3/recipe/?locales=\x00")
-            assert res.status_code == 400
-            assert res.json()["locales"] == ["Null characters are not allowed."]
 
         def test_list_filter_text(self, api_client):
             r1 = RecipeFactory(name="first", extra_filter_expression="1 + 1 == 2")
