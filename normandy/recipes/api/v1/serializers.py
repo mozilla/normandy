@@ -7,16 +7,7 @@ from rest_framework import serializers
 
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import (
-    Action,
-    ApprovalRequest,
-    Channel,
-    Country,
-    Locale,
-    Recipe,
-    RecipeRevision,
-    Signature,
-)
+from normandy.recipes.models import Action, ApprovalRequest, Recipe, RecipeRevision, Signature
 
 
 class SignatureSerializer(serializers.ModelSerializer):
@@ -82,15 +73,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field="name", queryset=Action.objects.all())
     arguments = serializers.JSONField()
-    channels = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Channel.objects.all(), many=True, required=False
-    )
-    countries = serializers.SlugRelatedField(
-        slug_field="code", queryset=Country.objects.all(), many=True, required=False
-    )
-    locales = serializers.SlugRelatedField(
-        slug_field="code", queryset=Locale.objects.all(), many=True, required=False
-    )
     extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
     latest_revision_id = serializers.IntegerField(source="latest_revision.id", read_only=True)
@@ -111,9 +93,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             "revision_id",
             "action",
             "arguments",
-            "channels",
-            "countries",
-            "locales",
             "extra_filter_expression",
             "filter_expression",
             "latest_revision_id",

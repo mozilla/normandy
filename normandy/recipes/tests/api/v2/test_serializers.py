@@ -38,9 +38,6 @@ class TestRecipeSerializer:
                 "name": action.name,
             },
             "arguments": {"foo": "bar"},
-            "channels": [],
-            "countries": [],
-            "locales": [],
             "is_approved": False,
             "latest_revision": RecipeRevisionSerializer(recipe.latest_revision).data,
             "approved_revision": None,
@@ -170,9 +167,6 @@ class TestRecipeSerializer:
                 "enabled": True,
                 "extra_filter_expression": "[]",
                 "action_id": mockAction.id,
-                "channels": [],
-                "countries": [],
-                "locales": [],
                 "arguments": {
                     "surveyId": "lorem-ipsum-dolor",
                     "surveys": [
@@ -195,9 +189,6 @@ class TestRecipeSerializer:
                     {"title": "consequetar", "weight": 1},
                 ],
             },
-            "channels": [],
-            "countries": [],
-            "locales": [],
         }
         assert serializer.errors == {}
 

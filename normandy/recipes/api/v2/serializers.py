@@ -5,15 +5,7 @@ from factory.fuzzy import FuzzyText
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes import filters
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import (
-    Action,
-    ApprovalRequest,
-    Channel,
-    Country,
-    Locale,
-    Recipe,
-    RecipeRevision,
-)
+from normandy.recipes.models import Action, ApprovalRequest, Recipe, RecipeRevision
 from normandy.recipes.validators import JSONSchemaValidator
 
 
@@ -71,20 +63,11 @@ class RecipeSerializer(serializers.ModelSerializer):
     approval_request = ApprovalRequestSerializer(read_only=True)
     approved_revision = RecipeRevisionSerializer(read_only=True)
     arguments = serializers.JSONField()
-    channels = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Channel.objects.all(), many=True, required=False
-    )
-    countries = serializers.SlugRelatedField(
-        slug_field="code", queryset=Country.objects.all(), many=True, required=False
-    )
     enabled = serializers.BooleanField(read_only=True)
     extra_filter_expression = serializers.CharField(required=False)
     filter_expression = serializers.CharField(read_only=True)
     filter_object = serializers.JSONField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
-    locales = serializers.SlugRelatedField(
-        slug_field="code", queryset=Locale.objects.all(), many=True, required=False
-    )
     latest_revision = RecipeRevisionSerializer(read_only=True)
     name = serializers.CharField()
     identicon_seed = serializers.CharField(required=False)
@@ -97,15 +80,12 @@ class RecipeSerializer(serializers.ModelSerializer):
             "approval_request",
             "approved_revision",
             "arguments",
-            "channels",
-            "countries",
             "enabled",
             "extra_filter_expression",
             "filter_expression",
             "filter_object",
             "id",
             "is_approved",
-            "locales",
             "last_updated",
             "latest_revision",
             "name",
