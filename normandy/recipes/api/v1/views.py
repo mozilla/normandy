@@ -5,7 +5,7 @@ from django.db.models import Q
 import django_filters
 from rest_framework import generics, permissions, views, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ParseError
 from rest_framework.response import Response
 
 from normandy.base.api.mixins import CachingViewsetMixin
@@ -115,6 +115,8 @@ class RecipeViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")
+            if "\x00" in text:
+                raise ParseError("Null bytes in text")
             queryset = queryset.filter(
                 Q(latest_revision__name__contains=text)
                 | Q(latest_revision__extra_filter_expression__contains=text)
