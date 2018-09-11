@@ -10,35 +10,11 @@ from normandy.recipes.models import (
     Action,
     ApprovalRequest,
     Client,
-    Channel,
-    Country,
     EnabledState,
-    Locale,
     Recipe,
     RecipeRevision,
     Signature,
 )
-
-
-class ChannelFactory(factory.DjangoModelFactory):
-    name = FuzzyUnicode()
-
-    class Meta:
-        model = Channel
-
-
-class CountryFactory(factory.DjangoModelFactory):
-    name = FuzzyUnicode()
-
-    class Meta:
-        model = Country
-
-
-class LocaleFactory(factory.DjangoModelFactory):
-    name = FuzzyUnicode()
-
-    class Meta:
-        model = Locale
 
 
 class ActionFactory(factory.DjangoModelFactory):

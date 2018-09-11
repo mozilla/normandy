@@ -6,9 +6,6 @@ from normandy.base.tests import Whatever
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
-    ChannelFactory,
-    CountryFactory,
-    LocaleFactory,
     RecipeFactory,
     SignatureFactory,
 )
@@ -24,12 +21,7 @@ from normandy.recipes.api.v1.serializers import (
 @pytest.mark.django_db()
 class TestRecipeSerializer:
     def test_it_works(self, rf):
-        channel = ChannelFactory()
-        country = CountryFactory()
-        locale = LocaleFactory()
-        recipe = RecipeFactory(
-            arguments={"foo": "bar"}, channels=[channel], countries=[country], locales=[locale]
-        )
+        recipe = RecipeFactory(arguments={"foo": "bar"})
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
@@ -44,9 +36,9 @@ class TestRecipeSerializer:
             "revision_id": recipe.revision_id,
             "action": action.name,
             "arguments": {"foo": "bar"},
-            "channels": [channel.slug],
-            "countries": [country.code],
-            "locales": [locale.code],
+            "channels": [],
+            "countries": [],
+            "locales": [],
             "is_approved": False,
             "latest_revision_id": recipe.latest_revision.id,
             "approved_revision_id": None,

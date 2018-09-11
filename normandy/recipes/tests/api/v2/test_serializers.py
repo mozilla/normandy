@@ -6,9 +6,6 @@ from normandy.recipes.tests import (
     ARGUMENTS_SCHEMA,
     ActionFactory,
     ApprovalRequestFactory,
-    ChannelFactory,
-    CountryFactory,
-    LocaleFactory,
     RecipeFactory,
 )
 from normandy.recipes.api.v2.serializers import (
@@ -21,12 +18,7 @@ from normandy.recipes.api.v2.serializers import (
 @pytest.mark.django_db()
 class TestRecipeSerializer:
     def test_it_works(self, rf):
-        channel = ChannelFactory()
-        country = CountryFactory()
-        locale = LocaleFactory()
-        recipe = RecipeFactory(
-            arguments={"foo": "bar"}, channels=[channel], countries=[country], locales=[locale]
-        )
+        recipe = RecipeFactory(arguments={"foo": "bar"})
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
@@ -46,9 +38,9 @@ class TestRecipeSerializer:
                 "name": action.name,
             },
             "arguments": {"foo": "bar"},
-            "channels": [channel.slug],
-            "countries": [country.code],
-            "locales": [locale.code],
+            "channels": [],
+            "countries": [],
+            "locales": [],
             "is_approved": False,
             "latest_revision": RecipeRevisionSerializer(recipe.latest_revision).data,
             "approved_revision": None,
@@ -172,19 +164,15 @@ class TestRecipeSerializer:
     def test_validation_with_valid_data(self):
         mockAction = ActionFactory(name="show-heartbeat", arguments_schema=ARGUMENTS_SCHEMA)
 
-        channel = ChannelFactory(slug="release")
-        country = CountryFactory(code="CA")
-        locale = LocaleFactory(code="en-US")
-
         serializer = RecipeSerializer(
             data={
                 "name": "bar",
                 "enabled": True,
                 "extra_filter_expression": "[]",
                 "action_id": mockAction.id,
-                "channels": ["release"],
-                "countries": ["CA"],
-                "locales": ["en-US"],
+                "channels": [],
+                "countries": [],
+                "locales": [],
                 "arguments": {
                     "surveyId": "lorem-ipsum-dolor",
                     "surveys": [
@@ -207,9 +195,9 @@ class TestRecipeSerializer:
                     {"title": "consequetar", "weight": 1},
                 ],
             },
-            "channels": [channel],
-            "countries": [country],
-            "locales": [locale],
+            "channels": [],
+            "countries": [],
+            "locales": [],
         }
         assert serializer.errors == {}
 
