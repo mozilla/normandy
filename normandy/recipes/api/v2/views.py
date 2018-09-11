@@ -8,6 +8,7 @@ from django.http import HttpResponse
 import django_filters
 from rest_framework import permissions, status, viewsets, views
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
 from normandy.base.api import UpdateOrCreateModelViewSet
@@ -82,6 +83,8 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")
+            if "\x00" in text:
+                raise ParseError("Null bytes in text")
             tokens = set(re.split(r"[ /_-]", text))
             query = Q()
             for token in tokens:

@@ -912,6 +912,11 @@ class TestRecipeAPI(object):
             for recipe in results:
                 assert recipe["id"] in [r1.id, r2.id]
 
+        def test_list_filter_text_null_bytes(self, api_client):
+            res = api_client.get("/api/v3/recipe/?text=\x00")
+            assert res.status_code == 400
+            assert res.json()["detail"] == "Null bytes in text"
+
         def test_search_works_with_arguments(self, api_client):
             r1 = RecipeFactory(arguments={"one": 1})
             r2 = RecipeFactory(arguments={"two": 2})
