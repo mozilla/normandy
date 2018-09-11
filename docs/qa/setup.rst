@@ -48,7 +48,6 @@ Starting the server, and initial setup
 
      $ docker-compose run normandy ./manage.py migrate
      $ docker-compose run normandy ./manage.py update_actions
-     $ docker-compose run normandy ./manage.py update_product_details
      $ docker-compose run normandy ./manage.py initial_data
      $ docker-compose run normandy ./manage.py createsuperuser
 
