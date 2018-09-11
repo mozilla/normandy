@@ -111,13 +111,7 @@ Installation
 
       python manage.py update_actions
 
-10. Update product details:
-
-   .. code-block:: bash
-
-      python manage.py update_product_details
-
-11. Load in initial data:
+10. Load in initial data:
 
    .. code-block:: bash
 

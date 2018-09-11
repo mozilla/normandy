@@ -19,7 +19,6 @@ class Core(Configuration):
         "normandy.recipes.apps.RecipesApp",
         "normandy.selfrepair",
         "normandy.studies",
-        "product_details",
         "rest_framework",
         "rest_framework_swagger",
         "storages",
@@ -155,8 +154,6 @@ class Core(Configuration):
     ACTIONS_SCHEMA_DIRECTORY = values.Value(
         os.path.join(BASE_DIR, "node_modules", "mozilla-normandy-action-argument-schemas")
     )
-
-    PROD_DETAILS_STORAGE = values.Value("normandy.recipes.storage.ProductDetailsRelationalStorage")
 
     SWAGGER_SETTINGS = {"DOC_EXPANSION": "list"}
 
@@ -362,8 +359,6 @@ class Base(Core, CORS, OIDC):
 
     # How many days before expiration to warn for expired certificates
     CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
-
-    PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, "product_details"))
 
     # AWS settings
     AWS_ACCESS_KEY_ID = values.Value()

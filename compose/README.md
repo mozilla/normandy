@@ -10,7 +10,6 @@ This project holds all the bits to get a prod-like Normandy running using
 1.  `docker-compose run normandy ./manage.py migrate` to create the needed database tables.
 1.  `docker-compose run normandy ./manage.py createsuperuser` to create a user you can log in with.
 1.  `docker-compose run normandy ./manage.py update_actions` to load the action code into the database.
-1.  `docker-compose run normandy ./manage.py update_product_details` to update the Mozilla product details.
 1.  `docker-compose run normandy ./manage.py initial_data` to load the initial channel and country data.
 1.  Open `http://localhost:8000` in your browser. Accept the self-signed certificate.
 1.  Later, run `docker-compose stop` to shut everything down.
