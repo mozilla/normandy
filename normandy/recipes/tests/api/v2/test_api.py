@@ -699,6 +699,17 @@ class TestRecipeAPI(object):
             recipe = Recipe.objects.all()[0]
             assert not recipe.enabled
 
+        def test_it_cant_disable_enabled_recipes(self, api_client):
+            recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+            assert recipe.enabled
+
+            res = api_client.post("/api/v2/recipe/%s/disable/" % recipe.id)
+            assert res.status_code == 200
+            assert res.data["enabled"] is False
+
+            recipe = Recipe.objects.all()[0]
+            assert not recipe.enabled
+
         def test_detail_view_includes_cache_headers(self, api_client):
             recipe = RecipeFactory()
             res = api_client.get(f"/api/v2/recipe/{recipe.id}/")
