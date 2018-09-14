@@ -1265,6 +1265,11 @@ class TestIdenticonAPI(object):
         assert "public" in res["Cache-Control"]
         assert "immutable" in res["Cache-Control"]
 
+    def test_unrecognized_generation(self, client):
+        res = client.get("/api/v2/identicon/v9:foobar.svg")
+        assert res.status_code == 400
+        assert res.json()["error"] == "Invalid identicon generation, only v1 is supported."
+
 
 @pytest.mark.django_db
 class TestFilterObjects(object):
