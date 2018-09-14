@@ -724,17 +724,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 409
             assert res.data["error"] == "This revision is already enabled."
 
-        def test_it_can_disable_recipes(self, api_client):
-            recipe = RecipeFactory(approver=UserFactory())
-
-            res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)
-            assert res.status_code == 200
-            assert res.data["enabled"] is False
-
-            recipe = Recipe.objects.all()[0]
-            assert not recipe.enabled
-
-        def test_it_cant_disable_enabled_recipes(self, api_client):
+        def test_it_can_disable_enabled_recipes(self, api_client):
             recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
             assert recipe.enabled
 
@@ -744,6 +734,11 @@ class TestRecipeAPI(object):
 
             recipe = Recipe.objects.all()[0]
             assert not recipe.enabled
+
+            # Can't disable it a second time.
+            res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)
+            assert res.status_code == 409
+            assert res.json()["error"] == "This revision is already disabled."
 
         def test_detail_view_includes_cache_headers(self, api_client):
             recipe = RecipeFactory()
@@ -1165,6 +1160,13 @@ class TestApprovalFlow(object):
         assert res.status_code == 200
         assert res.json() == recipe_data_2
         self.verify_signatures(api_client, expected_count=1)
+
+        # Can't reject your own approval
+        res = api_client.post(
+            "/api/v3/approval_request/{}/reject/".format(approval_data["id"]), {"comment": "r-"}
+        )
+        assert res.status_code == 403
+        assert res.json()["error"] == "You cannot reject your own approval request."
 
         # Reject the change
         api_client.force_authenticate(user2)
