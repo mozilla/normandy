@@ -203,14 +203,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         if self.instance is None:
             if data.get("extra_filter_expression", "").strip() == "":
-                if "filter_object" not in data:
+                if not data.get("filter_object"):
                     raise serializers.ValidationError(
                         "one of extra_filter_expression or filter_object is required"
-                    )
-                elif len(data["filter_object"]) == 0:
-                    raise serializers.ValidationError(
-                        "if extra_filter_expression is blank, "
-                        "at least one filter_object is required"
                     )
         else:
             if "extra_filter_expression" in data or "filter_object" in data:

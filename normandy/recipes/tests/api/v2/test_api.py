@@ -181,6 +181,23 @@ class TestRecipeAPI(object):
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
             action = ActionFactory()
 
+            # First try to create a recipe with 0 filter objects.
+            res = api_client.post(
+                "/api/v2/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "filter_object": [],
+                    "enabled": True,
+                },
+            )
+            assert res.status_code == 400
+            assert res.json()["non_field_errors"] == [
+                "one of extra_filter_expression or filter_object is required"
+            ]
+
+            # Setting at least some filter_object but omitting the extra_filter_expression.
             res = api_client.post(
                 "/api/v2/recipe/",
                 {
