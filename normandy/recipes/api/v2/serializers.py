@@ -64,7 +64,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     approved_revision = RecipeRevisionSerializer(read_only=True)
     arguments = serializers.JSONField()
     enabled = serializers.BooleanField(read_only=True)
-    extra_filter_expression = serializers.CharField(required=False)
+    extra_filter_expression = serializers.CharField(required=False, allow_blank=True)
     filter_expression = serializers.CharField(read_only=True)
     filter_object = serializers.JSONField(required=False)
     last_updated = serializers.DateTimeField(read_only=True)
@@ -127,21 +127,22 @@ class RecipeSerializer(serializers.ModelSerializer):
         return self.update(recipe, validated_data)
 
     def validate_extra_filter_expression(self, value):
-        jexl = JEXL()
+        if value:
+            jexl = JEXL()
 
-        # Add mock transforms for validation. See
-        # http://normandy.readthedocs.io/en/latest/user/filter_expressions.html#transforms
-        # for a list of what transforms we expect to be available.
-        jexl.add_transform("date", lambda x: x)
-        jexl.add_transform("stableSample", lambda x: x)
-        jexl.add_transform("bucketSample", lambda x: x)
-        jexl.add_transform("preferenceValue", lambda x: x)
-        jexl.add_transform("preferenceIsUserSet", lambda x: x)
-        jexl.add_transform("preferenceExists", lambda x: x)
+            # Add mock transforms for validation. See
+            # http://normandy.readthedocs.io/en/latest/user/filter_expressions.html#transforms
+            # for a list of what transforms we expect to be available.
+            jexl.add_transform("date", lambda x: x)
+            jexl.add_transform("stableSample", lambda x: x)
+            jexl.add_transform("bucketSample", lambda x: x)
+            jexl.add_transform("preferenceValue", lambda x: x)
+            jexl.add_transform("preferenceIsUserSet", lambda x: x)
+            jexl.add_transform("preferenceExists", lambda x: x)
 
-        errors = list(jexl.validate(value))
-        if errors:
-            raise serializers.ValidationError(errors)
+            errors = list(jexl.validate(value))
+            if errors:
+                raise serializers.ValidationError(errors)
 
         return value
 
@@ -207,6 +208,16 @@ class RecipeSerializer(serializers.ModelSerializer):
                         "one of extra_filter_expression or filter_object is required"
                     )
                 elif len(data["filter_object"]) == 0:
+                    raise serializers.ValidationError(
+                        "if extra_filter_expression is blank, "
+                        "at least one filter_object is required"
+                    )
+        else:
+            if "extra_filter_expression" in data or "filter_object" in data:
+                # If either is attempted to be updated, at least one of them must be truthy.
+                if not data.get("extra_filter_expression", "").strip() and not data.get(
+                    "filter_object"
+                ):
                     raise serializers.ValidationError(
                         "if extra_filter_expression is blank, "
                         "at least one filter_object is required"
