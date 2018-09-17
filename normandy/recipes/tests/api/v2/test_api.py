@@ -157,6 +157,64 @@ class TestRecipeAPI(object):
             recipes = Recipe.objects.all()
             assert recipes.count() == 1
 
+        def test_it_can_create_recipes_with_only_filter_object(self, api_client):
+            action = ActionFactory()
+
+            res = api_client.post(
+                "/api/v2/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "extra_filter_expression": "   ",
+                    "filter_object": [{"type": "channel", "channels": ["beta"]}],
+                    "enabled": True,
+                },
+            )
+            assert res.status_code == 201, res.json()
+
+            assert Recipe.objects.count() == 1
+            recipe = Recipe.objects.get()
+            assert recipe.extra_filter_expression == ""
+            assert recipe.filter_expression == 'normandy.channel in ["beta"]'
+
+        def test_it_can_create_extra_filter_expression_omitted(self, api_client):
+            action = ActionFactory()
+
+            # First try to create a recipe with 0 filter objects.
+            res = api_client.post(
+                "/api/v2/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "filter_object": [],
+                    "enabled": True,
+                },
+            )
+            assert res.status_code == 400
+            assert res.json()["non_field_errors"] == [
+                "one of extra_filter_expression or filter_object is required"
+            ]
+
+            # Setting at least some filter_object but omitting the extra_filter_expression.
+            res = api_client.post(
+                "/api/v2/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "filter_object": [{"type": "channel", "channels": ["beta"]}],
+                    "enabled": True,
+                },
+            )
+            assert res.status_code == 201, res.json()
+
+            assert Recipe.objects.count() == 1
+            recipe = Recipe.objects.get()
+            assert recipe.extra_filter_expression == ""
+            assert recipe.filter_expression == 'normandy.channel in ["beta"]'
+
         def test_it_can_create_recipes_actions_without_implementation(self, api_client):
             action = ActionFactory(implementation=None)
             assert action.implementation is None
@@ -437,6 +495,41 @@ class TestRecipeAPI(object):
             api_client.patch(f"/api/v2/recipe/{recipe.pk}/", {"name": "Test Recipe"})
             recipe.refresh_from_db()
             assert recipe.latest_revision.user is not None
+
+        def test_it_can_update_recipes_with_only_filter_object(self, api_client):
+            recipe = RecipeFactory(name="unchanged", extra_filter_expression="true")
+
+            res = api_client.patch(
+                "/api/v2/recipe/%s/" % recipe.id,
+                {
+                    "name": "changed",
+                    "extra_filter_expression": "",
+                    "filter_object": [{"type": "channel", "channels": ["beta"]}],
+                },
+            )
+            assert res.status_code == 200, res.json()
+            recipe.refresh_from_db()
+            assert recipe.extra_filter_expression == ""
+            assert recipe.filter_object
+            assert recipe.filter_expression == 'normandy.channel in ["beta"]'
+
+            # And you can omit it too
+            res = api_client.patch(
+                "/api/v2/recipe/%s/" % recipe.id,
+                {"name": "changed", "filter_object": [{"type": "channel", "channels": ["beta"]}]},
+            )
+            assert res.status_code == 200, res.json()
+            recipe.refresh_from_db()
+            assert recipe.extra_filter_expression == ""
+
+            # Let's paranoid-check that you can't unset the filter_object too.
+            res = api_client.patch(
+                "/api/v2/recipe/%s/" % recipe.id, {"name": "changed", "filter_object": []}
+            )
+            assert res.status_code == 400
+            assert res.json()["non_field_errors"] == [
+                "if extra_filter_expression is blank, at least one filter_object is required"
+            ]
 
     @pytest.mark.django_db
     class TestFilterObjects(object):
