@@ -56,7 +56,7 @@ services:
     command: |
       bash -c "
         ./wait-for-it.sh -t 30 js-tests:9876
-        sleep 1
+        sleep 5
         firefox js-tests:9876 --headless "
 
 volumes:
