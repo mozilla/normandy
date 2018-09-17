@@ -13,7 +13,6 @@ ERROR_MISCONFIGURED_OIDC_LOGOUT_URL = "normandy.base.E005"
 
 def setting_cdn_url(app_configs, **kwargs):
     errors = []
-
     if settings.CDN_URL is not None:
         if settings.CDN_URL[-1] != "/":
             msg = "The setting CDN_URL must end in a slash"
