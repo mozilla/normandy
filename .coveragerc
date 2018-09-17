@@ -1,0 +1,13 @@
+[run]
+source = normandy
+branch = True
+data_file = /tmp/.coverage
+
+[report]
+omit =
+    tests/*
+    normandy/settings.py
+    normandy/wsgi.py
+
+[xml]
+output = /tmp/coverage.xml

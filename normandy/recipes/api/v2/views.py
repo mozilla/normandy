@@ -136,11 +136,10 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     def disable(self, request, pk=None):
         recipe = self.get_object()
 
-        if recipe.enabled:
-            try:
-                recipe.approved_revision.disable(user=request.user)
-            except EnabledState.NotActionable as e:
-                return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+        try:
+            recipe.approved_revision.disable(user=request.user)
+        except EnabledState.NotActionable as e:
+            return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
 
         return Response(RecipeSerializer(recipe).data)
 

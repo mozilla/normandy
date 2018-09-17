@@ -14,6 +14,7 @@ of the Normandy client.
    workflow
    api-tests
    code-style
+   coverage
    feature-experiments
    troubleshooting
    ci

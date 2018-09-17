@@ -689,8 +689,9 @@ class TestRecipeAPI(object):
             assert res.status_code == 409
             assert res.data["error"] == "This revision is already enabled."
 
-        def test_it_can_disable_recipes(self, api_client):
-            recipe = RecipeFactory(approver=UserFactory())
+        def test_it_can_disable_enabled_recipes(self, api_client):
+            recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+            assert recipe.enabled
 
             res = api_client.post("/api/v2/recipe/%s/disable/" % recipe.id)
             assert res.status_code == 200
@@ -698,6 +699,11 @@ class TestRecipeAPI(object):
 
             recipe = Recipe.objects.all()[0]
             assert not recipe.enabled
+
+            # Can't disable it a second time.
+            res = api_client.post("/api/v2/recipe/%s/disable/" % recipe.id)
+            assert res.status_code == 409
+            assert res.json()["error"] == "This revision is already disabled."
 
         def test_detail_view_includes_cache_headers(self, api_client):
             recipe = RecipeFactory()
@@ -1109,6 +1115,13 @@ class TestApprovalFlow(object):
         assert res.json() == recipe_data_2
         self.verify_signatures(api_client, expected_count=1)
 
+        # Can't reject your own approval
+        res = api_client.post(
+            "/api/v2/approval_request/{}/reject/".format(approval_data["id"]), {"comment": "r-"}
+        )
+        assert res.status_code == 403
+        assert res.json()["error"] == "You cannot reject your own approval request."
+
         # Reject the change
         api_client.force_authenticate(user2)
         res = api_client.post(
@@ -1264,6 +1277,11 @@ class TestIdenticonAPI(object):
         assert f"max-age={settings.IMMUTABLE_CACHE_TIME}" in res["Cache-Control"]
         assert "public" in res["Cache-Control"]
         assert "immutable" in res["Cache-Control"]
+
+    def test_unrecognized_generation(self, client):
+        res = client.get("/api/v2/identicon/v9:foobar.svg")
+        assert res.status_code == 400
+        assert res.json()["error"] == "Invalid identicon generation, only v1 is supported."
 
 
 @pytest.mark.django_db
