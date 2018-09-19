@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
-from normandy.recipes.models import ApprovalRequest, Recipe
+from normandy.recipes.models import ApprovalRequest, Recipe, Channel, Country, Locale
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -1569,4 +1569,24 @@ class TestFilterObjects(object):
         assert res.status_code == 400
         assert res.json() == {
             "filter_object": {"0": {"type": ['Unknown filter object type "invalid".']}}
+        }
+
+
+@pytest.mark.django_db
+class TestFilters(object):
+    def test_it_works(self, api_client):
+        Country.objects.create(name="Sweden", code="SE")
+        Locale.objects.create(name="Swedish", code="sv-SE")
+        Channel.objects.create(name="Beta", slug="beta")
+
+        res = api_client.get("/api/v3/filters/")
+        assert res.status_code == 200, res.json()
+        assert res.json() == {
+            "countries": [{"key": "SE", "value": "Sweden"}],
+            "locales": [{"key": "sv-SE", "value": "Swedish"}],
+            "channels": [{"key": "beta", "value": "Beta"}],
+            "status": [
+                {"key": "enabled", "value": "Enabled"},
+                {"key": "disabled", "value": "Disabled"},
+            ],
         }

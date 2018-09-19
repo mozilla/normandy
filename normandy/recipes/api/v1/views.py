@@ -12,16 +12,7 @@ from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import api_cache_control
-from normandy.recipes.models import (
-    Action,
-    ApprovalRequest,
-    Channel,
-    Client,
-    Country,
-    Locale,
-    Recipe,
-    RecipeRevision,
-)
+from normandy.recipes.models import Action, ApprovalRequest, Client, Recipe, RecipeRevision
 from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
@@ -181,21 +172,3 @@ class ClassifyClient(views.APIView):
         client = Client(request)
         serializer = self.serializer_class(client, context={"request": request})
         return Response(serializer.data)
-
-
-class Filters(views.APIView):
-    authentication_classes = []
-    permission_classes = []
-
-    def get(self, request, format=None):
-        return Response(
-            {
-                "status": [
-                    {"key": "enabled", "value": "Enabled"},
-                    {"key": "disabled", "value": "Disabled"},
-                ],
-                "channels": [{"key": c.slug, "value": c.name} for c in Channel.objects.all()],
-                "countries": [{"key": c.code, "value": c.name} for c in Country.objects.all()],
-                "locales": [{"key": l.code, "value": l.name} for l in Locale.objects.all()],
-            }
-        )
