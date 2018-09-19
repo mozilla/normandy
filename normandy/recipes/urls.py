@@ -16,7 +16,6 @@ v1_router.register(r"approval_request", api_v1_views.ApprovalRequestViewSet)
 v1_router.register_view(
     "classify_client", api_v1_views.ClassifyClient, name="classify-client", allow_cdn=False
 )
-v1_router.register_view("filters", api_v1_views.Filters, name="filters")
 
 v2_router = MixedViewRouter()
 v2_router.register("action", api_v2_views.ActionViewSet)
@@ -29,6 +28,7 @@ v3_router.register("action", api_v3_views.ActionViewSet)
 v3_router.register("recipe", api_v3_views.RecipeViewSet)
 v3_router.register("recipe_revision", api_v3_views.RecipeRevisionViewSet)
 v3_router.register(r"approval_request", api_v3_views.ApprovalRequestViewSet)
+v3_router.register_view("filters", api_v3_views.Filters, name="filters")
 
 app_name = "recipes"
 

@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Q
 
 import django_filters
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
@@ -14,7 +14,16 @@ from normandy.base.api.filters import AliasedOrderingFilter
 from normandy.base.api.mixins import CachingViewsetMixin
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.decorators import api_cache_control
-from normandy.recipes.models import Action, ApprovalRequest, EnabledState, Recipe, RecipeRevision
+from normandy.recipes.models import (
+    Action,
+    ApprovalRequest,
+    EnabledState,
+    Channel,
+    Country,
+    Locale,
+    Recipe,
+    RecipeRevision,
+)
 from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
 from normandy.recipes.api.v3.serializers import (
     ActionSerializer,
@@ -233,3 +242,22 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
         approval_request = self.get_object()
         approval_request.close()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class Filters(views.APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        print("COUNTRIES", Country.objects.all())
+        return Response(
+            {
+                "status": [
+                    {"key": "enabled", "value": "Enabled"},
+                    {"key": "disabled", "value": "Disabled"},
+                ],
+                "channels": [{"key": c.slug, "value": c.name} for c in Channel.objects.all()],
+                "countries": [{"key": c.code, "value": c.name} for c in Country.objects.all()],
+                "locales": [{"key": l.code, "value": l.name} for l in Locale.objects.all()],
+            }
+        )
