@@ -497,6 +497,9 @@ class ApprovalRequest(models.Model):
     )
     comment = models.TextField(null=True)
 
+    class Meta:
+        ordering = ("id",)
+
     class NotActionable(Exception):
         pass
 
@@ -575,6 +578,9 @@ class Action(DirtyFieldsMixin, models.Model):
     signature = models.OneToOneField(
         Signature, related_name="action", null=True, blank=True, on_delete=models.CASCADE
     )
+
+    class Meta:
+        ordering = ("id",)
 
     errors = {
         "duplicate_branch_slug": "Feature branch slugs must be unique within an experiment",

@@ -10,7 +10,14 @@ from rest_framework.reverse import reverse
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
-from normandy.recipes.models import ApprovalRequest, Channel, Country, Locale, Recipe, RecipeRevision
+from normandy.recipes.models import (
+    ApprovalRequest,
+    Channel,
+    Country,
+    Locale,
+    Recipe,
+    RecipeRevision,
+)
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -25,7 +32,7 @@ class TestActionAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/action/")
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data == {"count": 0, "next": None, "previous": None, "results": []}
 
     def test_it_serves_actions(self, api_client):
         action = ActionFactory(
@@ -38,14 +45,19 @@ class TestActionAPI(object):
             kwargs={"name": action.name, "impl_hash": action.implementation_hash},
         )
         assert res.status_code == 200
-        assert res.data == [
-            {
-                "id": action.id,
-                "name": "foo",
-                "implementation_url": Whatever.endswith(action_url),
-                "arguments_schema": {"type": "object"},
-            }
-        ]
+        assert res.data == {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": action.id,
+                    "name": "foo",
+                    "implementation_url": Whatever.endswith(action_url),
+                    "arguments_schema": {"type": "object"},
+                }
+            ],
+        }
 
     def test_it_serves_actions_without_implementation(self, api_client):
         action = ActionFactory(
@@ -54,7 +66,7 @@ class TestActionAPI(object):
 
         res = api_client.get("/api/v3/action/")
         assert res.status_code == 200
-        assert res.data == [
+        assert res.data["results"] == [
             {
                 "id": action.id,
                 "name": "foo-remote",
@@ -1050,7 +1062,7 @@ class TestRecipeRevisionAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/recipe_revision/")
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data == {"count": 0, "next": None, "previous": None, "results": []}
 
     def test_it_serves_revisions(self, api_client):
         recipe = RecipeFactory()
@@ -1085,7 +1097,7 @@ class TestApprovalRequestAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/approval_request/")
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data == {"count": 0, "next": None, "previous": None, "results": []}
 
     def test_approve(self, api_client):
         r = RecipeFactory()

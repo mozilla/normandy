@@ -38,7 +38,6 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-    pagination_class = None
 
 
 class RecipeFilters(django_filters.FilterSet):
@@ -168,7 +167,6 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = RecipeRevisionSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
-    pagination_class = None
 
     @action(detail=True, methods=["POST"])
     def request_approval(self, request, pk=None):
@@ -191,7 +189,6 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ApprovalRequest.objects.all()
     serializer_class = ApprovalRequestSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
-    pagination_class = None
 
     @action(detail=True, methods=["POST"])
     def approve(self, request, pk=None):
