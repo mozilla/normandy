@@ -9,7 +9,7 @@ level, such as a web interface that allows building a filter with a form.
 
 Filter objects are generally specified as a JSON object with at least a
 "type" field, and other fields determined by that type. For example,
-ChannelFilter` below has a type of "channel" and requires a ``channels``
+``ChannelFilter`` below has a type of "channel" and requires a ``channels``
 field, so the final JSON would look something like this:
 
 .. code:: json
@@ -108,8 +108,13 @@ class BucketSampleFilter(BaseFilter):
     """
     Sample a portion of the users by defining a series of buckets, evenly
     distributing users into those buckets, and then selecting a range of
-    those buckets. This is stable: a given set of inputs will always match or
-    always not match.
+    those buckets.
+
+    This is consistent but unpredictable: a given set of inputs will always
+    produce the same answer, but can't be figured out ahead of time. This
+    makes it appropriate for sampling since it uniformly distributes inputs
+    over the entire sample space, and any variations in the inputs are spread
+    out over the entire space.
 
     The range to check is defined by a start point and length, and can wrap
     around the input space. For example, if there are 100 buckets, and we ask
@@ -165,9 +170,14 @@ class BucketSampleFilter(BaseFilter):
 
 class StableSampleFilter(BaseFilter):
     """
-    Stably sample users at a particular rate. This is "random" in that it is
-    unpredictable, but it will always match or not match for a given Firefox
-    profile.
+    Sample a portion of users. With a rate of ``0.3``, 3 out of every 10
+    users will be selected by this filter.
+
+    This is consistent but unpredictable: a given set of inputs will always
+    produce the same answer, but can't be figured out ahead of time. This
+    makes it appropriate for sampling since it uniformly distributes inputs
+    over the entire sample space, and any variations in the inputs are spread
+    out over the entire space.
 
     This works by hashing the inputs, and then checking if the hash falls above
     or below the sample point of the hash space.
