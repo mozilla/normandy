@@ -249,7 +249,6 @@ class Filters(views.APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        print("COUNTRIES", Country.objects.all())
         return Response(
             {
                 "status": [
