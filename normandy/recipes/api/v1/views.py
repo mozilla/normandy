@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import never_cache
 
 import django_filters
 from rest_framework import generics, permissions, views, viewsets
@@ -169,7 +169,7 @@ class ClassifyClient(views.APIView):
     permission_classes = []
     serializer_class = ClientSerializer
 
-    @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+    @never_cache
     def get(self, request, format=None):
         client = Client(request)
         serializer = self.serializer_class(client, context={"request": request})
