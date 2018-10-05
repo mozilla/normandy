@@ -19,7 +19,7 @@ class TestPermissiveFilenameStorageMixing(object):
 
         def test_it_removes_some_special_chars(self, storage):
             assert (
-                storage.get_valid_name("""special \\^`<>{}[]#%"'~| characters""")
+                storage.get_valid_name("""special \\^`<>{}[]#%"'~|[]*? characters""")
                 == "special_characters"
             )
 
