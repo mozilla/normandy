@@ -58,6 +58,7 @@ class RecipeOrderingFilter(AliasedOrderingFilter):
     aliases = {
         "last_updated": ("latest_revision__updated", "Last Updated"),
         "name": ("latest_revision__name", "Name"),
+        "action": ("latest_revision__action__name", "Action"),
     }
 
 

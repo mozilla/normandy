@@ -1025,6 +1025,27 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert [r["id"] for r in res.data["results"]] == [r2.id, r1.id]
 
+        def test_order_by_action_name(self, api_client):
+            r1 = RecipeFactory(name="a")
+            r1.action.name = "Bee"
+            r1.action.save()
+            r2 = RecipeFactory(name="b")
+            r2.action.name = "Cee"
+            r2.action.save()
+            r3 = RecipeFactory(name="c")
+            r3.action.name = "Ahh"
+            r3.action.save()
+
+            res = api_client.get("/api/v3/recipe/?ordering=action")
+            assert res.status_code == 200
+            # Expected order is ['Ahh', 'Bee', 'Cee']
+            assert [r["id"] for r in res.data["results"]] == [r3.id, r1.id, r2.id]
+
+            res = api_client.get("/api/v3/recipe/?ordering=-action")
+            assert res.status_code == 200
+            # Expected order is ['Cee', 'Bee', 'Ahh']
+            assert [r["id"] for r in res.data["results"]] == [r2.id, r1.id, r3.id]
+
         def test_order_bogus(self, api_client):
             """Test that filtering by an unknown key doesn't change the sort order"""
             RecipeFactory(name="a")
