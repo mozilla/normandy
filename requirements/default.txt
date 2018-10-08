@@ -16,10 +16,9 @@ dj-database-url==0.5.0 \
 dj-inmemorystorage==1.4.1 \
     --hash=sha256:2b587f9320ea26f9ed1c62fefaf05c817735eda989d6439072b73d1b59b1c591 \
     --hash=sha256:fa921269b83ffc762411e36d446fa07b602a4ad74632ae1819844d32e6fb12bd
-Django==2.0.8 \
-    --hash=sha256:0c5b65847d00845ee404bbc0b4a85686f15eb3001ffddda3db4e9baa265bf136 \
-    --hash=sha256:68aeea369a8130259354b6ba1fa9babe0c5ee6bced505dea4afcd00f765ae38b \
-    # pyup: <2.1 # django-webpack-loader doesn't support 2.1 yet
+Django==2.0.9 \
+    --hash=sha256:25df265e1fdb74f7e7305a1de620a84681bcc9c05e84a3ed97e4a1a63024f18d \
+    --hash=sha256:d6d94554abc82ca37e447c3d28958f5ac39bd7d4adaa285543ae97fb1129fd69    # pyup: <2.1 # django-webpack-loader doesn't support 2.1 yet
 django-configurations==2.1 \
     --hash=sha256:e70433eeed10549d30bf5ca386c962505ff9f492893dd2483c52af536347adce \
     --hash=sha256:71d9acdff33aa034f0157b0b3d23629fe0cd499bf4d0b6d699b9ca0701d952e8
