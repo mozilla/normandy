@@ -22,8 +22,8 @@ class LoggingAuthBackendMixin(object):
     def get_username(self, **kwargs):
         raise NotImplemented()
 
-    def authenticate(self, **kwargs):
-        result = super().authenticate(**kwargs)
+    def authenticate(self, request, **kwargs):
+        result = super().authenticate(request, **kwargs)
         username = self.get_username(**kwargs)
 
         if result is None:
