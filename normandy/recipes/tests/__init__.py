@@ -9,12 +9,39 @@ from normandy.base.utils import sri_hash
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
+    Channel,
     Client,
+    Country,
     EnabledState,
+    Locale,
     Recipe,
     RecipeRevision,
     Signature,
 )
+
+
+class ChannelFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Channel
+
+    slug = "beta"
+    name = "Beta"
+
+
+class CountryFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Country
+
+    code = "SE"
+    name = "Sweden"
+
+
+class LocaleFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Locale
+
+    code = "sv"
+    name = "Swedish"
 
 
 class ActionFactory(factory.DjangoModelFactory):
