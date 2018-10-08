@@ -292,23 +292,6 @@ in other Django projects.
    If set, when checking certificates for validity, start failing
    system checks this many days before the certificate would expire.
 
-.. envvar:: DJANGO_AWS_ACCESS_KEY_ID
-
-   The Access Key ID for an AWS user with read/write access to the S3 bucket.
-   This is required by django-storages_ to access S3.
-
-    .. _django-storages: https://github.com/jschneier/django-storages
-
-.. envvar:: DJANGO_AWS_SECRET_ACCESS_KEY
-
-   The Secret Access Key for the AWS user identified by
-   :envvar:`DJANGO_AWS_ACCESS_KEY_ID`. This is also required by
-   django-storages to access S3.
-
-.. envvar:: DJANGO_AWS_STORAGE_BUCKET_NAME
-
-   The name of the S3 bucket to be used to store media files.
-
 .. envvar:: DJANGO_CORS_ORIGIN_ALLOW_ALL
 
    :default: ``False``
@@ -346,6 +329,43 @@ in other Django projects.
    This URL needs to match the OIDC domain used by the client to authenticate.
    The value for this setting is usually listed in
    ``/.well-known/openid-configuration`` on the OIDC provider.
+
+.. envvar:: DJANGO_DEFAULT_FILE_STORAGE 
+
+   :default: ``normandy.base.storage.S3Boto3PermissiveStorage``
+
+   The Python import path for the file storage backend to use. For AWS, use
+   the default value of ``normandy.base.storage.S3Boto3PermissiveStorage``.
+   For GCP, use ``normandy.base.storage.NormandyGoogleCloudStorage``.
+
+   When using AWS, it is required to also set
+   ``DJANGO_AWS_STORAGE_BUCKET_NAME``. ``DJANGO_AWS_ACCESS_KEY_ID`` and
+   ``DJANGO_AWS_SECRET_ACCESS_KEY`` may also be needed.
+
+   When using GCP, it is required to also set
+   ``DJANGO_GCS_STORAGE_BUCKET_NAME``.
+
+.. envvar:: DJANGO_AWS_ACCESS_KEY_ID
+
+   The Access Key ID for an AWS user with read/write access to the S3 bucket.
+   This is required by django-storages_ to access S3.
+
+    .. _django-storages: https://github.com/jschneier/django-storages
+
+.. envvar:: DJANGO_AWS_SECRET_ACCESS_KEY
+
+   The Secret Access Key for the AWS user identified by
+   :envvar:`DJANGO_AWS_ACCESS_KEY_ID`. This is also required by
+   django-storages to access S3.
+
+.. envvar:: DJANGO_AWS_STORAGE_BUCKET_NAME
+
+   The name of the S3 bucket to be used to store media files.
+
+.. envvar:: DJANGO_GCP_STORAGE_BUCKET_NAME
+
+   The name of the Google storage bucket to be used to store media files.
+
 
 Gunicorn settings
 -----------------
