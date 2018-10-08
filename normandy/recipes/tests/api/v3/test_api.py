@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
-from normandy.recipes.models import ApprovalRequest, Recipe, Channel, Country, Locale
+from normandy.recipes.models import ApprovalRequest, Channel, Country, Locale, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -369,6 +369,7 @@ class TestRecipeAPI(object):
 
         def test_it_can_create_recipes_with_only_filter_object(self, api_client):
             action = ActionFactory()
+            Channel.objects.get_or_create(slug="beta", name="Beta")
 
             res = api_client.post(
                 "/api/v3/recipe/",
@@ -390,6 +391,7 @@ class TestRecipeAPI(object):
 
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
             action = ActionFactory()
+            Channel.objects.get_or_create(slug="beta", name="Beta")
 
             # First try to create a recipe with 0 filter objects.
             res = api_client.post(
@@ -533,6 +535,7 @@ class TestRecipeAPI(object):
 
         def test_it_can_update_recipes_with_only_filter_object(self, api_client):
             recipe = RecipeFactory(name="unchanged", extra_filter_expression="true")
+            Channel.objects.get_or_create(slug="beta", name="Beta")
 
             res = api_client.patch(
                 "/api/v3/recipe/%s/" % recipe.id,
@@ -603,7 +606,53 @@ class TestRecipeAPI(object):
             assert res.status_code == 400
             assert res.json() == {"filter_object": {"0": {"type": ["This field is required."]}}}
 
+        def test_validate_filter_objects_channels(self, api_client):
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "channel", "channels": ["nightwolf"]}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                "filter_object": {"0": {"channels": ["Unrecognized channel slug 'nightwolf'"]}}
+            }
+            Channel.objects.create(slug="nightwolf", name="Nightwolf")
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "channel", "channels": ["nightwolf"]}]
+            )
+            assert res.status_code == 201
+
+        def test_validate_filter_objects_locales(self, api_client):
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "locale", "locales": ["sv"]}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                "filter_object": {"0": {"locales": ["Unrecognized locale code 'sv'"]}}
+            }
+
+            Locale.objects.create(code="sv", name="Swedish")
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "locale", "locales": ["sv"]}]
+            )
+            assert res.status_code == 201
+
+        def test_validate_filter_objects_countries(self, api_client):
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "country", "countries": ["SS"]}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                "filter_object": {"0": {"countries": ["Unrecognized country code 'SS'"]}}
+            }
+
+            Country.objects.create(code="SS", name="South Sudan")
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "country", "countries": ["SS"]}]
+            )
+            assert res.status_code == 201
+
         def test_channel_works(self, api_client):
+            Channel.objects.get_or_create(slug="beta", name="Beta")
+            Channel.objects.get_or_create(slug="release", name="Release")
             res = self.make_recipe(
                 api_client, filter_object=[{"type": "channel", "channels": ["release", "beta"]}]
             )
@@ -623,6 +672,8 @@ class TestRecipeAPI(object):
             }
 
         def test_locale_works(self, api_client):
+            Locale.objects.create(code="en-US", name="English")
+            Locale.objects.create(code="de", name="German")
             res = self.make_recipe(
                 api_client, filter_object=[{"type": "locale", "locales": ["en-US", "de"]}]
             )
@@ -640,6 +691,8 @@ class TestRecipeAPI(object):
             assert res.json() == {"filter_object": {"0": {"locales": ["This field is required."]}}}
 
         def test_country_works(self, api_client):
+            Country.objects.get_or_create(code="US", name="United States of America")
+            Country.objects.get_or_create(code="DE", name="Germany")
             res = self.make_recipe(
                 api_client, filter_object=[{"type": "country", "countries": ["US", "DE"]}]
             )
@@ -1451,6 +1504,8 @@ class TestFilterObjects(object):
         assert res.json() == {"filter_object": {"0": {"type": ["This field is required."]}}}
 
     def test_channel_works(self, api_client):
+        Channel.objects.get_or_create(slug="beta", name="Beta")
+        Channel.objects.get_or_create(slug="release", name="Release")
         res = self.make_recipe(
             api_client, filter_object=[{"type": "channel", "channels": ["release", "beta"]}]
         )
@@ -1463,6 +1518,8 @@ class TestFilterObjects(object):
         assert res.json() == {"filter_object": {"0": {"channels": ["This field is required."]}}}
 
     def test_locale_works(self, api_client):
+        Locale.objects.get_or_create(code="en-US", name="English (US)")
+        Locale.objects.get_or_create(code="de", name="German")
         res = self.make_recipe(
             api_client, filter_object=[{"type": "locale", "locales": ["en-US", "de"]}]
         )
@@ -1475,6 +1532,8 @@ class TestFilterObjects(object):
         assert res.json() == {"filter_object": {"0": {"locales": ["This field is required."]}}}
 
     def test_country_works(self, api_client):
+        Country.objects.get_or_create(code="US", name="United States of America")
+        Country.objects.get_or_create(code="DE", name="Germany")
         res = self.make_recipe(
             api_client, filter_object=[{"type": "country", "countries": ["US", "DE"]}]
         )

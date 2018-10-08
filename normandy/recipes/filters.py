@@ -22,7 +22,6 @@ field, so the final JSON would look something like this:
 
 from rest_framework import serializers
 
-
 # If you add a new filter to this file, remember to update the docs too!
 
 
@@ -54,6 +53,15 @@ class ChannelFilter(BaseFilter):
     type = "channel"
     channels = serializers.ListField(child=serializers.CharField(), min_length=1)
 
+    def validate_channels(self, value):
+        # Avoid circular imports
+        from normandy.recipes.models import Channel
+
+        for slug in value:
+            if not Channel.objects.filter(slug=slug).exists():
+                raise serializers.ValidationError(f"Unrecognized channel slug {slug!r}")
+        return value
+
     def to_jexl(self):
         channels = ",".join(f'"{c}"' for c in self.data["channels"])
         return f"normandy.channel in [{channels}]"
@@ -77,6 +85,15 @@ class LocaleFilter(BaseFilter):
     type = "locale"
     locales = serializers.ListField(child=serializers.CharField(), min_length=1)
 
+    def validate_locales(self, value):
+        # Avoid circular imports
+        from normandy.recipes.models import Locale
+
+        for code in value:
+            if not Locale.objects.filter(code=code).exists():
+                raise serializers.ValidationError(f"Unrecognized locale code {code!r}")
+        return value
+
     def to_jexl(self):
         locales = ",".join(f'"{l}"' for l in self.data["locales"])
         return f"normandy.locale in [{locales}]"
@@ -98,6 +115,15 @@ class CountryFilter(BaseFilter):
 
     type = "country"
     countries = serializers.ListField(child=serializers.CharField(), min_length=1)
+
+    def validate_countries(self, value):
+        # Avoid circular imports
+        from normandy.recipes.models import Country
+
+        for code in value:
+            if not Country.objects.filter(code=code).exists():
+                raise serializers.ValidationError(f"Unrecognized country code {code!r}")
+        return value
 
     def to_jexl(self):
         countries = ",".join(f'"{c}"' for c in self.data["countries"])
