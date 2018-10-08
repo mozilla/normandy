@@ -66,7 +66,7 @@ def test_static_cache_headers(conf, requests_session):
         script_req.raise_for_status()
         cache_control = parse_cache_control(script_req.headers["cache-control"])
         assert cache_control["public"], f"Cache-control: public for {url}"
-        ONE_YEAR = 31536000
+        ONE_YEAR = 31_536_000
         assert cache_control["max-age"] >= ONE_YEAR, f"Cache-control: max-age > 1 year for {url}"
         assert cache_control["immutable"], f"Cache-control: immutable for {url}"
 
