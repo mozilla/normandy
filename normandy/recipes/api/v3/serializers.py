@@ -153,18 +153,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         data = super().validate(data)
         action = data.get("action")
-        required_error_msg = serializers.PrimaryKeyRelatedField.default_error_messages["required"]
-
         if action is None:
-            if not self.instance:
-                raise serializers.ValidationError({"action_id": required_error_msg})
             action = self.instance.action
 
         arguments = data.get("arguments")
-
-        if arguments is None and not self.instance:
-            raise serializers.ValidationError({"arguments": required_error_msg})
-
         if arguments is not None:
             # Ensure the value is a dict
             if not isinstance(arguments, dict):
