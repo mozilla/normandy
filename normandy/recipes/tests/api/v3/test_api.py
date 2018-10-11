@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
-from normandy.recipes.models import ApprovalRequest, Recipe
+from normandy.recipes.models import ApprovalRequest, Recipe, RecipeRevision
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -28,7 +28,7 @@ class TestActionAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/action/")
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data == {"count": 0, "next": None, "previous": None, "results": []}
 
     def test_it_serves_actions(self, api_client):
         action = ActionFactory(
@@ -41,14 +41,19 @@ class TestActionAPI(object):
             kwargs={"name": action.name, "impl_hash": action.implementation_hash},
         )
         assert res.status_code == 200
-        assert res.data == [
-            {
-                "id": action.id,
-                "name": "foo",
-                "implementation_url": Whatever.endswith(action_url),
-                "arguments_schema": {"type": "object"},
-            }
-        ]
+        assert res.data == {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": action.id,
+                    "name": "foo",
+                    "implementation_url": Whatever.endswith(action_url),
+                    "arguments_schema": {"type": "object"},
+                }
+            ],
+        }
 
     def test_it_serves_actions_without_implementation(self, api_client):
         action = ActionFactory(
@@ -57,7 +62,7 @@ class TestActionAPI(object):
 
         res = api_client.get("/api/v3/action/")
         assert res.status_code == 200
-        assert res.data == [
+        assert res.data["results"] == [
             {
                 "id": action.id,
                 "name": "foo-remote",
@@ -107,7 +112,7 @@ class TestRecipeAPI(object):
 
             res = api_client.get("/api/v3/recipe/")
             assert res.status_code == 200
-            assert res.data["results"][0]["name"] == recipe.name
+            assert res.data["results"][0]["latest_revision"]["name"] == recipe.name
 
         def test_available_if_admin_enabled(self, api_client, settings):
             settings.ADMIN_ENABLED = True
@@ -505,7 +510,7 @@ class TestRecipeAPI(object):
 
             res = api_client.get("/api/v3/recipe/%s/" % recipe.id)
             assert res.status_code == 200, res.json()
-            assert res.json()["arguments"] == arguments
+            assert res.json()["latest_revision"]["arguments"] == arguments
 
             arguments = {"message": "second message", "checkbox": True}
             res = api_client.patch(
@@ -517,7 +522,7 @@ class TestRecipeAPI(object):
 
             res = api_client.get("/api/v3/recipe/%s/" % recipe.id)
             assert res.status_code == 200, res.json()
-            assert res.json()["arguments"] == arguments
+            assert res.json()["latest_revision"]["arguments"] == arguments
 
         def test_it_can_delete_recipes(self, api_client):
             recipe = RecipeFactory()
@@ -693,7 +698,7 @@ class TestRecipeAPI(object):
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
-            assert recipe_data["filter_expression"] == (
+            assert recipe_data["latest_revision"]["filter_expression"] == (
                 f'(normandy.channel in ["{channel1.slug}","{channel2.slug}"]) && (true)'
             )
 
@@ -715,7 +720,7 @@ class TestRecipeAPI(object):
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
-            assert recipe_data["filter_expression"] == (
+            assert recipe_data["latest_revision"]["filter_expression"] == (
                 f'(normandy.locale in ["{locale1.code}","{locale2.code}"]) && (true)'
             )
 
@@ -735,7 +740,7 @@ class TestRecipeAPI(object):
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
-            assert recipe_data["filter_expression"] == (
+            assert recipe_data["latest_revision"]["filter_expression"] == (
                 f'(normandy.country in ["{country1.code}","{country2.code}"]) && (true)'
             )
 
@@ -763,7 +768,7 @@ class TestRecipeAPI(object):
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
-            assert recipe_data["filter_expression"] == (
+            assert recipe_data["latest_revision"]["filter_expression"] == (
                 "([normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)) && (true)"
             )
 
@@ -812,7 +817,7 @@ class TestRecipeAPI(object):
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
-            assert recipe_data["filter_expression"] == (
+            assert recipe_data["latest_revision"]["filter_expression"] == (
                 "([normandy.userId,normandy.recipeId]|stableSample(0.5)) && (true)"
             )
 
@@ -849,7 +854,7 @@ class TestRecipeAPI(object):
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
-            assert recipe_data["filter_expression"] == (
+            assert recipe_data["latest_revision"]["filter_expression"] == (
                 '((normandy.version>="57"&&normandy.version<"58")||'
                 '(normandy.version>="58"&&normandy.version<"59")) && (true)'
             )
@@ -877,16 +882,16 @@ class TestRecipeAPI(object):
 
             res = api_client.get("/api/v3/recipe/%s/history/" % recipe.id)
 
-            assert res.data[0]["recipe"]["name"] == "version 3"
-            assert res.data[1]["recipe"]["name"] == "version 2"
-            assert res.data[2]["recipe"]["name"] == "version 1"
+            assert res.data[0]["name"] == "version 3"
+            assert res.data[1]["name"] == "version 2"
+            assert res.data[2]["name"] == "version 1"
 
         def test_it_can_enable_recipes(self, api_client):
             recipe = RecipeFactory(approver=UserFactory())
 
             res = api_client.post("/api/v3/recipe/%s/enable/" % recipe.id)
             assert res.status_code == 200
-            assert res.data["enabled"] is True
+            assert res.data["approved_revision"]["enabled"] is True
 
             recipe = Recipe.objects.all()[0]
             assert recipe.enabled
@@ -911,7 +916,7 @@ class TestRecipeAPI(object):
 
             res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)
             assert res.status_code == 200
-            assert res.data["enabled"] is False
+            assert res.data["approved_revision"]["enabled"] is False
 
             recipe = Recipe.objects.all()[0]
             assert not recipe.enabled
@@ -1088,10 +1093,16 @@ class TestRecipeAPI(object):
             assert set(r["id"] for r in res.data["results"]) == set([match1.id, match2.id])
 
         def test_order_last_updated(self, api_client):
-            now = datetime.now()
+            r1 = RecipeFactory()
+            r2 = RecipeFactory()
+            now = r1.latest_revision.updated
             yesterday = now - timedelta(days=1)
-            r1 = RecipeFactory(updated=yesterday)
-            r2 = RecipeFactory(updated=now)
+            r1.latest_revision.updated = yesterday
+            r2.latest_revision.updated = now
+            # Call the super class's save method so that
+            # `latest_revision.updated` doesn't get rewritten
+            super(RecipeRevision, r1.latest_revision).save()
+            super(RecipeRevision, r2.latest_revision).save()
 
             res = api_client.get("/api/v3/recipe/?ordering=last_updated")
             assert res.status_code == 200
@@ -1153,7 +1164,7 @@ class TestRecipeRevisionAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/recipe_revision/")
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data == {"count": 0, "next": None, "previous": None, "results": []}
 
     def test_it_serves_revisions(self, api_client):
         recipe = RecipeFactory()
@@ -1188,7 +1199,7 @@ class TestApprovalRequestAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/approval_request/")
         assert res.status_code == 200
-        assert res.data == []
+        assert res.data == {"count": 0, "next": None, "previous": None, "results": []}
 
     def test_approve(self, api_client):
         r = RecipeFactory()
@@ -1263,6 +1274,7 @@ class TestApprovalRequestAPI(object):
 @pytest.mark.django_db
 class TestApprovalFlow(object):
     def verify_signatures(self, api_client, expected_count=None):
+        # v1 usage here is correct, since v3 doesn't yet provide signatures
         res = api_client.get("/api/v1/recipe/signed/")
         assert res.status_code == 200
         signed_data = res.json()
@@ -1298,8 +1310,14 @@ class TestApprovalFlow(object):
                 "enabled": "false",
             },
         )
-        assert res.status_code == 201
+        assert res.status_code == 201, res.data
         recipe_data_0 = res.json()
+
+        # It is visible in the api but not approved
+        res = api_client.get(f"/api/v3/recipe/{recipe_data_0['id']}/")
+        assert res.status_code == 200
+        assert res.json()["latest_revision"] is not None
+        assert res.json()["approved_revision"] is None
 
         # Request approval for it
         res = api_client.post(
@@ -1325,10 +1343,11 @@ class TestApprovalFlow(object):
         res = api_client.post("/api/v3/recipe/{}/enable/".format(recipe_data_0["id"]))
         assert res.status_code == 200
 
-        # It is now visible in the API
+        # It is now visible in the API as approved and signed
         res = api_client.get("/api/v3/recipe/{}/".format(recipe_data_0["id"]))
         assert res.status_code == 200
         recipe_data_1 = res.json()
+        assert recipe_data_1["approved_revision"] is not None
         self.verify_signatures(api_client, expected_count=1)
 
         # Make another change
@@ -1339,11 +1358,12 @@ class TestApprovalFlow(object):
         )
         assert res.status_code == 200
 
-        # The change should not be visible yet, since it isn't approved
+        # The change should only be seen in the latest revision, not the approved
         res = api_client.get("/api/v3/recipe/{}/".format(recipe_data_1["id"]))
         assert res.status_code == 200
         recipe_data_2 = res.json()
-        assert recipe_data_2["extra_filter_expression"] == "counter == 0"
+        assert recipe_data_2["approved_revision"]["extra_filter_expression"] == "counter == 0"
+        assert recipe_data_2["latest_revision"]["extra_filter_expression"] == "counter == 1"
         self.verify_signatures(api_client, expected_count=1)
 
         # Request approval for the change
@@ -1353,14 +1373,14 @@ class TestApprovalFlow(object):
             )
         )
         approval_data = res.json()
-        recipe_data_2["approval_request"] = approval_data
         recipe_data_2["latest_revision"]["approval_request"] = approval_data
         assert res.status_code == 201
 
         # The change should not be visible yet, since it isn't approved
         res = api_client.get("/api/v3/recipe/{}/".format(recipe_data_1["id"]))
         assert res.status_code == 200
-        assert res.json() == recipe_data_2
+        assert res.json()["approved_revision"] == recipe_data_2["approved_revision"]
+        assert res.json()["latest_revision"] == recipe_data_2["latest_revision"]
         self.verify_signatures(api_client, expected_count=1)
 
         # Can't reject your own approval
@@ -1383,7 +1403,8 @@ class TestApprovalFlow(object):
         # The change should not be visible yet, since it isn't approved
         res = api_client.get("/api/v3/recipe/{}/".format(recipe_data_1["id"]))
         assert res.status_code == 200
-        assert res.json() == recipe_data_2
+        assert res.json()["approved_revision"] == recipe_data_2["approved_revision"]
+        assert res.json()["latest_revision"] == recipe_data_2["latest_revision"]
         self.verify_signatures(api_client, expected_count=1)
 
         # Make a third version of the recipe
@@ -1415,7 +1436,7 @@ class TestApprovalFlow(object):
         res = api_client.get("/api/v3/recipe/{}/".format(recipe_data_1["id"]))
         assert res.status_code == 200
         recipe_data_4 = res.json()
-        assert recipe_data_4["extra_filter_expression"] == "counter == 2"
+        assert recipe_data_4["approved_revision"]["extra_filter_expression"] == "counter == 2"
         self.verify_signatures(api_client, expected_count=1)
 
     def test_cancel_approval(self, api_client, mocked_autograph):
@@ -1497,6 +1518,7 @@ def test_apis_makes_a_reasonable_number_of_db_queries(endpoint, Factory, client,
     # per item, which is very slow. Make sure that isn't the case.
     Factory.create_batch(100)
     queries = CaptureQueriesContext(connection)
+
     with queries:
         res = client.get(endpoint)
         assert res.status_code == 200
@@ -1504,7 +1526,8 @@ def test_apis_makes_a_reasonable_number_of_db_queries(endpoint, Factory, client,
     # Pagination naturally makes one query per item in the page. Anything
     # under `page_size * 2` isn't doing any additional queries per recipe.
     page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
-    assert len(queries) < page_size * 2
+
+    assert len(queries) < page_size * 2, queries
 
 
 @pytest.mark.django_db
@@ -1547,7 +1570,7 @@ class TestFilterObjects(object):
             filter_object=[{"type": "channel", "channels": [channel1.slug, channel2.slug]}],
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == (
+        assert res.json()["latest_revision"]["filter_expression"] == (
             f'normandy.channel in ["{channel1.slug}","{channel2.slug}"]'
         )
 
@@ -1563,7 +1586,7 @@ class TestFilterObjects(object):
             api_client, filter_object=[{"type": "locale", "locales": [locale1.code, locale2.code]}]
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == (
+        assert res.json()["latest_revision"]["filter_expression"] == (
             f'normandy.locale in ["{locale1.code}","{locale2.code}"]'
         )
 
@@ -1580,7 +1603,7 @@ class TestFilterObjects(object):
             filter_object=[{"type": "country", "countries": [country1.code, country2.code]}],
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == (
+        assert res.json()["latest_revision"]["filter_expression"] == (
             f'normandy.country in ["{country1.code}","{country2.code}"]'
         )
 
@@ -1603,7 +1626,7 @@ class TestFilterObjects(object):
             ],
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == (
+        assert res.json()["latest_revision"]["filter_expression"] == (
             "[normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)"
         )
 
@@ -1649,7 +1672,7 @@ class TestFilterObjects(object):
             ],
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == (
+        assert res.json()["latest_revision"]["filter_expression"] == (
             "[normandy.userId,normandy.recipeId]|stableSample(0.5)"
         )
 
@@ -1678,7 +1701,7 @@ class TestFilterObjects(object):
             api_client, filter_object=[{"type": "version", "versions": [57, 58]}]
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == (
+        assert res.json()["latest_revision"]["filter_expression"] == (
             '(normandy.version>="57"&&normandy.version<"58")||'
             '(normandy.version>="58"&&normandy.version<"59")'
         )

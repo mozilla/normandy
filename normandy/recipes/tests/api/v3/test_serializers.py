@@ -1,7 +1,6 @@
 import pytest
 from rest_framework import serializers
 
-from normandy.base.tests import Whatever
 from normandy.recipes.tests import (
     ARGUMENTS_SCHEMA,
     ActionFactory,
@@ -19,39 +18,17 @@ from normandy.recipes.api.v3.serializers import (
 class TestRecipeSerializer:
     def test_it_works(self, rf):
         recipe = RecipeFactory(arguments={"foo": "bar"}, bug_number=1436113)
-        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        action = recipe.action
+        ApprovalRequestFactory(revision=recipe.latest_revision)
+        request = rf.get("/")
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
 
         assert serializer.data == {
-            "name": recipe.name,
             "id": recipe.id,
-            "last_updated": Whatever(),
-            "enabled": recipe.enabled,
-            "extra_filter_expression": recipe.extra_filter_expression,
-            "filter_expression": recipe.filter_expression,
-            "filter_object": [],
-            "action": {
-                "arguments_schema": {},
-                "id": action.id,
-                "implementation_url": Whatever(),
-                "name": action.name,
-            },
-            "arguments": {"foo": "bar"},
-            "comment": recipe.comment,
-            "is_approved": False,
-            "latest_revision": RecipeRevisionSerializer(recipe.latest_revision).data,
+            "latest_revision": RecipeRevisionSerializer(
+                recipe.latest_revision, context={"request": request}
+            ).data,
             "approved_revision": None,
-            "approval_request": {
-                "id": approval.id,
-                "created": Whatever(),
-                "creator": Whatever(),
-                "approved": None,
-                "approver": None,
-                "comment": None,
-            },
-            "identicon_seed": Whatever.startswith("v1:"),
-            "bug_number": 1436113,
+            "signature": None,
         }
 
     def test_validation_with_invalid_action(self):

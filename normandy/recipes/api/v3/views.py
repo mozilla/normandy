@@ -38,7 +38,6 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-    pagination_class = None
 
 
 class RecipeFilters(django_filters.FilterSet):
@@ -67,14 +66,22 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
     queryset = (
         Recipe.objects.all()
-        # Foreign keys
-        .select_related("latest_revision")
-        .select_related("latest_revision__action")
-        .select_related("latest_revision__approval_request")
-        # Many-to-many
-        .prefetch_related("latest_revision__channels")
-        .prefetch_related("latest_revision__countries")
-        .prefetch_related("latest_revision__locales")
+        .select_related(
+            "approved_revision__action",
+            "approved_revision__approval_request",
+            "latest_revision__action",
+            "latest_revision__approval_request",
+        )
+        .prefetch_related(
+            "approved_revision__channels",
+            "approved_revision__countries",
+            "approved_revision__enabled_states",
+            "approved_revision__locales",
+            "latest_revision__channels",
+            "latest_revision__countries",
+            "latest_revision__enabled_states",
+            "latest_revision__locales",
+        )
     )
     serializer_class = RecipeSerializer
     filterset_class = RecipeFilters
@@ -138,6 +145,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
                 status=status.HTTP_409_CONFLICT,
             )
 
+        recipe.latest_revision.refresh_from_db()
         return Response(RecipeSerializer(recipe).data)
 
     @action(detail=True, methods=["POST"])
@@ -155,17 +163,11 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         RecipeRevision.objects.all()
-        .select_related("action")
-        .select_related("approval_request")
-        .select_related("recipe")
-        # Many-to-many
-        .prefetch_related("channels")
-        .prefetch_related("countries")
-        .prefetch_related("locales")
+        .select_related("action", "approval_request", "recipe")
+        .prefetch_related("enabled_states", "channels", "countries", "locales")
     )
     serializer_class = RecipeRevisionSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
-    pagination_class = None
 
     @action(detail=True, methods=["POST"])
     def request_approval(self, request, pk=None):
@@ -188,7 +190,6 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ApprovalRequest.objects.all()
     serializer_class = ApprovalRequestSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
-    pagination_class = None
 
     @action(detail=True, methods=["POST"])
     def approve(self, request, pk=None):

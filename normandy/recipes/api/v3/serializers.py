@@ -5,8 +5,27 @@ from factory.fuzzy import FuzzyText
 from normandy.base.api.serializers import UserSerializer
 from normandy.recipes import filters
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
-from normandy.recipes.models import Action, ApprovalRequest, Recipe, RecipeRevision
+from normandy.recipes.models import (
+    Action,
+    ApprovalRequest,
+    EnabledState,
+    Recipe,
+    RecipeRevision,
+    Signature,
+)
 from normandy.recipes.validators import JSONSchemaValidator
+
+
+class CustomizableSerializerMixin:
+    """Serializer Mixin that allows callers to exclude fields on instance of this serializer."""
+
+    def __init__(self, *args, **kwargs):
+        exclude_fields = kwargs.pop("exclude_fields", [])
+        super().__init__(*args, **kwargs)
+
+        if exclude_fields:
+            for field in exclude_fields:
+                self.fields.pop(field)
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -28,82 +47,105 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
         fields = ["approved", "approver", "comment", "created", "creator", "id"]
 
 
+class EnabledStateSerializer(CustomizableSerializerMixin, serializers.ModelSerializer):
+    creator = UserSerializer()
+
+    class Meta:
+        model = EnabledState
+        fields = ["revision_id", "created", "creator", "enabled", "carryover_from"]
+
+
 class RecipeRevisionSerializer(serializers.ModelSerializer):
+    action = serializers.SerializerMethodField(read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
     comment = serializers.CharField(required=False)
+    creator = UserSerializer(source="user", read_only=True)
     date_created = serializers.DateTimeField(source="created", read_only=True)
+    enabled_states = EnabledStateSerializer(many=True, exclude_fields=["revision_id"])
     recipe = serializers.SerializerMethodField(read_only=True)
-    user = UserSerializer()
 
     class Meta:
         model = RecipeRevision
         fields = [
+            "action",
             "approval_request",
+            "arguments",
+            "bug_number",
             "comment",
             "date_created",
-            "id",
-            "recipe",
-            "user",
-            "identicon_seed",
-        ]
-
-    def get_recipe(self, instance):
-        serializer = RecipeSerializer(
-            instance.serializable_recipe,
-            exclude_fields=["latest_revision", "approved_revision", "approval_request"],
-        )
-        return serializer.data
-
-
-class RecipeSerializer(serializers.ModelSerializer):
-    action = serializers.SerializerMethodField(read_only=True)
-    action_id = serializers.PrimaryKeyRelatedField(
-        source="action", queryset=Action.objects.all(), write_only=True
-    )
-    approval_request = ApprovalRequestSerializer(read_only=True)
-    approved_revision = RecipeRevisionSerializer(read_only=True)
-    arguments = serializers.JSONField()
-    enabled = serializers.BooleanField(read_only=True)
-    extra_filter_expression = serializers.CharField(required=False, allow_blank=True)
-    filter_expression = serializers.CharField(read_only=True)
-    filter_object = serializers.JSONField(required=False)
-    last_updated = serializers.DateTimeField(read_only=True)
-    latest_revision = RecipeRevisionSerializer(read_only=True)
-    name = serializers.CharField()
-    identicon_seed = serializers.CharField(required=False)
-    comment = serializers.CharField(required=False)
-    bug_number = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = Recipe
-        fields = [
-            "action",
-            "action_id",
-            "approval_request",
-            "approved_revision",
-            "arguments",
+            "enabled_states",
             "enabled",
             "extra_filter_expression",
             "filter_expression",
             "filter_object",
             "id",
-            "is_approved",
-            "last_updated",
+            "identicon_seed",
+            "name",
+            "recipe",
+            "creator",
+            "updated",
+        ]
+
+    def get_recipe(self, instance):
+        serializer = RecipeLinkSerializer(instance.recipe)
+        return serializer.data
+
+    def get_action(self, instance):
+        serializer = ActionSerializer(
+            instance.action, read_only=True, context={"request": self.context.get("request")}
+        )
+        return serializer.data
+
+
+class SignatureSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(read_only=True)
+    signature = serializers.ReadOnlyField()
+    x5u = serializers.ReadOnlyField()
+    public_key = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Signature
+        fields = ["timestamp", "signature", "x5u", "public_key"]
+
+
+class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer):
+    # read-only fields
+    approved_revision = RecipeRevisionSerializer(read_only=True)
+    latest_revision = RecipeRevisionSerializer(read_only=True)
+    signature = SignatureSerializer(read_only=True)
+
+    # write-only fields
+    action_id = serializers.PrimaryKeyRelatedField(
+        source="action", queryset=Action.objects.all(), write_only=True
+    )
+    arguments = serializers.JSONField(write_only=True)
+    extra_filter_expression = serializers.CharField(
+        required=False, allow_blank=True, write_only=True
+    )
+    filter_object = serializers.JSONField(required=False, write_only=True)
+    name = serializers.CharField(write_only=True)
+    identicon_seed = serializers.CharField(required=False, write_only=True)
+    comment = serializers.CharField(required=False, write_only=True)
+    bug_number = serializers.IntegerField(required=False, write_only=True)
+
+    class Meta:
+        model = Recipe
+        fields = [
+            # read-only
+            "approved_revision",
+            "id",
             "latest_revision",
+            "signature",
+            # write-only
+            "action_id",
+            "arguments",
+            "extra_filter_expression",
+            "filter_object",
             "name",
             "identicon_seed",
             "comment",
             "bug_number",
         ]
-
-    def __init__(self, *args, **kwargs):
-        exclude_fields = kwargs.pop("exclude_fields", [])
-        super().__init__(*args, **kwargs)
-
-        if exclude_fields:
-            for field in exclude_fields:
-                if field in self.fields:
-                    self.fields.pop(field)
 
     def get_action(self, instance):
         serializer = ActionSerializer(
@@ -244,3 +286,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
 
         return value
+
+
+class RecipeLinkSerializer(RecipeSerializer):
+    class Meta(RecipeSerializer.Meta):
+        fields = ["approved_revision_id", "id", "latest_revision_id"]

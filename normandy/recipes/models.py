@@ -276,8 +276,13 @@ class Recipe(DirtyFieldsMixin, models.Model):
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        if self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields(check_relationship=True)
+        dirty_fields = {
+            k: v
+            for k, v in self.get_dirty_fields(check_relationship=True, verbose=True).items()
+            if v["saved"] != v["current"]
+        }
+
+        if dirty_fields:
             dirty_field_names = list(dirty_fields.keys())
 
             if (
@@ -492,6 +497,9 @@ class ApprovalRequest(models.Model):
     )
     comment = models.TextField(null=True)
 
+    class Meta:
+        ordering = ("id",)
+
     class NotActionable(Exception):
         pass
 
@@ -571,6 +579,9 @@ class Action(DirtyFieldsMixin, models.Model):
         Signature, related_name="action", null=True, blank=True, on_delete=models.CASCADE
     )
 
+    class Meta:
+        ordering = ("id",)
+
     errors = {
         "duplicate_branch_slug": "Feature branch slugs must be unique within an experiment",
         "duplicate_branch_value": "Feature branch values must be unique within an experiment",
@@ -641,8 +652,12 @@ class Action(DirtyFieldsMixin, models.Model):
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        if self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields(check_relationship=True)
+        dirty_fields = {
+            k: v
+            for k, v in self.get_dirty_fields(check_relationship=True, verbose=True).items()
+            if v["saved"] != v["current"]
+        }
+        if dirty_fields:
             dirty_field_names = list(dirty_fields.keys())
 
             if (
