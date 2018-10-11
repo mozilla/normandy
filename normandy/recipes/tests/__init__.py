@@ -4,7 +4,7 @@ from django.utils import timezone
 
 import factory
 
-from normandy.base.tests import FuzzyUnicode
+from normandy.base.tests import FuzzyUnicode, UserFactory
 from normandy.base.utils import sri_hash
 from normandy.recipes.models import (
     Action,
@@ -169,6 +169,7 @@ class EnabledStateFactory(factory.DjangoModelFactory):
     class Meta:
         model = EnabledState
 
+    creator = factory.SubFactory(UserFactory)
     revision = factory.SubFactory(RecipeRevisionFactory)
 
 

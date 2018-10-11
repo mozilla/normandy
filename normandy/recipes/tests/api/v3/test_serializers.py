@@ -1,6 +1,7 @@
 import pytest
 from rest_framework import serializers
 
+from normandy.base.tests import UserFactory, Whatever
 from normandy.recipes.tests import (
     ARGUMENTS_SCHEMA,
     ActionFactory,
@@ -9,6 +10,7 @@ from normandy.recipes.tests import (
 )
 from normandy.recipes.api.v3.serializers import (
     ActionSerializer,
+    EnabledStateSerializer,
     RecipeRevisionSerializer,
     RecipeSerializer,
 )
@@ -181,3 +183,55 @@ class TestActionSerializer:
         action = ActionFactory()
         serializer = ActionSerializer(action, context={"request": rf.get("/")})
         assert serializer.data["implementation_url"].startswith(settings.CDN_URL)
+
+
+@pytest.mark.django_db()
+class TestEnabledStateSerializer:
+    def test_it_works(self):
+        author = UserFactory()
+        reviewer = UserFactory()
+
+        recipe = RecipeFactory(name="first", user=author)
+        revision1 = recipe.latest_revision
+        approval_request = revision1.request_approval(author)
+        approval_request.approve(reviewer, "r+")
+        revision1.enable(author)
+        state1 = revision1.enabled_state
+        assert state1 is not None
+
+        recipe.revise("second", user=author)
+        revision2 = recipe.latest_revision
+        approval_request = revision2.request_approval(author)
+        approval_request.approve(reviewer, "r+")
+        state2 = revision2.enabled_state
+        assert state2 is not None
+
+        serializer = EnabledStateSerializer(state1)
+        assert serializer.data == {
+            "id": state1.id,
+            "carryover_from": None,
+            "created": Whatever.iso8601(),
+            "creator": {
+                "id": author.id,
+                "first_name": author.first_name,
+                "last_name": author.last_name,
+                "email": author.email,
+            },
+            "enabled": True,
+            "revision_id": revision1.id,
+        }
+
+        serializer = EnabledStateSerializer(state2)
+        assert serializer.data == {
+            "id": state2.id,
+            "carryover_from": state1.id,
+            "created": Whatever.iso8601(),
+            "creator": {
+                "id": reviewer.id,
+                "first_name": reviewer.first_name,
+                "last_name": reviewer.last_name,
+                "email": reviewer.email,
+            },
+            "enabled": True,
+            "revision_id": revision2.id,
+        }
