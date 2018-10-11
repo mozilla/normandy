@@ -6,5 +6,4 @@ These documents are aimed at QA testers working on Normandy.
    :maxdepth: 2
 
    example
-   setup
    environments

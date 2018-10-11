@@ -31,6 +31,7 @@ class AliasedOrderingFilter(filters.OrderingFilter):
         ordering = super().get_ordering(*args, **kwargs)
         if ordering is not None:
             return list(map(self.replace_alias, ordering))
+
         return ordering
 
     def replace_alias(self, term):

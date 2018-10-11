@@ -16,6 +16,9 @@ from normandy.recipes.models import ApprovalRequest, Recipe
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
+    ChannelFactory,
+    CountryFactory,
+    LocaleFactory,
     RecipeFactory,
     RecipeRevisionFactory,
     fake_sign,
@@ -159,6 +162,7 @@ class TestRecipeAPI(object):
 
         def test_it_can_create_recipes_with_only_filter_object(self, api_client):
             action = ActionFactory()
+            channel = ChannelFactory()
 
             res = api_client.post(
                 "/api/v2/recipe/",
@@ -167,7 +171,7 @@ class TestRecipeAPI(object):
                     "action_id": action.id,
                     "arguments": {},
                     "extra_filter_expression": "   ",
-                    "filter_object": [{"type": "channel", "channels": ["beta"]}],
+                    "filter_object": [{"type": "channel", "channels": [channel.slug]}],
                     "enabled": True,
                 },
             )
@@ -176,10 +180,11 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             assert recipe.extra_filter_expression == ""
-            assert recipe.filter_expression == 'normandy.channel in ["beta"]'
+            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
             action = ActionFactory()
+            channel = ChannelFactory()
 
             # First try to create a recipe with 0 filter objects.
             res = api_client.post(
@@ -204,7 +209,7 @@ class TestRecipeAPI(object):
                     "name": "Test Recipe",
                     "action_id": action.id,
                     "arguments": {},
-                    "filter_object": [{"type": "channel", "channels": ["beta"]}],
+                    "filter_object": [{"type": "channel", "channels": [channel.slug]}],
                     "enabled": True,
                 },
             )
@@ -213,7 +218,7 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             assert recipe.extra_filter_expression == ""
-            assert recipe.filter_expression == 'normandy.channel in ["beta"]'
+            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
         def test_it_can_create_recipes_actions_without_implementation(self, api_client):
             action = ActionFactory(implementation=None)
@@ -498,25 +503,29 @@ class TestRecipeAPI(object):
 
         def test_it_can_update_recipes_with_only_filter_object(self, api_client):
             recipe = RecipeFactory(name="unchanged", extra_filter_expression="true")
+            channel = ChannelFactory()
 
             res = api_client.patch(
                 "/api/v2/recipe/%s/" % recipe.id,
                 {
                     "name": "changed",
                     "extra_filter_expression": "",
-                    "filter_object": [{"type": "channel", "channels": ["beta"]}],
+                    "filter_object": [{"type": "channel", "channels": [channel.slug]}],
                 },
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
             assert recipe.extra_filter_expression == ""
             assert recipe.filter_object
-            assert recipe.filter_expression == 'normandy.channel in ["beta"]'
+            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
             # And you can omit it too
             res = api_client.patch(
                 "/api/v2/recipe/%s/" % recipe.id,
-                {"name": "changed", "filter_object": [{"type": "channel", "channels": ["beta"]}]},
+                {
+                    "name": "changed",
+                    "filter_object": [{"type": "channel", "channels": [channel.slug]}],
+                },
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
@@ -568,16 +577,63 @@ class TestRecipeAPI(object):
             assert res.status_code == 400
             assert res.json() == {"filter_object": {"0": {"type": ["This field is required."]}}}
 
-        def test_channel_works(self, api_client):
+        def test_validate_filter_objects_channels(self, api_client):
             res = self.make_recipe(
-                api_client, filter_object=[{"type": "channel", "channels": ["release", "beta"]}]
+                api_client, filter_object=[{"type": "channel", "channels": ["nightwolf"]}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                "filter_object": {"0": {"channels": ["Unrecognized channel slug 'nightwolf'"]}}
+            }
+            ChannelFactory(slug="nightwolf")
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "channel", "channels": ["nightwolf"]}]
+            )
+            assert res.status_code == 201
+
+        def test_validate_filter_objects_locales(self, api_client):
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "locale", "locales": ["sv"]}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                "filter_object": {"0": {"locales": ["Unrecognized locale code 'sv'"]}}
+            }
+
+            locale = LocaleFactory()
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "locale", "locales": [locale.code]}]
+            )
+            assert res.status_code == 201
+
+        def test_validate_filter_objects_countries(self, api_client):
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "country", "countries": ["SS"]}]
+            )
+            assert res.status_code == 400
+            assert res.json() == {
+                "filter_object": {"0": {"countries": ["Unrecognized country code 'SS'"]}}
+            }
+
+            CountryFactory(code="SS", name="South Sudan")
+            res = self.make_recipe(
+                api_client, filter_object=[{"type": "country", "countries": ["SS"]}]
+            )
+            assert res.status_code == 201
+
+        def test_channel_works(self, api_client):
+            channel1 = ChannelFactory(slug="beta")
+            channel2 = ChannelFactory(slug="release")
+            res = self.make_recipe(
+                api_client,
+                filter_object=[{"type": "channel", "channels": [channel1.slug, channel2.slug]}],
             )
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
             assert recipe_data["filter_expression"] == (
-                '(normandy.channel in ["release","beta"]) && (true)'
+                f'(normandy.channel in ["{channel1.slug}","{channel2.slug}"]) && (true)'
             )
 
         def test_channel_correct_fields(self, api_client):
@@ -588,15 +644,18 @@ class TestRecipeAPI(object):
             }
 
         def test_locale_works(self, api_client):
+            locale1 = LocaleFactory()
+            locale2 = LocaleFactory(code="de")
             res = self.make_recipe(
-                api_client, filter_object=[{"type": "locale", "locales": ["en-US", "de"]}]
+                api_client,
+                filter_object=[{"type": "locale", "locales": [locale1.code, locale2.code]}],
             )
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
             assert recipe_data["filter_expression"] == (
-                '(normandy.locale in ["en-US","de"]) && (true)'
+                f'(normandy.locale in ["{locale1.code}","{locale2.code}"]) && (true)'
             )
 
         def test_locale_correct_fields(self, api_client):
@@ -605,15 +664,18 @@ class TestRecipeAPI(object):
             assert res.json() == {"filter_object": {"0": {"locales": ["This field is required."]}}}
 
         def test_country_works(self, api_client):
+            country1 = CountryFactory()
+            country2 = CountryFactory(code="DE")
             res = self.make_recipe(
-                api_client, filter_object=[{"type": "country", "countries": ["US", "DE"]}]
+                api_client,
+                filter_object=[{"type": "country", "countries": [country1.code, country2.code]}],
             )
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
             assert recipe_data["filter_expression"] == (
-                '(normandy.country in ["US","DE"]) && (true)'
+                f'(normandy.country in ["{country1.code}","{country2.code}"]) && (true)'
             )
 
         def test_country_correct_fields(self, api_client):
@@ -978,6 +1040,27 @@ class TestRecipeAPI(object):
             res = api_client.get("/api/v2/recipe/?ordering=-name")
             assert res.status_code == 200
             assert [r["id"] for r in res.data["results"]] == [r2.id, r1.id]
+
+        def test_order_by_action_name(self, api_client):
+            r1 = RecipeFactory(name="a")
+            r1.action.name = "Bee"
+            r1.action.save()
+            r2 = RecipeFactory(name="b")
+            r2.action.name = "Cee"
+            r2.action.save()
+            r3 = RecipeFactory(name="c")
+            r3.action.name = "Ahh"
+            r3.action.save()
+
+            res = api_client.get("/api/v2/recipe/?ordering=action")
+            assert res.status_code == 200
+            # Expected order is ['Ahh', 'Bee', 'Cee']
+            assert [r["id"] for r in res.data["results"]] == [r3.id, r1.id, r2.id]
+
+            res = api_client.get("/api/v2/recipe/?ordering=-action")
+            assert res.status_code == 200
+            # Expected order is ['Cee', 'Bee', 'Ahh']
+            assert [r["id"] for r in res.data["results"]] == [r2.id, r1.id, r3.id]
 
         def test_order_bogus(self, api_client):
             """Test that filtering by an unknown key doesn't change the sort order"""
@@ -1409,11 +1492,16 @@ class TestFilterObjects(object):
         assert res.json() == {"filter_object": {"0": {"type": ["This field is required."]}}}
 
     def test_channel_works(self, api_client):
+        channel1 = ChannelFactory(slug="beta")
+        channel2 = ChannelFactory(slug="release")
         res = self.make_recipe(
-            api_client, filter_object=[{"type": "channel", "channels": ["release", "beta"]}]
+            api_client,
+            filter_object=[{"type": "channel", "channels": [channel1.slug, channel2.slug]}],
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == ('normandy.channel in ["release","beta"]')
+        assert res.json()["filter_expression"] == (
+            f'normandy.channel in ["{channel1.slug}","{channel2.slug}"]'
+        )
 
     def test_channel_correct_fields(self, api_client):
         res = self.make_recipe(api_client, filter_object=[{"type": "channel"}])
@@ -1421,11 +1509,15 @@ class TestFilterObjects(object):
         assert res.json() == {"filter_object": {"0": {"channels": ["This field is required."]}}}
 
     def test_locale_works(self, api_client):
+        locale1 = LocaleFactory()
+        locale2 = LocaleFactory(code="de")
         res = self.make_recipe(
-            api_client, filter_object=[{"type": "locale", "locales": ["en-US", "de"]}]
+            api_client, filter_object=[{"type": "locale", "locales": [locale1.code, locale2.code]}]
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == ('normandy.locale in ["en-US","de"]')
+        assert res.json()["filter_expression"] == (
+            f'normandy.locale in ["{locale1.code}","{locale2.code}"]'
+        )
 
     def test_locale_correct_fields(self, api_client):
         res = self.make_recipe(api_client, filter_object=[{"type": "locale"}])
@@ -1433,11 +1525,16 @@ class TestFilterObjects(object):
         assert res.json() == {"filter_object": {"0": {"locales": ["This field is required."]}}}
 
     def test_country_works(self, api_client):
+        country1 = CountryFactory()
+        country2 = CountryFactory(code="DE")
         res = self.make_recipe(
-            api_client, filter_object=[{"type": "country", "countries": ["US", "DE"]}]
+            api_client,
+            filter_object=[{"type": "country", "countries": [country1.code, country2.code]}],
         )
         assert res.status_code == 201, res.json()
-        assert res.json()["filter_expression"] == ('normandy.country in ["US","DE"]')
+        assert res.json()["filter_expression"] == (
+            f'normandy.country in ["{country1.code}","{country2.code}"]'
+        )
 
     def test_country_correct_fields(self, api_client):
         res = self.make_recipe(api_client, filter_object=[{"type": "country"}])

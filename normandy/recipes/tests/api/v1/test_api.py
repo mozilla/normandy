@@ -430,6 +430,13 @@ class TestClassifyClient(object):
         assert res.status_code == 200
         assert res.client.cookies == {}
 
+    def test_sets_cache_header_to_not_cache(self, api_client):
+        res = api_client.get("/api/v1/classify_client/")
+        assert res.status_code == 200
+        assert "no-cache" in res["Cache-Control"]
+        assert "no-store" in res["Cache-Control"]
+        assert "must-revalidate" in res["Cache-Control"]
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(

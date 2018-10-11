@@ -57,6 +57,7 @@ class RecipeOrderingFilter(AliasedOrderingFilter):
     aliases = {
         "last_updated": ("latest_revision__updated", "Last Updated"),
         "name": ("latest_revision__name", "Name"),
+        "action": ("latest_revision__action__name", "Action"),
     }
 
 
@@ -250,7 +251,6 @@ class Filters(views.APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        print("COUNTRIES", Country.objects.all())
         return Response(
             {
                 "status": [

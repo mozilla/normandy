@@ -360,10 +360,12 @@ class Base(Core, CORS, OIDC):
     # How many days before expiration to warn for expired certificates
     CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
 
-    # AWS settings
+    # Storage settings
+    DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.S3Boto3PermissiveStorage")
     AWS_ACCESS_KEY_ID = values.Value()
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
+    GCS_STORAGE_BUCKET_NAME = values.Value()
 
     GITHUB_URL = values.Value("https://github.com/mozilla/normandy")
 
