@@ -67,9 +67,9 @@ flake8==3.5.0 \
     --hash=sha256:c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37
 flake8-junit-report==2.1.0 \
     --hash=sha256:f8890c1ebe0acb516fefacddec4b802bca9f89bb07db933e4ee3cd11ceaa1e8b
-geoip2==2.8.0 \
-    --hash=sha256:762e5ea1400d40772249c0778328b6fc82b82503092ceb48c00a7500d7ce4a64 \
-    --hash=sha256:7e119472ca841fb39293272403476c7012fa7127541b2780a9e432a5ebbb4a89
+geoip2==2.9.0 \
+    --hash=sha256:a37ddac2d200ffb97c736da8b8ba9d5d8dc47da6ec0f162a461b681ecac53a14 \
+    --hash=sha256:f7ffe9d258e71a42cf622ce6350d976de1d0312b9f2fbce3975c7d838b57ecf0
 gevent==1.3.6 \
     --hash=sha256:a9a0a61f8dc652b3dd5dc8b9f5f9ace5d2f91f5e81f368e9ef180c8eec968234 \
     --hash=sha256:e9e2942704f7fe75064ef0bc17ba46b097a57ec0e70eca1d790d5a3edb691628 \
