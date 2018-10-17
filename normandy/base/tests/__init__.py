@@ -29,9 +29,13 @@ class Whatever(object):
     @classmethod
     def iso8601(cls):
         def is_iso8601_date(s):
-            # Will throw is it does not match
-            datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%fZ")
-            return True
+            if not isinstance(s, str):
+                return False
+            try:
+                datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%fZ")
+                return True
+            except ValueError:
+                return False
 
         return cls(is_iso8601_date, name="datetime")
 

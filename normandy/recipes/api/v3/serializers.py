@@ -52,7 +52,7 @@ class EnabledStateSerializer(CustomizableSerializerMixin, serializers.ModelSeria
 
     class Meta:
         model = EnabledState
-        fields = ["revision_id", "created", "creator", "enabled", "carryover_from"]
+        fields = ["id", "revision_id", "created", "creator", "enabled", "carryover_from"]
 
 
 class RecipeRevisionSerializer(serializers.ModelSerializer):
