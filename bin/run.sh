@@ -38,6 +38,7 @@ case $1 in
     set -e
     ;;
   migrations-check)
+    ./manage.py migrate
     echo "Checking that all migrations have been made"
     ./manage.py makemigrations --check --no-input --dry-run || (
       echo "You probably have migrations that need to be created" && exit 1
