@@ -50,6 +50,9 @@ case $1 in
   first-start)
     echo "Starting the gunicorn server the first time"
     ./manage.py migrate
+    ./manage.py makemigrations --check --no-input --dry-run || (
+      echo "You probably have migrations that need to be created" && exit 1
+    )
     ./manage.py update_actions
     start_gunicorn
     ;;

@@ -13,7 +13,7 @@ jobs:
     working_directory: ~/normandy
 
     environment:
-        COMPOSE_FILE: ci/docker-compose.yml
+      COMPOSE_FILE: ci/docker-compose.yml
 
     steps:
       - checkout
