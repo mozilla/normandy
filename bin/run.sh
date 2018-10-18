@@ -2,7 +2,7 @@
 set -eo pipefail
 
 usage() {
-  echo "usage: ./bin/run.sh python-tests|js-tests|lint|start"
+  echo "usage: ./bin/run.sh python-tests|js-tests|lint|start|migrations-check"
   exit 1
 }
 
@@ -37,6 +37,12 @@ case $1 in
     fi
     set -e
     ;;
+  migrations-check)
+    echo "Checking that all migrations have been made"
+    ./manage.py makemigrations --check --no-input --dry-run || (
+      echo "You probably have migrations that need to be created" && exit 1
+    )
+    ;;
   python-tests)
     echo "Running Python tests"
     junit_path=$ARTIFACTS_PATH/test_results/python_tests
@@ -50,9 +56,6 @@ case $1 in
   first-start)
     echo "Starting the gunicorn server the first time"
     ./manage.py migrate
-    ./manage.py makemigrations --check --no-input --dry-run || (
-      echo "You probably have migrations that need to be created" && exit 1
-    )
     ./manage.py update_actions
     start_gunicorn
     ;;

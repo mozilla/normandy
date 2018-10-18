@@ -58,6 +58,10 @@ jobs:
           command: docker-compose run web python-tests
 
       - run:
+          name: Missing migrations
+          command: docker-compose run web migrations-check
+
+      - run:
           name: Contract tests
           command: |
             docker-compose up -d web
