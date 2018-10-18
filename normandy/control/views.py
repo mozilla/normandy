@@ -14,7 +14,7 @@ def index(request):
     hostname = request.get_host()
 
     delivery_console_url = delivery_console_urls["prod"]
-    match = re.search("normandy\.(\w+)\.mozaws", hostname, re.I)
+    match = re.search(r"normandy\.(\w+)\.mozaws", hostname, re.I)
     if match:
         env = match.group(1)
         if env in delivery_console_urls:
