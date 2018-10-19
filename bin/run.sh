@@ -2,7 +2,7 @@
 set -eo pipefail
 
 usage() {
-  echo "usage: ./bin/run.sh python-tests|js-tests|lint|start"
+  echo "usage: ./bin/run.sh python-tests|js-tests|lint|start|migrations-check"
   exit 1
 }
 
@@ -36,6 +36,13 @@ case $1 in
         exit 1
     fi
     set -e
+    ;;
+  migrations-check)
+    ./manage.py migrate
+    echo "Checking that all migrations have been made"
+    ./manage.py makemigrations --check --no-input --dry-run || (
+      echo "You probably have migrations that need to be created" && exit 1
+    )
     ;;
   python-tests)
     echo "Running Python tests"
