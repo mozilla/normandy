@@ -1,4 +1,5 @@
 import hashlib
+import json
 
 from django.utils import timezone
 
@@ -23,6 +24,7 @@ from normandy.recipes.models import (
 class ChannelFactory(factory.DjangoModelFactory):
     class Meta:
         model = Channel
+        django_get_or_create = ("slug",)
 
     slug = "beta"
     name = "Beta"
@@ -31,6 +33,7 @@ class ChannelFactory(factory.DjangoModelFactory):
 class CountryFactory(factory.DjangoModelFactory):
     class Meta:
         model = Country
+        django_get_or_create = ("code",)
 
     code = "SE"
     name = "Sweden"
@@ -39,6 +42,7 @@ class CountryFactory(factory.DjangoModelFactory):
 class LocaleFactory(factory.DjangoModelFactory):
     class Meta:
         model = Locale
+        django_get_or_create = ("code",)
 
     code = "sv"
     name = "Swedish"
@@ -156,6 +160,74 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
     recipe = factory.SubFactory(RecipeFactory)
     identicon_seed = FuzzyIdenticonSeed()
     comment = FuzzyUnicode()
+    extra_filter_expression = factory.fuzzy.FuzzyChoice(["true", "false"])
+
+    @factory.lazy_attribute
+    def filter_object_json(self):
+        filters = [
+            ChannelFilterFactory(),
+            LocaleFilterFactory(),
+            CountryFilterFactory(),
+            StableSampleFilterFactory(),
+            BucketSampleFilterFactory(),
+        ]
+        return json.dumps(filters)
+
+
+class DictFactory(factory.Factory):
+    class Meta:
+        model = dict
+
+
+class ChannelFilterFactory(DictFactory):
+    class Params:
+        channel_objects = factory.LazyAttribute(lambda o: [ChannelFactory()])
+
+    type = "channel"
+    channels = factory.LazyAttribute(lambda o: [channel.slug for channel in o.channel_objects])
+
+
+class LocaleFilterFactory(DictFactory):
+    class Params:
+        locale_objects = factory.LazyAttribute(lambda o: [LocaleFactory()])
+
+    type = "locale"
+    locales = factory.LazyAttribute(lambda o: [locale.code for locale in o.locale_objects])
+
+
+class CountryFilterFactory(DictFactory):
+    class Params:
+        country_objects = factory.LazyAttribute(lambda o: [CountryFactory()])
+
+    type = "country"
+    countries = factory.LazyAttribute(lambda o: [country.code for country in o.country_objects])
+
+
+class FuzzySampleInputs(factory.fuzzy.FuzzyChoice):
+    def __init__(self, **kwargs):
+        super().__init__(
+            [
+                ["normandy.userId"],
+                ["normandy.userId", "42"],
+                ["normandy.userId", '"some study"'],
+                ["normandy.userId", "normandy.recipe.id"],
+                ["normandy.recipe.id", "normandy.userId"],
+            ]
+        )
+
+
+class StableSampleFilterFactory(DictFactory):
+    type = "stableSample"
+    input = FuzzySampleInputs()
+    rate = factory.fuzzy.FuzzyFloat(0.0, 1.0)
+
+
+class BucketSampleFilterFactory(DictFactory):
+    type = "bucketSample"
+    input = FuzzySampleInputs()
+    total = factory.fuzzy.FuzzyInteger(100, 10000)
+    start = factory.LazyAttribute(lambda o: factory.fuzzy.FuzzyInteger(0, o.total).fuzz())
+    count = factory.LazyAttribute(lambda o: factory.fuzzy.FuzzyInteger(0, o.total).fuzz())
 
 
 class ApprovalRequestFactory(factory.DjangoModelFactory):

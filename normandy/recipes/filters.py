@@ -63,7 +63,7 @@ class ChannelFilter(BaseFilter):
         return value
 
     def to_jexl(self):
-        channels = ",".join(f'"{c}"' for c in self.data["channels"])
+        channels = ",".join(f'"{c}"' for c in self.initial_data["channels"])
         return f"normandy.channel in [{channels}]"
 
 
@@ -95,7 +95,7 @@ class LocaleFilter(BaseFilter):
         return value
 
     def to_jexl(self):
-        locales = ",".join(f'"{l}"' for l in self.data["locales"])
+        locales = ",".join(f'"{l}"' for l in self.initial_data["locales"])
         return f"normandy.locale in [{locales}]"
 
 
@@ -126,7 +126,7 @@ class CountryFilter(BaseFilter):
         return value
 
     def to_jexl(self):
-        countries = ",".join(f'"{c}"' for c in self.data["countries"])
+        countries = ",".join(f'"{c}"' for c in self.initial_data["countries"])
         return f"normandy.country in [{countries}]"
 
 
@@ -187,10 +187,10 @@ class BucketSampleFilter(BaseFilter):
     input = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        inputs = ",".join(f"{i}" for i in self.data["input"])
-        start = self.data["start"]
-        count = self.data["count"]
-        total = self.data["total"]
+        inputs = ",".join(f"{i}" for i in self.initial_data["input"])
+        start = self.initial_data["start"]
+        count = self.initial_data["count"]
+        total = self.initial_data["total"]
         return f"[{inputs}]|bucketSample({start},{count},{total})"
 
 
@@ -230,8 +230,8 @@ class StableSampleFilter(BaseFilter):
     input = serializers.ListField(child=serializers.CharField(), min_length=1)
 
     def to_jexl(self):
-        inputs = ",".join(f"{i}" for i in self.data["input"])
-        rate = self.data["rate"]
+        inputs = ",".join(f"{i}" for i in self.initial_data["input"])
+        rate = self.initial_data["rate"]
         return f"[{inputs}]|stableSample({rate})"
 
 
@@ -268,7 +268,8 @@ class VersionFilter(BaseFilter):
         #   (normandy.version >= 57 && normandy.version < 58)
 
         return "||".join(
-            f'(normandy.version>="{v}"&&normandy.version<"{v + 1}")' for v in self.data["versions"]
+            f'(normandy.version>="{v}"&&normandy.version<"{v + 1}")'
+            for v in self.initial_data["versions"]
         )
 
 

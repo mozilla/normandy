@@ -268,10 +268,10 @@ class TestRecipe(object):
         assert recipe.revision_id == revision_id
 
     def test_filter_expression(self):
-        r = RecipeFactory()
+        r = RecipeFactory(extra_filter_expression="", filter_object_json=None)
         assert r.filter_expression == ""
 
-        r = RecipeFactory(extra_filter_expression="2 + 2 == 4")
+        r = RecipeFactory(extra_filter_expression="2 + 2 == 4", filter_object_json=None)
         assert r.filter_expression == "2 + 2 == 4"
 
     def test_canonical_json(self):
@@ -280,6 +280,7 @@ class TestRecipe(object):
             arguments_json='{"foo": 1, "bar": 2}',
             extra_filter_expression="2 + 2 == 4",
             name="canonical",
+            filter_object_json=None,
         )
         # Yes, this is really ugly, but we really do need to compare an exact
         # byte sequence, since this is used for hashing and signing
@@ -403,6 +404,7 @@ class TestRecipe(object):
             action=a1,
             arguments={"message": "something"},
             extra_filter_expression="something !== undefined",
+            filter_object_json=None,
         )
         a2 = ActionFactory()
         recipe.revise(name="changed", action=a2)
