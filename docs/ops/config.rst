@@ -343,7 +343,7 @@ in other Django projects.
    ``DJANGO_AWS_SECRET_ACCESS_KEY`` may also be needed.
 
    When using GCP, it is required to also set
-   ``DJANGO_GCS_STORAGE_BUCKET_NAME``.
+   ``DJANGO_GS_BUCKET_NAME``.
 
 .. envvar:: DJANGO_AWS_ACCESS_KEY_ID
 
@@ -362,7 +362,7 @@ in other Django projects.
 
    The name of the S3 bucket to be used to store media files.
 
-.. envvar:: DJANGO_GCP_STORAGE_BUCKET_NAME
+.. envvar:: DJANGO_GS_BUCKET_NAME
 
    The name of the Google storage bucket to be used to store media files.
 
