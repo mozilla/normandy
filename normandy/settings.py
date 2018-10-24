@@ -365,7 +365,7 @@ class Base(Core, CORS, OIDC):
     AWS_ACCESS_KEY_ID = values.Value()
     AWS_SECRET_ACCESS_KEY = values.Value()
     AWS_STORAGE_BUCKET_NAME = values.Value()
-    GCS_STORAGE_BUCKET_NAME = values.Value()
+    GS_BUCKET_NAME = values.Value()
 
     GITHUB_URL = values.Value("https://github.com/mozilla/normandy")
 
