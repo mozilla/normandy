@@ -372,7 +372,6 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
         for obj in self.filter_object:
             filter = filters.from_data(obj)
-            assert filter.is_valid(), [obj, filter.errors]
             parts.append(filter.to_jexl())
 
         if self.extra_filter_expression:

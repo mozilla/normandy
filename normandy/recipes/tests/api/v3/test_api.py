@@ -464,7 +464,9 @@ class TestRecipeAPI(object):
     @pytest.mark.django_db
     class TestUpdates(object):
         def test_it_can_edit_recipes(self, api_client):
-            recipe = RecipeFactory(name="unchanged", extra_filter_expression="true")
+            recipe = RecipeFactory(
+                name="unchanged", extra_filter_expression="true", filter_object_json=None
+            )
             old_revision_id = recipe.revision_id
 
             res = api_client.patch(
@@ -769,7 +771,7 @@ class TestRecipeAPI(object):
 
             Recipe.objects.get(id=recipe_data["id"])
             assert recipe_data["latest_revision"]["filter_expression"] == (
-                "([normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)) && (true)"
+                "([normandy.userId,normandy.recipeId]|bucketSample(1,2,3)) && (true)"
             )
 
         def test_bucket_sample_correct_fields(self, api_client):
@@ -1627,7 +1629,7 @@ class TestFilterObjects(object):
         )
         assert res.status_code == 201, res.json()
         assert res.json()["latest_revision"]["filter_expression"] == (
-            "[normandy.userId,normandy.recipeId]|bucketSample(1.0,2.0,3.0)"
+            "[normandy.userId,normandy.recipeId]|bucketSample(1,2,3)"
         )
 
     def test_bucket_sample_correct_fields(self, api_client):

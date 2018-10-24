@@ -18,7 +18,7 @@ from normandy.recipes.api.v2.serializers import (
 @pytest.mark.django_db()
 class TestRecipeSerializer:
     def test_it_works(self, rf):
-        recipe = RecipeFactory(arguments={"foo": "bar"})
+        recipe = RecipeFactory(arguments={"foo": "bar"}, filter_object_json=None)
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
         action = recipe.action
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
