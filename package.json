@@ -41,7 +41,7 @@
     "eslint-plugin-jasmine": "2.10.1",
     "eslint-plugin-jsx-a11y": "6.1.2",
     "eslint-plugin-react": "7.11.1",
-    "jasmine-core": "3.2.1",
+    "jasmine-core": "3.3.0",
     "jasmine-promises": "0.4.1",
     "karma": "3.0.0",
     "karma-firefox-launcher": "1.1.0",
