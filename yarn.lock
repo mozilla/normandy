@@ -891,10 +891,10 @@ babel-minify-webpack-plugin@0.3.1:
     babel-preset-minify "^0.3.0"
     webpack-sources "^1.0.1"
 
-babel-plugin-import@1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-import/-/babel-plugin-import-1.9.1.tgz#ceb3b37e4920cec094a075fee674fb3dddafc9c8"
-  integrity sha512-1IRnjAhCC9SxD9y9iqOfMf4U7b88mWZJHWfA2DSKq0FjYM63tYzWrTp81X6yZuCV7iDVSH9jMqxfwBxLJRXV7Q==
+babel-plugin-import@1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-import/-/babel-plugin-import-1.11.0.tgz#78ac908e6b225206babb734e19eae5f78d6d1035"
+  integrity sha512-de9dWdU1YjmWRPYurlHRKD2hTd24z0bIQ0/JgyXqLMXML+TsvEkVhtqzOsNtu9MmCuvwBiTTTjZBbZXA1Xu7TQ==
   dependencies:
     "@babel/helper-module-imports" "^7.0.0"
     "@babel/runtime" "^7.0.0"
@@ -2461,10 +2461,10 @@ eslint-visitor-keys@^1.0.0:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
   integrity sha512-qzm/XxIbxm/FHyH341ZrbnMUpe+5Bocte9xkmFMzPMjRaZMcXww+MpBptFvtU+79L362nqiLhekCxCxDPaUMBQ==
 
-eslint@5.7.0:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.7.0.tgz#55c326d6fb2ad45fcbd0ce17c3846f025d1d819c"
-  integrity sha512-zYCeFQahsxffGl87U2aJ7DPyH8CbWgxBC213Y8+TCanhUTf2gEvfq3EKpHmEcozTLyPmGe9LZdMAwC/CpJBM5A==
+eslint@5.8.0:
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-5.8.0.tgz#91fbf24f6e0471e8fdf681a4d9dd1b2c9f28309b"
+  integrity sha512-Zok6Bru3y2JprqTNm14mgQ15YQu/SMDkWdnmHfFg770DIUlmMFd/gqqzCHekxzjHZJxXv3tmTpH0C1icaYJsRQ==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     ajv "^6.5.3"
@@ -3447,10 +3447,10 @@ isobject@^3.0.0, isobject@^3.0.1:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
-jasmine-core@3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.2.1.tgz#8e4ff5b861603ee83343f2b49eee6a0ffe9650ce"
-  integrity sha512-pa9tbBWgU0EE4SWgc85T4sa886ufuQdsgruQANhECYjwqgV4z7Vw/499aCaP8ZH79JDS4vhm8doDG9HO4+e4sA==
+jasmine-core@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.3.0.tgz#dea1cdc634bc93c7e0d4ad27185df30fa971b10e"
+  integrity sha512-3/xSmG/d35hf80BEN66Y6g9Ca5l/Isdeg/j6zvbTYlTzeKinzmaTM4p9am5kYqOmE05D7s1t8FGjzdSnbUbceA==
 
 jasmine-promises@0.4.1:
   version "0.4.1"
