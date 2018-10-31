@@ -20,7 +20,7 @@ class LoggingAuthBackendMixin(object):
     """
 
     def get_username(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplementedError
 
     def authenticate(self, request, **kwargs):
         result = super().authenticate(request, **kwargs)

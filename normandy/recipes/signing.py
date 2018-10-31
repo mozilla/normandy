@@ -108,7 +108,7 @@ def verify_signature(data, signature, pubkey):
             raise WrongPublicKeySize()
         else:
             raise
-    except IndexError as e:
+    except IndexError:
         raise WrongPublicKeySize()
 
     try:
