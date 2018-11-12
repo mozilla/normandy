@@ -20,6 +20,7 @@ from normandy.recipes import filters
 from normandy.recipes.decorators import approved_revision_property, current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
+from normandy.recipes.exports import RemoteSettings
 from normandy.recipes.validators import validate_json
 from normandy.recipes.fields import IdenticonSeedField
 
@@ -453,11 +454,26 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         if self.enabled:
             raise EnabledState.NotActionable("This revision is already enabled.")
 
+        # enable() is also called from ApprovalRequest.approve()
+        if settings.REMOTE_SETTINGS_ENABLED:
+            try:
+                rs = RemoteSettings()
+                rs.publish(self)
+            except ImproperlyConfigured:
+                pass
+
         self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
     def disable(self, user):
         if not self.enabled:
             raise EnabledState.NotActionable("This revision is already disabled.")
+
+        if settings.REMOTE_SETTINGS_ENABLED:
+            try:
+                rs = RemoteSettings()
+                rs.unpublish(self)
+            except ImproperlyConfigured:
+                pass
 
         self._create_new_enabled_state(creator=user, enabled=False)
 
