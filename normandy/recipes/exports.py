@@ -8,20 +8,6 @@ from django.core.exceptions import ImproperlyConfigured
 logger = logging.getLogger(__name__)
 
 
-def check_config():
-    """
-    RemoteSettings config is not mandatory if not enabled.
-    """
-    if not settings.REMOTE_SETTINGS_ENABLED:
-        return
-
-    required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
-    for key in required_keys:
-        if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
-            msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
-            raise ImproperlyConfigured(msg)
-
-
 def recipe_as_record(recipe):
     """
     Transform a recipe to a dict with the minimum amount of fields needed for clients
@@ -65,6 +51,52 @@ class RemoteSettings:
             collection=self.collection_id,
             retry=int(settings.REMOTE_SETTINGS_RETRY_REQUESTS),
         )
+
+    def check_config(self):
+        """
+        Verify that integration with Remote Settings is configured properly.
+        """
+        if not settings.REMOTE_SETTINGS_ENABLED:
+            return
+
+        required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
+        for key in required_keys:
+            if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
+                msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
+                raise ImproperlyConfigured(msg)
+
+        # Test authentication.
+        server_info = self.client.server_info()
+        is_authenticated = (
+            "user" in server_info
+            and settings.REMOTE_SETTINGS_USERNAME in server_info["user"]["id"]
+        )
+        if not is_authenticated:
+            raise ImproperlyConfigured("Invalid Remote Settings credentials")
+
+        # Test that collection is writable.
+        metadata = self.client.get_collection()
+        if server_info["user"]["id"] not in metadata["permissions"].get("write", []):
+            raise ImproperlyConfigured(
+                f"Remote Settings collection {self.collection_id} is not writable."
+            )
+
+        # Test that signoff was disabled for this collection.
+        signer_capabilities = server_info["capabilities"]["signer"]
+        specific_config = [
+            r
+            for r in signer_capabilities["resources"]
+            if r["source"].get("collection") == self.collection_id
+            and r["source"].get("bucket") == settings.REMOTE_SETTINGS_BUCKET_ID
+        ]
+        if (
+            len(specific_config) == 0
+            or specific_config[0].get("to_review_enabled", True)
+            or specific_config[0].get("group_check_enabled", True)
+        ):
+            raise ImproperlyConfigured(
+                f"Review was not disabled for {self.collection_id} on Remote Settings server"
+            )
 
     def publish(self, recipe):
         """

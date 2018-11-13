@@ -35,12 +35,11 @@ class TestRemoteSettings:
 
     def test_it_checks_settings(self, settings):
         """Test that each required key is required individually"""
-        default_collection_id = settings.REMOTE_SETTINGS_COLLECTION_ID
 
         # Leave out URL with Remote Settings disabled (default)
         settings.REMOTE_SETTINGS_URL = None
         # assert doesn't raise
-        exports.check_config()
+        exports.RemoteSettings().check_config()
 
         # Enable the feature.
         settings.REMOTE_SETTINGS_ENABLED = True
@@ -49,13 +48,13 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
         with pytest.raises(ImproperlyConfigured) as exc:
-            exports.check_config()
+            exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_URL" in str(exc)
 
         # Set empty URL
         settings.REMOTE_SETTINGS_URL = ""
         with pytest.raises(ImproperlyConfigured) as exc:
-            exports.check_config()
+            exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_URL" in str(exc)
 
         # Leave out USERNAME
@@ -63,7 +62,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_USERNAME = None
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
         with pytest.raises(ImproperlyConfigured) as exc:
-            exports.check_config()
+            exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_USERNAME" in str(exc)
 
         # Leave out PASSWORD
@@ -71,7 +70,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = None
         with pytest.raises(ImproperlyConfigured) as exc:
-            exports.check_config()
+            exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_PASSWORD" in str(exc)
 
         # Leave out COLLECTION_ID
@@ -80,16 +79,83 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
         settings.REMOTE_SETTINGS_COLLECTION_ID = None
         with pytest.raises(ImproperlyConfigured) as exc:
-            exports.check_config()
+            exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_COLLECTION_ID" in str(exc)
 
-        # Include everything
+    def test_check_connection(self, settings, requestsmock):
+        settings.REMOTE_SETTINGS_ENABLED = True
         settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
-        settings.REMOTE_SETTINGS_COLLECTION_ID = default_collection_id
-        # assert doesn't raise
-        exports.check_config()
+
+        # Root URL should return currently authenticated user.
+        requestsmock.get(f"{settings.REMOTE_SETTINGS_URL}/", json={})
+
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings().check_config()
+        assert "Invalid Remote Settings credentials" in str(exc)
+
+        requestsmock.get(
+            f"{settings.REMOTE_SETTINGS_URL}/",
+            json={"user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"}},
+        )
+
+        # Collection should be writable.
+        collection_url = (
+            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+        )
+        requestsmock.get(collection_url, json={"data": {}, "permissions": {}})
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings().check_config()
+        assert (
+            f"Remote Settings collection {settings.REMOTE_SETTINGS_COLLECTION_ID} is not writable"
+            in str(exc)
+        )
+
+        requestsmock.get(
+            collection_url,
+            json={
+                "data": {},
+                "permissions": {"write": [f"account:{settings.REMOTE_SETTINGS_USERNAME}"]},
+            },
+        )
+
+        # Review must be disabled on server for this collection.
+        requestsmock.get(
+            f"{settings.REMOTE_SETTINGS_URL}/",
+            json={
+                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
+                "capabilities": {"signer": {"resources": [{"source": {"bucket": "test"}}]}},
+            },
+        )
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings().check_config()
+        assert f"Review was not disabled for {settings.REMOTE_SETTINGS_COLLECTION_ID}" in str(exc)
+
+        requestsmock.get(
+            f"{settings.REMOTE_SETTINGS_URL}/",
+            json={
+                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
+                "capabilities": {
+                    "signer": {
+                        "resources": [
+                            {
+                                "source": {
+                                    "bucket": settings.REMOTE_SETTINGS_BUCKET_ID,
+                                    "collection": settings.REMOTE_SETTINGS_COLLECTION_ID,
+                                },
+                                "to_review_enabled": False,
+                                "group_check_enabled": False,
+                            }
+                        ]
+                    }
+                },
+            },
+        )
+
+        # Assert does not raise.
+        exports.RemoteSettings().check_config()
 
     def test_publish_puts_record_and_approves(self, settings, requestsmock, mock_logger):
         """Test that requests are sent to Remote Settings on publish."""
