@@ -37,6 +37,11 @@ def mocked_autograph(mocker):
     return mocked
 
 
+@pytest.fixture
+def mocked_remotesettings(mocker):
+    return mocker.patch("normandy.recipes.models.RemoteSettings")
+
+
 @pytest.fixture()
 def migrations(transactional_db):
     """

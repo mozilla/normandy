@@ -579,6 +579,57 @@ class TestRecipeRevision(object):
         with pytest.raises(EnabledState.NotActionable):
             recipe.latest_revision.disable(user=UserFactory())
 
+    def test_it_publishes_when_enabled(self, settings, mock_logger, mocked_remotesettings):
+        settings.REMOTE_SETTINGS_ENABLED = True
+        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
+        settings.REMOTE_SETTINGS_USERNAME = "normandy"
+        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
+
+        recipe = RecipeFactory(name="Test")
+
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+        recipe.approved_revision.enable(user=UserFactory())
+
+        mocked_remotesettings.return_value.publish.assert_called_with(recipe)
+
+        # Publishes once when disabled twice.
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.approved_revision.enable(user=UserFactory())
+
+        assert mocked_remotesettings.return_value.publish.call_count == 1
+
+    def test_it_does_not_publish_when_approved(self, settings, mocked_remotesettings):
+        settings.REMOTE_SETTINGS_ENABLED = True
+        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
+        settings.REMOTE_SETTINGS_USERNAME = "normandy"
+        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
+
+        recipe = RecipeFactory(name="Test")
+
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+
+        assert not mocked_remotesettings.return_value.publish.called
+
+    def test_it_unpublishes_when_disabled(self, settings, mock_logger, mocked_remotesettings):
+        settings.REMOTE_SETTINGS_ENABLED = True
+        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
+        settings.REMOTE_SETTINGS_USERNAME = "normandy"
+        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
+
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+
+        recipe.approved_revision.disable(user=UserFactory())
+
+        mocked_remotesettings.return_value.unpublish.assert_called_with(recipe)
+
+        # Unpublishes once when disabled twice.
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.approved_revision.disable(user=UserFactory())
+
+        assert mocked_remotesettings.return_value.publish.call_count == 1
+
 
 @pytest.mark.django_db
 class TestApprovalRequest(object):

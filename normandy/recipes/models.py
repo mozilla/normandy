@@ -456,11 +456,8 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
         # enable() is also called from ApprovalRequest.approve()
         if settings.REMOTE_SETTINGS_ENABLED:
-            try:
-                rs = RemoteSettings()
-                rs.publish(self)
-            except ImproperlyConfigured:
-                pass
+            rs = RemoteSettings()
+            rs.publish(self.recipe)
 
         self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
@@ -469,11 +466,8 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             raise EnabledState.NotActionable("This revision is already disabled.")
 
         if settings.REMOTE_SETTINGS_ENABLED:
-            try:
-                rs = RemoteSettings()
-                rs.unpublish(self)
-            except ImproperlyConfigured:
-                pass
+            rs = RemoteSettings()
+            rs.unpublish(self.recipe)
 
         self._create_new_enabled_state(creator=user, enabled=False)
 
