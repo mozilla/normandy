@@ -8,6 +8,20 @@ from django.core.exceptions import ImproperlyConfigured
 logger = logging.getLogger(__name__)
 
 
+def check_config():
+    """
+    RemoteSettings config is not mandatory if not enabled.
+    """
+    if not settings.REMOTE_SETTINGS_ENABLED:
+        return
+
+    required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
+    for key in required_keys:
+        if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
+            msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
+            raise ImproperlyConfigured(msg)
+
+
 def recipe_as_record(recipe):
     """
     Transform a recipe to a dict with the minimum amount of fields needed for clients
@@ -40,7 +54,6 @@ class RemoteSettings:
     """
 
     def __init__(self):
-        self.check_config()
         self.collection_id = str(settings.REMOTE_SETTINGS_COLLECTION_ID)
 
         # Kinto is the underlying implementation of Remote Settings. The client
@@ -52,17 +65,6 @@ class RemoteSettings:
             collection=self.collection_id,
             retry=int(settings.REMOTE_SETTINGS_RETRY_REQUESTS),
         )
-
-    def check_config(self):
-        # RemoteSettings config is not mandatory if not enabled.
-        if not settings.REMOTE_SETTINGS_ENABLED:
-            return
-
-        required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
-        for key in required_keys:
-            if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
-                msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
-                raise ImproperlyConfigured(msg)
 
     def publish(self, recipe):
         """
