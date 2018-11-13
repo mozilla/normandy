@@ -454,22 +454,21 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         if self.enabled:
             raise EnabledState.NotActionable("This revision is already enabled.")
 
-        # enable() is also called from ApprovalRequest.approve()
+        self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
+
         if settings.REMOTE_SETTINGS_ENABLED:
             rs = RemoteSettings()
             rs.publish(self.recipe)
-
-        self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
     def disable(self, user):
         if not self.enabled:
             raise EnabledState.NotActionable("This revision is already disabled.")
 
+        self._create_new_enabled_state(creator=user, enabled=False)
+
         if settings.REMOTE_SETTINGS_ENABLED:
             rs = RemoteSettings()
             rs.unpublish(self.recipe)
-
-        self._create_new_enabled_state(creator=user, enabled=False)
 
 
 class EnabledState(models.Model):

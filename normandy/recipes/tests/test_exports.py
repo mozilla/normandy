@@ -35,10 +35,13 @@ class TestRemoteSettings(object):
         """Test default settings values."""
 
         assert not settings.REMOTE_SETTINGS_ENABLED
+        assert settings.REMOTE_SETTINGS_BUCKET_ID == "main-workspace"
         assert settings.REMOTE_SETTINGS_COLLECTION_ID == "normandy-recipes"
+        assert settings.REMOTE_SETTINGS_RETRY_REQUESTS == 3
 
     def test_it_checks_settings(self, settings):
         """Test that each required key is required individually"""
+        default_collection_id = settings.REMOTE_SETTINGS_COLLECTION_ID
 
         # Leave out URL with Remote Settings disabled (default)
         settings.REMOTE_SETTINGS_URL = None
@@ -85,7 +88,7 @@ class TestRemoteSettings(object):
         settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
-        settings.REMOTE_SETTINGS_COLLECTION_ID = "normandy-recipes"
+        settings.REMOTE_SETTINGS_COLLECTION_ID = default_collection_id
         # assert doesn't raise
         exports.RemoteSettings()
 
@@ -96,7 +99,7 @@ class TestRemoteSettings(object):
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
-        mock_kinto_request.return_value = mock.MagicMock(status_code=200)
+        mock_kinto_request.return_value = mock.MagicMock(status_code=200, headers={})
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
 
         remotesettings = exports.RemoteSettings()
@@ -104,8 +107,11 @@ class TestRemoteSettings(object):
 
         auth = (settings.REMOTE_SETTINGS_USERNAME, settings.REMOTE_SETTINGS_PASSWORD)
         headers = {"User-Agent": KINTO_USER_AGENT, "Content-Type": "application/json"}
-        url = settings.REMOTE_SETTINGS_URL + "/buckets/main-workspace/collections/normandy-recipes"
-        record_url = url + "/records/" + str(recipe.id)
+        url = (
+            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+        )
+        record_url = f"{url}/records/{recipe.id}"
 
         # Assert the correct request was made
         payload = json.dumps({"data": exports.recipe_as_record(recipe)})
@@ -130,7 +136,7 @@ class TestRemoteSettings(object):
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
-        mock_kinto_request.return_value = mock.MagicMock(status_code=200)
+        mock_kinto_request.return_value = mock.MagicMock(status_code=200, headers={})
         recipe = RecipeFactory(name="Test", approver=UserFactory())
 
         remotesettings = exports.RemoteSettings()
@@ -138,8 +144,11 @@ class TestRemoteSettings(object):
 
         auth = (settings.REMOTE_SETTINGS_USERNAME, settings.REMOTE_SETTINGS_PASSWORD)
         headers = {"User-Agent": KINTO_USER_AGENT, "Content-Type": "application/json"}
-        url = settings.REMOTE_SETTINGS_URL + "/buckets/main-workspace/collections/normandy-recipes"
-        record_url = url + "/records/" + str(recipe.id)
+        url = (
+            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+        )
+        record_url = f"{url}/records/{recipe.id}"
 
         assert mock_kinto_request.call_count == 2
         mock_kinto_request.assert_any_call(

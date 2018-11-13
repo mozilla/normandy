@@ -7,9 +7,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger(__name__)
 
-REMOTE_SETTINGS_BUCKET = "main-workspace"
-NB_RETRY_REQUESTS = 3
-
 
 def recipe_as_record(recipe):
     """
@@ -19,15 +16,17 @@ def recipe_as_record(recipe):
     :param recipe: a recipe ready to be exported.
     :returns: a dict to be posted on Remote Settings.
     """
-    from normandy.recipes.api.v1.serializers import MinimalRecipeSerializer
+    from normandy.recipes.api.v1.serializers import (
+        MinimalRecipeSerializer,
+    )  # avoid circular imports
 
     serializer = MinimalRecipeSerializer(recipe)
-    record = serializer.data.copy()
+    record = serializer.data
     record["id"] = str(recipe.id)
     return record
 
 
-class RemoteSettings(object):
+class RemoteSettings:
     """
     Interacts with a RemoteSettings service.
 
@@ -42,20 +41,17 @@ class RemoteSettings(object):
 
     def __init__(self):
         self.check_config()
-        self.cid = str(settings.REMOTE_SETTINGS_COLLECTION_ID)
+        self.collection_id = str(settings.REMOTE_SETTINGS_COLLECTION_ID)
 
-    @property
-    def client(self):
         # Kinto is the underlying implementation of Remote Settings. The client
         # is basically a tiny abstraction on top of the requests library.
-        client = kinto_http.Client(
+        self.client = kinto_http.Client(
             server_url=str(settings.REMOTE_SETTINGS_URL),
             auth=(str(settings.REMOTE_SETTINGS_USERNAME), str(settings.REMOTE_SETTINGS_PASSWORD)),
-            bucket=REMOTE_SETTINGS_BUCKET,
-            collection=self.cid,
-            retry=NB_RETRY_REQUESTS,
+            bucket=str(settings.REMOTE_SETTINGS_BUCKET_ID),
+            collection=self.collection_id,
+            retry=int(settings.REMOTE_SETTINGS_RETRY_REQUESTS),
         )
-        return client
 
     def check_config(self):
         # RemoteSettings config is not mandatory if not enabled.
@@ -64,7 +60,7 @@ class RemoteSettings(object):
 
         required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
         for key in required_keys:
-            if getattr(settings, "REMOTE_SETTINGS_" + key) is None:
+            if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
                 msg = "set settings.REMOTE_SETTINGS_{} to use Remote Settings integration".format(
                     key
                 )
@@ -76,7 +72,7 @@ class RemoteSettings(object):
         """
         record = recipe_as_record(recipe)
         self.client.update_record(data=record)
-        self.client.patch_collection(id=self.cid, data={"status": "to-sign"})
+        self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
         logger.info(f"Published record '{recipe.id}' for recipe {recipe}")
 
     def unpublish(self, recipe):
@@ -92,5 +88,5 @@ class RemoteSettings(object):
                 return
             raise
 
-        self.client.patch_collection(id=self.cid, data={"status": "to-sign"})
+        self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
         logger.info(f"Deleted record '{recipe.id}' of recipe {recipe}")
