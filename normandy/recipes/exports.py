@@ -81,23 +81,6 @@ class RemoteSettings:
                 f"Remote Settings collection {self.collection_id} is not writable."
             )
 
-        # Test that signoff was disabled for this collection.
-        signer_capabilities = server_info["capabilities"]["signer"]
-        specific_config = [
-            r
-            for r in signer_capabilities["resources"]
-            if r["source"].get("collection") == self.collection_id
-            and r["source"].get("bucket") == settings.REMOTE_SETTINGS_BUCKET_ID
-        ]
-        if (
-            len(specific_config) == 0
-            or specific_config[0].get("to_review_enabled", True)
-            or specific_config[0].get("group_check_enabled", True)
-        ):
-            raise ImproperlyConfigured(
-                f"Review was not disabled for {self.collection_id} on Remote Settings server"
-            )
-
     def publish(self, recipe):
         """
         Publish the specified `recipe` on the remote server by upserting a record.

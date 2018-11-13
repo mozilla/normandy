@@ -121,39 +121,6 @@ class TestRemoteSettings:
             },
         )
 
-        # Review must be disabled on server for this collection.
-        requestsmock.get(
-            f"{settings.REMOTE_SETTINGS_URL}/",
-            json={
-                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
-                "capabilities": {"signer": {"resources": [{"source": {"bucket": "test"}}]}},
-            },
-        )
-        with pytest.raises(ImproperlyConfigured) as exc:
-            exports.RemoteSettings().check_config()
-        assert f"Review was not disabled for {settings.REMOTE_SETTINGS_COLLECTION_ID}" in str(exc)
-
-        requestsmock.get(
-            f"{settings.REMOTE_SETTINGS_URL}/",
-            json={
-                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
-                "capabilities": {
-                    "signer": {
-                        "resources": [
-                            {
-                                "source": {
-                                    "bucket": settings.REMOTE_SETTINGS_BUCKET_ID,
-                                    "collection": settings.REMOTE_SETTINGS_COLLECTION_ID,
-                                },
-                                "to_review_enabled": False,
-                                "group_check_enabled": False,
-                            }
-                        ]
-                    }
-                },
-            },
-        )
-
         # Assert does not raise.
         exports.RemoteSettings().check_config()
 
