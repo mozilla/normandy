@@ -61,9 +61,7 @@ class RemoteSettings:
         required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
         for key in required_keys:
             if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
-                msg = "set settings.REMOTE_SETTINGS_{} to use Remote Settings integration".format(
-                    key
-                )
+                msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
                 raise ImproperlyConfigured(msg)
 
     def publish(self, recipe):

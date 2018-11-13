@@ -52,9 +52,14 @@ class TestRemoteSettings(object):
         settings.REMOTE_SETTINGS_ENABLED = True
 
         # Leave out URL
-        settings.REMOTE_SETTINGS_URL = None
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings()
+        assert "REMOTE_SETTINGS_URL" in str(exc)
+
+        # Set empty URL
+        settings.REMOTE_SETTINGS_URL = ""
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings()
         assert "REMOTE_SETTINGS_URL" in str(exc)
