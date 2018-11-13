@@ -8,7 +8,7 @@ from django.core.management import call_command, CommandError
 import pytest
 
 from normandy.base.tests import UserFactory
-from normandy.recipes.models import Action
+from normandy.recipes.models import Action, Recipe
 from normandy.recipes.tests import ActionFactory, RecipeFactory
 
 
@@ -269,7 +269,8 @@ class TestUpdateAddonUrls(object):
             arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
         )
         call_command("update_addon_urls", "after.example.com")
-        recipe.refresh_from_db()
+
+        recipe = Recipe.objects.get(id=recipe.id)
         assert recipe.arguments["addonUrl"] == "https://after.example.com/extensions/addon.xpi"
 
     def test_signatures_are_updated(self, mocked_autograph):
@@ -305,6 +306,6 @@ class TestUpdateAddonUrls(object):
             arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
         )
         call_command("update_addon_urls", "after.example.com")
-        recipe.refresh_from_db()
-        # not updated
+        # Url should not be not updated
+        recipe = Recipe.objects.get(id=recipe.id)
         assert recipe.arguments["addonUrl"] == "https://before.example.com/extensions/addon.xpi"

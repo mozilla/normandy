@@ -1,5 +1,3 @@
-import json
-
 from urllib.parse import urlparse, urlunparse
 from django.core.management.base import BaseCommand
 from django.template.defaultfilters import pluralize
@@ -36,7 +34,7 @@ class Command(BaseCommand):
                 continue
 
             parsed_url = urlparse(arguments["addonUrl"])
-            if parsed_url.netlock == new_hostname:
+            if parsed_url.netloc == new_hostname:
                 # nothing to do
                 continue
 
@@ -46,7 +44,7 @@ class Command(BaseCommand):
             new_url_parts = parsed_url._replace(netloc=new_hostname)
             new_url = urlunparse(new_url_parts)
             arguments["addonUrl"] = new_url
-            rev.arguments_json = json.dumps(arguments)
+            rev.arguments = arguments
             rev.save()
             update_count += 1
 
