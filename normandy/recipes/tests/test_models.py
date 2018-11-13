@@ -579,7 +579,7 @@ class TestRecipeRevision(object):
         with pytest.raises(EnabledState.NotActionable):
             recipe.latest_revision.disable(user=UserFactory())
 
-    def test_it_publishes_when_enabled(self, settings, mock_logger, mocked_remotesettings):
+    def test_it_publishes_when_enabled(self, settings, mocked_remotesettings):
         settings.REMOTE_SETTINGS_ENABLED = True
         settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
         settings.REMOTE_SETTINGS_USERNAME = "normandy"
@@ -593,7 +593,7 @@ class TestRecipeRevision(object):
 
         mocked_remotesettings.return_value.publish.assert_called_with(recipe)
 
-        # Publishes once when disabled twice.
+        # Publishes once when enabled twice.
         with pytest.raises(EnabledState.NotActionable):
             recipe.approved_revision.enable(user=UserFactory())
 
@@ -612,7 +612,7 @@ class TestRecipeRevision(object):
 
         assert not mocked_remotesettings.return_value.publish.called
 
-    def test_it_unpublishes_when_disabled(self, settings, mock_logger, mocked_remotesettings):
+    def test_it_unpublishes_when_disabled(self, settings, mocked_remotesettings):
         settings.REMOTE_SETTINGS_ENABLED = True
         settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
         settings.REMOTE_SETTINGS_USERNAME = "normandy"
