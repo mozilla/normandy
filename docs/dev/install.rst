@@ -200,7 +200,7 @@ If you ever need to bypass Therapist, you can do so by passing
 RemoteSettings
 --------------
 If you want to enable the publication of recipes on `Remote Settings`_, you'll need to set up
-a instance locally.
+an instance locally.
 
 1. Follow the `Remote Settings installation instructions`_ to launch a development
    instance of Remote Settings locally.
