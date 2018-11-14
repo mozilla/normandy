@@ -44,22 +44,29 @@ class RemoteSettings:
 
         # Kinto is the underlying implementation of Remote Settings. The client
         # is basically a tiny abstraction on top of the requests library.
-        self.client = kinto_http.Client(
-            server_url=str(settings.REMOTE_SETTINGS_URL),
-            auth=(str(settings.REMOTE_SETTINGS_USERNAME), str(settings.REMOTE_SETTINGS_PASSWORD)),
-            bucket=str(settings.REMOTE_SETTINGS_BUCKET_ID),
-            collection=self.collection_id,
-            retry=int(settings.REMOTE_SETTINGS_RETRY_REQUESTS),
+        self.client = (
+            kinto_http.Client(
+                server_url=str(settings.REMOTE_SETTINGS_URL),
+                auth=(
+                    str(settings.REMOTE_SETTINGS_USERNAME),
+                    str(settings.REMOTE_SETTINGS_PASSWORD),
+                ),
+                bucket=str(settings.REMOTE_SETTINGS_BUCKET_ID),
+                collection=self.collection_id,
+                retry=int(settings.REMOTE_SETTINGS_RETRY_REQUESTS),
+            )
+            if settings.REMOTE_SETTINGS_URL
+            else None
         )
 
     def check_config(self):
         """
         Verify that integration with Remote Settings is configured properly.
         """
-        if not settings.REMOTE_SETTINGS_ENABLED:
+        if not settings.REMOTE_SETTINGS_URL:
             return
 
-        required_keys = ["URL", "COLLECTION_ID", "USERNAME", "PASSWORD"]
+        required_keys = ["COLLECTION_ID", "USERNAME", "PASSWORD"]
         for key in required_keys:
             if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
                 msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
@@ -85,6 +92,9 @@ class RemoteSettings:
         """
         Publish the specified `recipe` on the remote server by upserting a record.
         """
+        if self.client is None:
+            return  # no-op if disabled.
+
         record = recipe_as_record(recipe)
         self.client.update_record(data=record)
         self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
@@ -94,6 +104,9 @@ class RemoteSettings:
         """
         Unpublish the specified `recipe` by deleted its associated records on the remote server.
         """
+        if self.client is None:
+            return  # no-op if disabled.
+
         try:
             self.client.delete_record(id=str(recipe.id))
 

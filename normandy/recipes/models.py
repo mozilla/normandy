@@ -456,9 +456,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
         self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
-        if settings.REMOTE_SETTINGS_ENABLED:
-            rs = RemoteSettings()
-            rs.publish(self.recipe)
+        RemoteSettings().publish(self.recipe)
 
     def disable(self, user):
         if not self.enabled:
@@ -466,9 +464,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
         self._create_new_enabled_state(creator=user, enabled=False)
 
-        if settings.REMOTE_SETTINGS_ENABLED:
-            rs = RemoteSettings()
-            rs.unpublish(self.recipe)
+        RemoteSettings().unpublish(self.recipe)
 
 
 class EnabledState(models.Model):

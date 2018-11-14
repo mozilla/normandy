@@ -580,11 +580,6 @@ class TestRecipeRevision(object):
             recipe.latest_revision.disable(user=UserFactory())
 
     def test_it_publishes_when_enabled(self, settings, mocked_remotesettings):
-        settings.REMOTE_SETTINGS_ENABLED = True
-        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
-        settings.REMOTE_SETTINGS_USERNAME = "normandy"
-        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
-
         recipe = RecipeFactory(name="Test")
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
@@ -600,11 +595,6 @@ class TestRecipeRevision(object):
         assert mocked_remotesettings.return_value.publish.call_count == 1
 
     def test_it_does_not_publish_when_approved(self, settings, mocked_remotesettings):
-        settings.REMOTE_SETTINGS_ENABLED = True
-        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
-        settings.REMOTE_SETTINGS_USERNAME = "normandy"
-        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
-
         recipe = RecipeFactory(name="Test")
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
@@ -613,11 +603,6 @@ class TestRecipeRevision(object):
         assert not mocked_remotesettings.return_value.publish.called
 
     def test_it_unpublishes_when_disabled(self, settings, mocked_remotesettings):
-        settings.REMOTE_SETTINGS_ENABLED = True
-        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
-        settings.REMOTE_SETTINGS_USERNAME = "normandy"
-        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
-
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
 
         recipe.approved_revision.disable(user=UserFactory())

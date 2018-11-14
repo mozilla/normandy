@@ -28,7 +28,6 @@ class TestRemoteSettings:
     def test_default_settings(self, settings):
         """Test default settings values."""
 
-        assert not settings.REMOTE_SETTINGS_ENABLED
         assert settings.REMOTE_SETTINGS_BUCKET_ID == "main-workspace"
         assert settings.REMOTE_SETTINGS_COLLECTION_ID == "normandy-recipes"
         assert settings.REMOTE_SETTINGS_RETRY_REQUESTS == 3
@@ -36,31 +35,26 @@ class TestRemoteSettings:
     def test_it_checks_settings(self, settings):
         """Test that each required key is required individually"""
 
-        # Leave out URL with Remote Settings disabled (default)
+        # Leave out URL with Remote Settings (default)
         settings.REMOTE_SETTINGS_URL = None
         # assert doesn't raise
         exports.RemoteSettings().check_config()
 
-        # Enable the feature.
-        settings.REMOTE_SETTINGS_ENABLED = True
-
-        # Leave out URL
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
-        with pytest.raises(ImproperlyConfigured) as exc:
-            exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_URL" in str(exc)
-
         # Set empty URL
         settings.REMOTE_SETTINGS_URL = ""
-        with pytest.raises(ImproperlyConfigured) as exc:
-            exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_URL" in str(exc)
+        # assert doesn't raise
+        exports.RemoteSettings().check_config()
 
         # Leave out USERNAME
         settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
         settings.REMOTE_SETTINGS_USERNAME = None
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings().check_config()
+        assert "REMOTE_SETTINGS_USERNAME" in str(exc)
+
+        # Set empty USERNAME
+        settings.REMOTE_SETTINGS_USERNAME = ""
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_USERNAME" in str(exc)
@@ -83,7 +77,6 @@ class TestRemoteSettings:
         assert "REMOTE_SETTINGS_COLLECTION_ID" in str(exc)
 
     def test_check_connection(self, settings, requestsmock):
-        settings.REMOTE_SETTINGS_ENABLED = True
         settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
@@ -124,6 +117,15 @@ class TestRemoteSettings:
         # Assert does not raise.
         exports.RemoteSettings().check_config()
 
+    def test_publish_and_unpublish_are_noop_if_not_enabled(self, settings, requestsmock):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        remotesettings = exports.RemoteSettings()
+
+        remotesettings.publish(recipe)
+        remotesettings.unpublish(recipe)
+
+        assert len(requestsmock.request_history) == 0
+
     def test_publish_puts_record_and_approves(self, settings, requestsmock, mock_logger):
         """Test that requests are sent to Remote Settings on publish."""
 
@@ -131,7 +133,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
-        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        recipe = RecipeFactory(name="Test", approver=UserFactory())
         collection_url = (
             f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
             f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
@@ -168,7 +170,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
-        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        recipe = RecipeFactory(name="Test", approver=UserFactory())
         collection_url = (
             f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
             f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"

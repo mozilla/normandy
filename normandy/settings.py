@@ -358,7 +358,6 @@ class Base(Core, CORS, OIDC):
     AUTOGRAPH_X5U_CACHE_BUST = values.Value(None)
 
     # Remote Settings connection configuration
-    REMOTE_SETTINGS_ENABLED = values.BooleanValue(False)
     REMOTE_SETTINGS_URL = values.Value()
     REMOTE_SETTINGS_USERNAME = values.Value()
     REMOTE_SETTINGS_PASSWORD = values.Value()
