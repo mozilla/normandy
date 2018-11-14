@@ -171,6 +171,49 @@ in other Django projects.
     re-fetch the certificate chain in cases where they're caching an expired or
     otherwise invalid copy of the chain.
 
+.. envvar:: DJANGO_REMOTE_SETTINGS_URL
+
+    :default: Unset
+
+    The URL where a `Remote Settings`_ server can be reached
+    (e.g. ``https://settings-writer.prod.mozaws.net/v1``).
+
+    If left blank, the publication of recipes will be disabled.
+
+    .. _Remote Settings: https://remote-settings.readthedocs.io
+
+.. envvar:: DJANGO_REMOTE_SETTINGS_USERNAME
+
+    :default: Unset
+
+    The account username that is allowed to create records on the
+    Remote Settings collection.
+
+.. envvar:: DJANGO_REMOTE_SETTINGS_PASSWORD
+
+    :default: Unset
+
+    The account password to authenticate as DJANGO_REMOTE_SETTINGS_USERNAME.
+
+.. envvar:: DJANGO_REMOTE_SETTINGS_COLLECTION_ID
+
+    :default: ``normandy-recipes``
+
+    The name of the Remote Settings collection where the recipes will be published.
+
+.. envvar:: DJANGO_REMOTE_SETTINGS_BUCKET_ID
+
+    :default: ``main-workspace``
+
+    The name of the Remote Settings bucket where the recipes will be published.
+
+.. envvar:: REMOTE_SETTINGS_RETRY_REQUESTS
+
+    :default: ``3``
+
+    If the Remote Settings server does not return a successful response, the
+    requests will be retried if the specified number is superior to zero.
+
 .. envvar:: DJANGO_API_CACHE_TIME
 
     :default: ``30``
@@ -330,7 +373,7 @@ in other Django projects.
    The value for this setting is usually listed in
    ``/.well-known/openid-configuration`` on the OIDC provider.
 
-.. envvar:: DJANGO_DEFAULT_FILE_STORAGE 
+.. envvar:: DJANGO_DEFAULT_FILE_STORAGE
 
    :default: ``normandy.base.storage.S3Boto3PermissiveStorage``
 

@@ -194,3 +194,69 @@ If you ever need to bypass Therapist, you can do so by passing
 ``--no-verify`` to your ``git commit`` command.
 
 .. _Therapist: http://therapist.readthedocs.io/en/latest/overview.html
+
+.. _remotesettings-install:
+
+RemoteSettings
+--------------
+If you want to enable the publication of recipes on `Remote Settings`_, you'll need to set up
+a instance locally.
+
+1. Follow the `Remote Settings installation instructions`_ to launch a development
+   instance of Remote Settings locally.
+
+2. Add the following configuration to ``.env`` (create the file
+   if it does not exist yet):
+
+   .. code-block:: ini
+
+      DJANGO_REMOTE_SETTINGS_URL=http://localhost:8888/v1
+      DJANGO_REMOTE_SETTINGS_USERNAME=normandy
+      DJANGO_REMOTE_SETTINGS_PASSWORD=n0rm4ndy
+
+3. Add the following configuration to ``server.ini`` and restart the Remote Settings container:
+
+   .. code-block:: ini
+
+      kinto.signer.main-workspace.normandy-recipes.to_review_enabled = false
+      kinto.signer.main-workspace.normandy-recipes.group_check_enabled = false
+
+4. Create the dedicated user and collection for Normandy:
+
+   .. code-block:: bash
+
+      SERVER=http://localhost:8888/v1
+
+      curl -X PUT ${SERVER}/accounts/normandy \
+           -d '{"data": {"password": "n0rm4ndy"}}' \
+           -H 'Content-Type:application/json'
+
+      curl -X PUT ${SERVER}/buckets/main-workspace/collections/normandy-recipes \
+           -H 'Content-Type:application/json' \
+           -u 'normandy:n0rm4ndy'
+
+With the configuration in place, Normandy should start without error. When a recipe is enabled, it is published and becomes visible
+on the RemoteSettings server:
+
+.. code-block:: bash
+
+      curl ${SERVER}/buckets/main/collections/normandy-recipes/records
+
+On the Firefox side, pulling the recipes from the local instance of Remote Settings will require these preferences to
+be set:
+
+- ``services.settings.server``: ``http://localhost:8888/v1``
+- ``services.settings.verify_signature``: false
+- ``app.normandy.remotesettings.enabled``: true
+
+And then trigger a manual synchronization in the Browser console:
+
+.. code-block:: javascript
+
+      const { RemoteSettings } = ChromeUtils.import("resource://services-settings/remote-settings.js", {});
+      await RemoteSettings.pollChanges();
+
+The Normandy recipe runner will now be able to read the list of recipes to execute from the local Remote Settings database.
+
+.. _Remote Settings: https://remote-settings.readthedocs.io
+.. _Remote Settings installation instructions: https://remote-settings.readthedocs.io/en/latest/tutorial-local-server.html
