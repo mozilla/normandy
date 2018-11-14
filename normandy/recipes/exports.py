@@ -63,8 +63,8 @@ class RemoteSettings:
         """
         Verify that integration with Remote Settings is configured properly.
         """
-        if not settings.REMOTE_SETTINGS_URL:
-            return
+        if self.client is None:
+            return  # no check if disabled.
 
         required_keys = ["COLLECTION_ID", "USERNAME", "PASSWORD"]
         for key in required_keys:
