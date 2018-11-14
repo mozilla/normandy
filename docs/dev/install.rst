@@ -197,8 +197,8 @@ If you ever need to bypass Therapist, you can do so by passing
 
 .. _remotesettings-install:
 
-RemoteSettings
---------------
+Remote Settings
+---------------
 If you want to enable the publication of recipes on `Remote Settings`_, you'll need to set up
 an instance locally.
 
@@ -236,7 +236,7 @@ an instance locally.
            -u 'normandy:n0rm4ndy'
 
 With the configuration in place, Normandy should start without error. When a recipe is enabled, it is published and becomes visible
-on the RemoteSettings server:
+on the Remote Settings server:
 
 .. code-block:: bash
 
