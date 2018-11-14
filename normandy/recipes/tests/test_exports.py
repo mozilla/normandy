@@ -28,6 +28,9 @@ class TestRemoteSettings:
     def test_default_settings(self, settings):
         """Test default settings values."""
 
+        assert settings.REMOTE_SETTINGS_URL is None
+        assert settings.REMOTE_SETTINGS_USERNAME is None
+        assert settings.REMOTE_SETTINGS_PASSWORD is None
         assert settings.REMOTE_SETTINGS_BUCKET_ID == "main-workspace"
         assert settings.REMOTE_SETTINGS_COLLECTION_ID == "normandy-recipes"
         assert settings.REMOTE_SETTINGS_RETRY_REQUESTS == 3
