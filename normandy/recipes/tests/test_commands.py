@@ -270,6 +270,7 @@ class TestUpdateAddonUrls(object):
         )
         call_command("update_addon_urls", "after.example.com")
 
+        # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
         assert recipe.arguments["addonUrl"] == "https://after.example.com/extensions/addon.xpi"
 
@@ -306,6 +307,7 @@ class TestUpdateAddonUrls(object):
             arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
         )
         call_command("update_addon_urls", "after.example.com")
-        # Url should not be not updated
+        # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
+        # Url should not be not updated
         assert recipe.arguments["addonUrl"] == "https://before.example.com/extensions/addon.xpi"

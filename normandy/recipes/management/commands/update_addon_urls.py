@@ -25,7 +25,7 @@ class Command(BaseCommand):
             # real attribute of the object
             arguments = rev.arguments
 
-            if arguments.get("addonUrl") is None:
+            if not arguments.get("addonUrl"):
                 self.stderr.write(
                     f"Warning: Recipe {rev.recipe.id} revision {rev.id} has action=opt-out-study, "
                     f"but no addonUrl",
