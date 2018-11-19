@@ -19,3 +19,12 @@ class AdminEnabledOrReadOnly(AdminEnabled):
 
     def has_permission(self, request, view):
         return super().has_permission(request, view) or request.method in permissions.SAFE_METHODS
+
+
+class IsSuperUser(permissions.BasePermission):
+    """
+    Allows access only to super users.
+    """
+
+    def has_permission(self, request, view):
+        return request.user and request.user.is_superuser

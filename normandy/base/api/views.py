@@ -1,10 +1,11 @@
 from urllib.parse import urljoin
 
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.urls import NoReverseMatch
 
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import (
@@ -13,6 +14,7 @@ from rest_framework.views import (
     set_rollback,
 )
 
+from normandy.base.api.permissions import IsSuperUser
 from normandy.base.api.serializers import UserSerializer, ServiceInfoSerializer
 from normandy.base.decorators import api_cache_control
 
@@ -77,6 +79,23 @@ class ServiceInfoView(APIView):
                 }
             ).data
         )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """Viewset for managing users."""
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsSuperUser,)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Should not be able to delete self
+        if request.user == instance:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        super().destroy(request, *args, **kwargs)
 
 
 def exception_handler(exc, context):

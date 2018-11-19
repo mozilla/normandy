@@ -9,7 +9,7 @@ from django.views.generic import View
 
 from normandy.base.api.views import APIRootView
 from normandy.base.api.routers import MixedViewRouter
-from normandy.base.tests import Whatever
+from normandy.base.tests import UserFactory, Whatever
 
 
 @pytest.mark.django_db
@@ -235,3 +235,35 @@ class TestServiceInfoView(object):
             "logout_url": settings.OIDC_LOGOUT_URL,
             "github_url": settings.GITHUB_URL,
         }
+
+
+@pytest.mark.django_db
+class TestUserAPI(object):
+    def test_it_works(self, api_client):
+        user = User.objects.first()
+        res = api_client.get("/api/v3/user/")
+        assert res.status_code == 200
+        assert res.data == {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
+                }
+            ],
+        }
+
+    def test_must_be_superuser(self, api_client):
+        user = UserFactory(is_superuser=False)
+        api_client.force_authenticate(user=user)
+        res = api_client.get("/api/v3/user/")
+        assert res.status_code == 403
+
+    def test_cannot_delete_self(self, api_client):
+        user = User.objects.first()
+        res = api_client.delete(f"/api/v3/user/{user.id}/")
+        assert res.status_code == 403
