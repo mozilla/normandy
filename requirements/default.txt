@@ -190,9 +190,9 @@ requests-hawk==1.0.0 \
 statsd==3.3.0 \
     --hash=sha256:c610fb80347fca0ef62666d241bce64184bd7cc1efe582f9690e045c25535eaa \
     --hash=sha256:e3e6db4c246f7c59003e51c9720a51a7f39a396541cb9b147ff4b14d15b5dd1f
-whitenoise==4.1 \
-    --hash=sha256:133a92ff0ab8fb9509f77d4f7d0de493eca19c6fea973f4195d4184f888f2e02 \
-    --hash=sha256:32b57d193478908a48acb66bf73e7a3c18679263e3e64bfebcfac1144a430039
+whitenoise==4.1.1 \
+    --hash=sha256:d3609f505db173be501e8a5549d396e6013543fe126ee073b435833fc3403306 \
+    --hash=sha256:b1ddbce083c51a064da5e99dacbfff38b291d8436b6fd75156a3bb2265c55d39
 backoff==1.6.0 \
     --hash=sha256:e3df718a774c456a516f7c88516e47a9f2d02aa562943cdfa274c439e9dbbfde
 requests-mock==1.5.2 \
