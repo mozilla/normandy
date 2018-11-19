@@ -167,9 +167,9 @@ pyasn1-modules==0.2.2 \
 pyjexl==0.2.3 \
     --hash=sha256:1369c08c3f1f6931bc3c3089f24e79902680b6022412ccfc5e818441cf0dca52 \
     --hash=sha256:56eb1ab1bd78eb12d3c514b6e2f2c93fe7f2fdd00bd821873e3f089706452c51
-pytest-django==3.4.3 \
-    --hash=sha256:49e9ffc856bc6a1bec1c26c5c7b7213dff7cc8bc6b64d624c4d143d04aff0bcf \
-    --hash=sha256:b379282feaf89069cb790775ab6bbbd2bd2038a68c7ef9b84a41898e0b551081
+pytest-django==3.4.4 \
+    --hash=sha256:deffd9d65827c582bd0a85638a0fe52f0eb65a764872ddcee9ce51cdf6ae9f55 \
+    --hash=sha256:fe1f71a0171f6b7edac37654da0904c9bd5ffba5221ab5a76779ab870611f41f
 pytest==3.10.1 \
     --hash=sha256:3f193df1cfe1d1609d4c583838bea3d532b18d6160fd3f55c9447fdca30848ec \
     --hash=sha256:e246cf173c01169b9617fc07264b7b1316e78d7a650055235d6d897bc80d9660
