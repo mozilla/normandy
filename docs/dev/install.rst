@@ -205,8 +205,8 @@ an instance locally.
 1. Follow the `Remote Settings installation instructions`_ to launch a development
    instance of Remote Settings locally.
 
-2. Add the following configuration to ``.env`` (create the file
-   if it does not exist yet):
+2. Configure Normandy to enable the integration by adding the following lines
+   to ``.env`` (create the file if it does not exist yet):
 
    .. code-block:: ini
 
@@ -214,14 +214,15 @@ an instance locally.
       DJANGO_REMOTE_SETTINGS_USERNAME=normandy
       DJANGO_REMOTE_SETTINGS_PASSWORD=n0rm4ndy
 
-3. Add the following configuration to ``server.ini`` and restart the Remote Settings container:
+3. Adjust the Remote Settings configuration in ``server.ini`` for the Normandy
+   recipes collection, and restart the Remote Settings container:
 
    .. code-block:: ini
 
       kinto.signer.main-workspace.normandy-recipes.to_review_enabled = false
       kinto.signer.main-workspace.normandy-recipes.group_check_enabled = false
 
-4. Create the dedicated user and collection for Normandy:
+4. Create the dedicated Remote Settings user and collection for Normandy:
 
    .. code-block:: bash
 
@@ -235,7 +236,7 @@ an instance locally.
            -H 'Content-Type:application/json' \
            -u 'normandy:n0rm4ndy'
 
-With the configuration in place, Normandy should start without error. When a recipe is enabled, it is published and becomes visible
+With both configurations in place, Normandy should start without error. When a recipe is enabled, it is published and becomes visible
 on the Remote Settings server:
 
 .. code-block:: bash
