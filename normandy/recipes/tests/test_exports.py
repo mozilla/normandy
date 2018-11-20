@@ -219,7 +219,7 @@ class TestRemoteSettings:
         with pytest.raises(kinto_http.KintoException):
             remotesettings.publish(recipe)
 
-        assert requestsmock.call_count == 4  # retried thrice.
+        assert requestsmock.call_count == settings.REMOTE_SETTINGS_RETRY_REQUESTS + 1
 
     def test_unpublish_ignores_error_about_missing_record(
         self, settings, requestsmock, mock_logger

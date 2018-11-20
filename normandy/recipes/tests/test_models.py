@@ -594,7 +594,22 @@ class TestRecipeRevision(object):
 
         assert mocked_remotesettings.return_value.publish.call_count == 1
 
-    def test_it_does_not_publish_when_approved(self, settings, mocked_remotesettings):
+    def test_it_publishes_new_revisions_if_enabled(self, settings, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        assert mocked_remotesettings.return_value.publish.call_count == 1
+
+        recipe.revise(name="Modified")
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+
+        assert mocked_remotesettings.return_value.publish.call_count == 2
+        second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
+        modified_recipe, = second_call_args
+        assert modified_recipe.name == "Modified"
+
+    def test_it_does_not_publish_when_approved_if_not_enabled(
+        self, settings, mocked_remotesettings
+    ):
         recipe = RecipeFactory(name="Test")
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
@@ -614,6 +629,15 @@ class TestRecipeRevision(object):
             recipe.approved_revision.disable(user=UserFactory())
 
         assert mocked_remotesettings.return_value.publish.call_count == 1
+
+    def test_it_publishes_several_times_when_reenabled(self, settings, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+
+        recipe.approved_revision.disable(user=UserFactory())
+        recipe.approved_revision.enable(user=UserFactory())
+
+        assert mocked_remotesettings.return_value.unpublish.call_count == 1
+        assert mocked_remotesettings.return_value.publish.call_count == 2
 
 
 @pytest.mark.django_db

@@ -95,8 +95,10 @@ class RemoteSettings:
         if self.client is None:
             return  # no-op if disabled.
 
+        # 1. Put the record.
         record = recipe_as_record(recipe)
         self.client.update_record(data=record)
+        # 2. Approve the changes immediately (multi-signoff is disabled).
         self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
         logger.info(f"Published record '{recipe.id}' for recipe {recipe}")
 
@@ -107,6 +109,7 @@ class RemoteSettings:
         if self.client is None:
             return  # no-op if disabled.
 
+        # 1. Delete the record.
         try:
             self.client.delete_record(id=str(recipe.id))
 
@@ -115,6 +118,6 @@ class RemoteSettings:
                 logger.warning(f"The recipe '{recipe.id}' was never published. Skip.")
                 return
             raise
-
+        # 2. Approve the changes immediately (multi-signoff is disabled).
         self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
         logger.info(f"Deleted record '{recipe.id}' of recipe {recipe}")
