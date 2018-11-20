@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 logger = logging.getLogger(__name__)
 
 
-MAIN_BUCKET_ID = "main"
+APPROVE_CHANGES_FLAG = {"status": "to-sign"}
 
 
 def recipe_as_record(recipe):
@@ -40,6 +40,26 @@ class RemoteSettings:
     bypasses the one of Remote Settings (leveraging a specific server configuration for this
     particular collection).
 
+    .. notes::
+
+        Remote Settings signoff workflow relies on several buckets (see kinto-signer API).
+
+        The `main-workspace` is only readable and writable by authorized accounts.
+        The `main` bucket is read-only, but publicly readable. The Remote Settings
+        clients pull data from there.
+
+        Since the review step is disabled for Normandy, publishing data is done in two steps:
+
+        1. Create, update or delete records in the `main-workspace` bucket
+        2. Approve the changes by flipping the ``status`` field to ``to-sign``
+           in the collection metadata
+        3. The server will sign and publish the new data to the `main` bucket.
+
+    """
+
+    MAIN_BUCKET_ID = "main"
+    """The name of the publicly readable bucket of Remote Settings where the approved
+    records are published.
     """
 
     def __init__(self):
@@ -127,17 +147,21 @@ class RemoteSettings:
         self.client.update_record(data=record)
         try:
             # 2. Approve the changes immediately (multi-signoff is disabled).
-            self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
+            self.client.patch_collection(data=APPROVE_CHANGES_FLAG)
 
         except kinto_http.exceptions.KintoException:
-            # Approval failed. Cancel changes and raise.
+            # Approval failed. The changes in the `main-workspace` bucket must be reverted.
             try:
-                # Restore the record already published.
-                in_prod = self.client.get_record(id=record["id"], bucket=MAIN_BUCKET_ID)
+                # If it was an update of existing record, revert the modifications in the
+                # `main-workspace` bucket by restoring the version that was published
+                # in the `main` bucket.
+                in_prod = self.client.get_record(id=record["id"], bucket=self.MAIN_BUCKET_ID)
                 self.client.update_record(data=in_prod)
+
             except kinto_http.exceptions.KintoException as e:
-                # Record was never published, delete it.
                 if e.response.status_code == 404:
+                    # It was a new record that was never published in the `main` bucket,
+                    # revert its creation in the `main-workspace` bucket by deleting it.
                     self.client.delete_record(id=record["id"])
             raise
 
@@ -161,11 +185,13 @@ class RemoteSettings:
             raise
         try:
             # 2. Approve the changes immediately (multi-signoff is disabled).
-            self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
+            self.client.patch_collection(data=APPROVE_CHANGES_FLAG)
 
         except kinto_http.exceptions.KintoException:
-            # Approval failed. Cancel changes and raise.
-            in_prod = self.client.get_record(id=str(recipe.id), bucket=MAIN_BUCKET_ID)
+            # Approval failed. The deletion from the `main-workspace` bucket must be reverted.
+            # Revert its deletion from the `main-workspace` bucket by restoring the version
+            # that was published in the `main` bucket.
+            in_prod = self.client.get_record(id=str(recipe.id), bucket=self.MAIN_BUCKET_ID)
             self.client.update_record(data=in_prod["data"])
             raise
 

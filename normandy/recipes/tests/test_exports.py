@@ -308,7 +308,7 @@ class TestRemoteSettings:
         requestsmock.request("patch", collection_url, status_code=403)
         record_prod_url = record_url.replace(
             f"/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/",
-            f"/buckets/{exports.MAIN_BUCKET_ID}/",
+            f"/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/",
         )
         requestsmock.request("get", record_prod_url, content=b"{}", status_code=404)
         requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
@@ -336,7 +336,7 @@ class TestRemoteSettings:
         requestsmock.request("patch", collection_url, status_code=403)
         record_prod_url = record_url.replace(
             f"/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/",
-            f"/buckets/{exports.MAIN_BUCKET_ID}/",
+            f"/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/",
         )
         record_in_prod = json.dumps({"data": exports.recipe_as_record(recipe)}).encode()
         requestsmock.request("get", record_prod_url, content=record_in_prod)
