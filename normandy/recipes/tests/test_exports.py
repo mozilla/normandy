@@ -85,7 +85,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
         # Root URL should return currently authenticated user.
-        requestsmock.get(f"{settings.REMOTE_SETTINGS_URL}/", json={})
+        requestsmock.get(f"{settings.REMOTE_SETTINGS_URL}/", json={"capabilities": {}})
 
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
@@ -93,7 +93,21 @@ class TestRemoteSettings:
 
         requestsmock.get(
             f"{settings.REMOTE_SETTINGS_URL}/",
-            json={"user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"}},
+            json={
+                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
+                "capabilities": {
+                    "signer": {
+                        "to_review_enabled": True,
+                        "group_check_enabled": True,
+                        "resources": [
+                            {
+                                "source": {"bucket": "main-workspace", "collection": None},
+                                "destination": {"bucket": "main", "collection": None},
+                            }
+                        ],
+                    }
+                },
+            },
         )
 
         # Collection should be writable.
@@ -114,6 +128,45 @@ class TestRemoteSettings:
             json={
                 "data": {},
                 "permissions": {"write": [f"account:{settings.REMOTE_SETTINGS_USERNAME}"]},
+            },
+        )
+
+        # Collection review should be explicitly disabled.
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings().check_config()
+        assert (
+            "Review was not disabled on Remote Settings collection "
+            f"{settings.REMOTE_SETTINGS_COLLECTION_ID}."
+        ) in str(exc)
+
+        requestsmock.get(
+            f"{settings.REMOTE_SETTINGS_URL}/",
+            json={
+                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
+                "capabilities": {
+                    "signer": {
+                        "to_review_enabled": True,
+                        "group_check_enabled": True,
+                        "resources": [
+                            {
+                                "source": {"bucket": "main-workspace", "collection": None},
+                                "destination": {"bucket": "main", "collection": None},
+                            },
+                            {
+                                "source": {
+                                    "bucket": "main-workspace",
+                                    "collection": "normandy-recipes",
+                                },
+                                "destination": {
+                                    "bucket": "main",
+                                    "collection": "normandy-recipes",
+                                },
+                                "to_review_enabled": False,
+                                "group_check_enabled": False,
+                            },
+                        ],
+                    }
+                },
             },
         )
 

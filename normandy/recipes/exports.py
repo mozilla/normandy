@@ -88,6 +88,30 @@ class RemoteSettings:
                 f"Remote Settings collection {self.collection_id} is not writable."
             )
 
+        # Test that collection has the proper review settings.
+        capabilities = server_info["capabilities"]
+        if "signer" in capabilities:
+            signer_config = capabilities["signer"]
+            normandy_resource = [
+                r
+                for r in signer_config["resources"]
+                if r["source"]["bucket"] == settings.REMOTE_SETTINGS_BUCKET_ID
+                and r["source"]["collection"] == self.collection_id
+            ]
+            review_disabled = (
+                len(normandy_resource) == 1
+                and not normandy_resource[0].get(
+                    "to_review_enabled", signer_config["to_review_enabled"]
+                )
+                and not normandy_resource[0].get(
+                    "group_check_enabled", signer_config["group_check_enabled"]
+                )
+            )
+            if not review_disabled:
+                raise ImproperlyConfigured(
+                    f"Review was not disabled on Remote Settings collection {self.collection_id}."
+                )
+
     def publish(self, recipe):
         """
         Publish the specified `recipe` on the remote server by upserting a record.
