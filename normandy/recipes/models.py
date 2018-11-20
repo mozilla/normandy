@@ -450,6 +450,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         self.recipe.update_signature()
         self.recipe.save()
 
+    @transaction.atomic
     def enable(self, user, carryover_from=None):
         if self.enabled:
             raise EnabledState.NotActionable("This revision is already enabled.")
@@ -458,6 +459,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
         RemoteSettings().publish(self.recipe)
 
+    @transaction.atomic
     def disable(self, user):
         if not self.enabled:
             raise EnabledState.NotActionable("This revision is already disabled.")

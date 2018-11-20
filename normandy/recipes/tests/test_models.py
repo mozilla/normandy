@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 
 import pytest
 from rest_framework import serializers
+from kinto_http import exceptions as remote_settings_exceptions
 
 from normandy.base.tests import UserFactory, Whatever
 from normandy.recipes.models import (
@@ -638,6 +639,28 @@ class TestRecipeRevision(object):
 
         assert mocked_remotesettings.return_value.unpublish.call_count == 1
         assert mocked_remotesettings.return_value.publish.call_count == 2
+
+    def test_it_rollbacks_changes_if_error_happens_on_publish(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory())
+        error = remote_settings_exceptions.KintoException
+        mocked_remotesettings.return_value.publish.side_effect = error
+
+        with pytest.raises(error):
+            recipe.approved_revision.enable(user=UserFactory())
+
+        saved = Recipe.objects.get(id=recipe.id)
+        assert not saved.approved_revision.enabled
+
+    def test_it_rollbacks_changes_if_error_happens_on_unpublish(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        error = remote_settings_exceptions.KintoException
+        mocked_remotesettings.return_value.unpublish.side_effect = error
+
+        with pytest.raises(error):
+            recipe.approved_revision.disable(user=UserFactory())
+
+        saved = Recipe.objects.get(id=recipe.id)
+        assert saved.approved_revision.enabled
 
 
 @pytest.mark.django_db
