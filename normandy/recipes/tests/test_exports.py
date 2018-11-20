@@ -257,8 +257,6 @@ class TestRemoteSettings:
 
     def test_publish_raises_an_error_if_request_fails(self, settings, requestsmock):
         settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         record_url = (
@@ -278,8 +276,6 @@ class TestRemoteSettings:
         self, settings, requestsmock, mock_logger
     ):
         settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         record_url = (
