@@ -580,7 +580,7 @@ class TestRecipeRevision(object):
         with pytest.raises(EnabledState.NotActionable):
             recipe.latest_revision.disable(user=UserFactory())
 
-    def test_it_publishes_when_enabled(self, settings, mocked_remotesettings):
+    def test_it_publishes_when_enabled(self, mocked_remotesettings):
         recipe = RecipeFactory(name="Test")
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
@@ -595,7 +595,7 @@ class TestRecipeRevision(object):
 
         assert mocked_remotesettings.return_value.publish.call_count == 1
 
-    def test_it_publishes_new_revisions_if_enabled(self, settings, mocked_remotesettings):
+    def test_it_publishes_new_revisions_if_enabled(self, mocked_remotesettings):
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
         assert mocked_remotesettings.return_value.publish.call_count == 1
 
@@ -608,9 +608,7 @@ class TestRecipeRevision(object):
         modified_recipe, = second_call_args
         assert modified_recipe.name == "Modified"
 
-    def test_it_does_not_publish_when_approved_if_not_enabled(
-        self, settings, mocked_remotesettings
-    ):
+    def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
         recipe = RecipeFactory(name="Test")
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
@@ -618,7 +616,7 @@ class TestRecipeRevision(object):
 
         assert not mocked_remotesettings.return_value.publish.called
 
-    def test_it_unpublishes_when_disabled(self, settings, mocked_remotesettings):
+    def test_it_unpublishes_when_disabled(self, mocked_remotesettings):
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
 
         recipe.approved_revision.disable(user=UserFactory())
@@ -631,7 +629,7 @@ class TestRecipeRevision(object):
 
         assert mocked_remotesettings.return_value.publish.call_count == 1
 
-    def test_it_publishes_several_times_when_reenabled(self, settings, mocked_remotesettings):
+    def test_it_publishes_several_times_when_reenabled(self, mocked_remotesettings):
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
 
         recipe.approved_revision.disable(user=UserFactory())
