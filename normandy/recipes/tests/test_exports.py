@@ -1,4 +1,5 @@
 import base64
+import json
 
 import pytest
 import kinto_http
@@ -293,3 +294,63 @@ class TestRemoteSettings:
         mock_logger.warning.assert_called_with(
             f"The recipe '{recipe.id}' was never published. Skip."
         )
+
+    def test_publish_reverts_changes_if_approval_fails(self, settings, requestsmock):
+        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
+
+        recipe = RecipeFactory(name="Test", approver=UserFactory())
+        collection_url = (
+            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+        )
+        record_url = f"{collection_url}/records/{recipe.id}"
+        requestsmock.request("put", record_url, content=b'{"data": {}}', status_code=201)
+        requestsmock.request("patch", collection_url, status_code=403)
+        record_prod_url = record_url.replace(
+            f"/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/",
+            f"/buckets/{exports.MAIN_BUCKET_ID}/",
+        )
+        requestsmock.request("get", record_prod_url, content=b"{}", status_code=404)
+        requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
+
+        remotesettings = exports.RemoteSettings()
+        with pytest.raises(kinto_http.KintoException):
+            remotesettings.publish(recipe)
+
+        assert len(requestsmock.request_history) == 4
+        assert requestsmock.request_history[0].url == record_url
+        assert requestsmock.request_history[1].url == collection_url
+        assert requestsmock.request_history[2].url == record_prod_url
+        assert requestsmock.request_history[3].url == record_url
+        assert requestsmock.request_history[3].method == "DELETE"
+
+    def test_unpublish_reverts_changes_if_approval_fails(self, settings, requestsmock):
+        recipe = RecipeFactory(name="Test", enabler=UserFactory(), approver=UserFactory())
+        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
+        collection_url = (
+            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+        )
+        record_url = f"{collection_url}/records/{recipe.id}"
+        requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
+        requestsmock.request("patch", collection_url, status_code=403)
+        record_prod_url = record_url.replace(
+            f"/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/",
+            f"/buckets/{exports.MAIN_BUCKET_ID}/",
+        )
+        record_in_prod = json.dumps({"data": exports.recipe_as_record(recipe)}).encode()
+        requestsmock.request("get", record_prod_url, content=record_in_prod)
+        requestsmock.request("put", record_url, content=b'{"data": {}}')
+
+        remotesettings = exports.RemoteSettings()
+        with pytest.raises(kinto_http.KintoException):
+            remotesettings.unpublish(recipe)
+
+        assert len(requestsmock.request_history) == 4
+        assert requestsmock.request_history[0].url == record_url
+        assert requestsmock.request_history[0].method == "DELETE"
+        assert requestsmock.request_history[1].url == collection_url
+        assert requestsmock.request_history[2].url == record_prod_url
+        assert requestsmock.request_history[3].url == record_url
+        assert requestsmock.request_history[3].method == "PUT"
+        assert requestsmock.request_history[3].json()["data"]["name"] == "Test"

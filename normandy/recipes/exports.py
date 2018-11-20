@@ -8,6 +8,9 @@ from django.core.exceptions import ImproperlyConfigured
 logger = logging.getLogger(__name__)
 
 
+MAIN_BUCKET_ID = "main"
+
+
 def recipe_as_record(recipe):
     """
     Transform a recipe to a dict with the minimum amount of fields needed for clients
@@ -122,13 +125,27 @@ class RemoteSettings:
         # 1. Put the record.
         record = recipe_as_record(recipe)
         self.client.update_record(data=record)
-        # 2. Approve the changes immediately (multi-signoff is disabled).
-        self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
+        try:
+            # 2. Approve the changes immediately (multi-signoff is disabled).
+            self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
+
+        except kinto_http.exceptions.KintoException:
+            # Approval failed. Cancel changes and raise.
+            try:
+                # Restore the record already published.
+                in_prod = self.client.get_record(id=record["id"], bucket=MAIN_BUCKET_ID)
+                self.client.update_record(data=in_prod)
+            except kinto_http.exceptions.KintoException as e:
+                # Record was never published, delete it.
+                if e.response.status_code == 404:
+                    self.client.delete_record(id=record["id"])
+            raise
+
         logger.info(f"Published record '{recipe.id}' for recipe {recipe}")
 
     def unpublish(self, recipe):
         """
-        Unpublish the specified `recipe` by deleted its associated records on the remote server.
+        Unpublish the specified `recipe` by deleted its associated record on the remote server.
         """
         if self.client is None:
             return  # no-op if disabled.
@@ -142,6 +159,14 @@ class RemoteSettings:
                 logger.warning(f"The recipe '{recipe.id}' was never published. Skip.")
                 return
             raise
-        # 2. Approve the changes immediately (multi-signoff is disabled).
-        self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
+        try:
+            # 2. Approve the changes immediately (multi-signoff is disabled).
+            self.client.patch_collection(id=self.collection_id, data={"status": "to-sign"})
+
+        except kinto_http.exceptions.KintoException:
+            # Approval failed. Cancel changes and raise.
+            in_prod = self.client.get_record(id=str(recipe.id), bucket=MAIN_BUCKET_ID)
+            self.client.update_record(data=in_prod["data"])
+            raise
+
         logger.info(f"Deleted record '{recipe.id}' of recipe {recipe}")
