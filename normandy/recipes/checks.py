@@ -110,7 +110,7 @@ def signatures_use_good_certificates(app_configs, **kwargs):
             matching_recipes = Recipe.objects.filter(signature__x5u=url)
             matching_actions = Action.objects.filter(signature__x5u=url)
             matching_objects = list(matching_recipes) + list(matching_actions)
-            object_names = ", ".join(str(o) for o in matching_objects)
+            object_names = [str(o) for o in matching_objects]
             return object_names
 
         for url in urls:
