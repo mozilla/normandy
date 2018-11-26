@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+import requests.exceptions
 
 from normandy.recipes import checks, signing
 from normandy.recipes.tests import RecipeFactory, SignatureFactory
@@ -20,7 +21,7 @@ class TestSignaturesUseGoodCertificates(object):
         errors = checks.signatures_use_good_certificates(None)
         mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, None)
         assert len(errors) == 1
-        assert errors[0].id == checks.WARNING_BAD_SIGNING_CERTIFICATE
+        assert errors[0].id == checks.ERROR_BAD_SIGNING_CERTIFICATE
 
     def test_it_ignores_signatures_not_in_use(self, mocker, settings):
         settings.CERTIFICATES_EXPIRE_EARLY_DAYS = None
@@ -47,3 +48,12 @@ class TestSignaturesUseGoodCertificates(object):
         errors = checks.signatures_use_good_certificates(None)
         mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, timedelta(7))
         assert errors == []
+
+    def test_it_reports_x5u_network_errors(self, mocker):
+        RecipeFactory(signed=True)
+        mock_verify_x5u = mocker.patch("normandy.recipes.checks.signing.verify_x5u")
+        mock_verify_x5u.side_effect = requests.exceptions.ConnectionError
+        errors = checks.signatures_use_good_certificates(None)
+        mock_verify_x5u.assert_called_once()
+        assert len(errors) == 1
+        assert errors[0].id == checks.ERROR_COULD_NOT_VERIFY_CERTIFICATE
