@@ -123,7 +123,7 @@ def signatures_use_good_certificates(app_configs, **kwargs):
                     f"{bad_object_names}. {exc.detail}. Certificate url is {url}. "
                 )
                 errors.append(Error(msg, id=ERROR_BAD_SIGNING_CERTIFICATE))
-            except requests.ConnectionError as exc:
+            except requests.RequestException as exc:
                 bad_object_names = get_matching_object_names(url)
                 msg = (
                     f"The certificate at {url} could not be fetched due to a network error to "
