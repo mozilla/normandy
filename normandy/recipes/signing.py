@@ -2,6 +2,7 @@ import base64
 import binascii
 import hashlib
 import logging
+import re
 from datetime import datetime
 
 import ecdsa
@@ -88,6 +89,12 @@ class Autographer(object):
         return signatures
 
 
+BASE64_WRONG_LENGTH_RE = re.compile(
+    r"Invalid base64-encoded string: number of data characters \(\d+\) cannot "
+    r"be [123] more than a multiple of 4"
+)
+
+
 def verify_signature(data, signature, pubkey):
     """
     Verify a signature.
@@ -114,8 +121,8 @@ def verify_signature(data, signature, pubkey):
     try:
         signature = base64.urlsafe_b64decode(signature)
     except binascii.Error as e:
-        if e.args == ("Incorrect padding",):
-            raise WrongSignatureSize()
+        if BASE64_WRONG_LENGTH_RE.match(e.args[0]):
+            raise WrongSignatureSize("Base64 encoded signature was not a multiple of 4")
         else:
             raise
 
