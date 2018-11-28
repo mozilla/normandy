@@ -121,9 +121,8 @@ def verify_signature(data, signature, pubkey):
     try:
         signature = base64.urlsafe_b64decode(signature)
     except binascii.Error as e:
-        print(e.args[0], BASE64_WRONG_LENGTH_RE.match(e.args[0]))
         if BASE64_WRONG_LENGTH_RE.match(e.args[0]):
-            raise WrongSignatureSize()
+            raise WrongSignatureSize("Base64 encoded signature was not a multiple of 4")
         else:
             raise
 
