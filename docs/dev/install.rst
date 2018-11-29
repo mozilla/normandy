@@ -232,6 +232,10 @@ an instance locally.
            -d '{"data": {"password": "n0rm4ndy"}}' \
            -H 'Content-Type:application/json'
 
+      curl -X PUT ${SERVER}/buckets/main-workspace \
+           -H 'Content-Type:application/json' \
+           -u 'normandy:n0rm4ndy'
+
       curl -X PUT ${SERVER}/buckets/main-workspace/collections/normandy-recipes \
            -H 'Content-Type:application/json' \
            -u 'normandy:n0rm4ndy'
