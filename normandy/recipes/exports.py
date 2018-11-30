@@ -135,6 +135,15 @@ class RemoteSettings:
                     f"Review was not disabled on Remote Settings collection {self.collection_id}."
                 )
 
+    def published_recipes(self):
+        """
+        Return the current list of remote records.
+        """
+        if self.client is None:
+            raise ImproperlyConfigured("Remote Settings is not enabled.")
+
+        return self.client.get_records(bucket=self.MAIN_BUCKET_ID)
+
     def publish(self, recipe):
         """
         Publish the specified `recipe` on the remote server by upserting a record.
@@ -195,4 +204,4 @@ class RemoteSettings:
             self.client.update_record(data=in_prod["data"])
             raise
 
-        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe}")
+        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name}")
