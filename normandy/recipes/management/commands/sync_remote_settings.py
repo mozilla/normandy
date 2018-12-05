@@ -17,15 +17,17 @@ class Command(BaseCommand):
     """Check that Remote Settings published content is consistent and up-to-date.
     """
 
-    help = "Check or sync Remote Settings content"
+    help = "Sync recipes with Remote Settings"
 
     def add_arguments(self, parser):
-        parser.add_argument("--sync", action="store_true", help="Synchronized remote content")
+        parser.add_argument(
+            "--dry-run", action="store_true", default=False, help="Do not sync, just print out."
+        )
 
-    def handle(self, *args, sync=False, **options):
+    def handle(self, *args, dry_run=False, **options):
         remote_settings = RemoteSettings()
 
-        local_recipes = [r for r in Recipe.objects.all() if r.enabled]
+        local_recipes = Recipe.objects.filter(approved_revision__enabled_state__enabled=True)
         remote_records = remote_settings.published_recipes()
 
         # Compare the two sets: local recipes that are missing remotely will
@@ -42,7 +44,7 @@ class Command(BaseCommand):
                     to_update.append(local_recipe)
             else:
                 to_publish.append(local_recipe)
-        # Lookup the recipes locally, those that are published but should not.
+        # Lookup locally the recipes that are published but should not.
         to_unpublish = []
         for rid in remote_by_id.keys():
             try:
@@ -50,32 +52,30 @@ class Command(BaseCommand):
             except Recipe.DoesNotExist:
                 to_unpublish.append(Recipe(id=rid))
 
-        # If there is nothing to do. Exit.
-        if len(to_publish) + len(to_update) + len(to_unpublish) == 0:
+        # If there is nothing to do, exit.
+        if not to_publish and not to_update and not to_unpublish:
             self.stdout.write(self.style.SUCCESS("Sync OK. Nothing to do."))
             return
 
-        if sync:
-            # Sync is enabled, recipes are un/published.
-            for r in to_publish + to_update:
+        # Show differences on stdout, and un/publish if not dry-run.
+        style = self.style.SUCCESS if not to_publish else self.style.MIGRATE_LABEL
+        self.stdout.write(style(f"{len(to_publish)} recipes to publish:"))
+        for r in to_publish:
+            self.stdout.write(f" * {r.name!r} (id={r.id!r})")
+            if not dry_run:
                 remote_settings.publish(r)
-            for r in to_unpublish:
+
+        style = self.style.SUCCESS if not to_update else self.style.MIGRATE_LABEL
+        self.stdout.write(style(f"{len(to_update)} recipes to update:"))
+        for r in to_update:
+            self.stdout.write(f" * {r.name!r} (id={r.id!r})")
+            if not dry_run:
+                remote_settings.publish(r)
+
+        style = self.style.SUCCESS if not to_unpublish else self.style.MIGRATE_LABEL
+        self.stdout.write(style(f"{len(to_unpublish)} recipes to unpublish:"))
+        for r in to_unpublish:
+            name = r.name if r.name else self.style.WARNING("Unknown locally")
+            self.stdout.write(f" * {name!r} (id={r.id!r})")
+            if not dry_run:
                 remote_settings.unpublish(r)
-
-        else:
-            # Show differences on stdout.
-            style = self.style.SUCCESS if len(to_publish) == 0 else self.style.MIGRATE_LABEL
-            self.stdout.write(style(f"{len(to_publish)} recipes to publish:"))
-            for r in to_publish:
-                self.stdout.write(f" * {r} (id={r.id})")
-
-            style = self.style.SUCCESS if len(to_update) == 0 else self.style.MIGRATE_LABEL
-            self.stdout.write(style(f"{len(to_update)} recipes to update:"))
-            for r in to_update:
-                self.stdout.write(f" * {r} (id={r.id})")
-
-            style = self.style.SUCCESS if len(to_unpublish) == 0 else self.style.MIGRATE_LABEL
-            self.stdout.write(style(f"{len(to_unpublish)} recipes to unpublish:"))
-            for r in to_unpublish:
-                name = r.name if r.name else self.style.WARNING("Unknown locally")
-                self.stdout.write(f" * {name} (id={r.id})")

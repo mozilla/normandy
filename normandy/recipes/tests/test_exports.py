@@ -20,11 +20,12 @@ def mock_logger(mocker):
 
 @pytest.mark.django_db
 class TestRemoteSettings:
-    test_settings = {
-        "URL": "https://remotesettings.example.com/v1",
-        "USERNAME": "normandy",
-        "PASSWORD": "n0rm4ndy",
-    }
+    @pytest.fixture
+    def rs_settings(self, settings):
+        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
+        settings.REMOTE_SETTINGS_USERNAME = "normandy"
+        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
+        return settings
 
     def test_default_settings(self, settings):
         """Test default settings values."""
@@ -36,7 +37,7 @@ class TestRemoteSettings:
         assert settings.REMOTE_SETTINGS_COLLECTION_ID == "normandy-recipes"
         assert settings.REMOTE_SETTINGS_RETRY_REQUESTS == 3
 
-    def test_it_checks_settings(self, settings):
+    def test_it_checks_config(self, settings):
         """Test that each required key is required individually"""
 
         # Leave out URL with Remote Settings (default)
@@ -50,9 +51,9 @@ class TestRemoteSettings:
         exports.RemoteSettings().check_config()
 
         # Leave out USERNAME
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
+        settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
         settings.REMOTE_SETTINGS_USERNAME = None
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
+        settings.REMOTE_SETTINGS_PASSWORD = "p4ssw0rd"
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_USERNAME" in str(exc)
@@ -64,38 +65,35 @@ class TestRemoteSettings:
         assert "REMOTE_SETTINGS_USERNAME" in str(exc)
 
         # Leave out PASSWORD
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
+        settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
+        settings.REMOTE_SETTINGS_USERNAME = "usename"
         settings.REMOTE_SETTINGS_PASSWORD = None
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_PASSWORD" in str(exc)
 
         # Leave out COLLECTION_ID
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
+        settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
+        settings.REMOTE_SETTINGS_USERNAME = "usename"
+        settings.REMOTE_SETTINGS_PASSWORD = "p4ssw0rd"
         settings.REMOTE_SETTINGS_COLLECTION_ID = None
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_COLLECTION_ID" in str(exc)
 
-    def test_check_connection(self, settings, requestsmock):
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
-
+    def test_check_connection(self, rs_settings, requestsmock):
         # Root URL should return currently authenticated user.
-        requestsmock.get(f"{settings.REMOTE_SETTINGS_URL}/", json={"capabilities": {}})
+
+        requestsmock.get(f"{rs_settings.REMOTE_SETTINGS_URL}/", json={"capabilities": {}})
 
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert "Invalid Remote Settings credentials" in str(exc)
 
         requestsmock.get(
-            f"{settings.REMOTE_SETTINGS_URL}/",
+            f"{rs_settings.REMOTE_SETTINGS_URL}/",
             json={
-                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
+                "user": {"id": f"account:{rs_settings.REMOTE_SETTINGS_USERNAME}"},
                 "capabilities": {
                     "signer": {
                         "to_review_enabled": True,
@@ -113,22 +111,22 @@ class TestRemoteSettings:
 
         # Collection should be writable.
         collection_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
         requestsmock.get(collection_url, json={"data": {}, "permissions": {}})
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert (
-            f"Remote Settings collection {settings.REMOTE_SETTINGS_COLLECTION_ID} is not writable"
-            in str(exc)
-        )
+            f"Remote Settings collection {rs_settings.REMOTE_SETTINGS_COLLECTION_ID} "
+            "is not writable"
+        ) in str(exc)
 
         requestsmock.get(
             collection_url,
             json={
                 "data": {},
-                "permissions": {"write": [f"account:{settings.REMOTE_SETTINGS_USERNAME}"]},
+                "permissions": {"write": [f"account:{rs_settings.REMOTE_SETTINGS_USERNAME}"]},
             },
         )
 
@@ -137,13 +135,13 @@ class TestRemoteSettings:
             exports.RemoteSettings().check_config()
         assert (
             "Review was not disabled on Remote Settings collection "
-            f"{settings.REMOTE_SETTINGS_COLLECTION_ID}."
+            f"{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}."
         ) in str(exc)
 
         requestsmock.get(
-            f"{settings.REMOTE_SETTINGS_URL}/",
+            f"{rs_settings.REMOTE_SETTINGS_URL}/",
             json={
-                "user": {"id": f"account:{settings.REMOTE_SETTINGS_USERNAME}"},
+                "user": {"id": f"account:{rs_settings.REMOTE_SETTINGS_USERNAME}"},
                 "capabilities": {
                     "signer": {
                         "to_review_enabled": True,
@@ -174,7 +172,7 @@ class TestRemoteSettings:
         # Assert does not raise.
         exports.RemoteSettings().check_config()
 
-    def test_publish_and_unpublish_are_noop_if_not_enabled(self, settings, requestsmock):
+    def test_publish_and_unpublish_are_noop_if_not_enabled(self, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
         remotesettings = exports.RemoteSettings()
 
@@ -183,20 +181,18 @@ class TestRemoteSettings:
 
         assert len(requestsmock.request_history) == 0
 
-    def test_publish_puts_record_and_approves(self, settings, requestsmock, mock_logger):
+    def test_publish_puts_record_and_approves(self, rs_settings, requestsmock, mock_logger):
         """Test that requests are sent to Remote Settings on publish."""
-
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         collection_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
         record_url = f"{collection_url}/records/{recipe.id}"
-        auth = f"{settings.REMOTE_SETTINGS_USERNAME}:{settings.REMOTE_SETTINGS_PASSWORD}".encode()
+        auth = (
+            rs_settings.REMOTE_SETTINGS_USERNAME + ":" + rs_settings.REMOTE_SETTINGS_PASSWORD
+        ).encode()
         request_headers = {
             "User-Agent": KINTO_USER_AGENT,
             "Content-Type": "application/json",
@@ -217,23 +213,21 @@ class TestRemoteSettings:
         assert requestsmock.request_history[0].json() == {"data": exports.recipe_as_record(recipe)}
         assert requestsmock.request_history[1].url == collection_url
         mock_logger.info.assert_called_with(
-            f"Published record '{recipe.id}' for recipe {recipe.name}"
+            f"Published record '{recipe.id}' for recipe '{recipe.name}'"
         )
 
-    def test_unpublish_deletes_record_and_approves(self, settings, requestsmock, mock_logger):
+    def test_unpublish_deletes_record_and_approves(self, rs_settings, requestsmock, mock_logger):
         """Test that requests are sent to Remote Settings on unpublish."""
-
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-        settings.REMOTE_SETTINGS_USERNAME = self.test_settings["USERNAME"]
-        settings.REMOTE_SETTINGS_PASSWORD = self.test_settings["PASSWORD"]
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         collection_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
         record_url = f"{collection_url}/records/{recipe.id}"
-        auth = f"{settings.REMOTE_SETTINGS_USERNAME}:{settings.REMOTE_SETTINGS_PASSWORD}".encode()
+        auth = (
+            rs_settings.REMOTE_SETTINGS_USERNAME + ":" + rs_settings.REMOTE_SETTINGS_PASSWORD
+        ).encode()
         request_headers = {
             "User-Agent": KINTO_USER_AGENT,
             "Content-Type": "application/json",
@@ -253,16 +247,14 @@ class TestRemoteSettings:
         assert requestsmock.request_history[0].url == record_url
         assert requestsmock.request_history[1].url == collection_url
         mock_logger.info.assert_called_with(
-            f"Deleted record '{recipe.id}' of recipe {recipe.name}"
+            f"Deleted record '{recipe.id}' of recipe '{recipe.name}'"
         )
 
-    def test_publish_raises_an_error_if_request_fails(self, settings, requestsmock):
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-
+    def test_publish_raises_an_error_if_request_fails(self, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         record_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
             f"/records/{recipe.id}"
         )
         requestsmock.request("put", record_url, status_code=503)
@@ -271,17 +263,15 @@ class TestRemoteSettings:
         with pytest.raises(kinto_http.KintoException):
             remotesettings.publish(recipe)
 
-        assert requestsmock.call_count == settings.REMOTE_SETTINGS_RETRY_REQUESTS + 1
+        assert requestsmock.call_count == rs_settings.REMOTE_SETTINGS_RETRY_REQUESTS + 1
 
     def test_unpublish_ignores_error_about_missing_record(
-        self, settings, requestsmock, mock_logger
+        self, rs_settings, requestsmock, mock_logger
     ):
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         record_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
             f"/records/{recipe.id}"
         )
         requestsmock.request("delete", record_url, status_code=404)
@@ -295,19 +285,17 @@ class TestRemoteSettings:
             f"The recipe '{recipe.id}' was never published. Skip."
         )
 
-    def test_publish_reverts_changes_if_approval_fails(self, settings, requestsmock):
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
-
+    def test_publish_reverts_changes_if_approval_fails(self, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
         collection_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
         record_url = f"{collection_url}/records/{recipe.id}"
         requestsmock.request("put", record_url, content=b'{"data": {}}', status_code=201)
         requestsmock.request("patch", collection_url, status_code=403)
         record_prod_url = record_url.replace(
-            f"/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/",
+            f"/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}/",
             f"/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/",
         )
         requestsmock.request("get", record_prod_url, content=b"{}", status_code=404)
@@ -324,18 +312,17 @@ class TestRemoteSettings:
         assert requestsmock.request_history[3].url == record_url
         assert requestsmock.request_history[3].method == "DELETE"
 
-    def test_unpublish_reverts_changes_if_approval_fails(self, settings, requestsmock):
-        recipe = RecipeFactory(name="Test", enabler=UserFactory(), approver=UserFactory())
-        settings.REMOTE_SETTINGS_URL = self.test_settings["URL"]
+    def test_unpublish_reverts_changes_if_approval_fails(self, rs_settings, requestsmock):
+        recipe = RecipeFactory(name="Test", approver=UserFactory())
         collection_url = (
-            f"{settings.REMOTE_SETTINGS_URL}/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}"
-            f"/collections/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
+            f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
         record_url = f"{collection_url}/records/{recipe.id}"
         requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
         requestsmock.request("patch", collection_url, status_code=403)
         record_prod_url = record_url.replace(
-            f"/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/",
+            f"/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}/",
             f"/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/",
         )
         record_in_prod = json.dumps({"data": exports.recipe_as_record(recipe)}).encode()

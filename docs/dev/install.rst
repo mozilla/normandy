@@ -247,10 +247,13 @@ on the Remote Settings server:
 
       curl ${SERVER}/buckets/main/collections/normandy-recipes/records
 
-On the Firefox side, pulling the recipes from the local instance of Remote Settings will require these preferences to
+On the Firefox side, pulling the recipes from the local instance of Remote Settings will require this preference to
 be set:
 
 - ``services.settings.server``: ``http://localhost:8888/v1``
+
+And these two boolean preferences need to be created (*right click*):
+
 - ``services.settings.verify_signature``: false
 - ``app.normandy.remotesettings.enabled``: true
 

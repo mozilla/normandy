@@ -44,16 +44,16 @@ class RemoteSettings:
 
         Remote Settings signoff workflow relies on several buckets (see kinto-signer API).
 
-        The `main-workspace` is only readable and writable by authorized accounts.
-        The `main` bucket is read-only, but publicly readable. The Remote Settings
+        The ``main-workspace`` is only readable and writable by authorized accounts.
+        The ``main`` bucket is read-only, but publicly readable. The Remote Settings
         clients pull data from there.
 
         Since the review step is disabled for Normandy, publishing data is done in two steps:
 
-        1. Create, update or delete records in the `main-workspace` bucket
+        1. Create, update or delete records in the ``main-workspace`` bucket
         2. Approve the changes by flipping the ``status`` field to ``to-sign``
            in the collection metadata
-        3. The server will sign and publish the new data to the `main` bucket.
+        3. The server will sign and publish the new data to the ``main`` bucket.
 
     """
 
@@ -63,20 +63,15 @@ class RemoteSettings:
     """
 
     def __init__(self):
-        self.collection_id = str(settings.REMOTE_SETTINGS_COLLECTION_ID)
-
         # Kinto is the underlying implementation of Remote Settings. The client
         # is basically a tiny abstraction on top of the requests library.
         self.client = (
             kinto_http.Client(
-                server_url=str(settings.REMOTE_SETTINGS_URL),
-                auth=(
-                    str(settings.REMOTE_SETTINGS_USERNAME),
-                    str(settings.REMOTE_SETTINGS_PASSWORD),
-                ),
-                bucket=str(settings.REMOTE_SETTINGS_BUCKET_ID),
-                collection=self.collection_id,
-                retry=int(settings.REMOTE_SETTINGS_RETRY_REQUESTS),
+                server_url=settings.REMOTE_SETTINGS_URL,
+                auth=(settings.REMOTE_SETTINGS_USERNAME, settings.REMOTE_SETTINGS_PASSWORD),
+                bucket=settings.REMOTE_SETTINGS_BUCKET_ID,
+                collection=settings.REMOTE_SETTINGS_COLLECTION_ID,
+                retry=settings.REMOTE_SETTINGS_RETRY_REQUESTS,
             )
             if settings.REMOTE_SETTINGS_URL
             else None
@@ -108,7 +103,8 @@ class RemoteSettings:
         metadata = self.client.get_collection()
         if server_info["user"]["id"] not in metadata["permissions"].get("write", []):
             raise ImproperlyConfigured(
-                f"Remote Settings collection {self.collection_id} is not writable."
+                f"Remote Settings collection {settings.REMOTE_SETTINGS_COLLECTION_ID} "
+                "is not writable."
             )
 
         # Test that collection has the proper review settings.
@@ -119,7 +115,7 @@ class RemoteSettings:
                 r
                 for r in signer_config["resources"]
                 if r["source"]["bucket"] == settings.REMOTE_SETTINGS_BUCKET_ID
-                and r["source"]["collection"] == self.collection_id
+                and r["source"]["collection"] == settings.REMOTE_SETTINGS_COLLECTION_ID
             ]
             review_disabled = (
                 len(normandy_resource) == 1
@@ -132,7 +128,8 @@ class RemoteSettings:
             )
             if not review_disabled:
                 raise ImproperlyConfigured(
-                    f"Review was not disabled on Remote Settings collection {self.collection_id}."
+                    "Review was not disabled on Remote Settings collection "
+                    f"{settings.REMOTE_SETTINGS_COLLECTION_ID}."
                 )
 
     def published_recipes(self):
@@ -174,7 +171,7 @@ class RemoteSettings:
                     self.client.delete_record(id=record["id"])
             raise
 
-        logger.info(f"Published record '{recipe.id}' for recipe {recipe}")
+        logger.info(f"Published record '{recipe.id}' for recipe {recipe.name!r}")
 
     def unpublish(self, recipe):
         """
@@ -204,4 +201,4 @@ class RemoteSettings:
             self.client.update_record(data=in_prod["data"])
             raise
 
-        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name}")
+        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name!r}")
