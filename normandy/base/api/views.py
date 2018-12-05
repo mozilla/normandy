@@ -1,11 +1,12 @@
 from urllib.parse import urljoin
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.urls import NoReverseMatch
 
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import (
@@ -14,8 +15,13 @@ from rest_framework.views import (
     set_rollback,
 )
 
-from normandy.base.api.permissions import IsSuperUser
-from normandy.base.api.serializers import UserSerializer, ServiceInfoSerializer
+from normandy.base.api.permissions import CanChangeUser
+from normandy.base.api.serializers import (
+    GroupSerializer,
+    ServiceInfoSerializer,
+    UserSerializer,
+    UserWithGroupsSerializer,
+)
 from normandy.base.decorators import api_cache_control
 
 
@@ -85,8 +91,8 @@ class UserViewSet(viewsets.ModelViewSet):
     """Viewset for managing users."""
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsSuperUser,)
+    serializer_class = UserWithGroupsSerializer
+    permission_classes = (CanChangeUser,)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -96,6 +102,58 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         super().destroy(request, *args, **kwargs)
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    """Viewset for managing groups."""
+
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = (CanChangeUser,)
+
+    @action(detail=True, methods=["POST"])
+    def add_user(self, request, pk=None):
+        group = self.get_object()
+
+        if not request.data.get("user_id"):
+            return Response(
+                {"user_id": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(pk=request.data.get("user_id"))
+        except User.DoesNotExist:
+            return Response({"user_id": "Invalid user ID."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.user == user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        user.groups.add(group)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["POST"])
+    def remove_user(self, request, pk=None):
+        group = self.get_object()
+
+        if not request.data.get("user_id"):
+            return Response(
+                {"user_id": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(pk=request.data.get("user_id"))
+        except User.DoesNotExist:
+            return Response({"user_id": "Invalid user ID."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.groups.filter(pk=group.pk).count() == 0:
+            return Response(
+                {"user_id": "User is not in group."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.groups.remove(group)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def exception_handler(exc, context):

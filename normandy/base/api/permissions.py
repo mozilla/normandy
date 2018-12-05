@@ -21,10 +21,10 @@ class AdminEnabledOrReadOnly(AdminEnabled):
         return super().has_permission(request, view) or request.method in permissions.SAFE_METHODS
 
 
-class IsSuperUser(permissions.BasePermission):
+class CanChangeUser(permissions.BasePermission):
     """
-    Allows access only to super users.
+    Ensures that users have the appropriate permission to change users.
     """
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_superuser
+        return request.user and request.user.has_perm("auth.change_user")

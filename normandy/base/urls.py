@@ -8,6 +8,7 @@ from normandy.base.api.routers import MixedViewRouter
 # API Router
 router = MixedViewRouter()
 router.register("user", api_views.UserViewSet)
+router.register("group", api_views.GroupViewSet)
 
 
 urlpatterns = [
