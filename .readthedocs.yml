@@ -1,5 +1,13 @@
-requirements_file: requirements/docs.txt
+# As of December 2018, we can't use Python 3.7 in Readthedocs.
+# Our requirements file (default.txt to be exact) only has hashes for Python 3.7.
+# So to be able to build all the requirements for Python 3.6 we first install
+# py36.txt which has specific hashes for Python 3.6. So when it processes docs.txt
+# if will file packages like bcrypt or cffi are already installed.
+# This works because it py36_docs.txt, at the bottom of the file, refers to `-r docs.txt`
+# so by the time it works on `docs.txt` a bunch of Python 3.6 binary packages
+# are already installed.
+requirements_file: requirements/py36_docs.txt
 build:
-    image: latest
+  image: latest
 python:
-    version: 3.7
+  version: 3.6
