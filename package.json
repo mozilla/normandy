@@ -17,8 +17,8 @@
   "license": "MPL-2.0",
   "dependencies": {
     "mozilla-normandy-action-argument-schemas": "0.3.0",
-    "node-uuid": "1.4.8",
-    "nsp": "3.2.1"
+    "nsp": "3.2.1",
+    "uuid": "3.3.2"
   },
   "devDependencies": {
     "@babel/core": "7.1.6",
