@@ -1,4 +1,4 @@
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 
 /**
  * EventEmitter for Heartbeat events. Unlike normal event emitters,
@@ -40,7 +40,9 @@ export class HeartbeatEmitter {
 
   emit(eventName, data) {
     if (this.eventData[eventName] !== null) {
-      throw new Error(`Cannot emit a Heartbeat event more than once: ${eventName}`);
+      throw new Error(
+        `Cannot emit a Heartbeat event more than once: ${eventName}`,
+      );
     }
 
     this.eventData[eventName] = data;
@@ -94,9 +96,7 @@ export function mockNormandy() {
     location() {
       return Promise.resolve(this.mock.location);
     },
-    log() {
-
-    },
+    log() {},
     createStorage() {
       return this.mock.storage;
     },

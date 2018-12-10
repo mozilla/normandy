@@ -88,7 +88,7 @@ class Core(Configuration):
     NPM_FILE_PATTERNS = {
         "babel-polyfill": ["dist/*.js"],
         "font-awesome": ["css/*.css", "fonts/*"],
-        "node-uuid": ["uuid.js"],
+        "uuid": ["uuid.js"],
         "jquery": ["dist/*.js"],
         "json-editor": ["dist/*.js"],
         "wolfy87-eventemitter": ["EventEmitter.js"],
