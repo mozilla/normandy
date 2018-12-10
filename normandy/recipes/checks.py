@@ -2,9 +2,11 @@ from datetime import timedelta
 
 from django.apps import apps
 from django.conf import settings
-from django.core.checks import Warning, Info, register as register_check
+from django.core.checks import Error, Info, register as register_check
 from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import OperationalError, ProgrammingError
+
+import requests.exceptions
 
 from normandy.recipes import signing
 
@@ -12,10 +14,11 @@ from normandy.recipes import signing
 INFO_COULD_NOT_RETRIEVE_ACTIONS = "normandy.recipes.I001"
 INFO_COULD_NOT_RETRIEVE_RECIPES = "normandy.recipes.I002"
 INFO_COULD_NOT_RETRIEVE_SIGNATURES = "normandy.recipes.I003"
-WARNING_MISMATCHED_ACTION_HASH = "normandy.recipes.W001"
-WARNING_INVALID_RECIPE_SIGNATURE = "normandy.recipes.W002"
-WARNING_BAD_SIGNING_CERTIFICATE = "normandy.recipes.W003"
-WARNING_INVALID_ACTION_SIGNATURE = "normandy.recipes.W004"
+ERROR_MISMATCHED_ACTION_HASH = "normandy.recipes.E001"
+ERROR_INVALID_RECIPE_SIGNATURE = "normandy.recipes.E002"
+ERROR_BAD_SIGNING_CERTIFICATE = "normandy.recipes.E003"
+ERROR_INVALID_ACTION_SIGNATURE = "normandy.recipes.E004"
+ERROR_COULD_NOT_VERIFY_CERTIFICATE = "normandy.recipes.E005"
 
 
 def actions_have_consistent_hashes(app_configs, **kwargs):
@@ -31,7 +34,7 @@ def actions_have_consistent_hashes(app_configs, **kwargs):
                 msg = "Action '{action}' (id={action.id}) has a mismatched hash".format(
                     action=action
                 )
-                errors.append(Warning(msg, id=WARNING_MISMATCHED_ACTION_HASH))
+                errors.append(Error(msg, id=ERROR_MISMATCHED_ACTION_HASH))
 
     return errors
 
@@ -55,7 +58,7 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
                 msg = "Recipe '{recipe}' (id={recipe.id}) has a bad signature: {detail}".format(
                     recipe=recipe, detail=e.detail
                 )
-                errors.append(Warning(msg, id=WARNING_INVALID_RECIPE_SIGNATURE))
+                errors.append(Error(msg, id=ERROR_INVALID_RECIPE_SIGNATURE))
 
     return errors
 
@@ -78,7 +81,7 @@ def action_signatures_are_correct(app_configs, **kwargs):
                 signing.verify_signature(data, signature, pubkey)
             except signing.BadSignature as e:
                 msg = f"Action '{action}' (id={action.id}) has a bad signature: {e.detail}"
-                errors.append(Warning(msg, id=WARNING_INVALID_ACTION_SIGNATURE))
+                errors.append(Error(msg, id=ERROR_INVALID_ACTION_SIGNATURE))
 
     return errors
 
@@ -102,20 +105,32 @@ def signatures_use_good_certificates(app_configs, **kwargs):
         msg = f"Could not retrieve signatures: {e}"
         errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_SIGNATURES))
     else:
+
+        def get_matching_object_names(url):
+            matching_recipes = Recipe.objects.filter(signature__x5u=url)
+            matching_actions = Action.objects.filter(signature__x5u=url)
+            matching_objects = list(matching_recipes) + list(matching_actions)
+            object_names = [str(o) for o in matching_objects]
+            return object_names
+
         for url in urls:
             try:
                 signing.verify_x5u(url, expire_early)
             except signing.BadCertificate as exc:
-                matching_recipes = Recipe.objects.filter(signature__x5u=url)
-                matching_actions = Action.objects.filter(signature__x5u=url)
-                bad_objects = list(matching_recipes) + list(matching_actions)
-
-                object_names = ", ".join(str(o) for o in bad_objects)
+                bad_object_names = get_matching_object_names(url)
                 msg = (
-                    f"{len(bad_objects)} objects are signed with a bad cert: {object_names}. "
-                    f"{exc.detail}. Certificate url is {url}. "
+                    f"{len(bad_object_names)} objects are signed with a bad cert: "
+                    f"{bad_object_names}. {exc.detail}. Certificate url is {url}. "
                 )
-                errors.append(Warning(msg, id=WARNING_BAD_SIGNING_CERTIFICATE))
+                errors.append(Error(msg, id=ERROR_BAD_SIGNING_CERTIFICATE))
+            except requests.RequestException as exc:
+                bad_object_names = get_matching_object_names(url)
+                msg = (
+                    f"The certificate at {url} could not be fetched due to a network error to "
+                    f"verify. {len(bad_object_names)} objects are signed with this certificate: "
+                    f"{bad_object_names}. {exc}"
+                )
+                errors.append(Error(msg, id=ERROR_COULD_NOT_VERIFY_CERTIFICATE))
 
     return errors
 
