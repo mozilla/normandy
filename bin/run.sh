@@ -28,14 +28,7 @@ case $1 in
     yarn lint:js
 
     echo "Checking JS package security"
-    # Disable automatic failure
-    set +e
-    # nsp uses exit code 1 for security problems
     yarn run lint:js-security
-    if [[ $? -eq 1 ]]; then
-        exit 1
-    fi
-    set -e
     ;;
   migrations-check)
     ./manage.py migrate
