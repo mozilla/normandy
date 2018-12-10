@@ -214,9 +214,10 @@ appdirs==1.4.3 \
 google-api-core==1.6.0 \
     --hash=sha256:481f3a306f39c7cb0b4901fc1cc133c693343e82604871fd8f83fcb8a2ee2921 \
     --hash=sha256:84dca4d7fcf13574ad8e31ba02ad04ffcdb2e5b596383571e3105d9d0ad70d27
-google-cloud-core==0.29.0 \
-    --hash=sha256:d4a4ec4d76269328bb0acbf69262912068886b30d4498976e1f0924a158accc3 \
-    --hash=sha256:8a2c63fd26ad97310a20ff53daec06893b6ac9a165d90a2aee9ed58d24482372
+google-cloud-core==0.28.1 \
+    --hash=sha256:0090df83dbc5cb2405fa90844366d13176d1c0b48181c1807ab15f53be403f73 \
+    --hash=sha256:89e8140a288acec20c5e56159461d3afa4073570c9758c05d4e6cb7f2f8cc440 \
+    # pyup: <0.29dev # requests_mock doesn't support >= 0.29
 google-resumable-media==0.3.1 \
     --hash=sha256:116de90b9cd483b17c53618ee6a5a20f33e741c648140c8cc9c2141e07616ff1 \
     --hash=sha256:97de518f8166d442cc0b61fab308bcd319dbb970981e667ec8ded44f5ce49836
