@@ -3,7 +3,6 @@
 .env*
 .floo*
 docs/_build
-GeoLite2-Country.mmdb
 media
 node_modules
 pip-cache
