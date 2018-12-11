@@ -8,7 +8,7 @@ from django.db.utils import OperationalError, ProgrammingError
 
 import requests.exceptions
 
-from normandy.recipes import signing
+from normandy.recipes import signing, geolocation
 
 
 INFO_COULD_NOT_RETRIEVE_ACTIONS = "normandy.recipes.I001"
@@ -19,6 +19,8 @@ ERROR_INVALID_RECIPE_SIGNATURE = "normandy.recipes.E002"
 ERROR_BAD_SIGNING_CERTIFICATE = "normandy.recipes.E003"
 ERROR_INVALID_ACTION_SIGNATURE = "normandy.recipes.E004"
 ERROR_COULD_NOT_VERIFY_CERTIFICATE = "normandy.recipes.E005"
+ERROR_GEOIP_DB_NOT_AVAILABLE = "normandy.recipes.E006"
+ERROR_GEOIP_DB_UNEXPECTED_RESULT = "normandy.recipes.E007"
 
 
 def actions_have_consistent_hashes(app_configs, **kwargs):
@@ -135,9 +137,33 @@ def signatures_use_good_certificates(app_configs, **kwargs):
     return errors
 
 
+def geoip_db_is_available(app_configs, **kwargs):
+    errors = []
+    if geolocation.geoip_reader is None:
+        # try loading it
+        geolocation.load_geoip_database()
+        if geolocation.geoip_reader is None:
+            errors.append(Error("GeoIP DB not available", id=ERROR_GEOIP_DB_NOT_AVAILABLE))
+
+    if not errors:
+        # DB seems to be available, test a known value
+        expected = "US"
+        actual = geolocation.get_country_code("1.2.3.4")
+        if actual != expected:
+            errors.append(
+                Error(
+                    f"GeoIP DB returned unexpected result. Expected {expected} got {actual}",
+                    id=ERROR_GEOIP_DB_UNEXPECTED_RESULT,
+                )
+            )
+
+    return errors
+
+
 def register():
     register_check(actions_have_consistent_hashes)
     # Temporarily disabled, see Issue #900.
     # register_check(recipe_signatures_are_correct)
     # register_check(action_signatures_are_correct)
     register_check(signatures_use_good_certificates)
+    register_check(geoip_db_is_available)
