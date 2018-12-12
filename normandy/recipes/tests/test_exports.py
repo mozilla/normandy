@@ -20,13 +20,6 @@ def mock_logger(mocker):
 
 @pytest.mark.django_db
 class TestRemoteSettings:
-    @pytest.fixture
-    def rs_settings(self, settings):
-        settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
-        settings.REMOTE_SETTINGS_USERNAME = "normandy"
-        settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
-        return settings
-
     def test_default_settings(self, settings):
         """Test default settings values."""
 
