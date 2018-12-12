@@ -2,7 +2,7 @@ import os
 import re
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 
 from factory import DjangoModelFactory, fuzzy, Sequence
 import pytest
@@ -64,6 +64,13 @@ class UserFactory(DjangoModelFactory):
 
     class Meta:
         model = User
+
+
+class GroupFactory(DjangoModelFactory):
+    name = FuzzyUnicode()
+
+    class Meta:
+        model = Group
 
 
 def skip_except_in_ci():
