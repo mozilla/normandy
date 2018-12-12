@@ -3,19 +3,29 @@ from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+class UserOnlyNamesSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name"]
+
+
+class UserSerializer(UserOnlyNamesSerializer):
     email = serializers.CharField()
 
     class Meta:
         model = User
         fields = ["id", "first_name", "last_name", "email"]
 
+    def create(self, validated_data):
+        # Username should be the same as email
+        validated_data["username"] = validated_data.get("email")
+        return super().create(validated_data)
+
 
 class GroupSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
     name = serializers.CharField()
 
     class Meta:

@@ -19,6 +19,7 @@ from normandy.base.api.permissions import CanChangeUser
 from normandy.base.api.serializers import (
     GroupSerializer,
     ServiceInfoSerializer,
+    UserOnlyNamesSerializer,
     UserSerializer,
     UserWithGroupsSerializer,
 )
@@ -90,9 +91,16 @@ class ServiceInfoView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     """Viewset for managing users."""
 
-    queryset = User.objects.all()
+    # Order by ID to prevent UnorderedObjectListWarning
+    queryset = User.objects.order_by("id")
     serializer_class = UserWithGroupsSerializer
     permission_classes = (CanChangeUser,)
+
+    def get_serializer_class(self):
+        # Don't allow users to update email address
+        if self.request.method in ("PUT", "PATCH"):
+            return UserOnlyNamesSerializer
+        return self.serializer_class
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -101,13 +109,14 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.user == instance:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        super().destroy(request, *args, **kwargs)
+        return super().destroy(request, *args, **kwargs)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
     """Viewset for managing groups."""
 
-    queryset = Group.objects.all()
+    # Order by ID to prevent UnorderedObjectListWarning
+    queryset = Group.objects.order_by("id")
     serializer_class = GroupSerializer
     permission_classes = (CanChangeUser,)
 
