@@ -392,6 +392,8 @@ class Development(Base):
     SWAGGER_SETTINGS = Base.SWAGGER_SETTINGS
     SWAGGER_SETTINGS["VALIDATOR_URL"] = None
 
+    SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
+
 
 class Production(Base):
     """Settings for the production environment."""
