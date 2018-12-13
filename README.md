@@ -11,6 +11,9 @@ studies, user surveys and controlled rollout of new features.
 
 Normandy is licensed under the MPLv2. See the `LICENSE` file for details.
 
+The Docker images published for Normandy include GeoLite2 data created by
+MaxMind, available from https://www.maxmind.com.
+
 # Hacking
 
 Please see the [Developer Setup] documentation to get started.
