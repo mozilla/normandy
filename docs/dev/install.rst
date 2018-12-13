@@ -195,7 +195,7 @@ If you ever need to bypass Therapist, you can do so by passing
 
 .. _Therapist: http://therapist.readthedocs.io/en/latest/overview.html
 
-.. _remotesettings-install:
+.. _remote-settings-install:
 
 Remote Settings
 ---------------
@@ -240,31 +240,11 @@ an instance locally.
            -H 'Content-Type:application/json' \
            -u 'normandy:n0rm4ndy'
 
-With both configurations in place, Normandy should start without error. When a recipe is enabled, it is published and becomes visible
-on the Remote Settings server:
+With both configurations in place, Normandy should start without error.
 
-.. code-block:: bash
+.. seealso::
 
-      curl ${SERVER}/buckets/main/collections/normandy-recipes/records
-
-On the Firefox side, pulling the recipes from the local instance of Remote Settings will require this preference to
-be set:
-
-- ``services.settings.server``: ``http://localhost:8888/v1``
-
-And these two boolean preferences need to be created (*right click*):
-
-- ``services.settings.verify_signature``: false
-- ``app.normandy.remotesettings.enabled``: true
-
-And then trigger a manual synchronization in the Browser console:
-
-.. code-block:: javascript
-
-      const { RemoteSettings } = ChromeUtils.import("resource://services-settings/remote-settings.js", {});
-      await RemoteSettings.pollChanges();
-
-The Normandy recipe runner will now be able to read the list of recipes to execute from the local Remote Settings database.
+   The :ref:`documentation section dedicated to Remote Settings <remote-settings>`
 
 .. _Remote Settings: https://remote-settings.readthedocs.io
 .. _Remote Settings installation instructions: https://remote-settings.readthedocs.io/en/latest/tutorial-local-server.html
