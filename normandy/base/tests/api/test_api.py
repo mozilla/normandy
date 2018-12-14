@@ -4,12 +4,13 @@ import pytest
 from rest_framework.test import APIClient
 
 from django.conf.urls import url
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.views.generic import View
 
 from normandy.base.api.views import APIRootView
 from normandy.base.api.routers import MixedViewRouter
-from normandy.base.tests import Whatever
+from normandy.base.tests import GroupFactory, UserFactory, Whatever
 
 
 @pytest.mark.django_db
@@ -235,3 +236,189 @@ class TestServiceInfoView(object):
             "logout_url": settings.OIDC_LOGOUT_URL,
             "github_url": settings.GITHUB_URL,
         }
+
+
+@pytest.mark.django_db
+class TestUserAPI(object):
+    def test_it_works(self, api_client):
+        user = User.objects.first()
+        group = GroupFactory()
+        user.groups.add(group)
+        res = api_client.get("/api/v3/user/")
+        assert res.status_code == 200
+        assert res.data == {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
+                    "groups": [{"id": group.id, "name": group.name}],
+                }
+            ],
+        }
+
+    def test_must_have_permission(self, api_client):
+        user = UserFactory(is_superuser=False)
+        api_client.force_authenticate(user=user)
+        res = api_client.get("/api/v3/user/")
+        assert res.status_code == 403
+
+        ct = ContentType.objects.get_for_model(User)
+        permission = Permission.objects.get(codename="change_user", content_type=ct)
+        user.user_permissions.add(permission)
+        user = User.objects.get(pk=user.pk)
+        api_client.force_authenticate(user=user)
+        res = api_client.get("/api/v3/user/")
+        assert res.status_code == 200
+
+    def test_create_user(self, api_client):
+        res = api_client.post(
+            "/api/v3/user/", {"first_name": "John", "last_name": "Doe", "email": "jdoe@mail.com"}
+        )
+        assert res.status_code == 201
+
+        user = User.objects.get(email="jdoe@mail.com")
+        assert user.username == user.email
+
+    def test_update_user(self, api_client):
+        u = UserFactory(first_name="John", last_name="Doe")
+        res = api_client.patch(f"/api/v3/user/{u.id}/", {"first_name": "Jane"})
+        assert res.status_code == 200
+        u.refresh_from_db()
+        assert u.first_name == "Jane"
+
+        res = api_client.patch(
+            f"/api/v3/user/{u.id}/", {"first_name": "Lejames", "last_name": "Bron"}
+        )
+        assert res.status_code == 200
+        u.refresh_from_db()
+        assert u.first_name == "Lejames"
+        assert u.last_name == "Bron"
+
+    def test_cannot_update_email(self, api_client):
+        u = UserFactory(email="test@test.com")
+
+        res = api_client.patch(f"/api/v3/user/{u.id}/", {"email": "foo@bar.com"})
+        assert res.status_code == 200
+        u.refresh_from_db()
+        assert u.email == "test@test.com"
+
+        res = api_client.put(
+            f"/api/v3/user/{u.id}/",
+            {"first_name": "Lejames", "last_name": "Bron", "email": "foo@bar.com"},
+        )
+        assert res.status_code == 200
+        u.refresh_from_db()
+        assert u.email == "test@test.com"
+
+    def test_delete_user(self, api_client):
+        u = UserFactory()
+        res = api_client.delete(f"/api/v3/user/{u.id}/")
+        assert res.status_code == 204
+        assert User.objects.filter(pk=u.pk).count() == 0
+
+    def test_cannot_delete_self(self, api_client):
+        user = User.objects.first()
+        res = api_client.delete(f"/api/v3/user/{user.id}/")
+        assert res.status_code == 403
+
+
+@pytest.mark.django_db
+class TestGroupAPI(object):
+    def test_it_works(self, api_client):
+        group = GroupFactory()
+        res = api_client.get("/api/v3/group/")
+        assert res.status_code == 200
+        assert res.data == {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [{"id": group.id, "name": group.name}],
+        }
+
+    def test_must_have_permission(self, api_client):
+        user = UserFactory(is_superuser=False)
+        api_client.force_authenticate(user=user)
+        res = api_client.get("/api/v3/group/")
+        assert res.status_code == 403
+
+        ct = ContentType.objects.get_for_model(User)
+        permission = Permission.objects.get(codename="change_user", content_type=ct)
+        user.user_permissions.add(permission)
+        user = User.objects.get(pk=user.pk)
+        api_client.force_authenticate(user=user)
+        res = api_client.get("/api/v3/group/")
+        assert res.status_code == 200
+
+    def test_create_group(self, api_client):
+        res = api_client.post("/api/v3/group/", {"name": "Test"})
+
+        assert res.status_code == 201
+        assert Group.objects.all().count() == 1
+
+        g = Group.objects.first()
+        assert g.name == "Test"
+
+    def test_update_group(self, api_client):
+        g = GroupFactory(name="abc")
+        res = api_client.put(f"/api/v3/group/{g.id}/", {"name": "def"})
+        assert res.status_code == 200
+        g.refresh_from_db()
+        assert g.name == "def"
+
+    def test_delete_group(self, api_client):
+        g = GroupFactory()
+        res = api_client.delete(f"/api/v3/group/{g.id}/")
+        assert res.status_code == 204
+        assert Group.objects.all().count() == 0
+
+    def test_add_user(self, api_client):
+        user = UserFactory()
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/add_user/", {"user_id": user.id})
+        assert res.status_code == 204
+        assert user.groups.filter(pk=group.pk).count() == 1
+
+    def test_add_user_no_user_id(self, api_client):
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/add_user/")
+        assert res.status_code == 400
+
+    def test_add_user_bad_user_id(self, api_client):
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/add_user/", {"user_id": 9999})
+        assert res.status_code == 400
+
+    def test_add_user_cannot_add_self(self, api_client):
+        user = User.objects.first()
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/add_user/", {"user_id": user.id})
+        assert res.status_code == 403
+
+    def test_remove_user(self, api_client):
+        user = UserFactory()
+        group = GroupFactory()
+        user.groups.add(group)
+        res = api_client.post(f"/api/v3/group/{group.id}/remove_user/", {"user_id": user.id})
+        assert res.status_code == 204
+        assert user.groups.filter(pk=group.pk).count() == 0
+
+    def test_remove_user_no_user_id(self, api_client):
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/remove_user/")
+        assert res.status_code == 400
+
+    def test_remove_user_bad_user_id(self, api_client):
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/remove_user/", {"user_id": 9999})
+        assert res.status_code == 400
+
+    def test_remove_user_not_in_group(self, api_client):
+        user = UserFactory()
+        group = GroupFactory()
+        res = api_client.post(f"/api/v3/group/{group.id}/remove_user/", {"user_id": user.id})
+        assert res.status_code == 400

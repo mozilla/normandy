@@ -46,6 +46,7 @@ jobs:
           # requires an explicit list so it doesn't try to pull images that
           # have already been built.
           command: |
+            ./bin/download_geolite2.sh
             docker-compose build
             docker-compose pull db
 
@@ -100,7 +101,7 @@ jobs:
 
   docs:
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.7
 
     working_directory: ~/repo
 

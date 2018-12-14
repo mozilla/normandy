@@ -2,7 +2,7 @@ version: "3"
 
 services:
   db:
-    image: postgres:9.4
+    image: postgres:9.6
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 1s
@@ -19,6 +19,7 @@ services:
     ports:
       - 8000:8000
     environment:
+      - CI
       - DJANGO_CONFIGURATION=ProductionInsecure
       - DATABASE_URL=postgres://postgres@db/postgres
       - ARTIFACTS_PATH=/artifacts
@@ -28,6 +29,8 @@ services:
 
   artifact-collector:
     image: ubuntu:18.04 # TODO this could be a more minimal image
+    environment:
+      - CI
     volumes:
       - test-artifacts:/artifacts
     command: |
@@ -42,6 +45,7 @@ services:
     ports:
       - 9876:9876
     environment:
+      - CI
       - ARTIFACTS_PATH=/artifacts
     volumes:
       - test-artifacts:/artifacts
@@ -51,6 +55,8 @@ services:
     build:
       context: .
       dockerfile: js-tests-browser.Dockerfile
+    environment:
+      - CI
     # The test runner starts listening on the port slightly before it starts
     # acceptions requests. Waiting a second makes this work more reliably.
     command: |

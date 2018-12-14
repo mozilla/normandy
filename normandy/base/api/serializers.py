@@ -1,17 +1,44 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+class UserOnlyNamesSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name"]
+
+
+class UserSerializer(UserOnlyNamesSerializer):
     email = serializers.CharField()
 
     class Meta:
         model = User
         fields = ["id", "first_name", "last_name", "email"]
+
+    def create(self, validated_data):
+        # Username should be the same as email
+        validated_data["username"] = validated_data.get("email")
+        return super().create(validated_data)
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+
+    class Meta:
+        model = Group
+        fields = ["id", "name"]
+
+
+class UserWithGroupsSerializer(UserSerializer):
+    groups = GroupSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name", "email", "groups"]
 
 
 class ServiceInfoSerializer(serializers.Serializer):
