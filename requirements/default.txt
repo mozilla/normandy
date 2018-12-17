@@ -215,7 +215,6 @@ requests-mock==1.5.2 \
 black==18.9b0 \
     --hash=sha256:817243426042db1d36617910df579a54f1afd659adb96fc5032fcf4b36209739 \
     --hash=sha256:e030a9a28f542debc08acceb273f228ac422798e5215ba2a791a6ddeaaca22a5
-google-cloud-storage==1.13.0 \
-    --hash=sha256:936c859c47f8e94fd0005e98235a10d5e75828d2c6c3a8caacae18344a572a0a \
-    --hash=sha256:fc32b9be41a45016ba2387e3ad23e70ccba399d626ef596409316f7cee477956 \
-    # google-cloud-storage==1.13.0 is pinning google-cloud-core<0.29dev,>=0.28.0
+google-cloud-storage==1.13.1 \
+    --hash=sha256:d82e49f584b5df3711c8b6ad702c16817d00f3bc493a9068883bd960f464297f \
+    --hash=sha256:9bb4119d0fd72550c3857af08c06ecaccf6c14e84f3a2b8e6d1a55bb55746492    # google-cloud-storage==1.13.0 is pinning google-cloud-core<0.29dev,>=0.28.0
