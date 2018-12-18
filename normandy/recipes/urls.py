@@ -43,6 +43,11 @@ urlpatterns = [
     url(
         r"^api/v2/identicon/(?P<generation>v[0-9]):(?P<seed>.{1,64})\.svg",
         api_v2_views.IdenticonView.as_view(),
+        name="identicon-v2",
+    ),
+    url(
+        r"^api/v3/identicon/(?P<generation>v[0-9]):(?P<seed>.{1,64})\.svg",
+        api_v2_views.IdenticonView.as_view(),
         name="identicon",
     ),
     url(r"^api/v3/", include((v3_router.urls, "recipes"), namespace="v3")),
