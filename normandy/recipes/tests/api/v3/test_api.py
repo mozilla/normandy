@@ -1,11 +1,13 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 import pytest
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+from pathlib import Path
 
 from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
@@ -1530,6 +1532,36 @@ def test_apis_makes_a_reasonable_number_of_db_queries(endpoint, Factory, client,
     page_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
 
     assert len(queries) < page_size * 2, queries
+
+
+class TestIdenticonAPI(object):
+    def test_it_works(self, client):
+        res = client.get("/api/v3/identicon/v1:foobar.svg")
+        assert res.status_code == 200
+
+    def test_it_returns_the_same_output(self, client):
+        res1 = client.get("/api/v3/identicon/v1:foobar.svg")
+        res2 = client.get("/api/v3/identicon/v1:foobar.svg")
+        assert res1.content == res2.content
+
+    def test_it_returns_known_output(self, client):
+        res = client.get("/api/v3/identicon/v1:foobar.svg")
+        reference_svg = Path(settings.BASE_DIR).joinpath(
+            "normandy", "recipes", "tests", "api", "v2", "foobar.svg"
+        )
+        with open(reference_svg, "rb") as svg_file:
+            assert svg_file.read() == res.content
+
+    def test_includes_cache_headers(self, client):
+        res = client.get("/api/v3/identicon/v1:foobar.svg")
+        assert f"max-age={settings.IMMUTABLE_CACHE_TIME}" in res["Cache-Control"]
+        assert "public" in res["Cache-Control"]
+        assert "immutable" in res["Cache-Control"]
+
+    def test_unrecognized_generation(self, client):
+        res = client.get("/api/v3/identicon/v9:foobar.svg")
+        assert res.status_code == 400
+        assert res.json()["error"] == "Invalid identicon generation, only v1 is supported."
 
 
 @pytest.mark.django_db
