@@ -7,7 +7,5 @@
   },
   "dockerfile": {
     "pinDigests": true
-  },
-  "timezone": "UTC",
-  "schedule": ["before 13:00 on mondays"]
+  }
 }
