@@ -204,3 +204,6 @@ google-cloud-storage==1.13.0 \
     --hash=sha256:936c859c47f8e94fd0005e98235a10d5e75828d2c6c3a8caacae18344a572a0a \
     --hash=sha256:fc32b9be41a45016ba2387e3ad23e70ccba399d626ef596409316f7cee477956 \
     # google-cloud-storage==1.13.0 is pinning google-cloud-core<0.29dev,>=0.28.0
+kinto-http==10.1.0 \
+    --hash=sha256:4b1ace6d46a180810c5ce0744fa89a4273c8314824abc70f868114a047780313 \
+    --hash=sha256:8a9358eeca2f020d5dbdb884ed0c4c7d9436afad9a801e6a609b2ed83d26f638

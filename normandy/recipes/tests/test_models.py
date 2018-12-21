@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 
 import pytest
 from rest_framework import serializers
+from kinto_http import exceptions as remote_settings_exceptions
 
 from normandy.base.tests import UserFactory, Whatever
 from normandy.recipes.models import (
@@ -578,6 +579,86 @@ class TestRecipeRevision(object):
 
         with pytest.raises(EnabledState.NotActionable):
             recipe.latest_revision.disable(user=UserFactory())
+
+    def test_it_publishes_when_enabled(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test")
+
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+        recipe.approved_revision.enable(user=UserFactory())
+
+        mocked_remotesettings.return_value.publish.assert_called_with(recipe)
+
+        # Publishes once when enabled twice.
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.approved_revision.enable(user=UserFactory())
+
+        assert mocked_remotesettings.return_value.publish.call_count == 1
+
+    def test_it_publishes_new_revisions_if_enabled(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        assert mocked_remotesettings.return_value.publish.call_count == 1
+
+        recipe.revise(name="Modified")
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+
+        assert mocked_remotesettings.return_value.publish.call_count == 2
+        second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
+        modified_recipe, = second_call_args
+        assert modified_recipe.name == "Modified"
+
+    def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test")
+
+        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+
+        assert not mocked_remotesettings.return_value.publish.called
+
+    def test_it_unpublishes_when_disabled(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+
+        recipe.approved_revision.disable(user=UserFactory())
+
+        mocked_remotesettings.return_value.unpublish.assert_called_with(recipe)
+
+        # Unpublishes once when disabled twice.
+        with pytest.raises(EnabledState.NotActionable):
+            recipe.approved_revision.disable(user=UserFactory())
+
+        assert mocked_remotesettings.return_value.publish.call_count == 1
+
+    def test_it_publishes_several_times_when_reenabled(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+
+        recipe.approved_revision.disable(user=UserFactory())
+        recipe.approved_revision.enable(user=UserFactory())
+
+        assert mocked_remotesettings.return_value.unpublish.call_count == 1
+        assert mocked_remotesettings.return_value.publish.call_count == 2
+
+    def test_it_rollbacks_changes_if_error_happens_on_publish(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory())
+        error = remote_settings_exceptions.KintoException
+        mocked_remotesettings.return_value.publish.side_effect = error
+
+        with pytest.raises(error):
+            recipe.approved_revision.enable(user=UserFactory())
+
+        saved = Recipe.objects.get(id=recipe.id)
+        assert not saved.approved_revision.enabled
+
+    def test_it_rollbacks_changes_if_error_happens_on_unpublish(self, mocked_remotesettings):
+        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+        error = remote_settings_exceptions.KintoException
+        mocked_remotesettings.return_value.unpublish.side_effect = error
+
+        with pytest.raises(error):
+            recipe.approved_revision.disable(user=UserFactory())
+
+        saved = Recipe.objects.get(id=recipe.id)
+        assert saved.approved_revision.enabled
 
 
 @pytest.mark.django_db

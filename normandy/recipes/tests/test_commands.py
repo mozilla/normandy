@@ -2,12 +2,17 @@ import hashlib
 import json
 from unittest.mock import patch
 from datetime import timedelta
+import requests_mock
 
+from django.conf import settings
 from django.core.management import call_command, CommandError
+from django.core.exceptions import ImproperlyConfigured
 
 import pytest
+import requests.exceptions
 
 from normandy.base.tests import UserFactory
+from normandy.recipes import exports
 from normandy.recipes.models import Action, Recipe
 from normandy.recipes.tests import ActionFactory, RecipeFactory
 
@@ -311,3 +316,109 @@ class TestUpdateAddonUrls(object):
         recipe = Recipe.objects.get(id=recipe.id)
         # Url should not be not updated
         assert recipe.arguments["addonUrl"] == "https://before.example.com/extensions/addon.xpi"
+
+
+@pytest.mark.django_db
+class TestSyncRemoteSettings(object):
+    workspace_collection_url = (
+        f"/v1/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/collections"
+        f"/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+    )
+    published_records_url = (
+        f"/v1/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/collections"
+        f"/{settings.REMOTE_SETTINGS_COLLECTION_ID}/records"
+    )
+
+    @pytest.mark.django_db
+    def test_it_works(self, rs_settings, requestsmock):
+        """
+        Verify that the sync_remote_settings command doesn't throw an error.
+        """
+        requestsmock.get(self.published_records_url, json={"data": []})
+
+        call_command("sync_remote_settings")
+
+    def test_it_fails_if_not_enabled(self):
+        # We enabled Remote Settings without mocking server calls.
+        with pytest.raises(ImproperlyConfigured):
+            call_command("sync_remote_settings")
+
+    def test_it_fails_if_server_not_reachable(self, rs_settings):
+        # We enabled Remote Settings without mocking server calls.
+        with pytest.raises(requests.exceptions.ConnectionError):
+            call_command("sync_remote_settings")
+
+    def test_it_does_nothing_on_dry_run(self, rs_settings, requestsmock, mocked_remotesettings):
+        r1 = RecipeFactory(name="Test 1", approver=UserFactory())
+        r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
+        requestsmock.get(self.published_records_url, json={"data": [exports.recipe_as_record(r1)]})
+
+        call_command("sync_remote_settings", "--dry-run")
+
+        assert not mocked_remotesettings.publish.called
+        assert not mocked_remotesettings.unpublish.called
+
+    def test_publishes_missing_recipes(self, rs_settings, requestsmock):
+        # Some records will be created with PUT.
+        requestsmock.put(requests_mock.ANY, json={})
+        # A signature request will be sent.
+        requestsmock.patch(self.workspace_collection_url, json={})
+        # Instantiate local recipes.
+        r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
+        r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
+        # Mock the server responses.
+        # `r2` should be on the server
+        requestsmock.get(self.published_records_url, json={"data": [exports.recipe_as_record(r1)]})
+        # It will be created.
+        r2_url = self.workspace_collection_url + f"/records/{r2.id}"
+        requestsmock.put(r2_url, json={})
+
+        call_command("sync_remote_settings")
+
+        assert requestsmock.request_history[-2].method == "PUT"
+        assert requestsmock.request_history[-2].url.endswith(r2_url)
+
+    def test_republishes_outdated_recipes(self, rs_settings, requestsmock):
+        # Some records will be created with PUT.
+        requestsmock.put(requests_mock.ANY, json={})
+        # A signature request will be sent.
+        requestsmock.patch(self.workspace_collection_url, json={})
+        # Instantiate local recipes.
+        r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
+        r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
+        # Mock the server responses.
+        to_update = {**exports.recipe_as_record(r2), "name": "Outdated name"}
+        requestsmock.get(
+            self.published_records_url, json={"data": [exports.recipe_as_record(r1), to_update]}
+        )
+        # It will be updated.
+        r2_url = self.workspace_collection_url + f"/records/{r2.id}"
+        requestsmock.put(r2_url, json={})
+
+        call_command("sync_remote_settings")
+
+        assert requestsmock.request_history[-2].method == "PUT"
+        assert requestsmock.request_history[-2].url.endswith(r2_url)
+
+    def test_unpublishes_extra_recipes(self, rs_settings, requestsmock):
+        # Some records will be created with PUT.
+        requestsmock.put(requests_mock.ANY, json={})
+        # A signature request will be sent.
+        requestsmock.patch(self.workspace_collection_url, json={})
+        # Instantiate local recipes.
+        r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
+        r2 = RecipeFactory(name="Test 2", approver=UserFactory())
+        # Mock the server responses.
+        # `r2` should not be on the server (not enabled)
+        requestsmock.get(
+            self.published_records_url,
+            json={"data": [exports.recipe_as_record(r1), exports.recipe_as_record(r2)]},
+        )
+        # It will be deleted.
+        r2_url = self.workspace_collection_url + f"/records/{r2.id}"
+        requestsmock.delete(r2_url, json={"data": {}})
+
+        call_command("sync_remote_settings")
+
+        assert requestsmock.request_history[-2].method == "DELETE"
+        assert requestsmock.request_history[-2].url.endswith(r2_url)

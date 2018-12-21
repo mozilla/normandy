@@ -194,3 +194,57 @@ If you ever need to bypass Therapist, you can do so by passing
 ``--no-verify`` to your ``git commit`` command.
 
 .. _Therapist: http://therapist.readthedocs.io/en/latest/overview.html
+
+.. _remote-settings-install:
+
+Remote Settings
+---------------
+If you want to enable the publication of recipes on `Remote Settings`_, you'll need to set up
+an instance locally.
+
+1. Follow the `Remote Settings installation instructions`_ to launch a development
+   instance of Remote Settings locally.
+
+2. Configure Normandy to enable the integration by adding the following lines
+   to ``.env`` (create the file if it does not exist yet):
+
+   .. code-block:: ini
+
+      DJANGO_REMOTE_SETTINGS_URL=http://localhost:8888/v1
+      DJANGO_REMOTE_SETTINGS_USERNAME=normandy
+      DJANGO_REMOTE_SETTINGS_PASSWORD=n0rm4ndy
+
+3. Adjust the Remote Settings configuration in ``server.ini`` for the Normandy
+   recipes collection, and restart the Remote Settings container:
+
+   .. code-block:: ini
+
+      kinto.signer.main-workspace.normandy-recipes.to_review_enabled = false
+      kinto.signer.main-workspace.normandy-recipes.group_check_enabled = false
+
+4. Create the dedicated Remote Settings user and collection for Normandy:
+
+   .. code-block:: bash
+
+      SERVER=http://localhost:8888/v1
+
+      curl -X PUT ${SERVER}/accounts/normandy \
+           -d '{"data": {"password": "n0rm4ndy"}}' \
+           -H 'Content-Type:application/json'
+
+      curl -X PUT ${SERVER}/buckets/main-workspace \
+           -H 'Content-Type:application/json' \
+           -u 'normandy:n0rm4ndy'
+
+      curl -X PUT ${SERVER}/buckets/main-workspace/collections/normandy-recipes \
+           -H 'Content-Type:application/json' \
+           -u 'normandy:n0rm4ndy'
+
+With both configurations in place, Normandy should start without error.
+
+.. seealso::
+
+   The :ref:`documentation section dedicated to Remote Settings <remote-settings>`
+
+.. _Remote Settings: https://remote-settings.readthedocs.io
+.. _Remote Settings installation instructions: https://remote-settings.readthedocs.io/en/latest/tutorial-local-server.html

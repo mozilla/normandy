@@ -357,6 +357,14 @@ class Base(Core, CORS, OIDC):
     AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
     AUTOGRAPH_X5U_CACHE_BUST = values.Value(None)
 
+    # Remote Settings connection configuration
+    REMOTE_SETTINGS_URL = values.Value()
+    REMOTE_SETTINGS_USERNAME = values.Value()
+    REMOTE_SETTINGS_PASSWORD = values.Value()
+    REMOTE_SETTINGS_BUCKET_ID = values.Value("main-workspace")
+    REMOTE_SETTINGS_COLLECTION_ID = values.Value("normandy-recipes")
+    REMOTE_SETTINGS_RETRY_REQUESTS = values.IntegerValue(3)
+
     # How many days before expiration to warn for expired certificates
     CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
 

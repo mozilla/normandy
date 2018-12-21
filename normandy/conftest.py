@@ -37,6 +37,19 @@ def mocked_autograph(mocker):
     return mocked
 
 
+@pytest.fixture
+def mocked_remotesettings(mocker):
+    return mocker.patch("normandy.recipes.models.RemoteSettings")
+
+
+@pytest.fixture
+def rs_settings(settings):
+    settings.REMOTE_SETTINGS_URL = "https://remotesettings.example.com/v1"
+    settings.REMOTE_SETTINGS_USERNAME = "normandy"
+    settings.REMOTE_SETTINGS_PASSWORD = "n0rm4ndy"
+    return settings
+
+
 @pytest.fixture()
 def migrations(transactional_db):
     """

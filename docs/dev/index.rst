@@ -16,5 +16,6 @@ of the Normandy client.
    code-style
    coverage
    feature-experiments
+   remote-settings
    troubleshooting
    ci
