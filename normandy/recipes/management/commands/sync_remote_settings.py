@@ -1,3 +1,5 @@
+import sys
+
 from django.core.management.base import BaseCommand
 
 from normandy.recipes.models import Recipe
@@ -79,3 +81,7 @@ class Command(BaseCommand):
             self.stdout.write(f" * {name!r} (id={r.id!r})")
             if not dry_run:
                 remote_settings.unpublish(r)
+
+        # When running with dry-run, we return non-zero if some differences exist.
+        if dry_run and (to_publish or to_update or to_unpublish):
+            sys.exit(1)

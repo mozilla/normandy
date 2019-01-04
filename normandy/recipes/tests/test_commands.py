@@ -349,7 +349,6 @@ class TestSyncRemoteSettings(object):
             call_command("sync_remote_settings")
 
     def test_it_does_nothing_on_dry_run(self, rs_settings, requestsmock, mocked_remotesettings):
-        r1 = RecipeFactory(name="Test 1", approver=UserFactory())
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         requestsmock.get(self.published_records_url, json={"data": [exports.recipe_as_record(r1)]})
 
@@ -357,6 +356,24 @@ class TestSyncRemoteSettings(object):
 
         assert not mocked_remotesettings.publish.called
         assert not mocked_remotesettings.unpublish.called
+
+    def test_dry_run_returns_zero_if_in_sync(
+        self, rs_settings, requestsmock, mocked_remotesettings
+    ):
+        requestsmock.get(self.published_records_url, json={"data": []})
+        r = call_command("sync_remote_settings", "--dry-run")
+        assert not r
+
+    def test_dry_run_returns_non_zero_if_unsync(
+        self, rs_settings, requestsmock, mocked_remotesettings
+    ):
+        RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
+        requestsmock.get(self.published_records_url, json={"data": []})
+
+        with patch("sys.exit") as exit_mocked:
+            call_command("sync_remote_settings", "--dry-run")
+
+        exit_mocked.assert_called_with(1)
 
     def test_publishes_missing_recipes(self, rs_settings, requestsmock):
         # Some records will be created with PUT.
