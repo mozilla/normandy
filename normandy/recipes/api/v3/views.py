@@ -68,18 +68,26 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         Recipe.objects.all()
         .select_related(
             "approved_revision__action",
+            "approved_revision__user",
             "approved_revision__approval_request",
+            "approved_revision__approval_request__creator",
+            "approved_revision__approval_request__approver",
             "latest_revision__action",
+            "latest_revision__user",
             "latest_revision__approval_request",
+            "latest_revision__approval_request__creator",
+            "latest_revision__approval_request__approver",
         )
         .prefetch_related(
             "approved_revision__channels",
             "approved_revision__countries",
             "approved_revision__enabled_states",
+            "approved_revision__enabled_states__creator",
             "approved_revision__locales",
             "latest_revision__channels",
             "latest_revision__countries",
             "latest_revision__enabled_states",
+            "latest_revision__enabled_states__creator",
             "latest_revision__locales",
         )
     )
