@@ -99,9 +99,9 @@ def signatures_use_good_certificates(app_configs, **kwargs):
         Action = apps.get_model("recipes", "Action")
 
         urls = set()
-        for recipe in Recipe.objects.exclude(signature=None):
+        for recipe in Recipe.objects.exclude(signature__x5u=None).select_related("signature"):
             urls.add(recipe.signature.x5u)
-        for action in Action.objects.exclude(signature=None):
+        for action in Action.objects.exclude(signature__x5u=None).select_related("signature"):
             urls.add(action.signature.x5u)
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         msg = f"Could not retrieve signatures: {e}"
