@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import timedelta
 
 from django.apps import apps
@@ -98,35 +99,28 @@ def signatures_use_good_certificates(app_configs, **kwargs):
         Recipe = apps.get_model("recipes", "Recipe")
         Action = apps.get_model("recipes", "Action")
 
-        urls = set()
-        for recipe in Recipe.objects.exclude(signature=None):
-            urls.add(recipe.signature.x5u)
-        for action in Action.objects.exclude(signature=None):
-            urls.add(action.signature.x5u)
+        x5u_urls = defaultdict(list)
+        for recipe in Recipe.objects.exclude(signature__x5u=None).select_related("signature"):
+            x5u_urls[recipe.signature.x5u].append(str(recipe))
+        for action in Action.objects.exclude(signature__x5u=None).select_related("signature"):
+            x5u_urls[action.signature.x5u].append(str(action))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         msg = f"Could not retrieve signatures: {e}"
         errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_SIGNATURES))
     else:
 
-        def get_matching_object_names(url):
-            matching_recipes = Recipe.objects.filter(signature__x5u=url)
-            matching_actions = Action.objects.filter(signature__x5u=url)
-            matching_objects = list(matching_recipes) + list(matching_actions)
-            object_names = [str(o) for o in matching_objects]
-            return object_names
-
-        for url in urls:
+        for url in x5u_urls:
             try:
                 signing.verify_x5u(url, expire_early)
             except signing.BadCertificate as exc:
-                bad_object_names = get_matching_object_names(url)
+                bad_object_names = x5u_urls[url]
                 msg = (
                     f"{len(bad_object_names)} objects are signed with a bad cert: "
                     f"{bad_object_names}. {exc.detail}. Certificate url is {url}. "
                 )
                 errors.append(Error(msg, id=ERROR_BAD_SIGNING_CERTIFICATE))
             except requests.RequestException as exc:
-                bad_object_names = get_matching_object_names(url)
+                bad_object_names = x5u_urls[url]
                 msg = (
                     f"The certificate at {url} could not be fetched due to a network error to "
                     f"verify. {len(bad_object_names)} objects are signed with this certificate: "

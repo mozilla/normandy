@@ -4,7 +4,7 @@ import pytest
 import requests.exceptions
 
 from normandy.recipes import checks, signing
-from normandy.recipes.tests import RecipeFactory, SignatureFactory
+from normandy.recipes.tests import ActionFactory, RecipeFactory, SignatureFactory
 
 
 @pytest.mark.django_db
@@ -22,6 +22,16 @@ class TestSignaturesUseGoodCertificates(object):
         mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, None)
         assert len(errors) == 1
         assert errors[0].id == checks.ERROR_BAD_SIGNING_CERTIFICATE
+        assert recipe.name in errors[0].msg
+
+    def test_it_ignores_signatures_without_x5u(self):
+        recipe = RecipeFactory(signed=True)
+        recipe.signature.x5u = None
+        recipe.signature.save()
+        actions = ActionFactory(signed=True)
+        actions.signature.x5u = None
+        actions.signature.save()
+        assert checks.signatures_use_good_certificates(None) == []
 
     def test_it_ignores_signatures_not_in_use(self, mocker, settings):
         settings.CERTIFICATES_EXPIRE_EARLY_DAYS = None
