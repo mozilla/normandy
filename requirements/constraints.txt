@@ -96,8 +96,9 @@ MarkupSafe==1.1.0 \
     --hash=sha256:1c25694ca680b6919de53a4bb3bdd0602beafc63ff001fea2f2fc16ec3a11834 \
     --hash=sha256:7d263e5770efddf465a9e31b78362d84d015cc894ca2c131901a4445eaa61ee1 \
     --hash=sha256:4e97332c9ce444b0c2c38dd22ddc61c743eb208d916e4265a2a3b575bdccb1d3
-mohawk==0.3.4 \
-    --hash=sha256:e98b331d9fa9ece7b8be26094cbe2d57613ae882133cc755167268a984bc0ab3
+mohawk==1.0.0 \
+    --hash=sha256:aa57e6626a6ea323ab714779f23734de1d1feca8cb6fc00b65e65ce115c1696a \
+    --hash=sha256:fca4e34d8f5492f1c33141c98b96e168a089e5692ce65fb747e4bb613f5fe552
 maxminddb==1.4.1 \
     --hash=sha256:df1451bcd848199905ac0de4631b3d02d6a655ad28ba5e5a4ca29a23358db712
 mccabe==0.6.1 \
