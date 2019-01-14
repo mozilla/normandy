@@ -225,8 +225,8 @@ google-resumable-media==0.3.2 \
 google-auth==1.6.2 \
     --hash=sha256:b6081ba9946828d6417c15ecdc723fdb7c007cdd74e140747d3876a7440f0be5 \
     --hash=sha256:e8d64e9bc8cb6f0fc5360c693f86dc9ee6964081ee702e3b5ddc937f99efc950
-googleapis-common-protos==1.5.5 \
-    --hash=sha256:0946967c4c29b1339bb211949e1e17dbe0ae9ff8265fafa7bf4cf2164ef5a3b1
+googleapis-common-protos==1.5.6 \
+    --hash=sha256:6de6de98e895f4266caefa768778533bdea98abbead6972d35c8a0f57409eea2
 protobuf==3.6.1 \
     --hash=sha256:574085a33ca0d2c67433e5f3e9a0965c487410d6cb3406c83bdaf549bfc2992e \
     --hash=sha256:4b92e235a3afd42e7493b281c8b80c0c65cbef45de30f43d571d1ee40a1f77ef \
