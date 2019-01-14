@@ -7,7 +7,6 @@ attrs==18.2.0 \
 botocore==1.12.78 \
     --hash=sha256:bd0b042dded14c7b2978d13dd8088f10f05f9e12382e882e03694e9131185358 \
     --hash=sha256:2cdf5519ddab95774248a002c24fbd804b5e5b44ed1c25497d34b34a06e9f84a
-    # NB: botocore 1.12.28 is holding urllib3 at < 1.24. When botocore supports urllib 1.24, remove the pyup hold.
 certifi==2018.11.29 \
     --hash=sha256:993f830721089fef441cdfeb4b2c8c9df86f0c63239f06bd025a76a7daddb033 \
     --hash=sha256:47f9c83ef4c0c621eaef743f133f09fa8a74a9b75f037e8624f83bd1b6626cb7
@@ -174,7 +173,6 @@ uritemplate==3.0.0 \
 urllib3==1.24.1 \
     --hash=sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39 \
     --hash=sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22
-    # pyup: <1.24 # botocore 1.12.28 has requirement urllib3<1.24,>=1.20
 webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
