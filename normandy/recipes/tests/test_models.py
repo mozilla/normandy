@@ -269,7 +269,7 @@ class TestValidateArgumentShowHeartbeat(object):
         approval_request = rev.request_approval(UserFactory())
         approval_request.approve(UserFactory(), "r+")
         rev.enable(UserFactory())
-        assert rev.arguments['surveyId'] == '001'
+        assert rev.arguments["surveyId"] == "001"
 
     def test_no_error_distinctly_different_survey_ids(self):
         action = ActionFactory(name="show-heartbeat")
@@ -292,12 +292,12 @@ class TestValidateArgumentShowHeartbeat(object):
         approval_request = rev.request_approval(UserFactory())
         approval_request.approve(UserFactory(), "r+")
         rev.enable(UserFactory())
-        assert rev.arguments['surveyId'] == '001'
+        assert rev.arguments["surveyId"] == "001"
 
-        arguments['surveyId'] = '002'
+        arguments["surveyId"] = "002"
         recipe = RecipeFactory(action=action, arguments=arguments)
         rev = recipe.latest_revision
-        assert rev.arguments['surveyId'] == '002'
+        assert rev.arguments["surveyId"] == "002"
 
     def test_repeated_identical_survey_ids(self):
         action = ActionFactory(name="show-heartbeat")
@@ -315,7 +315,7 @@ class TestValidateArgumentShowHeartbeat(object):
         RecipeFactory(action=action, arguments=arguments)
         # Reusing the same "surveyId" should cause a ValidationError.
         # But you can change other things.
-        arguments['message'] += ' And this!'
+        arguments["message"] += " And this!"
         with pytest.raises(serializers.ValidationError) as exc_info:
             RecipeFactory(action=action, arguments=arguments)
         expected_error = action.errors["duplicate_survey_id"]

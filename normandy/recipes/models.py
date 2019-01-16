@@ -742,9 +742,7 @@ class Action(DirtyFieldsMixin, models.Model):
 
         elif self.name == "show-heartbeat":
             # Survey ID should be unique across all recipes
-            other_recipes = Recipe.objects.filter(
-                latest_revision__action=self
-            )
+            other_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 other_recipes = other_recipes.exclude(id=revision.recipe.id)
             # Note, `recipe.arguments` refers to `recipe.current_revision.arguments`
