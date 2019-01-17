@@ -698,6 +698,10 @@ class Action(DirtyFieldsMixin, models.Model):
 
         errors = default()
 
+        # Note, `recipe.arguments` refers to `recipe.current_revision.arguments`
+        # which in term is shorthand for
+        # `recipe.(approved_revision or latest_revision).arguments`.
+
         if self.name == "preference-experiment":
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
@@ -745,11 +749,8 @@ class Action(DirtyFieldsMixin, models.Model):
             other_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 other_recipes = other_recipes.exclude(id=revision.recipe.id)
-            # Note, `recipe.arguments` refers to `recipe.current_revision.arguments`
-            # which in term is shorthand for
-            # `recipe.(approved_revision or latest_revision).arguments`.
             # So it *could* be that a different recipe's *latest_revision*'s argument
-            # has this same surveyId but its *approved_revision has a different surveyId.
+            # has this same surveyId but its *approved_revision* has a different surveyId.
             # It's unlikely in the real-world that different revisions, within a recipe,
             # has different surveyIds *and* that any of these clash with an entirely
             # different recipe.
