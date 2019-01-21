@@ -43,9 +43,9 @@ django-countries==5.3.2 \
     --hash=sha256:74ebe919aeccea818dafea17b0b243fb1280c55226cb315b9622f0c0416536d2
 django-dirtyfields==1.3.1 \
     --hash=sha256:c3aafe524fc26c6ac573bbaf3ea852607e7b0f8622a2ec23dcdf65e1a9dcb7bb
-django-filter==2.0.0 \
-    --hash=sha256:86c3925020c27d072cdae7b828aaa5d165c2032a629abbe3c3a1be1edae61c58 \
-    --hash=sha256:6f4e4bc1a11151178520567b50320e5c32f8edb552139d93ea3e30613b886f56
+django-filter==2.1.0 \
+    --hash=sha256:a3014de317bef0cd43075a0f08dfa1d319a7ccc5733c3901fb860da70b0dda68 \
+    --hash=sha256:3dafb7d2810790498895c22a1f31b2375795910680ac9c1432821cbedb1e176d
 django-npm==1.0.0 \
     --hash=sha256:2e6bba65e728fa18b9db3c8dc0d4490b70cb7f43bacf60eb3654d7dcb6424272
 django-rest-swagger==2.2.0 \
