@@ -594,6 +594,7 @@ class Action(DirtyFieldsMixin, models.Model):
         "duplicate_experiment_slug": "Experiment slugs must be globally unique",
         "duplicate_rollout_slug": "Rollout slugs must be globally unique",
         "rollout_slug_not_found": "Rollout slug not found for rollback",
+        "duplicate_survey_id": "Survey ID must be globally unique",
     }
 
     @property
@@ -697,6 +698,10 @@ class Action(DirtyFieldsMixin, models.Model):
 
         errors = default()
 
+        # Note, `recipe.arguments` refers to `recipe.current_revision.arguments`
+        # which in term is shorthand for
+        # `recipe.(approved_revision or latest_revision).arguments`.
+
         if self.name == "preference-experiment":
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
@@ -738,6 +743,20 @@ class Action(DirtyFieldsMixin, models.Model):
             rollout_slugs = set(r.arguments["slug"] for r in rollouts)
             if arguments["rolloutSlug"] not in rollout_slugs:
                 errors["slug"] = self.errors["rollout_slug_not_found"]
+
+        elif self.name == "show-heartbeat":
+            # Survey ID should be unique across all recipes
+            other_recipes = Recipe.objects.filter(latest_revision__action=self)
+            if revision.recipe and revision.recipe.id:
+                other_recipes = other_recipes.exclude(id=revision.recipe.id)
+            # So it *could* be that a different recipe's *latest_revision*'s argument
+            # has this same surveyId but its *approved_revision* has a different surveyId.
+            # It's unlikely in the real-world that different revisions, within a recipe,
+            # has different surveyIds *and* that any of these clash with an entirely
+            # different recipe.
+            for recipe in other_recipes:
+                if recipe.arguments["surveyId"] == arguments["surveyId"]:
+                    errors["surveyId"] = self.errors["duplicate_survey_id"]
 
         # Raise errors, if any
         if errors:
