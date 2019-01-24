@@ -455,6 +455,8 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         if self.enabled:
             raise EnabledState.NotActionable("This revision is already enabled.")
 
+        self._validate_preference_rollout_rollback_enabled_invariance()
+
         self._create_new_enabled_state(creator=user, enabled=True, carryover_from=carryover_from)
 
         RemoteSettings().publish(self.recipe)
@@ -467,6 +469,32 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         self._create_new_enabled_state(creator=user, enabled=False)
 
         RemoteSettings().unpublish(self.recipe)
+
+    def _validate_preference_rollout_rollback_enabled_invariance(self):
+        """Raise ValidationError if you're trying to enable a preference-rollback
+        whose preference-rollout is still enabled. Same if you'ree trying to enable a
+        preference-rollout whose preference-rollback is still enabled.
+
+        If not applicable or not a problem, do nothing.
+        """
+        if self.action.name == "preference-rollback":
+            slug = self.arguments["rolloutSlug"]
+            rollout_recipes = Recipe.objects.filter(
+                approved_revision__action__name="preference-rollout",
+                approved_revision__enabled_state__enabled=True,
+            )
+            for recipe in rollout_recipes:
+                if recipe.arguments["slug"] == slug:
+                    raise ValidationError(f"Rollout recipe {recipe.name!r} is currently enabled")
+        elif self.action.name == "preference-rollout":
+            slug = self.arguments["slug"]
+            rollback_recipes = Recipe.objects.filter(
+                approved_revision__action__name="preference-rollback",
+                approved_revision__enabled_state__enabled=True,
+            )
+            for recipe in rollback_recipes:
+                if recipe.arguments["rolloutSlug"] == slug:
+                    raise ValidationError(f"Rollback recipe {recipe.name!r} is currently enabled")
 
 
 class EnabledState(models.Model):

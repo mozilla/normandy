@@ -740,6 +740,40 @@ class TestRecipeRevision(object):
         saved = Recipe.objects.get(id=recipe.id)
         assert saved.approved_revision.enabled
 
+    def test_enable_rollback_enable_rollout_invariance(self):
+        rollout_recipe = RecipeFactory(
+            name="Rollout",
+            approver=UserFactory(),
+            enabler=UserFactory(),
+            action=ActionFactory(name="preference-rollout"),
+            arguments={"slug": "myslug"},
+        )
+        assert rollout_recipe.enabled
+
+        rollback_recipe = RecipeFactory(
+            name="Rollback",
+            action=ActionFactory(name="preference-rollback"),
+            arguments={"rolloutSlug": "myslug"},
+        )
+        approval_request = rollback_recipe.latest_revision.request_approval(creator=UserFactory())
+        approval_request.approve(approver=UserFactory(), comment="r+")
+
+        with pytest.raises(ValidationError) as exc_info:
+            rollback_recipe.approved_revision.enable(user=UserFactory())
+        assert exc_info.value.message == "Rollout recipe 'Rollout' is currently enabled"
+
+        rollout_recipe.approved_revision.disable(user=UserFactory())
+        assert not rollout_recipe.enabled
+        # Now it should be possible to enable the rollback recipe.
+        rollback_recipe.approved_revision.enable(user=UserFactory())
+        assert rollback_recipe.enabled
+
+        # Can't make up your mind. Now try to enable the rollout recipe again even though
+        # the rollback recipe is enabled.
+        with pytest.raises(ValidationError) as exc_info:
+            rollout_recipe.approved_revision.enable(user=UserFactory())
+        assert exc_info.value.message == "Rollback recipe 'Rollback' is currently enabled"
+
 
 @pytest.mark.django_db
 class TestApprovalRequest(object):
