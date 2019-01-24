@@ -15,6 +15,7 @@ from normandy.base.tests import UserFactory
 from normandy.recipes import exports
 from normandy.recipes.models import Action, Recipe
 from normandy.recipes.tests import ActionFactory, RecipeFactory
+from normandy.studies.tests import ExtensionFactory
 
 
 @pytest.yield_fixture
@@ -267,23 +268,24 @@ class TestUpdateActionSignatures(object):
 
 @pytest.mark.django_db
 class TestUpdateAddonUrls(object):
-    def test_it_works(self):
+    def test_it_works(self, storage):
+        extension = ExtensionFactory()
+        fake_old_url = extension.xpi.url.replace("/media/", "/media-old/")
         action = ActionFactory(name="opt-out-study")
-        recipe = RecipeFactory(
-            action=action,
-            arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
-        )
-        call_command("update_addon_urls", "after.example.com")
+        recipe = RecipeFactory(action=action, arguments={"addonUrl": fake_old_url})
+        call_command("update_addon_urls")
 
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
-        assert recipe.arguments["addonUrl"] == "https://after.example.com/extensions/addon.xpi"
+        assert recipe.arguments["addonUrl"] == extension.xpi.url
 
-    def test_signatures_are_updated(self, mocked_autograph):
+    def test_signatures_are_updated(self, mocked_autograph, storage):
+        extension = ExtensionFactory()
+        fake_old_url = extension.xpi.url.replace("/media/", "/media-old/")
         action = ActionFactory(name="opt-out-study")
         recipe = RecipeFactory(
             action=action,
-            arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
+            arguments={"addonUrl": fake_old_url},
             approver=UserFactory(),
             enabler=UserFactory(),
             signed=True,
@@ -293,17 +295,12 @@ class TestUpdateAddonUrls(object):
         assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
         signature_before = recipe.signature.signature
 
-        call_command("update_addon_urls", "after.example.com")
+        call_command("update_addon_urls")
         recipe.refresh_from_db()
 
         assert recipe.signature is not None
         assert recipe.signature != signature_before
         assert recipe.signature.signature == hashlib.sha256(recipe.canonical_json()).hexdigest()
-
-    def test_new_hostname_is_required(self):
-        with pytest.raises(CommandError) as err:
-            call_command("update_addon_urls")
-        assert "the following arguments are required: new_hostname" in str(err)
 
     def test_it_doesnt_update_other_actions(self):
         action = ActionFactory(name="some-other-action")
@@ -311,7 +308,7 @@ class TestUpdateAddonUrls(object):
             action=action,
             arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
         )
-        call_command("update_addon_urls", "after.example.com")
+        call_command("update_addon_urls")
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
         # Url should not be not updated
