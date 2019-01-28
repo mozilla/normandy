@@ -33,7 +33,11 @@ case $1 in
   migrations-check)
     ./manage.py migrate
     echo "Checking that all migrations have been made"
-    ./manage.py makemigrations --check --no-input --dry-run || (
+    # The mozilla-django-product-details has a bug in that calling `./manage.py makemigrations`
+    # on it will actually create a new migration (.py) file. So, be specific and only do this
+    # migration check for *our* apps.
+    # See https://github.com/mozilla/django-product-details/issues/68
+    ./manage.py makemigrations --check --no-input --dry-run recipes studies || (
       echo "You probably have migrations that need to be created" && exit 1
     )
     ;;
