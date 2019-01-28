@@ -19,7 +19,7 @@ class ExtensionFileField(FileField):
             self.fail("not_a_zip")
 
         if self._is_webext(xpi_zip):
-            self._has_webext_id(xpi_zip)
+            self._has_extension_id(xpi_zip)
         self._is_signed(xpi_zip)
 
         return super().to_internal_value(data)
@@ -34,11 +34,11 @@ class ExtensionFileField(FileField):
                 self.fail("bad_manifest")
         return True
 
-    def _has_webext_id(self, xpi_zip):
+    def _has_extension_id(self, xpi_zip):
         with xpi_zip.open("manifest.json") as manifest_file:
             data = json.load(manifest_file)
-            webext_id = data.get("applications", {}).get("gecko", {}).get("id", None)
-            if webext_id is None:
+            extension_id = data.get("applications", {}).get("gecko", {}).get("id", None)
+            if extension_id is None:
                 self.fail("no_id")
 
     def _is_signed(self, xpi_zip):

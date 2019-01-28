@@ -31,7 +31,7 @@ class TestExtensionAPI(object):
                 "id": extension.id,
                 "name": "foo",
                 "xpi": Whatever(),
-                "webext_id": extension.webext_id,
+                "extension_id": extension.extension_id,
                 "version": extension.version,
                 "hash": extension.hash,
             }

@@ -21,7 +21,8 @@ SIGNING_FILES = {"META-INF/mozilla.rsa", "META-INF/mozilla.sf", "META-INF/manife
 class Extension(DirtyFieldsMixin, models.Model):
     name = models.CharField(max_length=255)
     xpi = models.FileField(upload_to="extensions")
-    webext_id = models.CharField(max_length=255)
+    is_legacy = models.BooleanField(default=False)
+    extension_id = models.CharField(max_length=255)
     version = models.CharField(max_length=32)
     hash = models.CharField(max_length=64)
 
@@ -44,62 +45,72 @@ class Extension(DirtyFieldsMixin, models.Model):
     def populate_metadata(self):
         # Validate XPI file
         try:
-            zf = zipfile.ZipFile(self.xpi)
+            with zipfile.ZipFile(self.xpi) as zf:
+                files = set(zf.namelist())
+
+                # Verify this is a web extension or legacy addon
+                if "manifest.json" in files:  # Web extension
+                    with zf.open("manifest.json") as manifest_file:
+                        try:
+                            data = json.load(manifest_file)
+                        except json.decoder.JSONDecodeError:
+                            raise ValidationError({"xpi": "Web extension manifest is corrupt."})
+
+                    self.extension_id = (
+                        data.get("applications", {}).get("gecko", {}).get("id", None)
+                    )
+                    self.version = data.get("version")
+
+                    if not self.extension_id:
+                        raise ValidationError(
+                            {
+                                "xpi": (
+                                    "Web extensions must have a manifest key "
+                                    '"applications.gecko.id".'
+                                )
+                            }
+                        )
+
+                    if not self.version:
+                        raise ValidationError(
+                            {"xpi": 'Web extensions must have a manifest key "version".'}
+                        )
+                elif "install.rdf" in files:  # Legacy addon
+                    self.is_legacy = True
+
+                    with zf.open("install.rdf", "r") as rdf_file:
+                        try:
+                            data = untangle.parse(rdf_file.read().decode())
+                        except SAXParseException:
+                            raise ValidationError(
+                                {"xpi": 'Legacy addon "install.rdf" is corrupt.'}
+                            )
+
+                    try:
+                        self.extension_id = data.RDF.Description.em_id.cdata
+                        self.version = data.RDF.Description.em_version.cdata
+                    except AttributeError:
+                        pass  # Ignore as this will be dealt with in the next step
+
+                    if not self.extension_id:
+                        raise ValidationError(
+                            {"xpi": 'Legacy addons "install.rdf" must specify an id.'}
+                        )
+
+                    if not self.version:
+                        raise ValidationError(
+                            {"xpi": 'Legacy addons "install.rdf" must specify a version.'}
+                        )
+                else:
+                    raise ValidationError(
+                        {"xpi": "Extension file must be a valid WebExtension or legacy addon."}
+                    )
+
+                # Verify the extension is signed
+                if not SIGNING_FILES.issubset(files):
+                    raise ValidationError({"xpi": "Extension file must be signed."})
         except zipfile.BadZipFile:
             raise ValidationError({"xpi": "Extension file must be zip-formatted."})
-
-        files = set(zf.namelist())
-
-        # Verify this is a web extension or legacy addon
-        if "manifest.json" in files:  # Web extension
-            with zf.open("manifest.json") as manifest_file:
-                try:
-                    data = json.load(manifest_file)
-                except json.decoder.JSONDecodeError:
-                    raise ValidationError({"xpi": "Web extension manifest is corrupt."})
-
-            self.webext_id = data.get("applications", {}).get("gecko", {}).get("id", None)
-            self.version = data.get("version")
-
-            if not self.webext_id:
-                raise ValidationError(
-                    {"xpi": ('Web extensions must have a manifest key "applications.gecko.id".')}
-                )
-
-            if not self.version:
-                raise ValidationError(
-                    {"xpi": 'Web extensions must have a manifest key "version".'}
-                )
-        elif "install.rdf" in files:  # Legacy addon
-            with zf.open("install.rdf", "r") as rdf_file:
-                try:
-                    data = untangle.parse(rdf_file.read().decode())
-                except SAXParseException:
-                    raise ValidationError({"xpi": 'Legacy addon "install.rdf" is corrupt.'})
-
-            try:
-                self.webext_id = data.RDF.Description.em_id.cdata
-                self.version = data.RDF.Description.em_version.cdata
-            except AttributeError:
-                pass  # Ignore as this will be dealt with in the next step
-
-            if not self.webext_id:
-                raise ValidationError({"xpi": 'Legacy addons "install.rdf" must specify an id.'})
-
-            if not self.version:
-                raise ValidationError(
-                    {"xpi": 'Legacy addons "install.rdf" must specify a version.'}
-                )
-        else:
-            raise ValidationError(
-                {"xpi": "Extension file must be a valid WebExtension or legacy addon."}
-            )
-
-        # Verify the extension is signed
-        if not SIGNING_FILES.issubset(files):
-            raise ValidationError({"xpi": "Extension file must be signed."})
-
-        zf.close()
 
         # Make sure to read the XPI file from the start before hashing
         self.xpi.seek(0)

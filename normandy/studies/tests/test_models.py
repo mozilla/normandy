@@ -29,9 +29,9 @@ class TestExtension(object):
         assert set(extension.recipes_used_by) == set([used_in_recipe_1, used_in_recipe_2])
 
     @pytest.mark.django_db
-    def test_webext_id(self, storage):
+    def test_extension_id(self, storage):
         extension = ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
-        assert extension.webext_id == "test-addon@normandy.mozilla.org"
+        assert extension.extension_id == "test-addon@normandy.mozilla.org"
 
     @pytest.mark.django_db
     def test_version(self, storage):

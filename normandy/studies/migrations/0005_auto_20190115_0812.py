@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
             model_name="extension", name="version", field=models.CharField(max_length=32)
         ),
         migrations.AlterField(
-            model_name="extension", name="webext_id", field=models.CharField(max_length=255)
+            model_name="extension", name="extension_id", field=models.CharField(max_length=255)
         ),
     ]

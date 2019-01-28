@@ -19,14 +19,15 @@ def populate_metadata(apps, schema_editor):
                 if "manifest.json" in files:
                     with zf.open("manifest.json") as manifest_file:
                         data = json.load(manifest_file)
-                        extension.webext_id = (
+                        extension.extension_id = (
                             data.get("applications", {}).get("gecko", {}).get("id", None)
                         )
                         extension.version = data.get("version")
                 elif "install.rdf" in files:
+                    extension.is_legacy = True
                     with zf.open("install.rdf", "r") as rdf_file:
                         data = untangle.parse(rdf_file.read().decode())
-                        extension.webext_id = data.RDF.Description.em_id.cdata
+                        extension.extension_id = data.RDF.Description.em_id.cdata
                         extension.version = data.RDF.Description.em_version.cdata
                 else:
                     raise Exception("Invalid XPI.")

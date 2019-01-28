@@ -9,6 +9,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
+            model_name="extension", name="is_legacy", field=models.BooleanField(default=False)
+        ),
+        migrations.AddField(
             model_name="extension", name="hash", field=models.CharField(max_length=64, null=True)
         ),
         migrations.AddField(
@@ -18,7 +21,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="extension",
-            name="webext_id",
+            name="extension_id",
             field=models.CharField(max_length=255, null=True),
         ),
     ]
