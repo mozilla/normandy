@@ -32,6 +32,9 @@ def populate_metadata(apps, schema_editor):
                 else:
                     raise Exception("Invalid XPI.")
 
+            if not extension.extension_id or not extension.version:
+                raise Exception("Extension ID or version not set.")
+
             f.seek(0)
             extension.hash = hashlib.sha256(f.read()).hexdigest()
         extension.save()
