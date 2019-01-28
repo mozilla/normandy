@@ -8,7 +8,6 @@ from django.conf import settings
 from normandy.base.tests import Whatever
 from normandy.studies.models import Extension
 from normandy.studies.tests import ExtensionFactory
-from normandy.studies.api.v3.fields import ExtensionFileField
 
 
 @pytest.mark.django_db
@@ -27,7 +26,16 @@ class TestExtensionAPI(object):
 
         res = api_client.get("/api/v3/extension/")
         assert res.status_code == 200
-        assert res.data["results"] == [{"id": extension.id, "name": "foo", "xpi": Whatever()}]
+        assert res.data["results"] == [
+            {
+                "id": extension.id,
+                "name": "foo",
+                "xpi": Whatever(),
+                "extension_id": extension.extension_id,
+                "version": extension.version,
+                "hash": extension.hash,
+            }
+        ]
 
     def test_list_view_includes_cache_headers(self, api_client):
         res = api_client.get("/api/v3/extension/")
@@ -95,19 +103,19 @@ class TestExtensionAPI(object):
         path = self.data_path("not-an-addon.txt")
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
-        assert res.data == {"xpi": [ExtensionFileField.default_error_messages["not_a_zip"]]}
+        assert res.data == {"xpi": "Extension file must be zip-formatted."}
 
     def test_uploads_must_be_signed_webext(self, api_client, storage):
         path = self.data_path("webext-unsigned.xpi")
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
-        assert res.data == {"xpi": [ExtensionFileField.default_error_messages["not_signed"]]}
+        assert res.data == {"xpi": "Extension file must be signed."}
 
     def test_uploads_must_be_signed_legacy(self, api_client, storage):
         path = self.data_path("legacy-unsigned.xpi")
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
-        assert res.data == {"xpi": [ExtensionFileField.default_error_messages["not_signed"]]}
+        assert res.data == {"xpi": "Extension file must be signed."}
 
     def test_uploaded_webexts_must_have_id(self, api_client, storage):
         # NB: This is a fragile test. It uses a unsigned webext, and
@@ -116,7 +124,9 @@ class TestExtensionAPI(object):
         path = self.data_path("webext-no-id-unsigned.xpi")
         res = self._upload_extension(api_client, path)
         assert res.status_code == 400  # Client error
-        assert res.data == {"xpi": [ExtensionFileField.default_error_messages["no_id"]]}
+        assert res.data == {
+            "xpi": 'Web extensions must have a manifest key "applications.gecko.id".'
+        }
 
     def test_keeps_extension_filename(self, api_client, storage):
         filename = "bootstrap-addon-example@mozilla.org-0.1.0.xpi"

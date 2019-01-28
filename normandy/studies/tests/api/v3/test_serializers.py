@@ -14,4 +14,7 @@ class TestExtensionSerializer:
             "id": extension.id,
             "name": extension.name,
             "xpi": extension.xpi.url,
+            "extension_id": extension.extension_id,
+            "version": extension.version,
+            "hash": extension.hash,
         }
