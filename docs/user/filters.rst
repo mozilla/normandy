@@ -3,7 +3,7 @@ Filters
 Normandy filters describe which users a :ref:`recipe <recipes>` should be
 executed for. They're executed locally in the client's browser. If the client
 matches the critera, the corresponding recipe is executed. Filters have
-access to information about the browser, such as it's country, locale, and
+access to information about the browser, such as its country, locale, and
 Firefox version.
 
 There are two major forms of filters in Normandy. The first is filter objects,

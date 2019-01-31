@@ -6,7 +6,7 @@ approval process. This process requires two separate users to be completed.
 
 .. note::
 
-   On some test versions of Normandy, notable the staging server, the approval
+   On some test versions of Normandy, notably the staging server, the approval
    process can be completed with a single user to ease testing of recipes and
    the Firefox client.
 

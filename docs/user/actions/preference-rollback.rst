@@ -3,7 +3,7 @@
 preference-rollback: Undo a preference rollback
 ===================================================
 The ``preference-rollback`` action undoes the effects a
-:ref:`preference-rollout action <preference-rollout>`. that did not go as
+:ref:`preference-rollout action <preference-rollout>` that did not go as
 planned.
 
 Users who run a ``preference-rollback`` have preferences reverted to their

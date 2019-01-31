@@ -137,11 +137,12 @@ High volume recipes
    1% of the Release channel, or similarly sized populations of other
    channels.
 Prevent New Enrollment
-   When checked, new participants will not be enrolled in the experiment, and
-   existing participants will continue to run the experiment. When unchecked,
-   new participants will continue to be enrolled based on the recipe filters.
-   This is useful to prevent an experiment's population from growing while
-   still collecting additional data from the users already enrolled.
+   When checked, new participants will not be enrolled in the experiment,
+   although existing participants will continue to run the experiment. When
+   unchecked, new participants will continue to be enrolled based on the
+   recipe filters. This is useful to prevent an experiment's population from
+   growing while still collecting additional data from the users already
+   enrolled.
 Branches
    A list of experiment branches, each with the following arguments:
 

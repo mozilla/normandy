@@ -52,8 +52,8 @@ Description
 Add-on
    The add-on to install. The list of available add-ons pulls from the add-ons
    that have been uploaded via the Extensions listing.
-Pause Enrollment
-   When checked, new participants will not be enrolled in the study, and
+Prevent New Enrollment
+   When checked, new participants will not be enrolled in the study, although
    existing participants will continue to run the study add-on. When
    unchecked, new participants will continue to be enrolled based on the
    recipe filters. This is useful to prevent a study's population from
@@ -83,3 +83,9 @@ After the user matches the filter expression and executes the recipe:
    saved on the client.
 3. Once it's done running the experiment, the study add-on should uninstall
    itself, which marks the study as complete.
+
+Testing Notes
+-------------
+If testing against a local copy of Normandy with a self-signed certificate,
+add-on installation will fail unless you set the
+``extensions.install.requireBuiltInCerts`` preference to ``false``.
