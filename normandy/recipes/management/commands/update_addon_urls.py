@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django.core.management.base import BaseCommand
 from django.template.defaultfilters import pluralize
 
@@ -6,7 +8,7 @@ from normandy.studies.models import Extension
 
 
 def get_filename_from_url(url):
-    url.split("/")[-1]
+    return urlparse(url).path.split("/")[-1]
 
 
 class Command(BaseCommand):
@@ -34,8 +36,7 @@ class Command(BaseCommand):
             if not arguments.get("addonUrl"):
                 self.stderr.write(
                     f"Warning: Recipe {rev.recipe.id} revision {rev.id} has action=opt-out-study, "
-                    f"but no addonUrl",
-                    ending="\n",
+                    f"but no addonUrl"
                 )
                 continue
 
@@ -44,8 +45,7 @@ class Command(BaseCommand):
             if filename not in extension_by_filename:
                 self.stderr.write(
                     f"Warning: Recipe {rev.recipe.id} revision {rev.id} has an addonUrl that does "
-                    f"not match any in the database.",
-                    ending="\n",
+                    f"not match any in the database."
                 )
                 continue
 

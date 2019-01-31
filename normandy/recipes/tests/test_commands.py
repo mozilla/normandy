@@ -266,18 +266,21 @@ class TestUpdateActionSignatures(object):
         assert a.signature.signature == "original signature"
 
 
+addonUrl = "addonUrl"
+
+
 @pytest.mark.django_db
 class TestUpdateAddonUrls(object):
     def test_it_works(self, storage):
         extension = ExtensionFactory()
         fake_old_url = extension.xpi.url.replace("/media/", "/media-old/")
         action = ActionFactory(name="opt-out-study")
-        recipe = RecipeFactory(action=action, arguments={"addonUrl": fake_old_url})
+        recipe = RecipeFactory(action=action, arguments={addonUrl: fake_old_url})
         call_command("update_addon_urls")
 
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
-        assert recipe.arguments["addonUrl"] == extension.xpi.url
+        assert recipe.arguments[addonUrl] == extension.xpi.url
 
     def test_signatures_are_updated(self, mocked_autograph, storage):
         extension = ExtensionFactory()
@@ -285,7 +288,7 @@ class TestUpdateAddonUrls(object):
         action = ActionFactory(name="opt-out-study")
         recipe = RecipeFactory(
             action=action,
-            arguments={"addonUrl": fake_old_url},
+            arguments={addonUrl: fake_old_url},
             approver=UserFactory(),
             enabler=UserFactory(),
             signed=True,
@@ -305,14 +308,32 @@ class TestUpdateAddonUrls(object):
     def test_it_doesnt_update_other_actions(self):
         action = ActionFactory(name="some-other-action")
         recipe = RecipeFactory(
-            action=action,
-            arguments={"addonUrl": "https://before.example.com/extensions/addon.xpi"},
+            action=action, arguments={addonUrl: "https://before.example.com/extensions/addon.xpi"}
         )
         call_command("update_addon_urls")
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
         # Url should not be not updated
-        assert recipe.arguments["addonUrl"] == "https://before.example.com/extensions/addon.xpi"
+        assert recipe.arguments[addonUrl] == "https://before.example.com/extensions/addon.xpi"
+
+    def test_it_works_for_multiple_extensions(self, storage):
+        extension1 = ExtensionFactory(name="1.xpi")
+        extension2 = ExtensionFactory(name="2.xpi")
+
+        fake_old_url1 = extension1.xpi.url.replace("/media/", "/media-old/")
+        fake_old_url2 = extension2.xpi.url.replace("/media/", "/media-old/")
+
+        action = ActionFactory(name="opt-out-study")
+        recipe1 = RecipeFactory(action=action, arguments={addonUrl: fake_old_url1})
+        recipe2 = RecipeFactory(action=action, arguments={addonUrl: fake_old_url2})
+        call_command("update_addon_urls")
+
+        # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
+        recipe1 = Recipe.objects.get(id=recipe1.id)
+        recipe2 = Recipe.objects.get(id=recipe2.id)
+
+        assert recipe1.arguments[addonUrl] == extension1.xpi.url
+        assert recipe2.arguments[addonUrl] == extension2.xpi.url
 
 
 @pytest.mark.django_db
