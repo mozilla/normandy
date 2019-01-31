@@ -8,7 +8,9 @@ they accept.
 .. toctree::
    :maxdepth: 1
 
-   console-log
    show-heartbeat
    preference-experiment
+   preference-rollout
+   preference-rollback
    opt-out-study
+   console-log

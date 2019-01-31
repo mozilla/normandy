@@ -17,17 +17,17 @@ When shown a Heartbeat prompt, users can:
 - Click the close button on the far right of the bar, which dismisses it
   entirely.
 
-After a Heartbeat prompt has been shown to a user once, it will store a flag
-and not show itself to the user again until 7 days have passed since the last
-time it was shown. This happens on a per-recipe basis. This does not apply when
-the recipe is viewed in testing mode, such as within the admin preview.
+A maximum of one Heartbeat prompt will be shown to a user on any given day
+from any recipe. Recipes can configure heartbeat prompts to have one of three
+repetition modes. These repetition rules are applied on a per-recipe basis,
+while also respecting the global rate limit of one-per-day.
 
 Telemetry Ping
 --------------
 Whenever the user interacts with the prompt, a ping is written to Telemetry_
-with information on how the user has interacted with the current prompt thusfar.
-The `"heartbeat" ping documentation`_ has more information on the contents of
-the ping.
+with information on how the user has interacted with the current prompt thus
+far. The `"heartbeat" ping documentation`_ has more information on the
+contents of the ping.
 
 .. _Telemetry: https://wiki.mozilla.org/Telemetry
 .. _"heartbeat" ping documentation: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/heartbeat-ping.html
@@ -45,11 +45,21 @@ Engagement Button Label
 Thanks Message
    Message to show after the user clicks the rating stars or button.
 Post-Answer URL
-   **Optional.** URL to open in a new tab after the user clicks the rating stars
-   or button.
+   **Optional.** URL to open in a new tab after the user clicks the rating
+   stars or button.
 Learn More Message
    **Optional.** Text to use for the "Learn More" link. If blank, the link is
    not displayed.
 Learn More URL
-   **Optional.** URL to open in a new tab after the user clicks the "Learn More"
-   link. If blank, the link is not displayed.
+   **Optional.** URL to open in a new tab after the user clicks the
+   "Learn More" link. If blank, the link is not displayed.
+Include Telemetry UUID
+   If this is set to true, extra information is included in Telemetry and the
+   Post Answer URL in order to correlate the two, such as linking Telemetry
+   data with survey responses.
+How often should this prompt be shown
+   This field has three values:
+
+   1. Show this prompt once
+   2. Show this prompt until the user interacts with it, and then never again.
+   3. Show users this prompt once every X days.

@@ -1,7 +1,7 @@
 console-log: Log to the Console
 ===============================
 The ``console-log`` action logs a message to the `Browser Console`_. It's
-mostly used for testing purposes.
+only used for testing purposes.
 
 Arguments
 ---------
