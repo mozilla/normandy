@@ -1,7 +1,44 @@
 opt-out-study: Install a Study Add-on Without Prompting
 =======================================================
-The ``opt-out-study`` action installs an add-on, typically one that implements a
-feature experiment by changing Firefox and measuring how it affects the user.
+
+.. note::
+
+   A note on terminology: This action refers to the unit of work as a
+   "study". This isn't exactly correct, and doesn't mesh well with the rest
+   of the usage in Normandy.
+
+   A more correct definition is that a study is a line of inquiry that asks a
+   question, gathers some data, and draws a conclusion. An individual study
+   may have zero or more experiments. This action represents a single
+   experiment.
+
+   On this page the name "study" is still used for compatibility reasons.
+   Please be aware that today this would be called an experiment, not a
+   study. In the future this incongruence will be fixed.
+
+
+.. note::
+
+   On the meaning of "opt-out": This action was developed at a time where
+   there were already existing studies involving add-ons happening. These
+   older studies worked by prompting users via Heartbeat to install an
+   extension.
+
+   These older studies were called "opt-in add-on studies" or often just
+   "opt-in studies". At the time the major difference between that existing
+   pattern and this new action was that this was opt-*out*. Users could
+   opt-out of individual studies or the whole program, but were opted-in by
+   default.
+
+   The important detail at the time was that the studies were opt-out. Today
+   that style of opt-in study has died off, and now this action has a
+   confusing name. It is difficult to change the names of actions however.
+   Please be aware that better name for this action would be
+   "opt-out-addon-experiment", or just "addon-experiment"
+
+The ``opt-out-study`` action installs an add-on, typically one that
+implements a feature experiment by changing Firefox and measuring how it
+affects the user.
 
 Each recipe corresponds to a single _study_; you could run multiple studies (
 using multiple recipes) that use the same add-on.
@@ -15,18 +52,21 @@ Description
 Add-on
    The add-on to install. The list of available add-ons pulls from the add-ons
    that have been uploaded via the Extensions listing.
-Pause Enrollment
-   When checked, new participants will not be enrolled in the study, and
-   existing participants will continue to run the study add-on. When unchecked,
-   new participants will continue to be enrolled based on the recipe filters.
+Prevent New Enrollment
+   When checked, new participants will not be enrolled in the study, although
+   existing participants will continue to run the study add-on. When
+   unchecked, new participants will continue to be enrolled based on the
+   recipe filters. This is useful to prevent a study's population from
+   growing while still collecting additional data from the users already
+   enrolled.
 
 Uploading Add-ons
 -----------------
 Add-ons to be used in studies can be uploaded to Normandy via the extensions
-listing, available at ``/control/extension/`` on the server.
+page of Delivery Console, accessible from the home page.
 
-Add-ons used in studies must be signed using a special key. Please contact the
-Normandy development team for more details.
+Add-ons used in studies must be signed using a special key. Please contact
+the Normandy development team for more details.
 
 User Flow
 ---------
@@ -35,8 +75,7 @@ After the user matches the filter expression and executes the recipe:
 1. If the user is eligible for the study, they are enrolled. A user is
    ineligible if:
 
-   * Their Shield add-on is too old to support add-on studies.
-   * Their `opt-out preference`_ is set to ``false``.
+   * Their `opt-out preference <opt-out-preference>`_ is set to ``false``.
    * They have participated in this study/recipe previously.
    * They have an add-on installed with the same ID as the study add-on.
 
@@ -45,49 +84,8 @@ After the user matches the filter expression and executes the recipe:
 3. Once it's done running the experiment, the study add-on should uninstall
    itself, which marks the study as complete.
 
-about:studies
--------------
-.. image:: about_studies.png
-   :align: center
-
-Users can view active and complete studies they've participated in on
-``about:studies``. They can also manually end an active study using the Remove
-buttons on this page.
-
-The top of the page links to a SUMO article explaining studies, as well as to
-the `opt-out preference`_.
-
-.. _opt-out preference:
-
-Opt-Out Preference
-------------------
-.. image:: opt_out_pref.png
-   :align: center
-
-Shield adds a preference to ``about:preferences`` under the Privacy & Security
-tab, labeled "Allow Firefox to install and run studies" that defaults to being
-checked and links to ``about:studies``. It controls the
-``app.shield.optoutstudies.enabled`` preference in ``about:config``.
-
-If unchecked, the user will not be enrolled in any new studies.
-
-The checkbox is linked to the one above it: "Allow Nightly to automatically send
-technical and interaction data to Mozilla". If that preference is unchecked, the
-opt-out preference will also be unchecked and disabled until the user checks the
-data one again (at which point the opt-out preference becomes checked once
-more).
-
-Ending a Study
---------------
-The following events can cause a study to end before the add-on uninstalls
-itself:
-
-* The user uninstalls the add-on manually, or while Firefox is closed.
-* The recipe for the study is disabled; the study will end the next time the
-  user fetches recipes.
-
 Testing Notes
 -------------
-- If testing against a local copy of Normandy with a self-signed certificate,
-  add-on installation will fail unless you set the
-  ``extensions.install.requireBuiltInCerts`` preference to ``false``.
+If testing against a local copy of Normandy with a self-signed certificate,
+add-on installation will fail unless you set the
+``extensions.install.requireBuiltInCerts`` preference to ``false``.

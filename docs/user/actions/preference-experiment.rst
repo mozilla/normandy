@@ -3,11 +3,12 @@ preference-experiment: Temporarily Change a Preference
 The ``preference-experiment`` action temporarily changes a preference in order
 to test the effects of the change.
 
-Users who match ``preference-experiment`` recipes are assigned to one of several
-experiment branches, each with an assigned value for the preference. During the
-experiment, Telemetry_ pings are annotated with a list of active experiments,
-allowing us to measure the effect the preference change has on existing
-Telemetry metrics.
+Users that run ``preference-experiment`` recipes are assigned to one of
+several experiment branches, each with an assigned value for the preference.
+During the experiment, Telemetry_ pings are annotated with a list of active
+experiments, allowing us to measure the effect the preference change has on
+existing Telemetry metrics. When a user is enrolled or unenrolled in
+preference experiments, Telemetry events are sent.
 
 .. note::
 
@@ -37,8 +38,7 @@ Disqualification
 Any of the following conditions will prevent a user from being enrolled in an
 experiment, regardless of other filters:
 
-- The user does not have a version of the SHIELD client which supports
-  preference experiments.
+- Their :ref:`opt-out preference` is set to ``false``.
 - The user has previously participated in an experiment with the same ID.
 - The user is already in an active experiment for the same preference.
 - The preference value type in the recipe does not match the type of the
@@ -79,27 +79,34 @@ environment is sent along with the `main ping`_, among others.
      }
    }
 
+Additionally, `Telemetry Events`_ are sent that mark the enrollment and
+unenrollment of clients.
+
 .. _Telemetry Environment: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/index.html
 .. _main ping: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/main-ping.html
+.. _Telemetry Events: https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/events.html
 
 Experiment End Conditions
 -------------------------
 Any of the following events will cause the experiment to end:
 
 - If the recipe is disabled, or if its filters no longer match the user, the
-  experiment will end the next time recipes are executed. The preference will be
+  experiment will end the next time recipes are executed. The preference will
+  be reset to the value it had before the experiment.
+- If the user (or another system in Firefox) modifies the preference being
+  tested, the experiment will end immediately and the preference will not be
   reset to the value it had before the experiment.
-- If the user modifies the preference being tested, the experiment will end and
-  the preference will not be reset to the value it had before the experiment.
 
 Arguments
 ---------
-Slug
+Slug (sometimes called "Experiment Name")
    A unique identifier for this experiment. Users may only participate in an
-   experiment with the same slug once.
+   experiment with the same slug once. Slugs should consist only of lower
+   case letters, numbers, and hypens.
 Experiment Document URL
-   An unused field for saving a link to an experiment document that describes
-   the experiment that a recipe implements.
+   A field for saving a link to an experiment document that describes the
+   experiment that a recipe implements. This is often a link to a Bugzilla
+   bug. This URL is not used anywhere except in the admin interface.
 Preference Name
    The full dotted-path of the preference to modify.
 Preference Type
@@ -114,15 +121,28 @@ Preference Branch Type
    the preference system in more detail, there are a few situations where you
    may want to use the **user** branch:
 
-   - You want to modify a preference that is read before add-ons are
-     initialized; default preference experiments do not modify the
-     preference until the SHIELD system add-on starts.
+   - You want to modify a preference that is read before Normandy is
+     initialized, and which is not updated on change. Default preference
+     experiments have the old value during very early Firefox startup.
    - You want to modify a preference that is generally user-set by the browser
      itself (user-set means that the value does not match the default, not that
      the user has manually set the value).
 
    In general, it is not recommended to use the user branch unless it is
    necessary.
+High volume recipes
+   This changes the kind of telemetry sent, so that it is not picked up by
+   automated systems that are not designed to handle very high amounts of
+   traffic. This field should be set for any experiment targeting more than
+   1% of the Release channel, or similarly sized populations of other
+   channels.
+Prevent New Enrollment
+   When checked, new participants will not be enrolled in the experiment,
+   although existing participants will continue to run the experiment. When
+   unchecked, new participants will continue to be enrolled based on the
+   recipe filters. This is useful to prevent an experiment's population from
+   growing while still collecting additional data from the users already
+   enrolled.
 Branches
    A list of experiment branches, each with the following arguments:
 

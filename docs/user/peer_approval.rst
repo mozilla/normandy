@@ -2,12 +2,13 @@ Peer Approval
 =============
 
 Recipes can only be enabled once they are approved by going through a peer
-approval process.
+approval process. This process requires two separate users to be completed.
 
 .. note::
 
-  An approval request cannot be created and approved/rejected by the same user.
-  These actions  must be completed by two separate users.
+   On some test versions of Normandy, notably the staging server, the approval
+   process can be completed with a single user to ease testing of recipes and
+   the Firefox client.
 
 Workflow
 --------

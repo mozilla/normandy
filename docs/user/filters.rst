@@ -1,9 +1,10 @@
 Filters
 =======
 Normandy filters describe which users a :ref:`recipe <recipes>` should be
-executed for. They're executed locally in the client's browser and, if they
-pass, the corresponding recipe is executed. Filters have access to information
-about the user, such as their location, locale, and Firefox version.
+executed for. They're executed locally in the client's browser. If the client
+matches the critera, the corresponding recipe is executed. Filters have
+access to information about the browser, such as its country, locale, and
+Firefox version.
 
 There are two major forms of filters in Normandy. The first is filter objects,
 which are simpler and more restrictive. They are a good first choice. The second
@@ -549,61 +550,22 @@ This section lists some examples of commonly-used filter expressions.
    normandy.plugins['Shockwave Flash']
 
 
-Advanced: Testing Filter Expressions in the Browser Console
------------------------------------------------------------
-1. Open the DevTools and go into the settings via the Gear Icon
+Testing Filter Expressions with the Normandy Devtools
+-----------------------------------------------------
+1. Install the Normandy Devtools by downloading the lastest version from `the
+Github Releases page`_ for the project.
 
-2. Ensure "Enable browser chrome and add-on debugging toolboxes" is checked.
+.. _`the Github Releases page`: https://github.com/mozilla/normandy-devtools/releases
 
-3. Open the browser console
+2. Open the devtools by clicking on the new green and gold hand-and-wrench
+   icon provided by the extension in Firefox menu.
 
-   * Tools > Web Developer > Browser Console
-   * :kbd:`Cmd + Shift + J`
+3. Click the "Filters" menu item.
 
-4. Run the following in the console:
+4. Type your filter in the box in the center. The results will appear in
+   real-time on the right hand side.
 
-   .. code-block:: javascript
-
-      Cu.import("resource://normandy/lib/RecipeRunner.jsm", {})
-        .RecipeRunner.checkFilter({
-          id: 1,
-          arguments: {},
-          filter_expression: FILTER_TO_TEST,
-        })
-        .then(result => console.log(result))
-
-   For example:
-
-   .. code-block:: javascript
-
-      Cu.import("resource://normandy/lib/RecipeRunner.jsm", {})
-        .RecipeRunner.checkFilter({
-          id: 1,
-          arguments: {},
-          filter_expression: 'true',
-        })
-        .then(result => console.log(result))
-
-   You can use backticks for multi-line expressions:
-
-   .. code-block:: javascript
-
-      Cu.import("resource://normandy/lib/RecipeRunner.jsm", {})
-        .RecipeRunner.checkFilter({
-          id: 1,
-          arguments: {},
-          filter_expression: `
-            (
-              true &&
-              normandy.country == "US"
-            )
-          `,
-        })
-        .then(result => console.log(result))
-
-5. The console will output a ``Promise`` object, and then log ``true``
-   or ``false`` depending on whether the expression passed for your
-   client or not.
+You can also see the values of context variables on the left of the page.
 
 .. note::
 

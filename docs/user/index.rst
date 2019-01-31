@@ -1,7 +1,9 @@
 User Documentation
 ==================
 These documents describe how Normandy works for admin users who create and
-configure recipes with the control interface.
+configure recipes with `Delivery Console`_.
+
+.. _Delivery Console: https://github.com/mozilla/delivery-console
 
 .. toctree::
    :maxdepth: 2
@@ -9,4 +11,4 @@ configure recipes with the control interface.
    filters
    peer_approval
    actions/index
-   data_collection
+   end_user_interaction
