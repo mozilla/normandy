@@ -108,7 +108,7 @@ class Core(Configuration):
             "normandy.base.api.renderers.CustomBrowsableAPIRenderer",
         ),
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-        "PAGE_SIZE": 10,
+        "PAGE_SIZE": 25,
         "EXCEPTION_HANDLER": "normandy.base.api.views.exception_handler",
     }
 
