@@ -17,13 +17,14 @@ class ExtensionSerializer(serializers.ModelSerializer):
     def is_valid(self, raise_exception=False):
         super().is_valid(raise_exception=raise_exception)
 
-        try:
-            Extension(**self.validated_data).populate_metadata()
-        except DjangoValidationError as ex:
-            self._validated_data = {}
+        if "xpi" in self.validated_data:
+            try:
+                Extension(**self.validated_data).populate_metadata()
+            except DjangoValidationError as ex:
+                self._validated_data = {}
 
-            for field in ex.message_dict:
-                self._errors.update({field: ex.message_dict[field][0]})
+                for field in ex.message_dict:
+                    self._errors.update({field: ex.message_dict[field][0]})
 
         if self._errors and raise_exception:
             raise ValidationError(self.errors)

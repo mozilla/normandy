@@ -87,6 +87,11 @@ class TestExtensionAPI(object):
             )
         return res
 
+    def _update_extension(self, api_client, id, path):
+        with open(path, "rb") as f:
+            res = api_client.patch(f"/api/v3/extension/{id}/", {"xpi": f}, format="multipart")
+        return res
+
     def test_upload_works_webext(self, api_client, storage):
         path = self.data_path("webext-signed.xpi")
         res = self._upload_extension(api_client, path)
@@ -98,6 +103,21 @@ class TestExtensionAPI(object):
         res = self._upload_extension(api_client, path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data["id"]).exists()
+
+    def test_can_update_xpi(self, api_client, storage):
+        e = ExtensionFactory(xpi__from_path=self.data_path("legacy-signed.xpi"))
+        path = self.data_path("webext-signed.xpi")
+        res = self._update_extension(api_client, e.id, path)
+        assert res.status_code == 200
+        e.refresh_from_db()
+        assert e.xpi.name.endswith("webext-signed.xpi")
+
+    def test_can_update_without_xpi(self, api_client, storage):
+        e = ExtensionFactory(xpi__from_path=self.data_path("webext-signed.xpi"))
+        res = api_client.patch(f"/api/v3/extension/{e.id}/", {"name": "new name"})
+        assert res.status_code == 200
+        e.refresh_from_db()
+        assert e.name == "new name"
 
     def test_uploads_must_be_zips(self, api_client, storage):
         path = self.data_path("not-an-addon.txt")
