@@ -1,8 +1,14 @@
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse
+
 from django.core.management.base import BaseCommand
 from django.template.defaultfilters import pluralize
 
 from normandy.recipes.models import RecipeRevision
+from normandy.studies.models import Extension
+
+
+def get_filename_from_url(url):
+    return urlparse(url).path.split("/")[-1]
 
 
 class Command(BaseCommand):
@@ -11,15 +17,17 @@ class Command(BaseCommand):
     file storage to a new hostname.
     """
 
-    help = "Updates add-on URL in revisions"
+    help = "Updates add-on URL in revisions to match the current storage system"
 
-    def add_arguments(self, parser):
-        parser.add_argument("new_hostname", help="Hostname to convert add-on urls to")
+    def handle(self, *args, **options):
+        extension_by_filename = {}
+        for extension in Extension.objects.all():
+            filename = get_filename_from_url(extension.xpi.url)
+            extension_by_filename[filename] = extension
 
-    def handle(self, *args, new_hostname, **options):
         target_revisions = RecipeRevision.objects.filter(action__name="opt-out-study")
         update_count = 0
-        for rev in target_revisions.iterator():
+        for rev in target_revisions:
             # Pull into a local variable to modify the arguments since
             # `rev.arguments` is actually a property that parses JSON, not a
             # real attribute of the object
@@ -28,22 +36,26 @@ class Command(BaseCommand):
             if not arguments.get("addonUrl"):
                 self.stderr.write(
                     f"Warning: Recipe {rev.recipe.id} revision {rev.id} has action=opt-out-study, "
-                    f"but no addonUrl",
-                    ending="\n",
+                    f"but no addonUrl"
                 )
                 continue
 
-            parsed_url = urlparse(arguments["addonUrl"])
-            if parsed_url.netloc == new_hostname:
+            filename = get_filename_from_url(arguments["addonUrl"])
+
+            if filename not in extension_by_filename:
+                self.stderr.write(
+                    f"Warning: Recipe {rev.recipe.id} revision {rev.id} has an addonUrl that does "
+                    f"not match any in the database."
+                )
+                continue
+
+            extension = extension_by_filename[filename]
+            new_url = extension.xpi.url
+            if arguments["addonUrl"] == new_url:
                 # nothing to do
                 continue
 
-            # _replace is not a private method. parsed_url is a named tuple,
-            # and named tuples expose all their public methods with underscores
-            # to avoid colliding with data keys.
-            new_url_parts = parsed_url._replace(netloc=new_hostname)
-            new_url = urlunparse(new_url_parts)
-            arguments["addonUrl"] = new_url
+            arguments["addonUrl"] = extension.xpi.url
             rev.arguments = arguments
             rev.save()
             update_count += 1
