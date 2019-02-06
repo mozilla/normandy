@@ -1,5 +1,6 @@
 import re
 
+from django.http import JsonResponse
 from django.shortcuts import render
 
 
@@ -11,6 +12,11 @@ delivery_console_urls = {
 
 
 def index(request):
+    if request.path.startswith("/api"):
+        # If you ended up here, your URL pattern didn't match anything and if your path
+        # starts with anything "api" you're going to expect JSON.
+        return JsonResponse({"path": request.path}, status=404)
+
     hostname = request.get_host()
 
     delivery_console_url = delivery_console_urls["prod"]
