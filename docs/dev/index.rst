@@ -9,11 +9,9 @@ of the Normandy client.
    :maxdepth: 2
 
    concepts
-   driver
    install
    workflow
    api-tests
-   code-style
    coverage
    feature-experiments
    remote-settings
