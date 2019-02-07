@@ -193,7 +193,7 @@ class TestUpdateRecipeSignatures(object):
         r.signature.save()
         call_command("update_recipe_signatures")
         r.refresh_from_db()
-        assert r.signature.signature is not "old signature"
+        assert r.signature.signature != "old signature"
 
     def test_it_unsigns_disabled_recipes(self, mocked_autograph):
         r = RecipeFactory(signed=True)
@@ -215,7 +215,7 @@ class TestUpdateRecipeSignatures(object):
         r.signature.save()
         call_command("update_recipe_signatures", "--force")
         r.refresh_from_db()
-        assert r.signature.signature is not "old signature"
+        assert r.signature.signature != "old signature"
 
     def test_it_does_not_resign_up_to_date_recipes(self, settings, mocked_autograph):
         r = RecipeFactory(approver=UserFactory(), enabler=UserFactory(), signed=True)
@@ -247,7 +247,7 @@ class TestUpdateActionSignatures(object):
         a.signature.save()
         call_command("update_action_signatures")
         a.refresh_from_db()
-        assert a.signature.signature is not "old signature"
+        assert a.signature.signature != "old signature"
 
     def test_it_resigns_signed_actions_with_force(self, mocked_autograph):
         a = ActionFactory(signed=True)
