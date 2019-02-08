@@ -25,6 +25,7 @@ class Extension(DirtyFieldsMixin, models.Model):
     extension_id = models.CharField(max_length=255)
     version = models.CharField(max_length=32)
     hash = models.CharField(max_length=64)
+    hash_algorithm = models.CharField(max_length=16)
 
     class Meta:
         ordering = ("-id",)
@@ -115,6 +116,7 @@ class Extension(DirtyFieldsMixin, models.Model):
         # Make sure to read the XPI file from the start before hashing
         self.xpi.seek(0)
         self.hash = hashlib.sha256(self.xpi.read()).hexdigest()
+        self.hash_algorithm = "sha256"
 
     def save(self, *args, **kwargs):
         dirty_fields = {
