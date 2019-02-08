@@ -17,4 +17,5 @@ class TestExtensionSerializer:
             "extension_id": extension.extension_id,
             "version": extension.version,
             "hash": extension.hash,
+            "hash_algorithm": extension.hash_algorithm,
         }

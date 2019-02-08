@@ -11,8 +11,8 @@ class ExtensionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Extension
-        fields = ["id", "name", "xpi", "extension_id", "version", "hash"]
-        read_only_fields = ["extension_id", "version", "hash"]
+        fields = ["id", "name", "xpi", "extension_id", "version", "hash", "hash_algorithm"]
+        read_only_fields = ["extension_id", "version", "hash", "hash_algorithm"]
 
     def is_valid(self, raise_exception=False):
         super().is_valid(raise_exception=raise_exception)
