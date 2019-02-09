@@ -8,9 +8,9 @@ update or wait for a new release.
 
 The system is made of two main components, a server and client. These
 components are known simply as the Normandy client and Normandy server. The
-server provides static information that the client acts on.
+server provides information that the client acts on.
 
-Normandy's execution is built around two main concepts: Actions, Recipes. This
+Normandy's execution is built around two main concepts: Actions and Recipes. This
 document describes those concepts in detail.
 
 .. _actions:
@@ -18,20 +18,21 @@ document describes those concepts in detail.
 Actions
 -------
 An action is one of the capabilities provided by Normandy. As of Firefox 66,
-actions are implemented entirely within the browser as native code. The
-server selects an action to run by name, such as "preference-experiment" or
+actions are implemented entirely within the browser as native code. Actions
+are identified in recipes by name, such as "preference-experiment" or
 "show-heartbeat".
 
 Actions can accept a configuration object that is specified within the
 Normandy control interface. This configuration, which is part of a
-:ref:`recipe <recipes>`, contains static data required by the action, such as
+:ref:`recipe <recipes>`, contains data required by the action, such as
 translated strings or boolean options for controlling behavior.
 
-For example, a survey action would include code to check whether we have
-shown a survey to the user recently, to determine which variant of a survey
-to show, and the code to actually display the survey itself. The
-configuration for the survey action would contain the text of the survey
-prompt and the URL to redirect the user to after answering.
+For example, a "survey" action could consist of code within Firefox to check
+whether we have shown a survey to the user recently, to determine which
+variant of a survey to show, and the code to actually display the survey
+itself. When issued to clients, this action is paired with configuration for
+the survey action would contain the text of the survey prompt and the URL to
+redirect the user to after answering.
 
 .. _recipes:
 
@@ -50,8 +51,11 @@ perform. Recipes contain three important pieces of information:
    the recipe's **arguments**.
 
 Recipes are stored in the Normandy server's database and the Normandy client
-fetches them from the service during execution. Here's an example of a recipe
-in JSON format, as fetched by the Normandy client:
+fetches them from the service during execution. All active recipes are sent
+to every client, and filtering is done locally on the client.
+
+Here's an example of a recipe in JSON format, as fetched by the Normandy
+client:
 
 .. code-block:: json
 
@@ -66,7 +70,7 @@ in JSON format, as fetched by the Normandy client:
       "filter_expression": "normandy.version >= '65.0' && stableSample(0.5)"
    }
 
-.. info::
+.. note::
 
    The data retrieved by the Normandy client is the minimum subset of data
    that is needed execute the action. Other API end points return more
@@ -75,19 +79,19 @@ in JSON format, as fetched by the Normandy client:
 .. _JEXL: https://github.com/TechnologyAdvice/Jexl
 .. _Telemetry: https://wiki.mozilla.org/Telemetry
 
-.. _runtime:
+.. _client:
 
 Normandy Client
 ---------------
 The Normandy client is `a Firefox component`_ that reads and executes
 instructions from the server. Upon activation (typically every few hours),
-the runtime:
+the client:
 
 1. Downloads :ref:`recipes <recipes>` from the Normandy service.
 2. Verifies the signature of the recipes.
-3. Evaluates the recipe filters and filters out recipes that do not match the
-   client the runtime is installed within.
-4. Passes the recipes to the corresponding action code for execution.
+3. Evaluates the recipe filters and removes recipes that do not match the
+   client.
+4. Executes the corresponding action code using the recipe's arguments.
 
 .. _a Firefox component: https://hg.mozilla.org/mozilla-central/file/tip/toolkit/components/normandy
 
@@ -100,11 +104,10 @@ controls to help mitigate this risk.
 
 Action and Recipe Signing
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-Recipes that are downloaded by the runtime are signed according to the
+Recipes that are downloaded by the client are signed according to the
 Content-Signature protocol as provided by the Autograph_ service. The client
-verifies the signature upon downloading the recipes, ensuring that the
-runtime only executes recipes that have been signed with a Mozilla-controlled
-key.
+verifies the signature upon downloading the recipes, ensuring that only
+recipes that have been signed with a Mozilla-controlled key are executed.
 
 This helps prevent Man-in-the-Middle attacks where an adversary pretends to be
 the remote Normandy service.
@@ -121,13 +124,14 @@ distributed by the service.
 This helps prevent compromise of a single account from compromising the entire
 service, since two accounts need to be compromised to publish a recipe.
 
-Static Instructions
-^^^^^^^^^^^^^^^^^^^
-Recipe data is provided in either a static format (JSON) or an executable
-format designed specifically to be weak and without access to exfiltrate
-data(Jexl filters). This means that even if an attacker could run a malicious
-recipe in Firefox, they are limited to the actions implemented in the
-existing client.
+Safe Instructions
+^^^^^^^^^^^^^^^^^
+Recipe data is provided in either a non-executable format (JSON) or a safe
+executable format designed specifically to be weak and without enough access
+to exfiltrate data (JEXL filters). In technical terms, the JEXL filters are
+not turing complete, by design. This means that even if an attacker could run
+a malicious recipe in Firefox, they are limited to the actions implemented in
+the existing client.
 
 Configurable Admin
 ^^^^^^^^^^^^^^^^^^

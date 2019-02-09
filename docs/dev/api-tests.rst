@@ -29,7 +29,7 @@ To run these tests, use the following command from the root project directory.
     py.test -v --server=<server> contract-tests/
 
 where ``<server>`` is the server you want to test, such as
-``https://stage .normandy.cloudops.mozgcp.net`` or `https://localhost:8000`.
+``https://stage.normandy.cloudops.mozgcp.net`` or `https://localhost:8000`.
 
 If you want to send results of the test run to TestRail, you need the following
 pre-requisites:

@@ -166,7 +166,7 @@ client, you'll need to set up Autograph_ to sign recipes as you save them:
       DJANGO_AUTOGRAPH_HAWK_ID=normandev
       DJANGO_AUTOGRAPH_HAWK_SECRET_KEY=3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
 
-.. info:
+.. note:
 
    The credentials provided here are not arbitrary. They are part of the
    default autograph configuration. They should be used exactly unless you
