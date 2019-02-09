@@ -9,9 +9,9 @@ pop-up notification with some configurable text, and only prompts users once.
 
 1. Adding a Function to the Driver
 ----------------------------------
-The first step is to add a new function to the :doc:`driver </dev/driver>` that
-will trigger the notification on the client. The driver is implemented in the
-system add-on, so we update the add-on to implement the function:
+The first step is to add a new function to the driver that will trigger the
+notification on the client. The driver is implemented in the system add-on,
+so we update the add-on to implement the function:
 
 .. js:function:: showNotification(message)
 
