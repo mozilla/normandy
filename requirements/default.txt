@@ -20,18 +20,18 @@ bcrypt==3.1.6 \
     --hash=sha256:9b2c5b640a2da533b0ab5f148d87fb9989bf9bcb2e61eea6a729102a6d36aef9 \
     --hash=sha256:28a0459381a8021f57230954b9e9a65bb5e3d569d2c253c5cac6cb181d71cf23 \
     --hash=sha256:44636759d222baa62806bbceb20e96f75a015a6381690d1bc2eda91c01ec02ea
-boto3==1.9.86 \
-    --hash=sha256:d1338582bc58741f54bd6b43488de6097a82ea45cebed0a3fd936981eadbb3a5 \
-    --hash=sha256:63cd957ba663f5c10ff48ed904575eaa701314f79f18dbc59bd050311cd5f809
+boto3==1.9.91 \
+    --hash=sha256:4a693170c79b4275d8bb6884e9930c82e6bb4e303597ca545f288333db77c6a7 \
+    --hash=sha256:428c6d535f373a7203ed7ec687bb826b88e62de7befc3816e0aacd305f7572a2
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
 dj-inmemorystorage==1.4.1 \
     --hash=sha256:2b587f9320ea26f9ed1c62fefaf05c817735eda989d6439072b73d1b59b1c591 \
     --hash=sha256:fa921269b83ffc762411e36d446fa07b602a4ad74632ae1819844d32e6fb12bd
-Django==2.0.10 \
-    --hash=sha256:e89f613e3c1f7ff245ffee3560472f9fa9c07060b11f65e1de3cb763f8dcd4b9 \
-    --hash=sha256:0292a7ad7d8ffc9cfc6a77f043d2e81f5bbc360c0c4a1686e130ef3432437d23    # pyup: <2.1 # django-webpack-loader doesn't support 2.1 yet
+Django==2.0.12 \
+    --hash=sha256:9493f9c4417ab6c15221a7ab964f73db0632bc6337ade33810078423b800dbd9 \
+    --hash=sha256:e2f3ada50cf2106af7b2631b7b0b6f0d983ae30aa218f06d5ec93d3049f94897    # pyup: <2.1 # django-webpack-loader doesn't support 2.1 yet
 django-configurations==2.1 \
     --hash=sha256:e70433eeed10549d30bf5ca386c962505ff9f492893dd2483c52af536347adce \
     --hash=sha256:71d9acdff33aa034f0157b0b3d23629fe0cd499bf4d0b6d699b9ca0701d952e8
@@ -192,8 +192,8 @@ pytest==4.2.0 \
 pytest-mock==1.10.1 \
     --hash=sha256:bfdf02789e3d197bd682a758cae0a4a18706566395fbe2803badcd1335e0173e \
     --hash=sha256:4d0d06d173eecf172703219a71dbd4ade0e13904e6bbce1ce660e2e0dc78b5c4
-pytest-testrail==2.3.2 \
-    --hash=sha256:3b4e82532d0b832aa15123998ca4cc7cc6072032668c6057404bf6d4186964f9
+pytest-testrail==2.3.3 \
+    --hash=sha256:d1981ff94fb28b485fa51c28042ea728bab5362b4f08de86aa849d398aede6fc
 raven==6.10.0 \
     --hash=sha256:44a13f87670836e153951af9a3c80405d36b43097db869a36e92809673692ce4 \
     --hash=sha256:3fa6de6efa2493a7c827472e984ce9b020797d0da16f1db67197bcc23c8fae54
