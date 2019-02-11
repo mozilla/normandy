@@ -8,8 +8,8 @@ Prerequisites
 This guide assumes you have already installed and set up the following:
 
 1. Git_
-2. `Python 3.6`_, `pip 8`_ or higher, and virtualenv_
-3. `Node.js 8`_ and NPM 5.
+2. `Python 3.7`_, `pip 8`_ or higher, and virtualenv_
+3. `Node.js 8`_ and NPM 5 or higher
 4. `Postgres 9.4`_
 5. ``openssl``
 
@@ -18,7 +18,7 @@ theory, run on Windows as well. All the example commands given below are
 intended to be run in a terminal.
 
 .. _Git: https://git-scm.com/
-.. _Python 3.6: https://www.python.org/
+.. _Python 3.7: https://www.python.org/
 .. _pip 8: https://pip.pypa.io/en/stable/
 .. _Node.js 8: https://nodejs.org/en/
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
@@ -57,13 +57,17 @@ Installation
       :ref:`pip-install-error`
          How to troubleshoot errors during ``pip install``.
 
-4. Install frontend dependencies using yarn_
-   and build the frontend code using npm:
+4. (Optional) Install frontend dependencies using yarn_
+   and build the legacy action code:
 
    .. code-block:: bash
 
       yarn install
-      npm run build
+      yarn build
+
+   This JS code is only used for legacy clients that do not have actions
+   implemented directly in the client. It can be safely ignored in most
+   development environments.
 
 .. _yarn: https://yarnpkg.com/lang/en/docs/install/
 
@@ -85,7 +89,6 @@ Installation
 
          DATABASE_URL=postgres://username:password@server_addr/database_name
 
-
 6. Initialize your database by running the migrations:
 
    .. code-block:: bash
@@ -98,20 +101,23 @@ Installation
 
       python manage.py createsuperuser
 
-8. Pull the latest geolocation database using the ``download_geolite2.sh``
+8. (Optional) Pull the latest geolocation database using the ``download_geolite2.sh``
    script:
 
    .. code-block:: bash
 
       ./bin/download_geolite2.sh
 
-9. Load actions into the database:
+   The geolocation database is used for the classify client API endpoint. It
+   is required for recipes that use geolocation filters, but can be omitted.
+
+9. (Optional) If you built the JS actions, load them into the database:
 
    .. code-block:: bash
 
       python manage.py update_actions
 
-10. Update product details:
+10. Update product details to provide a list of languages supported by Firefox.
 
    .. code-block:: bash
 
@@ -137,10 +143,11 @@ running:
    site for the first time, you will have to create a certificate exception to
    allow Firefox to accept the certificate and access the site over HTTPS.
 
-The site should be available at https://localhost:8000/.
+The site should be available at https://localhost:8000/. The main page will
+have the message "This interface has been removed". The API is available at
+the endpoint ``/api/v3/``. No user interface is provided.
 
 .. _fork: http://help.github.com/fork-a-repo/
-.. _issue: https://bugs.python.org/issue18378
 
 Autograph
 ---------
@@ -158,6 +165,12 @@ client, you'll need to set up Autograph_ to sign recipes as you save them:
       DJANGO_AUTOGRAPH_URL=http://localhost:8765/
       DJANGO_AUTOGRAPH_HAWK_ID=normandev
       DJANGO_AUTOGRAPH_HAWK_SECRET_KEY=3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts
+
+.. note:
+
+   The credentials provided here are not arbitrary. They are part of the
+   default autograph configuration. They should be used exactly unless you
+   are using an advanced Autograph configuration.
 
 With the configuration in place, you should see log messages when saving recipes
 that look like this::

@@ -19,7 +19,7 @@ In Python, to run the tests with code coverage run the following commands:
    py.test --cov-report html --cov-report term-missing --cov normandy
    open htmlcov/index.html
 
-Front-end JavaScript tests can be run with:
+JavaScript tests can be run with:
 
 .. code-block:: bash
 
@@ -89,7 +89,7 @@ steps, as they don't affect your setup if nothing has changed:
    python manage.py initial_data
 
    # Build frontend files
-   ./node_modules/.bin/webpack --config ./webpack.config.js --env.update-actions
+   yarn build
 
 Building the Documentation
 --------------------------
@@ -123,91 +123,27 @@ Dependency's dependencies should go in ``requirements/constraints.txt``.
 
 Preprocessing Assets with Webpack
 ---------------------------------
-We use Webpack_ to create asset bundles of static resources. You can build an
-asset bundle by running:
+We use Webpack_ to create asset bundles of static resources. These assets are
+only used for legacy actions, and can be ignored if you aren't working with
+Firefox clients older than Firefox 66. You can build an asset bundle by
+running:
 
 .. code-block:: bash
 
-   npm run build
+   yarn build
 
 You can also run the watch command to automatically rebuild your bundles as you
 make changes:
 
 .. code-block:: bash
 
-   npm run watch
+   yarn watch
 
 Running the command with ``--env.update-actions`` will automatically call
-``manage.py update_actions`` when action code is built. Arguments are separated
-from the rest of the command by ``--``:
+``manage.py update_actions`` when action code is built.
 
 .. code-block:: bash
 
-   npm run watch -- --env.update-actions
+   yarn watch --env.update-actions
 
 .. _Webpack: http://webpack.github.io/
-
-Self-Repair Setup
------------------
-.. note:: Self-repair has been removed from recent versions of Firefox and is
-   disabled by the Shield system add-on.
-
-Normandy has a self-support-compatible endpoint. If you want to test out using
-Normandy as a self-support server, you can point Firefox to it by setting the
-``browser.selfsupport.url`` value in ``about:config`` to
-``https://localhost:8000/%LOCALE%/repair``.
-
-You can also do this to test development and staging servers; simply replace
-``localhost:8000`` in the URL above with the URL for the server you wish to test
-against.
-
-After changing the setting, close and reopen Firefox, and after a 5 second
-delay, Firefox will download and execute actions from the server you pointed it
-to.
-
-UITour Whitelist
-----------------
-Actions that use UITour_ (such as Heartbeat surveys) require you to add the URL
-for the Normandy instance to a whitelist in ``about:config``.
-
-To do this, open up ``about:config`` and search for a value named
-``browser.uitour.testingOrigins``. If it doesn't exist, create it by
-right-clicking the page and selecting ``New -> String``. The preference should
-be set to a comma-separated list of server addresses, including the protocol.
-For example, ``https://localhost:8000,https://normandy.dev.mozaws.net`` would
-whitelist both local instances and the development server.
-
-After creating this value, restart Firefox and UITour actions should function
-normally.
-
-.. _UITour: http://bedrock.readthedocs.org/en/latest/uitour.html
-
-Adding and Updating Actions
----------------------------
-The code and argument schemas for Actions is stored on the filesystem, but must
-also be updated in the database to be used by the site.
-
-To add a new action:
-
-1. Create a new directory in ``normandy/recipes/static/actions`` containing a
-   ``package.json`` file for your action and the JavaScript code for it.
-2. Add the entry point for your action to ``webpack.config.js``.
-3. Add the action name and path to the ``ACTIONS`` setting in ``settings.py``.
-4. :ref:`Build the action code using Webpack <process-webpack>`.
-5. Update the database by running ``update_actions``:
-
-.. code-block:: bash
-
-   python manage.py update_actions
-
-To update an existing action, follow steps 4 and 5 above after making your
-changes.
-
-Redux DevTools
---------------
-The control interface includes the `Redux DevTools`_ in development mode to help
-debug issues. To toggle the DevTools, hit ``Ctrl-H``. You can change the side of
-the screen the tools are docked on using ``Ctrl-Q``, and can resize the tools by
-dragging the edge of the bar.
-
-.. _Redux DevTools: https://github.com/gaearon/redux-devtools

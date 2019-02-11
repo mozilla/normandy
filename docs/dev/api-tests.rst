@@ -5,15 +5,17 @@ not expected.
 
 Before running these tests you will need the following installed:
 
-* Python 3.6.0 or greater
+* Python 3.7.0 or greater
 * virtualenv (https://virtualenv.pypa.io/en/latest/virtualenv) installed
 
 Before running these tests you need to create a virtual environment using
-Python 3.6.0 or greater. To create it do the following:
+Python 3.7.0 or greater. If you have an existing environment running
+Normandy, you can re-use that environment and skip this step. To create it do
+the following:
 
 .. code-block:: bash
 
-    virtualenv -p /path/to/python3.6 venv
+    virtualenv -p /path/to/python3.7 venv
     source venv/bin/activate
     pip install -r requirements/default.txt
 
@@ -26,10 +28,8 @@ To run these tests, use the following command from the root project directory.
 
     py.test -v --server=<server> contract-tests/
 
-where ``<server>`` is one of
-
-* `https://normandy.stage.mozaws.net`
-* `https://self-repair.mozilla.org`
+where ``<server>`` is the server you want to test, such as
+``https://stage.normandy.cloudops.mozgcp.net`` or `https://localhost:8000`.
 
 If you want to send results of the test run to TestRail, you need the following
 pre-requisites:

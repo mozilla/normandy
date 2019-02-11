@@ -26,5 +26,12 @@ reason for your packages to have a different hash, add another hash line to
      --hash d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544 \
      --hash xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-A good reason for the hash to be different is if you use a platform that isn't
-covered by the existing hashes for a package that has wheels.
+This means one of three things:
+
+1. You are using the wrong version of Python. Make sure you are using Python 3.7.
+2. You are running on an unexpected platform. You may need to add hashes for
+   your platform using hashin.
+3. The packages you are downloading are different than expected, either
+   because they changed on the server, there has been a network error, or you
+   are not downloading them from a trust worthy source. You should consult
+   with other developers on the project.
