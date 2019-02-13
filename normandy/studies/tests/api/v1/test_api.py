@@ -18,14 +18,14 @@ class TestExtensionAPI(object):
     def test_it_works(self, api_client):
         res = api_client.get("/api/v1/extension/")
         assert res.status_code == 200
-        assert res.data["results"] == []
+        assert res.data == []
 
     def test_it_serves_extensions(self, api_client, storage):
         extension = ExtensionFactory(name="foo")
 
         res = api_client.get("/api/v1/extension/")
         assert res.status_code == 200
-        assert res.data["results"] == [
+        assert res.data == [
             {
                 "id": extension.id,
                 "name": "foo",
@@ -69,7 +69,7 @@ class TestExtensionAPI(object):
 
         res = api_client.get(f"/api/v1/extension/?text={matching_extension.name}")
         assert res.status_code == 200
-        assert [ext["name"] for ext in res.data["results"]] == [matching_extension.name]
+        assert [ext["name"] for ext in res.data] == [matching_extension.name]
 
     def test_filtering_by_xpi(self, api_client, storage):
         matching_extension = ExtensionFactory()
@@ -78,7 +78,7 @@ class TestExtensionAPI(object):
         res = api_client.get(f"/api/v1/extension/?text={matching_extension.xpi}")
         assert res.status_code == 200
         expected_path = matching_extension.xpi.url
-        assert [urlparse(ext["xpi"]).path for ext in res.data["results"]] == [expected_path]
+        assert [urlparse(ext["xpi"]).path for ext in res.data] == [expected_path]
 
     def test_read_only(self, api_client, storage):
         path = self.data_path("webext-signed.xpi")
@@ -94,11 +94,11 @@ class TestExtensionAPI(object):
 
         res = api_client.get(f"/api/v1/extension/?ordering=name")
         assert res.status_code == 200
-        assert [r["id"] for r in res.data["results"]] == [e1.id, e2.id]
+        assert [r["id"] for r in res.data] == [e1.id, e2.id]
 
         res = api_client.get(f"/api/v1/extension/?ordering=-name")
         assert res.status_code == 200
-        assert [r["id"] for r in res.data["results"]] == [e2.id, e1.id]
+        assert [r["id"] for r in res.data] == [e2.id, e1.id]
 
     def test_order_id(self, api_client, storage):
         e1 = ExtensionFactory()
@@ -107,11 +107,11 @@ class TestExtensionAPI(object):
 
         res = api_client.get(f"/api/v1/extension/?ordering=id")
         assert res.status_code == 200
-        assert [r["id"] for r in res.data["results"]] == [e1.id, e2.id]
+        assert [r["id"] for r in res.data] == [e1.id, e2.id]
 
         res = api_client.get(f"/api/v1/extension/?ordering=-id")
         assert res.status_code == 200
-        assert [r["id"] for r in res.data["results"]] == [e2.id, e1.id]
+        assert [r["id"] for r in res.data] == [e2.id, e1.id]
 
     def test_order_bogus(self, api_client, storage):
         """Test that filtering by an unknown key doesn't change the sort order"""
@@ -120,8 +120,8 @@ class TestExtensionAPI(object):
 
         res = api_client.get(f"/api/v1/extension/?ordering=bogus")
         assert res.status_code == 200
-        first_ordering = [r["id"] for r in res.data["results"]]
+        first_ordering = [r["id"] for r in res.data]
 
         res = api_client.get(f"/api/v1/extension/?ordering=-bogus")
         assert res.status_code == 200
-        assert [r["id"] for r in res.data["results"]] == first_ordering
+        assert [r["id"] for r in res.data] == first_ordering

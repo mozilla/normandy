@@ -20,7 +20,7 @@ class ExtensionViewSet(CachingViewsetMixin, viewsets.ModelViewSet):
     filter_backends = [ExtensionOrderingFilter]
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")

@@ -19,7 +19,7 @@ class ExtensionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         if "text" in self.request.GET:
             text = self.request.GET.get("text")
