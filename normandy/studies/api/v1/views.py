@@ -16,6 +16,7 @@ class ExtensionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Extension.objects.all()
     serializer_class = ExtensionSerializer
     filter_backends = [ExtensionOrderingFilter]
+    pagination_class = None
 
     def get_queryset(self):
         queryset = self.queryset
