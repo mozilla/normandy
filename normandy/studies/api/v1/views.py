@@ -1,6 +1,5 @@
-from django.db.models import Q
-
-from rest_framework import viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.response import Response
 
 from normandy.base.api.filters import AliasedOrderingFilter
 from normandy.base.api.mixins import CachingViewsetMixin
@@ -12,17 +11,9 @@ class ExtensionOrderingFilter(AliasedOrderingFilter):
     aliases = {"id": ("id", "ID"), "name": ("name", "Name")}
 
 
-class ExtensionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
+class ExtensionViewSet(CachingViewsetMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Extension.objects.all()
     serializer_class = ExtensionSerializer
-    filter_backends = [ExtensionOrderingFilter]
-    pagination_class = None
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        if "text" in self.request.GET:
-            text = self.request.GET.get("text")
-            queryset = queryset.filter(Q(name__icontains=text) | Q(xpi__icontains=text))
-
-        return queryset
+    def list(self, *args, **kwargs):
+        return Response(status=status.HTTP_204_NO_CONTENT)
