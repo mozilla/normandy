@@ -19,7 +19,7 @@ v3_router.register("extension", v3_views.ExtensionViewSet)
 app_name = "studies"
 
 urlpatterns = [
-    url(r"^api/v1/", include(v1_router.urls)),
-    url(r"^api/v2/", include(v2_router.urls)),
-    url(r"^api/v3/", include(v3_router.urls)),
+    url(r"^api/v1/", include((v1_router.urls, "studies"), namespace="v1")),
+    url(r"^api/v2/", include((v2_router.urls, "studies"), namespace="v2")),
+    url(r"^api/v3/", include((v3_router.urls, "studies"), namespace="v3")),
 ]
