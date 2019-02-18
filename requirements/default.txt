@@ -119,8 +119,8 @@ html5lib==1.0.1 \
 jsonschema==2.6.0 \
     --hash=sha256:000e68abd33c972a5248544925a0cae7d1125f9bf6c58280d37546b946769a08 \
     --hash=sha256:6ff5f3180870836cae40f06fa10419f557208175f13ad7bc26caa77beb1f6e02
-newrelic==4.12.0.113 \
-    --hash=sha256:8fdc94350bfe69e4f70dc8a3e7ead6c6a1905e8f161ce24de7ee3de4f69196ad
+newrelic==4.14.0.115 \
+    --hash=sha256:b0f2ef6c817d9b5389cb3ef0f06037abbd1c1ed1a4ae04f293dadeb0f78ea924
 psycopg2==2.7.7 \
     --hash=sha256:5d222983847b40af989ad96c07fc3f07e47925e463baa5de716be8f805b41d9b \
     --hash=sha256:36b60201b6d215d7658a71493fdf6bd5e60ad9a0cffed39906627ff9f4f3afd3 \
