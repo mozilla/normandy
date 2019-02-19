@@ -54,6 +54,7 @@
     "webpack-cli": "3.2.3"
   },
   "resolutions": {
-    "deep-extend": ">=0.5.1"
+    "deep-extend": ">=0.5.1",
+    "braces": ">=2.3.1"
   }
 }
