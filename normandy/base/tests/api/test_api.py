@@ -26,6 +26,7 @@ class TestApiRootV1(object):
             "reciperevision-list": "http://testserver/api/v1/recipe_revision/",
             "classify-client": "http://testserver/api/v1/classify_client/",
             "approvalrequest-list": "http://testserver/api/v1/approval_request/",
+            "extension-list": "http://testserver/api/v1/extension/",
         }
 
     def test_it_redirects_classify_client_to_app_server(self, api_client, settings):

@@ -16,6 +16,5 @@ urlpatterns = [
     url(r"^favicon.ico", views.favicon),
     url(r"^api/v2/service_info/", api_views.ServiceInfoView.as_view(), name="service-info-v2"),
     url(r"^api/v3/service_info/", api_views.ServiceInfoView.as_view(), name="service-info"),
-    url(r"^api/v1/user/me/", api_views.CurrentUserView.as_view(), name="current-user"),
     url(r"^api/v3/", include(router.urls)),
 ]
