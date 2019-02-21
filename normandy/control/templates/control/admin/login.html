@@ -1,11 +1,8 @@
-{% load render_bundle from normandy_webpack_loader %}
-
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:" en-us " }}">
 
 <head>
   <title>SHIELD Control Panel</title>
-  {% render_bundle 'control' 'css' %}
   <meta name="robots" content="NONE,NOARCHIVE" />
   <link rel="icon" type="image/png" sizes="32x32" href="{{STATIC_URL}}img/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="96x96" href="{{STATIC_URL}}img/favicon-96x96.png">

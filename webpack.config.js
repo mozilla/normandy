@@ -2,14 +2,13 @@
 /* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template, comma-dangle */
 var path = require('path');
 var webpack = require('webpack');
-var BundleTracker = require('webpack-bundle-tracker');
 var childProcess = require('child_process');
 var MinifyPlugin = require('babel-minify-webpack-plugin');
 
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
 const production = process.env.NODE_ENV === 'production';
-const jsNamePattern = production ? '[name].[hash].js' : '[name].js';
+const jsNamePattern = '[name].js';
 
 var plugins = [
   new webpack.DefinePlugin({
@@ -51,9 +50,6 @@ module.exports = function (webpackEnvOptions) {
     },
 
     plugins: plugins.concat([
-      new BundleTracker({ filename: './webpack-stats-actions.json' }),
-      // Small plugin to update the actions in the database if
-      // --env.update-actions was passed.
       function updateActions() {
         this.plugin('done', function () {
           var cmd;

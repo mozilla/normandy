@@ -8,4 +8,3 @@ node_modules
 pip-cache
 site-packages
 venv
-webpack-stats-actions.json

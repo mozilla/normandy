@@ -2,10 +2,9 @@ import json
 import os
 
 from django.conf import settings
+from django.contrib.staticfiles.finders import FileSystemFinder
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-
-from webpack_loader.utils import get_loader
 
 from normandy.recipes.models import Action
 
@@ -112,8 +111,7 @@ class Command(BaseCommand):
 
 
 def get_implementation(action_name):
-    chunks = get_loader("ACTIONS").get_assets()["chunks"]
-    implementation_path = chunks[action_name][0]["path"]
+    implementation_path = FileSystemFinder().find(f"bundles/{action_name}.js")
     with open(implementation_path) as f:
         return f.read()
 
