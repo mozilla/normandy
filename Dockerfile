@@ -1,6 +1,6 @@
 FROM python:3.7-slim@sha256:d00a4d0dba471f1404341ba2b86819653f4bf9419313a25edf541b51bc16cbd2
 WORKDIR /app
-RUN groupadd --gid 1001 app && useradd -g app --uid 1001 --shell /usr/sbin/nologin app
+RUN groupadd --gid 10001 app && useradd -g app --uid 10001 --shell /usr/sbin/nologin app
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
