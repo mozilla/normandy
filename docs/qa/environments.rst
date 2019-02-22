@@ -13,13 +13,8 @@ Production
 Production is the live, user-facing instance of Normandy that is hit by every
 active user of Firefox.
 
-- **Read-only server:** https://normandy.services.mozilla.com/
-- **API CDN:** https://normandy.cdn.mozilla.net/
-- **Legacy admin:** https://normandy-admin.prod.mozaws.net/ (VPN Required)
-- **Bearer auth admin:** https://normandy-admin-bearer.prod.mozaws.net/ (VPN Required)
-
-For new usage, the API CDN server is preferred for read-only usages, and the
-Bearer auth server is preferred for read-write usages.
+- **Public API server:** https://normandy.cdn.mozilla.net/
+- **Admin API server:** https://prod-admin.normandy.prod.cloudops.mozgcp.net/ (VPN Required)
 
 Preferences
 ~~~~~~~~~~~
@@ -40,11 +35,10 @@ Staging is a test environment used to test the deployment process. It is useful
 for testing a version of Normandy before it is deployed to users, but is not
 guaranteed to be functional or available at all times.
 
-- **Read-only server:** https://normandy.stage.mozaws.net/
-- **Legacy admin:** https://normandy-admin.stage.mozaws.net/ (VPN Required)
-- **Bearer auth admin:** https://normandy-admin-bearer.stage.mozaws.net/ (VPN Required)
+- **Public API server:** https://stage.normandy.nonprod.cloudops.mozgcp.net/
+- **Admin API server:** https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/ (VPN Required)
 
-Staging does not have a API CDN.
+Staging does not have an API CDN.
 
 Preferences
 ~~~~~~~~~~~
@@ -53,7 +47,7 @@ server:
 
 .. describe:: app.normandy.api_url
 
-   ``https://normandy.stage.mozaws.net/api/v1``
+   ``https://stage.normandy.nonprod.cloudops.mozgcp.net/api/v1``
 
 .. describe:: security.content.signature.root_hash
 
@@ -66,11 +60,10 @@ for testing admin frontends to Normandy, and always has the latest  code. Someti
 is broken. Dev doesn't have a separate read-only and admin server, there is only one
 server.
 
-- **Legacy admin:** https://normandy.dev.mozaws.net/
-- **Bearer auth admin:** https://normandy-admin-bearer.dev.mozaws.net/
+- **Read-only API server:** https://dev.normandy.nonprod.cloudops.mozgcp.net/
+- **Writable API server:** https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/
 
-Dev does not have a separate read-only server, nor an API CDN. None of its server
-require VPN to access.
+Dev does not require VPN to access.
 
 Preferences
 ~~~~~~~~~~~
@@ -79,7 +72,7 @@ server:
 
 .. describe:: app.normandy.api_url
 
-   ``https://normandy.dev.mozaws.net/api/v1``
+   ``https://dev.normandy.nonprod.cloudops.mozgcp.net/api/v1``
 
 .. describe:: security.content.signature.root_hash
 
