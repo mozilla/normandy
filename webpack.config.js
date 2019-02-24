@@ -50,6 +50,8 @@ module.exports = function (webpackEnvOptions) {
     },
 
     plugins: plugins.concat([
+      // Small plugin to update the actions in the database if
+      // --env.update-actions was passed.
       function updateActions() {
         this.plugin('done', function () {
           var cmd;
