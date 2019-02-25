@@ -11,10 +11,11 @@ auth admin server, and an API CDN. Not all environments have all of these.
 Production
 ----------
 Production is the live, user-facing instance of Normandy that is hit by every
-active user of Firefox.
+active user of Firefox. The public server is served through a CDN with a cache
+time of a few minutes.
 
-- **Public API server:** https://normandy.cdn.mozilla.net/
-- **Admin API server:** https://prod-admin.normandy.prod.cloudops.mozgcp.net/ (VPN Required)
+- **Public Read-only API server:** https://normandy.cdn.mozilla.net/
+- **VPN-Only Admin API server:** https://prod-admin.normandy.prod.cloudops.mozgcp.net/
 
 Preferences
 ~~~~~~~~~~~
@@ -33,12 +34,11 @@ Staging
 -------
 Staging is a test environment used to test the deployment process. It is useful
 for testing a version of Normandy before it is deployed to users, but is not
-guaranteed to be functional or available at all times.
+guaranteed to be functional or available at all times. Unlike Production, stage
+does not use a VPN for the public API server.
 
-- **Public API server:** https://stage.normandy.nonprod.cloudops.mozgcp.net/
-- **Admin API server:** https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/ (VPN Required)
-
-Staging does not have an API CDN.
+- **Public Read-only API server:** https://stage.normandy.nonprod.cloudops.mozgcp.net/
+- **VPN-Only Admin API server:** https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/ (VPN Required)
 
 Preferences
 ~~~~~~~~~~~
@@ -56,14 +56,12 @@ server:
 Dev
 ---
 Dev is an environment that deploys automatically from the master branch. It can be used
-for testing admin frontends to Normandy, and always has the latest  code. Sometimes it
-is broken. Dev doesn't have a separate read-only and admin server, there is only one
-server.
+for testing admin frontends to Normandy, and always has the latest code. Sometimes it
+is broken. Unlike Production and Staging, Dev doesn't require use of the VPN to access
+the admin server.
 
 - **Read-only API server:** https://dev.normandy.nonprod.cloudops.mozgcp.net/
-- **Writable API server:** https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/
-
-Dev does not require VPN to access.
+- **Admin API server:** https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/
 
 Preferences
 ~~~~~~~~~~~
