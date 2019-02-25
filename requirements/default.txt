@@ -59,10 +59,6 @@ django-storages==1.7.1 \
     --hash=sha256:8e35d2c7baeda5dc6f0b4f9a0fc142d25f9a1bf72b8cebfcbc5db4863abc552d
 django-sslserver==0.20 \
     --hash=sha256:6b2514427b4eed0713e478ae6dfdda622070a98f657d61a4502bf42b6311c66e
-django-webpack-loader==0.6.0 \
-    --hash=sha256:60bab6b9a037a5346fad12d2a70a6bc046afb33154cf75ed640b93d3ebd5f520 \
-    --hash=sha256:970b968c2a8975fb7eff56a3bab5d0d90d396740852d1e0c50c5cfe2b824199a
-    # Update Django to >=2.1 when this updates
 django_csp==3.5 \
     --hash=sha256:8b9997df89a7a936d7c397e051367f974aa1d1a97d0b32acb4300087b3bed071 \
     --hash=sha256:04600237701e6d6ff78ed7d41209ff923988148bf292c128f6b474b9befe444f

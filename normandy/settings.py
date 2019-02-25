@@ -24,7 +24,6 @@ class Core(Configuration):
         "rest_framework_swagger",
         "storages",
         "raven.contrib.django.raven_compat",
-        "webpack_loader",
         "corsheaders",
         "django_filters",
         "dockerflow.django",
@@ -110,13 +109,6 @@ class Core(Configuration):
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 25,
         "EXCEPTION_HANDLER": "normandy.base.api.views.exception_handler",
-    }
-
-    WEBPACK_LOADER = {
-        "ACTIONS": {
-            "BUNDLE_DIR_NAME": "bundles/",
-            "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats-actions.json"),
-        }
     }
 
     # Content Security Policy
