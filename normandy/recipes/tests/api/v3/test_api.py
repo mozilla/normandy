@@ -144,6 +144,11 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert "Cookies" not in res
 
+        def test_list_invalid_bug_number(self, api_client):
+            res = api_client.get("/api/v3/recipe/", {"bug_number": "not a number"})
+            assert res.status_code == 400
+            assert res.json()["bug_number"] == ["Enter a number."]
+
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
