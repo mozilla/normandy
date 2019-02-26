@@ -34,7 +34,7 @@ Staging
 -------
 Staging is a test environment used to test the deployment process. It is useful
 for testing a version of Normandy before it is deployed to users, but is not
-guaranteed to be functional or available at all times. Unlike Production, stage
+guaranteed to be functional or available at all times. Unlike Production, Stage
 does not use a VPN for the public API server.
 
 - **Public Read-only API server:** https://stage.normandy.nonprod.cloudops.mozgcp.net/
