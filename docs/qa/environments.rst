@@ -11,7 +11,7 @@ auth admin server, and an API CDN. Not all environments have all of these.
 Production
 ----------
 Production is the live, user-facing instance of Normandy that is hit by every
-active user of Firefox. The public server is served through a CDN with a cache
+active user of Firefox. The public read-only API server is served through a CDN with a cache
 time of a few minutes.
 
 - **Public Read-only API server:** https://normandy.cdn.mozilla.net/
