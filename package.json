@@ -54,6 +54,7 @@
   },
   "resolutions": {
     "deep-extend": ">=0.5.1",
-    "braces": ">=2.3.1"
+    "braces": ">=2.3.1",
+    "extend": ">=3.0.2"
   }
 }
