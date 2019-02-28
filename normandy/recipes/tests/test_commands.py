@@ -361,8 +361,9 @@ class TestSyncRemoteSettings(object):
         with pytest.raises(ImproperlyConfigured):
             call_command("sync_remote_settings")
 
-    def test_it_fails_if_server_not_reachable(self, rs_settings):
-        # We enabled Remote Settings without mocking server calls.
+    def test_it_fails_if_server_not_reachable(self, rs_settings, requestsmock):
+        requestsmock.get(self.published_records_url, exc=requests.exceptions.ConnectionError)
+
         with pytest.raises(requests.exceptions.ConnectionError):
             call_command("sync_remote_settings")
 
