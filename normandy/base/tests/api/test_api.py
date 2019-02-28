@@ -209,7 +209,6 @@ class TestServiceInfoV2View(object):
     def test_it_works(self, api_client, settings):
         user = User.objects.first()  # Get the default user
         settings.PEER_APPROVAL_ENFORCED = False
-        settings.OIDC_LOGOUT_URL = "/fake/logout/url"
 
         res = api_client.get("/api/v2/service_info/")
         assert res.status_code == 200
@@ -221,21 +220,18 @@ class TestServiceInfoV2View(object):
                 "email": user.email,
             },
             "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-            "logout_url": settings.OIDC_LOGOUT_URL,
             "github_url": settings.GITHUB_URL,
         }
 
     def test_logged_out(self, settings):
         client = APIClient()
         settings.PEER_APPROVAL_ENFORCED = False
-        settings.OIDC_LOGOUT_URL = "/fake/logout/url"
 
         res = client.get("/api/v2/service_info/")
         assert res.status_code == 200
         assert res.data == {
             "user": None,
             "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-            "logout_url": settings.OIDC_LOGOUT_URL,
             "github_url": settings.GITHUB_URL,
         }
 
@@ -245,7 +241,6 @@ class TestServiceInfoView(object):
     def test_it_works(self, api_client, settings):
         user = User.objects.first()  # Get the default user
         settings.PEER_APPROVAL_ENFORCED = False
-        settings.OIDC_LOGOUT_URL = "/fake/logout/url"
 
         res = api_client.get("/api/v3/service_info/")
         assert res.status_code == 200
@@ -257,21 +252,18 @@ class TestServiceInfoView(object):
                 "email": user.email,
             },
             "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-            "logout_url": settings.OIDC_LOGOUT_URL,
             "github_url": settings.GITHUB_URL,
         }
 
     def test_logged_out(self, settings):
         client = APIClient()
         settings.PEER_APPROVAL_ENFORCED = False
-        settings.OIDC_LOGOUT_URL = "/fake/logout/url"
 
         res = client.get("/api/v3/service_info/")
         assert res.status_code == 200
         assert res.data == {
             "user": None,
             "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-            "logout_url": settings.OIDC_LOGOUT_URL,
             "github_url": settings.GITHUB_URL,
         }
 
