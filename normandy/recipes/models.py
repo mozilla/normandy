@@ -181,6 +181,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def bug_number(self):
         return self.current_revision.bug_number
 
+    @current_revision_property()
+    def experimenter_id(self):
+        return self.current_revision.experimenter_id
+
     @property
     def approval_request(self):
         try:
@@ -335,6 +339,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     )
     comment = models.TextField()
     bug_number = models.IntegerField(null=True)
+    experimenter_id = models.IntegerField(null=True)
 
     class Meta:
         ordering = ("-created",)
@@ -353,6 +358,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             "identicon_seed": self.identicon_seed,
             "comment": self.comment,
             "bug_number": self.bug_number,
+            "experimenter_id": self.experimenter_id,
         }
 
     @property

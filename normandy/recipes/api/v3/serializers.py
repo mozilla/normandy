@@ -84,6 +84,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             "recipe",
             "creator",
             "updated",
+            "experimenter_id",
         ]
 
     def get_recipe(self, instance):
@@ -127,6 +128,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     identicon_seed = serializers.CharField(required=False, write_only=True)
     comment = serializers.CharField(required=False, write_only=True)
     bug_number = serializers.IntegerField(required=False, write_only=True)
+    experimenter_id = serializers.IntegerField(required=False, write_only=True)
 
     class Meta:
         model = Recipe
@@ -145,6 +147,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
             "identicon_seed",
             "comment",
             "bug_number",
+            "experimenter_id",
         ]
 
     def get_action(self, instance):

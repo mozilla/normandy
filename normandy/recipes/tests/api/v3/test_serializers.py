@@ -156,6 +156,7 @@ class TestRecipeSerializer:
                     ],
                 },
                 "bug_number": 1436113,
+                "experimenter_id": 13579,
             }
         )
 
@@ -172,6 +173,7 @@ class TestRecipeSerializer:
                 ],
             },
             "bug_number": 1436113,
+            "experimenter_id": 13579,
         }
         assert serializer.errors == {}
 

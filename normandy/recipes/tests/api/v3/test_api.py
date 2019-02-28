@@ -149,6 +149,11 @@ class TestRecipeAPI(object):
             assert res.status_code == 400
             assert res.json()["bug_number"] == ["Enter a number."]
 
+        def test_list_invalid_experimenter_id(self, api_client):
+            res = api_client.get("/api/v3/recipe/", {"experimenter_id": "not a number"})
+            assert res.status_code == 400
+            assert res.json()["experimenter_id"] == ["Enter a number."]
+
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
@@ -394,6 +399,25 @@ class TestRecipeAPI(object):
             recipe = Recipe.objects.get()
             assert recipe.bug_number == 42
 
+        def test_with_experimenter_id(self, api_client):
+            action = ActionFactory()
+
+            res = api_client.post(
+                "/api/v3/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "extra_filter_expression": "whatever",
+                    "enabled": True,
+                    "experimenter_id": 1000,
+                },
+            )
+            assert res.status_code == 201, res.json()
+
+            recipe = Recipe.objects.get()
+            assert recipe.experimenter_id == 1000
+
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()
             api_client.post(
@@ -569,6 +593,15 @@ class TestRecipeAPI(object):
 
             r.refresh_from_db()
             assert r.bug_number == 42
+
+        def test_update_experimenter_id(self, api_client):
+            r = RecipeFactory()
+
+            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"experimenter_id": 84})
+            assert res.status_code == 200
+
+            r.refresh_from_db()
+            assert r.experimenter_id == 84
 
         def test_updating_recipes_stores_the_user(self, api_client):
             recipe = RecipeFactory()
@@ -1100,6 +1133,17 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data["count"] == 2
             assert set(r["id"] for r in res.data["results"]) == set([match1.id, match2.id])
+
+        def test_filter_by_experimenter_id(self, api_client):
+            match1 = RecipeFactory(experimenter_id=1)
+            match2 = RecipeFactory(experimenter_id=2)
+
+            res = api_client.get("/api/v3/recipe/?experimenter_id=1")
+            assert res.status_code == 200
+            assert res.data["count"] == 1
+            ids = [r["id"] for r in res.data["results"]]
+            assert match1.id in ids
+            assert match2.id not in ids
 
         def test_order_last_updated(self, api_client):
             r1 = RecipeFactory()
