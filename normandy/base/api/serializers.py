@@ -45,9 +45,8 @@ class ServiceInfoSerializer(serializers.Serializer):
     """Data that frontend clients need to interact with the service."""
 
     github_url = serializers.CharField()
-    logout_url = serializers.CharField()
     peer_approval_enforced = serializers.BooleanField()
     user = UserSerializer()
 
     class Meta:
-        fields = ["github_url", "logout_url", "peer_approval_enforced", "user"]
+        fields = ["github_url", "peer_approval_enforced", "user"]
