@@ -58,6 +58,12 @@ class Command(BaseCommand):
             arguments["addonUrl"] = extension.xpi.url
             rev.arguments = arguments
             rev.save()
+
+            # The revision has changed so update the signature
+            recipe = rev.recipe
+            recipe.update_signature()
+            recipe.save()
+
             update_count += 1
 
         self.stdout.write(f"{update_count} revision{pluralize(update_count)} updated")

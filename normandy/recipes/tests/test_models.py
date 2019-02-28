@@ -468,12 +468,14 @@ class TestRecipe(object):
         rev = recipe.latest_revision
         approval_request = rev.request_approval(UserFactory())
         approval_request.approve(UserFactory(), "r+")
+        recipe.refresh_from_db()
         assert recipe.signature is None
         mocked_autograph.return_value.sign_data.assert_not_called()
 
         # Enabling signs the recipe
         mocked_autograph.return_value.sign_data.side_effect = fake_sign
         rev.enable(UserFactory())
+        recipe.refresh_from_db()
         expected_sig = fake_sign([recipe.canonical_json()])[0]["signature"]
         assert recipe.signature.signature == expected_sig
         assert mocked_autograph.return_value.sign_data.called_once()
