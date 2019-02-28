@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import View
 
+from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.views import APIRootView
 from normandy.base.api.routers import MixedViewRouter
 from normandy.base.tests import GroupFactory, UserFactory, Whatever
@@ -363,6 +364,25 @@ class TestUserAPI(object):
         res = api_client.delete(f"/api/v3/user/{user.id}/")
         assert res.status_code == 403
 
+    def test_users_in_read_only_mode(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+
+        res = api_client.get("/api/v3/user/")
+        assert res.status_code == 403
+        assert res.data["detail"] == AdminEnabled.message
+
+        res = api_client.post(
+            "/api/v3/user/", {"first_name": "John", "last_name": "Doe", "email": "jdoe@mail.com"}
+        )
+        assert res.status_code == 403
+        assert res.data["detail"] == AdminEnabled.message
+        assert not Group.objects.all().exists()
+
+        g = GroupFactory(name="abc")
+        res = api_client.put(f"/api/v3/group/{g.id}/", {"name": "def"})
+        assert res.status_code == 403
+        assert res.data["detail"] == AdminEnabled.message
+
 
 @pytest.mark.django_db
 class TestGroupAPI(object):
@@ -459,3 +479,20 @@ class TestGroupAPI(object):
         group = GroupFactory()
         res = api_client.post(f"/api/v3/group/{group.id}/remove_user/", {"user_id": user.id})
         assert res.status_code == 400
+
+    def test_groups_in_read_only_mode(self, api_client, settings):
+        settings.ADMIN_ENABLED = False
+
+        res = api_client.get("/api/v3/group/")
+        assert res.status_code == 403
+        assert res.data["detail"] == AdminEnabled.message
+
+        res = api_client.post("/api/v3/group/", {"name": "Test"})
+        assert res.status_code == 403
+        assert res.data["detail"] == AdminEnabled.message
+        assert not Group.objects.all().exists()
+
+        g = GroupFactory(name="abc")
+        res = api_client.put(f"/api/v3/group/{g.id}/", {"name": "def"})
+        assert res.status_code == 403
+        assert res.data["detail"] == AdminEnabled.message
