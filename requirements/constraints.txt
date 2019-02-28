@@ -78,8 +78,7 @@ greenlet==0.4.15 \
     --hash=sha256:9416443e219356e3c31f1f918a91badf2e37acf297e2fa13d24d1cc2380f8fbc
 idna==2.6 \
     --hash=sha256:2c6a5de3089009e3da7c5dde64a141dbc8551d5b7f6cf4ed7c2568d0cc520a8f \
-    --hash=sha256:8c7309c718f94b3a625cb648ace320157ad16ff131ae0af362c9f21b80ef6ec4 \
-    # pyup: <2.7 # requests_mock doesn't support >= 2.7
+    --hash=sha256:8c7309c718f94b3a625cb648ace320157ad16ff131ae0af362c9f21b80ef6ec4
 itypes==1.1.0 \
     --hash=sha256:c6e77bb9fd68a4bfeb9d958fea421802282451a25bac4913ec94db82a899c073
 Jinja2==2.10 \
@@ -235,8 +234,7 @@ google-api-core==1.7.0 \
     --hash=sha256:85693e163a1a6faea69a74f8feaf35d54dfa2559fbdbbe389c93ffb3bb4c9a79
 google-cloud-core==0.28.1 \
     --hash=sha256:0090df83dbc5cb2405fa90844366d13176d1c0b48181c1807ab15f53be403f73 \
-    --hash=sha256:89e8140a288acec20c5e56159461d3afa4073570c9758c05d4e6cb7f2f8cc440 \
-    # pyup: <0.29dev # requests_mock doesn't support >= 0.29
+    --hash=sha256:89e8140a288acec20c5e56159461d3afa4073570c9758c05d4e6cb7f2f8cc440
 google-resumable-media==0.3.2 \
     --hash=sha256:2dae98ee716efe799db3578a7b902fbf5592fc5c77d3c0906fc4ef9b1b930861 \
     --hash=sha256:3e38923493ca0d7de0ad91c31acfefc393c78586db89364e91cb4f11990e51ba

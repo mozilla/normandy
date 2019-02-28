@@ -31,7 +31,7 @@ dj-inmemorystorage==1.4.1 \
     --hash=sha256:fa921269b83ffc762411e36d446fa07b602a4ad74632ae1819844d32e6fb12bd
 Django==2.0.13 \
     --hash=sha256:665457d4146bbd34ae9d2970fa3b37082d7b225b0671bfd24c337458f229db78 \
-    --hash=sha256:bde46d4dbc410678e89bc95ea5d312dd6eb4c37d0fa0e19c9415cad94addf22f    # pyup: <2.1 # django-webpack-loader doesn't support 2.1 yet
+    --hash=sha256:bde46d4dbc410678e89bc95ea5d312dd6eb4c37d0fa0e19c9415cad94addf22f
 django-configurations==2.1 \
     --hash=sha256:e70433eeed10549d30bf5ca386c962505ff9f492893dd2483c52af536347adce \
     --hash=sha256:71d9acdff33aa034f0157b0b3d23629fe0cd499bf4d0b6d699b9ca0701d952e8
@@ -217,8 +217,7 @@ black==18.9b0 \
     --hash=sha256:e030a9a28f542debc08acceb273f228ac422798e5215ba2a791a6ddeaaca22a5
 google-cloud-storage==1.13.0 \
     --hash=sha256:936c859c47f8e94fd0005e98235a10d5e75828d2c6c3a8caacae18344a572a0a \
-    --hash=sha256:fc32b9be41a45016ba2387e3ad23e70ccba399d626ef596409316f7cee477956 \
-    # pyup: <=1.13.0 # google-cloud-storage==1.13.0 is pinning google-cloud-core<0.29dev,>=0.28.0
+    --hash=sha256:fc32b9be41a45016ba2387e3ad23e70ccba399d626ef596409316f7cee477956
 kinto-http==10.2.0 \
     --hash=sha256:ccf086ec71e7a1b8b4216225c1e70821c208502b776982dcdd77b10f9d789c56 \
     --hash=sha256:e8343772a4e16bbb832ec36600e98b16a3a6ee02bd5a0142897eae180be4fcb0
