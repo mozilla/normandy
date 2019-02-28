@@ -33,7 +33,11 @@ def add_extension_id(apps, schema_editor):
     RecipeRevision = apps.get_model("recipes", "RecipeRevision")
     Extension = apps.get_model("studies", "Extension")
 
-    action = Action.objects.get(name="opt-out-study")
+    try:
+        action = Action.objects.get(name="opt-out-study")
+    except Action.DoesNotExist:
+        return  # Do nothing since there cannot be any recipes using the opt-out-study action
+
     revisions = RecipeRevision.objects.filter(action_id=action.id)
 
     for revision in revisions:
@@ -53,7 +57,11 @@ def remove_extension_id(apps, schema_editor):
     Action = apps.get_model("recipes", "Action")
     RecipeRevision = apps.get_model("recipes", "RecipeRevision")
 
-    action = Action.objects.get(name="opt-out-study")
+    try:
+        action = Action.objects.get(name="opt-out-study")
+    except Action.DoesNotExist:
+        return  # Do nothing since there cannot be any recipes using the opt-out-study action
+
     revisions = RecipeRevision.objects.filter(action_id=action.id)
 
     for revision in revisions:
