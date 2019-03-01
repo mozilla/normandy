@@ -314,6 +314,13 @@ class TestUserAPI(object):
         user = User.objects.get(email="jdoe@mail.com")
         assert user.username == user.email
 
+    def test_create_user_duplicate(self, api_client):
+        User.objects.create(first_name="Some", last_name="Thing", email="jdoe@mail.com")
+        res = api_client.post(
+            "/api/v3/user/", {"first_name": "John", "last_name": "Doe", "email": "Jdoe@mail.com"}
+        )
+        assert res.status_code == 400
+
     def test_update_user(self, api_client):
         u = UserFactory(first_name="John", last_name="Doe")
         res = api_client.patch(f"/api/v3/user/{u.id}/", {"first_name": "Jane"})
