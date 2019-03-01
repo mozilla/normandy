@@ -22,7 +22,7 @@ class MixedViewRouter(SimpleRouter):
         urls = super().get_urls()
         urls.extend(self.registered_view_urls)
 
-        view = self.get_api_root_view(api_urls=urls[:])
+        view = self.get_api_root_view()
         root_url = url(r"^$", view, name=self.root_view_name)
         urls.append(root_url)
 
@@ -38,5 +38,5 @@ class MixedViewRouter(SimpleRouter):
         url_pattern.allow_cdn = allow_cdn
         self.registered_view_urls.append(url_pattern)
 
-    def get_api_root_view(self, api_urls):
-        return self.api_root_view.as_view(api_urls=api_urls)
+    def get_api_root_view(self):
+        return self.api_root_view.as_view()

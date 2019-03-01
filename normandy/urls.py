@@ -1,9 +1,7 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-from rest_framework_swagger.views import get_swagger_view
 
-from normandy.base.api import views as base_api_views
 from normandy.base.api.routers import MixedViewRouter
 from normandy.recipes.api.v1 import views as recipes_api_v1_views
 from normandy.studies.api.v1 import views as studies_api_v1_views
@@ -28,15 +26,16 @@ urlpatterns += [
     url(r"", include("normandy.selfrepair.urls")),
     url(r"", include("normandy.health.urls")),
     url(r"", include("normandy.studies.urls")),
-    url(r"api/docs/", get_swagger_view()),
     # v1 API
     url(r"^api/v1/", include((v1_router.urls, "normandy"), namespace="v1")),
+    # Swagger
+    url(r"^api/v1/", include("normandy.base.api.swagger_urls", namespace="v1")),
+    url(r"^api/v3/", include("normandy.base.api.swagger_urls", namespace="v3")),
     url(
         r"^api/v1/action/(?P<name>[_\-\w]+)/implementation/(?P<impl_hash>[a-zA-Z0-9_-]*)/$",
         recipes_api_v1_views.ActionImplementationView.as_view(),
         name="action-implementation",
     ),
-    url(r"^api/v1/user/me/", base_api_views.CurrentUserView.as_view(), name="current-user"),
 ]
 
 # static handles serving uploaded files during development; it disables
