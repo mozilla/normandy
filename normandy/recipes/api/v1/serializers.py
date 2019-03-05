@@ -113,7 +113,8 @@ class MinimalRecipeSerializer(RecipeSerializer):
         # Attributes serialized here are made available to filter expressions via
         # normandy.recipe, and should be documented if they are intended to be
         # used in filter expressions.
-        fields = ["id", "name", "revision_id", "action", "arguments", "filter_expression"]
+        fields = ["id", "name", "revision_id", "action", "arguments", "filter_expression",
+                  "last_updated"]
 
     def get_revision_id(self, recipe):
         # Certain parts of Telemetry expect this to be a string, so coerce it to
