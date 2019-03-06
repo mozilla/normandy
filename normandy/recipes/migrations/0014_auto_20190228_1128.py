@@ -2,9 +2,13 @@
 
 import json
 
-from urllib.parse import unquote_plus
+from urllib.parse import urlparse
 
 from django.db import migrations
+
+
+def get_filename_from_url(url):
+    return urlparse(url).path.split("/")[-1]
 
 
 def remove_signatures(apps, schema_editor):
@@ -43,7 +47,7 @@ def add_extension_id(apps, schema_editor):
     for revision in revisions:
         arguments = json.loads(revision.arguments_json)
         url = arguments.get("addonUrl")
-        filename = unquote_plus(url.split("/extensions/").pop())
+        filename = get_filename_from_url(url)
         extension = Extension.objects.get(xpi=f"extensions/{filename}")
         arguments["extensionApiId"] = extension.id
         revision.arguments_json = json.dumps(arguments)
