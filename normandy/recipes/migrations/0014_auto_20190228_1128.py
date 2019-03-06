@@ -11,27 +11,6 @@ def get_filename_from_url(url):
     return urlparse(url).path.split("/")[-1]
 
 
-def remove_signatures(apps, schema_editor):
-    Recipe = apps.get_model("recipes", "Recipe")
-    Action = apps.get_model("recipes", "Action")
-    Signature = apps.get_model("recipes", "Signature")
-
-    for recipe in Recipe.objects.exclude(signature=None):
-        sig = recipe.signature
-        recipe.signature = None
-        recipe.save()
-        sig.delete()
-
-    for action in Action.objects.exclude(signature=None):
-        sig = action.signature
-        action.signature = None
-        action.save()
-        sig.delete()
-
-    for sig in Signature.objects.all():
-        sig.delete()
-
-
 def add_extension_id(apps, schema_editor):
     Action = apps.get_model("recipes", "Action")
     RecipeRevision = apps.get_model("recipes", "RecipeRevision")
@@ -53,9 +32,6 @@ def add_extension_id(apps, schema_editor):
         revision.arguments_json = json.dumps(arguments)
         revision.save()
 
-        # Remove signatures to prompt resigning
-        remove_signatures(apps, schema_editor)
-
 
 def remove_extension_id(apps, schema_editor):
     Action = apps.get_model("recipes", "Action")
@@ -74,9 +50,6 @@ def remove_extension_id(apps, schema_editor):
             arguments.pop("extensionApiId")
         revision.arguments_json = json.dumps(arguments)
         revision.save()
-
-        # Remove signatures to prompt resigning
-        remove_signatures(apps, schema_editor)
 
 
 class Migration(migrations.Migration):
