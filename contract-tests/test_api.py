@@ -3,9 +3,22 @@ import jsonschema
 import pytest
 
 from datetime import datetime
-
 from normandy.recipes import signing
+from os.path import join, dirname
 from pytest_testrail.plugin import pytestrail
+
+
+def _load_json_schema(filename):
+    relative_path = join('schemas', filename)
+    absolute_path = join(dirname(__file__), relative_path)
+
+    with open(absolute_path) as schema_file:
+        return json.loads(schema_file.read())
+
+
+def assert_valid_schema(data, schema_file):
+    schema = _load_json_schema(schema_file)
+    return jsonschema.validate(data, schema)
 
 
 def canonical_json(data):
@@ -167,104 +180,56 @@ def test_recipe_history(conf, requests_session):
             last_date = created
 
 
-def test_docs(conf, requests_session):
-    r = requests_session.get(conf.getoption("server") + "/api/docs")
-    r.raise_for_status()
-    data = r.json()
-    assert data["_type"] == "document"
-    assert "_meta" in data
-
-
 def test_approval_request(conf, requests_session):
-    r = requests_session.get(conf.getoption("server") + "/api/v1/approval_request")
+    r = requests_session.get(conf.getoption("server") + "/api/v1/approval_request/")
     r.raise_for_status()
     data = r.json()
-    sample_record = data[0]
-    expected_fields = ["approved", "comment", "created", "creator", "id"]
-    expected_approver_fields = ["email", "first_name", "id", "last_name"]
-    expected_creator_fields = ["email", "first_name", "id", "last_name"]
-    assert r.status_code in [200, 302]
 
-    for field in expected_fields:
-        assert field in sample_record
-
-    for field in expected_approver_fields:
-        assert field in sample_record["approver"]
-
-    for field in expected_creator_fields:
-        assert field in sample_record["creator"]
+    assert r.status_code == 200
+    assert len(data) > 0
 
 
 def test_approval_request_by_record(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/approval_request/1")
     r.raise_for_status()
     data = r.json()
-    expected_fields = ["approved", "approver", "comment", "created", "creator", "id"]
-    expected_approver_fields = ["email", "first_name", "id", "last_name"]
-    expected_creator_fields = ["email", "first_name", "id", "last_name"]
 
-    assert r.status_code in [200, 302]
-
-    for field in expected_fields:
-        assert field in data
-
-    for key in data.keys():
-        assert key in expected_fields
-
-    for field in expected_approver_fields:
-        assert field in data["approver"]
-
-    for field in expected_creator_fields:
-        assert field in data["creator"]
+    assert r.status_code == 200
+    assert_valid_schema(data, 'approval_request.schema')
 
 
 def test_classify_client(conf, requests_session):
-    r = requests_session.get(conf.getoption("server") + "/api/v1/classify_client")
+    r = requests_session.get(conf.getoption("server") + "/api/v1/classify_client/")
     r.raise_for_status()
     data = r.json()
-    expected_fields = ["country", "request_time"]
 
-    assert r.status_code in [200, 302]
-
-    for field in expected_fields:
-        assert field in data
-
-    for key in data.keys():
-        assert key in expected_fields
+    assert r.status_code == 200
+    assert_valid_schema(data, 'classify_client.schema')
 
 
 def test_extension(conf, requests_session):
-    r = requests_session.get(conf.getoption("server") + "/api/v1/extension")
+    r = requests_session.get(conf.getoption("server") + "/api/v1/extension/1")
     r.raise_for_status()
+    data = r.json()
 
-    assert r.status_code in range(200, 399)
+    assert r.status_code == 200
+    assert_valid_schema(data, 'extension.schema')
 
 
 def test_recipe_revision(conf, requests_session):
-    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision")
+    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision/")
     r.raise_for_status()
     data = r.json()
-    record = data[0]
 
-    expected_fields = ["approval_request", "comment", "date_created", "id", "recipe"]
-    expected_approval_request_fields = [
-        "approved",
-        "approver",
-        "comment",
-        "created",
-        "creator",
-        "id",
-    ]
-    assert r.status_code in [200, 302]
+    assert r.status_code == 200
+    assert len(data) > 0
 
-    for field in expected_fields:
-        assert field in record
 
-    for key in record.keys():
-        assert key in expected_fields
+def test_recipe_revision_by_id(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision/20/")
+    r.raise_for_status()
+    data = r.json()
 
-    for field in expected_approval_request_fields:
-        assert field in record["approval_request"]
+    assert r.status_code == 200
+    assert_valid_schema(data, 'recipe_revision.schema')
 
-    for key in record["approval_request"].keys():
-        assert key in expected_approval_request_fields

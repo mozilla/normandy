@@ -1,0 +1,611 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "approval_request",
+    "comment",
+    "date_created",
+    "id",
+    "recipe"
+  ],
+  "properties": {
+    "approval_request": {
+      "$id": "#/properties/approval_request",
+      "type": "object",
+      "title": "The Approval_request Schema",
+      "required": [
+        "approved",
+        "approver",
+        "comment",
+        "created",
+        "creator",
+        "id"
+      ],
+      "properties": {
+        "approved": {
+          "$id": "#/properties/approval_request/properties/approved",
+          "type": "boolean",
+          "title": "The Approved Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "approver": {
+          "$id": "#/properties/approval_request/properties/approver",
+          "type": "object",
+          "title": "The Approver Schema",
+          "required": [
+            "email",
+            "first_name",
+            "id",
+            "last_name"
+          ],
+          "properties": {
+            "email": {
+              "$id": "#/properties/approval_request/properties/approver/properties/email",
+              "type": "string",
+              "title": "The Email Schema",
+              "default": "",
+              "examples": [
+                "tdowner@mozilla.com"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "first_name": {
+              "$id": "#/properties/approval_request/properties/approver/properties/first_name",
+              "type": "string",
+              "title": "The First_name Schema",
+              "default": "",
+              "examples": [
+                "Tyler"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "id": {
+              "$id": "#/properties/approval_request/properties/approver/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                10
+              ]
+            },
+            "last_name": {
+              "$id": "#/properties/approval_request/properties/approver/properties/last_name",
+              "type": "string",
+              "title": "The Last_name Schema",
+              "default": "",
+              "examples": [
+                "Downer"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "comment": {
+          "$id": "#/properties/approval_request/properties/comment",
+          "type": "string",
+          "title": "The Comment Schema",
+          "default": "",
+          "examples": [
+            "+1"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "created": {
+          "$id": "#/properties/approval_request/properties/created",
+          "type": "string",
+          "title": "The Created Schema",
+          "default": "",
+          "examples": [
+            "2018-04-25T20:36:51.331212Z"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "creator": {
+          "$id": "#/properties/approval_request/properties/creator",
+          "type": "object",
+          "title": "The Creator Schema",
+          "required": [
+            "email",
+            "first_name",
+            "id",
+            "last_name"
+          ],
+          "properties": {
+            "email": {
+              "$id": "#/properties/approval_request/properties/creator/properties/email",
+              "type": "string",
+              "title": "The Email Schema",
+              "default": "",
+              "examples": [
+                "rrayborn@mozilla.com"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "first_name": {
+              "$id": "#/properties/approval_request/properties/creator/properties/first_name",
+              "type": "string",
+              "title": "The First_name Schema",
+              "default": "",
+              "examples": [
+                "Robert"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "id": {
+              "$id": "#/properties/approval_request/properties/creator/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                4
+              ]
+            },
+            "last_name": {
+              "$id": "#/properties/approval_request/properties/creator/properties/last_name",
+              "type": "string",
+              "title": "The Last_name Schema",
+              "default": "",
+              "examples": [
+                "Rayborn"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "id": {
+          "$id": "#/properties/approval_request/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            785
+          ]
+        }
+      }
+    },
+    "comment": {
+      "$id": "#/properties/comment",
+      "type": "string",
+      "title": "The Comment Schema",
+      "default": "",
+      "examples": [
+        ""
+      ],
+      "pattern": "^(.*)$"
+    },
+    "date_created": {
+      "$id": "#/properties/date_created",
+      "type": "string",
+      "title": "The Date_created Schema",
+      "default": "",
+      "examples": [
+        "2018-04-25T20:16:30.965746Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema",
+      "default": 0,
+      "examples": [
+        20
+      ]
+    },
+    "recipe": {
+      "$id": "#/properties/recipe",
+      "type": "object",
+      "title": "The Recipe Schema",
+      "required": [
+        "action",
+        "approval_request",
+        "approved_revision_id",
+        "arguments",
+        "enabled",
+        "extra_filter_expression",
+        "filter_expression",
+        "id",
+        "identicon_seed",
+        "is_approved",
+        "last_updated",
+        "latest_revision_id",
+        "name",
+        "revision_id"
+      ],
+      "properties": {
+        "action": {
+          "$id": "#/properties/recipe/properties/action",
+          "type": "string",
+          "title": "The Action Schema",
+          "default": "",
+          "examples": [
+            "show-heartbeat"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "approval_request": {
+          "$id": "#/properties/recipe/properties/approval_request",
+          "type": "object",
+          "title": "The Approval_request Schema",
+          "required": [
+            "approved",
+            "approver",
+            "comment",
+            "created",
+            "creator",
+            "id"
+          ],
+          "properties": {
+            "approved": {
+              "$id": "#/properties/recipe/properties/approval_request/properties/approved",
+              "type": "boolean",
+              "title": "The Approved Schema",
+              "default": false,
+              "examples": [
+                true
+              ]
+            },
+            "approver": {
+              "$id": "#/properties/recipe/properties/approval_request/properties/approver",
+              "type": "object",
+              "title": "The Approver Schema",
+              "required": [
+                "email",
+                "first_name",
+                "id",
+                "last_name"
+              ],
+              "properties": {
+                "email": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/approver/properties/email",
+                  "type": "string",
+                  "title": "The Email Schema",
+                  "default": "",
+                  "examples": [
+                    "tdowner@mozilla.com"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "first_name": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/approver/properties/first_name",
+                  "type": "string",
+                  "title": "The First_name Schema",
+                  "default": "",
+                  "examples": [
+                    "Tyler"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "id": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/approver/properties/id",
+                  "type": "integer",
+                  "title": "The Id Schema",
+                  "default": 0,
+                  "examples": [
+                    10
+                  ]
+                },
+                "last_name": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/approver/properties/last_name",
+                  "type": "string",
+                  "title": "The Last_name Schema",
+                  "default": "",
+                  "examples": [
+                    "Downer"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "comment": {
+              "$id": "#/properties/recipe/properties/approval_request/properties/comment",
+              "type": "string",
+              "title": "The Comment Schema",
+              "default": "",
+              "examples": [
+                "+1"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "created": {
+              "$id": "#/properties/recipe/properties/approval_request/properties/created",
+              "type": "string",
+              "title": "The Created Schema",
+              "default": "",
+              "examples": [
+                "2018-04-25T20:36:51.331212Z"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "creator": {
+              "$id": "#/properties/recipe/properties/approval_request/properties/creator",
+              "type": "object",
+              "title": "The Creator Schema",
+              "required": [
+                "email",
+                "first_name",
+                "id",
+                "last_name"
+              ],
+              "properties": {
+                "email": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/creator/properties/email",
+                  "type": "string",
+                  "title": "The Email Schema",
+                  "default": "",
+                  "examples": [
+                    "rrayborn@mozilla.com"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "first_name": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/creator/properties/first_name",
+                  "type": "string",
+                  "title": "The First_name Schema",
+                  "default": "",
+                  "examples": [
+                    "Robert"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "id": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/creator/properties/id",
+                  "type": "integer",
+                  "title": "The Id Schema",
+                  "default": 0,
+                  "examples": [
+                    4
+                  ]
+                },
+                "last_name": {
+                  "$id": "#/properties/recipe/properties/approval_request/properties/creator/properties/last_name",
+                  "type": "string",
+                  "title": "The Last_name Schema",
+                  "default": "",
+                  "examples": [
+                    "Rayborn"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "id": {
+              "$id": "#/properties/recipe/properties/approval_request/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                785
+              ]
+            }
+          }
+        },
+        "approved_revision_id": {
+          "$id": "#/properties/recipe/properties/approved_revision_id",
+          "type": "integer",
+          "title": "The Approved_revision_id Schema",
+          "default": 0,
+          "examples": [
+            20
+          ]
+        },
+        "arguments": {
+          "$id": "#/properties/recipe/properties/arguments",
+          "type": "object",
+          "title": "The Arguments Schema",
+          "required": [
+            "engagementButtonLabel",
+            "includeTelemetryUUID",
+            "learnMoreMessage",
+            "learnMoreUrl",
+            "message",
+            "postAnswerUrl",
+            "repeatEvery",
+            "repeatOption",
+            "surveyId",
+            "thanksMessage"
+          ],
+          "properties": {
+            "engagementButtonLabel": {
+              "$id": "#/properties/recipe/properties/arguments/properties/engagementButtonLabel",
+              "type": "string",
+              "title": "The Engagementbuttonlabel Schema",
+              "default": "",
+              "examples": [
+                "立即更新"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "includeTelemetryUUID": {
+              "$id": "#/properties/recipe/properties/arguments/properties/includeTelemetryUUID",
+              "type": "boolean",
+              "title": "The Includetelemetryuuid Schema",
+              "default": false,
+              "examples": [
+                false
+              ]
+            },
+            "learnMoreMessage": {
+              "$id": "#/properties/recipe/properties/arguments/properties/learnMoreMessage",
+              "type": "string",
+              "title": "The Learnmoremessage Schema",
+              "default": "",
+              "examples": [
+                "了解更多"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "learnMoreUrl": {
+              "$id": "#/properties/recipe/properties/arguments/properties/learnMoreUrl",
+              "type": "string",
+              "title": "The Learnmoreurl Schema",
+              "default": "",
+              "examples": [
+                "https://support.mozilla.org/kb/rate-your-firefox-experience-heartbeat"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "message": {
+              "$id": "#/properties/recipe/properties/arguments/properties/message",
+              "type": "string",
+              "title": "The Message Schema",
+              "default": "",
+              "examples": [
+                "您的 Firefox 版本已經太舊了，請務必更新以確保安全。"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "postAnswerUrl": {
+              "$id": "#/properties/recipe/properties/arguments/properties/postAnswerUrl",
+              "type": "string",
+              "title": "The Postanswerurl Schema",
+              "default": "",
+              "examples": [
+                "https://www.mozilla.org/firefox/new/?utm_source=firefox&utm_medium=heartbeat&utm_campaign=outofdatezh"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "repeatEvery": {
+              "$id": "#/properties/recipe/properties/arguments/properties/repeatEvery",
+              "type": "integer",
+              "title": "The Repeatevery Schema",
+              "default": 0,
+              "examples": [
+                1
+              ]
+            },
+            "repeatOption": {
+              "$id": "#/properties/recipe/properties/arguments/properties/repeatOption",
+              "type": "string",
+              "title": "The Repeatoption Schema",
+              "default": "",
+              "examples": [
+                "xdays"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "surveyId": {
+              "$id": "#/properties/recipe/properties/arguments/properties/surveyId",
+              "type": "string",
+              "title": "The Surveyid Schema",
+              "default": "",
+              "examples": [
+                "hb-out-of-date-zh"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "thanksMessage": {
+              "$id": "#/properties/recipe/properties/arguments/properties/thanksMessage",
+              "type": "string",
+              "title": "The Thanksmessage Schema",
+              "default": "",
+              "examples": [
+                "感謝您"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "enabled": {
+          "$id": "#/properties/recipe/properties/enabled",
+          "type": "boolean",
+          "title": "The Enabled Schema",
+          "default": false,
+          "examples": [
+            false
+          ]
+        },
+        "extra_filter_expression": {
+          "$id": "#/properties/recipe/properties/extra_filter_expression",
+          "type": "string",
+          "title": "The Extra_filter_expression Schema",
+          "default": "",
+          "examples": [
+            "(\n  normandy.locale == 'zh-TW'\n  && normandy.version < '58'\n  && normandy.channel == 'release'\n)"
+          ]
+        },
+        "filter_expression": {
+          "$id": "#/properties/recipe/properties/filter_expression",
+          "type": "string",
+          "title": "The Filter_expression Schema",
+          "default": "",
+          "examples": [
+            "(\n  normandy.locale == 'zh-TW'\n  && normandy.version < '58'\n  && normandy.channel == 'release'\n)"
+          ]
+        },
+        "id": {
+          "$id": "#/properties/recipe/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            456
+          ]
+        },
+        "identicon_seed": {
+          "$id": "#/properties/recipe/properties/identicon_seed",
+          "type": "string",
+          "title": "The Identicon_seed Schema",
+          "default": "",
+          "examples": [
+            "v1:o92mtsx1fie"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "is_approved": {
+          "$id": "#/properties/recipe/properties/is_approved",
+          "type": "boolean",
+          "title": "The Is_approved Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "last_updated": {
+          "$id": "#/properties/recipe/properties/last_updated",
+          "type": "string",
+          "title": "The Last_updated Schema",
+          "default": "",
+          "examples": [
+            "2018-05-21T21:00:28.386118Z"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "latest_revision_id": {
+          "$id": "#/properties/recipe/properties/latest_revision_id",
+          "type": "integer",
+          "title": "The Latest_revision_id Schema",
+          "default": 0,
+          "examples": [
+            20
+          ]
+        },
+        "name": {
+          "$id": "#/properties/recipe/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "Out of Date - ZH"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "revision_id": {
+          "$id": "#/properties/recipe/properties/revision_id",
+          "type": "integer",
+          "title": "The Revision_id Schema",
+          "default": 0,
+          "examples": [
+            20
+          ]
+        }
+      }
+    }
+  }
+}
