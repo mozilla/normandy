@@ -393,6 +393,7 @@ class Development(Base):
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
     PEER_APPROVAL_ENFORCED = values.BooleanValue(False)
     CSP_REPORT_URI = values.Value("")
+    DEFAULT_FILE_STORAGE = values.Value("django.core.files.storage.FileSystemStorage")
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
