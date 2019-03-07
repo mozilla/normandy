@@ -19,6 +19,11 @@ class UserSerializer(UserOnlyNamesSerializer):
         model = User
         fields = ["id", "first_name", "last_name", "email"]
 
+    def validate_email(self, email):
+        if User.objects.filter(email__iexact=email).exists():
+            raise serializers.ValidationError({"email": "Already a user by that email."})
+        return email
+
     def create(self, validated_data):
         # Username should be the same as email
         validated_data["username"] = validated_data.get("email")
@@ -45,9 +50,8 @@ class ServiceInfoSerializer(serializers.Serializer):
     """Data that frontend clients need to interact with the service."""
 
     github_url = serializers.CharField()
-    logout_url = serializers.CharField()
     peer_approval_enforced = serializers.BooleanField()
     user = UserSerializer()
 
     class Meta:
-        fields = ["github_url", "logout_url", "peer_approval_enforced", "user"]
+        fields = ["github_url", "peer_approval_enforced", "user"]

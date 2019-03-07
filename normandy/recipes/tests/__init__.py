@@ -128,6 +128,7 @@ class RecipeFactory(factory.DjangoModelFactory):
     def enabler(self, create, extracted, **kwargs):
         if extracted:
             self.approved_revision.enable(extracted)
+            self.refresh_from_db()  # Ensure signature side-effect is picked up
 
     # NOTE: This should always be last or the signature gets erased.
     # It is important that the signature be based on the actual data, and not

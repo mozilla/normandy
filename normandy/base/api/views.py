@@ -15,7 +15,7 @@ from rest_framework.views import (
     set_rollback,
 )
 
-from normandy.base.api.permissions import CanChangeUser
+from normandy.base.api.permissions import AdminEnabled, CanChangeUser
 from normandy.base.api.serializers import (
     GroupSerializer,
     ServiceInfoSerializer,
@@ -81,7 +81,6 @@ class ServiceInfoView(APIView):
                 {
                     "user": user,
                     "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-                    "logout_url": settings.OIDC_LOGOUT_URL or reverse("control:logout"),
                     "github_url": settings.GITHUB_URL,
                 }
             ).data
@@ -94,7 +93,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # Order by ID to prevent UnorderedObjectListWarning
     queryset = User.objects.order_by("id")
     serializer_class = UserWithGroupsSerializer
-    permission_classes = (CanChangeUser,)
+    permission_classes = (AdminEnabled, CanChangeUser)
 
     def get_serializer_class(self):
         # Don't allow users to update email address
@@ -118,7 +117,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     # Order by ID to prevent UnorderedObjectListWarning
     queryset = Group.objects.order_by("id")
     serializer_class = GroupSerializer
-    permission_classes = (CanChangeUser,)
+    permission_classes = (AdminEnabled, CanChangeUser)
 
     @action(detail=True, methods=["POST"])
     def add_user(self, request, pk=None):
