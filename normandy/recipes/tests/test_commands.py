@@ -324,8 +324,8 @@ class TestUpdateAddonUrls(object):
         fake_old_url2 = extension2.xpi.url.replace("/media/", "/media-old/")
 
         action = ActionFactory(name="opt-out-study")
-        recipe1 = RecipeFactory(action=action, arguments={addonUrl: fake_old_url1})
-        recipe2 = RecipeFactory(action=action, arguments={addonUrl: fake_old_url2})
+        recipe1 = RecipeFactory(action=action, arguments={"name": "1", addonUrl: fake_old_url1})
+        recipe2 = RecipeFactory(action=action, arguments={"name": "2", addonUrl: fake_old_url2})
         call_command("update_addon_urls")
 
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.

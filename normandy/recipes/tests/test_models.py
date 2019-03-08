@@ -241,6 +241,41 @@ class TestValidateArgumentPreferenceExperiments(object):
             error = rollback_action.errors["rollout_slug_not_found"]
             assert exc_info.value.detail == {"arguments": {"slug": error}}
 
+    @pytest.mark.django_db
+    class TestOptOutStudy(object):
+        def test_no_errors(self):
+            action = ActionFactory(name="opt-out-study")
+            arguments = {"name": "foo"}
+            recipe = RecipeFactory(action=action, arguments=arguments)
+
+            # Approve and enable the revision
+            rev = recipe.latest_revision
+            approval_request = rev.request_approval(UserFactory())
+            approval_request.approve(UserFactory(), "r+")
+            rev.enable(UserFactory())
+
+        def test_unique_name_new_collision(self):
+            action = ActionFactory(name="opt-out-study")
+            arguments = {"name": "foo"}
+            RecipeFactory(action=action, arguments=arguments)
+
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                RecipeFactory(action=action, arguments=arguments)
+            error = action.errors["duplicate_study_name"]
+            assert exc_info1.value.detail == {"arguments": {"name": error}}
+
+        def test_unique_name_update_collision(self):
+            action = ActionFactory(name="opt-out-study")
+            arguments_a = {"name": "foo"}
+            arguments_b = {"name": "bar"}
+            RecipeFactory(action=action, arguments=arguments_a)
+            recipe = RecipeFactory(action=action, arguments=arguments_b)
+
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                recipe.revise(arguments=arguments_a)
+            error = action.errors["duplicate_study_name"]
+            assert exc_info1.value.detail == {"arguments": {"name": error}}
+
 
 @pytest.mark.django_db
 class TestValidateArgumentShowHeartbeat(object):

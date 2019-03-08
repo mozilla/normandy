@@ -623,6 +623,7 @@ class Action(DirtyFieldsMixin, models.Model):
         "duplicate_rollout_slug": "Rollout slugs must be globally unique",
         "rollout_slug_not_found": "Rollout slug not found for rollback",
         "duplicate_survey_id": "Survey ID must be globally unique",
+        "duplicate_study_name": "Study name must be globally unique",
     }
 
     @property
@@ -785,6 +786,15 @@ class Action(DirtyFieldsMixin, models.Model):
             for recipe in other_recipes:
                 if recipe.arguments["surveyId"] == arguments["surveyId"]:
                     errors["surveyId"] = self.errors["duplicate_survey_id"]
+
+        elif self.name == "opt-out-study":
+            # Name should be unique across all recipes
+            other_recipes = Recipe.objects.filter(latest_revision__action=self)
+            if revision.recipe and revision.recipe.id:
+                other_recipes = other_recipes.exclude(id=revision.recipe.id)
+            for recipe in other_recipes:
+                if recipe.arguments["name"] == arguments["name"]:
+                    errors["name"] = self.errors["duplicate_study_name"]
 
         # Raise errors, if any
         if errors:
