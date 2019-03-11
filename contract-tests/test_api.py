@@ -9,7 +9,7 @@ from pytest_testrail.plugin import pytestrail
 
 
 def _load_json_schema(filename):
-    relative_path = join('schemas', filename)
+    relative_path = join("schemas", filename)
     absolute_path = join(dirname(__file__), relative_path)
 
     with open(absolute_path) as schema_file:
@@ -195,7 +195,7 @@ def test_approval_request_by_record(conf, requests_session):
     data = r.json()
 
     assert r.status_code == 200
-    assert_valid_schema(data, 'approval_request.schema')
+    assert_valid_schema(data, "approval_request.schema")
 
 
 def test_classify_client(conf, requests_session):
@@ -204,7 +204,7 @@ def test_classify_client(conf, requests_session):
     data = r.json()
 
     assert r.status_code == 200
-    assert_valid_schema(data, 'classify_client.schema')
+    assert_valid_schema(data, "classify_client.schema")
 
 
 def test_extension(conf, requests_session):
@@ -213,7 +213,7 @@ def test_extension(conf, requests_session):
     data = r.json()
 
     assert r.status_code == 200
-    assert_valid_schema(data, 'extension.schema')
+    assert_valid_schema(data, "extension.schema")
 
 
 def test_recipe_revision(conf, requests_session):
@@ -231,5 +231,4 @@ def test_recipe_revision_by_id(conf, requests_session):
     data = r.json()
 
     assert r.status_code == 200
-    assert_valid_schema(data, 'recipe_revision.schema')
-
+    assert_valid_schema(data, "recipe_revision.schema")
