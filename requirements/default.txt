@@ -20,9 +20,9 @@ bcrypt==3.1.6 \
     --hash=sha256:9b2c5b640a2da533b0ab5f148d87fb9989bf9bcb2e61eea6a729102a6d36aef9 \
     --hash=sha256:28a0459381a8021f57230954b9e9a65bb5e3d569d2c253c5cac6cb181d71cf23 \
     --hash=sha256:44636759d222baa62806bbceb20e96f75a015a6381690d1bc2eda91c01ec02ea
-boto3==1.9.106 \
-    --hash=sha256:30badbe5dab638e764e23125479e848c446a9669ef0612b8d8d305738bc442d3 \
-    --hash=sha256:c2dd70cb1ee2c49aed8bd3782fa82a766ad68921e1230620d41f4efe3b16bb75
+boto3==1.9.111 \
+    --hash=sha256:06414c75d1f62af7d04fd652b38d1e4fd3cfd6b35bad978466af88e2aaecd00d \
+    --hash=sha256:f3b77dff382374773d02411fa47ee408f4f503aeebd837fd9dc9ed8635bc5e8e
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
@@ -35,9 +35,9 @@ Django==2.1.7 \
 django-configurations==2.1 \
     --hash=sha256:e70433eeed10549d30bf5ca386c962505ff9f492893dd2483c52af536347adce \
     --hash=sha256:71d9acdff33aa034f0157b0b3d23629fe0cd499bf4d0b6d699b9ca0701d952e8
-django-cors-headers==2.4.1 \
-    --hash=sha256:8f94f96d2cdfa46360c62b892daae42477591997686ebf36c4f1cd9015528d22 \
-    --hash=sha256:ff46a244965bddd71070bb71c2f0e27ceae2d73c52db5d4ffa09ecc51d47548e
+django-cors-headers==2.5.0 \
+    --hash=sha256:4f39b4af6b3a9aaf54e6711a60ecee1d2c4ed3056395ab6626d7ed17555c8fce \
+    --hash=sha256:a8aeae8b56d9a7a1f57e9096e9e0dc6cfead2ecea4d5c4d51c1fd66024ac390a
 django-countries==5.3.3 \
     --hash=sha256:5307a61172eee5740720e44ea08721858b7d8bf8509ec7701ccd7a8d21120b9a \
     --hash=sha256:e4eaaec9bddb9365365109f833d1fd0ecc0cfee3348bf5441c0ccefb2d6917cd
@@ -218,8 +218,8 @@ black==18.9b0 \
 google-cloud-storage==1.14.0 \
     --hash=sha256:a3115c22a71e2f172fade72c7b7b797a071f3ac9b66043191fc84c214ba0c671 \
     --hash=sha256:aef243b533144c11c9ff750565c43dffe5445debb143697002edb6205f64a437
-kinto-http==10.2.0 \
-    --hash=sha256:ccf086ec71e7a1b8b4216225c1e70821c208502b776982dcdd77b10f9d789c56 \
-    --hash=sha256:e8343772a4e16bbb832ec36600e98b16a3a6ee02bd5a0142897eae180be4fcb0
+kinto-http==10.3.0 \
+    --hash=sha256:b2ac0f716a05e7645be6ca1dbdf4f7a2704dfc8743d58aa8ddc5f1b8a12730f5 \
+    --hash=sha256:ffaa9a81b3def3707eb05780f1d66f16c71ac0a21a34de7e21f16236ad0564dc
 untangle==1.1.1 \
     --hash=sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb
