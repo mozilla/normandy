@@ -218,8 +218,8 @@ black==18.9b0 \
 google-cloud-storage==1.14.0 \
     --hash=sha256:a3115c22a71e2f172fade72c7b7b797a071f3ac9b66043191fc84c214ba0c671 \
     --hash=sha256:aef243b533144c11c9ff750565c43dffe5445debb143697002edb6205f64a437
-kinto-http==10.2.0 \
-    --hash=sha256:ccf086ec71e7a1b8b4216225c1e70821c208502b776982dcdd77b10f9d789c56 \
-    --hash=sha256:e8343772a4e16bbb832ec36600e98b16a3a6ee02bd5a0142897eae180be4fcb0
+kinto-http==10.3.0 \
+    --hash=sha256:b2ac0f716a05e7645be6ca1dbdf4f7a2704dfc8743d58aa8ddc5f1b8a12730f5 \
+    --hash=sha256:ffaa9a81b3def3707eb05780f1d66f16c71ac0a21a34de7e21f16236ad0564dc
 untangle==1.1.1 \
     --hash=sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb
