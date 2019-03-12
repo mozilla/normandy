@@ -16,7 +16,7 @@
       "examples": [
         "US"
       ],
-      "pattern": "^(.*)$"
+      "pattern": ""
     },
     "request_time": {
       "$id": "#/properties/request_time",
