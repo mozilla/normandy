@@ -10,13 +10,13 @@
   "properties": {
     "country": {
       "$id": "#/properties/country",
-      "type": "string",
+      "type": ["string", "null"],
       "title": "The Country Schema",
       "default": "",
       "examples": [
         "US"
       ],
-      "pattern": ""
+      "pattern": "^(.*)$"
     },
     "request_time": {
       "$id": "#/properties/request_time",
