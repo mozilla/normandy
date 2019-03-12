@@ -3,9 +3,22 @@ import jsonschema
 import pytest
 
 from datetime import datetime
-
 from normandy.recipes import signing
-from pytest_testrail.plugin import testrail
+from os.path import join, dirname
+from pytest_testrail.plugin import pytestrail
+
+
+def _load_json_schema(filename):
+    relative_path = join("schemas", filename)
+    absolute_path = join(dirname(__file__), relative_path)
+
+    with open(absolute_path) as schema_file:
+        return json.loads(schema_file.read())
+
+
+def assert_valid_schema(data, schema_file):
+    schema = _load_json_schema(schema_file)
+    return jsonschema.validate(data, schema)
 
 
 def canonical_json(data):
@@ -31,7 +44,7 @@ def check_action_schema_format(action):
         "are actually added to mozilla-central. "
     )
 )
-@testrail("C7108")
+@pytestrail.case("C7108")
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/action/")
     r.raise_for_status()
@@ -47,7 +60,7 @@ def test_expected_action_types(conf, requests_session):
         assert record["name"] in expected_records
 
 
-@testrail("C7109")
+@pytestrail.case("C7109")
 def test_console_log(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/action/")
     r.raise_for_status()
@@ -72,7 +85,7 @@ def test_console_log(conf, requests_session):
     check_action_schema_format(record)
 
 
-@testrail("C7110")
+@pytestrail.case("C7110")
 def test_show_heartbeat(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/action/")
     r.raise_for_status()
@@ -96,7 +109,7 @@ def test_show_heartbeat(conf, requests_session):
     check_action_schema_format(record)
 
 
-@testrail("C7113")
+@pytestrail.case("C7113")
 def test_recipe_signatures(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/recipe/signed/")
     r.raise_for_status()
@@ -165,3 +178,74 @@ def test_recipe_history(conf, requests_session):
             created = datetime.strptime(revision["date_created"], "%Y-%m-%dT%H:%M:%S.%fZ")
             assert created < last_date
             last_date = created
+
+
+def test_approval_request(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/approval_request/")
+    r.raise_for_status()
+    data = r.json()
+
+    if len(data) == 0:
+        pytest.skip("No approval requests found.")
+
+    assert r.status_code == 200
+    assert len(data) > 0
+
+
+def test_approval_request_by_record(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/approval_request/1")
+
+    if r.status_code == 404:
+        pytest.skip("No approval requests found")
+
+    r.raise_for_status()
+    data = r.json()
+
+    assert r.status_code == 200
+    assert_valid_schema(data, "approval_request.schema")
+
+
+def test_classify_client(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/classify_client/")
+    r.raise_for_status()
+    data = r.json()
+
+    assert r.status_code == 200
+    assert_valid_schema(data, "classify_client.schema")
+
+
+def test_extension(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/extension/1")
+
+    if r.status_code == 404:
+        pytest.skip("No extension value found")
+
+    r.raise_for_status()
+    data = r.json()
+
+    assert r.status_code == 200
+    assert_valid_schema(data, "extension.schema")
+
+
+def test_recipe_revision(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision/")
+    r.raise_for_status()
+    data = r.json()
+
+    if len(data) == 0:
+        pytest.skip("No list of recipe revisions found")
+
+    assert r.status_code == 200
+
+
+def test_recipe_revision_by_id(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision/1/")
+
+    if r.status_code == 404:
+        pytest.skip("No recipe revision was found")
+
+    r.raise_for_status()
+    data = r.json()
+    print(data)
+    assert r.status_code == 200
+    assert_valid_schema(data, "recipe_revision.schema")

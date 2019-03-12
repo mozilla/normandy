@@ -1,0 +1,87 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "extension_id",
+    "hash",
+    "hash_algorithm",
+    "id",
+    "name",
+    "version",
+    "xpi"
+  ],
+  "properties": {
+    "extension_id": {
+      "$id": "#/properties/extension_id",
+      "type": "string",
+      "title": "The Extension_id Schema",
+      "default": "",
+      "examples": [
+        "share-button-study@mozilla.org"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "hash": {
+      "$id": "#/properties/hash",
+      "type": "string",
+      "title": "The Hash Schema",
+      "default": "",
+      "examples": [
+        "90abe64d2809a251c69661c73d6842bbb82522c0ed33ec2b361cdb978d8452c2"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "hash_algorithm": {
+      "$id": "#/properties/hash_algorithm",
+      "type": "string",
+      "title": "The Hash_algorithm Schema",
+      "default": "",
+      "examples": [
+        "sha256"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema",
+      "default": 0,
+      "examples": [
+        2
+      ]
+    },
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "The Name Schema",
+      "default": "",
+      "examples": [
+        "Share Button Study 1.0.1"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "version": {
+      "$id": "#/properties/version",
+      "type": "string",
+      "title": "The Version Schema",
+      "default": "",
+      "examples": [
+        "1.0.1"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "xpi": {
+      "$id": "#/properties/xpi",
+      "type": "string",
+      "title": "The Xpi Schema",
+      "default": "",
+      "examples": [
+        "https://storage.googleapis.com/moz-fx-normandy-prod-addons/extensions/share-button-study-1.0.1-signed.xpi"
+      ],
+      "pattern": "^(.*)$"
+    }
+  }
+}

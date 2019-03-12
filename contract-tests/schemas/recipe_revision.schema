@@ -1,0 +1,304 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "id",
+    "date_created",
+    "recipe",
+    "comment",
+    "approval_request"
+  ],
+  "properties": {
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema",
+      "default": 0,
+      "examples": [
+        1
+      ]
+    },
+    "date_created": {
+      "$id": "#/properties/date_created",
+      "type": "string",
+      "title": "The Date_created Schema",
+      "default": "",
+      "examples": [
+        "2018-05-16T22:07:56.120079Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "recipe": {
+      "$id": "#/properties/recipe",
+      "type": "object",
+      "title": "The Recipe Schema",
+      "required": [
+        "id",
+        "last_updated",
+        "name",
+        "enabled",
+        "is_approved",
+        "revision_id",
+        "action",
+        "arguments",
+        "extra_filter_expression",
+        "filter_expression",
+        "latest_revision_id",
+        "approved_revision_id",
+        "approval_request",
+        "identicon_seed"
+      ],
+      "properties": {
+        "id": {
+          "$id": "#/properties/recipe/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            461
+          ]
+        },
+        "last_updated": {
+          "$id": "#/properties/recipe/properties/last_updated",
+          "type": "string",
+          "title": "The Last_updated Schema",
+          "default": "",
+          "examples": [
+            "2018-05-16T22:07:56.125535Z"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/recipe/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "FB Container Survey"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "enabled": {
+          "$id": "#/properties/recipe/properties/enabled",
+          "type": "boolean",
+          "title": "The Enabled Schema",
+          "default": false,
+          "examples": [
+            false
+          ]
+        },
+        "is_approved": {
+          "$id": "#/properties/recipe/properties/is_approved",
+          "type": "boolean",
+          "title": "The Is_approved Schema",
+          "default": false,
+          "examples": [
+            false
+          ]
+        },
+        "revision_id": {
+          "$id": "#/properties/recipe/properties/revision_id",
+          "type": "integer",
+          "title": "The Revision_id Schema",
+          "default": 0,
+          "examples": [
+            1
+          ]
+        },
+        "action": {
+          "$id": "#/properties/recipe/properties/action",
+          "type": "string",
+          "title": "The Action Schema",
+          "default": "",
+          "examples": [
+            "show-heartbeat"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "arguments": {
+          "$id": "#/properties/recipe/properties/arguments",
+          "type": "object",
+          "title": "The Arguments Schema",
+          "required": [
+            "surveyId",
+            "message",
+            "learnMoreMessage",
+            "learnMoreUrl",
+            "engagementButtonLabel",
+            "thanksMessage",
+            "postAnswerUrl",
+            "includeTelemetryUUID",
+            "repeatOption"
+          ],
+          "properties": {
+            "surveyId": {
+              "$id": "#/properties/recipe/properties/arguments/properties/surveyId",
+              "type": "string",
+              "title": "The Surveyid Schema",
+              "default": "",
+              "examples": [
+                "hb-fb-container"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "message": {
+              "$id": "#/properties/recipe/properties/arguments/properties/message",
+              "type": "string",
+              "title": "The Message Schema",
+              "default": "",
+              "examples": [
+                "Please take a minute to fill out this survey about Firefox"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "learnMoreMessage": {
+              "$id": "#/properties/recipe/properties/arguments/properties/learnMoreMessage",
+              "type": "string",
+              "title": "The Learnmoremessage Schema",
+              "default": "",
+              "examples": [
+                "Learn More"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "learnMoreUrl": {
+              "$id": "#/properties/recipe/properties/arguments/properties/learnMoreUrl",
+              "type": "string",
+              "title": "The Learnmoreurl Schema",
+              "default": "",
+              "examples": [
+                "https://wiki.mozilla.org/Firefox/Shield/Heartbeat"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "engagementButtonLabel": {
+              "$id": "#/properties/recipe/properties/arguments/properties/engagementButtonLabel",
+              "type": "string",
+              "title": "The Engagementbuttonlabel Schema",
+              "default": "",
+              "examples": [
+                "Take Survey"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "thanksMessage": {
+              "$id": "#/properties/recipe/properties/arguments/properties/thanksMessage",
+              "type": "string",
+              "title": "The Thanksmessage Schema",
+              "default": "",
+              "examples": [
+                "Thank you!"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "postAnswerUrl": {
+              "$id": "#/properties/recipe/properties/arguments/properties/postAnswerUrl",
+              "type": "string",
+              "title": "The Postanswerurl Schema",
+              "default": "",
+              "examples": [
+                "https://qsurvey.mozilla.com/s3/FB-Container"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "includeTelemetryUUID": {
+              "$id": "#/properties/recipe/properties/arguments/properties/includeTelemetryUUID",
+              "type": "boolean",
+              "title": "The Includetelemetryuuid Schema",
+              "default": false,
+              "examples": [
+                false
+              ]
+            },
+            "repeatOption": {
+              "$id": "#/properties/recipe/properties/arguments/properties/repeatOption",
+              "type": "string",
+              "title": "The Repeatoption Schema",
+              "default": "",
+              "examples": [
+                "once"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "extra_filter_expression": {
+          "$id": "#/properties/recipe/properties/extra_filter_expression",
+          "type": "string",
+          "title": "The Extra_filter_expression Schema",
+          "default": "",
+          "examples": [
+            "(\n    [normandy.userId, normandy.recipe.id]|stableSample(0.2)\n    && normandy.locale == 'en-US'\n    && normandy.channel == 'release'\n\n)"
+          ],
+          "pattern": ""
+        },
+        "filter_expression": {
+          "$id": "#/properties/recipe/properties/filter_expression",
+          "type": "string",
+          "title": "The Filter_expression Schema",
+          "default": "",
+          "pattern": ""
+        },
+        "latest_revision_id": {
+          "$id": "#/properties/recipe/properties/latest_revision_id",
+          "type": "integer",
+          "title": "The Latest_revision_id Schema",
+          "default": 0,
+          "examples": [
+            1
+          ]
+        },
+        "approved_revision_id": {
+          "$id": "#/properties/recipe/properties/approved_revision_id",
+          "type": "null",
+          "title": "The Approved_revision_id Schema",
+          "default": null,
+          "examples": [
+            null
+          ]
+        },
+        "approval_request": {
+          "$id": "#/properties/recipe/properties/approval_request",
+          "type": "null",
+          "title": "The Approval_request Schema",
+          "default": null,
+          "examples": [
+            null
+          ]
+        },
+        "identicon_seed": {
+          "$id": "#/properties/recipe/properties/identicon_seed",
+          "type": "string",
+          "title": "The Identicon_seed Schema",
+          "default": "",
+          "examples": [
+            "v1:pv61si42tgs"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "comment": {
+      "$id": "#/properties/comment",
+      "type": "string",
+      "title": "The Comment Schema",
+      "default": "",
+      "examples": [
+        ""
+      ],
+      "pattern": "^(.*)$"
+    },
+    "approval_request": {
+      "$id": "#/properties/approval_request",
+      "type": "null",
+      "title": "The Approval_request Schema",
+      "default": null,
+      "examples": [
+        null
+      ]
+    }
+  }
+}
