@@ -5,7 +5,6 @@
   "type": "object",
   "title": "The Root Schema",
   "required": [
-    "country",
     "request_time"
   ],
   "properties": {

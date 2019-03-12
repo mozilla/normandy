@@ -185,12 +185,19 @@ def test_approval_request(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
+    if len(data) == 0:
+        pytest.skip("No approval requests found.")
+
     assert r.status_code == 200
     assert len(data) > 0
 
 
 def test_approval_request_by_record(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/approval_request/1")
+
+    if r.status_code == 404:
+        pytest.skip("No approval requests found")
+
     r.raise_for_status()
     data = r.json()
 
@@ -209,6 +216,10 @@ def test_classify_client(conf, requests_session):
 
 def test_extension(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/extension/1")
+
+    if r.status_code == 404:
+        pytest.skip("No extension value found")
+
     r.raise_for_status()
     data = r.json()
 
@@ -221,14 +232,20 @@ def test_recipe_revision(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
+    if len(data) == 0:
+        pytest.skip("No list of recipe revisions found")
+
     assert r.status_code == 200
-    assert len(data) > 0
 
 
 def test_recipe_revision_by_id(conf, requests_session):
-    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision/20/")
+    r = requests_session.get(conf.getoption("server") + "/api/v1/recipe_revision/1/")
+
+    if r.status_code == 404:
+        pytest.skip("No recipe revision was found")
+
     r.raise_for_status()
     data = r.json()
-
+    print(data)
     assert r.status_code == 200
     assert_valid_schema(data, "recipe_revision.schema")
