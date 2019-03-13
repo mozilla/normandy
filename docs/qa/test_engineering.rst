@@ -9,7 +9,7 @@ The Delivery Console is not currently being tested, as it’s a much lower prior
 The test strategy incorporates manual and automated testing. Different approaches are outlined for each area. 
 
 Normandy Server
---------------
+---------------
 The Normandy Server is an API server with recipes. This feature is high priority, and needs to maintain a high level of service. There are two versions with different functionality. V1 is the server clients connect to. V3 is the server that Admins connect to.
 
 - v1
@@ -27,7 +27,7 @@ Normandy Firefox client
 -----------------------
      The Normandy Firefox client queries the Normandy server for instructions and picks up recipe changes. 
 QA: cmuresan
-Automation: https://github.com/18epedersen/Normandy-e2e-tests Status: outdated
+Automation: 
 Test Engineer: b4hand
 Manual tests: https://testrail.stage.mozaws.net/index.php?/suites/view/232&group_by=cases:section_id&group_order=asc&group_id=16918
 Status: b4hand is reviewing and fixing outdated UI Automation tests. Ciprian is reviewing and updating manual tests.
@@ -36,6 +36,7 @@ Normandy Delivery Console
 -------------------------
      This is a tool to edit API recipes by Admins. It’s also referred to as the Admin panel. It is a single page application that is only used by internal users. If there is a problem it is reported by internal users, and is considered an inconvenience, not a high priority.
 QA/Test Engineer: none
+Automation: https://github.com/18epedersen/Normandy-e2e-tests Status: outdated
 Manual tests: https://testrail.stage.mozaws.net/index.php?/suites/view/232&group_by=cases:section_id&group_order=asc&group_id=16918
 Status: Needs more tests. The manual tests are extremely basic.
 
