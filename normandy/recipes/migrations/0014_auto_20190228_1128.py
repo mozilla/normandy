@@ -48,7 +48,7 @@ def add_extension_id(apps, schema_editor):
 
     if failures:
         for failure in failures:
-            sys.stderr.write(f"{failure}")
+            sys.stderr.write(f"{failure}\n")
         raise Exception("There were failures in this migration.")
 
 
