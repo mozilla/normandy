@@ -119,7 +119,7 @@ class TestExtensionAPI(object):
         assert res.data == {"xpi": [ExtensionFileField.default_error_messages["no_id"]]}
 
     def test_keeps_extension_filename(self, api_client, storage):
-        filename = "bootstrap-addon-example@mozilla.org-0.1.0.xpi"
+        filename = "bootstrap-addon-example@mozilla.org-0.1.0-signed.xpi"
         path = self.data_path(filename)
         res = self._upload_extension(api_client, path)
         assert res.status_code == 201, f"body of unexpected response: {res.data}"  # created

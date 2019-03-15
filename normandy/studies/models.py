@@ -137,7 +137,7 @@ class Extension(DirtyFieldsMixin, models.Model):
 
                 filename = get_extension_filename(self)
 
-                if Extension.objects.filter(xpi=filename, pk=self.pk).exists():
+                if Extension.objects.filter(xpi=filename).exclude(pk=self.pk).exists():
                     # Django just renames the file with a suffix if there is collision and the
                     # FileField is set to `unique=True`. This forces an integrity error.
                     raise IntegrityError("Extension file is a duplicate.")
