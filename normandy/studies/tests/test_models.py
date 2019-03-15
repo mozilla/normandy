@@ -2,8 +2,10 @@ import os
 import pytest
 
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 
 from normandy.recipes.tests import RecipeFactory
+from normandy.studies.models import Extension
 from normandy.studies.tests import ExtensionFactory
 
 
@@ -42,6 +44,18 @@ class TestExtension(object):
     def test_hash(self, storage):
         extension = ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
         assert extension.hash == "7c0e9203de9538b1a7513d28ec344a5712f9237f2bcd494db31344dea378baf5"
+
+    @pytest.mark.django_db
+    def test_uploaded_filename(self, storage):
+        extension = ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
+        assert extension.xpi.name == "extensions/test-addon@normandy.mozilla.org-0.1-signed.xpi"
+
+    @pytest.mark.django_db
+    def test_no_duplicate_files(self, storage):
+        ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
+        with pytest.raises(IntegrityError):
+            ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
+        assert Extension.objects.count() == 1
 
     @pytest.mark.django_db()
     def test_xpi_not_a_zip(self):

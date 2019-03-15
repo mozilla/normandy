@@ -7,7 +7,7 @@ import untangle
 from xml.sax import SAXParseException
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import IntegrityError, models
 from django.template.loader import render_to_string
 
 from dirtyfields import DirtyFieldsMixin
@@ -18,9 +18,13 @@ from normandy.recipes.models import Recipe
 SIGNING_FILES = {"META-INF/mozilla.rsa", "META-INF/mozilla.sf", "META-INF/manifest.mf"}
 
 
+def get_extension_filename(instance, *args):
+    return f"extensions/{instance.extension_id}-{instance.version}-signed.xpi"
+
+
 class Extension(DirtyFieldsMixin, models.Model):
     name = models.CharField(max_length=255)
-    xpi = models.FileField(upload_to="extensions")
+    xpi = models.FileField(upload_to=get_extension_filename, unique=True)
     is_legacy = models.BooleanField(default=False)
     extension_id = models.CharField(max_length=255)
     version = models.CharField(max_length=32)
@@ -130,5 +134,12 @@ class Extension(DirtyFieldsMixin, models.Model):
 
             if "xpi" in dirty_field_names:
                 self.populate_metadata()
+
+                filename = get_extension_filename(self)
+
+                if Extension.objects.filter(xpi=filename, pk=self.pk).exists():
+                    # Django just renames the file with a suffix if there is collision and the
+                    # FileField is set to `unique=True`. This forces an integrity error.
+                    raise IntegrityError("Extension file is a duplicate.")
 
         super().save(*args, **kwargs)
