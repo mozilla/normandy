@@ -7,7 +7,7 @@ from django.conf import settings
 
 from normandy.base.tests import Whatever
 from normandy.studies.models import Extension
-from normandy.studies.tests import ExtensionFactory
+from normandy.studies.tests import ExtensionFactory, XPIFileFactory
 
 
 @pytest.mark.django_db
@@ -106,7 +106,9 @@ class TestExtensionAPI(object):
         Extension.objects.filter(id=res.data["id"]).exists()
 
     def test_can_update_xpi(self, api_client, storage):
-        e = ExtensionFactory(xpi__from_path=self.data_path("legacy-signed.xpi"))
+        e = ExtensionFactory(
+            xpi__from_func=lambda: open(self.data_path("legacy-signed.xpi"), "rb")
+        )
         path = self.data_path("webext-signed.xpi")
         res = self._update_extension(api_client, e.id, path)
         assert res.status_code == 200
@@ -114,7 +116,8 @@ class TestExtensionAPI(object):
         assert e.xpi.name.endswith("webext-signed.xpi")
 
     def test_can_update_without_xpi(self, api_client, storage):
-        e = ExtensionFactory(xpi__from_path=self.data_path("webext-signed.xpi"))
+        xpi = XPIFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
         res = api_client.patch(f"/api/v3/extension/{e.id}/", {"name": "new name"})
         assert res.status_code == 200
         e.refresh_from_db()

@@ -364,7 +364,7 @@ class Base(Core, CORS, OIDC):
     CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
 
     # Storage settings
-    DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.S3Boto3PermissiveStorage")
+    DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.NormandyS3Boto3Storage")
 
     PROD_DETAILS_DIR = values.Value(os.path.join(Core.BASE_DIR, "product_details"))
 
@@ -410,7 +410,7 @@ class Production(Base):
     SECURE_PROXY_SSL_HEADER = values.TupleValue(("HTTP_X_FORWARDED_PROTO", "https"))
     LOGGING_USE_JSON = values.Value(True)
     SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
-    DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.S3Boto3PermissiveStorage")
+    DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.NormandyS3Boto3Storage")
     AWS_S3_FILE_OVERWRITE = False
 
 

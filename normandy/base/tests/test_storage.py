@@ -2,10 +2,12 @@ from itertools import chain
 
 import pytest
 
+from django.core.files.base import ContentFile
+
 from normandy.base.storage import PermissiveFilenameStorageMixin
 
 
-class TestPermissiveFilenameStorageMixing(object):
+class TestPermissiveFilenameStorageMixin(object):
     @pytest.fixture
     def storage(self):
         return PermissiveFilenameStorageMixin()
@@ -30,3 +32,13 @@ class TestPermissiveFilenameStorageMixing(object):
         def test_it_allows_an_addon_filename(self, storage):
             addon_filename = "shield-recipe-client@mozilla.org-82.1.g32b36827-signed.xpi"
             assert storage.get_valid_name(addon_filename) == addon_filename
+
+
+class TestRestrictedOverwriteFilenameStorageMixin(object):
+    def test_get_available_name(self, storage):
+        assert storage.get_available_name("tmp/f00") == "tmp/f00"
+
+    def test_file_exists(self, storage):
+        storage.save("tmp/foo", ContentFile(b""))
+        with pytest.raises(FileExistsError):
+            storage.get_available_name("tmp/foo")
