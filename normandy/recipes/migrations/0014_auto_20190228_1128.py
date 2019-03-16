@@ -3,13 +3,13 @@
 import json
 import sys
 
-from urllib.parse import urlparse
+from urllib.parse import unquote_plus, urlparse
 
 from django.db import migrations
 
 
 def get_filename_from_url(url):
-    return urlparse(url).path.split("/")[-1]
+    return unquote_plus(urlparse(url).path.split("/")[-1])
 
 
 def add_extension_id(apps, schema_editor):
