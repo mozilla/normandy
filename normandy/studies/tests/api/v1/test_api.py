@@ -3,7 +3,7 @@ from pathlib import Path
 
 from django.conf import settings
 
-from normandy.studies.tests import ExtensionFactory
+from normandy.studies.tests import ExtensionFactory, XPIFileFactory
 
 
 @pytest.mark.django_db
@@ -36,8 +36,8 @@ class TestExtensionAPI(object):
         assert res.client.cookies == {}
 
     def test_read_only(self, api_client, storage):
-        path = self.data_path("webext-signed.xpi")
-        with open(path, "rb") as f:
+        xpi = XPIFileFactory()
+        with open(xpi.path, "rb") as f:
             res = api_client.post(
                 "/api/v1/extension/", {"name": "test extension", "xpi": f}, format="multipart"
             )

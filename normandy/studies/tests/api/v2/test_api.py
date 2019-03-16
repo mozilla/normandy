@@ -7,7 +7,7 @@ from django.conf import settings
 
 from normandy.base.tests import Whatever
 from normandy.studies.models import Extension
-from normandy.studies.tests import ExtensionFactory
+from normandy.studies.tests import ExtensionFactory, XPIFileFactory
 from normandy.studies.api.v2.fields import ExtensionFileField
 
 
@@ -80,8 +80,8 @@ class TestExtensionAPI(object):
         return res
 
     def test_upload_works_webext(self, api_client, storage):
-        path = self.data_path("webext-signed.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory()
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data["id"]).exists()
 
@@ -98,8 +98,8 @@ class TestExtensionAPI(object):
         assert res.data == {"xpi": [ExtensionFileField.default_error_messages["not_a_zip"]]}
 
     def test_uploads_must_be_signed_webext(self, api_client, storage):
-        path = self.data_path("webext-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory(signed=False)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": [ExtensionFileField.default_error_messages["not_signed"]]}
 
@@ -113,8 +113,9 @@ class TestExtensionAPI(object):
         # NB: This is a fragile test. It uses a unsigned webext, and
         # so it relies on the ID check happening before the signing
         # check, so that the error comes from the former.
-        path = self.data_path("webext-no-id-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory(signed=False)
+        xpi.update_manifest({"applications": {"gecko": {}}})
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": [ExtensionFileField.default_error_messages["no_id"]]}
 

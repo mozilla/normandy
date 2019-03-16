@@ -1,3 +1,5 @@
+import os
+
 from urllib.parse import urlparse, quote as url_quote
 
 import pytest
@@ -94,8 +96,8 @@ class TestExtensionAPI(object):
         return res
 
     def test_upload_works_webext(self, api_client, storage):
-        path = self.data_path("webext-signed.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory()
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data["id"]).exists()
 
@@ -109,11 +111,12 @@ class TestExtensionAPI(object):
         e = ExtensionFactory(
             xpi__from_func=lambda: open(self.data_path("legacy-signed.xpi"), "rb")
         )
-        path = self.data_path("webext-signed.xpi")
-        res = self._update_extension(api_client, e.id, path)
+        xpi = XPIFileFactory()
+        dir_path, filename = os.path.split(xpi.path)
+        res = self._update_extension(api_client, e.id, xpi.path)
         assert res.status_code == 200
         e.refresh_from_db()
-        assert e.xpi.name.endswith("webext-signed.xpi")
+        assert e.xpi.name.endswith(filename)
 
     def test_can_update_without_xpi(self, api_client, storage):
         xpi = XPIFileFactory()
@@ -130,8 +133,8 @@ class TestExtensionAPI(object):
         assert res.data == {"xpi": "Extension file must be zip-formatted."}
 
     def test_uploads_must_be_signed_webext(self, api_client, storage):
-        path = self.data_path("webext-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory(signed=False)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": "Extension file must be signed."}
 
@@ -145,8 +148,9 @@ class TestExtensionAPI(object):
         # NB: This is a fragile test. It uses a unsigned webext, and
         # so it relies on the ID check happening before the signing
         # check, so that the error comes from the former.
-        path = self.data_path("webext-no-id-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory()
+        xpi.update_manifest({"applications": {"gecko": {}}})
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {
             "xpi": 'Web extensions must have a manifest key "applications.gecko.id".'
