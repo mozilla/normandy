@@ -126,19 +126,18 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_bad_install_rdf(self):
+        xpi = XPIFileFactory(legacy=True, signed=False)
+        xpi.add_file("install.rdf", b"{}")
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(
-                xpi__from_func=lambda: open(data_path("legacy-bad-install-rdf-unsigned.xpi"), "rb")
-            )
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == 'Legacy addon "install.rdf" is corrupt.'
 
     @pytest.mark.django_db()
     def test_legacy_no_id(self):
+        xpi = XPIFileFactory(legacy=True, overwrite_data={"id": ""}, signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(
-                xpi__from_func=lambda: open(data_path("legacy-no-id-unsigned.xpi"), "rb")
-            )
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -147,10 +146,9 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_no_version(self):
+        xpi = XPIFileFactory(legacy=True, overwrite_data={"version": ""}, signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(
-                xpi__from_func=lambda: open(data_path("legacy-no-version-unsigned.xpi"), "rb")
-            )
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -165,7 +163,8 @@ class TestExtension(object):
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be signed."
 
+        xpi = XPIFileFactory(legacy=True, signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_func=lambda: open(data_path("legacy-unsigned.xpi"), "rb"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be signed."

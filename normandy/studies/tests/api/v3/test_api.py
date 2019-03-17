@@ -4,9 +4,6 @@ import tempfile
 from urllib.parse import urlparse, quote as url_quote
 
 import pytest
-from pathlib import Path
-
-from django.conf import settings
 
 from normandy.base.tests import Whatever
 from normandy.studies.models import Extension
@@ -15,10 +12,6 @@ from normandy.studies.tests import ExtensionFactory, XPIFileFactory
 
 @pytest.mark.django_db
 class TestExtensionAPI(object):
-    @classmethod
-    def data_path(cls, file_name):
-        return Path(settings.BASE_DIR) / "normandy/studies/tests/data" / file_name
-
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/extension/")
         assert res.status_code == 200
@@ -103,18 +96,17 @@ class TestExtensionAPI(object):
         Extension.objects.filter(id=res.data["id"]).exists()
 
     def test_upload_works_legacy(self, api_client, storage):
-        path = self.data_path("legacy-signed.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory(legacy=True)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data["id"]).exists()
 
     def test_can_update_xpi(self, api_client, storage):
-        e = ExtensionFactory(
-            xpi__from_func=lambda: open(self.data_path("legacy-signed.xpi"), "rb")
-        )
-        xpi = XPIFileFactory()
-        dir_path, filename = os.path.split(xpi.path)
-        res = self._update_extension(api_client, e.id, xpi.path)
+        legacy = XPIFileFactory(legacy=True)
+        e = ExtensionFactory(xpi__from_func=legacy.open)
+        webext = XPIFileFactory()
+        _, filename = os.path.split(webext.path)
+        res = self._update_extension(api_client, e.id, webext.path)
         assert res.status_code == 200
         e.refresh_from_db()
         assert e.xpi.name.endswith(filename)
@@ -142,8 +134,8 @@ class TestExtensionAPI(object):
         assert res.data == {"xpi": "Extension file must be signed."}
 
     def test_uploads_must_be_signed_legacy(self, api_client, storage):
-        path = self.data_path("legacy-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory(legacy=True, signed=False)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": "Extension file must be signed."}
 
@@ -160,10 +152,10 @@ class TestExtensionAPI(object):
         }
 
     def test_keeps_extension_filename(self, api_client, storage):
-        filename = "bootstrap-addon-example@mozilla.org-0.1.0-signed.xpi"
-        path = self.data_path(filename)
-        res = self._upload_extension(api_client, path)
+        xpi = XPIFileFactory(legacy=True)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201, f"body of unexpected response: {res.data}"  # created
+        _, filename = os.path.split(xpi.path)
         assert res.data["xpi"].split("/")[-1] == url_quote(filename)
 
         # Download the XPI to make sure the url is actually good

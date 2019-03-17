@@ -8,11 +8,33 @@ from normandy.base.tests import FuzzyUnicode
 from normandy.studies.models import Extension
 
 
-DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
+INSTALL_RDF_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+<RDF xmlns="http://w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:type>2</em:type>
+    <em:bootstrap>true</em:bootstrap>
+    <em:unpack>false</em:unpack>
+    <em:multiprocessCompatible>true</em:multiprocessCompatible>
+    {}
+
+    <em:targetApplication>
+      <Description>
+        <em:id>{{ec8030f7-c20a-464f-9b0e-13a3a9e97384}}</em:id>
+        <em:minVersion>52.0</em:minVersion>
+        <em:maxVersion>*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+  </Description>
+</RDF>
+"""
 
 
 class XPIFileFactory(object):
-    def __init__(self, from_file=None, gecko_id=None, overwrite_data=None, signed=True):
+    _manifest = {}
+
+    def __init__(
+        self, from_file=None, gecko_id=None, overwrite_data=None, signed=True, legacy=False
+    ):
         # Generate a unique random path for the new XPI file
         f, self._path = tempfile.mkstemp(suffix=".xpi")
 
@@ -26,21 +48,38 @@ class XPIFileFactory(object):
         if not gecko_id:
             gecko_id = f"{factory.Faker('md5').generate({})}@normandy.mozilla.org"
 
-        if from_file:
-            self._manifest = json.load(from_file)
+        if legacy:
+            if from_file:
+                with open(from_file, "rb") as f:
+                    self.add_file("install.rdf", f.read())
+            else:
+                data = {
+                    "id": gecko_id,
+                    "version": "0.1",
+                    "name": "Signed Bootstrap Mozilla Extension Example",
+                    "description": "Example of a bootstrapped addon",
+                }
+
+                if overwrite_data:
+                    data.update(overwrite_data)
+
+                self.generate_install_rdf(data)
         else:
-            self._manifest = {
-                "manifest_version": 2,
-                "name": "normandy test addon",
-                "version": "0.1",
-                "description": "This is an add-on for us in Normandy's tests",
-                "applications": {"gecko": {"id": gecko_id}},
-            }
+            if from_file:
+                self._manifest = json.load(from_file)
+            else:
+                self._manifest = {
+                    "manifest_version": 2,
+                    "name": "normandy test addon",
+                    "version": "0.1",
+                    "description": "This is an add-on for us in Normandy's tests",
+                    "applications": {"gecko": {"id": gecko_id}},
+                }
 
-        if overwrite_data:
-            self._manifest.update(overwrite_data)
+            if overwrite_data:
+                self._manifest.update(overwrite_data)
 
-        self.save_manifest()
+            self.save_manifest()
 
         if signed:
             self.add_file("META-INF/manifest.mf", b"")
@@ -70,6 +109,12 @@ class XPIFileFactory(object):
     def replace_manifest(self, data):
         self._manifest = data
         self.save_manifest()
+
+    def generate_install_rdf(self, data):
+        insert = ""
+        for k in data:
+            insert += "<em:{}>{}</em:{}>\n".format(k, data[k], k)
+        self.add_file("install.rdf", INSTALL_RDF_TEMPLATE.format(insert).encode())
 
     def open(self, mode="rb"):
         return open(self.path, mode="rb")
