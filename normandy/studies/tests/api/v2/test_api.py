@@ -1,7 +1,9 @@
+import tempfile
+
 from urllib.parse import urlparse, quote as url_quote
+from pathlib import Path
 
 import pytest
-from pathlib import Path
 
 from django.conf import settings
 
@@ -92,8 +94,9 @@ class TestExtensionAPI(object):
         Extension.objects.filter(id=res.data["id"]).exists()
 
     def test_uploads_must_be_zips(self, api_client, storage):
-        path = self.data_path("not-an-addon.txt")
-        res = self._upload_extension(api_client, path)
+        tmp = tempfile.NamedTemporaryFile(suffix=".txt")
+        tmp.write(b"not an addon")
+        res = self._upload_extension(api_client, tmp.name)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": [ExtensionFileField.default_error_messages["not_a_zip"]]}
 

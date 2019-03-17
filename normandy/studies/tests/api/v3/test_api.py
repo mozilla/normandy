@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 from urllib.parse import urlparse, quote as url_quote
 
@@ -127,8 +128,10 @@ class TestExtensionAPI(object):
         assert e.name == "new name"
 
     def test_uploads_must_be_zips(self, api_client, storage):
-        path = self.data_path("not-an-addon.txt")
-        res = self._upload_extension(api_client, path)
+        tmp = tempfile.NamedTemporaryFile(suffix=".txt")
+        tmp.write(b"not an addon")
+        tmp.seek(0)
+        res = self._upload_extension(api_client, tmp.name)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": "Extension file must be zip-formatted."}
 

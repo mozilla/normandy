@@ -1,6 +1,8 @@
 import hashlib
 import os
 import pytest
+import tempfile
+import zipfile
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -63,15 +65,24 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_xpi_not_a_zip(self):
+        tmp = tempfile.NamedTemporaryFile(suffix=".txt")
+        tmp.write(b"not an addon")
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_func=lambda: open(data_path("not-an-addon.txt"), "rb"))
+            ExtensionFactory(xpi__from_func=lambda: tmp)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be zip-formatted."
 
     @pytest.mark.django_db()
-    def test_xpi_not_an_addon(self):
+    def test_xpi_not_an_addon(self, tmpdir):
+        _, path = tempfile.mkstemp(suffix=".zip")
+        file = open(path, "w+b")
+        zf = zipfile.ZipFile(file, mode="w")
+        with zf.open("not-addon.txt", mode="w") as tf:
+            tf.write(b"not an addon")
+        zf.close()
+
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_func=lambda: open(data_path("not-an-addon.zip"), "rb"))
+            ExtensionFactory(xpi__from_func=lambda: file)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
