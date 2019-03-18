@@ -32,7 +32,7 @@
     "babel-plugin-import": "1.11.0",
     "babel-plugin-syntax-async-functions": "6.13.0",
     "babili-webpack-plugin": "0.1.2",
-    "eslint": "5.15.1",
+    "eslint": "5.15.3",
     "eslint-config-airbnb": "17.1.0",
     "eslint-import-resolver-webpack": "0.11.0",
     "eslint-plugin-babel": "5.3.0",
