@@ -9,7 +9,11 @@ from django.db import transaction
 
 from normandy.recipes.tests import RecipeFactory
 from normandy.studies.models import Extension
-from normandy.studies.tests import ExtensionFactory, XPIFileFactory
+from normandy.studies.tests import (
+    ExtensionFactory,
+    LegacyAddonFileFactory,
+    WebExtensionFileFactory,
+)
 
 
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
@@ -35,19 +39,19 @@ class TestExtension(object):
 
     @pytest.mark.django_db
     def test_extension_id(self, storage):
-        xpi = XPIFileFactory(gecko_id="test-addon@normandy.mozilla.org")
+        xpi = WebExtensionFileFactory(gecko_id="test-addon@normandy.mozilla.org")
         extension = ExtensionFactory(xpi__from_func=xpi.open)
         assert extension.extension_id == "test-addon@normandy.mozilla.org"
 
     @pytest.mark.django_db
     def test_version(self, storage):
-        xpi = XPIFileFactory(overwrite_data={"version": "0.1"})
+        xpi = WebExtensionFileFactory(overwrite_data={"version": "0.1"})
         extension = ExtensionFactory(xpi__from_func=xpi.open)
         assert extension.version == "0.1"
 
     @pytest.mark.django_db
     def test_hash(self, storage):
-        xpi = XPIFileFactory()
+        xpi = WebExtensionFileFactory()
         f = xpi.open()
         hashed = hashlib.sha256(f.read()).hexdigest()
         f.close()
@@ -56,7 +60,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db
     def test_no_duplicate_files(self, storage):
-        xpi = XPIFileFactory()
+        xpi = WebExtensionFileFactory()
         ExtensionFactory(xpi__from_func=xpi.open)
         with transaction.atomic():
             with pytest.raises(FileExistsError):
@@ -91,7 +95,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_webext_bad_manifest(self):
-        xpi = XPIFileFactory(signed=False)
+        xpi = WebExtensionFileFactory(signed=False)
         xpi.add_file("manifest.json", b"")
 
         with pytest.raises(ValidationError) as exc:
@@ -101,7 +105,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_webext_no_id(self):
-        xpi = XPIFileFactory(signed=False, overwrite_data={"applications": {"gecko": {}}})
+        xpi = WebExtensionFileFactory(signed=False, overwrite_data={"applications": {"gecko": {}}})
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
@@ -112,7 +116,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_webext_no_version(self):
-        xpi = XPIFileFactory()
+        xpi = WebExtensionFileFactory()
         manifest = xpi.manifest
         del manifest["version"]
         xpi.replace_manifest(manifest)
@@ -126,7 +130,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_bad_install_rdf(self):
-        xpi = XPIFileFactory(legacy=True, signed=False)
+        xpi = LegacyAddonFileFactory(signed=False)
         xpi.add_file("install.rdf", b"{}")
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
@@ -135,7 +139,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_no_id(self):
-        xpi = XPIFileFactory(legacy=True, overwrite_data={"id": ""}, signed=False)
+        xpi = LegacyAddonFileFactory(overwrite_data={"id": ""}, signed=False)
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
@@ -146,7 +150,7 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_no_version(self):
-        xpi = XPIFileFactory(legacy=True, overwrite_data={"version": ""}, signed=False)
+        xpi = LegacyAddonFileFactory(overwrite_data={"version": ""}, signed=False)
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
@@ -157,13 +161,13 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_xpi_must_be_signed(self):
-        xpi = XPIFileFactory(signed=False)
+        xpi = WebExtensionFileFactory(signed=False)
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be signed."
 
-        xpi = XPIFileFactory(legacy=True, signed=False)
+        xpi = LegacyAddonFileFactory(signed=False)
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1

@@ -30,11 +30,7 @@ INSTALL_RDF_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
 
 
 class XPIFileFactory(object):
-    _manifest = {}
-
-    def __init__(
-        self, from_file=None, gecko_id=None, overwrite_data=None, signed=True, legacy=False
-    ):
+    def __init__(self, signed=True):
         # Generate a unique random path for the new XPI file
         f, self._path = tempfile.mkstemp(suffix=".xpi")
 
@@ -45,42 +41,6 @@ class XPIFileFactory(object):
         zf = zipfile.ZipFile(self.path, mode="w")
         zf.close()
 
-        if not gecko_id:
-            gecko_id = f"{factory.Faker('md5').generate({})}@normandy.mozilla.org"
-
-        if legacy:
-            if from_file:
-                with open(from_file, "rb") as f:
-                    self.add_file("install.rdf", f.read())
-            else:
-                data = {
-                    "id": gecko_id,
-                    "version": "0.1",
-                    "name": "Signed Bootstrap Mozilla Extension Example",
-                    "description": "Example of a bootstrapped addon",
-                }
-
-                if overwrite_data:
-                    data.update(overwrite_data)
-
-                self.generate_install_rdf(data)
-        else:
-            if from_file:
-                self._manifest = json.load(from_file)
-            else:
-                self._manifest = {
-                    "manifest_version": 2,
-                    "name": "normandy test addon",
-                    "version": "0.1",
-                    "description": "This is an add-on for us in Normandy's tests",
-                    "applications": {"gecko": {"id": gecko_id}},
-                }
-
-            if overwrite_data:
-                self._manifest.update(overwrite_data)
-
-            self.save_manifest()
-
         if signed:
             self.add_file("META-INF/manifest.mf", b"")
             self.add_file("META-INF/mozilla.rsa", b"")
@@ -90,14 +50,41 @@ class XPIFileFactory(object):
     def path(self):
         return self._path
 
-    @property
-    def manifest(self):
-        return self._manifest
-
     def add_file(self, filename, data):
         with zipfile.ZipFile(self.path, mode="a") as zf:
             with zf.open(filename, mode="w") as f:
                 f.write(data)
+
+    def open(self, mode="rb"):
+        return open(self.path, mode="rb")
+
+
+class WebExtensionFileFactory(XPIFileFactory):
+    def __init__(self, signed=True, from_file=None, gecko_id=None, overwrite_data=None):
+        super().__init__(signed=signed)
+
+        if not gecko_id:
+            gecko_id = f"{factory.Faker('md5').generate({})}@normandy.mozilla.org"
+
+        if from_file:
+            self._manifest = json.load(from_file)
+        else:
+            self._manifest = {
+                "manifest_version": 2,
+                "name": "normandy test addon",
+                "version": "0.1",
+                "description": "This is an add-on for us in Normandy's tests",
+                "applications": {"gecko": {"id": gecko_id}},
+            }
+
+        if overwrite_data:
+            self._manifest.update(overwrite_data)
+
+        self.save_manifest()
+
+    @property
+    def manifest(self):
+        return self._manifest
 
     def save_manifest(self):
         self.add_file("manifest.json", json.dumps(self.manifest).encode())
@@ -110,19 +97,40 @@ class XPIFileFactory(object):
         self._manifest = data
         self.save_manifest()
 
+
+class LegacyAddonFileFactory(XPIFileFactory):
+    def __init__(self, signed=True, from_file=None, addon_id=None, overwrite_data=None):
+        super().__init__(signed=signed)
+
+        if not addon_id:
+            addon_id = f"{factory.Faker('md5').generate({})}@normandy.mozilla.org"
+
+        if from_file:
+            with open(from_file, "rb") as f:
+                self.add_file("install.rdf", f.read())
+        else:
+            data = {
+                "id": addon_id,
+                "version": "0.1",
+                "name": "Signed Bootstrap Mozilla Extension Example",
+                "description": "Example of a bootstrapped addon",
+            }
+
+            if overwrite_data:
+                data.update(overwrite_data)
+
+            self.generate_install_rdf(data)
+
     def generate_install_rdf(self, data):
         insert = ""
         for k in data:
             insert += "<em:{}>{}</em:{}>\n".format(k, data[k], k)
         self.add_file("install.rdf", INSTALL_RDF_TEMPLATE.format(insert).encode())
 
-    def open(self, mode="rb"):
-        return open(self.path, mode="rb")
-
 
 class ExtensionFactory(factory.DjangoModelFactory):
     name = FuzzyUnicode()
-    xpi = factory.django.FileField(from_func=lambda: XPIFileFactory().open())
+    xpi = factory.django.FileField(from_func=lambda: WebExtensionFileFactory().open())
 
     class Meta:
         model = Extension

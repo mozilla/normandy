@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.studies.tests import ExtensionFactory, XPIFileFactory
+from normandy.studies.tests import ExtensionFactory, WebExtensionFileFactory
 
 
 @pytest.mark.django_db
@@ -29,7 +29,7 @@ class TestExtensionAPI(object):
         assert res.client.cookies == {}
 
     def test_read_only(self, api_client, storage):
-        xpi = XPIFileFactory()
+        xpi = WebExtensionFileFactory()
         with open(xpi.path, "rb") as f:
             res = api_client.post(
                 "/api/v1/extension/", {"name": "test extension", "xpi": f}, format="multipart"
