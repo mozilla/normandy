@@ -1,0 +1,645 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "approved_revision",
+    "id",
+    "latest_revision",
+    "signature"
+  ],
+  "properties": {
+    "approved_revision": {
+      "$id": "#/properties/approved_revision",
+      "type": "null",
+      "title": "The Approved_revision Schema",
+      "default": null,
+      "examples": [
+        null
+      ]
+    },
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema",
+      "default": 0,
+      "examples": [
+        715
+      ]
+    },
+    "latest_revision": {
+      "$id": "#/properties/latest_revision",
+      "type": "object",
+      "title": "The Latest_revision Schema",
+      "required": [
+        "action",
+        "approval_request",
+        "arguments",
+        "bug_number",
+        "comment",
+        "creator",
+        "date_created",
+        "enabled",
+        "enabled_states",
+        "extra_filter_expression",
+        "filter_expression",
+        "filter_object",
+        "id",
+        "identicon_seed",
+        "name",
+        "recipe",
+        "updated"
+      ],
+      "properties": {
+        "action": {
+          "$id": "#/properties/latest_revision/properties/action",
+          "type": "object",
+          "title": "The Action Schema",
+          "required": [
+            "arguments_schema",
+            "id",
+            "implementation_url",
+            "name"
+          ],
+          "properties": {
+            "arguments_schema": {
+              "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema",
+              "type": "object",
+              "title": "The Arguments_schema Schema",
+              "required": [
+                "$schema",
+                "properties",
+                "required",
+                "title",
+                "type"
+              ],
+              "properties": {
+                "$schema": {
+                  "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/$schema",
+                  "type": "string",
+                  "title": "The $schema Schema",
+                  "default": "",
+                  "examples": [
+                    "http://json-schema.org/draft-04/schema#"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "properties": {
+                  "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties",
+                  "type": "object",
+                  "title": "The Properties Schema",
+                  "properties": {
+                    "addonUrl": {
+                      "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/addonUrl",
+                      "type": "object",
+                      "title": "The Addonurl Schema",
+                      "required": [
+                        "format",
+                        "minLength",
+                        "type"
+                      ],
+                      "properties": {
+                        "description": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/addonUrl/properties/description",
+                          "type": "string",
+                          "title": "The Description Schema",
+                          "default": "",
+                          "examples": [
+                            "URL of the add-on XPI file"
+                          ],
+                          "pattern": "^(.*)$"
+                        },
+                        "format": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/addonUrl/properties/format",
+                          "type": "string",
+                          "title": "The Format Schema",
+                          "default": "",
+                          "examples": [
+                            "uri"
+                          ],
+                          "pattern": "^(.*)$"
+                        },
+                        "minLength": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/addonUrl/properties/minLength",
+                          "type": "integer",
+                          "title": "The Minlength Schema",
+                          "default": 0,
+                          "examples": [
+                            1
+                          ]
+                        },
+                        "type": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/addonUrl/properties/type",
+                          "type": "string",
+                          "title": "The Type Schema",
+                          "default": "",
+                          "examples": [
+                            "string"
+                          ],
+                          "pattern": "^(.*)$"
+                        }
+                      }
+                    },
+                    "description": {
+                      "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/description",
+                      "type": "object",
+                      "title": "The Description Schema",
+                      "required": [
+                        "description",
+                        "minLength",
+                        "type"
+                      ],
+                      "properties": {
+                        "description": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/description/properties/description",
+                          "type": "string",
+                          "title": "The Description Schema",
+                          "default": "",
+                          "examples": [
+                            "User-facing description of the study"
+                          ],
+                          "pattern": "^(.*)$"
+                        },
+                        "minLength": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/description/properties/minLength",
+                          "type": "integer",
+                          "title": "The Minlength Schema",
+                          "default": 0,
+                          "examples": [
+                            1
+                          ]
+                        },
+                        "type": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/description/properties/type",
+                          "type": "string",
+                          "title": "The Type Schema",
+                          "default": "",
+                          "examples": [
+                            "string"
+                          ],
+                          "pattern": "^(.*)$"
+                        }
+                      }
+                    },
+                    "isEnrollmentPaused": {
+                      "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/isEnrollmentPaused",
+                      "type": "object",
+                      "title": "The Isenrollmentpaused Schema",
+                      "required": [
+                        "default",
+                        "description",
+                        "type"
+                      ],
+                      "properties": {
+                        "default": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/isEnrollmentPaused/properties/default",
+                          "type": "boolean",
+                          "title": "The Default Schema",
+                          "default": false,
+                          "examples": [
+                            false
+                          ]
+                        },
+                        "description": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/isEnrollmentPaused/properties/description",
+                          "type": "string",
+                          "title": "The Description Schema",
+                          "default": "",
+                          "examples": [
+                            "If true, new users will not be enrolled in the study."
+                          ],
+                          "pattern": "^(.*)$"
+                        },
+                        "type": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/isEnrollmentPaused/properties/type",
+                          "type": "string",
+                          "title": "The Type Schema",
+                          "default": "",
+                          "examples": [
+                            "boolean"
+                          ],
+                          "pattern": "^(.*)$"
+                        }
+                      }
+                    },
+                    "name": {
+                      "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/name",
+                      "type": "object",
+                      "title": "The Name Schema",
+                      "required": [
+                        "description",
+                        "minLength",
+                        "type"
+                      ],
+                      "properties": {
+                        "description": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/name/properties/description",
+                          "type": "string",
+                          "title": "The Description Schema",
+                          "default": "",
+                          "examples": [
+                            "User-facing name of the study"
+                          ],
+                          "pattern": "^(.*)$"
+                        },
+                        "minLength": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/name/properties/minLength",
+                          "type": "integer",
+                          "title": "The Minlength Schema",
+                          "default": 0,
+                          "examples": [
+                            1
+                          ]
+                        },
+                        "type": {
+                          "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/properties/properties/name/properties/type",
+                          "type": "string",
+                          "title": "The Type Schema",
+                          "default": "",
+                          "examples": [
+                            "string"
+                          ],
+                          "pattern": "^(.*)$"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/required",
+                  "type": "array",
+                  "title": "The Required Schema",
+                  "items": {
+                    "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/required/items",
+                    "type": "string",
+                    "title": "The Items Schema",
+                    "default": "",
+                    "examples": [
+                      "name",
+                      "description",
+                      "addonUrl"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                },
+                "title": {
+                  "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/title",
+                  "type": "string",
+                  "title": "The Title Schema",
+                  "default": "",
+                  "examples": [
+                    "Enroll a user in an opt-out SHIELD study"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "type": {
+                  "$id": "#/properties/latest_revision/properties/action/properties/arguments_schema/properties/type",
+                  "type": "string",
+                  "title": "The Type Schema",
+                  "default": "",
+                  "examples": [
+                    "object"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            },
+            "id": {
+              "$id": "#/properties/latest_revision/properties/action/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                4
+              ]
+            },
+            "implementation_url": {
+              "$id": "#/properties/latest_revision/properties/action/properties/implementation_url",
+              "type": ["string","null"],
+              "title": "The Implementation_url Schema",
+              "default": "",
+              "examples": [
+                "https://normandy.cdn.mozilla.net/api/v1/action/opt-out-study/implementation/sha384-QKoPs61T67mshtL1-RGVzzj7xgQbzCCit0fDUfnxE7UPiAKpHpFe5R7P-9Zr6jRZ/"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "name": {
+              "$id": "#/properties/latest_revision/properties/action/properties/name",
+              "type": "string",
+              "title": "The Name Schema",
+              "default": "",
+              "examples": [
+                "opt-out-study"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "approval_request": {
+          "$id": "#/properties/latest_revision/properties/approval_request",
+          "title": "The Approval_request Schema",
+          "default": null,
+          "examples": [
+            null
+          ]
+        },
+        "arguments": {
+          "$id": "#/properties/latest_revision/properties/arguments",
+          "type": "object",
+          "title": "The Arguments Schema",
+          "properties": {
+            "addonUrl": {
+              "$id": "#/properties/latest_revision/properties/arguments/properties/addonUrl",
+              "type": "string",
+              "title": "The Addonurl Schema",
+              "default": "",
+              "examples": [
+                "https://storage.googleapis.com/moz-fx-normandy-prod-addons/extensions/federated-learning-v2%40shield.mozilla.org-2.1.4-signed.xpi"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "description": {
+              "$id": "#/properties/latest_revision/properties/arguments/properties/description",
+              "type": "string",
+              "title": "The Description Schema",
+              "default": "",
+              "examples": [
+                "We seek to replicate the federated learning study performed last year with an updated architecture and additional probes."
+              ]
+            },
+            "extensionApiId": {
+              "$id": "#/properties/latest_revision/properties/arguments/properties/extensionApiId",
+              "type": "integer",
+              "title": "The Extensionapiid Schema",
+              "default": 0,
+              "examples": [
+                75
+              ]
+            },
+            "isEnrollmentPaused": {
+              "$id": "#/properties/latest_revision/properties/arguments/properties/isEnrollmentPaused",
+              "type": "boolean",
+              "title": "The Isenrollmentpaused Schema",
+              "default": false,
+              "examples": [
+                false
+              ]
+            },
+            "name": {
+              "$id": "#/properties/latest_revision/properties/arguments/properties/name",
+              "type": "string",
+              "title": "The Name Schema",
+              "default": "",
+              "examples": [
+                "addon-study-federated-learning-v2-1532217"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "bug_number": {
+          "$id": "#/properties/latest_revision/properties/bug_number",
+          "type": "null",
+          "title": "The Bug_number Schema",
+          "default": null,
+          "examples": [
+            null
+          ]
+        },
+        "comment": {
+          "$id": "#/properties/latest_revision/properties/comment",
+          "type": "string",
+          "title": "The Comment Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": "^(.*)$"
+        },
+        "creator": {
+          "$id": "#/properties/latest_revision/properties/creator",
+          "type": ["object", "null"],
+          "title": "The Creator Schema",
+          "required": [
+            "email",
+            "first_name",
+            "id",
+            "last_name"
+          ],
+          "properties": {
+            "email": {
+              "$id": "#/properties/latest_revision/properties/creator/properties/email",
+              "type": "string",
+              "title": "The Email Schema",
+              "default": "",
+              "examples": [
+                "mcooper@mozilla.com"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "first_name": {
+              "$id": "#/properties/latest_revision/properties/creator/properties/first_name",
+              "type": "string",
+              "title": "The First_name Schema",
+              "default": "",
+              "examples": [
+                "Michael"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "id": {
+              "$id": "#/properties/latest_revision/properties/creator/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                1
+              ]
+            },
+            "last_name": {
+              "$id": "#/properties/latest_revision/properties/creator/properties/last_name",
+              "type": "string",
+              "title": "The Last_name Schema",
+              "default": "",
+              "examples": [
+                "Cooper"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "date_created": {
+          "$id": "#/properties/latest_revision/properties/date_created",
+          "type": "string",
+          "title": "The Date_created Schema",
+          "default": "",
+          "examples": [
+            "2019-03-18T18:06:03.182593Z"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "enabled": {
+          "$id": "#/properties/latest_revision/properties/enabled",
+          "type": "boolean",
+          "title": "The Enabled Schema",
+          "default": false,
+          "examples": [
+            false
+          ]
+        },
+        "enabled_states": {
+          "$id": "#/properties/latest_revision/properties/enabled_states",
+          "type": "array",
+          "title": "The Enabled_states Schema"
+        },
+        "extra_filter_expression": {
+          "$id": "#/properties/latest_revision/properties/extra_filter_expression",
+          "type": "string",
+          "title": "The Extra_filter_expression Schema",
+          "default": "",
+          "examples": [
+            "\"browser.urlbar.suggest.searches\"|preferenceValue == true\n&& \"browser.urlbar.suggest.history\"|preferenceValue == true\n&& \"browser.urlbar.suggest.bookmark\"|preferenceValue == true\n&& \"browser.privatebrowsing.autostart\"|preferenceValue == false\n&& \"privacy.sanitize.sanitizeOnShutdown\"|preferenceValue == false\n&& \"browser.urlbar.matchBuckets\"|preferenceValue == \"general:5,suggestion:Infinity\""
+          ]
+        },
+        "filter_expression": {
+          "$id": "#/properties/latest_revision/properties/filter_expression",
+          "type": "string",
+          "title": "The Filter_expression Schema",
+          "default": "",
+          "examples": [
+            "(normandy.channel in [\"release\"]) && ((normandy.version>=\"66\"&&normandy.version<\"67\")||(normandy.version>=\"67\"&&normandy.version<\"68\")) && ([\"federated-learning\",normandy.userId]|bucketSample(0,10,1000)) && (\"browser.urlbar.suggest.searches\"|preferenceValue == true\n&& \"browser.urlbar.suggest.history\"|preferenceValue == true\n&& \"browser.urlbar.suggest.bookmark\"|preferenceValue == true\n&& \"browser.privatebrowsing.autostart\"|preferenceValue == false\n&& \"privacy.sanitize.sanitizeOnShutdown\"|preferenceValue == false\n&& \"browser.urlbar.matchBuckets\"|preferenceValue == \"general:5,suggestion:Infinity\")"
+          ]
+        },
+        "filter_object": {
+          "$id": "#/properties/latest_revision/properties/filter_object",
+          "type": "array",
+          "title": "The Filter_object Schema",
+          "items": {
+            "$id": "#/properties/latest_revision/properties/filter_object/items",
+            "type": "object",
+            "title": "The Items Schema",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "channels": {
+                "$id": "#/properties/latest_revision/properties/filter_object/items/properties/channels",
+                "type": "array",
+                "title": "The Channels Schema",
+                "items": {
+                  "$id": "#/properties/latest_revision/properties/filter_object/items/properties/channels/items",
+                  "type": "string",
+                  "title": "The Items Schema",
+                  "default": "",
+                  "examples": [
+                    "release"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              },
+              "type": {
+                "$id": "#/properties/latest_revision/properties/filter_object/items/properties/type",
+                "type": "string",
+                "title": "The Type Schema",
+                "default": "",
+                "examples": [
+                  "channel"
+                ],
+                "pattern": "^(.*)$"
+              }
+            }
+          }
+        },
+        "id": {
+          "$id": "#/properties/latest_revision/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            2320
+          ]
+        },
+        "identicon_seed": {
+          "$id": "#/properties/latest_revision/properties/identicon_seed",
+          "type": "string",
+          "title": "The Identicon_seed Schema",
+          "default": "",
+          "examples": [
+            "v1:f8vu5dqrqae"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/latest_revision/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "Add-On Study: Federated Learning v2 [Bug 1532217]"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "recipe": {
+          "$id": "#/properties/latest_revision/properties/recipe",
+          "type": "object",
+          "title": "The Recipe Schema",
+          "required": [
+            "approved_revision_id",
+            "id",
+            "latest_revision_id"
+          ],
+          "properties": {
+            "approved_revision_id": {
+              "$id": "#/properties/latest_revision/properties/recipe/properties/approved_revision_id",
+              "type": "null",
+              "title": "The Approved_revision_id Schema",
+              "default": null,
+              "examples": [
+                null
+              ]
+            },
+            "id": {
+              "$id": "#/properties/latest_revision/properties/recipe/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                715
+              ]
+            },
+            "latest_revision_id": {
+              "$id": "#/properties/latest_revision/properties/recipe/properties/latest_revision_id",
+              "type": "integer",
+              "title": "The Latest_revision_id Schema",
+              "default": 0,
+              "examples": [
+                2320
+              ]
+            }
+          }
+        },
+        "updated": {
+          "$id": "#/properties/latest_revision/properties/updated",
+          "type": "string",
+          "title": "The Updated Schema",
+          "default": "",
+          "examples": [
+            "2019-03-18T18:06:03.183018Z"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "signature": {
+      "$id": "#/properties/signature",
+      "type": "null",
+      "title": "The Signature Schema",
+      "default": null,
+      "examples": [
+        null
+      ]
+    }
+  }
+}
