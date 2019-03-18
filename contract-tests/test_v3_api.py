@@ -53,7 +53,6 @@ def test_v3_approval_request_with_id(conf, requests_session):
     key = randint(0, len(data["results"]) - 1)
     approval_request_id = data["results"][key]["id"]
 
-    id = randint(1, 9)
     r = requests_session.get(
         conf.getoption("server") + "/api/v3/approval_request/{}/".format(approval_request_id)
     )
