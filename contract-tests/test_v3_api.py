@@ -48,12 +48,10 @@ def test_v3_approval_request(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("No list of v3 approval requests found")
 
     assert r.status_code == 200
-    assert len(data) > 0
-    assert len(data["results"]) > 0
 
 
 def test_v3_approval_request_with_id(conf, requests_session):
@@ -62,7 +60,7 @@ def test_v3_approval_request_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 approval requests")
 
     key = randint(0, len(data["results"]) - 1)
@@ -94,9 +92,6 @@ def test_v3_extension(conf, requests_session):
         pytest.skip("Could not find a list of v3 extensions")
 
     assert r.status_code == 200
-    assert len(data) > 0
-    assert int(data["count"]) > 0
-    assert len(data["results"]) > 0
 
 
 def test_v3_extension_with_id(conf, requests_session):
@@ -105,7 +100,7 @@ def test_v3_extension_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 extensions")
 
     key = randint(0, len(data["results"]) - 1)
@@ -133,7 +128,6 @@ def test_v3_filters(conf, requests_session):
         pytest.skip("Could not find a list of v3 filters")
 
     assert r.status_code == 200
-    assert len(data) > 0
     assert "channels" in data
     assert "countries" in data
     assert "status" in data
@@ -152,11 +146,10 @@ def test_v3_recipe(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 recipes")
 
     assert r.status_code == 200
-    assert len(data) > 0
 
     assert "count" in data
     assert "next" in data
@@ -170,7 +163,7 @@ def test_v3_recipe_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 recipes")
 
     key = randint(0, len(data["results"]) - 1)
@@ -193,7 +186,7 @@ def test_v3_recipe_history_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 recipes")
 
     key = randint(0, len(data["results"]) - 1)
@@ -217,11 +210,10 @@ def test_v3_recipe_revision(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 recipe revisions")
 
     assert r.status_code == 200
-    assert len(data["results"]) > 0
 
 
 def test_v3_recipe_revision_with_id(conf, requests_session):
@@ -230,7 +222,7 @@ def test_v3_recipe_revision_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
+    if len(data) == 0 or len(data["results"]) == 0:
         pytest.skip("Could not find a list of v3 recipe revisions")
 
     key = randint(0, len(data["results"]) - 1)
