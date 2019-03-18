@@ -14,7 +14,6 @@ class Core(Configuration):
     # Application definition
     INSTALLED_APPS = [
         "normandy.base.apps.BaseApp",
-        "normandy.control.apps.ControlApp",
         "normandy.health.apps.HealthApp",
         "normandy.recipes.apps.RecipesApp",
         "normandy.selfrepair",
@@ -27,7 +26,6 @@ class Core(Configuration):
         "corsheaders",
         "django_filters",
         "dockerflow.django",
-        "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
         "django.contrib.sessions",
@@ -212,7 +210,6 @@ class Base(Core, CORS, OIDC):
             return ["normandy.base.auth_backends.LoggingModelBackend"]
 
     OIDC_REMOTE_AUTH_HEADER = values.Value("HTTP_REMOTE_USER")
-    OIDC_LOGOUT_URL = values.Value(None)
 
     # Middleware that _most_ environments will need. Subclasses can override this list.
     EXTRA_MIDDLEWARE = [

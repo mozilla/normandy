@@ -1,9 +1,0 @@
-{% if recipes %}
-  <ul>
-    {% for recipe in recipes %}
-      <li>{{ recipe.name }} (id={{ recipe.id }})</li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>Not used in any recipes.</p>
-{% endif %}

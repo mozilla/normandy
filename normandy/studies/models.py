@@ -8,7 +8,6 @@ from xml.sax import SAXParseException
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.template.loader import render_to_string
 
 from dirtyfields import DirtyFieldsMixin
 
@@ -34,14 +33,6 @@ class Extension(DirtyFieldsMixin, models.Model):
     def recipes_used_by(self):
         """Set of enabled recipes that are using this extension."""
         return Recipe.objects.filter(latest_revision__arguments_json__contains=self.xpi.url)
-
-    def recipes_used_by_html(self):
-        return render_to_string(
-            "admin/field_recipe_list.html",
-            {"recipes": self.recipes_used_by.order_by("latest_revision__name")},
-        )
-
-    recipes_used_by_html.short_description = "Used in Recipes"
 
     def populate_metadata(self):
         # Validate XPI file
