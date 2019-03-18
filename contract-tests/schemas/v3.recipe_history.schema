@@ -717,7 +717,7 @@
         "properties": {
           "approved": {
             "$id": "#/items/properties/approval_request/properties/approved",
-            "type": "boolean",
+            "type": ["boolean", "null"],
             "title": "The Approved Schema",
             "default": false,
             "examples": [
@@ -726,7 +726,7 @@
           },
           "approver": {
             "$id": "#/items/properties/approval_request/properties/approver",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The Approver Schema",
             "required": [
               "email",
