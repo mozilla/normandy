@@ -1,0 +1,1142 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "action",
+    "approval_request",
+    "arguments",
+    "bug_number",
+    "comment",
+    "creator",
+    "date_created",
+    "enabled",
+    "enabled_states",
+    "extra_filter_expression",
+    "filter_expression",
+    "filter_object",
+    "id",
+    "identicon_seed",
+    "name",
+    "recipe",
+    "updated"
+  ],
+  "properties": {
+    "action": {
+      "$id": "#/properties/action",
+      "type": "object",
+      "title": "The Action Schema",
+      "required": [
+        "arguments_schema",
+        "id",
+        "implementation_url",
+        "name"
+      ],
+      "properties": {
+        "arguments_schema": {
+          "$id": "#/properties/action/properties/arguments_schema",
+          "type": "object",
+          "title": "The Arguments_schema Schema",
+          "required": [
+            "$schema",
+            "properties",
+            "required",
+            "title",
+            "type"
+          ],
+          "properties": {
+            "$schema": {
+              "$id": "#/properties/action/properties/arguments_schema/properties/$schema",
+              "type": "string",
+              "title": "The $schema Schema",
+              "default": "",
+              "examples": [
+                "http://json-schema.org/draft-04/schema#"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "description": {
+              "$id": "#/properties/action/properties/arguments_schema/properties/description",
+              "type": "string",
+              "title": "The Description Schema",
+              "default": "",
+              "examples": [
+                "This action shows a single survey."
+              ],
+              "pattern": "^(.*)$"
+            },
+            "properties": {
+              "$id": "#/properties/action/properties/arguments_schema/properties/properties",
+              "type": "object",
+              "title": "The Properties Schema",
+              "properties": {
+                "engagementButtonLabel": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/engagementButtonLabel",
+                  "type": "object",
+                  "title": "The Engagementbuttonlabel Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/engagementButtonLabel/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        ""
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/engagementButtonLabel/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Text for the engagement button. If specified, this button will be shown instead of rating stars."
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/engagementButtonLabel/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "includeTelemetryUUID": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/includeTelemetryUUID",
+                  "type": "object",
+                  "title": "The Includetelemetryuuid Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/includeTelemetryUUID/properties/default",
+                      "type": "boolean",
+                      "title": "The Default Schema",
+                      "default": false,
+                      "examples": [
+                        false
+                      ]
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/includeTelemetryUUID/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Include unique user ID in post-answer-url and Telemetry"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/includeTelemetryUUID/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "boolean"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "learnMoreMessage": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreMessage",
+                  "type": "object",
+                  "title": "The Learnmoremessage Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreMessage/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        ""
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreMessage/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Message to show to the user to learn more"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreMessage/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "learnMoreUrl": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreUrl",
+                  "type": "object",
+                  "title": "The Learnmoreurl Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreUrl/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        ""
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreUrl/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "URL to show to the user when they click Learn More"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/learnMoreUrl/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "message": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/message",
+                  "type": "object",
+                  "title": "The Message Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/message/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        ""
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/message/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Message to show to the user"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/message/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "postAnswerUrl": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/postAnswerUrl",
+                  "type": "object",
+                  "title": "The Postanswerurl Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/postAnswerUrl/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        ""
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/postAnswerUrl/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "URL to redirect the user to after rating Firefox or clicking the engagement button"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/postAnswerUrl/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "repeatEvery": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatEvery",
+                  "type": "object",
+                  "title": "The Repeatevery Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatEvery/properties/default",
+                      "type": "null",
+                      "title": "The Default Schema",
+                      "default": null,
+                      "examples": [
+                        null
+                      ]
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatEvery/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "How often (in days) the action is displayed."
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatEvery/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "number"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "repeatOption": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatOption",
+                  "type": "object",
+                  "title": "The Repeatoption Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatOption/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        "once"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatOption/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Determines how often an action executes. (once|nag|xdays)"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/repeatOption/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "surveyId": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/surveyId",
+                  "type": "object",
+                  "title": "The Surveyid Schema",
+                  "required": [
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/surveyId/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Slug uniquely identifying this survey in telemetry"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/surveyId/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                },
+                "thanksMessage": {
+                  "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/thanksMessage",
+                  "type": "object",
+                  "title": "The Thanksmessage Schema",
+                  "required": [
+                    "default",
+                    "description",
+                    "type"
+                  ],
+                  "properties": {
+                    "default": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/thanksMessage/properties/default",
+                      "type": "string",
+                      "title": "The Default Schema",
+                      "default": "",
+                      "examples": [
+                        ""
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "description": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/thanksMessage/properties/description",
+                      "type": "string",
+                      "title": "The Description Schema",
+                      "default": "",
+                      "examples": [
+                        "Thanks message to show to the user after they've rated Firefox"
+                      ],
+                      "pattern": "^(.*)$"
+                    },
+                    "type": {
+                      "$id": "#/properties/action/properties/arguments_schema/properties/properties/properties/thanksMessage/properties/type",
+                      "type": "string",
+                      "title": "The Type Schema",
+                      "default": "",
+                      "examples": [
+                        "string"
+                      ],
+                      "pattern": "^(.*)$"
+                    }
+                  }
+                }
+              }
+            },
+            "required": {
+              "$id": "#/properties/action/properties/arguments_schema/properties/required",
+              "type": "array",
+              "title": "The Required Schema",
+              "items": {
+                "$id": "#/properties/action/properties/arguments_schema/properties/required/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                  "surveyId",
+                  "message",
+                  "thanksMessage"
+                ],
+                "pattern": "^(.*)$"
+              }
+            },
+            "title": {
+              "$id": "#/properties/action/properties/arguments_schema/properties/title",
+              "type": "string",
+              "title": "The Title Schema",
+              "default": "",
+              "examples": [
+                "Show a Heartbeat survey."
+              ],
+              "pattern": "^(.*)$"
+            },
+            "type": {
+              "$id": "#/properties/action/properties/arguments_schema/properties/type",
+              "type": "string",
+              "title": "The Type Schema",
+              "default": "",
+              "examples": [
+                "object"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "id": {
+          "$id": "#/properties/action/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            2
+          ]
+        },
+        "implementation_url": {
+          "$id": "#/properties/action/properties/implementation_url",
+          "type": "string",
+          "title": "The Implementation_url Schema",
+          "default": "",
+          "examples": [
+            "https://normandy.cdn.mozilla.net/api/v1/action/show-heartbeat/implementation/sha384-VTOdZHFMo1LOw0JWf6_jAGBb9r5sBbb7BQrmI8n3wy3oVO3ywb1g3ulD1BagmaMA/"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/action/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "show-heartbeat"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "approval_request": {
+      "$id": "#/properties/approval_request",
+      "type": ["object", "null"],
+      "title": "The Approval_request Schema",
+      "required": [
+        "approved",
+        "approver",
+        "comment",
+        "created",
+        "creator",
+        "id"
+      ],
+      "properties": {
+        "approved": {
+          "$id": "#/properties/approval_request/properties/approved",
+          "type": "boolean",
+          "title": "The Approved Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "approver": {
+          "$id": "#/properties/approval_request/properties/approver",
+          "type": ["object", "null"],
+          "title": "The Approver Schema",
+          "required": [
+            "email",
+            "first_name",
+            "id",
+            "last_name"
+          ],
+          "properties": {
+            "email": {
+              "$id": "#/properties/approval_request/properties/approver/properties/email",
+              "type": "string",
+              "title": "The Email Schema",
+              "default": "",
+              "examples": [
+                "mgrimes@mozilla.com"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "first_name": {
+              "$id": "#/properties/approval_request/properties/approver/properties/first_name",
+              "type": "string",
+              "title": "The First_name Schema",
+              "default": "",
+              "examples": [
+                "Matthew"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "id": {
+              "$id": "#/properties/approval_request/properties/approver/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                3
+              ]
+            },
+            "last_name": {
+              "$id": "#/properties/approval_request/properties/approver/properties/last_name",
+              "type": "string",
+              "title": "The Last_name Schema",
+              "default": "",
+              "examples": [
+                "Grimes"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "comment": {
+          "$id": "#/properties/approval_request/properties/comment",
+          "type": "string",
+          "title": "The Comment Schema",
+          "default": "",
+          "examples": [
+            "Sample Bump"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "created": {
+          "$id": "#/properties/approval_request/properties/created",
+          "type": "string",
+          "title": "The Created Schema",
+          "default": "",
+          "examples": [
+            "2019-03-04T20:23:48.430787Z"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "creator": {
+          "$id": "#/properties/approval_request/properties/creator",
+          "type": ["object", "null"],
+          "title": "The Creator Schema",
+          "required": [
+            "email",
+            "first_name",
+            "id",
+            "last_name"
+          ],
+          "properties": {
+            "email": {
+              "$id": "#/properties/approval_request/properties/creator/properties/email",
+              "type": "string",
+              "title": "The Email Schema",
+              "default": "",
+              "examples": [
+                "rrayborn@mozilla.com"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "first_name": {
+              "$id": "#/properties/approval_request/properties/creator/properties/first_name",
+              "type": "string",
+              "title": "The First_name Schema",
+              "default": "",
+              "examples": [
+                "Robert"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "id": {
+              "$id": "#/properties/approval_request/properties/creator/properties/id",
+              "type": "integer",
+              "title": "The Id Schema",
+              "default": 0,
+              "examples": [
+                4
+              ]
+            },
+            "last_name": {
+              "$id": "#/properties/approval_request/properties/creator/properties/last_name",
+              "type": "string",
+              "title": "The Last_name Schema",
+              "default": "",
+              "examples": [
+                "Rayborn"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "id": {
+          "$id": "#/properties/approval_request/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            1467
+          ]
+        }
+      }
+    },
+    "arguments": {
+      "$id": "#/properties/arguments",
+      "type": "object",
+      "title": "The Arguments Schema",
+      "properties": {
+        "engagementButtonLabel": {
+          "$id": "#/properties/arguments/properties/engagementButtonLabel",
+          "type": "string",
+          "title": "The Engagementbuttonlabel Schema",
+          "default": "",
+          "examples": [
+            "Learn More"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "includeTelemetryUUID": {
+          "$id": "#/properties/arguments/properties/includeTelemetryUUID",
+          "type": "boolean",
+          "title": "The Includetelemetryuuid Schema",
+          "default": false,
+          "examples": [
+            false
+          ]
+        },
+        "learnMoreMessage": {
+          "$id": "#/properties/arguments/properties/learnMoreMessage",
+          "type": "string",
+          "title": "The Learnmoremessage Schema",
+          "default": "",
+          "examples": [
+            "?"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "learnMoreUrl": {
+          "$id": "#/properties/arguments/properties/learnMoreUrl",
+          "type": "string",
+          "title": "The Learnmoreurl Schema",
+          "default": "",
+          "examples": [
+            "https://blog.mozilla.org/futurereleases/2019/02/25/exploring-alternative-funding-models-for-the-web/"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "message": {
+          "$id": "#/properties/arguments/properties/message",
+          "type": "string",
+          "title": "The Message Schema",
+          "default": "",
+          "examples": [
+            "Ads are distracting! Don't get distracted from a great read with a new service for Firefox."
+          ],
+          "pattern": "^(.*)$"
+        },
+        "postAnswerUrl": {
+          "$id": "#/properties/arguments/properties/postAnswerUrl",
+          "type": "string",
+          "title": "The Postanswerurl Schema",
+          "default": "",
+          "examples": [
+            "https://firstlook.firefox.com/scroll/v2a/?rc=heartbeat&rv=distracted"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "repeatOption": {
+          "$id": "#/properties/arguments/properties/repeatOption",
+          "type": "string",
+          "title": "The Repeatoption Schema",
+          "default": "",
+          "examples": [
+            "once"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "surveyId": {
+          "$id": "#/properties/arguments/properties/surveyId",
+          "type": "string",
+          "title": "The Surveyid Schema",
+          "default": "",
+          "examples": [
+            "hb-scroll-v2a"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "thanksMessage": {
+          "$id": "#/properties/arguments/properties/thanksMessage",
+          "type": "string",
+          "title": "The Thanksmessage Schema",
+          "default": "",
+          "examples": [
+            "Thanks"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "bug_number": {
+      "$id": "#/properties/bug_number",
+      "type": "null",
+      "title": "The Bug_number Schema",
+      "default": null,
+      "examples": [
+        null
+      ]
+    },
+    "comment": {
+      "$id": "#/properties/comment",
+      "type": "string",
+      "title": "The Comment Schema",
+      "default": "",
+      "examples": [
+        ""
+      ],
+      "pattern": "^(.*)$"
+    },
+    "creator": {
+      "$id": "#/properties/creator",
+      "type": "object",
+      "title": "The Creator Schema",
+      "required": [
+        "email",
+        "first_name",
+        "id",
+        "last_name"
+      ],
+      "properties": {
+        "email": {
+          "$id": "#/properties/creator/properties/email",
+          "type": "string",
+          "title": "The Email Schema",
+          "default": "",
+          "examples": [
+            "rrayborn@mozilla.com"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "first_name": {
+          "$id": "#/properties/creator/properties/first_name",
+          "type": "string",
+          "title": "The First_name Schema",
+          "default": "",
+          "examples": [
+            "Robert"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "id": {
+          "$id": "#/properties/creator/properties/id",
+          "type": "integer",
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            4
+          ]
+        },
+        "last_name": {
+          "$id": "#/properties/creator/properties/last_name",
+          "type": "string",
+          "title": "The Last_name Schema",
+          "default": "",
+          "examples": [
+            "Rayborn"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "date_created": {
+      "$id": "#/properties/date_created",
+      "type": "string",
+      "title": "The Date_created Schema",
+      "default": "",
+      "examples": [
+        "2019-03-04T20:22:35.593396Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "enabled": {
+      "$id": "#/properties/enabled",
+      "type": "boolean",
+      "title": "The Enabled Schema",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "enabled_states": {
+      "$id": "#/properties/enabled_states",
+      "type": "array",
+      "title": "The Enabled_states Schema",
+      "items": {
+        "$id": "#/properties/enabled_states/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "carryover_from",
+          "created",
+          "creator",
+          "enabled",
+          "id"
+        ],
+        "properties": {
+          "carryover_from": {
+            "$id": "#/properties/enabled_states/items/properties/carryover_from",
+            "type": ["integer", "null"],
+            "title": "The Carryover_from Schema",
+            "default": 0,
+            "examples": [
+              695
+            ]
+          },
+          "created": {
+            "$id": "#/properties/enabled_states/items/properties/created",
+            "type": "string",
+            "title": "The Created Schema",
+            "default": "",
+            "examples": [
+              "2019-03-04T21:22:17.667228Z"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "creator": {
+            "$id": "#/properties/enabled_states/items/properties/creator",
+            "type": "object",
+            "title": "The Creator Schema",
+            "required": [
+              "email",
+              "first_name",
+              "id",
+              "last_name"
+            ],
+            "properties": {
+              "email": {
+                "$id": "#/properties/enabled_states/items/properties/creator/properties/email",
+                "type": "string",
+                "title": "The Email Schema",
+                "default": "",
+                "examples": [
+                  "mgrimes@mozilla.com"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "first_name": {
+                "$id": "#/properties/enabled_states/items/properties/creator/properties/first_name",
+                "type": "string",
+                "title": "The First_name Schema",
+                "default": "",
+                "examples": [
+                  "Matthew"
+                ],
+                "pattern": "^(.*)$"
+              },
+              "id": {
+                "$id": "#/properties/enabled_states/items/properties/creator/properties/id",
+                "type": "integer",
+                "title": "The Id Schema",
+                "default": 0,
+                "examples": [
+                  3
+                ]
+              },
+              "last_name": {
+                "$id": "#/properties/enabled_states/items/properties/creator/properties/last_name",
+                "type": "string",
+                "title": "The Last_name Schema",
+                "default": "",
+                "examples": [
+                  "Grimes"
+                ],
+                "pattern": "^(.*)$"
+              }
+            }
+          },
+          "enabled": {
+            "$id": "#/properties/enabled_states/items/properties/enabled",
+            "type": "boolean",
+            "title": "The Enabled Schema",
+            "default": false,
+            "examples": [
+              true
+            ]
+          },
+          "id": {
+            "$id": "#/properties/enabled_states/items/properties/id",
+            "type": "integer",
+            "title": "The Id Schema",
+            "default": 0,
+            "examples": [
+              711
+            ]
+          }
+        }
+      }
+    },
+    "extra_filter_expression": {
+      "$id": "#/properties/extra_filter_expression",
+      "type": "string",
+      "title": "The Extra_filter_expression Schema",
+      "default": "",
+      "examples": [
+        ""
+      ]
+    },
+    "filter_expression": {
+      "$id": "#/properties/filter_expression",
+      "type": "string",
+      "title": "The Filter_expression Schema",
+      "default": "",
+      "examples": [
+        "(normandy.locale in [\"en-US\"]) && (normandy.country in [\"US\"]) && (normandy.channel in [\"release\"]) && ([\"scroll\",normandy.userId]|bucketSample(4000,10,13000))"
+      ]
+    },
+    "filter_object": {
+      "$id": "#/properties/filter_object",
+      "type": "array",
+      "title": "The Filter_object Schema",
+      "items": {
+        "$id": "#/properties/filter_object/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "locales": {
+            "$id": "#/properties/filter_object/items/properties/locales",
+            "type": "array",
+            "title": "The Locales Schema",
+            "items": {
+              "$id": "#/properties/filter_object/items/properties/locales/items",
+              "type": "string",
+              "title": "The Items Schema",
+              "default": "",
+              "examples": [
+                "en-US"
+              ],
+              "pattern": "^(.*)$"
+            }
+          },
+          "type": {
+            "$id": "#/properties/filter_object/items/properties/type",
+            "type": "string",
+            "title": "The Type Schema",
+            "default": "",
+            "examples": [
+              "locale"
+            ],
+            "pattern": "^(.*)$"
+          }
+        }
+      }
+    },
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema",
+      "default": 0,
+      "examples": [
+        2302
+      ]
+    },
+    "identicon_seed": {
+      "$id": "#/properties/identicon_seed",
+      "type": "string",
+      "title": "The Identicon_seed Schema",
+      "default": "",
+      "examples": [
+        "v1:wbl2jallyp"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "The Name Schema",
+      "default": "",
+      "examples": [
+        "Heartbeat Scroll [v2a]"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "recipe": {
+      "$id": "#/properties/recipe",
+      "type": "object",
+      "title": "The Recipe Schema",
+      "required": [
+        "approved_revision_id",
+        "id",
+        "latest_revision_id"
+      ],
+      "properties": {
+        "approved_revision_id": {
+          "$id": "#/properties/recipe/properties/approved_revision_id",
+          "type": ["integer", "null"],
+          "title": "The Approved_revision_id Schema",
+          "default": 0,
+          "examples": [
+            2313
+          ]
+        },
+        "id": {
+          "$id": "#/properties/recipe/properties/id",
+          "type": ["integer", "null"],
+          "title": "The Id Schema",
+          "default": 0,
+          "examples": [
+            703
+          ]
+        },
+        "latest_revision_id": {
+          "$id": "#/properties/recipe/properties/latest_revision_id",
+          "type": "integer",
+          "title": "The Latest_revision_id Schema",
+          "default": 0,
+          "examples": [
+            2313
+          ]
+        }
+      }
+    },
+    "updated": {
+      "$id": "#/properties/updated",
+      "type": "string",
+      "title": "The Updated Schema",
+      "default": "",
+      "examples": [
+        "2019-03-04T21:22:18.585885Z"
+      ],
+      "pattern": "^(.*)$"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "extension_id",
+    "hash",
+    "hash_algorithm",
+    "id",
+    "name",
+    "version",
+    "xpi"
+  ],
+  "properties": {
+    "extension_id": {
+      "$id": "#/properties/extension_id",
+      "type": "string",
+      "title": "The Extension_id Schema",
+      "default": "",
+      "examples": [
+        "sbv4-gradual-rollout@mozilla.com"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "hash": {
+      "$id": "#/properties/hash",
+      "type": "string",
+      "title": "The Hash Schema",
+      "default": "",
+      "examples": [
+        "417a8fd3f66fc58f5f15953ad6361e9adb0d9945d2d3dbf1ccd75fee280fd145"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "hash_algorithm": {
+      "$id": "#/properties/hash_algorithm",
+      "type": "string",
+      "title": "The Hash_algorithm Schema",
+      "default": "",
+      "examples": [
+        "sha256"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema",
+      "default": 0,
+      "examples": [
+        5
+      ]
+    },
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "The Name Schema",
+      "default": "",
+      "examples": [
+        "Safe Browsing v4 (Gradual Rollout)"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "version": {
+      "$id": "#/properties/version",
+      "type": "string",
+      "title": "The Version Schema",
+      "default": "",
+      "examples": [
+        "1.0.0"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "xpi": {
+      "$id": "#/properties/xpi",
+      "type": "string",
+      "title": "The Xpi Schema",
+      "default": "",
+      "examples": [
+        "https://storage.googleapis.com/moz-fx-normandy-prod-addons/extensions/safe-browsing-v4-gradual-rollout-study-signed.xpi"
+      ],
+      "pattern": "^(.*)$"
+    }
+  }
+}

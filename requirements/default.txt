@@ -223,3 +223,5 @@ kinto-http==10.3.0 \
     --hash=sha256:ffaa9a81b3def3707eb05780f1d66f16c71ac0a21a34de7e21f16236ad0564dc
 untangle==1.1.1 \
     --hash=sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb
+python-magic==0.4.15 \
+    --hash=sha256:f2674dcfad52ae6c49d4803fa027809540b130db1dec928cfbb9240316831375

@@ -246,6 +246,5 @@ def test_recipe_revision_by_id(conf, requests_session):
 
     r.raise_for_status()
     data = r.json()
-    print(data)
     assert r.status_code == 200
     assert_valid_schema(data, "recipe_revision.schema")
