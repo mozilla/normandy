@@ -21,6 +21,22 @@ def assert_valid_schema(data, schema_file):
 
 
 def test_v3_actions(conf, requests_session):
+    r = requests_session.get(conf.getoption("server") + "/api/v3/action/")
+    r.raise_for_status()
+    data = r.json()
+
+    if len(data) == 0:
+        pytest.skip("No list of v3 actions found")
+
+    assert r.status_code == 200
+    assert "count" in data
+    assert "next" in data
+    assert "previous" in data
+    assert "results" in data
+    assert len(data["results"]) > 0
+
+
+def test_v3_actions_with_id(conf, requests_session):
     # Get a random action and validate it
     r = requests_session.get(conf.getoption("server") + "/api/v3/action/")
     r.raise_for_status()
@@ -35,9 +51,6 @@ def test_v3_actions(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v3/action/{}/".format(action_id))
     r.raise_for_status()
     data = r.json()
-
-    if len(data) == 0:
-        pytest.skip("Could not find a v3 action with the ID {}".format(action_id))
 
     assert r.status_code == 200
     assert_valid_schema(data, "v3.action.schema")
@@ -72,13 +85,6 @@ def test_v3_approval_request_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
-        pytest.skip(
-            "Could not find a v3 approval request for approval request ID {}".format(
-                approval_request_id
-            )
-        )
-
     assert r.status_code == 200
     assert_valid_schema(data, "v3.approval_request.schema")
 
@@ -111,9 +117,6 @@ def test_v3_extension_with_id(conf, requests_session):
     )
     r.raise_for_status()
     data = r.json()
-
-    if len(data) == 0:
-        pytest.skip("Could not find v3 extension with an ID of {}".format(extension_id))
 
     assert r.status_code == 200
     assert_valid_schema(data, "v3.extension.schema")
@@ -173,9 +176,6 @@ def test_v3_recipe_with_id(conf, requests_session):
     r.raise_for_status()
     data = r.json()
 
-    if len(data) == 0:
-        pytest.skip("Could not find a v3 recipe with an ID of {}".format(recipe_id))
-
     assert r.status_code == 200
     assert_valid_schema(data, "v3.recipe.schema")
 
@@ -197,9 +197,6 @@ def test_v3_recipe_history_with_id(conf, requests_session):
     )
     r.raise_for_status()
     data = r.json()
-
-    if len(data) == 0:
-        pytest.skip("Could not find a v3 recipe history for a recipe with ID {}".format(recipe_id))
 
     assert r.status_code == 200
     assert_valid_schema(data, "v3.recipe_history.schema")
@@ -232,9 +229,6 @@ def test_v3_recipe_revision_with_id(conf, requests_session):
     )
     r.raise_for_status()
     data = r.json()
-
-    if len(data) == 0:
-        pytest.skip("Could not find a v3 recipe revision for recipe id {}".format(recipe_id))
 
     assert r.status_code == 200
     assert_valid_schema(data, "v3.recipe_revision.schema")

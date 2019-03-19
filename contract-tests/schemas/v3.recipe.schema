@@ -13,7 +13,7 @@
   "properties": {
     "approved_revision": {
       "$id": "#/properties/approved_revision",
-      "type": "null",
+      "type": ["object", "null"],
       "title": "The Approved_revision Schema",
       "default": null,
       "examples": [
@@ -593,7 +593,7 @@
           "properties": {
             "approved_revision_id": {
               "$id": "#/properties/latest_revision/properties/recipe/properties/approved_revision_id",
-              "type": "null",
+              "type": ["integer", "null"],
               "title": "The Approved_revision_id Schema",
               "default": null,
               "examples": [

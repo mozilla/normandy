@@ -1101,7 +1101,7 @@
       "properties": {
         "approved_revision_id": {
           "$id": "#/properties/recipe/properties/approved_revision_id",
-          "type": "integer",
+          "type": ["integer", "null"],
           "title": "The Approved_revision_id Schema",
           "default": 0,
           "examples": [
@@ -1110,7 +1110,7 @@
         },
         "id": {
           "$id": "#/properties/recipe/properties/id",
-          "type": "integer",
+          "type": ["integer", "null"],
           "title": "The Id Schema",
           "default": 0,
           "examples": [

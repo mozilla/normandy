@@ -778,7 +778,7 @@
           },
           "comment": {
             "$id": "#/items/properties/approval_request/properties/comment",
-            "type": "string",
+            "type": ["string", "null"],
             "title": "The Comment Schema",
             "default": "",
             "examples": [
@@ -1094,7 +1094,7 @@
         "properties": {
           "approved_revision_id": {
             "$id": "#/items/properties/recipe/properties/approved_revision_id",
-            "type": "null",
+            "type": ["integer", "null"],
             "title": "The Approved_revision_id Schema",
             "default": null,
             "examples": [
