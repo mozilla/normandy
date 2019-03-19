@@ -62,9 +62,8 @@ class TestExtension(object):
     def test_no_duplicate_files(self, storage):
         xpi = WebExtensionFileFactory()
         ExtensionFactory(xpi__from_func=xpi.open)
-        with transaction.atomic():
-            with pytest.raises(FileExistsError):
-                ExtensionFactory(xpi__from_func=xpi.open)
+        with transaction.atomic(), pytest.raises(FileExistsError):
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert Extension.objects.count() == 1
 
     @pytest.mark.django_db()

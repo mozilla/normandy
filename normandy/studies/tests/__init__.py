@@ -1,6 +1,5 @@
 import factory
 import json
-import os
 import tempfile
 import zipfile
 
@@ -33,9 +32,6 @@ class XPIFileFactory(object):
     def __init__(self, signed=True):
         # Generate a unique random path for the new XPI file
         f, self._path = tempfile.mkstemp(suffix=".xpi")
-
-        # Ensure the path exists
-        os.makedirs(os.path.dirname(self._path), exist_ok=True)
 
         # Create a blank zip file on disk
         zf = zipfile.ZipFile(self.path, mode="w")
