@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.recipes.api.v2.shield_identicon import Genome
+from normandy.recipes.api.v3.shield_identicon import Genome
 
 
 @pytest.fixture

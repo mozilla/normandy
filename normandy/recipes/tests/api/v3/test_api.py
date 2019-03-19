@@ -1552,7 +1552,7 @@ class TestIdenticonAPI(object):
     def test_it_returns_known_output(self, client):
         res = client.get("/api/v3/identicon/v1:foobar.svg")
         reference_svg = Path(settings.BASE_DIR).joinpath(
-            "normandy", "recipes", "tests", "api", "v2", "foobar.svg"
+            "normandy", "recipes", "tests", "api", "v3", "foobar.svg"
         )
         with open(reference_svg, "rb") as svg_file:
             assert svg_file.read() == res.content
