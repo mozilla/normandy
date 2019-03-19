@@ -63,45 +63,6 @@ class TestApiRootV1(object):
         assert res.has_header("access-control-allow-methods")
 
 
-@pytest.mark.django_db
-class TestApiRootV2(object):
-    def test_it_works(self, api_client):
-        res = api_client.get("/api/v2/")
-        assert res.status_code == 200
-
-        assert res.json() == {
-            "action-list": "http://testserver/api/v2/action/",
-            "recipe-list": "http://testserver/api/v2/recipe/",
-            "reciperevision-list": "http://testserver/api/v2/recipe_revision/",
-            "approvalrequest-list": "http://testserver/api/v2/approval_request/",
-        }
-
-    def test_includes_cache_headers(self, api_client):
-        res = api_client.get("/api/v2/")
-        assert res.status_code == 200
-        # It isn't important to assert a particular value for max-age
-        assert "max-age=" in res["Cache-Control"]
-        assert "public" in res["Cache-Control"]
-
-    def test_cors_headers(self, api_client):
-        res = api_client.get("/api/v2/")
-        assert res.status_code == 200
-        assert not res.has_header("access-control-allow-origin")
-
-        res = api_client.get("/api/v2/", HTTP_ORIGIN="any.example.com")
-        assert res.status_code == 200
-        assert res.has_header("access-control-allow-origin")
-        assert res["access-control-allow-origin"] == "*"
-
-        # OPTIONS method is louder
-        res = api_client.options("/api/v2/", HTTP_ORIGIN="any.example.com")
-        assert res.status_code == 200
-        assert res["access-control-allow-origin"] == "*"
-        assert res.has_header("access-control-allow-headers")
-        assert res.has_header("access-control-allow-origin")
-        assert res.has_header("access-control-allow-methods")
-
-
 class TestAPIRootView(object):
     @pytest.fixture
     def static_url_pattern(cls):
@@ -202,38 +163,6 @@ class TestCurrentUserView(object):
         res = api_client.logout()
         res = api_client.get("/api/v1/user/me/")
         assert res.status_code == 401
-
-
-@pytest.mark.django_db
-class TestServiceInfoV2View(object):
-    def test_it_works(self, api_client, settings):
-        user = User.objects.first()  # Get the default user
-        settings.PEER_APPROVAL_ENFORCED = False
-
-        res = api_client.get("/api/v2/service_info/")
-        assert res.status_code == 200
-        assert res.data == {
-            "user": {
-                "id": user.id,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
-            },
-            "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-            "github_url": settings.GITHUB_URL,
-        }
-
-    def test_logged_out(self, settings):
-        client = APIClient()
-        settings.PEER_APPROVAL_ENFORCED = False
-
-        res = client.get("/api/v2/service_info/")
-        assert res.status_code == 200
-        assert res.data == {
-            "user": None,
-            "peer_approval_enforced": settings.PEER_APPROVAL_ENFORCED,
-            "github_url": settings.GITHUB_URL,
-        }
 
 
 @pytest.mark.django_db

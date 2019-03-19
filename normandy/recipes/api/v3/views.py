@@ -1,7 +1,9 @@
 import re
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
+from django.http import HttpResponse
 
 import django_filters
 from rest_framework import permissions, status, views, viewsets
@@ -25,6 +27,7 @@ from normandy.recipes.models import (
     RecipeRevision,
 )
 from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
+from normandy.recipes.api.v3 import shield_identicon
 from normandy.recipes.api.v3.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
@@ -270,3 +273,17 @@ class Filters(views.APIView):
                 "locales": [{"key": l.code, "value": l.name} for l in Locale.objects.all()],
             }
         )
+
+
+class IdenticonView(views.APIView):
+    @api_cache_control(max_age=settings.IMMUTABLE_CACHE_TIME, immutable=True)
+    def get(self, request, *, generation, seed):
+        if generation != "v1":
+            return Response(
+                {"error": "Invalid identicon generation, only v1 is supported."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        genome = shield_identicon.Genome(seed)
+        identicon_svg = shield_identicon.generate_svg(genome)
+        return HttpResponse(identicon_svg, content_type="image/svg+xml")

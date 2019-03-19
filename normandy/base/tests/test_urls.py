@@ -1,5 +1,5 @@
 def test_slash_redirects_have_cache_control_headers(client, settings):
-    res = client.get("/api/v2")
+    res = client.get("/api/v3")
     assert res.status_code == 301
     assert "Location" in res
     # It isn't important to assert a particular value for max-age

@@ -14,7 +14,6 @@ router.register("group", api_views.GroupViewSet)
 urlpatterns = [
     url(r"^$", views.index, name="index"),
     url(r"^favicon.ico", views.favicon),
-    url(r"^api/v2/service_info/", api_views.ServiceInfoView.as_view(), name="service-info-v2"),
     url(r"^api/v3/service_info/", api_views.ServiceInfoView.as_view(), name="service-info"),
     url(r"^api/v3/", include(router.urls)),
 ]
