@@ -1,10 +1,19 @@
+import hashlib
 import os
 import pytest
+import tempfile
+import zipfile
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 from normandy.recipes.tests import RecipeFactory
-from normandy.studies.tests import ExtensionFactory
+from normandy.studies.models import Extension
+from normandy.studies.tests import (
+    ExtensionFactory,
+    LegacyAddonFileFactory,
+    WebExtensionFileFactory,
+)
 
 
 DATA_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
@@ -30,30 +39,53 @@ class TestExtension(object):
 
     @pytest.mark.django_db
     def test_extension_id(self, storage):
-        extension = ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
+        xpi = WebExtensionFileFactory(gecko_id="test-addon@normandy.mozilla.org")
+        extension = ExtensionFactory(xpi__from_func=xpi.open)
         assert extension.extension_id == "test-addon@normandy.mozilla.org"
 
     @pytest.mark.django_db
     def test_version(self, storage):
-        extension = ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
+        xpi = WebExtensionFileFactory(overwrite_data={"version": "0.1"})
+        extension = ExtensionFactory(xpi__from_func=xpi.open)
         assert extension.version == "0.1"
 
     @pytest.mark.django_db
     def test_hash(self, storage):
-        extension = ExtensionFactory(xpi__from_path=data_path("webext-signed.xpi"))
-        assert extension.hash == "7c0e9203de9538b1a7513d28ec344a5712f9237f2bcd494db31344dea378baf5"
+        xpi = WebExtensionFileFactory()
+        f = xpi.open()
+        hashed = hashlib.sha256(f.read()).hexdigest()
+        f.close()
+        extension = ExtensionFactory(xpi__from_func=xpi.open)
+        assert extension.hash == hashed
+
+    @pytest.mark.django_db
+    def test_no_duplicate_files(self, storage):
+        xpi = WebExtensionFileFactory()
+        ExtensionFactory(xpi__from_func=xpi.open)
+        with transaction.atomic(), pytest.raises(FileExistsError):
+            ExtensionFactory(xpi__from_func=xpi.open)
+        assert Extension.objects.count() == 1
 
     @pytest.mark.django_db()
     def test_xpi_not_a_zip(self):
+        tmp = tempfile.NamedTemporaryFile(suffix=".txt")
+        tmp.write(b"not an addon")
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("not-an-addon.txt"))
+            ExtensionFactory(xpi__from_func=lambda: tmp)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be zip-formatted."
 
     @pytest.mark.django_db()
-    def test_xpi_not_an_addon(self):
+    def test_xpi_not_an_addon(self, tmpdir):
+        _, path = tempfile.mkstemp(suffix=".zip")
+        file = open(path, "w+b")
+        zf = zipfile.ZipFile(file, mode="w")
+        with zf.open("not-addon.txt", mode="w") as tf:
+            tf.write(b"not an addon")
+        zf.close()
+
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("not-an-addon.zip"))
+            ExtensionFactory(xpi__from_func=lambda: file)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -62,15 +94,19 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_webext_bad_manifest(self):
+        xpi = WebExtensionFileFactory(signed=False)
+        xpi.add_file("manifest.json", b"")
+
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("webext-bad-manifest-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Web extension manifest is corrupt."
 
     @pytest.mark.django_db()
     def test_webext_no_id(self):
+        xpi = WebExtensionFileFactory(signed=False, overwrite_data={"applications": {"gecko": {}}})
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("webext-no-id-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -79,8 +115,12 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_webext_no_version(self):
+        xpi = WebExtensionFileFactory()
+        manifest = xpi.manifest
+        del manifest["version"]
+        xpi.replace_manifest(manifest)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("webext-no-version-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -89,15 +129,18 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_bad_install_rdf(self):
+        xpi = LegacyAddonFileFactory(signed=False)
+        xpi.add_file("install.rdf", b"{}")
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("legacy-bad-install-rdf-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == 'Legacy addon "install.rdf" is corrupt.'
 
     @pytest.mark.django_db()
     def test_legacy_no_id(self):
+        xpi = LegacyAddonFileFactory(overwrite_data={"id": ""}, signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("legacy-no-id-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -106,8 +149,9 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_legacy_no_version(self):
+        xpi = LegacyAddonFileFactory(overwrite_data={"version": ""}, signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("legacy-no-version-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert (
             exc.value.error_dict["xpi"][0].message
@@ -116,12 +160,14 @@ class TestExtension(object):
 
     @pytest.mark.django_db()
     def test_xpi_must_be_signed(self):
+        xpi = WebExtensionFileFactory(signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("webext-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be signed."
 
+        xpi = LegacyAddonFileFactory(signed=False)
         with pytest.raises(ValidationError) as exc:
-            ExtensionFactory(xpi__from_path=data_path("legacy-unsigned.xpi"))
+            ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
         assert exc.value.error_dict["xpi"][0].message == "Extension file must be signed."

@@ -1,21 +1,21 @@
+import os
+import tempfile
+
 from urllib.parse import urlparse, quote as url_quote
 
 import pytest
-from pathlib import Path
-
-from django.conf import settings
 
 from normandy.base.tests import Whatever
 from normandy.studies.models import Extension
-from normandy.studies.tests import ExtensionFactory
+from normandy.studies.tests import (
+    ExtensionFactory,
+    LegacyAddonFileFactory,
+    WebExtensionFileFactory,
+)
 
 
 @pytest.mark.django_db
 class TestExtensionAPI(object):
-    @classmethod
-    def data_path(cls, file_name):
-        return Path(settings.BASE_DIR) / "normandy/studies/tests/data" / file_name
-
     def test_it_works(self, api_client):
         res = api_client.get("/api/v3/extension/")
         assert res.status_code == 200
@@ -94,47 +94,52 @@ class TestExtensionAPI(object):
         return res
 
     def test_upload_works_webext(self, api_client, storage):
-        path = self.data_path("webext-signed.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = WebExtensionFileFactory()
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data["id"]).exists()
 
     def test_upload_works_legacy(self, api_client, storage):
-        path = self.data_path("legacy-signed.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = LegacyAddonFileFactory()
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201  # created
         Extension.objects.filter(id=res.data["id"]).exists()
 
     def test_can_update_xpi(self, api_client, storage):
-        e = ExtensionFactory(xpi__from_path=self.data_path("legacy-signed.xpi"))
-        path = self.data_path("webext-signed.xpi")
-        res = self._update_extension(api_client, e.id, path)
+        legacy = LegacyAddonFileFactory()
+        e = ExtensionFactory(xpi__from_func=legacy.open)
+        webext = WebExtensionFileFactory()
+        _, filename = os.path.split(webext.path)
+        res = self._update_extension(api_client, e.id, webext.path)
         assert res.status_code == 200
         e.refresh_from_db()
-        assert e.xpi.name.endswith("webext-signed.xpi")
+        assert e.xpi.name.endswith(filename)
 
     def test_can_update_without_xpi(self, api_client, storage):
-        e = ExtensionFactory(xpi__from_path=self.data_path("webext-signed.xpi"))
+        xpi = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
         res = api_client.patch(f"/api/v3/extension/{e.id}/", {"name": "new name"})
         assert res.status_code == 200
         e.refresh_from_db()
         assert e.name == "new name"
 
     def test_uploads_must_be_zips(self, api_client, storage):
-        path = self.data_path("not-an-addon.txt")
-        res = self._upload_extension(api_client, path)
+        tmp = tempfile.NamedTemporaryFile(suffix=".txt")
+        tmp.write(b"not an addon")
+        tmp.seek(0)
+        res = self._upload_extension(api_client, tmp.name)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": "Extension file must be zip-formatted."}
 
     def test_uploads_must_be_signed_webext(self, api_client, storage):
-        path = self.data_path("webext-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = WebExtensionFileFactory(signed=False)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": "Extension file must be signed."}
 
     def test_uploads_must_be_signed_legacy(self, api_client, storage):
-        path = self.data_path("legacy-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = LegacyAddonFileFactory(signed=False)
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {"xpi": "Extension file must be signed."}
 
@@ -142,18 +147,19 @@ class TestExtensionAPI(object):
         # NB: This is a fragile test. It uses a unsigned webext, and
         # so it relies on the ID check happening before the signing
         # check, so that the error comes from the former.
-        path = self.data_path("webext-no-id-unsigned.xpi")
-        res = self._upload_extension(api_client, path)
+        xpi = WebExtensionFileFactory()
+        xpi.update_manifest({"applications": {"gecko": {}}})
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 400  # Client error
         assert res.data == {
             "xpi": 'Web extensions must have a manifest key "applications.gecko.id".'
         }
 
     def test_keeps_extension_filename(self, api_client, storage):
-        filename = "bootstrap-addon-example@mozilla.org-0.1.0.xpi"
-        path = self.data_path(filename)
-        res = self._upload_extension(api_client, path)
+        xpi = LegacyAddonFileFactory()
+        res = self._upload_extension(api_client, xpi.path)
         assert res.status_code == 201, f"body of unexpected response: {res.data}"  # created
+        _, filename = os.path.split(xpi.path)
         assert res.data["xpi"].split("/")[-1] == url_quote(filename)
 
         # Download the XPI to make sure the url is actually good

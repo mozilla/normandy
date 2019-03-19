@@ -20,7 +20,7 @@ SIGNING_FILES = {"META-INF/mozilla.rsa", "META-INF/mozilla.sf", "META-INF/manife
 
 class Extension(DirtyFieldsMixin, models.Model):
     name = models.CharField(max_length=255)
-    xpi = models.FileField(upload_to="extensions")
+    xpi = models.FileField(upload_to="extensions", unique=True)
     is_legacy = models.BooleanField(default=False)
     extension_id = models.CharField(max_length=255)
     version = models.CharField(max_length=32)
