@@ -399,6 +399,11 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@mozilla/normandy-action-argument-schemas@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@mozilla/normandy-action-argument-schemas/-/normandy-action-argument-schemas-0.7.0.tgz#cd057e887d80032d05c877f1cc2f1121e3bc2125"
+  integrity sha512-oMeZ9ED7MIe7+9wpptrre7Bbph28mlEDAzjFuHT8cDJRJxc8U6q+a1JvuvaS4glEADRRS597tN/CvsqeK+NbhQ==
+
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.8.5.tgz#51b1c5fe6576a34953bf4b253df9f0d490d9e359"
@@ -3935,11 +3940,6 @@ move-concurrently@^1.0.1:
     mkdirp "^0.5.1"
     rimraf "^2.5.4"
     run-queue "^1.0.3"
-
-mozilla-normandy-action-argument-schemas@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/mozilla-normandy-action-argument-schemas/-/mozilla-normandy-action-argument-schemas-0.3.0.tgz#c959858337343e201e0082313aa75625f337b7a6"
-  integrity sha512-Hiw+sUYJZ1sa5K1FeuNpBv/PhQUO9b2jCcM3ab2t4OtWiGPU1YnFvB+FHN6VJcZ2qNlkufKuGkpzp5mdTHsdkA==
 
 ms@2.0.0:
   version "2.0.0"
