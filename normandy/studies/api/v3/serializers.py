@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from normandy.recipes.models import RecipeRevision
 from normandy.studies.models import Extension
 
 
@@ -30,3 +31,14 @@ class ExtensionSerializer(serializers.ModelSerializer):
             raise ValidationError(self.errors)
 
         return not bool(self._errors)
+
+    def update(self, instance, validated_data):
+        revisions = RecipeRevision.objects.exclude(
+            action__name="opt-out-study", latest_for_recipe=None, approved_for_recipe=None
+        )
+
+        for r in revisions:
+            if r.arguments.get("extensionId") == instance.id:
+                raise ValidationError("Extension cannot be updated while in use by a recipe.")
+
+        return super().update(instance, validated_data)
