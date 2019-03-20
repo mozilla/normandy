@@ -16,7 +16,7 @@
   },
   "license": "MPL-2.0",
   "dependencies": {
-    "mozilla-normandy-action-argument-schemas": "0.3.0",
+    "@mozilla/normandy-action-argument-schemas": "0.7.0",
     "uuid": "3.3.2"
   },
   "devDependencies": {
