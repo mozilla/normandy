@@ -17,7 +17,7 @@ class MixedViewRouter(SimpleRouter):
 
     def get_urls(self):
         """
-        Generate the list of URL patterns, including a default root view for the API.
+        Generate the list of URL patterns for the API.
         """
         urls = super().get_urls()
         urls.extend(self.registered_view_urls)
