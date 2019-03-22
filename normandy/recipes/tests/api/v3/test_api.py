@@ -39,7 +39,7 @@ class TestActionAPI(object):
 
         res = api_client.get("/api/v3/action/")
         action_url = reverse(
-            "action-implementation",
+            "recipes:v1:action-implementation",
             kwargs={"name": action.name, "impl_hash": action.implementation_hash},
         )
         assert res.status_code == 200

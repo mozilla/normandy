@@ -3,6 +3,8 @@ from django.conf.urls import include, url
 from normandy.base import views
 
 
+app_name = "base"
+
 urlpatterns = [
     url(r"^$", views.index, name="index"),
     url(r"^favicon.ico", views.favicon),

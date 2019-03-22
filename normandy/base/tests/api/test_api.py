@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import View
 
 from normandy.base.api.permissions import AdminEnabled
-from normandy.base.api.views import APIRootView
+from normandy.base.api.views import APIView, APIRootView
 from normandy.base.api.routers import MixedViewRouter
 from normandy.base.tests import GroupFactory, UserFactory, Whatever
 
@@ -65,19 +65,36 @@ class TestApiRootV1(object):
 
 class TestAPIRootView(object):
     @pytest.fixture
-    def static_url_pattern(cls):
-        return url("^test$", View.as_view(), name="test-view")
+    def mock_conf(cls):
+        class MockConf(object):
+            urlpatterns = []
+
+        return MockConf()
+
+    @pytest.fixture()
+    def dummy_view(cls):
+        class DummyView(APIView):
+            def get(self):
+                pass
+
+        return DummyView.as_view()
 
     @pytest.fixture
-    def dynamic_url_pattern(cls):
-        url_pattern = url("^test$", View.as_view(), name="test-view")
-        url_pattern.allow_cdn = False
-        return url_pattern
+    def static_url_pattern_conf(cls, mock_conf, dummy_view):
+        mock_conf.urlpatterns = [url("^test$", dummy_view, name="test-view")]
+        return mock_conf
 
-    def test_it_works(self, rf, mocker, static_url_pattern):
+    @pytest.fixture
+    def dynamic_url_pattern_conf(cls, mock_conf, dummy_view):
+        url_pattern = url("^test$", dummy_view, name="test-view")
+        url_pattern.allow_cdn = False
+        mock_conf.urlpatterns = [url_pattern]
+        return mock_conf
+
+    def test_it_works(self, rf, mocker, static_url_pattern_conf):
         mock_reverse = mocker.patch("normandy.base.api.views.reverse")
         mock_reverse.return_value = "/test"
-        view = APIRootView.as_view(api_urls=[static_url_pattern])
+        view = APIRootView.as_view(urlconf=static_url_pattern_conf)
 
         res = view(rf.get("/test"))
         assert mock_reverse.called
@@ -85,11 +102,11 @@ class TestAPIRootView(object):
         res.render()
         assert json.loads(res.content.decode()) == {"test-view": "http://testserver/test"}
 
-    def test_it_reroutes_dynamic_views(self, rf, mocker, settings, dynamic_url_pattern):
+    def test_it_reroutes_dynamic_views(self, rf, mocker, settings, dynamic_url_pattern_conf):
         mock_reverse = mocker.patch("normandy.base.api.views.reverse")
         mock_reverse.return_value = "/test"
         settings.APP_SERVER_URL = "https://testserver-app/"
-        view = APIRootView.as_view(api_urls=[dynamic_url_pattern])
+        view = APIRootView.as_view(urlconf=dynamic_url_pattern_conf)
 
         res = view(rf.get("/test"))
         assert mock_reverse.called
@@ -97,11 +114,11 @@ class TestAPIRootView(object):
         res.render()
         assert json.loads(res.content.decode()) == {"test-view": "https://testserver-app/test"}
 
-    def test_dynamic_views_and_no_setting(self, rf, mocker, settings, dynamic_url_pattern):
+    def test_dynamic_views_and_no_setting(self, rf, mocker, settings, dynamic_url_pattern_conf):
         mock_reverse = mocker.patch("normandy.base.api.views.reverse")
         mock_reverse.return_value = "/test"
         settings.APP_SERVER_URL = None
-        view = APIRootView.as_view(api_urls=[dynamic_url_pattern])
+        view = APIRootView.as_view(urlconf=dynamic_url_pattern_conf)
 
         res = view(rf.get("/test"))
         assert mock_reverse.called
@@ -144,25 +161,6 @@ class TestMixedViewRouter(object):
         router.register_view("view", View, name="standalone-view")
         router.get_urls()
         assert mock_api_view.called_once_with([Whatever(lambda v: v.name == "standalone-view")])
-
-
-@pytest.mark.django_db
-class TestCurrentUserView(object):
-    def test_it_works(self, api_client):
-        user = User.objects.first()  # Get the default user
-        res = api_client.get("/api/v1/user/me/")
-        assert res.status_code == 200
-        assert res.data == {
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-        }
-
-    def test_unauthorized(self, api_client):
-        res = api_client.logout()
-        res = api_client.get("/api/v1/user/me/")
-        assert res.status_code == 401
 
 
 @pytest.mark.django_db

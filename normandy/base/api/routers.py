@@ -24,6 +24,7 @@ class MixedViewRouter(SimpleRouter):
 
         view = self.get_api_root_view()
         root_url = url(r"^$", view, name=self.root_view_name)
+        root_url.exclude_from_schema = True
         urls.append(root_url)
 
         return urls

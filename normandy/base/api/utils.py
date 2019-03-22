@@ -64,7 +64,7 @@ def get_allowed_methods(callback):
     return [method for method in methods if method not in ("OPTIONS", "HEAD")]
 
 
-def get_api_endpoints(patterns=None, namespace=None, prefix=""):
+def get_api_endpoints(patterns=None, namespace="", prefix=""):
     """
     Return a list of all available API endpoints by inspecting the URL conf.
     """
