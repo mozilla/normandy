@@ -50,10 +50,6 @@ class APIRootView(APIView):
             name = endpoint["pattern"].name
             if endpoint["method"] == "GET" and namespace in endpoint["namespace"].split(":"):
                 allow_cdn = getattr(endpoint["pattern"], "allow_cdn", True)
-                exclude = getattr(endpoint["pattern"], "exclude_from_schema", False)
-
-                if exclude:
-                    continue
 
                 if not allow_cdn and settings.APP_SERVER_URL:
                     base = settings.APP_SERVER_URL
@@ -70,8 +66,6 @@ class APIRootView(APIView):
 
                 full_url = urljoin(base, path)
                 ret[name] = full_url
-
-        print(ret)
 
         return Response(ret)
 

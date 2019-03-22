@@ -14,9 +14,10 @@ def is_api_view(callback):
     """
     # Avoid import cycle on APIView
     from rest_framework.views import APIView
+    from normandy.base.api.views import APIRootView
 
     cls = getattr(callback, "cls", None)
-    return (cls is not None) and issubclass(cls, APIView)
+    return (cls is not None) and issubclass(cls, APIView) and not issubclass(cls, APIRootView)
 
 
 def get_path_from_regex(path_regex):
