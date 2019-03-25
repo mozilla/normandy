@@ -229,9 +229,9 @@ toml==0.10.0 \
 appdirs==1.4.3 \
     --hash=sha256:9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92 \
     --hash=sha256:d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e
-google-api-core==1.8.1 \
-    --hash=sha256:25e20c24395439dffcdb6e364cc6adb9b28a9e28d516ef5a51b9266ae0894a44 \
-    --hash=sha256:b1fce5000657dfa4d2ed3a7c94addf9c74fc3e632c7b0e8611b0e8519d1e610a
+google-api-core==1.8.2 \
+    --hash=sha256:16b14c0492154110d869a08be22d27440010057fd826205303c7edaa1c3cd71e \
+    --hash=sha256:9f8ef10c924d8a9f50d9156eea7cd779929f27aa23b855ad0abe05424553b66f
 google-cloud-core==0.29.1 \
     --hash=sha256:9bee63e0991be9801a4baf0b7841cf54f86c6e7fec922f45ea74cd4032ed4ee4 \
     --hash=sha256:d85b1aaaf3bad9415ad1d8ee5eadce96d7007a82f13ce0a0629a003a11e83f29
