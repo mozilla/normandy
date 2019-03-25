@@ -333,4 +333,4 @@ class TestRemoteSettings:
         assert requestsmock.request_history[2].url == record_prod_url
         assert requestsmock.request_history[3].url == record_url
         assert requestsmock.request_history[3].method == "PUT"
-        assert requestsmock.request_history[3].json()["data"]["name"] == "Test"
+        assert requestsmock.request_history[3].json()["data"]["recipe"]["name"] == "Test"

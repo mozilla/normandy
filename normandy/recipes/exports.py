@@ -21,11 +21,14 @@ def recipe_as_record(recipe):
     """
     from normandy.recipes.api.v1.serializers import (
         MinimalRecipeSerializer,
+        SignatureSerializer,
     )  # avoid circular imports
 
-    serializer = MinimalRecipeSerializer(recipe)
-    record = serializer.data
-    record["id"] = str(recipe.id)
+    record = {
+        "id": str(recipe.id),
+        "recipe": MinimalRecipeSerializer(recipe).data,
+        "signature": SignatureSerializer(recipe.signature).data,
+    }
     return record
 
 
