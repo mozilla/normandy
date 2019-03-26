@@ -33,8 +33,8 @@ class ExtensionSerializer(serializers.ModelSerializer):
         return not bool(self._errors)
 
     def update(self, instance, validated_data):
-        revisions = RecipeRevision.objects.exclude(
-            action__name="opt-out-study", latest_for_recipe=None, approved_for_recipe=None
+        revisions = RecipeRevision.objects.filter(action__name="opt-out-study").exclude(
+            latest_for_recipe=None, approved_for_recipe=None
         )
 
         for r in revisions:

@@ -216,3 +216,14 @@ class TestExtensionAPI(object):
         assert res.data == ["Extension cannot be updated while in use by a recipe."]
         e.refresh_from_db()
         assert e.name != "new name"
+
+    def test_cannot_delete_in_use_extension(self, api_client, storage):
+        xpi = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
+        a = ActionFactory(name="opt-out-study")
+        RecipeFactory(action=a, arguments_json=json.dumps({"extensionId": e.id}))
+        res = api_client.delete(f"/api/v3/extension/{e.id}/")
+        assert res.status_code == 400
+        assert res.data == ["Extension cannot be updated while in use by a recipe."]
+        e.refresh_from_db()
+        assert Extension.objects.count() == 1
