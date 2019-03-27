@@ -5,7 +5,7 @@ from django.conf import settings
 
 from rest_framework import serializers
 
-from normandy.base.api.serializers import UserSerializer
+from normandy.base.api.v1.serializers import UserSerializer
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import Action, ApprovalRequest, Recipe, RecipeRevision, Signature
 

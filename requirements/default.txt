@@ -51,10 +51,6 @@ django-mozilla-product-details==0.13.1 \
     --hash=sha256:fdb87422ebd1b15ece9d338100c75d1dbe936930ca14e4f5644b9918b6b4f6f3
 django-npm==1.0.0 \
     --hash=sha256:2e6bba65e728fa18b9db3c8dc0d4490b70cb7f43bacf60eb3654d7dcb6424272
-django-rest-swagger==2.1.2 \
-    --hash=sha256:3471e6c21a3e97751fa6f7b81b66e916e40fa645cac36be1594c0efed810d247 \
-    --hash=sha256:ff889e2b339a9a57010dba7729d56471e05b77827f6dd36c0bcb983839882598 \
-    # pyup: <2.2 # django-rest-swagger 2.2 incompatible with our CSP policy: https://github.com/marcgibbons/django-rest-swagger/issues/795
 django-storages==1.7.1 \
     --hash=sha256:b1a63cd5ea286ee5a9fb45de6c3c5c0ae132d58308d06f1ce9865cfcd5e470a7 \
     --hash=sha256:8e35d2c7baeda5dc6f0b4f9a0fc142d25f9a1bf72b8cebfcbc5db4863abc552d
@@ -225,3 +221,6 @@ untangle==1.1.1 \
     --hash=sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb
 python-magic==0.4.15 \
     --hash=sha256:f2674dcfad52ae6c49d4803fa027809540b130db1dec928cfbb9240316831375
+drf-yasg==1.14.0 \
+    --hash=sha256:a276bc90af1902b1bd9c11927f75658da1a62aad2d87022ae5f653106ed09a17 \
+    --hash=sha256:ca17555127f8ac59d51c2bf721eff83b46ae20a8626c033f186a4c4d7d6053f4
