@@ -4,9 +4,9 @@ atomicwrites==1.3.0 \
 attrs==19.1.0 \
     --hash=sha256:69c0dbf2ed392de1cb5ec704444b08a5ef81680a61cb899dc08127123af36a79 \
     --hash=sha256:f0b870f674851ecbfbbbd364d6b5cbdff9dcedbc7f3f5e18a6891057f21fe399
-botocore==1.12.115 \
-    --hash=sha256:7c8ec120bc5bcc4076aebd7dac3a679777ff3a3ce3263c64d7342ea7982b578c \
-    --hash=sha256:f4607f8800f87fd8eacd450699666f92d7fbc48fbb757903ad56825ce08e072a
+botocore==1.12.120 \
+    --hash=sha256:2bf8768887bfb008406eec725eecf6f174307dac00f5fad244cdd5d39c6c2147 \
+    --hash=sha256:c0f9c57e7a8c65f17a62a0926c3e73686f6ae1c08abf3b5a63cc3a5bcc4c437b
 certifi==2019.3.9 \
     --hash=sha256:59b7658e26ca9c7339e00f8f4636cdfe59d34fa37b9b04f6f9e9926b3cece1a5 \
     --hash=sha256:b26104d6835d1f5e49452a26eb2ff87fe7090b89dfcaee5ea2212697e1e1d7ae
@@ -224,9 +224,9 @@ toml==0.10.0 \
 appdirs==1.4.3 \
     --hash=sha256:9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92 \
     --hash=sha256:d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e
-google-api-core==1.8.1 \
-    --hash=sha256:25e20c24395439dffcdb6e364cc6adb9b28a9e28d516ef5a51b9266ae0894a44 \
-    --hash=sha256:b1fce5000657dfa4d2ed3a7c94addf9c74fc3e632c7b0e8611b0e8519d1e610a
+google-api-core==1.8.2 \
+    --hash=sha256:16b14c0492154110d869a08be22d27440010057fd826205303c7edaa1c3cd71e \
+    --hash=sha256:9f8ef10c924d8a9f50d9156eea7cd779929f27aa23b855ad0abe05424553b66f
 google-cloud-core==0.29.1 \
     --hash=sha256:9bee63e0991be9801a4baf0b7841cf54f86c6e7fec922f45ea74cd4032ed4ee4 \
     --hash=sha256:d85b1aaaf3bad9415ad1d8ee5eadce96d7007a82f13ce0a0629a003a11e83f29
@@ -236,8 +236,8 @@ google-resumable-media==0.3.2 \
 google-auth==1.6.3 \
     --hash=sha256:0f7c6a64927d34c1a474da92cfc59e552a5d3b940d3266606c6a28b72888b9e4 \
     --hash=sha256:20705f6803fd2c4d1cc2dcb0df09d4dfcb9a7d51fd59e94a3a28231fd93119ed
-googleapis-common-protos==1.5.8 \
-    --hash=sha256:d56ca712f67fff216d3be9eeeb8360ca59066d0365ba70b137b9e1801813747e
+googleapis-common-protos==1.5.9 \
+    --hash=sha256:627ec53fab43d06c1b5c950e217fa9819e169daf753111a7f244e94bf8fb3384
 protobuf==3.7.0 \
     --hash=sha256:03666634d038e35d90155756914bc3a6316e8bcc0d300f3ee539e586889436b9 \
     --hash=sha256:049d5900e442d4cc0fd2afd146786b429151e2b29adebed28e6376026ab0ee0b \
