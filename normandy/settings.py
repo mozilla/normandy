@@ -149,8 +149,6 @@ class Core(Configuration):
 
     PROD_DETAILS_STORAGE = values.Value("normandy.recipes.storage.ProductDetailsRelationalStorage")
 
-    # SWAGGER_SETTINGS = {"DOC_EXPANSION": "list"}
-
     AWS_QUERYSTRING_AUTH = False
 
     # We changed the CSRF cookie from http-only to non http-only and need to override existing
@@ -395,9 +393,6 @@ class Development(Base):
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
-
-    # SWAGGER_SETTINGS = Base.SWAGGER_SETTINGS
-    # SWAGGER_SETTINGS["VALIDATOR_URL"] = None
 
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
 

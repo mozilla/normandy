@@ -11,7 +11,7 @@ router = MixedViewRouter()
 router.register("action", views.ActionViewSet)
 router.register("recipe", views.RecipeViewSet)
 router.register("recipe_revision", views.RecipeRevisionViewSet)
-router.register(r"approval_request", views.ApprovalRequestViewSet)
+router.register("approval_request", views.ApprovalRequestViewSet)
 router.register_view(
     "classify_client", views.ClassifyClient, name="classify-client", allow_cdn=False
 )
