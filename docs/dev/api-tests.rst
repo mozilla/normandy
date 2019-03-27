@@ -17,7 +17,7 @@ the following:
 
     virtualenv -p /path/to/python3.7 venv
     source venv/bin/activate
-    pip install -r requirements/default.txt
+    pip install -r requirements/dev.txt
 
 This creates the virtual environment, activates it, and installs the Python
 dependencies needed to run the tests.

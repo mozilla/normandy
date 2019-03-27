@@ -400,6 +400,15 @@ class Development(Base):
 
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
 
+    def LOGGING(self):
+        config = super().LOGGING()
+        config["loggers"]["werkzeug"] = {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        }
+        return config
+
 
 class Production(Base):
     """Settings for the production environment."""
