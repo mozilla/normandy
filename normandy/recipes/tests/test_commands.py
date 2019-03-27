@@ -218,7 +218,9 @@ class TestUpdateRecipeSignatures(object):
         assert r.signature.signature != "old signature"
 
     def test_it_updates_remote_settings_if_enabled(self, mocker, mocked_autograph):
-        mocked_remotesettings = mocker.patch("normandy.recipes.exports.RemoteSettings")
+        mocked_remotesettings = mocker.patch(
+            "normandy.recipes.management.commands.update_recipe_signatures.RemoteSettings"
+        )
         for i in range(3):
             r = RecipeFactory(approver=UserFactory(), enabler=UserFactory(), signed=True)
             r.signature.signature = "old signature"
