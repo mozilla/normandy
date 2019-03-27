@@ -384,7 +384,6 @@ class Development(Base):
     SECRET_KEY = values.Value("not a secret")
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
-    INSTALLED_APPS = Base.INSTALLED_APPS + ["sslserver"]
     EMAIL_BACKEND = values.Value("django.core.mail.backends.console.EmailBackend")
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
@@ -451,7 +450,6 @@ class ProductionInsecure(Production):
     Not intended for general use on the public internet.
     """
 
-    INSTALLED_APPS = Production.INSTALLED_APPS + ["sslserver"]
     SECRET_KEY = values.Value("not a secret")
     ALLOWED_HOSTS = values.ListValue(["*"])
     SECURE_SSL_REDIRECT = values.BooleanValue(False)
