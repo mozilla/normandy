@@ -32,6 +32,19 @@ def recipe_as_record(recipe):
     return record
 
 
+def records_equal(a, b):
+    """Compare records, ignoring timestamps.
+
+    :param a: one record
+    :param b: another record
+    :returns: True if both are equal.
+    """
+    ignored_fields = ("last_modified", "schema")
+    ra = {k: v for k, v in a.items() if k not in ignored_fields}
+    rb = {k: v for k, v in b.items() if k not in ignored_fields}
+    return ra == rb
+
+
 class RemoteSettings:
     """
     Interacts with a RemoteSettings service.
@@ -144,7 +157,7 @@ class RemoteSettings:
 
         return self.client.get_records(bucket=self.MAIN_BUCKET_ID)
 
-    def publish(self, recipe):
+    def publish(self, recipe, approve_changes=True):
         """
         Publish the specified `recipe` on the remote server by upserting a record.
         """
@@ -154,29 +167,13 @@ class RemoteSettings:
         # 1. Put the record.
         record = recipe_as_record(recipe)
         self.client.update_record(data=record)
-        try:
-            # 2. Approve the changes immediately (multi-signoff is disabled).
-            self.client.patch_collection(data=APPROVE_CHANGES_FLAG)
-
-        except kinto_http.exceptions.KintoException:
-            # Approval failed. The changes in the `main-workspace` bucket must be reverted.
-            try:
-                # If it was an update of existing record, revert the modifications in the
-                # `main-workspace` bucket by restoring the version that was published
-                # in the `main` bucket.
-                in_prod = self.client.get_record(id=record["id"], bucket=self.MAIN_BUCKET_ID)
-                self.client.update_record(data=in_prod)
-
-            except kinto_http.exceptions.KintoException as e:
-                if e.response.status_code == 404:
-                    # It was a new record that was never published in the `main` bucket,
-                    # revert its creation in the `main-workspace` bucket by deleting it.
-                    self.client.delete_record(id=record["id"])
-            raise
+        # 2. Approve the changes immediately (multi-signoff is disabled).
+        if approve_changes:
+            self.approve_changes()
 
         logger.info(f"Published record '{recipe.id}' for recipe {recipe.name!r}")
 
-    def unpublish(self, recipe):
+    def unpublish(self, recipe, approve_changes=True):
         """
         Unpublish the specified `recipe` by deleted its associated record on the remote server.
         """
@@ -192,16 +189,43 @@ class RemoteSettings:
                 logger.warning(f"The recipe '{recipe.id}' was never published. Skip.")
                 return
             raise
+        # 2. Approve the changes immediately (multi-signoff is disabled).
+        if approve_changes:
+            self.approve_changes()
+
+        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name!r}")
+
+    def approve_changes(self):
+        """
+        Approve the changes made in the workspace collection.
+
+        .. note::
+            This only works because multi-signoff is disabled for the Normandy recipes
+            in configuration (see :ref:`remote-settings-install`)
+        """
+        if self.client is None:
+            return  # no-op if disabled.
+
         try:
-            # 2. Approve the changes immediately (multi-signoff is disabled).
             self.client.patch_collection(data=APPROVE_CHANGES_FLAG)
 
         except kinto_http.exceptions.KintoException:
-            # Approval failed. The deletion from the `main-workspace` bucket must be reverted.
-            # Revert its deletion from the `main-workspace` bucket by restoring the version
-            # that was published in the `main` bucket.
-            in_prod = self.client.get_record(id=str(recipe.id), bucket=self.MAIN_BUCKET_ID)
-            self.client.update_record(data=in_prod["data"])
-            raise
+            # Approval failed unexpectedly.
+            # The changes in the `main-workspace` bucket must be reverted.
+            records_in_workspace = self.client.get_records()
+            records_in_prod = self.client.get_records(bucket=self.MAIN_BUCKET_ID)
+            in_prod_by_id = {r["id"]: r for r in records_in_prod}
+            # Compare records collection in prod vs. in workspace.
+            for record in records_in_workspace:
+                in_prod = in_prod_by_id.pop(record["id"], None)
+                if in_prod is None:
+                    # Record only exists in workspace, delete it.
+                    self.client.delete_record(id=record["id"])
+                elif not records_equal(record, in_prod):
+                    # Record was modified in workspace, restore it.
+                    self.client.update_record(data=in_prod)
+            # Remaining records only exist in prod, re-create them.
+            for in_prod in in_prod_by_id.values():
+                self.client.create_record(data=in_prod)
 
-        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name!r}")
+            raise

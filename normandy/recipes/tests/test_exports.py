@@ -203,7 +203,9 @@ class TestRemoteSettings:
 
         assert len(requestsmock.request_history) == 2
         assert requestsmock.request_history[0].url == record_url
+        assert requestsmock.request_history[0].method == "PUT"
         assert requestsmock.request_history[0].json() == {"data": exports.recipe_as_record(recipe)}
+        assert requestsmock.request_history[1].method == "PATCH"
         assert requestsmock.request_history[1].url == collection_url
         mock_logger.info.assert_called_with(
             f"Published record '{recipe.id}' for recipe '{recipe.name}'"
@@ -238,7 +240,9 @@ class TestRemoteSettings:
 
         assert len(requestsmock.request_history) == 2
         assert requestsmock.request_history[0].url == record_url
+        assert requestsmock.request_history[0].method == "DELETE"
         assert requestsmock.request_history[1].url == collection_url
+        assert requestsmock.request_history[1].method == "PATCH"
         mock_logger.info.assert_called_with(
             f"Deleted record '{recipe.id}' of recipe '{recipe.name}'"
         )
@@ -280,57 +284,91 @@ class TestRemoteSettings:
 
     def test_publish_reverts_changes_if_approval_fails(self, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
+        record = exports.recipe_as_record(recipe)
+        unchanged = exports.recipe_as_record(
+            RecipeFactory(name="Unchanged", approver=UserFactory())
+        )
         collection_url = (
             f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
             f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
+        records_url = f"{collection_url}/records"
         record_url = f"{collection_url}/records/{recipe.id}"
-        requestsmock.request("put", record_url, content=b'{"data": {}}', status_code=201)
-        requestsmock.request("patch", collection_url, status_code=403)
-        record_prod_url = record_url.replace(
+        records_prod_url = records_url.replace(
             f"/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}/",
             f"/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/",
         )
-        requestsmock.request("get", record_prod_url, content=b"{}", status_code=404)
+        # Creating the record works.
+        requestsmock.request("put", record_url, content=b'{"data": {}}', status_code=201)
+        # Approving fails.
+        requestsmock.request("patch", collection_url, status_code=403)
+        # Simulate that the record exists in workspace but not in main
+        requestsmock.request(
+            "get", records_url, content=json.dumps({"data": [unchanged, record]}).encode()
+        )
+        requestsmock.request(
+            "get", records_prod_url, content=json.dumps({"data": [unchanged]}).encode()
+        )
+        # Reverting changes means deleting this record.
         requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
 
         remotesettings = exports.RemoteSettings()
         with pytest.raises(kinto_http.KintoException):
             remotesettings.publish(recipe)
 
-        assert len(requestsmock.request_history) == 4
+        assert len(requestsmock.request_history) == 5
         assert requestsmock.request_history[0].url == record_url
+        assert requestsmock.request_history[0].method == "PUT"
         assert requestsmock.request_history[1].url == collection_url
-        assert requestsmock.request_history[2].url == record_prod_url
-        assert requestsmock.request_history[3].url == record_url
-        assert requestsmock.request_history[3].method == "DELETE"
+        assert requestsmock.request_history[1].method == "PATCH"
+        assert requestsmock.request_history[2].url == records_url
+        assert requestsmock.request_history[3].url == records_prod_url
+        assert requestsmock.request_history[4].url == record_url
+        assert requestsmock.request_history[4].method == "DELETE"
 
     def test_unpublish_reverts_changes_if_approval_fails(self, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
+        record = exports.recipe_as_record(recipe)
+        unchanged = exports.recipe_as_record(
+            RecipeFactory(name="Unchanged", approver=UserFactory())
+        )
         collection_url = (
             f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}"
             f"/collections/{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}"
         )
+        records_url = f"{collection_url}/records"
         record_url = f"{collection_url}/records/{recipe.id}"
-        requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
-        requestsmock.request("patch", collection_url, status_code=403)
-        record_prod_url = record_url.replace(
+        records_prod_url = records_url.replace(
             f"/buckets/{rs_settings.REMOTE_SETTINGS_BUCKET_ID}/",
             f"/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/",
         )
-        record_in_prod = json.dumps({"data": exports.recipe_as_record(recipe)}).encode()
-        requestsmock.request("get", record_prod_url, content=record_in_prod)
+        # Deleting the record works.
+        requestsmock.request("delete", record_url, content=b'{"data": {"deleted":true}}')
+        # Approving fails.
+        requestsmock.request("patch", collection_url, status_code=403)
+        # Simulate that the record exists in prod but not in workspace
+        requestsmock.request(
+            "get", records_url, content=json.dumps({"data": [unchanged]}).encode()
+        )
+        requestsmock.request(
+            "get", records_prod_url, content=json.dumps({"data": [unchanged, record]}).encode()
+        )
+        # Reverting changes means recreating this record.
         requestsmock.request("put", record_url, content=b'{"data": {}}')
 
         remotesettings = exports.RemoteSettings()
         with pytest.raises(kinto_http.KintoException):
             remotesettings.unpublish(recipe)
 
-        assert len(requestsmock.request_history) == 4
+        assert len(requestsmock.request_history) == 5
         assert requestsmock.request_history[0].url == record_url
         assert requestsmock.request_history[0].method == "DELETE"
         assert requestsmock.request_history[1].url == collection_url
-        assert requestsmock.request_history[2].url == record_prod_url
-        assert requestsmock.request_history[3].url == record_url
-        assert requestsmock.request_history[3].method == "PUT"
-        assert requestsmock.request_history[3].json()["data"]["recipe"]["name"] == "Test"
+        assert requestsmock.request_history[1].method == "PATCH"
+        assert requestsmock.request_history[2].url == records_url
+        assert requestsmock.request_history[3].url == records_prod_url
+        assert requestsmock.request_history[4].url == record_url
+        assert requestsmock.request_history[4].method == "PUT"
+        submitted = requestsmock.request_history[4].json()
+        assert submitted["data"]["id"] == str(recipe.id)
+        assert submitted["data"]["recipe"]["name"] == "Test"

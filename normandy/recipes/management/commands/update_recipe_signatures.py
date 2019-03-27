@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from normandy.recipes.models import Recipe
+from normandy.recipes.exports import RemoteSettings
 
 
 class Command(BaseCommand):
@@ -22,6 +23,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, force=False, **options):
+        remote_settings = RemoteSettings()
+
         if force:
             recipes_to_update = Recipe.objects.only_enabled()
         else:
@@ -36,6 +39,9 @@ class Command(BaseCommand):
                 self.stdout.write(" * " + recipe.name)
                 recipe.update_signature()
                 recipe.save()
+                remote_settings.publish(recipe, approve_changes=False)
+            # Approve all Remote Settings changes.
+            remote_settings.approve_changes()
 
         recipes_to_unsign = Recipe.objects.only_disabled().exclude(signature=None)
         count = recipes_to_unsign.count()
