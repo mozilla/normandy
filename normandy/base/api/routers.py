@@ -2,17 +2,14 @@ from django.conf.urls import url
 
 from rest_framework.routers import SimpleRouter
 
-from normandy.base.api.views import APIRootView
-
 
 class MixedViewRouter(SimpleRouter):
     """Router that allows for detached routes."""
 
     root_view_name = "api-root"
 
-    def __init__(self, *args, view=APIRootView, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.api_root_view = view
         self.registered_view_urls = []
 
     def get_urls(self):

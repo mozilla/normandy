@@ -11,7 +11,7 @@ from django.views.generic import View
 from normandy.base.api.permissions import AdminEnabled
 from normandy.base.api.views import APIView, APIRootView
 from normandy.base.api.routers import MixedViewRouter
-from normandy.base.tests import GroupFactory, UserFactory, Whatever
+from normandy.base.tests import GroupFactory, UserFactory
 
 
 @pytest.mark.django_db
@@ -142,25 +142,12 @@ class TestMixedViewRouter(object):
             router.register_view("view", View, allow_cdn=True)
         assert "missing 1 required keyword-only argument: 'name'" in str(err)
 
-    def test_get_urls_includes_api_root(self):
-        router = MixedViewRouter()
-        urls = router.get_urls()
-        assert len(urls) == 1
-        assert urls[0].name == router.root_view_name
-
     def test_get_urls_includes_non_viewset_views(self):
         router = MixedViewRouter()
         router.register_view("view", View, name="standalone-view")
         urls = router.get_urls()
-        assert len(urls) == 2
+        assert len(urls) == 1
         assert urls[0].name == "standalone-view"
-
-    def test_it_doesnt_pass_the_api_root_url_to_the_api_root_view(self, mocker):
-        mock_api_view = mocker.Mock()
-        router = MixedViewRouter(view=mock_api_view)
-        router.register_view("view", View, name="standalone-view")
-        router.get_urls()
-        assert mock_api_view.called_once_with([Whatever(lambda v: v.name == "standalone-view")])
 
 
 @pytest.mark.django_db
