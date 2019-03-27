@@ -174,6 +174,30 @@ class TestRemoteSettings:
 
         assert len(requestsmock.request_history) == 0
 
+    def test_recipe_as_remotesettings_record(self, mocked_autograph):
+        """Test that recipes are serialized as expected by our clients."""
+
+        recipe = RecipeFactory(
+            name="Test", approver=UserFactory(), enabler=UserFactory(), signed=True
+        )
+
+        record = exports.recipe_as_record(recipe)
+        assert sorted(record.keys()) == ["id", "recipe", "signature"]
+        assert sorted(record["recipe"].keys()) == [
+            "action",
+            "arguments",
+            "filter_expression",
+            "id",
+            "name",
+            "revision_id",
+        ]
+        assert sorted(record["signature"].keys()) == [
+            "public_key",
+            "signature",
+            "timestamp",
+            "x5u",
+        ]
+
     def test_publish_puts_record_and_approves(self, rs_settings, requestsmock, mock_logger):
         """Test that requests are sent to Remote Settings on publish."""
 
