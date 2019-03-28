@@ -17,10 +17,11 @@ If you get an error like this, the solution is harder::
          Expected sha256 d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544
                Got        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-Normandy pins requirements with both a package version, and also a package hash.
-This gives reproducibility in builds. If you are sure that there is a good
-reason for your packages to have a different hash, add another hash line to
-``requirements/default.txt`` for the requirement in question, like this::
+Normandy pins requirements with both a package version, and also a package
+hash. This gives reproducibility in builds. If you are sure that there is a
+good reason for your packages to have a different hash, add another hash line
+to ``requirements/default.txt`` or the relavant requirements file for the
+requirement in question, like this::
 
   alabaster==0.7.7 \
      --hash d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544 \

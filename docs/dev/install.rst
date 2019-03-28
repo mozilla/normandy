@@ -50,7 +50,7 @@ Installation
 
    .. code-block:: bash
 
-      pip install -r requirements/default.txt
+      pip install -r requirements/dev.txt
 
    .. seealso::
 

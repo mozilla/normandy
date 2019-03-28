@@ -20,7 +20,7 @@ class Core(Configuration):
         "normandy.studies",
         "product_details",
         "rest_framework",
-        "rest_framework_swagger",
+        "drf_yasg",
         "storages",
         "raven.contrib.django.raven_compat",
         "corsheaders",
@@ -107,6 +107,7 @@ class Core(Configuration):
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 25,
         "EXCEPTION_HANDLER": "normandy.base.api.views.exception_handler",
+        "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     }
 
     # Content Security Policy
@@ -147,8 +148,6 @@ class Core(Configuration):
     )
 
     PROD_DETAILS_STORAGE = values.Value("normandy.recipes.storage.ProductDetailsRelationalStorage")
-
-    SWAGGER_SETTINGS = {"DOC_EXPANSION": "list"}
 
     AWS_QUERYSTRING_AUTH = False
 
@@ -384,7 +383,7 @@ class Development(Base):
     SECRET_KEY = values.Value("not a secret")
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
-    INSTALLED_APPS = Base.INSTALLED_APPS + ["sslserver"]
+    INSTALLED_APPS = Base.INSTALLED_APPS + ["django_extensions"]
     EMAIL_BACKEND = values.Value("django.core.mail.backends.console.EmailBackend")
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
@@ -395,10 +394,16 @@ class Development(Base):
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
 
-    SWAGGER_SETTINGS = Base.SWAGGER_SETTINGS
-    SWAGGER_SETTINGS["VALIDATOR_URL"] = None
-
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
+
+    def LOGGING(self):
+        config = super().LOGGING()
+        config["loggers"]["werkzeug"] = {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        }
+        return config
 
 
 class Production(Base):
@@ -442,7 +447,6 @@ class ProductionInsecure(Production):
     Not intended for general use on the public internet.
     """
 
-    INSTALLED_APPS = Production.INSTALLED_APPS + ["sslserver"]
     SECRET_KEY = values.Value("not a secret")
     ALLOWED_HOSTS = values.ListValue(["*"])
     SECURE_SSL_REDIRECT = values.BooleanValue(False)
@@ -486,3 +490,7 @@ class Test(Base):
     AUTOGRAPH_HAWK_ID = None
     AUTOGRAPH_HAWK_SECRET_KEY = None
     OIDC_USER_ENDPOINT = "https://auth.example.com/userinfo"
+
+
+class Docs(Base):
+    SECRET_KEY = "not a secret"
