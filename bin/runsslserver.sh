@@ -4,7 +4,9 @@
 BASE_DIR="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
 SSL_DIR="$BASE_DIR/etc/ssl"
 KEY="$SSL_DIR/normandy_dev.key"
-CERT="$SSL_DIR/normandy_dev.cert"
+CERT="$SSL_DIR/normandy_dev.crt"
+
+OLD_CERT="$SSL_DIR/normandy_dev.cert"
 
 
 # If the key or cert don't exist, generate them.
@@ -14,12 +16,15 @@ if [ ! -f $KEY ]; then
 fi
 
 if [ ! -f $CERT ]; then
-    openssl req -new -x509 -nodes -sha256 -key $KEY \
-        -subj "/C=US/ST=Test/L=Test/O=Mozilla/CN=normandy_dev" > $CERT
+    if [ -f $OLD_CERT ]; then
+        echo "Moving existing SSL certificate from $OLD_CERT to $CERT"
+        mv $OLD_CERT $CERT
+    else
+        openssl req -new -x509 -nodes -sha256 -key $KEY \
+            -subj "/C=US/ST=Test/L=Test/O=Mozilla/CN=normandy_dev" > $CERT
+    fi
 fi
 
-
-$BASE_DIR/manage.py runsslserver \
-    --certificate=$CERT \
-    --key=$KEY \
+$BASE_DIR/manage.py runserver_plus \
+    --cert-file=$CERT \
     "$@"

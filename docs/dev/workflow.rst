@@ -73,7 +73,7 @@ steps, as they don't affect your setup if nothing has changed:
    git pull origin master
 
    # Install new dependencies or update existing ones.
-   pip install -r requirements/default.txt
+   pip install -r requirements/dev.txt
    yarn install
 
    # Run database migrations.
@@ -106,9 +106,9 @@ After running this command, the documentation should be available at
 
 Adding New Dependencies
 -----------------------
-Normandy uses hashed requirements for all of our dependencies. This means that
-``requirements/default.txt`` includes hashes that help verify that dependencies
-downloaded by pip haven't been tampered with.
+Normandy uses hashed requirements for all of our dependencies. This means
+that files in the ``requirements`` directory includes hashes that help verify
+that dependencies downloaded by pip haven't been tampered with.
 
 When adding a new dependency, you must include hashes for it. For packages that
 use wheels, you will have to include hashes for all of the platforms that the

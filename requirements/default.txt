@@ -54,8 +54,6 @@ django-npm==1.0.0 \
 django-storages==1.7.1 \
     --hash=sha256:b1a63cd5ea286ee5a9fb45de6c3c5c0ae132d58308d06f1ce9865cfcd5e470a7 \
     --hash=sha256:8e35d2c7baeda5dc6f0b4f9a0fc142d25f9a1bf72b8cebfcbc5db4863abc552d
-django-sslserver==0.20 \
-    --hash=sha256:6b2514427b4eed0713e478ae6dfdda622070a98f657d61a4502bf42b6311c66e
 django_csp==3.5 \
     --hash=sha256:8b9997df89a7a936d7c397e051367f974aa1d1a97d0b32acb4300087b3bed071 \
     --hash=sha256:04600237701e6d6ff78ed7d41209ff923988148bf292c128f6b474b9befe444f

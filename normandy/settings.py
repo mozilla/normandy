@@ -383,7 +383,7 @@ class Development(Base):
     SECRET_KEY = values.Value("not a secret")
     DEBUG = values.BooleanValue(True)
     AUTH_PASSWORD_VALIDATORS = values.ListValue([])
-    INSTALLED_APPS = Base.INSTALLED_APPS + ["sslserver"]
+    INSTALLED_APPS = Base.INSTALLED_APPS + ["django_extensions"]
     EMAIL_BACKEND = values.Value("django.core.mail.backends.console.EmailBackend")
     SECURE_SSL_REDIRECT = values.Value(False)
     REQUIRE_RECIPE_AUTH = values.BooleanValue(False)
@@ -395,6 +395,15 @@ class Development(Base):
     API_CACHE_TIME = values.IntegerValue(0)
 
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
+
+    def LOGGING(self):
+        config = super().LOGGING()
+        config["loggers"]["werkzeug"] = {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        }
+        return config
 
 
 class Production(Base):
@@ -438,7 +447,6 @@ class ProductionInsecure(Production):
     Not intended for general use on the public internet.
     """
 
-    INSTALLED_APPS = Production.INSTALLED_APPS + ["sslserver"]
     SECRET_KEY = values.Value("not a secret")
     ALLOWED_HOSTS = values.ListValue(["*"])
     SECURE_SSL_REDIRECT = values.BooleanValue(False)
@@ -482,3 +490,7 @@ class Test(Base):
     AUTOGRAPH_HAWK_ID = None
     AUTOGRAPH_HAWK_SECRET_KEY = None
     OIDC_USER_ENDPOINT = "https://auth.example.com/userinfo"
+
+
+class Docs(Base):
+    SECRET_KEY = "not a secret"
