@@ -1,6 +1,10 @@
-html, body {
+html, body, #root {
   height: 100%;
   margin: 0;
   overflow: hidden;
   width: 100%;
+}
+
+.graphiql-container .search-box > input {
+  background: #fff;
 }
