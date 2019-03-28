@@ -10,3 +10,4 @@ class ExtensionSerializer(serializers.ModelSerializer):
         model = Extension
         fields = ["id", "name", "xpi", "extension_id", "version", "hash", "hash_algorithm"]
         read_only_fields = ["extension_id", "version", "hash", "hash_algorithm"]
+        ref_name = "ExtensionSerializerV1"

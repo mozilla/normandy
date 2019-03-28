@@ -2,7 +2,7 @@ from pyjexl import JEXL
 from rest_framework import serializers
 from factory.fuzzy import FuzzyText
 
-from normandy.base.api.serializers import UserSerializer
+from normandy.base.api.v3.serializers import UserSerializer
 from normandy.recipes import filters
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField
 from normandy.recipes.models import (

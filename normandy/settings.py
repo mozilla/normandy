@@ -20,7 +20,7 @@ class Core(Configuration):
         "normandy.studies",
         "product_details",
         "rest_framework",
-        "rest_framework_swagger",
+        "drf_yasg",
         "storages",
         "raven.contrib.django.raven_compat",
         "corsheaders",
@@ -107,6 +107,7 @@ class Core(Configuration):
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 25,
         "EXCEPTION_HANDLER": "normandy.base.api.views.exception_handler",
+        "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     }
 
     # Content Security Policy
@@ -147,8 +148,6 @@ class Core(Configuration):
     )
 
     PROD_DETAILS_STORAGE = values.Value("normandy.recipes.storage.ProductDetailsRelationalStorage")
-
-    SWAGGER_SETTINGS = {"DOC_EXPANSION": "list"}
 
     AWS_QUERYSTRING_AUTH = False
 
@@ -394,9 +393,6 @@ class Development(Base):
 
     API_CACHE_ENABLED = values.BooleanValue(False)
     API_CACHE_TIME = values.IntegerValue(0)
-
-    SWAGGER_SETTINGS = Base.SWAGGER_SETTINGS
-    SWAGGER_SETTINGS["VALIDATOR_URL"] = None
 
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
 
