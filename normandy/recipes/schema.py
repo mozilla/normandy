@@ -61,8 +61,16 @@ class SignatureType(DjangoObjectType):
 
 
 class Query(object):
+    all_actions = graphene.List(ActionType)
+    all_approval_requests = graphene.List(ApprovalRequestType)
     all_recipes = graphene.List(RecipeType)
     all_recipe_revisions = graphene.List(RecipeRevisionType)
+
+    def resolve_all_actions(self, info, **kwargs):
+        return ActionType.objects.all()
+
+    def resolve_all_approval_requests(self, info, **kwargs):
+        return ApprovalRequest.objects.all()
 
     def resolve_all_recipes(self, info, **kwargs):
         return Recipe.objects.all()
