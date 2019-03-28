@@ -156,8 +156,7 @@ def geoip_db_is_available(app_configs, **kwargs):
 
 def register():
     register_check(actions_have_consistent_hashes)
-    # Temporarily disabled, see Issue #900.
-    # register_check(recipe_signatures_are_correct)
-    # register_check(action_signatures_are_correct)
+    register_check(recipe_signatures_are_correct)
+    register_check(action_signatures_are_correct)
     register_check(signatures_use_good_certificates)
     register_check(geoip_db_is_available)
