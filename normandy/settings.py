@@ -144,7 +144,7 @@ class Core(Configuration):
     # This node package is expected to have been installed as a pre-build step
     # (i.e. `yarn`) and should always exist.
     ACTIONS_SCHEMA_DIRECTORY = values.Value(
-        os.path.join(BASE_DIR, "node_modules", "mozilla-normandy-action-argument-schemas")
+        os.path.join(BASE_DIR, "node_modules", "@mozilla", "normandy-action-argument-schemas")
     )
 
     PROD_DETAILS_STORAGE = values.Value("normandy.recipes.storage.ProductDetailsRelationalStorage")
