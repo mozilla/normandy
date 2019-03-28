@@ -494,3 +494,7 @@ class Test(Base):
     AUTOGRAPH_HAWK_ID = None
     AUTOGRAPH_HAWK_SECRET_KEY = None
     OIDC_USER_ENDPOINT = "https://auth.example.com/userinfo"
+
+
+class Docs(Base):
+    SECRET_KEY = "not a secret"

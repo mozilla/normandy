@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # Set up Django settings
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "normandy.settings")
-os.environ.setdefault("DJANGO_CONFIGURATION", "Development")
+os.environ.setdefault("DJANGO_CONFIGURATION", "Docs")
 
 # -- General configuration ------------------------------------------------
 
