@@ -1,3 +1,5 @@
+import graphene
+
 from graphene_django.types import DjangoObjectType
 
 from normandy.recipes.models import (
@@ -56,3 +58,14 @@ class RecipeRevisionType(DjangoObjectType):
 class SignatureType(DjangoObjectType):
     class Meta:
         model = Signature
+
+
+class Query(object):
+    all_recipes = graphene.List(RecipeType)
+    all_recipe_revisions = graphene.List(RecipeRevisionType)
+
+    def resolve_all_recipes(self, info, **kwargs):
+        return Recipe.objects.all()
+
+    def resolve_all_recipe_revisions(self, info, **kwargs):
+        return RecipeRevision.objects.all()

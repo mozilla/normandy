@@ -1,10 +1,10 @@
 import graphene
 
-from normandy.recipes.gql import schema as recipes_schema
+from normandy.recipes.schema import Query as RecipesQuery
 
 
-class Query(recipes_schema.Query, graphene.ObjectType):
+class NormandyQuery(RecipesQuery, graphene.ObjectType):
     pass
 
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=NormandyQuery)
