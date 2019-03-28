@@ -72,6 +72,10 @@ module.exports = function (webpackEnvOptions) {
             exclude: /node_modules/,
             loader: 'babel-loader',
           },
+          {
+            test: /\.js.flow$/,
+            loader: 'ignore-loader',
+          },
         ],
       },
     },
