@@ -4,7 +4,7 @@ RUN groupadd --gid 10001 app && useradd -g app --uid 10001 --shell /usr/sbin/nol
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-    gcc libpq-dev curl apt-transport-https libffi-dev openssh-client gnupg
+    gcc libpq-dev curl apt-transport-https libffi-dev openssh-client gnupg python-dev libgmp3-dev
 
 # Install node from NodeSource
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
