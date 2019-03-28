@@ -6,6 +6,7 @@ from urllib.parse import urlparse, quote as url_quote
 import pytest
 
 from normandy.base.tests import Whatever
+from normandy.recipes.tests import ActionFactory, RecipeFactory
 from normandy.studies.models import Extension
 from normandy.studies.tests import (
     ExtensionFactory,
@@ -203,3 +204,44 @@ class TestExtensionAPI(object):
         res = api_client.get(f"/api/v3/extension/?ordering=-bogus")
         assert res.status_code == 200
         assert [r["id"] for r in res.data["results"]] == first_ordering
+
+    def test_cannot_update_in_use_extension(self, api_client, storage):
+        xpi = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
+        a = ActionFactory(name="opt-out-study")
+        RecipeFactory(action=a, arguments={"extensionId": e.id})
+        res = api_client.patch(f"/api/v3/extension/{e.id}/", {"name": "new name"})
+        assert res.status_code == 400
+        assert res.data == ["Extension cannot be updated while in use by a recipe."]
+        e.refresh_from_db()
+        assert e.name != "new name"
+
+    def test_can_update_extensions_no_longer_in_use(self, api_client, storage):
+        xpi = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
+        a = ActionFactory(name="opt-out-study")
+        r = RecipeFactory(action=a, arguments={"extensionId": e.id})
+        r.revise(arguments={"extensionId": 0})
+        res = api_client.patch(f"/api/v3/extension/{e.id}/", {"name": "new name"})
+        assert res.status_code == 200
+        assert res.data["name"] == "new name"
+
+    def test_cannot_delete_in_use_extension(self, api_client, storage):
+        xpi = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
+        a = ActionFactory(name="opt-out-study")
+        RecipeFactory(action=a, arguments={"extensionId": e.id})
+        res = api_client.delete(f"/api/v3/extension/{e.id}/")
+        assert res.status_code == 400
+        assert res.data == ["Extension cannot be updated while in use by a recipe."]
+        assert Extension.objects.count() == 1
+
+    def test_can_delete_extensions_no_longer_in_use(self, api_client, storage):
+        xpi = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi.open)
+        a = ActionFactory(name="opt-out-study")
+        r = RecipeFactory(action=a, arguments={"extensionId": e.id})
+        r.revise(arguments={"extensionId": 0})
+        res = api_client.delete(f"/api/v3/extension/{e.id}/")
+        assert res.status_code == 204
+        assert Extension.objects.count() == 0
