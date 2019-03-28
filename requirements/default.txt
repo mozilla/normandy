@@ -222,3 +222,6 @@ python-magic==0.4.15 \
 drf-yasg==1.14.0 \
     --hash=sha256:a276bc90af1902b1bd9c11927f75658da1a62aad2d87022ae5f653106ed09a17 \
     --hash=sha256:ca17555127f8ac59d51c2bf721eff83b46ae20a8626c033f186a4c4d7d6053f4
+graphene-django==2.2.0 \
+    --hash=sha256:3afd81d47c8b702650e05cc1179fac1cfceae991d241bb164d51f28bed9ec95c \
+    --hash=sha256:760a18068feb5457e2ec00d2447c09b2fbac2a6b8c32cc8be2abce3752107ad3
