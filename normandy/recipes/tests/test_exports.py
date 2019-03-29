@@ -3,14 +3,13 @@ import json
 
 import pytest
 import kinto_http
-
 from django.core.exceptions import ImproperlyConfigured
+from kinto_http.session import USER_AGENT as KINTO_USER_AGENT
 
 from normandy.base.tests import UserFactory
 from normandy.recipes import exports
 from normandy.recipes.tests import RecipeFactory
-
-from kinto_http.session import USER_AGENT as KINTO_USER_AGENT
+from normandy.base.tests import Whatever
 
 
 @pytest.fixture
@@ -182,21 +181,23 @@ class TestRemoteSettings:
         )
 
         record = exports.recipe_as_record(recipe)
-        assert sorted(record.keys()) == ["id", "recipe", "signature"]
-        assert sorted(record["recipe"].keys()) == [
-            "action",
-            "arguments",
-            "filter_expression",
-            "id",
-            "name",
-            "revision_id",
-        ]
-        assert sorted(record["signature"].keys()) == [
-            "public_key",
-            "signature",
-            "timestamp",
-            "x5u",
-        ]
+        assert record == {
+            "id": str(recipe.id),
+            "recipe": {
+                "action": recipe.action.name,
+                "arguments": recipe.arguments,
+                "filter_expression": recipe.filter_expression,
+                "id": recipe.id,
+                "name": recipe.name,
+                "revision_id": str(recipe.revision_id),
+            },
+            "signature": {
+                "public_key": Whatever.regex(r"[a-zA-Z0-9/+]{160}"),
+                "signature": Whatever.regex(r"[a-f0-9]{40}"),
+                "timestamp": Whatever.iso8601(),
+                "x5u": Whatever.startswith("https://"),
+            },
+        }
 
     def test_publish_puts_record_and_approves(self, rs_settings, requestsmock, mock_logger):
         """Test that requests are sent to Remote Settings on publish."""

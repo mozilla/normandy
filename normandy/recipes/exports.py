@@ -33,7 +33,7 @@ def recipe_as_record(recipe):
 
 
 def records_equal(a, b):
-    """Compare records, ignoring timestamps.
+    """Compare records, ignoring timestamps and collection schema version.
 
     :param a: one record
     :param b: another record
