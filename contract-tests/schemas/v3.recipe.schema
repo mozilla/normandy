@@ -634,11 +634,47 @@
     },
     "signature": {
       "$id": "#/properties/signature",
-      "type": "null",
       "title": "The Signature Schema",
       "default": null,
       "examples": [
         null
+      ],
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "title": "Signature with metadata",
+          "required": [
+            "public_key",
+            "signature",
+            "timestamp",
+            "x5u"
+          ],
+          "properties": {
+            "public_key": {
+              "$id": "#/properties/signature/properties/public_key",
+              "type": "string",
+              "title": "The public key associated with the signature"
+            },
+            "signature": {
+              "$id": "#/properties/signature/properties/signature",
+              "type": "string",
+              "title": "The signature, encoded with base64"
+            },
+            "timestamp": {
+              "$id": "#/properties/signature/properties/timestamp",
+              "type": "string",
+              "title": "The time the signature was created"
+             },
+            "x5u": {
+              "$id": "#/properties/signature/properties/x5u",
+              "type": "string",
+              "title": "The URL of the x5u certificate chain"
+            }
+          }
+        }
       ]
     }
   }

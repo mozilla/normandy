@@ -531,7 +531,7 @@
         },
         "implementation_url": {
           "$id": "#/properties/action/properties/implementation_url",
-          "type": "string",
+          "type": ["string", "null"],
           "title": "The Implementation_url Schema",
           "default": "",
           "examples": [
