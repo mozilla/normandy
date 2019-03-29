@@ -62,18 +62,58 @@ class SignatureType(DjangoObjectType):
 
 class Query(object):
     all_actions = graphene.List(ActionType)
+    action = graphene.Field(ActionType, id=graphene.Int(), name=graphene.String())
     all_approval_requests = graphene.List(ApprovalRequestType)
+    approval_request = graphene.Field(ApprovalRequestType, id=graphene.Int())
     all_recipes = graphene.List(RecipeType)
+    recipe = graphene.Field(RecipeType, id=graphene.Int())
     all_recipe_revisions = graphene.List(RecipeRevisionType)
+    recipe_revision = graphene.Field(RecipeRevisionType, id=graphene.Int())
 
     def resolve_all_actions(self, info, **kwargs):
-        return ActionType.objects.all()
+        return Action.objects.all()
+
+    def resolve_action(self, info, **kwargs):
+        id = kwargs.get("id")
+        name = kwargs.get("name")
+
+        if id is not None:
+            return Action.objects.get(id=id)
+
+        if name is not None:
+            return Action.objects.get(name=name)
+
+        return None
 
     def resolve_all_approval_requests(self, info, **kwargs):
         return ApprovalRequest.objects.all()
 
+    def resolve_approval_request(self, info, **kwargs):
+        id = kwargs.get("id")
+
+        if id is not None:
+            return ApprovalRequest.objects.get(id=id)
+
+        return None
+
     def resolve_all_recipes(self, info, **kwargs):
         return Recipe.objects.all()
 
+    def resolve_recipe(self, info, **kwargs):
+        id = kwargs.get("id")
+
+        if id is not None:
+            return Recipe.objects.get(id=id)
+
+        return None
+
     def resolve_all_recipe_revisions(self, info, **kwargs):
         return RecipeRevision.objects.all()
+
+    def resolve_recipe_revision(self, info, **kwargs):
+        id = kwargs.get("id")
+
+        if id is not None:
+            return RecipeRevision.objects.get(id=id)
+
+        return None
