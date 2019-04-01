@@ -53,18 +53,20 @@ Use ``--dry-run`` to only print out the result of the synchronization.
 Client side
 -----------
 
-The Normandy client integration was introduced in Firefox 66 (`Bug 1506175
-<https://bugzilla.mozilla.org/show_bug.cgi?id=1506175>`_) and can be enabled
+The Normandy client integration is available from Firefox 68 (`Bug 1506175
+<https://bugzilla.mozilla.org/show_bug.cgi?id=1506175>`_, `Bug 1538248
+<https://bugzilla.mozilla.org/show_bug.cgi?id=1538248>`_) and can be enabled
 by flipping this preference:
 
-- ``app.normandy.remotesettings.enabled``: ``true``
+- ``features.normandy-remote-settings.enabled``: ``true``
 
-And then trigger a manual synchronization in the Browser console:
+In order to populate the list of recipes to be picked up by the Recipe Runner, trigger a manual synchronization in the Browser console:
 
 .. code-block:: javascript
 
-      const { RemoteSettings } = ChromeUtils.import("resource://services-settings/remote-settings.js", {});
-      await RemoteSettings.pollChanges();
+      ChromeUtils.import("resource://normandy/lib/RecipeRunner.jsm", this);
+
+      await RecipeRunner.loadRecipes();
 
 .. seealso::
 
