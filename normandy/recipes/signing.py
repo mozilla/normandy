@@ -5,8 +5,10 @@ import logging
 import re
 from datetime import datetime
 
-import ecdsa
 import requests
+import ecdsa.util
+import fastecdsa.ecdsa
+from fastecdsa.encoding.pem import PEMEncoder
 from pyasn1.codec.der.decoder import decode as der_decode
 from pyasn1.codec.native.encoder import encode as python_encode
 from pyasn1_modules import rfc5280
@@ -102,40 +104,34 @@ def verify_signature(data, signature, pubkey):
     If the signature is valid, returns True. If the signature is invalid, raise
     an exception explaining why.
     """
+    # Data must be encoded as bytes
     if isinstance(data, str):
         data = data.encode()
 
-    # Add data template
+    # Content signature implicitly adds a prefix to signed data
     data = b"Content-Signature:\x00" + data
 
-    try:
-        verifying_pubkey = ecdsa.VerifyingKey.from_pem(pubkey)
-    except binascii.Error as e:
-        if e.args == ("Incorrect padding",):
-            raise WrongPublicKeySize()
-        else:
-            raise
-    except IndexError:
-        raise WrongPublicKeySize()
+    # fastecdsa expects ASCII armored keys, but ours is unarmored. Add the
+    # armor before passing the key to the library.
+    EC_PUBLIC_HEADER = "-----BEGIN PUBLIC KEY-----"
+    EC_PUBLIC_FOOTER = "-----END PUBLIC KEY-----"
+    verifying_pubkey = PEMEncoder.decode_public_key(
+        "\n".join([EC_PUBLIC_HEADER, pubkey, EC_PUBLIC_FOOTER])
+    )
 
     try:
         signature = base64.urlsafe_b64decode(signature)
+        signature = ecdsa.util.sigdecode_string(signature, order=ecdsa.curves.NIST384p.order)
     except binascii.Error as e:
         if BASE64_WRONG_LENGTH_RE.match(e.args[0]):
             raise WrongSignatureSize("Base64 encoded signature was not a multiple of 4")
         else:
             raise
-
-    verified = False
-
-    try:
-        verified = verifying_pubkey.verify(signature, data, hashfunc=hashlib.sha384)
-    except ecdsa.keys.BadSignatureError:
-        raise SignatureDoesNotMatch()
     except AssertionError as e:
-        # The signature verifier has a clause like
+        # The signature decoder has a clause like
         #     assert len(signature) == 2*l, (len(signature), 2*l)
-        # Check that the AssertionError is consistent with that
+        # If the AssertionError is consistent with that signature, translate it
+        # to a nicer error. Otherwise re-raise.
         if (
             len(e.args) == 1
             and isinstance(e.args[0], tuple)
@@ -147,8 +143,12 @@ def verify_signature(data, signature, pubkey):
         else:
             raise
 
+    verified = fastecdsa.ecdsa.verify(
+        signature, data, verifying_pubkey, curve=fastecdsa.curve.P384, hashfunc=hashlib.sha384
+    )
+
     if not verified:
-        raise BadSignature()
+        raise SignatureDoesNotMatch()
 
     return True
 
