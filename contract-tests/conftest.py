@@ -1,10 +1,6 @@
 # Configuration file for running contract-tests
 import pytest
 import requests
-import urllib3
-
-# Disable warnings about unverified HTTPS requests
-urllib3.disable_warnings()
 
 
 def pytest_addoption(parser):
