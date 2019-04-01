@@ -180,9 +180,9 @@ pytest-django==3.4.8 \
 pytest==4.4.0 \
     --hash=sha256:13c5e9fb5ec5179995e9357111ab089af350d788cbc944c628f3cde72285809b \
     --hash=sha256:f21d2f1fb8200830dcbb5d8ec466a9c9120e20d8b53c7585d180125cce1d297a
-pytest-mock==1.10.2 \
-    --hash=sha256:3cbae151d5885bb7565ba5a1e6e44cc3d6f72f44de3be21a11a587e2d5f9155f \
-    --hash=sha256:cbec53e7cb0f2b57275220cb4f2822093ac89e486095555105ffe1a4e2f11df4
+pytest-mock==1.10.3 \
+    --hash=sha256:330bfa1a71c9b6e84e2976f01d70d8a174f755e7f9dc5b22f4b7335992e1e98b \
+    --hash=sha256:cea3983a1ebc88bf7c0fa1ed8c84e67b898bf71a320a49605bcb74f31e6cfd6a
 pytest-testrail==2.3.3 \
     --hash=sha256:d1981ff94fb28b485fa51c28042ea728bab5362b4f08de86aa849d398aede6fc
 raven==6.10.0 \
