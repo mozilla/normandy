@@ -4,7 +4,7 @@ from django.db.migrations.executor import MigrationExecutor
 
 import pytest
 import requests_mock
-from graphene.test import Client
+from graphene.test import Client as GrapheneClient
 from rest_framework.test import APIClient
 
 from normandy.schema import schema as normandy_schema
@@ -25,7 +25,7 @@ def api_client():
 @pytest.fixture
 def gql_client():
     """Fixture to provide a Graphene client."""
-    client = Client(normandy_schema)
+    client = GrapheneClient(normandy_schema)
     return client
 
 

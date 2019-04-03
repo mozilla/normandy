@@ -119,6 +119,8 @@ class GQ(object):
     def _attrToString(self, attr):
         if isinstance(attr, int):
             return attr
+        elif isinstance(attr, GQ):
+            return str(attr)
         else:
             return f'"{attr}"'
 

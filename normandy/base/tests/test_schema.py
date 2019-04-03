@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.base.tests import GQ, UserFactory
+from normandy.base.tests import GQ, GroupFactory, UserFactory
 
 
 @pytest.mark.django_db
@@ -24,3 +24,18 @@ class TestQuery(object):
         u = UserFactory()
         res = gql_client.execute(GQ().query.user(email=u.email).fields("id"))
         assert res == {"data": {"user": {"id": str(u.id)}}}
+
+    def test_resolve_all_groups(self, gql_client):
+        g = GroupFactory()
+        res = gql_client.execute(GQ().query.allGroups.fields("id"))
+        assert res == {"data": {"allGroups": [{"id": str(g.id)}]}}
+
+    def test_resolve_group_by_id(self, gql_client):
+        g = GroupFactory()
+        res = gql_client.execute(GQ().query.group(id=g.id).fields("name"))
+        assert res == {"data": {"group": {"name": g.name}}}
+
+    def test_resolve_group_by_name(self, gql_client):
+        g = GroupFactory()
+        res = gql_client.execute(GQ().query.group(name=g.name).fields("id"))
+        assert res == {"data": {"group": {"id": str(g.id)}}}
