@@ -5,6 +5,8 @@ from urllib.parse import urlparse, quote as url_quote
 
 import pytest
 
+from django.db import transaction
+
 from normandy.base.tests import Whatever
 from normandy.recipes.tests import ActionFactory, RecipeFactory
 from normandy.studies.models import Extension
@@ -245,3 +247,24 @@ class TestExtensionAPI(object):
         res = api_client.delete(f"/api/v3/extension/{e.id}/")
         assert res.status_code == 204
         assert Extension.objects.count() == 0
+
+    def test_cannot_create_extension_duplicate_filename(self, api_client, storage):
+        xpi = WebExtensionFileFactory()
+        ExtensionFactory(xpi__from_func=xpi.open)
+        with transaction.atomic():
+            res = self._upload_extension(api_client, xpi.path)
+        assert res.status_code == 400
+        assert res.data == {"xpi": "An extension with this filename already exists."}
+        assert Extension.objects.count() == 1
+
+    def test_cannot_update_extension_duplicate_filename(self, api_client, storage):
+        xpi1 = WebExtensionFileFactory()
+        ExtensionFactory(xpi__from_func=xpi1.open)
+
+        xpi2 = WebExtensionFileFactory()
+        e = ExtensionFactory(xpi__from_func=xpi2.open)
+
+        with transaction.atomic():
+            res = self._update_extension(api_client, e.id, xpi1.path)
+        assert res.status_code == 400
+        assert res.data == {"xpi": "An extension with this filename already exists."}
