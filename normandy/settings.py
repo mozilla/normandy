@@ -180,6 +180,15 @@ class OIDC:
     OIDC_USER_ENDPOINT = values.URLValue("https://auth.mozilla.auth0.com/userinfo")
 
 
+class InsecureAuthentication:
+    def REST_FRAMEWORK(self):
+        return {
+            **Core.REST_FRAMEWORK,
+            "DEFAULT_AUTHENTICATION_CLASSES": Core.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
+            + ["normandy.base.api.authentication.InsecureEmailAuthentication"],
+        }
+
+
 class Base(Core, CORS, OIDC):
     """Settings that may change per-environment, some with defaults."""
 
@@ -439,7 +448,7 @@ class ProductionReadOnly(Production):
     CORS_ALLOW_METHODS = values.ListValue(["GET", "OPTIONS"])
 
 
-class ProductionInsecure(Production):
+class ProductionInsecure(Production, InsecureAuthentication):
     """
     Settings for a production-like environment that lacks many security features.
 
@@ -478,7 +487,7 @@ class Build(Production):
     SECRET_KEY = values.Value("not a secret")
 
 
-class Test(Base):
+class Test(Base, InsecureAuthentication):
     DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, ".env"))
     DOTENV = ".env" if DOTENV_EXISTS else None
     SECRET_KEY = "not a secret"
