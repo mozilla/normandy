@@ -13,7 +13,7 @@ from django.conf.urls import url
 from django.core.cache import cache
 
 from normandy.base.tests import UserFactory
-from normandy.base.api.authentication import BearerTokenAuthentication
+from normandy.base.api.authentication import BearerTokenAuthentication, InsecureEmailAuthentication
 
 
 class MockView(APIView):
@@ -33,7 +33,8 @@ class MockView(APIView):
 
 
 urlpatterns = [
-    url(r"^bearer/$", MockView.as_view(authentication_classes=[BearerTokenAuthentication]))
+    url(r"^bearer/$", MockView.as_view(authentication_classes=[BearerTokenAuthentication])),
+    url(r"^insecure/$", MockView.as_view(authentication_classes=[InsecureEmailAuthentication])),
 ]
 
 
@@ -241,3 +242,39 @@ class TestBearerTokenAuthentication(object):
 
         user.refresh_from_db()
         assert user.email == "john.doe@example.com"
+
+
+@pytest.mark.django_db
+@pytest.mark.urls("normandy.base.tests.api.test_authentication")
+class TestInsecureEmailAuthentication(object):
+    """Bearer token authentication"""
+
+    @pytest.fixture(autouse=True)
+    def clear_cache(self):
+        cache.clear()
+
+    @pytest.fixture
+    def bare_api_client(self):
+        return APIClient()
+
+    def test_it_works(self, bare_api_client):
+        response = bare_api_client.post(
+            "/insecure/",
+            {"example": "example"},
+            HTTP_AUTHORIZATION="Insecure john.doe@example.com",
+        )
+        assert response.status_code == 200
+        assert response.data.get("user") == "john.doe@example.com"
+
+    def test_user_exists(self, bare_api_client):
+        user = UserFactory()
+        response = bare_api_client.get("/insecure/", HTTP_AUTHORIZATION=f"Insecure {user.email}")
+        assert response.status_code == 200
+        assert response.data.get("user") == user.email
+
+    def test_user_is_not_active(self, bare_api_client):
+        user = UserFactory(username="test@example.com", email="test@example.com", is_active=False)
+        response = bare_api_client.post(
+            "/insecure/", {"example": "example"}, HTTP_AUTHORIZATION=f"Insecure {user.email}"
+        )
+        assert response.status_code == 401, (response.data, response.user)
