@@ -95,8 +95,7 @@ class Core(Configuration):
 
     REST_FRAMEWORK = {
         "DEFAULT_AUTHENTICATION_CLASSES": [
-            "normandy.base.api.authentication.BearerTokenAuthentication",
-            "rest_framework.authentication.SessionAuthentication",
+            "normandy.base.api.authentication.BearerTokenAuthentication"
         ],
         "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
         "TEST_REQUEST_DEFAULT_FORMAT": "json",
@@ -195,6 +194,9 @@ class Base(Core, CORS, OIDC):
             # We've subclassed Django's security middleware, so Django's
             # checks can't tell we are using the middleware.
             "security.W001",
+            # We have disabled CSRF as we do not use cookie-based authentication.
+            # As a result the CSRF middleware check is not required.
+            "security.W003",
             # Check CSRF cookie http only. disabled because we read the
             # CSRF cookie in JS for forms in React.
             "security.W017",
@@ -213,7 +215,6 @@ class Base(Core, CORS, OIDC):
     # Middleware that _most_ environments will need. Subclasses can override this list.
     EXTRA_MIDDLEWARE = [
         "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
     ]
@@ -458,6 +459,7 @@ class ProductionInsecure(Production):
     SILENCED_SYSTEM_CHECKS = values.ListValue(
         [
             "security.W001",  # security middleware check
+            "security.W003",  # CSRF middleware check
             "security.W004",  # check hsts seconds
             "security.W008",  # Secure SSL redirect
             "security.W009",  # Secret key length
