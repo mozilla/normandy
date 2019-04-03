@@ -70,13 +70,10 @@ class Query(object):
     all_recipe_revisions = graphene.List(RecipeRevisionType)
     recipe_revision = graphene.Field(RecipeRevisionType, id=graphene.Int())
 
-    def resolve_all_actions(self, info, **kwargs):
+    def resolve_all_actions(self, info):
         return Action.objects.all()
 
-    def resolve_action(self, info, **kwargs):
-        id = kwargs.get("id")
-        name = kwargs.get("name")
-
+    def resolve_action(self, info, id=None, name=None):
         if id is not None:
             return Action.objects.get(id=id)
 
@@ -85,34 +82,28 @@ class Query(object):
 
         return None
 
-    def resolve_all_approval_requests(self, info, **kwargs):
+    def resolve_all_approval_requests(self, info):
         return ApprovalRequest.objects.all()
 
-    def resolve_approval_request(self, info, **kwargs):
-        id = kwargs.get("id")
-
+    def resolve_approval_request(self, info, id=None):
         if id is not None:
             return ApprovalRequest.objects.get(id=id)
 
         return None
 
-    def resolve_all_recipes(self, info, **kwargs):
+    def resolve_all_recipes(self, info):
         return Recipe.objects.all()
 
-    def resolve_recipe(self, info, **kwargs):
-        id = kwargs.get("id")
-
+    def resolve_recipe(self, info, id=None):
         if id is not None:
             return Recipe.objects.get(id=id)
 
         return None
 
-    def resolve_all_recipe_revisions(self, info, **kwargs):
+    def resolve_all_recipe_revisions(self, info):
         return RecipeRevision.objects.all()
 
-    def resolve_recipe_revision(self, info, **kwargs):
-        id = kwargs.get("id")
-
+    def resolve_recipe_revision(self, info, id=None):
         if id is not None:
             return RecipeRevision.objects.get(id=id)
 

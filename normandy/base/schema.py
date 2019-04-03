@@ -23,14 +23,10 @@ class Query(object):
     all_groups = graphene.List(GroupType)
     group = graphene.Field(GroupType, id=graphene.Int(), name=graphene.String())
 
-    def resolve_all_users(self, info, **kwargs):
+    def resolve_all_users(self, info):
         return User.objects.all()
 
-    def resolve_user(self, info, **kwargs):
-        id = kwargs.get("id")
-        username = kwargs.get("username")
-        email = kwargs.get("email")
-
+    def resolve_user(self, info, id=None, username=None, email=None):
         if id is not None:
             return User.objects.get(id=id)
 
@@ -42,13 +38,10 @@ class Query(object):
 
         return None
 
-    def resolve_all_groups(self, info, **kwargs):
+    def resolve_all_groups(self, info):
         return Group.objects.all()
 
-    def resolve_group(self, info, **kwargs):
-        id = kwargs.get("id")
-        name = kwargs.get("name")
-
+    def resolve_group(self, info, id=None, name=None):
         if id is not None:
             return Group.objects.get(id=id)
 

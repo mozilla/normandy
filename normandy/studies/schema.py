@@ -14,12 +14,10 @@ class Query(object):
     all_extensions = graphene.List(ExtensionType)
     extension = graphene.Field(ExtensionType, id=graphene.Int())
 
-    def resolve_all_extensions(self, info, **kwargs):
+    def resolve_all_extensions(self, info):
         return Extension.objects.all()
 
-    def resolve_extension(self, info, **kwargs):
-        id = kwargs.get("id")
-
+    def resolve_extension(self, info, id=None):
         if id is not None:
             return Extension.objects.get(id=id)
 
