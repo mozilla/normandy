@@ -21,6 +21,24 @@ class ExtensionViewSet(CachingViewsetMixin, viewsets.ModelViewSet):
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
     filter_backends = [ExtensionOrderingFilter]
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except FileExistsError:
+            return Response(
+                {"xpi": "An extension with this filename already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except FileExistsError:
+            return Response(
+                {"xpi": "An extension with this filename already exists."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
