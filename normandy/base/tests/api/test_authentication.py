@@ -258,19 +258,19 @@ class TestInsecureEmailAuthentication(object):
         return APIClient()
 
     def test_it_works(self, bare_api_client):
+        user = UserFactory()
+        response = bare_api_client.get("/insecure/", HTTP_AUTHORIZATION=f"Insecure {user.email}")
+        assert response.status_code == 200
+        assert response.data.get("user") == user.email
+
+    def test_user_does_not_exist(self, bare_api_client):
         response = bare_api_client.post(
             "/insecure/",
             {"example": "example"},
             HTTP_AUTHORIZATION="Insecure john.doe@example.com",
         )
-        assert response.status_code == 200
-        assert response.data.get("user") == "john.doe@example.com"
-
-    def test_user_exists(self, bare_api_client):
-        user = UserFactory()
-        response = bare_api_client.get("/insecure/", HTTP_AUTHORIZATION=f"Insecure {user.email}")
-        assert response.status_code == 200
-        assert response.data.get("user") == user.email
+        assert response.status_code == 401
+        assert response.data == {"detail": "User does not exist."}
 
     def test_user_is_not_active(self, bare_api_client):
         user = UserFactory(username="test@example.com", email="test@example.com", is_active=False)

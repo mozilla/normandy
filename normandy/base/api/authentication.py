@@ -130,7 +130,7 @@ class InsecureEmailAuthentication(BaseAuthentication):
     A simple but insecure way to authenticate users for QA/dev purposes.
 
     Clients should authenticate by passing the token key in the "Authorization" HTTP header,
-    prepended with the string "Bearer ".  For example:
+    prepended with the string "Insecure ".  For example:
 
         Authorization: Insecure jdoe@mozilla.com
     """
@@ -149,9 +149,12 @@ class InsecureEmailAuthentication(BaseAuthentication):
 
     def authenticate_credentials(self, email):
         # Turn this email into a Django User instance.
-        user, _ = get_user_model().objects.get_or_create(
-            username=email[:150], defaults={"email": email}
-        )
+        User = get_user_model()
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed("User does not exist.")
 
         if not user.is_active:
             raise exceptions.AuthenticationFailed("User inactive.")
