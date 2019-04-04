@@ -47,8 +47,8 @@ class TestBearerTokenAuthentication(object):
         cache.clear()
 
     @pytest.fixture
-    def csrf_api_client(self):
-        return APIClient(enforce_csrf_checks=True)
+    def bare_api_client(self):
+        return APIClient()
 
     @pytest.fixture
     def mock_oidc(self, settings, requestsmock):
@@ -65,19 +65,19 @@ class TestBearerTokenAuthentication(object):
 
         return fn
 
-    def test_it_works(self, csrf_api_client, mock_oidc):
+    def test_it_works(self, bare_api_client, mock_oidc):
         mock_oidc(
             content=json.dumps(
                 {"email": "john.doe@example.com", "given_name": "John", "family_name": "Doe"}
             ).encode("utf-8")
         )
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 200
         assert response.data.get("user") == "john.doe@example.com"
 
-    def test_caching(self, csrf_api_client, requestsmock, settings):
+    def test_caching(self, bare_api_client, requestsmock, settings):
         user = UserFactory()
         user_data = json.dumps(
             {"email": user.email, "given_name": user.first_name, "family_name": user.last_name}
@@ -111,14 +111,14 @@ class TestBearerTokenAuthentication(object):
             ],
         )
 
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 200
         assert response.data.get("user") == user.email
 
         # Response should be cached and you shouldn't hit the 401
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 200
@@ -126,48 +126,48 @@ class TestBearerTokenAuthentication(object):
 
         # Sleep till cache expires
         time.sleep(2)
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 401
 
-    def test_user_exists(self, csrf_api_client, mock_oidc):
+    def test_user_exists(self, bare_api_client, mock_oidc):
         user = UserFactory()
         mock_oidc(user=user)
-        response = csrf_api_client.get("/bearer/", HTTP_AUTHORIZATION="Bearer valid-token")
+        response = bare_api_client.get("/bearer/", HTTP_AUTHORIZATION="Bearer valid-token")
         assert response.status_code == 200
         assert response.data.get("user") == user.email
 
-    def test_user_is_not_active(self, csrf_api_client, mock_oidc):
+    def test_user_is_not_active(self, bare_api_client, mock_oidc):
         user = UserFactory(username="test@example.com", email="test@example.com", is_active=False)
         mock_oidc(user=user)
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 401, (response.data, response.user)
 
-    def test_bad_access_token(self, csrf_api_client, mock_oidc):
+    def test_bad_access_token(self, bare_api_client, mock_oidc):
         mock_oidc(status_code=401)
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer invalid-token"
         )
         assert response.status_code == 401
 
-    def test_no_token(self, csrf_api_client, mock_oidc):
+    def test_no_token(self, bare_api_client, mock_oidc):
         user = UserFactory()
         mock_oidc(user=user)
-        response = csrf_api_client.post("/bearer/", {"example": "example"})
+        response = bare_api_client.post("/bearer/", {"example": "example"})
         assert response.status_code == 401
 
-    def test_oidc_provider_400_error(self, csrf_api_client, mock_oidc):
+    def test_oidc_provider_400_error(self, bare_api_client, mock_oidc):
         mock_oidc(status_code=400)
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 401
         assert response.data.get("detail") == "Unable to verify bearer token."
 
-    def test_retry_on_5xx_error(self, csrf_api_client, settings, requestsmock, caplog):
+    def test_retry_on_5xx_error(self, bare_api_client, settings, requestsmock, caplog):
         user = UserFactory()
         user_data = json.dumps(
             {"email": user.email, "given_name": user.first_name, "family_name": user.last_name}
@@ -182,7 +182,7 @@ class TestBearerTokenAuthentication(object):
             ],
         )
 
-        response = csrf_api_client.get("/bearer/", HTTP_AUTHORIZATION="Bearer valid-token")
+        response = bare_api_client.get("/bearer/", HTTP_AUTHORIZATION="Bearer valid-token")
         assert response.status_code == 200
         assert response.data.get("user") == user.email
 
@@ -197,7 +197,7 @@ class TestBearerTokenAuthentication(object):
 
         assert retry_count == 2
 
-    def test_max_retries_on_5xx_error(self, csrf_api_client, settings, requestsmock, caplog):
+    def test_max_retries_on_5xx_error(self, bare_api_client, settings, requestsmock, caplog):
         requestsmock.get(
             settings.OIDC_USER_ENDPOINT,
             [
@@ -211,7 +211,7 @@ class TestBearerTokenAuthentication(object):
             ],
         )
 
-        response = csrf_api_client.get("/bearer/", HTTP_AUTHORIZATION="Bearer valid-token")
+        response = bare_api_client.get("/bearer/", HTTP_AUTHORIZATION="Bearer valid-token")
         assert response.status_code == 401
         assert response.data.get("detail") == "Unable to verify bearer token."
 
@@ -226,14 +226,14 @@ class TestBearerTokenAuthentication(object):
 
         assert retry_count == 5
 
-    def test_existing_user_with_no_email(self, csrf_api_client, mock_oidc):
+    def test_existing_user_with_no_email(self, bare_api_client, mock_oidc):
         user = UserFactory(username="john.doe@example.com", email="")
         mock_oidc(
             content=json.dumps(
                 {"email": "john.doe@example.com", "given_name": "John", "family_name": "Doe"}
             ).encode("utf-8")
         )
-        response = csrf_api_client.post(
+        response = bare_api_client.post(
             "/bearer/", {"example": "example"}, HTTP_AUTHORIZATION="Bearer valid-token"
         )
         assert response.status_code == 200
