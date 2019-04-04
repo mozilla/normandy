@@ -197,9 +197,6 @@ class Base(Core, CORS, OIDC):
             # We have disabled CSRF as we do not use cookie-based authentication.
             # As a result the CSRF middleware check is not required.
             "security.W003",
-            # Check CSRF cookie http only. disabled because we read the
-            # CSRF cookie in JS for forms in React.
-            "security.W017",
         ]
     )
 
@@ -303,7 +300,7 @@ class Base(Core, CORS, OIDC):
     SECURE_PROXY_SSL_HEADER = values.TupleValue()
     SECURE_HSTS_SECONDS = values.IntegerValue(3600)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
-    CSRF_COOKIE_HTTPONLY = values.BooleanValue(False)
+    CSRF_COOKIE_HTTPONLY = values.BooleanValue(True)
     CSRF_COOKIE_SECURE = values.BooleanValue(True)
     SECURE_SSL_REDIRECT = values.BooleanValue(True)
     SECURE_REDIRECT_EXEMPT = values.ListValue([])
@@ -428,11 +425,7 @@ class ProductionReadOnly(Production):
     ]
     ADMIN_ENABLED = values.BooleanValue(False)
     SILENCED_SYSTEM_CHECKS = values.ListValue(
-        [
-            "security.W001",  # Security middle ware check
-            "security.W003",  # CSRF middleware check
-            "security.W017",  # Check CSRF cookie http only
-        ]
+        ["security.W001", "security.W003"]  # Security middle ware check  # CSRF middleware check
     )
 
     # In ReadOnly mode you have no business using the API to do any writes
@@ -465,7 +458,6 @@ class ProductionInsecure(Production):
             "security.W009",  # Secret key length
             "security.W012",  # Check session cookie secure
             "security.W016",  # Check CSRF cookie secure
-            "security.W017",  # Check CSRF cookie http only
         ]
     )
 
