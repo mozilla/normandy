@@ -30,14 +30,14 @@ class Command(BaseCommand):
             if os.path.isdir(directory):
                 action_names[name] = directory
 
-        # Next get all the keys from the mozilla-normandy-action-argument-schemas package.
+        # Next get all the keys from the @mozilla/normandy-action-argument-schemas package.
         action_schemas_fp = os.path.join(settings.ACTIONS_SCHEMA_DIRECTORY, "schemas.json")
         with open(action_schemas_fp) as f:
             action_schemas = json.load(f)
 
         aliases = settings.ACTIONS_ALIAS_NAMES
         for name in action_schemas:
-            # If the name in mozilla-normandy-action-argument-schemas
+            # If the name in @mozilla/normandy-action-argument-schemas
             # schemas.json isn't desired, here's our chance to call it our
             # own name.
             name = aliases.get(name, name)
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                     ):
                         # I.e. it *had* an implementation, but now the schema
                         # comes (and is different!) from the
-                        # mozilla-normandy-action-argument-schemas package.
+                        # @mozilla/normandy-action-argument-schemas package.
                         self.stdout.write(
                             self.style.WARNING(
                                 f"Action {name} is changing implementation AND argument schema. "

@@ -1,10 +1,10 @@
-FROM python:3.7-slim@sha256:ceab3384b540d7812a29ae5678da98d5eab553000f0a161476382306baaa4c9a
+FROM python:3.7-slim@sha256:3e4be41076ebb6fe8c3112b220ce133ef0dc49c814024e4874ca76eae3c8dec0
 WORKDIR /app
 RUN groupadd --gid 10001 app && useradd -g app --uid 10001 --shell /usr/sbin/nologin app
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-    gcc libpq-dev curl apt-transport-https libffi-dev openssh-client gnupg
+    gcc libpq-dev curl apt-transport-https libffi-dev openssh-client gnupg python-dev libgmp3-dev
 
 # Install node from NodeSource
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \

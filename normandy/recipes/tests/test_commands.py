@@ -217,6 +217,21 @@ class TestUpdateRecipeSignatures(object):
         r.refresh_from_db()
         assert r.signature.signature != "old signature"
 
+    def test_it_updates_remote_settings_if_enabled(self, mocker, mocked_autograph):
+        mocked_remotesettings = mocker.patch(
+            "normandy.recipes.management.commands.update_recipe_signatures.RemoteSettings"
+        )
+        for i in range(3):
+            r = RecipeFactory(approver=UserFactory(), enabler=UserFactory(), signed=True)
+            r.signature.signature = "old signature"
+            r.signature.save()
+        mocked_remotesettings.reset_mock()
+
+        call_command("update_recipe_signatures", "--force")
+
+        assert mocked_remotesettings.return_value.publish.call_count == 3
+        assert mocked_remotesettings.return_value.approve_changes.call_count == 1
+
     def test_it_does_not_resign_up_to_date_recipes(self, settings, mocked_autograph):
         r = RecipeFactory(approver=UserFactory(), enabler=UserFactory(), signed=True)
         r.signature.signature = "original signature"
