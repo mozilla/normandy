@@ -119,27 +119,32 @@ class GQ(object):
     def _attrToString(self, attr):
         if isinstance(attr, int):
             return attr
-        elif isinstance(attr, GQ):
-            return str(attr)
         else:
             return f'"{attr}"'
 
     def _build(self):
-        if not self.parent:
-            return self.child._build()
-        else:
+        built = ""
+
+        if self.type:
             built = self.type
 
-            if self.attrs:
-                built += "("
-                attrs = []
-                for k in self.attrs:
-                    attrs.append(f"{k}: {self._attrToString(self.attrs[k])}")
-                built += ", ".join(attrs) + ")"
+        if self.attrs:
+            built += "("
+            attrs = []
+            for k in self.attrs:
+                attrs.append(f"{k}: {self._attrToString(self.attrs[k])}")
+            built += ", ".join(attrs) + ")"
 
-            if self.child:
-                built += f" {{ {self.child._build()} }} "
-            elif self._fields:
-                built += f"{{ {', '.join(self._fields)} }}"
+        wrap = ""
+        if self.child:
+            wrap = self.child._build()
+        elif self._fields:
+            wrap = ", ".join(self._fields)
 
-            return built
+        if wrap:
+            if built:
+                built += f" {{ {wrap} }}"
+            else:
+                built += wrap
+
+        return built

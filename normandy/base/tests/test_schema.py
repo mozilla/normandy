@@ -3,6 +3,25 @@ import pytest
 from normandy.base.tests import GQ, GroupFactory, UserFactory
 
 
+class TestGQ(object):
+    """Test the GQ query composer helper"""
+
+    def test_simple_build(self):
+        assert str(GQ("query")) == "query"
+        assert str(GQ("query", attrs={"id": 1})) == "query(id: 1)"
+
+    def test_compose(self):
+        assert str(GQ().query) == "query"
+        assert (
+            str(GQ().query.user(id=1).fields("id", "name")) == "query { user(id: 1) { id, name } }"
+        )
+
+    def test_nested_object_in_fields(self):
+        assert (
+            GQ().query.users.fields("id", GQ("group").fields("id"))
+        ) == "query { users { id, group { id } } }"
+
+
 @pytest.mark.django_db
 class TestQuery(object):
     def test_resolve_all_users(self, gql_client):
