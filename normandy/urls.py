@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.views.decorators.csrf import csrf_exempt
+
+from graphene_django.views import GraphQLView
 
 
 app_name = "normandy"
@@ -15,6 +18,7 @@ urlpatterns += [
     # Swagger
     url(r"^api/v1/", include("normandy.base.api.swagger_urls", namespace="v1")),
     url(r"^api/v3/", include("normandy.base.api.swagger_urls", namespace="v3")),
+    url(r"^api/graphql/", csrf_exempt(GraphQLView.as_view())),
 ]
 
 # static handles serving uploaded files during development; it disables

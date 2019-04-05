@@ -87,3 +87,64 @@ class MigrationTest(object):
     def reset_migrations(self, migrations):
         yield
         migrations.reset()
+
+
+class GQ(object):
+    """A helper class to generate GraphQL queries."""
+
+    def __init__(self, type=None, attrs=None, parent=None):
+        self._fields = []
+        self.type = type
+        self.attrs = attrs
+        self.parent = parent
+        self.child = None
+
+    def fields(self, *args):
+        self._fields = args
+        return str(self)
+
+    def __getattr__(self, item):
+        self.child = GQ(item, parent=self)
+        return self.child
+
+    def __call__(self, **kwargs):
+        self.attrs = kwargs
+        return self
+
+    def __str__(self):
+        if self.parent:
+            return str(self.parent)
+        return self._build()
+
+    def _attrToString(self, attr):
+        if isinstance(attr, int):
+            return attr
+        else:
+            return f'"{attr}"'
+
+    def _build(self):
+        built = ""
+
+        if self.type:
+            built = self.type
+
+        if self.attrs:
+            built += "("
+            attrs = []
+            for k in self.attrs:
+                attrs.append(f"{k}: {self._attrToString(self.attrs[k])}")
+            built += ", ".join(attrs) + ")"
+
+        wrap = ""
+        if self.child:
+            wrap = self.child._build()
+        elif self._fields:
+            wrap = ", ".join(self._fields)
+
+        if wrap:
+            if built:
+                built += f" {{ {wrap} }}"
+            else:
+                built += wrap
+
+        return built

@@ -20,6 +20,7 @@ class Core(Configuration):
         "normandy.studies",
         "product_details",
         "rest_framework",
+        "graphene_django",
         "drf_yasg",
         "storages",
         "raven.contrib.django.raven_compat",
@@ -108,6 +109,8 @@ class Core(Configuration):
         "EXCEPTION_HANDLER": "normandy.base.api.views.exception_handler",
         "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     }
+
+    GRAPHENE = {"SCHEMA": "normandy.schema.schema"}
 
     # Content Security Policy
     def CSP_DEFAULT_SRC(self):

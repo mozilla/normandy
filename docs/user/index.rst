@@ -12,3 +12,4 @@ configure recipes with `Delivery Console`_.
    peer_approval
    actions/index
    end_user_interaction
+   api

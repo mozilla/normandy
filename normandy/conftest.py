@@ -4,8 +4,10 @@ from django.db.migrations.executor import MigrationExecutor
 
 import pytest
 import requests_mock
+from graphene.test import Client as GrapheneClient
 from rest_framework.test import APIClient
 
+from normandy.schema import schema as normandy_schema
 from normandy.base.tests import UserFactory, skip_except_in_ci
 from normandy.recipes import geolocation as geolocation_module
 from normandy.recipes.tests import fake_sign
@@ -17,6 +19,13 @@ def api_client():
     user = UserFactory(is_superuser=True)
     client = APIClient()
     client.force_authenticate(user=user)
+    return client
+
+
+@pytest.fixture
+def gql_client():
+    """Fixture to provide a Graphene client."""
+    client = GrapheneClient(normandy_schema)
     return client
 
 
