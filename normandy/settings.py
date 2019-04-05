@@ -383,7 +383,7 @@ class Base(Core, CORS, OIDC):
     GITHUB_URL = values.Value("https://github.com/mozilla/normandy")
 
 
-class Development(Base):
+class Development(InsecureAuthentication, Base):
     """Settings for local development."""
 
     DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, ".env"))
@@ -448,7 +448,7 @@ class ProductionReadOnly(Production):
     CORS_ALLOW_METHODS = values.ListValue(["GET", "OPTIONS"])
 
 
-class ProductionInsecure(Production, InsecureAuthentication):
+class ProductionInsecure(Production):
     """
     Settings for a production-like environment that lacks many security features.
 
@@ -487,7 +487,7 @@ class Build(Production):
     SECRET_KEY = values.Value("not a secret")
 
 
-class Test(Base, InsecureAuthentication):
+class Test(InsecureAuthentication, Base):
     DOTENV_EXISTS = os.path.exists(os.path.join(Core.BASE_DIR, ".env"))
     DOTENV = ".env" if DOTENV_EXISTS else None
     SECRET_KEY = "not a secret"
