@@ -123,3 +123,48 @@ class BearerTokenAuthentication(BaseAuthentication):
         # This could happen if, for some reason, we're not configured to be
         # allowed to talk to the OIDC endpoint.
         raise OIDCEndpointRequestError(response.status_code)
+
+
+class InsecureEmailAuthentication(BaseAuthentication):
+    """
+    A simple but insecure way to authenticate users for QA/dev purposes.
+
+    Clients should authenticate by passing the token key in the "Authorization" HTTP header,
+    prepended with the string "Insecure ".  For example:
+
+        Authorization: Insecure jdoe@mozilla.com
+    """
+
+    keyword = "Insecure"
+
+    def authenticate(self, request):
+        auth_header = get_authorization_header(request).decode().split()
+
+        if not auth_header or auth_header[0].lower() != self.keyword.lower():
+            return None
+
+        email = auth_header[1]
+
+        return self.authenticate_credentials(email)
+
+    def authenticate_credentials(self, email):
+        # Turn this email into a Django User instance.
+        User = get_user_model()
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed("User does not exist.")
+
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed("User inactive.")
+
+        return (user, email)
+
+    def authenticate_header(self, request):
+        """
+        Return a string to be used as the value of the `WWW-Authenticate`
+        header in a `401 Unauthenticated` response, or `None` if the
+        authentication scheme should return `403 Permission Denied` responses.
+        """
+        return self.keyword
