@@ -9,7 +9,7 @@ The Delivery Console is not currently being tested, as it’s a much lower prior
 The test strategy incorporates manual and automated testing. Different approaches are outlined for each area. 
 
 Normandy Server
---------------
+---------------
 The Normandy Server is an API server with recipes. This feature is high priority, and needs to maintain a high level of service. There are two versions with different functionality. V1 is the server clients connect to. V3 is the server that Admins connect to.
 
 * v1
