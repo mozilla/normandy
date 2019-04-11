@@ -30,7 +30,7 @@ The Normandy Firefox client queries the Normandy server for instructions and pic
 * QA: cmuresan
 * Automation: 
 * Test Engineer: b4hand
-* [Manual tests](https://testrail.stage.mozaws.net/index.php?/suites/view/232&group_by=cases:section_id&group_order=asc&group_id=16918)
+* _Manual tests: https://testrail.stage.mozaws.net/index.php?/suites/view/232&group_by=cases:section_id&group_order=asc&group_id=16918
 * **Status:** b4hand is reviewing and fixing outdated UI Automation tests. Ciprian is reviewing and updating manual tests.
 
 Normandy Delivery Console
@@ -38,9 +38,9 @@ Normandy Delivery Console
 This is a tool to edit API recipes by Admins. It’s also referred to as the Admin panel. It is a single page application that is only used by internal users. If there is a problem it is reported by internal users, and is considered an inconvenience, not a high priority.
 
 * QA/Test Engineer: none
-* [Automation](https://github.com/18epedersen/Normandy-e2e-tests)
+* _Automation: https://github.com/18epedersen/Normandy-e2e-tests
 	* **Status:** needs updating
-* [Manual tests](https://testrail.stage.mozaws.net/index.php?/suites/view/232&group_by=cases:section_id&group_order=asc&group_id=16918)
+* _Manual tests: https://testrail.stage.mozaws.net/index.php?/suites/view/232&group_by=cases:section_id&group_order=asc&group_id=16918
 	* **Status:** Needs more tests. The manual tests are extremely basic.
 
 GCP Migration
