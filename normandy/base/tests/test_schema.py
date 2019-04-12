@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.base.tests import GQ, GroupFactory, UserFactory
+from normandy.base.tests import GQ, GroupFactory, UserFactory, Whatever
 
 
 class TestGQ(object):
@@ -40,7 +40,7 @@ class TestQuery(object):
         assert res == {
             "errors": [
                 {
-                    "locations": [{"column": 23, "line": 1}],
+                    "locations": Whatever(),
                     "message": 'Cannot query field "password" on type "UserType".',
                 }
             ]
