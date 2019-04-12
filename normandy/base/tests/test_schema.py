@@ -34,6 +34,18 @@ class TestQuery(object):
         res = gql_client.execute(GQ().query.user(id=u.id).fields("username"))
         assert res == {"data": {"user": {"username": u.username}}}
 
+    def test_password_not_queryable(self, gql_client):
+        u = UserFactory()
+        res = gql_client.execute(GQ().query.user(id=u.id).fields("password"))
+        assert res == {
+            "errors": [
+                {
+                    "locations": [{"column": 23, "line": 1}],
+                    "message": 'Cannot query field "password" on type "UserType".',
+                }
+            ]
+        }
+
     def test_resolve_user_by_username(self, gql_client):
         u = UserFactory()
         res = gql_client.execute(GQ().query.user(username=u.username).fields("id"))
