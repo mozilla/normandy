@@ -358,9 +358,9 @@ aniso8601==3.0.2 \
     --hash=sha256:7849749cf00ae0680ad2bdfe4419c7a662bef19c03691a19e008c8b9a5267802 \
     --hash=sha256:94f90871fcd314a458a3d4eca1c84448efbd200e86f55fe4c733c7a40149ef50 \
     # pyup: >=3,<4 # pinned by graphene 2.2.0
-sphinxcontrib-htmlhelp==1.0.1 \
-    --hash=sha256:e31c8271f5a8f04b620a500c0442a7d5cfc1a732fa5c10ec363f90fe72af0cb8 \
-    --hash=sha256:0d691ca8edf5995fbacfe69b191914256071a94cbad03c3688dca47385c9206c
+sphinxcontrib-htmlhelp==1.0.2 \
+    --hash=sha256:4670f99f8951bd78cd4ad2ab962f798f5618b17675c35c5ac3b2132a14ea8422 \
+    --hash=sha256:d4fd39a65a625c9df86d7fa8a2d9f3cd8299a3a4b15db63b50aac9e161d8eff7
 sphinxcontrib-applehelp==1.0.1 \
     --hash=sha256:fb8dee85af95e5c30c91f10e7eb3c8967308518e0f7488a2828ef7bc191d0d5d \
     --hash=sha256:edaa0ab2b2bc74403149cb0209d6775c96de797dfd5b5e2a71981309efab3897
