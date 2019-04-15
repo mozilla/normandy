@@ -158,6 +158,10 @@ class Core(Configuration):
     CSRF_COOKIE_NAME = "csrftoken-20170707"
 
 
+# ==================== MIXINS ====================
+# These mixins are used to group settings together, and then are included in the environments below
+
+
 class CORS:
     """Default settings related to setting CORS headers."""
 
@@ -191,7 +195,18 @@ class InsecureAuthentication:
         }
 
 
-class Base(Core, CORS, OIDC):
+class Metrics:
+    METRICS_USE_DEBUG_LOGS = values.BooleanValue(False)
+    METRICS_USE_STATSD = values.BooleanValue(False)
+    METRICS_STATSD_HOST = values.Value("localhost")
+    METRICS_STATSD_PORT = values.IntegerValue(8125)
+    METRICS_STATSD_NAMESPACE = values.Value("")
+
+
+# ==================== ENVIRONMENTS ====================
+
+
+class Base(Core, CORS, OIDC, Metrics):
     """Settings that may change per-environment, some with defaults."""
 
     # Flags that affect other settings, via setting methods below
@@ -405,12 +420,18 @@ class Development(InsecureAuthentication, Base):
     API_CACHE_TIME = values.IntegerValue(0)
 
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
+    METRICS_USE_DEBUG_LOGS = values.Value(True)
 
     def LOGGING(self):
         config = super().LOGGING()
         config["loggers"]["werkzeug"] = {
             "handlers": ["console"],
             "level": "DEBUG",
+            "propagate": False,
+        }
+        config["loggers"]["markus"] = {
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": False,
         }
         return config
@@ -424,6 +445,7 @@ class Production(Base):
     SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
     DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.NormandyS3Boto3Storage")
     AWS_S3_FILE_OVERWRITE = False
+    METRICS_USE_STATSD = values.Value(True)
 
 
 class ProductionReadOnly(Production):
