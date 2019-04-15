@@ -46,7 +46,15 @@ Interacting with the GraphQL API
 To interact with the GraphQL API you will need some kind of client. You
 may install one such as Altair_ as a browser extension.
 
-Simply point your client at the GraphQL endpoint and it should take care
-of the rest.
+The public GraphQL API only supports GET requests. Configure your client to
+GET instead of POST.
+
+Additionally, the server does not accept requests that set ``Content-Type:
+application/json`` but do not provide a body. Altair does this by default. To
+work around this in Altair, add a header (using the asterisk icon in the top
+left of the UI), and specify ``Content-Type: text/plain``.
+
+.. image:: altair_set_header.png
+   :align: center
 
 .. _Altair: https://altair.sirmuel.design/
