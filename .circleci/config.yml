@@ -99,19 +99,11 @@ jobs:
               ./ci/deploy.sh "$CIRCLE_TAG"
             fi
 
-  docs:
+  docs-build:
     docker:
       - image: circleci/python:3.7
-
-    working_directory: ~/repo
-
     steps:
       - checkout
-
-      # Download and cache python dependencies
-      - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements/docs.txt" }}
-
       - run:
           name: Create virtualenv
           command: |
@@ -120,25 +112,53 @@ jobs:
       - run:
           name: Install requirements
           command: pip install -r requirements/docs.txt
-
-      - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements/docs.txt" }}
-          paths:
-            - "~/venv"
-
-      # Build the docs!
       - run:
           name: Build docs
           command: |
             cd docs
             make html
+      - persist_to_workspace:
+          root: docs/_build
+          paths: html
+      - store_artifacts:
+          path: docs/_build/html
+
+  docs-publish:
+    docker:
+      - image: node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: docs/_build
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g gh-pages@2
+            git config user.email "ci-build@normandy.mozilla.org"
+            git config user.name "ci-build"
+      - run:
+          name: Disable jekyll builds
+          command: touch docs/_build/html/.nojekyll
+      - add_ssh_keys:
+          fingerprints:
+            - "5d:91:56:44:f2:f7:57:2a:29:88:f0:2e:37:fe:86:2a"
+      - run:
+        name: Deploy docs to gh-pages
+        command: gh-pages --dotfiles --message "[skip ci] Docs updates" --dist docs/_build/html
 
 workflows:
   version: 2
   main:
     jobs:
       - build_test_publish:
+          # run on all tags, as well as the default of all other commits
           filters:
             tags:
               only: /.*/
-      - docs
+      - docs-build
+      - docs-publish:
+          requires:
+            - docs-build
+          filters:
+            branches:
+              only: master

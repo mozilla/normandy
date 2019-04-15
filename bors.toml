@@ -1,6 +1,6 @@
 status = [
   "ci/circleci: build_test_publish",
-  "ci/circleci: docs"
+  "ci/circleci: docs-build"
 ]
 # Avoid including verbose details from PR bodies
 cut_body_after = "\n---\n"
