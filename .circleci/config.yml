@@ -105,6 +105,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Create virtualenv
+          command: |
+            python3 -m venv ~/venv
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+      - run:
           name: Install requirements
           command: pip install -r requirements/docs.txt
       - run:
