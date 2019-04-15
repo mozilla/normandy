@@ -1,6 +1,6 @@
 import pytest
 
-from normandy.base.tests import GQ, GroupFactory, UserFactory
+from normandy.base.tests import GQ, GroupFactory, UserFactory, Whatever
 
 
 class TestGQ(object):
@@ -33,6 +33,18 @@ class TestQuery(object):
         u = UserFactory()
         res = gql_client.execute(GQ().query.user(id=u.id).fields("username"))
         assert res == {"data": {"user": {"username": u.username}}}
+
+    def test_password_not_queryable(self, gql_client):
+        u = UserFactory()
+        res = gql_client.execute(GQ().query.user(id=u.id).fields("password"))
+        assert res == {
+            "errors": [
+                {
+                    "locations": Whatever(),
+                    "message": 'Cannot query field "password" on type "UserType".',
+                }
+            ]
+        }
 
     def test_resolve_user_by_username(self, gql_client):
         u = UserFactory()

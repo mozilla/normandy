@@ -8,6 +8,7 @@ from graphene_django.types import DjangoObjectType
 class UserType(DjangoObjectType):
     class Meta:
         model = User
+        only_fields = ["id", "first_name", "last_name", "email", "username", "groups"]
 
 
 class GroupType(DjangoObjectType):
