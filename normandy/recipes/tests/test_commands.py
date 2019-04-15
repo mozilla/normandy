@@ -10,6 +10,8 @@ from django.core.exceptions import ImproperlyConfigured
 
 import pytest
 import requests.exceptions
+from markus.testing import MetricsMock
+from markus import GAUGE
 
 from normandy.base.tests import UserFactory
 from normandy.recipes import exports
@@ -182,6 +184,7 @@ class TestUpdateRecipeSignatures(object):
 
     def test_it_signs_unsigned_enabled_recipes(self, mocked_autograph):
         r = RecipeFactory(approver=UserFactory(), enabler=UserFactory(), signed=False)
+        assert r.signature is None
         call_command("update_recipe_signatures")
         r.refresh_from_db()
         assert r.signature is not None
@@ -202,7 +205,7 @@ class TestUpdateRecipeSignatures(object):
         assert r.signature is None
 
     def test_it_unsigns_out_of_date_disabled_recipes(self, settings, mocked_autograph):
-        r = RecipeFactory(signed=True)
+        r = RecipeFactory(signed=True, enabled=False)
         r.signature.timestamp -= timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE * 2)
         r.signature.save()
         call_command("update_recipe_signatures")
@@ -239,6 +242,18 @@ class TestUpdateRecipeSignatures(object):
         call_command("update_recipe_signatures")
         r.refresh_from_db()
         assert r.signature.signature == "original signature"
+
+    def test_it_sends_metrics(self, settings, mocked_autograph):
+        # 3 to sign
+        RecipeFactory.create_batch(3, approver=UserFactory(), enabler=UserFactory(), signed=False)
+        # and 1 to unsign
+        RecipeFactory(signed=True, enabled=False)
+
+        with MetricsMock() as mm:
+            call_command("update_recipe_signatures")
+            mm.print_records()
+            assert mm.has_record(GAUGE, stat="normandy.signing.recipes.signed", value=3)
+            assert mm.has_record(GAUGE, stat="normandy.signing.recipes.unsigned", value=1)
 
 
 @pytest.mark.django_db
@@ -279,6 +294,13 @@ class TestUpdateActionSignatures(object):
         call_command("update_action_signatures")
         a.refresh_from_db()
         assert a.signature.signature == "original signature"
+
+    def test_it_sends_metrics(self, settings, mocked_autograph):
+        ActionFactory.create_batch(3, signed=False)
+        with MetricsMock() as mm:
+            call_command("update_action_signatures")
+            mm.print_records()
+            assert mm.has_record(GAUGE, stat="normandy.signing.actions.signed", value=3)
 
 
 addonUrl = "addonUrl"

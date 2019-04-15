@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import markus
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -7,6 +8,9 @@ from django.utils import timezone
 
 from normandy.recipes.models import Recipe
 from normandy.recipes.exports import RemoteSettings
+
+
+metrics = markus.get_metrics("normandy.signing.recipes")
 
 
 class Command(BaseCommand):
@@ -43,6 +47,8 @@ class Command(BaseCommand):
             # Approve all Remote Settings changes.
             remote_settings.approve_changes()
 
+        metrics.gauge("signed", count, tags=["force"] if force else [])
+
         recipes_to_unsign = Recipe.objects.only_disabled().exclude(signature=None)
         count = recipes_to_unsign.count()
         if count == 0:
@@ -55,6 +61,8 @@ class Command(BaseCommand):
                 recipe.signature = None
                 recipe.save()
                 sig.delete()
+
+        metrics.gauge("unsigned", count, tags=["force"] if force else [])
 
     def get_outdated_recipes(self):
         outdated_age = timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE)

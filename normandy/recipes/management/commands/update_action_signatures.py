@@ -1,11 +1,15 @@
 from datetime import timedelta
 
+import markus
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.utils import timezone
 
 from normandy.recipes.models import Action
+
+
+metrics = markus.get_metrics("normandy.signing.actions")
 
 
 class Command(BaseCommand):
@@ -34,6 +38,8 @@ class Command(BaseCommand):
                 self.stdout.write(" * " + action.name)
                 action.update_signature()
                 action.save()
+
+        metrics.gauge("signed", count, tags=["force"] if force else [])
 
     def get_outdated_actions(self):
         outdated_age = timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE)

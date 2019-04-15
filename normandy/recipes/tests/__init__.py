@@ -70,8 +70,9 @@ class ActionFactory(factory.DjangoModelFactory):
             self.signature = SignatureFactory(data=self.canonical_json())
             self.signature.save()
             self.save()
-        else:
-            return None
+        elif extracted is False:
+            self.signature = None
+            self.save()
 
 
 class RecipeFactory(factory.DjangoModelFactory):
@@ -123,6 +124,12 @@ class RecipeFactory(factory.DjangoModelFactory):
             approval = ApprovalRequestFactory(revision=self.latest_revision)
             approval.approve(extracted, "r+")
 
+    @factory.post_generation
+    def enabled(self, create, extracted, **kwargs):
+        if extracted:
+            self.approved_revision.enable(UserFactory())
+            self.refresh_from_db()  # Ensure signature side-effect is picked up
+
     # This should always be after `approver` as we require approval to enable a recipe
     @factory.post_generation
     def enabler(self, create, extracted, **kwargs):
@@ -140,8 +147,9 @@ class RecipeFactory(factory.DjangoModelFactory):
             self.signature = SignatureFactory(data=self.canonical_json())
             self.signature.save()
             self.save()
-        else:
-            return None
+        elif extracted is False:
+            self.signature = None
+            self.save()
 
 
 class FuzzyIdenticonSeed(factory.fuzzy.FuzzyText):
