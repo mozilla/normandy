@@ -9,6 +9,11 @@ actions:
     include: "*.py"
     exclude: "docs/"
 
+  sort-requirements:
+    run: sort-requirements --check {files}
+    fix: sort-requirements {files}
+    include: "requirements/*.txt"
+
   eslint:
     run: eslint {files}
     fix: eslint --fix {files}

@@ -24,6 +24,9 @@ case $1 in
     black --check $python_to_lint
     pip check
 
+    echo "Linting Python requirements files"
+    sort-requirements --check requirements/*.txt
+
     echo "Linting JS files"
     yarn lint:js
 
