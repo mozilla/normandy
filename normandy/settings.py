@@ -38,6 +38,7 @@ class Core(Configuration):
     # Middleware that ALL environments must have. See the Base class for
     # details.
     MIDDLEWARE = [
+        "normandy.base.middleware.response_metrics_middleware",
         "corsheaders.middleware.CorsMiddleware",
         "normandy.base.middleware.request_received_at_middleware",
         "dockerflow.django.middleware.DockerflowMiddleware",

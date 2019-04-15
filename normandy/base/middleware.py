@@ -1,7 +1,9 @@
 import logging
 import os
 import re
+import time
 
+import markus
 from django import http
 from django.conf import settings
 from django.contrib.auth.middleware import RemoteUserMiddleware
@@ -17,6 +19,7 @@ DEBUG_HTTP_TO_HTTPS_REDIRECT = "normandy.base.middleware.D001"
 
 
 logger = logging.getLogger(__name__)
+metrics = markus.get_metrics("normandy")
 
 
 def request_received_at_middleware(get_response):
@@ -117,3 +120,25 @@ class NormandySecurityMiddleware(SecurityMiddleware):
                 },
             )
         return response
+
+
+def response_metrics_middleware(get_response):
+    def middleware(request):
+        start_time = time.time()
+        response = get_response(request)
+        delta = time.time() - start_time
+
+        view = request.resolver_match.func
+        view_name = f"{view.__module__}.{view.__name__}"
+        metrics.timing(
+            "response",
+            value=delta * 1000.0,
+            tags=[
+                f"status:{response.status_code}",
+                f"view:{view_name}",
+                f"method:{request.method}",
+            ],
+        )
+        return response
+
+    return middleware

@@ -1,6 +1,8 @@
 from random import randint
 
 import pytest
+from markus import TIMING
+from markus.testing import MetricsMock
 
 from normandy.base.middleware import (
     NormandyCommonMiddleware,
@@ -85,3 +87,19 @@ class TestNormandySecurityMiddleware(object):
                 },
             },
         )
+
+
+class TestResponseMetricsMiddleware(object):
+    def test_it_sends_a_timer_metric(self, settings, client):
+        middleware_name = "normandy.base.middleware.response_metrics_middleware"
+        if middleware_name not in settings.MIDDLEWARE:
+            settings.MIDDLEWARE.insert(0, middleware_name)
+
+        with MetricsMock() as mm:
+            client.get("/api/v3/?query=string")
+            mm.print_records()
+            assert mm.has_record(
+                TIMING,
+                stat="normandy.response",
+                tags=["status:200", "view:normandy.base.api.views.APIRootView", "method:GET"],
+            )

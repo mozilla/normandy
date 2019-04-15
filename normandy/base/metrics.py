@@ -38,6 +38,11 @@ class DebugLogsBackend(BackendBase):
             )
 
     def _emit(self, type, stat, value, tags, *, op="="):
+        # round floats to 2 decimal points
+        if isinstance(value, float):
+            if int(value) != value:
+                value = round(value * 100.0) / 100.0
+
         result = f"[{type}] {stat} {op} {value}"
         if tags:
             tags_display = ", ".join(t for t in tags)
@@ -52,7 +57,7 @@ class DebugLogsBackend(BackendBase):
         self._emit("gauge", stat, value, tags)
 
     def timing(self, stat, value, tags=None):
-        self._emit("timing", stat, value, tags)
+        self._emit("timing", stat, f"{value:>.1f}ms", tags)
 
     def histogram(self, stat, value, tags=None):
         self._emit("histogram", stat, value, tags)
