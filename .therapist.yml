@@ -15,8 +15,8 @@ actions:
     include: "requirements/*.txt"
 
   eslint:
-    run: eslint {files}
-    fix: eslint --fix {files}
+    run: yarn eslint {files}
+    fix: yarn eslint --fix {files}
     include:
       - "*.js"
       - "*.jsx"
