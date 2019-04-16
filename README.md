@@ -18,4 +18,4 @@ MaxMind, available from https://www.maxmind.com.
 
 Please see the [Developer Setup] documentation to get started.
 
-[Developer Setup]: https://normandy.readthedocs.io/dev/install.html
+[Developer Setup]: https://mozilla.github.io/normandy/dev/install.html

@@ -177,7 +177,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
             jexl = JEXL()
 
             # Add mock transforms for validation. See
-            # http://normandy.readthedocs.io/en/latest/user/filter_expressions.html#transforms
+            # https://mozilla.github.io/normandy/user/filters.html#transforms
             # for a list of what transforms we expect to be available.
             jexl.add_transform("date", lambda x: x)
             jexl.add_transform("stableSample", lambda x: x)
