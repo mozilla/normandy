@@ -11,10 +11,6 @@ import sys
 # module for autodocs.
 sys.path.insert(0, os.path.abspath(".."))
 
-# Set up Django settings
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "normandy.settings")
-os.environ.setdefault("DJANGO_CONFIGURATION", "Docs")
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
