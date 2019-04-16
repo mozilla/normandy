@@ -6,7 +6,49 @@
 #
 version: 2
 jobs:
-  build_test_publish:
+  lint:
+    docker:
+      # Image with Python/Node and therapist pre-installed
+      - image: mozilla/cidockerbases:therapist-latest
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Install python dependencies
+      - run:
+          name: Create virtualenv
+          command: |
+            python3 -m venv ~/venv
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+
+      - run:
+          name: Install python dependencies
+          command: pip install -U -r requirements/default.txt -c requirements/constraints.txt --require-hashes
+
+      # Download and cache node dependencies
+      - restore_cache:
+          keys:
+          - v2-dependencies-{{ checksum "yarn.lock" }}
+          # fallback to using the latest cache if no exact match is found
+          - v2-dependencies-
+
+      - run:
+          name: Install node dependencies
+          command: yarn install --frozen-lockfile
+
+      - save_cache:
+          paths:
+            - "node_modules"
+          key: v2-dependencies-{{ checksum "yarn.lock" }}
+
+      # Run lint suite using therapist
+      - run:
+          name: Lint
+          command: therapist run --use-tracked-files
+
+  build-test-publish:
     docker:
       - image: mozilla/cidockerbases:docker-latest
 
@@ -49,10 +91,6 @@ jobs:
             ./bin/download_geolite2.sh
             docker-compose build
             docker-compose pull db
-
-      - run:
-          name: Linting
-          command: docker-compose run web lint
 
       - run:
           name: Python Tests
@@ -150,7 +188,10 @@ workflows:
   version: 2
   main:
     jobs:
-      - build_test_publish:
+      - lint
+      - build-test-publish:
+          requires:
+            - lint
           # run on all tags, as well as the default of all other commits
           filters:
             tags:

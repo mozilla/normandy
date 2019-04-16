@@ -15,13 +15,16 @@ actions:
     include: "requirements/*.txt"
 
   eslint:
-    run: eslint {files}
-    fix: eslint --fix {files}
+    run: yarn eslint {files}
+    fix: yarn eslint --fix {files}
     include:
       - "*.js"
       - "*.jsx"
     exclude:
       - ".eslintrc.js"
+
+  yarn-audit:
+    run: yarn audit
 shortcuts:
   lint:
     flags:

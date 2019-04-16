@@ -2,7 +2,7 @@
 set -eo pipefail
 
 usage() {
-  echo "usage: ./bin/run.sh python-tests|js-tests|lint|start|migrations-check"
+  echo "usage: ./bin/run.sh python-tests|js-tests|start|migrations-check"
   exit 1
 }
 
@@ -17,22 +17,6 @@ function start_gunicorn {
 [ $# -lt 1 ] && usage
 
 case $1 in
-  lint)
-    echo "Linting Python files"
-    python_to_lint="normandy/ contract-tests/ manage.py docs/ bin/"
-    flake8 $python_to_lint
-    black --check $python_to_lint
-    pip check
-
-    echo "Linting Python requirements files"
-    sort-requirements --check requirements/*.txt
-
-    echo "Linting JS files"
-    yarn lint:js
-
-    echo "Checking JS package security"
-    yarn run lint:js-security
-    ;;
   migrations-check)
     ./manage.py migrate
     echo "Checking that all migrations have been made"
