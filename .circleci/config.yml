@@ -9,7 +9,7 @@ jobs:
   lint:
     docker:
       # Image with Python/Node and therapist pre-installed
-      - image: mozilla/cidockerbases:python-node-latest
+      - image: mozilla/cidockerbases:therapist-latest
 
     working_directory: ~/repo
 
