@@ -128,8 +128,12 @@ def response_metrics_middleware(get_response):
         response = get_response(request)
         delta = time.time() - start_time
 
-        view = request.resolver_match.func
-        view_name = f"{view.__module__}.{view.__name__}"
+        if request.resolver_match:
+            view = request.resolver_match.func
+            view_name = f"{view.__module__}.{view.__name__}"
+        else:
+            view_name = "<unknown view>"
+
         metrics.timing(
             "response",
             value=delta * 1000.0,
