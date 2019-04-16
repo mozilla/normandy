@@ -18,6 +18,12 @@ jobs:
 
       # Install python dependencies
       - run:
+          name: Create virtualenv
+          command: |
+            python3 -m venv ~/venv
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+
+      - run:
           name: Install python dependencies
           command: pip install -U -r requirements/default.txt -c requirements/constraints.txt --require-hashes
 
