@@ -8,8 +8,8 @@ version: 2
 jobs:
   lint:
     docker:
-      # Image with python 3.6 and node 8
-      - image: circleci/python:3.6-node-browsers
+      # Image with Python/Node and therapist pre-installed
+      - image: mozilla/cidockerbases:python-node-latest
 
     working_directory: ~/repo
 
@@ -26,10 +26,6 @@ jobs:
       - run:
           name: Install python dependencies
           command: pip install -U -r requirements/default.txt -c requirements/constraints.txt --require-hashes
-
-      - run:
-          name: Install therapist
-          command: pip install -U therapist
 
       # Download and cache node dependencies
       - restore_cache:
