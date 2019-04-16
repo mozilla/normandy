@@ -194,6 +194,8 @@ workflows:
     jobs:
       - lint
       - build-test-publish:
+          requires:
+            - lint
           # run on all tags, as well as the default of all other commits
           filters:
             tags:
