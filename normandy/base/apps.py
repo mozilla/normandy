@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from normandy.base import checks
+from normandy.base import checks, metrics
 
 
 class BaseApp(AppConfig):
@@ -10,3 +10,4 @@ class BaseApp(AppConfig):
 
     def ready(self):
         checks.register()
+        metrics.register()
