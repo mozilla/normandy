@@ -1,5 +1,3 @@
--r default.txt
-
 Sphinx==2.0.1 \
     --hash=sha256:423280646fb37944dd3c85c58fb92a20d745793a9f6c511f59da82fa97cd404b \
     --hash=sha256:de930f42600a4fef993587633984cc5027dedba2464bcf00ddace26b40f8d9ce
