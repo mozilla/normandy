@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Example &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Environments" href="environments.html" />
+    <link rel="prev" title="QA Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">QA Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-function-to-the-driver">1. Adding a Function to the Driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-a-notification-action">2. Write a Notification Action</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-recipe">3. Create a Recipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delivery">4. Delivery</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="environments.html">Environments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">QA Documentation</a> &raquo;</li>
+        
+      <li>Example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/qa/example.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<p>This document describes the end-to-end process of developing, shipping, and
+executing a new action with SHIELD, in order to illustrate in detail the
+mechanics of the system.</p>
+<p>In this example, we want to add the ability to SHIELD to prompt users with a
+pop-up notification with some configurable text, and only prompts users once.</p>
+<div class="section" id="adding-a-function-to-the-driver">
+<h2>1. Adding a Function to the Driver<a class="headerlink" href="#adding-a-function-to-the-driver" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to add a new function to the driver that will trigger the
+notification on the client. The driver is implemented in the system add-on,
+so we update the add-on to implement the function:</p>
+<dl class="function">
+<dt id="showNotification">
+<code class="descname">showNotification</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="headerlink" href="#showNotification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display a pop-up notification to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> – Message to show in the pop-up.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The change has to be merged into the system add-on and released before it will
+be available to actions to use.</p>
+</div>
+<div class="section" id="write-a-notification-action">
+<h2>2. Write a Notification Action<a class="headerlink" href="#write-a-notification-action" title="Permalink to this headline">¶</a></h2>
+<p>Next, we must develop an <a class="reference internal" href="../dev/concepts.html#actions"><span class="std std-ref">action</span></a> that uses <code class="docutils literal notranslate"><span class="pre">showNotification</span></code>
+to display the notification given in the action’s arguments. This includes the
+logic for only showing the notification if the user hasn’t seen it before:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">NotificationAction</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">normandy</span><span class="p">,</span> <span class="nx">recipe</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">normandy</span> <span class="o">=</span> <span class="nx">normandy</span><span class="p">;</span> <span class="c1">// The driver object</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">recipe</span> <span class="o">=</span> <span class="nx">recipe</span><span class="p">;</span> <span class="c1">// Contains recipe arguments and other data</span>
+
+    <span class="c1">// Persistent data store on the client.</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">storage</span> <span class="o">=</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">createStorage</span><span class="p">(</span><span class="nx">recipe</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nx">async</span> <span class="nx">execute</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Check if we&#39;ve shown the notification previously, and show it if we</span>
+    <span class="c1">// have not.</span>
+    <span class="kr">const</span> <span class="nx">haveShownPreviously</span> <span class="o">=</span> <span class="nx">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;shownPreviously&#39;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">haveShownPreviously</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;shownPreviously&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">showNotification</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">recipe</span><span class="p">.</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">registerAction</span><span class="p">(</span><span class="s1">&#39;notification&#39;</span><span class="p">,</span> <span class="nx">ConsoleLogAction</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In addition to the code above, actions have to define a <a class="reference external" href="http://json-schema.org/">JSON Schema</a>
+as well as a form for the arguments. These are used in the control interface
+in Normandy as well as in the system add-on to validate arguments.</p>
+</div>
+<p>After creating the action, it must be deployed to the Normandy service before it
+can be used in a recipe.</p>
+</div>
+<div class="section" id="create-a-recipe">
+<h2>3. Create a Recipe<a class="headerlink" href="#create-a-recipe" title="Permalink to this headline">¶</a></h2>
+<p>The next step is to create a <a class="reference internal" href="../dev/concepts.html#recipes"><span class="std std-ref">recipe</span></a> that uses the
+<code class="docutils literal notranslate"><span class="pre">notification</span></code> action that we created above. This is done via the control
+interface on the Normandy service itself. Important fields to input via the
+web interface include:</p>
+<ul class="simple">
+<li><p><strong>Action</strong>: The <code class="docutils literal notranslate"><span class="pre">notification</span></code> action.</p></li>
+<li><p><strong>Filter Expression</strong>: A <a class="reference external" href="https://github.com/TechnologyAdvice/Jexl">JEXL</a> statement to filter the recipe so that only
+certain users see it. For testing purposes, the expression <code class="docutils literal notranslate"><span class="pre">true</span></code> will match
+all users.</p></li>
+<li><p><strong>Arguments</strong>: A single <code class="docutils literal notranslate"><span class="pre">message</span></code> field containing the message to display.</p></li>
+</ul>
+<p>Once created, the recipe will need to be submitted for peer review and approved
+by another users before it is enabled within the service.</p>
+</div>
+<div class="section" id="delivery">
+<h2>4. Delivery<a class="headerlink" href="#delivery" title="Permalink to this headline">¶</a></h2>
+<p>Once the recipe is enabled, the service will include it in queries to the
+recipe API. The system add-on performs the following steps to fetch and execute
+our new recipe:</p>
+<ol class="arabic">
+<li><p>Upon activation, send a <code class="docutils literal notranslate"><span class="pre">POST</span></code> request to <code class="docutils literal notranslate"><span class="pre">/api/v1/recipe/?enabled=true</span></code>
+to retrieve all currently-enabled recipes. This returns a JSON response that
+looks similar:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+   <span class="p">{</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Notification&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;revision_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nt">&quot;action_name&quot;</span><span class="p">:</span> <span class="s2">&quot;notification&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Notification message!&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;filter_expression&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+   <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some fields were removed from the response above for readability.</p>
+</div>
+</li>
+<li><p>For each recipe, evaluate its <code class="docutils literal notranslate"><span class="pre">filter_expression</span></code> field as a <a class="reference external" href="https://github.com/TechnologyAdvice/Jexl">JEXL</a>
+expression against a context containing information about the client and
+environment that it is running in. If the expression returns true, then the
+recipe matches the client and will be run. Otherwise, the recipe is
+discarded.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">/api/v1/classify_client/</span></code> API endpoint is used to populate the context
+with the current server time and the country the user is located in via IP
+address geolocation.</p>
+</li>
+<li><p>For each matching recipe, download the action specified in the recipe if it
+hasn’t been downloaded yet. Actions served from URLs of the form
+<code class="docutils literal notranslate"><span class="pre">/api/v1/action/notification/</span></code> and return a response that looks like:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;show-heartbeat&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;implementation_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://normandy.cdn.mozilla.net/v1/action/notification/implementation/4574dbc126af07cd031a0da29d625a11365403ea/&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;arguments_schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="nt">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://json-schema.org/draft-04/schema#&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Display a pop-up notification&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+             <span class="s2">&quot;message&quot;</span>
+         <span class="p">],</span>
+         <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Message to show in the notification&quot;</span><span class="p">,</span>
+                 <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                 <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+             <span class="p">}</span>
+         <span class="p">}</span>
+     <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In addition, the JavaScript code for the action is downloaded via the URL in
+the <code class="docutils literal notranslate"><span class="pre">implementation_url</span></code> property of the response above.</p>
+</li>
+<li><p>For each matching recipe, execute the action associated with it in a sandbox,
+passing in information about the recipe (including its arguments) and the
+driver object.</p></li>
+</ol>
+<p>After these steps, the <code class="docutils literal notranslate"><span class="pre">notification</span></code> action and recipe that we created will
+have been downloaded and executed, and the user will see a notification pop up.
+Future runs of that specific recipe will not show a notification.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="environments.html" class="btn btn-neutral float-right" title="Environments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="QA Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

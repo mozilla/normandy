@@ -1,0 +1,1076 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Filters &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Peer Approval" href="peer_approval.html" />
+    <link rel="prev" title="User Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Filters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-normandy.recipes.filters">Filter Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filter-expressions">Filter Expressions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#jexl-basics">JEXL Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#context">Context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#operators">Operators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms">Transforms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-filter-expressions-with-the-normandy-devtools">Testing Filter Expressions with the Normandy Devtools</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="peer_approval.html">Peer Approval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions/index.html">Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="end_user_interaction.html">End User Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">User Documentation</a> &raquo;</li>
+        
+      <li>Filters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/user/filters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="filters">
+<h1>Filters<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h1>
+<p>Normandy filters describe which users a <a class="reference internal" href="../dev/concepts.html#recipes"><span class="std std-ref">recipe</span></a> should be
+executed for. They’re executed locally in the client’s browser. If the client
+matches the critera, the corresponding recipe is executed. Filters have
+access to information about the browser, such as its country, locale, and
+Firefox version.</p>
+<p>There are two major forms of filters in Normandy. The first is filter objects,
+which are simpler and more restrictive. They are a good first choice. The second
+is filter expressions, which are much more expressive, but also more complex. If
+filter objects can’t do what you want, turn to filter expressions.</p>
+<div class="section" id="module-normandy.recipes.filters">
+<span id="filter-objects"></span><h2>Filter Objects<a class="headerlink" href="#module-normandy.recipes.filters" title="Permalink to this headline">¶</a></h2>
+<p>Filter objects are based on a series of simple rules. In order for a recipe to
+match a user, every part of a filter object must be true. In other words, the
+parts of a filter expression are <code class="docutils literal notranslate"><span class="pre">AND</span></code> ed together.</p>
+<p>Each filter below defines a rule, and when it matches a user. Filter parameters
+are represented as JSON. Most users will interact with filters at a higher
+level, such as a web interface that allows building a filter with a form.</p>
+<p>Filter objects are generally specified as a JSON object with at least a
+“type” field, and other fields determined by that type. For example,
+<code class="docutils literal notranslate"><span class="pre">ChannelFilter</span></code> below has a type of “channel” and requires a <code class="docutils literal notranslate"><span class="pre">channels</span></code>
+field, so the final JSON would look something like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;channel&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;release&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="normandy.recipes.filters.ChannelFilter">
+<em class="property">class </em><code class="descclassname">normandy.recipes.filters.</code><code class="descname">ChannelFilter</code><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user on any of the listed channels.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.ChannelFilter.type">
+<code class="descname">type</code><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">channel</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.ChannelFilter.channels">
+<code class="descname">channels</code><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter.channels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;release&quot;,</span> <span class="pre">&quot;beta&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.LocaleFilter">
+<em class="property">class </em><code class="descclassname">normandy.recipes.filters.</code><code class="descname">LocaleFilter</code><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user on any of the listed locales.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.LocaleFilter.type">
+<code class="descname">type</code><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">locale</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.LocaleFilter.locales">
+<code class="descname">locales</code><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter.locales" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use full <code class="docutils literal notranslate"><span class="pre">xx-YY</span></code> locale codes instead of short <code class="docutils literal notranslate"><span class="pre">xx</span></code> codes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;en-US&quot;,</span> <span class="pre">&quot;en-CA&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.CountryFilter">
+<em class="property">class </em><code class="descclassname">normandy.recipes.filters.</code><code class="descname">CountryFilter</code><a class="headerlink" href="#normandy.recipes.filters.CountryFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user located in any of the listed countries.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.CountryFilter.type">
+<code class="descname">type</code><a class="headerlink" href="#normandy.recipes.filters.CountryFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">country</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.CountryFilter.countries">
+<code class="descname">countries</code><a class="headerlink" href="#normandy.recipes.filters.CountryFilter.countries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use two letter country codes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;US&quot;,</span> <span class="pre">&quot;DE&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.BucketSampleFilter">
+<em class="property">class </em><code class="descclassname">normandy.recipes.filters.</code><code class="descname">BucketSampleFilter</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample a portion of the users by defining a series of buckets, evenly
+distributing users into those buckets, and then selecting a range of
+those buckets.</p>
+<p>This is consistent but unpredictable: a given set of inputs will always
+produce the same answer, but can’t be figured out ahead of time. This
+makes it appropriate for sampling since it uniformly distributes inputs
+over the entire sample space, and any variations in the inputs are spread
+out over the entire space.</p>
+<p>The range to check is defined by a start point and length, and can wrap
+around the input space. For example, if there are 100 buckets, and we ask
+to check 50 buckets starting from bucket 70, then buckets 70-99 and 0-19
+will be checked.</p>
+<p>This works by hashing the inputs, and comparing the resulting hash to the
+possible hash space.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.BucketSampleFilter.type">
+<code class="descname">type</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">bucketSample</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.BucketSampleFilter.input">
+<code class="descname">input</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of <a class="reference internal" href="#filter-context"><span class="std std-ref">Context</span></a> values to consider for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;normandy.userId&quot;,</span> <span class="pre">&quot;recipe.id&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.BucketSampleFilter.start">
+<code class="descname">start</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>The bucket to begin at.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">70</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.BucketSampleFilter.count">
+<code class="descname">count</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of buckets to include. The size of the included population
+will be <code class="docutils literal notranslate"><span class="pre">count</span> <span class="pre">/</span> <span class="pre">total</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">50</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.BucketSampleFilter.total">
+<code class="descname">total</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.total" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total number of buckets considered in the space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">100</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.StableSampleFilter">
+<em class="property">class </em><code class="descclassname">normandy.recipes.filters.</code><code class="descname">StableSampleFilter</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample a portion of users. With a rate of <code class="docutils literal notranslate"><span class="pre">0.3</span></code>, 3 out of every 10
+users will be selected by this filter.</p>
+<p>This is consistent but unpredictable: a given set of inputs will always
+produce the same answer, but can’t be figured out ahead of time. This
+makes it appropriate for sampling since it uniformly distributes inputs
+over the entire sample space, and any variations in the inputs are spread
+out over the entire space.</p>
+<p>This works by hashing the inputs, and then checking if the hash falls above
+or below the sample point of the hash space.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.StableSampleFilter.type">
+<code class="descname">type</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">stableSample</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.StableSampleFilter.input">
+<code class="descname">input</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of <a class="reference internal" href="#filter-context"><span class="std std-ref">Context</span></a> values to consider for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;normandy.userId&quot;,</span> <span class="pre">&quot;recipe.id&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.StableSampleFilter.rate">
+<code class="descname">rate</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The portion of the sample that should match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.VersionFilter">
+<em class="property">class </em><code class="descclassname">normandy.recipes.filters.</code><code class="descname">VersionFilter</code><a class="headerlink" href="#normandy.recipes.filters.VersionFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user running any of the listed versions. This will include dot
+releases, and won’t consider channel.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.VersionFilter.type">
+<code class="descname">type</code><a class="headerlink" href="#normandy.recipes.filters.VersionFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.VersionFilter.versions">
+<code class="descname">versions</code><a class="headerlink" href="#normandy.recipes.filters.VersionFilter.versions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[59,</span> <span class="pre">61,</span> <span class="pre">62]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="filter-expressions">
+<h2>Filter Expressions<a class="headerlink" href="#filter-expressions" title="Permalink to this headline">¶</a></h2>
+<p>Filter expressions are written using a language called <a class="reference external" href="https://github.com/TechnologyAdvice/Jexl">JEXL</a>. JEXL is an
+open-source expression language that is given a context (in this case,
+information about the user’s browser) and evaluates a statement using that
+context. JEXL stands for “JavaScript Expression Language” and uses JavaScript
+syntax for several (but not all) of its features.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The rest of this document includes examples of JEXL syntax that has
+comments inline with the expressions. JEXL does <strong>not</strong> have any support for
+comments in statements, but we’re using them to make understanding our
+examples easier.</p>
+</div>
+<div class="section" id="jexl-basics">
+<h3>JEXL Basics<a class="headerlink" href="#jexl-basics" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/TechnologyAdvice/Jexl#jexl---">JEXL Readme</a> describes the syntax of the language in detail; the following
+section covers the basics of writing valid JEXL expressions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Normally, JEXL doesn’t allow newlines or other whitespace besides
+spaces in expressions, but filter expressions in Normandy allow arbitrary
+whitespace.</p>
+</div>
+<p>A JEXL expression evaluates down to a single value. JEXL supports several basic
+types, such as numbers, strings (single or double quoted), and booleans. JEXL
+also supports several operators for combining values, such as arithmetic,
+boolean operators, comparisons, and string concatenation.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Arithmetic</span>
+<span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">3</span> <span class="c1">// == 1</span>
+
+<span class="c1">// Numerical comparisons</span>
+<span class="mi">5</span> <span class="o">&gt;</span> <span class="mi">7</span> <span class="c1">// == false</span>
+
+<span class="c1">// Boolean operators</span>
+<span class="kc">false</span> <span class="o">||</span> <span class="mi">5</span> <span class="o">&gt;</span> <span class="mi">4</span> <span class="c1">// == true</span>
+
+<span class="c1">// String concatenation</span>
+<span class="s2">&quot;Mozilla&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;Firefox&quot;</span> <span class="c1">// == &quot;Mozilla Firefox&quot;</span>
+</pre></div>
+</div>
+<p>Expressions can be grouped using parenthesis:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">((</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span> <span class="c1">// == 7</span>
+</pre></div>
+</div>
+<p>JEXL also supports lists and objects (known as dictionaries in other languages)
+as well as attribute access:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">].</span><span class="nx">length</span> <span class="c1">// == 3</span>
+<span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="mi">2</span><span class="p">}.</span><span class="nx">foo</span> <span class="c1">// == 1</span>
+</pre></div>
+</div>
+<p>Unlike JavaScript, JEXL supports an <code class="docutils literal notranslate"><span class="pre">in</span></code> operator for checking if a substring
+is in a string or if an element is in an array:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;bar&quot;</span> <span class="k">in</span> <span class="s2">&quot;foobarbaz&quot;</span> <span class="c1">// == true</span>
+<span class="mi">3</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="c1">// == true</span>
+</pre></div>
+</div>
+<p>The context passed to JEXL can be expressed using identifiers, which also
+support attribute access:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">normandy</span><span class="p">.</span><span class="nx">locale</span> <span class="o">==</span> <span class="s1">&#39;en-US&#39;</span> <span class="c1">// == true if the client&#39;s locale is en-US</span>
+</pre></div>
+</div>
+<p>Another unique feature of JEXL is transforms, which modify the value given to
+them. Transforms are applied to a value using the <code class="docutils literal notranslate"><span class="pre">|</span></code> operator, and may take
+additional arguments passed in the expression:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;1980-01-07&#39;</span><span class="o">|</span><span class="nx">date</span> <span class="c1">// == a date object</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="context">
+<span id="filter-context"></span><h3>Context<a class="headerlink" href="#context" title="Permalink to this headline">¶</a></h3>
+<p>This section defines the context passed to filter expressions when they are
+evaluated. In other words, this is the client information available within
+filter expressions.</p>
+<dl class="data">
+<dt id="normandy">
+<code class="descname">normandy</code><a class="headerlink" href="#normandy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">normandy</span></code> object contains general information about the client.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.userId">
+<code class="descclassname">normandy.</code><code class="descname">userId</code><a class="headerlink" href="#normandy.userId" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29">v4 UUID</a> uniquely identifying the user. This is uncorrelated with any
+other unique IDs, such as Telemetry IDs.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.version">
+<code class="descclassname">normandy.</code><code class="descname">version</code><a class="headerlink" href="#normandy.version" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'47.0.1'</span></code></p>
+<p>String containing the user’s Firefox version.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.channel">
+<code class="descclassname">normandy.</code><code class="descname">channel</code><a class="headerlink" href="#normandy.channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>String containing the update channel. Valid values include, but are not
+limited to:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'release'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'aurora'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'beta'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'nightly'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'default'</span></code> (self-built or automated testing builds)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.isDefaultBrowser">
+<code class="descclassname">normandy.</code><code class="descname">isDefaultBrowser</code><a class="headerlink" href="#normandy.isDefaultBrowser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean specifying whether Firefox is set as the user’s default browser.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.searchEngine">
+<code class="descclassname">normandy.</code><code class="descname">searchEngine</code><a class="headerlink" href="#normandy.searchEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'google'</span></code></p>
+<p>String containing the user’s default search engine identifier. Identifiers
+are lowercase, and may by locale-specific (Wikipedia, for examnple, often has
+locale-specific codes like <code class="docutils literal notranslate"><span class="pre">'wikipedia-es'</span></code>).</p>
+<p>The default identifiers included in Firefox are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'google'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'yahoo'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'amazondotcom'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'bing'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'ddg'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'twitter'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'wikipedia'</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.syncSetup">
+<code class="descclassname">normandy.</code><code class="descname">syncSetup</code><a class="headerlink" href="#normandy.syncSetup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean containing whether the user has set up Firefox Sync.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.syncDesktopDevices">
+<code class="descclassname">normandy.</code><code class="descname">syncDesktopDevices</code><a class="headerlink" href="#normandy.syncDesktopDevices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer specifying the number of desktop clients the user has added to their
+Firefox Sync account.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.syncMobileDevices">
+<code class="descclassname">normandy.</code><code class="descname">syncMobileDevices</code><a class="headerlink" href="#normandy.syncMobileDevices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer specifying the number of mobile clients the user has added to their
+Firefox Sync account.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.syncTotalDevices">
+<code class="descclassname">normandy.</code><code class="descname">syncTotalDevices</code><a class="headerlink" href="#normandy.syncTotalDevices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer specifying the total number of clients the user has added to their
+Firefox Sync account.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.plugins">
+<code class="descclassname">normandy.</code><code class="descname">plugins</code><a class="headerlink" href="#normandy.plugins" title="Permalink to this definition">¶</a></dt>
+<dd><p>An object mapping of plugin names to <code class="xref js js-class docutils literal notranslate"><span class="pre">Plugin()</span></code> objects describing
+the plugins installed on the client.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.locale">
+<code class="descclassname">normandy.</code><code class="descname">locale</code><a class="headerlink" href="#normandy.locale" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'en-US'</span></code></p>
+<p>String containing the user’s locale.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.country">
+<code class="descclassname">normandy.</code><code class="descname">country</code><a class="headerlink" href="#normandy.country" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'US'</span></code></p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO 3166-1 alpha-2</a> country code for the country that the user is located
+in. This is determined via IP-based geolocation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.request_time">
+<code class="descclassname">normandy.</code><code class="descname">request_time</code><a class="headerlink" href="#normandy.request_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date object set to the time and date that the user requested recipes from
+Normandy. Useful for comparing against date ranges that a recipe is valid
+for.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Do not run recipe after January 1st.</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">request_time</span> <span class="o">&lt;</span> <span class="s1">&#39;2011-01-01&#39;</span><span class="o">|</span><span class="nx">date</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.distribution">
+<code class="descclassname">normandy.</code><code class="descname">distribution</code><a class="headerlink" href="#normandy.distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>String set to the user’s distribution ID. This is commonly used to target
+funnelcake builds of Firefox.</p>
+<p>On Firefox versions prior to 48.0, this value is set to <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.telemetry">
+<code class="descclassname">normandy.</code><code class="descname">telemetry</code><a class="headerlink" href="#normandy.telemetry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing data for the most recent <a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/index.html#">Telemetry</a> packet of each type.
+This allows you to target recipes at users based on their Telemetry data.</p>
+<p>The object is keyed off the ping type, as documented in the
+<a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/index.html">Telemetry data documentation</a> (see the <code class="docutils literal notranslate"><span class="pre">type</span></code> field in the packet
+example). The value is the contents of the ping.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Target clients that are running Firefox on a tablet</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">telemetry</span><span class="p">.</span><span class="nx">main</span><span class="p">.</span><span class="nx">environment</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">device</span><span class="p">.</span><span class="nx">isTablet</span>
+
+<span class="c1">// Target clients whose last crash had a BuildID of &quot;201403021422&quot;</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">telemetry</span><span class="p">.</span><span class="nx">crash</span><span class="p">.</span><span class="nx">payload</span><span class="p">.</span><span class="nx">metadata</span><span class="p">.</span><span class="nx">BuildID</span> <span class="o">==</span> <span class="s1">&#39;201403021422&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.doNotTrack">
+<code class="descclassname">normandy.</code><code class="descname">doNotTrack</code><a class="headerlink" href="#normandy.doNotTrack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean specifying whether the user has enabled Do Not Track.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.experiments">
+<code class="descclassname">normandy.</code><code class="descname">experiments</code><a class="headerlink" href="#normandy.experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object with several arrays containing the unique slugs for experiments that
+the user has participated in. Currently, this is limited to preference
+experiments.</p>
+<dl class="attribute">
+<dt id="normandy.normandy.experiments.all">
+<code class="descclassname">normandy.normandy.experiments.</code><code class="descname">all</code><a class="headerlink" href="#normandy.normandy.experiments.all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of experiment slugs for every experiment that the user has  enrolled
+in, whether currently active or expired.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.experiments.active">
+<code class="descclassname">normandy.experiments.</code><code class="descname">active</code><a class="headerlink" href="#normandy.experiments.active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of experiment slugs for active experiments that the user is enrolled
+in.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.experiments.expired">
+<code class="descclassname">normandy.experiments.</code><code class="descname">expired</code><a class="headerlink" href="#normandy.experiments.expired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of experiment slugs for expired experiments that the user has
+enrolled in.</p>
+</dd></dl>
+
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Target clients that have ever participated in the &quot;australis&quot;</span>
+<span class="c1">// experiment, including clients that are currently running it</span>
+<span class="s2">&quot;australis&quot;</span> <span class="k">in</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">experiments</span><span class="p">.</span><span class="nx">all</span>
+
+<span class="c1">// Target clients that are currently running the &quot;quantum&quot; experiment</span>
+<span class="s2">&quot;quantum&quot;</span> <span class="k">in</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">experiments</span><span class="p">.</span><span class="nx">active</span>
+
+<span class="c1">// Target clients that ran the &quot;photon&quot; experiment, and have finished it</span>
+<span class="s2">&quot;photon&quot;</span> <span class="k">in</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">experiments</span><span class="p">.</span><span class="nx">expired</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipe">
+<code class="descclassname">normandy.</code><code class="descname">recipe</code><a class="headerlink" href="#normandy.recipe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing information about the recipe being checked. Only documented
+attributes are guaranteed to be available.</p>
+<dl class="attribute">
+<dt id="normandy.normandy.recipe.id">
+<code class="descclassname">normandy.normandy.recipe.</code><code class="descname">id</code><a class="headerlink" href="#normandy.normandy.recipe.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unique ID number for the recipe.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipe.arguments">
+<code class="descclassname">normandy.recipe.</code><code class="descname">arguments</code><a class="headerlink" href="#normandy.recipe.arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing the arguments entered for the recipe. The shape of this
+object varies depending on the recipe, and use of this property is only
+recommended if you are familiar with the argument schema.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.isFirstRun">
+<code class="descclassname">normandy.</code><code class="descname">isFirstRun</code><a class="headerlink" href="#normandy.isFirstRun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean that indicates whether the user has just started Firefox for the
+first time with their current profile. This is only <code class="docutils literal notranslate"><span class="pre">true</span></code> once
+per-profile, and is set to <code class="docutils literal notranslate"><span class="pre">false</span></code> immediately after the first set of
+recipes are executed.</p>
+<p>Recipes that should not run immediately upon first run should include
+<code class="docutils literal notranslate"><span class="pre">!normandy.isFirstRun</span></code> in their filter expression.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.addons">
+<code class="descclassname">normandy.</code><code class="descname">addons</code><a class="headerlink" href="#normandy.addons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing information about installed add-ons. The keys on this
+object are add-on IDs. The values contain the following attributes:</p>
+<dl class="attribute">
+<dt id="normandy.addon.id">
+<code class="descclassname">normandy.addon.</code><code class="descname">id</code><a class="headerlink" href="#normandy.addon.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>String ID of the add-on.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="addon.installDate">
+<code class="descclassname">addon.</code><code class="descname">installDate</code><a class="headerlink" href="#addon.installDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date object indicating when the add-on was installed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="addon.isActive">
+<code class="descclassname">addon.</code><code class="descname">isActive</code><a class="headerlink" href="#addon.isActive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean indicating whether the add-on is active (disabling an add-on but
+not uninstalling it will set this to <code class="docutils literal notranslate"><span class="pre">false</span></code>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="addon.name">
+<code class="descclassname">addon.</code><code class="descname">name</code><a class="headerlink" href="#addon.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>String containing the user-visible name of the add-on.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="addon.type">
+<code class="descclassname">addon.</code><code class="descname">type</code><a class="headerlink" href="#addon.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>String indicating the add-on type. Common values are <code class="docutils literal notranslate"><span class="pre">extension</span></code>,
+<code class="docutils literal notranslate"><span class="pre">theme</span></code>, and <code class="docutils literal notranslate"><span class="pre">plugin</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="addon.version">
+<code class="descclassname">addon.</code><code class="descname">version</code><a class="headerlink" href="#addon.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>String containing the add-on’s version number.</p>
+</dd></dl>
+
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Target users with a specific add-on installed</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">addons</span><span class="p">[</span><span class="s2">&quot;shield-recipe-client@mozilla.org&quot;</span><span class="p">]</span>
+
+<span class="c1">// Target users who have at least one of a group of add-ons installed</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">addons</span><span class="o">|</span><span class="nx">keys</span> <span class="nx">intersect</span> <span class="p">[</span>
+   <span class="s2">&quot;shield-recipe-client@mozilla.org&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;some-other-addon@example.com&quot;</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="operators">
+<h3>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h3>
+<p>This section describes the special operators available to filter expressions on
+top of the standard operators in JEXL. They’re documented as functions, and the
+parameters correspond to the operands.</p>
+<dl class="function">
+<dt id="intersect">
+<code class="descname">intersect</code><span class="sig-paren">(</span><em>list1</em>, <em>list2</em><span class="sig-paren">)</span><a class="headerlink" href="#intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of all values in <code class="docutils literal notranslate"><span class="pre">list1</span></code> that are also present in
+<code class="docutils literal notranslate"><span class="pre">list2</span></code>. Values are compared using strict equality. If <code class="docutils literal notranslate"><span class="pre">list1</span></code> or
+<code class="docutils literal notranslate"><span class="pre">list2</span></code> are not arrays, the returned value is <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list1</strong> – The array to the left of the operator.</p></li>
+<li><p><strong>list2</strong> – The array to the right of the operator</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Evaluates to [2, 3]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="nx">intersect</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="transforms">
+<h3>Transforms<a class="headerlink" href="#transforms" title="Permalink to this headline">¶</a></h3>
+<p>This section describes the transforms available to filter expressions, and what
+they do. They’re documented as functions, and the first parameter to each
+function is the value being transformed.</p>
+<dl class="function">
+<dt id="stableSample">
+<code class="descname">stableSample</code><span class="sig-paren">(</span><em>input</em>, <em>rate</em><span class="sig-paren">)</span><a class="headerlink" href="#stableSample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly returns <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> based on the given sample rate. Used
+to sample over the set of matched users.</p>
+<p>Sampling with this transform is stable over the input, meaning that the same
+input and sample rate will always result in the same return value. The most
+common use is to pass in a unique user ID and a recipe ID as the input; this
+means that each user will consistently run or not run a recipe.</p>
+<p>Without stable sampling, a user might execute a recipe on Monday, and then
+not execute it on Tuesday. In addition, without stable sampling, a recipe
+would be seen by a different percentage of users each day, and over time this
+would add up such that the recipe is seen by more than the percent sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – A value for the sample to be stable over.</p></li>
+<li><p><strong>rate</strong> (<em>number</em>) – A number between <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> with the sample rate. For example,
+<code class="docutils literal notranslate"><span class="pre">0.5</span></code> would be a 50% sample rate.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// True 50% of the time, stable per-user per-recipe.</span>
+<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">recipe</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span><span class="o">|</span><span class="nx">stableSample</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="bucketSample">
+<code class="descname">bucketSample</code><span class="sig-paren">(</span><em>input</em>, <em>start</em>, <em>count</em>, <em>total</em><span class="sig-paren">)</span><a class="headerlink" href="#bucketSample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> if the current user falls within a “bucket” in
+the given range.</p>
+<p>Bucket sampling randomly groups users into a list of “buckets”, in this case
+based on the input parameter. Then, you specify which range of available
+buckets you want your sampling to match, and users who fall into a bucket in
+that range will be matched by this transform. Buckets are stable over the
+input, meaning that the same input will always result in the same bucket
+assignment.</p>
+<p>Importantly, this means that you can use a recipe-independent input across
+several recipes to ensure they do not get delivered to the same users. For
+example, if you have two survey recipes that are variants of each other, you
+can ensure they are not shown to the same people by using the
+<a class="reference internal" href="#normandy.userId" title="normandy.userId"><code class="xref js js-attr docutils literal notranslate"><span class="pre">normandy.userId</span></code></a> attribute:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Half of all users will match the first filter and not the</span>
+<span class="c1">// second one, while the other half will match the second and not</span>
+<span class="c1">// the first, _even across multiple recipes_.</span>
+<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">]</span><span class="o">|</span><span class="nx">bucketSample</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">]</span><span class="o">|</span><span class="nx">bucketSample</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The range to check wraps around the total bucket range. This means that if
+you have 100 buckets, and specify a range starting at bucket 70 that is 50
+buckets long, this function will check buckets 70-99, and buckets 0-19.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – A value for the bucket sampling to be stable over.</p></li>
+<li><p><strong>start</strong> (<em>integer</em>) – The bucket at the start of the range to check. Bucket indexes larger than
+the total bucket count wrap to the start of the range, e.g. bucket 110 and
+bucket 10 are the same bucket if the total bucket count is 100.</p></li>
+<li><p><strong>count</strong> (<em>integer</em>) – The number of buckets to check, starting at the start bucket. If this is
+large enough to cause the range to exceed the total number of buckets, the
+search will wrap to the start of the range again.</p></li>
+<li><p><strong>total</strong> (<em>integer</em>) – The number of buckets you want to group users into.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="date">
+<code class="descname">date</code><span class="sig-paren">(</span><em>dateString</em><span class="sig-paren">)</span><a class="headerlink" href="#date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a string as a date and returns a Date object. Date strings should be
+in <a class="reference external" href="https://www.w3.org/TR/NOTE-datetime">ISO 8601</a> format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dateString</strong> (<em>string</em>) – String to parse as a date.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;2011-10-10T14:48:00&#39;</span><span class="o">|</span><span class="nx">date</span> <span class="c1">// == Date object matching the given date</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of the given object’s own keys (specifically, its enumerable
+properties). Similar to <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys">Object.keys</a>, except that if given a non-object,
+<code class="docutils literal notranslate"><span class="pre">keys</span></code> will return <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – Object to get the keys for.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Evaluates to [&#39;foo&#39;, &#39;bar&#39;]</span>
+<span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span><span class="mi">2</span><span class="p">}</span><span class="o">|</span><span class="nx">keys</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="preference-filters">
+<h4>Preference Filters<a class="headerlink" href="#preference-filters" title="Permalink to this headline">¶</a></h4>
+<dl class="function">
+<dt id="preferenceValue">
+<code class="descname">preferenceValue</code><span class="sig-paren">(</span><em>prefKey</em>, <em>defaultValue</em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceValue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefKey</strong> (<em>string</em>) – Full dotted-path name of the preference to read.</p></li>
+<li><p><strong>defaultValue</strong> – The value to return if the preference does not have a value. Defaults to
+<code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The value of the preference.</p>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Match users with more than 2 content processes</span>
+<span class="s1">&#39;dom.ipc.processCount&#39;</span><span class="o">|</span><span class="nx">preferenceValue</span> <span class="o">&gt;</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="preferenceIsUserSet">
+<code class="descname">preferenceIsUserSet</code><span class="sig-paren">(</span><em>prefKey</em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceIsUserSet" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefKey</strong> (<em>string</em>) – Full dotted-path name of the preference to read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the preference has a value that is different than its default
+value, or <code class="docutils literal notranslate"><span class="pre">false</span></code> if it does not.</p>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Match users who have modified add-on signature checks</span>
+<span class="s1">&#39;xpinstall.signatures.required&#39;</span><span class="o">|</span><span class="nx">preferenceIsUserSet</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="preferenceExists">
+<code class="descname">preferenceExists</code><span class="sig-paren">(</span><em>prefKey</em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceExists" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefKey</strong> (<em>string</em>) – Full dotted-path name of the preference to read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the preference has <em>any</em> value (whether it is the default
+value or a user-set value), or <code class="docutils literal notranslate"><span class="pre">false</span></code> if it does not.</p>
+</dd>
+</dl>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Match users with an HTTP proxy</span>
+<span class="s1">&#39;network.proxy.http&#39;</span><span class="o">|</span><span class="nx">preferenceExists</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>This section lists some examples of commonly-used filter expressions.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Match users using the en-US locale while located in India</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">locale</span> <span class="o">==</span> <span class="s1">&#39;en-US&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">country</span> <span class="o">==</span> <span class="s1">&#39;IN&#39;</span>
+
+<span class="c1">// Match 10% of users in the fr locale.</span>
+<span class="p">(</span>
+   <span class="nx">normandy</span><span class="p">.</span><span class="nx">locale</span> <span class="o">==</span> <span class="s1">&#39;fr&#39;</span>
+   <span class="o">&amp;&amp;</span> <span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">recipe</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span><span class="o">|</span><span class="nx">stableSample</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1">// Match users in any English locale using Firefox Beta</span>
+<span class="p">(</span>
+   <span class="nx">normandy</span><span class="p">.</span><span class="nx">locale</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;en-US&#39;</span><span class="p">,</span> <span class="s1">&#39;en-AU&#39;</span><span class="p">,</span> <span class="s1">&#39;en-CA&#39;</span><span class="p">,</span> <span class="s1">&#39;en-GB&#39;</span><span class="p">,</span> <span class="s1">&#39;en-NZ&#39;</span><span class="p">,</span> <span class="s1">&#39;en-ZA&#39;</span><span class="p">]</span>
+   <span class="o">&amp;&amp;</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">channel</span> <span class="o">==</span> <span class="s1">&#39;beta&#39;</span>
+<span class="p">)</span>
+
+<span class="c1">// Only run the recipe between January 1st, 2011 and January 7th, 2011</span>
+<span class="p">(</span>
+   <span class="nx">normandy</span><span class="p">.</span><span class="nx">request_time</span> <span class="o">&gt;</span> <span class="s1">&#39;2011-01-01T00:00:00+00:00&#39;</span><span class="o">|</span><span class="nx">date</span>
+   <span class="o">&amp;&amp;</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">request_time</span> <span class="o">&lt;</span> <span class="s1">&#39;2011-01-07T00:00:00+00:00&#39;</span><span class="o">|</span><span class="nx">date</span>
+<span class="p">)</span>
+
+<span class="c1">// Match users located in the US who have Firefox as their default browser</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">country</span> <span class="o">==</span> <span class="s1">&#39;US&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">isDefaultBrowser</span>
+
+<span class="c1">// Match users with the Flash plugin installed. If Flash is missing, the</span>
+<span class="c1">// plugin list returns `undefined`, which is a falsy value in JavaScript and</span>
+<span class="c1">// fails the match. Otherwise, it returns a plugin object, which is truthy.</span>
+<span class="nx">normandy</span><span class="p">.</span><span class="nx">plugins</span><span class="p">[</span><span class="s1">&#39;Shockwave Flash&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="testing-filter-expressions-with-the-normandy-devtools">
+<h2>Testing Filter Expressions with the Normandy Devtools<a class="headerlink" href="#testing-filter-expressions-with-the-normandy-devtools" title="Permalink to this headline">¶</a></h2>
+<p>1. Install the Normandy Devtools by downloading the lastest version from <a class="reference external" href="https://github.com/mozilla/normandy-devtools/releases">the
+Github Releases page</a> for the project.</p>
+<ol class="arabic simple" start="2">
+<li><p>Open the devtools by clicking on the new green and gold hand-and-wrench
+icon provided by the extension in Firefox menu.</p></li>
+<li><p>Click the “Filters” menu item.</p></li>
+<li><p>Type your filter in the box in the center. The results will appear in
+real-time on the right hand side.</p></li>
+</ol>
+<p>You can also see the values of context variables on the left of the page.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Certain filters, particular filters that involve
+<code class="docutils literal notranslate"><span class="pre">normandy.recipe</span></code>, may not work as expected, as they rely on
+the <code class="docutils literal notranslate"><span class="pre">id</span></code> and <code class="docutils literal notranslate"><span class="pre">arguments</span></code> fields passed in.</p></li>
+<li><p>If you are using time-based or geolocation-based filters, which
+rely on the Normandy service, this method may fail if you’ve
+configured Firefox to point towards a local instance of Normandy
+which is not running.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="peer_approval.html" class="btn btn-neutral float-right" title="Peer Approval" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="User Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

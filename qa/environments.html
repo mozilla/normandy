@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Environments &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Operations Documentation" href="../ops/index.html" />
+    <link rel="prev" title="Example" href="example.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">QA Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example.html">Example</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Environments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#production">Production</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#preferences">Preferences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#staging">Staging</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Preferences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dev">Dev</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Preferences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#local">Local</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Preferences</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">QA Documentation</a> &raquo;</li>
+        
+      <li>Environments</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/qa/environments.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="environments">
+<h1>Environments<a class="headerlink" href="#environments" title="Permalink to this headline">¶</a></h1>
+<p>Mozilla runs several instances of Normandy; this document provides information
+about each one of them, including what preferences you need to set to point an
+instance of Firefox towards them</p>
+<p>Each environment may have several hostnames associated with it. Generally,
+there is a public, read-only server, a legacy admin server, a new Bearer
+auth admin server, and an API CDN. Not all environments have all of these.</p>
+<div class="section" id="production">
+<h2>Production<a class="headerlink" href="#production" title="Permalink to this headline">¶</a></h2>
+<p>Production is the live, user-facing instance of Normandy that is hit by every
+active user of Firefox. The public read-only API server is served through a CDN with a cache
+time of a few minutes.</p>
+<ul class="simple">
+<li><p><strong>Public Read-only API server:</strong> <a class="reference external" href="https://normandy.cdn.mozilla.net/">https://normandy.cdn.mozilla.net/</a></p></li>
+<li><p><strong>VPN-Only Admin API server:</strong> <a class="reference external" href="https://prod-admin.normandy.prod.cloudops.mozgcp.net/">https://prod-admin.normandy.prod.cloudops.mozgcp.net/</a></p></li>
+</ul>
+<div class="section" id="preferences">
+<h3>Preferences<a class="headerlink" href="#preferences" title="Permalink to this headline">¶</a></h3>
+<p>Set the following preferences to have Firefox execute recipes from the
+production server:</p>
+<dl class="describe">
+<dt>
+<code class="descname">app.normandy.api_url</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">https://normandy.cdn.mozilla.net/api/v1</span></code></p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<code class="descname">security.content.signature.root_hash</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">97:E8:BA:9C:F1:2F:B3:DE:53:CC:42:A4:E6:57:7E:D6:4D:F4:93:C2:47:B4:14:FE:A0:36:81:8D:38:23:56:0E</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="staging">
+<h2>Staging<a class="headerlink" href="#staging" title="Permalink to this headline">¶</a></h2>
+<p>Staging is a test environment used to test the deployment process. It is useful
+for testing a version of Normandy before it is deployed to users, but is not
+guaranteed to be functional or available at all times. Unlike Production, Stage
+does not use a VPN for the public API server.</p>
+<ul class="simple">
+<li><p><strong>Public Read-only API server:</strong> <a class="reference external" href="https://stage.normandy.nonprod.cloudops.mozgcp.net/">https://stage.normandy.nonprod.cloudops.mozgcp.net/</a></p></li>
+<li><p><strong>VPN-Only Admin API server:</strong> <a class="reference external" href="https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/">https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/</a> (VPN Required)</p></li>
+</ul>
+<div class="section" id="id1">
+<h3>Preferences<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Set the following preferences to have Firefox execute recipes from the staging
+server:</p>
+<dl class="describe">
+<dt>
+<code class="descname">app.normandy.api_url</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">https://stage.normandy.nonprod.cloudops.mozgcp.net/api/v1</span></code></p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<code class="descname">security.content.signature.root_hash</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DB:74:CE:58:E4:F9:D0:9E:E0:42:36:BE:6C:C5:C4:F6:6A:E7:74:7D:C0:21:42:7A:03:BC:2F:57:0C:8B:9B:90</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="dev">
+<h2>Dev<a class="headerlink" href="#dev" title="Permalink to this headline">¶</a></h2>
+<p>Dev is an environment that deploys automatically from the master branch. It can be used
+for testing admin frontends to Normandy, and always has the latest code. Sometimes it
+is broken. Unlike Production and Staging, Dev doesn’t require use of the VPN to access
+the admin server.</p>
+<ul class="simple">
+<li><p><strong>Read-only API server:</strong> <a class="reference external" href="https://dev.normandy.nonprod.cloudops.mozgcp.net/">https://dev.normandy.nonprod.cloudops.mozgcp.net/</a></p></li>
+<li><p><strong>Admin API server:</strong> <a class="reference external" href="https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/">https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/</a></p></li>
+</ul>
+<div class="section" id="id2">
+<h3>Preferences<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Set the following preferences to have Firefox execute recipes from the dev
+server:</p>
+<dl class="describe">
+<dt>
+<code class="descname">app.normandy.api_url</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">https://dev.normandy.nonprod.cloudops.mozgcp.net/api/v1</span></code></p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<code class="descname">security.content.signature.root_hash</code></dt>
+<dd><p>TODO: The value is currently unknown. It would be the root hash used for Autograph
+development servers.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="local">
+<h2>Local<a class="headerlink" href="#local" title="Permalink to this headline">¶</a></h2>
+<p>This section is for an instance of normandy you are running yourself, such as by
+following the instructions in this set of docs, or by running a Docker container.</p>
+<p>These environments don’t always have Autograph set up, but when they do, the
+hash to use is the one below. It is possible to configure Autograph to use
+different keys than the default ones provided for Normandy. That is a not a
+supported configuration for local development.</p>
+<p>The server run this way works as both a bearer auth server, and can be used
+with local Django authentication. It is not generally configured to use the
+legacy authentication method, though that is possible as well.</p>
+<div class="section" id="id3">
+<h3>Preferences<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Set the following preferences to have Firefox execute recipes from a typical
+local server:</p>
+<dl class="describe">
+<dt>
+<code class="descname">app.normandy.api_url</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">https://localhost:8000/api/v1</span></code></p>
+<p>Note that the Normandy API must be accessed via HTTPS, even for local
+development.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<code class="descname">security.content.signature.root_hash</code></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">4C:35:B1:C3:E3:12:D9:55:E7:78:ED:D0:A7:E7:8A:38:83:04:EF:01:BF:FA:03:29:B2:46:9F:3C:C5:EC:36:04</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../ops/index.html" class="btn btn-neutral float-right" title="Operations Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="example.html" class="btn btn-neutral float-left" title="Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

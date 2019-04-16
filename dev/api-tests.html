@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API Contract Tests &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Test Coverage" href="coverage.html" />
+    <link rel="prev" title="Workflow" href="workflow.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Developer Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">API Contract Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage.html">Test Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer Documentation</a> &raquo;</li>
+        
+      <li>API Contract Tests</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dev/api-tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api-contract-tests">
+<h1>API Contract Tests<a class="headerlink" href="#api-contract-tests" title="Permalink to this headline">¶</a></h1>
+<p>These tests are designed to look for changes to the recipe server API that are
+not expected.</p>
+<p>Before running these tests you will need the following installed:</p>
+<ul class="simple">
+<li><p>Python 3.7.0 or greater</p></li>
+<li><p>virtualenv (<a class="reference external" href="https://virtualenv.pypa.io/en/latest/virtualenv">https://virtualenv.pypa.io/en/latest/virtualenv</a>) installed</p></li>
+</ul>
+<p>Before running these tests you need to create a virtual environment using
+Python 3.7.0 or greater. If you have an existing environment running
+Normandy, you can re-use that environment and skip this step. To create it do
+the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>virtualenv -p /path/to/python3.7 venv
+<span class="nb">source</span> venv/bin/activate
+pip install -r requirements/dev.txt
+</pre></div>
+</div>
+<p>This creates the virtual environment, activates it, and installs the Python
+dependencies needed to run the tests.</p>
+<p>To run these tests, use the following command from the root project directory.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>py.test -v --server<span class="o">=</span>&lt;server&gt; contract-tests/
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">&lt;server&gt;</span></code> is the server you want to test, such as
+<code class="docutils literal notranslate"><span class="pre">https://stage.normandy.cloudops.mozgcp.net</span></code> or <cite>https://localhost:8000</cite>.</p>
+<p>If you want to send results of the test run to TestRail, you need the following
+pre-requisites:</p>
+<ol class="arabic simple">
+<li><p>You have VPN access to the staging environment</p></li>
+<li><p>You have an account on <a class="reference external" href="https://testrail.stage.mozaws.net">https://testrail.stage.mozaws.net</a></p></li>
+<li><p>Copy <cite>testrail.cfg.dist</cite> to <cite>testrail.cfg</cite></p></li>
+<li><p>Modify that TestRail configuration file with your email, TestRail password and TestRail user ID</p></li>
+</ol>
+<p>Then, for any test case you want to report results for, make sure the
+script file the test is in imports the proper TestRail module:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pytest_testrail.plugin</span> <span class="kn">import</span> <span class="n">testrail</span>
+</pre></div>
+</div>
+<p>and then you use a decorator to indicate this test case will be reporting
+results. Here’s an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@testrail</span><span class="p">(</span><span class="s1">&#39;C5603&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_expected_action_types</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">requests_session</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The ID for the test case (C5603 in this example) is generated by TestRail when
+the test case is created.</p>
+<p>To run the tests and report the results to TestRail, use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>py.test --server<span class="o">=</span>&lt;server&gt; -v <span class="se">\</span>
+--no-ssl-cert-check <span class="se">\</span>
+--testrail<span class="o">=</span>contract-tests/testrail.cfg contract-tests/
+</pre></div>
+</div>
+<p>The values for <code class="docutils literal notranslate"><span class="pre">&lt;server&gt;</span></code> are the same as before.</p>
+<p><cite>–no-ssl-cert-check</cite> tells pytest to not check if the SSL certificate for the
+TestRail install is valid – we are using a self-signed certificate and the
+underlying code throws an exception unless we tell it not to check.</p>
+<p><cite>–testrail=</cite> tells pytest that we wish to report the results of TestRail
+decorated tests and where we can find the configuration file.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="coverage.html" class="btn btn-neutral float-right" title="Test Coverage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="workflow.html" class="btn btn-neutral float-left" title="Workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Concepts &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Setup" href="install.html" />
+    <link rel="prev" title="Developer Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#actions">Actions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#recipes">Recipes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#normandy-client">Normandy Client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security-considerations">Security Considerations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#action-and-recipe-signing">Action and Recipe Signing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#peer-approval">Peer Approval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#safe-instructions">Safe Instructions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configurable-admin">Configurable Admin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Developer Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api-tests.html">API Contract Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage.html">Test Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer Documentation</a> &raquo;</li>
+        
+      <li>Concepts</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dev/concepts.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="concepts">
+<h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
+<p>Normandy is a system that allows Mozilla to instruct Firefox clients to
+perform a variety of actions to aid the user and gather feedback to guide
+Mozilla in developing a better browser for them. To do this, we need a way to
+instruct Firefox to perform certain actions without having to download an
+update or wait for a new release.</p>
+<p>The system is made of two main components, a server and client. These
+components are known simply as the Normandy client and Normandy server. The
+server provides information that the client acts on.</p>
+<p>Normandy’s execution is built around two main concepts: Actions and Recipes. This
+document describes those concepts in detail.</p>
+<div class="section" id="actions">
+<span id="id1"></span><h2>Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h2>
+<p>An action is one of the capabilities provided by Normandy. As of Firefox 66,
+actions are implemented entirely within the browser as native code. Actions
+are identified in recipes by name, such as “preference-experiment” or
+“show-heartbeat”.</p>
+<p>Actions can accept a configuration object that is specified within the
+Normandy control interface. This configuration, which is part of a
+<a class="reference internal" href="#recipes"><span class="std std-ref">recipe</span></a>, contains data required by the action, such as
+translated strings or boolean options for controlling behavior.</p>
+<p>For example, a “survey” action could consist of code within Firefox to check
+whether we have shown a survey to the user recently, to determine which
+variant of a survey to show, and the code to actually display the survey
+itself. When issued to clients, this action is paired with configuration for
+the survey action would contain the text of the survey prompt and the URL to
+redirect the user to after answering.</p>
+</div>
+<div class="section" id="recipes">
+<span id="id2"></span><h2>Recipes<a class="headerlink" href="#recipes" title="Permalink to this headline">¶</a></h2>
+<p>A recipe is a model that represents a single instance of an action we want to
+perform. Recipes contain three important pieces of information:</p>
+<ol class="arabic simple">
+<li><p>Client filtering data that determines which users the recipe should be run
+for. This takes the form of a <a class="reference external" href="https://github.com/TechnologyAdvice/Jexl">JEXL</a> expression that is evaluated on the
+client and has access to several pieces of data about the client, such as
+the data collected by <a class="reference external" href="https://wiki.mozilla.org/Telemetry">Telemetry</a>.</p></li>
+<li><p>The name of the <a class="reference internal" href="#actions"><span class="std std-ref">action</span></a> that this recipe should perform
+when run.</p></li>
+<li><p>The configuration data to pass to the Action code when it is executed, called
+the recipe’s <strong>arguments</strong>.</p></li>
+</ol>
+<p>Recipes are stored in the Normandy server’s database and the Normandy client
+fetches them from the service during execution. All active recipes are sent
+to every client, and filtering is done locally on the client.</p>
+<p>Here’s an example of a recipe in JSON format, as fetched by the Normandy
+client:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Console Log Test&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;revision_id&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+   <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;console-log&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;It works!&quot;</span>
+   <span class="p">},</span>
+   <span class="nt">&quot;filter_expression&quot;</span><span class="p">:</span> <span class="s2">&quot;normandy.version &gt;= &#39;65.0&#39; &amp;&amp; stableSample(0.5)&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The data retrieved by the Normandy client is the minimum subset of data
+that is needed execute the action. Other API end points return more
+information about the recipe, including it’s history and approval status.</p>
+</div>
+</div>
+<div class="section" id="normandy-client">
+<span id="client"></span><h2>Normandy Client<a class="headerlink" href="#normandy-client" title="Permalink to this headline">¶</a></h2>
+<p>The Normandy client is <a class="reference external" href="https://hg.mozilla.org/mozilla-central/file/tip/toolkit/components/normandy">a Firefox component</a> that reads and executes
+instructions from the server. Upon activation (typically every few hours),
+the client:</p>
+<ol class="arabic simple">
+<li><p>Downloads <a class="reference internal" href="#recipes"><span class="std std-ref">recipes</span></a> from the Normandy service.</p></li>
+<li><p>Verifies the signature of the recipes.</p></li>
+<li><p>Evaluates the recipe filters and removes recipes that do not match the
+client.</p></li>
+<li><p>Executes the corresponding action code using the recipe’s arguments.</p></li>
+</ol>
+</div>
+<div class="section" id="security-considerations">
+<h2>Security Considerations<a class="headerlink" href="#security-considerations" title="Permalink to this headline">¶</a></h2>
+<p>Since the goal of SHIELD is to allow Mozilla to perform certain privileged
+actions quickly without shipping full updates to Firefox, it is a tempting
+target for compromising Firefox users. Normandy includes several security
+controls to help mitigate this risk.</p>
+<div class="section" id="action-and-recipe-signing">
+<h3>Action and Recipe Signing<a class="headerlink" href="#action-and-recipe-signing" title="Permalink to this headline">¶</a></h3>
+<p>Recipes that are downloaded by the client are signed according to the
+Content-Signature protocol as provided by the <a class="reference external" href="https://github.com/mozilla-services/autograph">Autograph</a> service. The client
+verifies the signature upon downloading the recipes, ensuring that only
+recipes that have been signed with a Mozilla-controlled key are executed.</p>
+<p>This helps prevent Man-in-the-Middle attacks where an adversary pretends to be
+the remote Normandy service.</p>
+</div>
+<div class="section" id="peer-approval">
+<h3>Peer Approval<a class="headerlink" href="#peer-approval" title="Permalink to this headline">¶</a></h3>
+<p>Recipes cannot be enabled in the Normandy admin interface without going through
+an <cite>approval process &lt;/user/peer_approval&gt;</cite>. One user must submit the recipe
+for approval, and a separate user must approve the recipe before it can be
+distributed by the service.</p>
+<p>This helps prevent compromise of a single account from compromising the entire
+service, since two accounts need to be compromised to publish a recipe.</p>
+</div>
+<div class="section" id="safe-instructions">
+<h3>Safe Instructions<a class="headerlink" href="#safe-instructions" title="Permalink to this headline">¶</a></h3>
+<p>Recipe data is provided in either a non-executable format (JSON) or a safe
+executable format designed specifically to be weak and without enough access
+to exfiltrate data (JEXL filters). In technical terms, the JEXL filters are
+not turing complete, by design. This means that even if an attacker could run
+a malicious recipe in Firefox, they are limited to the actions implemented in
+the existing client.</p>
+</div>
+<div class="section" id="configurable-admin">
+<h3>Configurable Admin<a class="headerlink" href="#configurable-admin" title="Permalink to this headline">¶</a></h3>
+<p>The admin interface for Normandy can be disabled via a Django setting, which
+allows for disabling the admin interface on public-facing web servers and
+running them with read-only privileges. The writable admin interface is then
+deployed behind a VPN to restrict access to authorized users.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Developer Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Developer Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

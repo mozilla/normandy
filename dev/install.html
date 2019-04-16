@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Developer Setup &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Workflow" href="workflow.html" />
+    <link rel="prev" title="Concepts" href="concepts.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Developer Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autograph">Autograph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#therapist">Therapist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remote-settings">Remote Settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api-tests.html">API Contract Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage.html">Test Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer Documentation</a> &raquo;</li>
+        
+      <li>Developer Setup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dev/install.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="developer-setup">
+<h1>Developer Setup<a class="headerlink" href="#developer-setup" title="Permalink to this headline">¶</a></h1>
+<p>The following describes how to set up an instance of the site on your
+computer for development.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>This guide assumes you have already installed and set up the following:</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://git-scm.com/">Git</a></p></li>
+<li><p><a class="reference external" href="https://www.python.org/">Python 3.7</a>, <a class="reference external" href="https://pip.pypa.io/en/stable/">pip 8</a> or higher, and <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">virtualenv</a></p></li>
+<li><p><a class="reference external" href="https://nodejs.org/en/">Node.js 8</a> and NPM 5 or higher</p></li>
+<li><p><a class="reference external" href="http://www.postgresql.org/">Postgres 9.4</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">openssl</span></code></p></li>
+</ol>
+<p>These docs assume a Unix-like operating system, although the site should, in
+theory, run on Windows as well. All the example commands given below are
+intended to be run in a terminal.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>Clone this repository or your <a class="reference external" href="http://help.github.com/fork-a-repo/">fork</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/mozilla/normandy.git
+<span class="nb">cd</span> normandy
+</pre></div>
+</div>
+</li>
+<li><p>Create a virtualenv for Normandy and activate it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>virtualenv venv
+<span class="nb">source</span> ./venv/bin/activate
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Whenever you want to work on Normandy in a new terminal you’ll have to
+re-activate the virtualenv. Read the <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">virtualenv</a> documentation to learn
+more about how virtualenv works.</p>
+</div>
+</li>
+<li><p>Install the dependencies using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r requirements/dev.txt
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="troubleshooting.html#pip-install-error"><span class="std std-ref">Errors during pip install</span></a></dt><dd><p>How to troubleshoot errors during <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>.</p>
+</dd>
+</dl>
+</div>
+</li>
+<li><p>(Optional) Install frontend dependencies using <a class="reference external" href="https://yarnpkg.com/lang/en/docs/install/">yarn</a>
+and build the legacy action code:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yarn install
+yarn build
+</pre></div>
+</div>
+<p>This JS code is only used for legacy clients that do not have actions
+implemented directly in the client. It can be safely ignored in most
+development environments.</p>
+</li>
+</ol>
+<ol class="arabic" start="5">
+<li><p>Create a Postgres database for Normandy. By default it is assumed to be named
+<code class="docutils literal notranslate"><span class="pre">normandy</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>createdb normandy
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, it will connect to <code class="docutils literal notranslate"><span class="pre">localhost</span></code> using the global <code class="docutils literal notranslate"><span class="pre">postgres</span></code>
+user. If you use a different name for the database, or otherwise want to
+customize how you connect to the database, you may specify the database
+URL by adding the following to a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file at the root of the repo:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">DATABASE_URL</span><span class="o">=</span><span class="s">postgres://username:password@server_addr/database_name</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p>Initialize your database by running the migrations:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python manage.py migrate
+</pre></div>
+</div>
+</li>
+<li><p>Create a new superuser account:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python manage.py createsuperuser
+</pre></div>
+</div>
+</li>
+<li><p>(Optional) Pull the latest geolocation database using the <code class="docutils literal notranslate"><span class="pre">download_geolite2.sh</span></code>
+script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/download_geolite2.sh
+</pre></div>
+</div>
+<p>The geolocation database is used for the classify client API endpoint. It
+is required for recipes that use geolocation filters, but can be omitted.</p>
+</li>
+<li><p>(Optional) If you built the JS actions, load them into the database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python manage.py update_actions
+</pre></div>
+</div>
+</li>
+<li><p>Update product details to provide a list of languages supported by Firefox.</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python manage.py update_product_details
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="11">
+<li><p>Load in initial data:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python manage.py initial_data
+</pre></div>
+</div>
+</div></blockquote>
+<p>Once you’ve finished these steps, you should be able to start the site by
+running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/runsslserver.sh
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">runsslserver.sh</span></code> command automatically creates a self-signed
+certificate in the <code class="docutils literal notranslate"><span class="pre">etc/ssl</span></code> directory of the repository. When viewing the
+site for the first time, you will have to create a certificate exception to
+allow Firefox to accept the certificate and access the site over HTTPS.</p>
+</div>
+<p>The site should be available at <a class="reference external" href="https://localhost:8000/">https://localhost:8000/</a>. The main page will
+have the message “This interface has been removed”. The API is available at
+the endpoint <code class="docutils literal notranslate"><span class="pre">/api/v3/</span></code>. No user interface is provided.</p>
+</div>
+<div class="section" id="autograph">
+<h2>Autograph<a class="headerlink" href="#autograph" title="Permalink to this headline">¶</a></h2>
+<p>If you want to execute recipes on your local instance using the recipe
+client, you’ll need to set up <a class="reference external" href="https://github.com/mozilla-services/autograph">Autograph</a> to sign recipes as you save them:</p>
+<ol class="arabic">
+<li><p>Follow the <a class="reference external" href="https://github.com/mozilla-services/autograph#installation">Autograph installation instructions</a> to launch a development
+instance of Autograph.</p></li>
+<li><p>Add the following configuration to <code class="docutils literal notranslate"><span class="pre">.env</span></code> (create the file
+if it does not exist yet):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">DJANGO_AUTOGRAPH_URL</span><span class="o">=</span><span class="s">http://localhost:8765/</span>
+<span class="na">DJANGO_AUTOGRAPH_HAWK_ID</span><span class="o">=</span><span class="s">normandev</span>
+<span class="na">DJANGO_AUTOGRAPH_HAWK_SECRET_KEY</span><span class="o">=</span><span class="s">3dhoaupudifjjvm7xznd9bn73159xn3xwr77b61kzdjwzzsjts</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>With the configuration in place, you should see log messages when saving recipes
+that look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INFO</span> <span class="mi">2017</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">01</span> <span class="mi">19</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">04</span><span class="p">,</span><span class="mi">274</span> <span class="n">normandy</span><span class="o">.</span><span class="n">recipes</span><span class="o">.</span><span class="n">models</span> <span class="n">Requesting</span> <span class="n">signatures</span> <span class="k">for</span> <span class="n">recipes</span> <span class="k">with</span> <span class="n">ids</span> <span class="p">[</span><span class="mi">16</span><span class="p">]</span> <span class="kn">from</span> <span class="nn">Autograph</span>
+<span class="n">INFO</span> <span class="mi">2017</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">01</span> <span class="mi">19</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">04</span><span class="p">,</span><span class="mi">301</span> <span class="n">normandy</span><span class="o">.</span><span class="n">recipes</span><span class="o">.</span><span class="n">utils</span> <span class="n">Got</span> <span class="mi">1</span> <span class="n">signatures</span> <span class="kn">from</span> <span class="nn">Autograph</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="therapist">
+<span id="therapist-install"></span><h2>Therapist<a class="headerlink" href="#therapist" title="Permalink to this headline">¶</a></h2>
+<p>If you want to automatically enforce Normandy code style guidelines, you can
+use the <a class="reference external" href="http://therapist.readthedocs.io/en/latest/overview.html">Therapist</a> pre-commit hook. To install Therapist, simply run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install therapist
+</pre></div>
+</div>
+<p>After that, you should be able to run
+the following to set up the git pre-commit hook:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>therapist install
+</pre></div>
+</div>
+<p>After that, whenever you make a new commit Therapist will check the changed
+code. This will save time when submitting pull requests.</p>
+<p>If you want Therapist to attempt to automatically fix linting issues you can
+install the hook using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>therapist install --fix
+</pre></div>
+</div>
+<p>If you ever need to bypass Therapist, you can do so by passing
+<code class="docutils literal notranslate"><span class="pre">--no-verify</span></code> to your <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code> command.</p>
+</div>
+<div class="section" id="remote-settings">
+<span id="remote-settings-install"></span><h2>Remote Settings<a class="headerlink" href="#remote-settings" title="Permalink to this headline">¶</a></h2>
+<p>If you want to enable the publication of recipes on <a class="reference external" href="https://remote-settings.readthedocs.io">Remote Settings</a>, you’ll need to set up
+an instance locally.</p>
+<ol class="arabic">
+<li><p>Follow the <a class="reference external" href="https://remote-settings.readthedocs.io/en/latest/tutorial-local-server.html">Remote Settings installation instructions</a> to launch a development
+instance of Remote Settings locally.</p></li>
+<li><p>Configure Normandy to enable the integration by adding the following lines
+to <code class="docutils literal notranslate"><span class="pre">.env</span></code> (create the file if it does not exist yet):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">DJANGO_REMOTE_SETTINGS_URL</span><span class="o">=</span><span class="s">http://localhost:8888/v1</span>
+<span class="na">DJANGO_REMOTE_SETTINGS_USERNAME</span><span class="o">=</span><span class="s">normandy</span>
+<span class="na">DJANGO_REMOTE_SETTINGS_PASSWORD</span><span class="o">=</span><span class="s">n0rm4ndy</span>
+</pre></div>
+</div>
+</li>
+<li><p>Adjust the Remote Settings configuration in <code class="docutils literal notranslate"><span class="pre">server.ini</span></code> for the Normandy
+recipes collection, and restart the Remote Settings container:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">kinto.signer.main-workspace.normandy-recipes.to_review_enabled</span> <span class="o">=</span> <span class="s">false</span>
+<span class="na">kinto.signer.main-workspace.normandy-recipes.group_check_enabled</span> <span class="o">=</span> <span class="s">false</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the dedicated Remote Settings user and collection for Normandy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">SERVER</span><span class="o">=</span>http://localhost:8888/v1
+
+curl -X PUT <span class="si">${</span><span class="nv">SERVER</span><span class="si">}</span>/accounts/normandy <span class="se">\</span>
+     -d <span class="s1">&#39;{&quot;data&quot;: {&quot;password&quot;: &quot;n0rm4ndy&quot;}}&#39;</span> <span class="se">\</span>
+     -H <span class="s1">&#39;Content-Type:application/json&#39;</span>
+
+curl -X PUT <span class="si">${</span><span class="nv">SERVER</span><span class="si">}</span>/buckets/main-workspace <span class="se">\</span>
+     -H <span class="s1">&#39;Content-Type:application/json&#39;</span> <span class="se">\</span>
+     -u <span class="s1">&#39;normandy:n0rm4ndy&#39;</span>
+
+curl -X PUT <span class="si">${</span><span class="nv">SERVER</span><span class="si">}</span>/buckets/main-workspace/collections/normandy-recipes <span class="se">\</span>
+     -H <span class="s1">&#39;Content-Type:application/json&#39;</span> <span class="se">\</span>
+     -u <span class="s1">&#39;normandy:n0rm4ndy&#39;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>With both configurations in place, Normandy should start without error.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="remote-settings.html#remote-settings"><span class="std std-ref">documentation section dedicated to Remote Settings</span></a></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="workflow.html" class="btn btn-neutral float-right" title="Workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="concepts.html" class="btn btn-neutral float-left" title="Concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

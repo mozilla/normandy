@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Troubleshooting &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Continuous Integration" href="ci.html" />
+    <link rel="prev" title="Remote Settings" href="remote-settings.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Developer Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api-tests.html">API Contract Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coverage.html">Test Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#errors-during-pip-install">Errors during <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer Documentation</a> &raquo;</li>
+        
+      <li>Troubleshooting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dev/troubleshooting.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="errors-during-pip-install">
+<span id="pip-install-error"></span><h2>Errors during <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code><a class="headerlink" href="#errors-during-pip-install" title="Permalink to this headline">¶</a></h2>
+<p>If you get an error like <code class="docutils literal notranslate"><span class="pre">pip:</span> <span class="pre">error:</span> <span class="pre">no</span> <span class="pre">such</span> <span class="pre">option:</span> <span class="pre">--hash</span></code>, you are using
+too old a version of Pip. Please upgrade to Pip 8 or above.</p>
+<p>If you get an error like this, the solution is harder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">THESE</span> <span class="n">PACKAGES</span> <span class="n">DO</span> <span class="n">NOT</span> <span class="n">MATCH</span> <span class="n">THE</span> <span class="n">HASHES</span> <span class="n">FROM</span> <span class="n">THE</span> <span class="n">REQUIREMENTS</span> <span class="n">FILE</span><span class="o">.</span> <span class="n">If</span> <span class="n">you</span> <span class="n">have</span>
+<span class="n">updated</span> <span class="n">the</span> <span class="n">package</span> <span class="n">versions</span><span class="p">,</span> <span class="n">please</span> <span class="n">update</span> <span class="n">the</span> <span class="n">hashes</span><span class="o">.</span> <span class="n">Otherwise</span><span class="p">,</span> <span class="n">examine</span> <span class="n">the</span>
+<span class="n">package</span> <span class="n">contents</span> <span class="n">carefully</span><span class="p">;</span> <span class="n">someone</span> <span class="n">may</span> <span class="n">have</span> <span class="n">tampered</span> <span class="k">with</span> <span class="n">them</span><span class="o">.</span>
+   <span class="n">alabaster</span><span class="o">==</span><span class="mf">0.7</span><span class="o">.</span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">python</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">packages</span><span class="o">/</span><span class="n">py2</span><span class="o">.</span><span class="n">py3</span><span class="o">/</span><span class="n">a</span><span class="o">/</span><span class="n">alabaster</span><span class="o">/</span><span class="n">alabaster</span><span class="o">-</span><span class="mf">0.7</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="n">py2</span><span class="o">.</span><span class="n">py3</span><span class="o">-</span><span class="n">none</span><span class="o">-</span><span class="nb">any</span><span class="o">.</span><span class="n">whl</span>
+       <span class="n">Expected</span> <span class="n">sha256</span> <span class="n">d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544</span>
+             <span class="n">Got</span>        <span class="n">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+</pre></div>
+</div>
+<p>Normandy pins requirements with both a package version, and also a package
+hash. This gives reproducibility in builds. If you are sure that there is a
+good reason for your packages to have a different hash, add another hash line
+to <code class="docutils literal notranslate"><span class="pre">requirements/default.txt</span></code> or the relavant requirements file for the
+requirement in question, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alabaster</span><span class="o">==</span><span class="mf">0.7</span><span class="o">.</span><span class="mi">7</span> \
+   <span class="o">--</span><span class="nb">hash</span> <span class="n">d57602b3d730c2ecb978a213face0b7a16ceaa4a263575361bd4fd9e2669a544</span> \
+   <span class="o">--</span><span class="nb">hash</span> <span class="n">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+</pre></div>
+</div>
+<p>This means one of three things:</p>
+<ol class="arabic simple">
+<li><p>You are using the wrong version of Python. Make sure you are using Python 3.7.</p></li>
+<li><p>You are running on an unexpected platform. You may need to add hashes for
+your platform using hashin.</p></li>
+<li><p>The packages you are downloading are different than expected, either
+because they changed on the server, there has been a network error, or you
+are not downloading them from a trust worthy source. You should consult
+with other developers on the project.</p></li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ci.html" class="btn btn-neutral float-right" title="Continuous Integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="remote-settings.html" class="btn btn-neutral float-left" title="Remote Settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

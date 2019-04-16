@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Documentation" href="../dev/index.html" />
+    <link rel="prev" title="End User Interaction" href="end_user_interaction.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="filters.html">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peer_approval.html">Peer Approval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="actions/index.html">Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="end_user_interaction.html">End User Interaction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#restful-api">RESTful API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#swagger">Swagger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#graphql">GraphQL</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interacting-with-the-graphql-api">Interacting with the GraphQL API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">User Documentation</a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/user/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>Normandy provides several APIs for reading and mutating data on the server.</p>
+<div class="section" id="restful-api">
+<h2>RESTful API<a class="headerlink" href="#restful-api" title="Permalink to this headline">¶</a></h2>
+<p>Currently Normandy provides two versions of it’s RESTful API.</p>
+<p>The v1 API is a stable read-only API that is used by Normandy’s recipe runner
+to fetch recipes.</p>
+<p>The v1 API can be accessed at <code class="docutils literal notranslate"><span class="pre">/api/v1/</span></code>.</p>
+<p>The v3 API is the current read-write API. Write abilities are only available
+on VPN-protected instances. If you are writing a tool to communicate with
+Normandy it is suggested that you use this API. Be aware that from time to
+time breaking changes may be made to the shape of data returned.</p>
+<p>The v3 API can be accessed at <code class="docutils literal notranslate"><span class="pre">/api/v3/</span></code>.</p>
+<div class="section" id="swagger">
+<h3>Swagger<a class="headerlink" href="#swagger" title="Permalink to this headline">¶</a></h3>
+<p>Each version of the API also exposes <a class="reference external" href="https://swagger.io/">Swagger</a> documentation. This can be
+accessed at:</p>
+<p>v1: <code class="docutils literal notranslate"><span class="pre">/api/v1/swagger/</span></code>
+v2: <code class="docutils literal notranslate"><span class="pre">/api/v3/swagger/</span></code></p>
+</div>
+</div>
+<div class="section" id="graphql">
+<h2>GraphQL<a class="headerlink" href="#graphql" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the RESTful API, Normandy also provides a <a class="reference external" href="https://graphql.org/">GraphQL</a> API. This
+API should be considered experimental.</p>
+<p>It can be accessed at <code class="docutils literal notranslate"><span class="pre">/api/graphql/</span></code>.</p>
+<div class="section" id="interacting-with-the-graphql-api">
+<h3>Interacting with the GraphQL API<a class="headerlink" href="#interacting-with-the-graphql-api" title="Permalink to this headline">¶</a></h3>
+<p>To interact with the GraphQL API you will need some kind of client. You
+may install one such as <a class="reference external" href="https://altair.sirmuel.design/">Altair</a> as a browser extension.</p>
+<p>The public GraphQL API only supports GET requests. Configure your client to
+GET instead of POST.</p>
+<p>Additionally, the server does not accept requests that set <code class="docutils literal notranslate"><span class="pre">Content-Type:</span>
+<span class="pre">application/json</span></code> but do not provide a body. Altair does this by default. To
+work around this in Altair, add a header (using the asterisk icon in the top
+left of the UI), and specify <code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">text/plain</span></code>.</p>
+<img alt="../_images/altair_set_header.png" class="align-center" src="../_images/altair_set_header.png" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../dev/index.html" class="btn btn-neutral float-right" title="Developer Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="end_user_interaction.html" class="btn btn-neutral float-left" title="End User Interaction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

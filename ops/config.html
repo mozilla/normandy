@@ -1,0 +1,886 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Operations Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Operations Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#django-settings">Django settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#normandy-settings">Normandy settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gunicorn-settings">Gunicorn settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Operations Documentation</a> &raquo;</li>
+        
+      <li>Configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/ops/config.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>All configuration happens through environment variables.</p>
+<div class="section" id="django-settings">
+<h2>Django settings<a class="headerlink" href="#django-settings" title="Permalink to this headline">¶</a></h2>
+<p>These settings map directly to built-in Django settings. An environment
+variable like <code class="docutils literal notranslate"><span class="pre">DJANGO_FOO</span></code> controls the Django setting <code class="docutils literal notranslate"><span class="pre">FOO</span></code>. Not all
+Django settings are available for configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Default values given refer to <code class="docutils literal notranslate"><span class="pre">Production</span></code> configurations, which is the
+default in Docker images.. Other configurations may have defaults not
+listed here.</p>
+</div>
+<dl class="envvar">
+<dt id="envvar-DATABASE_URL">
+<code class="descname">DATABASE_URL</code><a class="headerlink" href="#envvar-DATABASE_URL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">postgres://postgres&#64;localhost/normandy</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://github.com/kennethreitz/dj-database-URL#URL-schema">https://github.com/kennethreitz/dj-database-URL#URL-schema</a></p>
+</dd>
+</dl>
+<p>A database URL, including any username and password, if needed.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_ALLOWED_HOSTS">
+<code class="descname">DJANGO_ALLOWED_HOSTS</code><a class="headerlink" href="#envvar-DJANGO_ALLOWED_HOSTS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>Empty string</p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.djangoproject.com/en/1.9/ref/settings/#std:allowed-hosts">https://docs.djangoproject.com/en/1.9/ref/settings/#std:allowed-hosts</a></p>
+</dd>
+</dl>
+<p>A comma-seperated list of host values to accept. Examples:
+<code class="docutils literal notranslate"><span class="pre">example.com,www.example.com</span></code>, <code class="docutils literal notranslate"><span class="pre">.example.com</span></code>
+(matches any subdomain of example.com), <code class="docutils literal notranslate"><span class="pre">*</span></code> (allows everything). This
+setting is required to be set. If there are other protections (such as
+load balancers), setting this to <code class="docutils literal notranslate"><span class="pre">*</span></code> presents no risk.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CONFIGURATION">
+<code class="descname">DJANGO_CONFIGURATION</code><a class="headerlink" href="#envvar-DJANGO_CONFIGURATION" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Production</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="http://django-configurations.readthedocs.io/en/stable/">http://django-configurations.readthedocs.io/en/stable/</a></p>
+</dd>
+</dl>
+<p>The name of a configuration preset to use for this environment. Useful
+values are</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Production</span></code> - Preferred</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ProductionInsecure</span></code> - For systems running without HTTPS</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Build</span></code> - This is used during CI to build static assets</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Development</span></code> - This is used by developers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Test</span></code> - Used during unit tests</p></li>
+</ul>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_DEBUG">
+<code class="descname">DJANGO_DEBUG</code><a class="headerlink" href="#envvar-DJANGO_DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.djangoproject.com/en/1.9/ref/settings/#std:debug">https://docs.djangoproject.com/en/1.9/ref/settings/#std:debug</a></p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>. Enables Django’s debug mode. This should never be
+enabled on permanent servers. It is inefficient and leaks memory.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_MEDIA_URL">
+<code class="descname">DJANGO_MEDIA_URL</code><a class="headerlink" href="#envvar-DJANGO_MEDIA_URL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/media/</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.djangoproject.com/en/1.9/ref/settings/#std:media-url">https://docs.djangoproject.com/en/1.9/ref/settings/#std:media-url</a></p>
+</dd>
+</dl>
+<p>The URL prefix for media files (files uploaded to the service). Both
+host-relative (<code class="docutils literal notranslate"><span class="pre">/media/</span></code>) and host-absolute URLs
+(<code class="docutils literal notranslate"><span class="pre">https://cdn.example.com/</span></code>) work. Should end in a slash.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_SECRET_KEY">
+<code class="descname">DJANGO_SECRET_KEY</code><a class="headerlink" href="#envvar-DJANGO_SECRET_KEY" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Required</dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-SECRET_KEY">https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-SECRET_KEY</a></p>
+</dd>
+</dl>
+<p>A string used as a seed for security features. This should be the same
+on all instances that share a database, and should be kept secret. It
+should be a long, random string. This field is required to be set in
+most environments.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_STATIC_URL">
+<code class="descname">DJANGO_STATIC_URL</code><a class="headerlink" href="#envvar-DJANGO_STATIC_URL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/static/</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.djangoproject.com/en/1.9/ref/settings/#std:static-url">https://docs.djangoproject.com/en/1.9/ref/settings/#std:static-url</a></p>
+</dd>
+</dl>
+<p>The URL prefix for static files (files shipped with the service). Both
+host-relative and host-absolute URLs work. Should end in a slash.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CONN_MAX_AGE">
+<code class="descname">DJANGO_CONN_MAX_AGE</code><a class="headerlink" href="#envvar-DJANGO_CONN_MAX_AGE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-CONN_MAX_AGE">https://docs.djangoproject.com/en/1.9/ref/settings/#std:setting-CONN_MAX_AGE</a></p>
+</dd>
+</dl>
+<p>Time to hold database connections open in seconds. If set to 0, will close
+every database connection immediately. Each worker (as controlled by
+<code class="docutils literal notranslate"><span class="pre">WEB_CONCURRENCY</span></code>) will have its own connection.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="normandy-settings">
+<h2>Normandy settings<a class="headerlink" href="#normandy-settings" title="Permalink to this headline">¶</a></h2>
+<p>These settings are specific to Normandy. In other words, they won’t be present
+in other Django projects.</p>
+<dl class="envvar">
+<dt id="envvar-DJANGO_GEOIP2_DATABASE">
+<code class="descname">DJANGO_GEOIP2_DATABASE</code><a class="headerlink" href="#envvar-DJANGO_GEOIP2_DATABASE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/app/GeoIP2-Country.mmdb</span></code></p>
+</dd>
+</dl>
+<p>Path to a Maxmind GeoIP Country database.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_ADMIN_ENABLED">
+<code class="descname">DJANGO_ADMIN_ENABLED</code><a class="headerlink" href="#envvar-DJANGO_ADMIN_ENABLED" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+</dd>
+</dl>
+<p>For security, Normandy can disable write access. This should be enabled on
+production servers. Servers with this setting set to <code class="docutils literal notranslate"><span class="pre">false</span></code> shouldn’t
+require write access to Postgres.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_IMMUTABLE_CACHE_TIME">
+<code class="descname">DJANGO_IMMUTABLE_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_IMMUTABLE_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">31536000</span></code> (1 year)</p>
+</dd>
+</dl>
+<p>Sets the time in seconds immutable objects (such as Action implementations)
+are cached for with the HTTP <code class="docutils literal notranslate"><span class="pre">Cache-Control</span></code> header.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_NUM_PROXIES">
+<code class="descname">DJANGO_NUM_PROXIES</code><a class="headerlink" href="#envvar-DJANGO_NUM_PROXIES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+</dl>
+<p>The number of proxies between users and Normandy. This is used to parse
+the <code class="docutils literal notranslate"><span class="pre">X-Forwarded-For</span></code> header.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_RAVEN_CONFIG_DSN">
+<code class="descname">DJANGO_RAVEN_CONFIG_DSN</code><a class="headerlink" href="#envvar-DJANGO_RAVEN_CONFIG_DSN" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>Optional. The DSN for Raven to report errors to Sentry.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_RAVEN_CONFIG_RELEASE">
+<code class="descname">DJANGO_RAVEN_CONFIG_RELEASE</code><a class="headerlink" href="#envvar-DJANGO_RAVEN_CONFIG_RELEASE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>Optional. The release for Raven to report to Sentry. Automatically set by
+production Docker images.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AUTOGRAPH_URL">
+<code class="descname">DJANGO_AUTOGRAPH_URL</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_URL" title="Permalink to this definition">¶</a></dt>
+<dd><p>The URL where an <a class="reference external" href="https://github.com/mozilla-services/autograph/">Autograph</a> server can be reached. If left blank, content
+signing will be disabled.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AUTOGRAPH_HAWK_ID">
+<code class="descname">DJANGO_AUTOGRAPH_HAWK_ID</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_HAWK_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pre-arranged ID to use for Hawk authentication with Autograph.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AUTOGRAPH_SECRET_KEY">
+<code class="descname">DJANGO_AUTOGRAPH_SECRET_KEY</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_SECRET_KEY" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pre-arranged secret key to use for Hawk authentication with Autograph.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE">
+<code class="descname">DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">604800</span></code> (1 week)</p>
+</dd>
+</dl>
+<p>Content with signature ages older than this are considered out of date and
+will be re-signed. The keys used by Autograph to sign content are generally
+only valid for a few weeks, and have a period of overlap where both the new
+key and old key are valid. The aim with this setting is to be as long as
+possible while still guaranteeing that actions will get resigned during the
+overlap period.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST">
+<code class="descname">DJANGO_AUTOGRAPH_X5U_CACHE_BUST</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>Unset</p>
+</dd>
+</dl>
+<p>If set, the value will be added to the URL for the x5u certificate chain as
+a query parameter named <cite>cachebust</cite>. This is used to force clients to
+re-fetch the certificate chain in cases where they’re caching an expired or
+otherwise invalid copy of the chain.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_REMOTE_SETTINGS_URL">
+<code class="descname">DJANGO_REMOTE_SETTINGS_URL</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_URL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>Unset</p>
+</dd>
+</dl>
+<p>The URL where a <a class="reference external" href="https://remote-settings.readthedocs.io">Remote Settings</a> server can be reached
+(e.g. <code class="docutils literal notranslate"><span class="pre">https://settings-writer.prod.mozaws.net/v1</span></code>).</p>
+<p>If left blank, the publication of recipes will be disabled.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_REMOTE_SETTINGS_USERNAME">
+<code class="descname">DJANGO_REMOTE_SETTINGS_USERNAME</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_USERNAME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>Unset</p>
+</dd>
+</dl>
+<p>The account username that is allowed to create records on the
+Remote Settings collection.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_REMOTE_SETTINGS_PASSWORD">
+<code class="descname">DJANGO_REMOTE_SETTINGS_PASSWORD</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_PASSWORD" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>Unset</p>
+</dd>
+</dl>
+<p>The account password to authenticate as DJANGO_REMOTE_SETTINGS_USERNAME.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_REMOTE_SETTINGS_COLLECTION_ID">
+<code class="descname">DJANGO_REMOTE_SETTINGS_COLLECTION_ID</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_COLLECTION_ID" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">normandy-recipes</span></code></p>
+</dd>
+</dl>
+<p>The name of the Remote Settings collection where the recipes will be published.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_REMOTE_SETTINGS_BUCKET_ID">
+<code class="descname">DJANGO_REMOTE_SETTINGS_BUCKET_ID</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_BUCKET_ID" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">main-workspace</span></code></p>
+</dd>
+</dl>
+<p>The name of the Remote Settings bucket where the recipes will be published.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-REMOTE_SETTINGS_RETRY_REQUESTS">
+<code class="descname">REMOTE_SETTINGS_RETRY_REQUESTS</code><a class="headerlink" href="#envvar-REMOTE_SETTINGS_RETRY_REQUESTS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p>
+</dd>
+</dl>
+<p>If the Remote Settings server does not return a successful response, the
+requests will be retried if the specified number is superior to zero.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_API_CACHE_TIME">
+<code class="descname">DJANGO_API_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_API_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
+</dd>
+</dl>
+<p>The time in seconds to set in cache headers for cacheable APIs. This may be
+set to 0 in non-production environments to ease testing. In production
+environments, setting this value too low can be a denial-of-service risk.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_API_CACHE_ENABLED">
+<code class="descname">DJANGO_API_CACHE_ENABLED</code><a class="headerlink" href="#envvar-DJANGO_API_CACHE_ENABLED" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+<p>Controls cache headers for cacheable APIs. If true, API views will send
+headers indicating that they can be cached according to
+<span class="target" id="index-0"></span><a class="reference internal" href="#envvar-DJANGO_API_CACHE_TIME"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_API_CACHE_TIME</span></code></a>. If false, API views will send headers
+indicating that they should never be cached.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_PERMANENT_REDIRECT_CACHE_TIME">
+<code class="descname">DJANGO_PERMANENT_REDIRECT_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_PERMANENT_REDIRECT_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2592000</span></code> (30 days)</p>
+</dd>
+</dl>
+<p>The time in seconds to set in cache headers for permanent redirects.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_HTTPS_REDIRECT_CACHE_TIME">
+<code class="descname">DJANGO_HTTPS_REDIRECT_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_HTTPS_REDIRECT_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2592000</span></code> (30 days)</p>
+</dd>
+</dl>
+<p>The time in seconds to set in cache headers for permanent redirects
+to change from HTTP to HTTPS.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_LOGGING_USE_JSON">
+<code class="descname">DJANGO_LOGGING_USE_JSON</code><a class="headerlink" href="#envvar-DJANGO_LOGGING_USE_JSON" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+<p>If this setting is true, standard logging will be output in <a class="reference external" href="https://github.com/mozilla-services/Dockerflow/blob/master/docs/mozlog.md">mozlog</a> format.
+Otherwise logs will be unstructured.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CSP_REPORT_URI">
+<code class="descname">DJANGO_CSP_REPORT_URI</code><a class="headerlink" href="#envvar-DJANGO_CSP_REPORT_URI" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>Controls the <code class="docutils literal notranslate"><span class="pre">report-uri</span></code> directive in the Content Security Policy header.
+Attempts to violate the Content Security Policy are sent by the browser to
+this URL. See the <a class="reference external" href="report-uri">MDN documentation on report-uri</a> for more
+info.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CDN_URL">
+<code class="descname">DJANGO_CDN_URL</code><a class="headerlink" href="#envvar-DJANGO_CDN_URL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>The URL of a CDN that is backed by Normandy, if one is in use. This is used to
+enforce that immutable content is routed through the CDN. Must end with a
+slash (<code class="docutils literal notranslate"><span class="pre">/</span></code>).</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_APP_SERVER_URL">
+<code class="descname">DJANGO_APP_SERVER_URL</code><a class="headerlink" href="#envvar-DJANGO_APP_SERVER_URL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>The URL that allows direct access to Normandy, bypassing any CDNs. This
+is used for content that cannot be cached. If not specified, Normandy will
+assume direct access. Must end with a slash (<code class="docutils literal notranslate"><span class="pre">/</span></code>).</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_USE_OIDC">
+<code class="descname">DJANGO_USE_OIDC</code><a class="headerlink" href="#envvar-DJANGO_USE_OIDC" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>If enabled, Normandy will authenticate users by reading a header in requests.
+The expectation is that a proxy server, such as Nginx, will perform
+authentication using Open ID Connect, and then pass the unique ID of the user
+in a header.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><span class="target" id="index-1"></span><a class="reference internal" href="#envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_OIDC_REMOTE_AUTH_HEADER</span></code></a> for which header Normandy
+reads this value from.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If this feature is enabled, the proxy server providing authentication
+<em>must</em> sanitize the headers passed along to Normandy. Specifically, the
+header defined in <span class="target" id="index-2"></span><a class="reference internal" href="#envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_OIDC_REMOTE_AUTH_HEADER</span></code></a> must not be
+passed on from the user.</p>
+<p>Failing to do this will result in any client being able to authenticate
+as any user, with no checks.</p>
+</div>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER">
+<code class="descname">DJANGO_OIDC_REMOTE_AUTH_HEADER</code><a class="headerlink" href="#envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">HTTP_REMOTE_USER</span></code></p>
+</dd>
+</dl>
+<p>If <span class="target" id="index-3"></span><a class="reference internal" href="#envvar-DJANGO_USE_OIDC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_USE_OIDC</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, this is the source of the user to
+authenticate. This must match Django header normalization, i.e. it must be
+capitalized, dashes replaced with underscores, and be prefixed with <code class="docutils literal notranslate"><span class="pre">HTTP_</span></code>.</p>
+<p>For example, the header <code class="docutils literal notranslate"><span class="pre">OIDC-Claim-User-Profile-Email</span></code> becomes
+<code class="docutils literal notranslate"><span class="pre">HTTP_OIDC_CLAIM_USER_PROFILE_EMAIL</span></code>.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_OIDC_LOGOUT_URL">
+<code class="descname">DJANGO_OIDC_LOGOUT_URL</code><a class="headerlink" href="#envvar-DJANGO_OIDC_LOGOUT_URL" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <span class="target" id="index-4"></span><a class="reference internal" href="#envvar-DJANGO_USE_OIDC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_USE_OIDC</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this settings must be set to
+the URL that a user can visit to logout. It may be a relative URL.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_PEER_APPROVAL_ENFORCED">
+<code class="descname">DJANGO_PEER_APPROVAL_ENFORCED</code><a class="headerlink" href="#envvar-DJANGO_PEER_APPROVAL_ENFORCED" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, approval requests for recipe changes can only be approved by a
+different user than the one who created the request. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, approval
+requests can be approved by the same user who created it.</p>
+<p>This defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code> for local developer instances.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS">
+<code class="descname">DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS" title="Permalink to this definition">¶</a></dt>
+<dd><p>If set, when checking certificates for validity, start failing
+system checks this many days before the certificate would expire.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CORS_ORIGIN_ALLOW_ALL">
+<code class="descname">DJANGO_CORS_ORIGIN_ALLOW_ALL</code><a class="headerlink" href="#envvar-DJANGO_CORS_ORIGIN_ALLOW_ALL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Respond with <code class="docutils literal notranslate"><span class="pre">Access-Control-Allow-Origin:</span> <span class="pre">*</span></code> if set to True. If False,
+needs the <code class="docutils literal notranslate"><span class="pre">Origin</span></code> header needs to match <code class="docutils literal notranslate"><span class="pre">DJANGO_CORS_ORIGIN_WHITELIST</span></code>.
+In all environments other than <code class="docutils literal notranslate"><span class="pre">Production</span></code> this is set to True.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The CORS headers only apply to URLs that match the regex <code class="docutils literal notranslate"><span class="pre">/api/*</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CORS_ORIGIN_WHITELIST">
+<code class="descname">DJANGO_CORS_ORIGIN_WHITELIST</code><a class="headerlink" href="#envvar-DJANGO_CORS_ORIGIN_WHITELIST" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p>
+</dd>
+</dl>
+<p>List of domains (with or without <code class="docutils literal notranslate"><span class="pre">https://</span></code> prefix, but ideally with)
+that is included in <code class="docutils literal notranslate"><span class="pre">Access-Control-Allow-Origin</span></code> header.
+Ideally this should list all the client-side apps that should be allowed
+to make remote XHR requests.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CORS_ALLOW_METHODS">
+<code class="descname">DJANGO_CORS_ALLOW_METHODS</code><a class="headerlink" href="#envvar-DJANGO_CORS_ALLOW_METHODS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">['DELETE',</span> <span class="pre">'GET',</span> <span class="pre">'OPTIONS',</span> <span class="pre">'PATCH',</span> <span class="pre">'POST',</span> <span class="pre">'PUT']</span></code></p>
+</dd>
+</dl>
+<p>List of allowed CORS methods if applicable. Specifically this list is
+reduced to “read-only” methods when using the <code class="docutils literal notranslate"><span class="pre">ProductionReadOnly</span></code>
+configuration.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_OIDC_USER_ENDPOINT">
+<code class="descname">DJANGO_OIDC_USER_ENDPOINT</code><a class="headerlink" href="#envvar-DJANGO_OIDC_USER_ENDPOINT" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">https://auth.mozilla.auth0.com/userinfo</span></code></p>
+</dd>
+</dl>
+<p>URL where we sent access tokens received as an authorization bearer token.
+This URL needs to match the OIDC domain used by the client to authenticate.
+The value for this setting is usually listed in
+<code class="docutils literal notranslate"><span class="pre">/.well-known/openid-configuration</span></code> on the OIDC provider.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_DEFAULT_FILE_STORAGE">
+<code class="descname">DJANGO_DEFAULT_FILE_STORAGE</code><a class="headerlink" href="#envvar-DJANGO_DEFAULT_FILE_STORAGE" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">normandy.base.storage.S3Boto3PermissiveStorage</span></code></p>
+</dd>
+</dl>
+<p>The Python import path for the file storage backend to use. For AWS, use
+the default value of <code class="docutils literal notranslate"><span class="pre">normandy.base.storage.S3Boto3PermissiveStorage</span></code>.
+For GCP, use <code class="docutils literal notranslate"><span class="pre">normandy.base.storage.NormandyGoogleCloudStorage</span></code>.</p>
+<p>When using AWS, it is required to also set
+<code class="docutils literal notranslate"><span class="pre">DJANGO_AWS_STORAGE_BUCKET_NAME</span></code>. <code class="docutils literal notranslate"><span class="pre">DJANGO_AWS_ACCESS_KEY_ID</span></code> and
+<code class="docutils literal notranslate"><span class="pre">DJANGO_AWS_SECRET_ACCESS_KEY</span></code> may also be needed.</p>
+<p>When using GCP, it is required to also set
+<code class="docutils literal notranslate"><span class="pre">DJANGO_GS_BUCKET_NAME</span></code>.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AWS_ACCESS_KEY_ID">
+<code class="descname">DJANGO_AWS_ACCESS_KEY_ID</code><a class="headerlink" href="#envvar-DJANGO_AWS_ACCESS_KEY_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Access Key ID for an AWS user with read/write access to the S3 bucket.
+This is required by <a class="reference external" href="https://github.com/jschneier/django-storages">django-storages</a> to access S3.</p>
+<blockquote>
+<div></div></blockquote>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AWS_SECRET_ACCESS_KEY">
+<code class="descname">DJANGO_AWS_SECRET_ACCESS_KEY</code><a class="headerlink" href="#envvar-DJANGO_AWS_SECRET_ACCESS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Secret Access Key for the AWS user identified by
+<span class="target" id="index-5"></span><a class="reference internal" href="#envvar-DJANGO_AWS_ACCESS_KEY_ID"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_AWS_ACCESS_KEY_ID</span></code></a>. This is also required by
+django-storages to access S3.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_AWS_STORAGE_BUCKET_NAME">
+<code class="descname">DJANGO_AWS_STORAGE_BUCKET_NAME</code><a class="headerlink" href="#envvar-DJANGO_AWS_STORAGE_BUCKET_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the S3 bucket to be used to store media files.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_GS_BUCKET_NAME">
+<code class="descname">DJANGO_GS_BUCKET_NAME</code><a class="headerlink" href="#envvar-DJANGO_GS_BUCKET_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the Google storage bucket to be used to store media files.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="gunicorn-settings">
+<h2>Gunicorn settings<a class="headerlink" href="#gunicorn-settings" title="Permalink to this headline">¶</a></h2>
+<p>These settings control how Gunicorn starts, when the default command of the
+provided Dockerfile is used.</p>
+<dl class="envvar">
+<dt id="envvar-GUNICORN_WORKER_CLASS">
+<code class="descname">GUNICORN_WORKER_CLASS</code><a class="headerlink" href="#envvar-GUNICORN_WORKER_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">sync</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.gunicorn.org/en/latest/settings.html#worker-class">http://docs.gunicorn.org/en/latest/settings.html#worker-class</a></p>
+</dd>
+</dl>
+<p>The worker class to use. Supported options are <code class="docutils literal notranslate"><span class="pre">sync</span></code>, <code class="docutils literal notranslate"><span class="pre">gevent</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">eventlet</span></code>.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-GUNICORN_MAX_REQUESTS">
+<code class="descname">GUNICORN_MAX_REQUESTS</code><a class="headerlink" href="#envvar-GUNICORN_MAX_REQUESTS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> (no cycling)</p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.gunicorn.org/en/latest/settings.html#max-requests">http://docs.gunicorn.org/en/latest/settings.html#max-requests</a></p>
+</dd>
+</dl>
+<p>If set to a positive number, after serving this many requests, individual
+Gunicorn works will be recycled. This can be helpful to avoid potential
+memory leaks.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-WEB_CONCURRENCY">
+<code class="descname">WEB_CONCURRENCY</code><a class="headerlink" href="#envvar-WEB_CONCURRENCY" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+<dt class="field-even">Documentation</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.gunicorn.org/en/latest/settings.html#workers">http://docs.gunicorn.org/en/latest/settings.html#workers</a></p>
+</dd>
+</dl>
+<p>The number of workers to use. Recommended values are in the range of
+<code class="docutils literal notranslate"><span class="pre">2-4</span> <span class="pre">x</span> <span class="pre">$(NUM_CORES)</span></code>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Operations Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

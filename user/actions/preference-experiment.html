@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>preference-experiment: Temporarily Change a Preference &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="preference-rollout: Permanently Change a Preference" href="preference-rollout.html" />
+    <link rel="prev" title="show-heartbeat: Show Heartbeat Prompt" href="show-heartbeat.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">User Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../filters.html">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../peer_approval.html">Peer Approval</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Actions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="show-heartbeat.html">show-heartbeat: Show Heartbeat Prompt</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">preference-experiment: Temporarily Change a Preference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#preference-filters">Preference Filters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#disqualification">Disqualification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#branches">Branches</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#telemetry-annotation">Telemetry Annotation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#experiment-end-conditions">Experiment End Conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#arguments">Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preference-rollout.html">preference-rollout: Permanently Change a Preference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preference-rollback.html">preference-rollback: Undo a preference rollback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opt-out-study.html">opt-out-study: Install a Study Add-on Without Prompting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="console-log.html">console-log: Log to the Console</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../end_user_interaction.html">End User Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">User Documentation</a> &raquo;</li>
+        
+          <li><a href="index.html">Actions</a> &raquo;</li>
+        
+      <li>preference-experiment: Temporarily Change a Preference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/user/actions/preference-experiment.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="preference-experiment-temporarily-change-a-preference">
+<h1>preference-experiment: Temporarily Change a Preference<a class="headerlink" href="#preference-experiment-temporarily-change-a-preference" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">preference-experiment</span></code> action temporarily changes a preference in order
+to test the effects of the change.</p>
+<p>Users that run <code class="docutils literal notranslate"><span class="pre">preference-experiment</span></code> recipes are assigned to one of
+several experiment branches, each with an assigned value for the preference.
+During the experiment, <a class="reference external" href="https://wiki.mozilla.org/Telemetry">Telemetry</a> pings are annotated with a list of active
+experiments, allowing us to measure the effect the preference change has on
+existing Telemetry metrics. When a user is enrolled or unenrolled in
+preference experiments, Telemetry events are sent.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Users may be enrolled in multiple preference experiments at the same time.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Preference experiments are designed to expire, and are not appropriate for
+permanent preference changes.</p>
+</div>
+<div class="section" id="preference-filters">
+<h2>Preference Filters<a class="headerlink" href="#preference-filters" title="Permalink to this headline">¶</a></h2>
+<p>Preference experiments save the value of preferences before changing them, but
+often you may want to respect users who have already modified the preference
+you’re testing. Preference studies allow you to do this in <a class="reference internal" href="../filters.html"><span class="doc">filters</span></a>:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Do not match clients with a user-set value for name.of.preference</span>
+<span class="o">!</span><span class="p">(</span><span class="s1">&#39;name.of.preference&#39;</span><span class="o">|</span><span class="nx">preferenceIsUserSet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="disqualification">
+<h2>Disqualification<a class="headerlink" href="#disqualification" title="Permalink to this headline">¶</a></h2>
+<p>Any of the following conditions will prevent a user from being enrolled in an
+experiment, regardless of other filters:</p>
+<ul class="simple">
+<li><p>Their <a class="reference internal" href="../end_user_interaction.html#opt-out-preference"><span class="std std-ref">Opt-Out Preference</span></a> is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+<li><p>The user has previously participated in an experiment with the same ID.</p></li>
+<li><p>The user is already in an active experiment for the same preference.</p></li>
+<li><p>The preference value type in the recipe does not match the type of the
+preference in the user’s profile, e.g. a boolean preference experiment for a
+preference with an integer value in the user’s profile.</p></li>
+</ul>
+</div>
+<div class="section" id="branches">
+<h2>Branches<a class="headerlink" href="#branches" title="Permalink to this headline">¶</a></h2>
+<p>Users are randomly assigned to a branch based on the ratio of the branch.
+Branch ratios define the ratio of users that will be assigned to the branch as
+compared to other branches. For example, consider four branches:</p>
+<ul class="simple">
+<li><p>Branch A; Ratio 4</p></li>
+<li><p>Branch B; Ratio 3</p></li>
+<li><p>Branch C; Ratio 2</p></li>
+<li><p>Branch D; Ratio 1</p></li>
+</ul>
+<p>Given the above, twice as many users will be assigned to branch A as branch C.
+Because the ratios total to 10, overall, 40% of matched users will be assigned
+to branch A, 30% to branch B, and so on.</p>
+<p>For completely random, equal assignment, set the ratio for each branch to 1.</p>
+</div>
+<div class="section" id="telemetry-annotation">
+<h2>Telemetry Annotation<a class="headerlink" href="#telemetry-annotation" title="Permalink to this headline">¶</a></h2>
+<p>While an experiment is running, the <a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/index.html">Telemetry Environment</a> contains a list of
+experiment IDs, as well as the branch that the user has been assigned to. This
+environment is sent along with the <a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/main-ping.html">main ping</a>, among others.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;environment&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;experiments&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;&lt;experiment id&gt;&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span> <span class="p">},</span>
+      <span class="nt">&quot;&lt;experiment id&gt;&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;branch&gt;&quot;</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Additionally, <a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/collection/events.html">Telemetry Events</a> are sent that mark the enrollment and
+unenrollment of clients.</p>
+</div>
+<div class="section" id="experiment-end-conditions">
+<h2>Experiment End Conditions<a class="headerlink" href="#experiment-end-conditions" title="Permalink to this headline">¶</a></h2>
+<p>Any of the following events will cause the experiment to end:</p>
+<ul class="simple">
+<li><p>If the recipe is disabled, or if its filters no longer match the user, the
+experiment will end the next time recipes are executed. The preference will
+be reset to the value it had before the experiment.</p></li>
+<li><p>If the user (or another system in Firefox) modifies the preference being
+tested, the experiment will end immediately and the preference will not be
+reset to the value it had before the experiment.</p></li>
+</ul>
+</div>
+<div class="section" id="arguments">
+<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>Slug (sometimes called “Experiment Name”)</dt><dd><p>A unique identifier for this experiment. Users may only participate in an
+experiment with the same slug once. Slugs should consist only of lower
+case letters, numbers, and hypens.</p>
+</dd>
+<dt>Experiment Document URL</dt><dd><p>A field for saving a link to an experiment document that describes the
+experiment that a recipe implements. This is often a link to a Bugzilla
+bug. This URL is not used anywhere except in the admin interface.</p>
+</dd>
+<dt>Preference Name</dt><dd><p>The full dotted-path of the preference to modify.</p>
+</dd>
+<dt>Preference Type</dt><dd><p>The type of the preference to modify. If this doesn’t match the type on the
+client, the experiment will not enroll anyone.</p>
+</dd>
+<dt>Preference Branch Type</dt><dd><p>Preference values can be saved on one of two branches: The <strong>user</strong> branch,
+or the <strong>default</strong> branch. Values on the user branch supersede values on the
+default branch.</p>
+<p>Most of the time, you want to use the <strong>default</strong> branch. If you understand
+the preference system in more detail, there are a few situations where you
+may want to use the <strong>user</strong> branch:</p>
+<ul class="simple">
+<li><p>You want to modify a preference that is read before Normandy is
+initialized, and which is not updated on change. Default preference
+experiments have the old value during very early Firefox startup.</p></li>
+<li><p>You want to modify a preference that is generally user-set by the browser
+itself (user-set means that the value does not match the default, not that
+the user has manually set the value).</p></li>
+</ul>
+<p>In general, it is not recommended to use the user branch unless it is
+necessary.</p>
+</dd>
+<dt>High volume recipes</dt><dd><p>This changes the kind of telemetry sent, so that it is not picked up by
+automated systems that are not designed to handle very high amounts of
+traffic. This field should be set for any experiment targeting more than
+1% of the Release channel, or similarly sized populations of other
+channels.</p>
+</dd>
+<dt>Prevent New Enrollment</dt><dd><p>When checked, new participants will not be enrolled in the experiment,
+although existing participants will continue to run the experiment. When
+unchecked, new participants will continue to be enrolled based on the
+recipe filters. This is useful to prevent an experiment’s population from
+growing while still collecting additional data from the users already
+enrolled.</p>
+</dd>
+<dt>Branches</dt><dd><p>A list of experiment branches, each with the following arguments:</p>
+<dl class="simple">
+<dt>Slug</dt><dd><p>A unique identifier for the branch.</p>
+</dd>
+<dt>Value</dt><dd><p>Value to set the preference to for users that are assigned to this branch.</p>
+</dd>
+<dt>Ratio</dt><dd><p>Ratio of users to assign to this branch in comparison to other branches
+within the experiment.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="preference-rollout.html" class="btn btn-neutral float-right" title="preference-rollout: Permanently Change a Preference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="show-heartbeat.html" class="btn btn-neutral float-left" title="show-heartbeat: Show Heartbeat Prompt" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

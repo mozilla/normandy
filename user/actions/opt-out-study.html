@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>opt-out-study: Install a Study Add-on Without Prompting &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="console-log: Log to the Console" href="console-log.html" />
+    <link rel="prev" title="preference-rollback: Undo a preference rollback" href="preference-rollback.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">User Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../filters.html">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../peer_approval.html">Peer Approval</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Actions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="show-heartbeat.html">show-heartbeat: Show Heartbeat Prompt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preference-experiment.html">preference-experiment: Temporarily Change a Preference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preference-rollout.html">preference-rollout: Permanently Change a Preference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preference-rollback.html">preference-rollback: Undo a preference rollback</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">opt-out-study: Install a Study Add-on Without Prompting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#arguments">Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uploading-add-ons">Uploading Add-ons</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#user-flow">User Flow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-notes">Testing Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="console-log.html">console-log: Log to the Console</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../end_user_interaction.html">End User Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">User Documentation</a> &raquo;</li>
+        
+          <li><a href="index.html">Actions</a> &raquo;</li>
+        
+      <li>opt-out-study: Install a Study Add-on Without Prompting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/user/actions/opt-out-study.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="opt-out-study-install-a-study-add-on-without-prompting">
+<h1>opt-out-study: Install a Study Add-on Without Prompting<a class="headerlink" href="#opt-out-study-install-a-study-add-on-without-prompting" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A note on terminology: This action refers to the unit of work as a
+“study”. This isn’t exactly correct, and doesn’t mesh well with the rest
+of the usage in Normandy.</p>
+<p>A more correct definition is that a study is a line of inquiry that asks a
+question, gathers some data, and draws a conclusion. An individual study
+may have zero or more experiments. This action represents a single
+experiment.</p>
+<p>On this page the name “study” is still used for compatibility reasons.
+Please be aware that today this would be called an experiment, not a
+study. In the future this incongruence will be fixed.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On the meaning of “opt-out”: This action was developed at a time where
+there were already existing studies involving add-ons happening. These
+older studies worked by prompting users via Heartbeat to install an
+extension.</p>
+<p>These older studies were called “opt-in add-on studies” or often just
+“opt-in studies”. At the time the major difference between that existing
+pattern and this new action was that this was opt-<em>out</em>. Users could
+opt-out of individual studies or the whole program, but were opted-in by
+default.</p>
+<p>The important detail at the time was that the studies were opt-out. Today
+that style of opt-in study has died off, and now this action has a
+confusing name. It is difficult to change the names of actions however.
+Please be aware that better name for this action would be
+“opt-out-addon-experiment”, or just “addon-experiment”</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">opt-out-study</span></code> action installs an add-on, typically one that
+implements a feature experiment by changing Firefox and measuring how it
+affects the user.</p>
+<p>Each recipe corresponds to a single _study_; you could run multiple studies (
+using multiple recipes) that use the same add-on.</p>
+<div class="section" id="arguments">
+<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>Name</dt><dd><p>User-facing name of the study, shown in <code class="docutils literal notranslate"><span class="pre">about:studies</span></code>.</p>
+</dd>
+<dt>Description</dt><dd><p>User-facing description of the study, shown in <code class="docutils literal notranslate"><span class="pre">about:studies</span></code>.</p>
+</dd>
+<dt>Add-on</dt><dd><p>The add-on to install. The list of available add-ons pulls from the add-ons
+that have been uploaded via the Extensions listing.</p>
+</dd>
+<dt>Prevent New Enrollment</dt><dd><p>When checked, new participants will not be enrolled in the study, although
+existing participants will continue to run the study add-on. When
+unchecked, new participants will continue to be enrolled based on the
+recipe filters. This is useful to prevent a study’s population from
+growing while still collecting additional data from the users already
+enrolled.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="uploading-add-ons">
+<h2>Uploading Add-ons<a class="headerlink" href="#uploading-add-ons" title="Permalink to this headline">¶</a></h2>
+<p>Add-ons to be used in studies can be uploaded to Normandy via the extensions
+page of Delivery Console, accessible from the home page.</p>
+<p>Add-ons used in studies must be signed using a special key. Please contact
+the Normandy development team for more details.</p>
+</div>
+<div class="section" id="user-flow">
+<h2>User Flow<a class="headerlink" href="#user-flow" title="Permalink to this headline">¶</a></h2>
+<p>After the user matches the filter expression and executes the recipe:</p>
+<ol class="arabic simple">
+<li><p>If the user is eligible for the study, they are enrolled. A user is
+ineligible if:</p>
+<ul class="simple">
+<li><p>Their <a class="reference external" href="opt-out-preference">opt-out preference</a> is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+<li><p>They have participated in this study/recipe previously.</p></li>
+<li><p>They have an add-on installed with the same ID as the study add-on.</p></li>
+</ul>
+</li>
+<li><p>The add-on is downloaded and installed on their system, and study info is
+saved on the client.</p></li>
+<li><p>Once it’s done running the experiment, the study add-on should uninstall
+itself, which marks the study as complete.</p></li>
+</ol>
+</div>
+<div class="section" id="testing-notes">
+<h2>Testing Notes<a class="headerlink" href="#testing-notes" title="Permalink to this headline">¶</a></h2>
+<p>If testing against a local copy of Normandy with a self-signed certificate,
+add-on installation will fail unless you set the
+<code class="docutils literal notranslate"><span class="pre">extensions.install.requireBuiltInCerts</span></code> preference to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="console-log.html" class="btn btn-neutral float-right" title="console-log: Log to the Console" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="preference-rollback.html" class="btn btn-neutral float-left" title="preference-rollback: Undo a preference rollback" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

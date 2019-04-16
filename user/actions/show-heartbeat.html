@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>show-heartbeat: Show Heartbeat Prompt &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="preference-experiment: Temporarily Change a Preference" href="preference-experiment.html" />
+    <link rel="prev" title="Actions" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">User Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../filters.html">Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../peer_approval.html">Peer Approval</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Actions</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">show-heartbeat: Show Heartbeat Prompt</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#telemetry-ping">Telemetry Ping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#arguments">Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="preference-experiment.html">preference-experiment: Temporarily Change a Preference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preference-rollout.html">preference-rollout: Permanently Change a Preference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="preference-rollback.html">preference-rollback: Undo a preference rollback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="opt-out-study.html">opt-out-study: Install a Study Add-on Without Prompting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="console-log.html">console-log: Log to the Console</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../end_user_interaction.html">End User Interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ops/index.html">Operations Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">User Documentation</a> &raquo;</li>
+        
+          <li><a href="index.html">Actions</a> &raquo;</li>
+        
+      <li>show-heartbeat: Show Heartbeat Prompt</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/user/actions/show-heartbeat.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="show-heartbeat-show-heartbeat-prompt">
+<h1>show-heartbeat: Show Heartbeat Prompt<a class="headerlink" href="#show-heartbeat-show-heartbeat-prompt" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">show-heartbeat</span></code> action shows a bar at the top of the browser viewport
+with a message and either a set of rating stars or a button that the user can
+interact with.</p>
+<img alt="../../_images/heartbeat.png" class="align-center" src="../../_images/heartbeat.png" />
+<p>When shown a Heartbeat prompt, users can:</p>
+<ul class="simple">
+<li><p>Click a star or the button (depending on which is shown), which replaces the
+bar contents with a “Thank you” message and optionally opens a webpage in a
+new tab. The “Thank you” message should disappear after a short delay.</p></li>
+<li><p>Click the “Learn More” link on the right side of the bar, which opens a
+webpage in a new tab and does <strong>not</strong> dismiss the bar.</p></li>
+<li><p>Click the close button on the far right of the bar, which dismisses it
+entirely.</p></li>
+</ul>
+<p>A maximum of one Heartbeat prompt will be shown to a user on any given day
+from any recipe. Recipes can configure heartbeat prompts to have one of three
+repetition modes. These repetition rules are applied on a per-recipe basis,
+while also respecting the global rate limit of one-per-day.</p>
+<div class="section" id="telemetry-ping">
+<h2>Telemetry Ping<a class="headerlink" href="#telemetry-ping" title="Permalink to this headline">¶</a></h2>
+<p>Whenever the user interacts with the prompt, a ping is written to <a class="reference external" href="https://wiki.mozilla.org/Telemetry">Telemetry</a>
+with information on how the user has interacted with the current prompt thus
+far. The <a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/data/heartbeat-ping.html">“heartbeat” ping documentation</a> has more information on the
+contents of the ping.</p>
+</div>
+<div class="section" id="arguments">
+<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>Survey ID</dt><dd><p>An identifier for the survey used to distinguish between different surveys
+during analysis. Typically this is alphanumeric and dashes (<code class="docutils literal notranslate"><span class="pre">-</span></code>).</p>
+</dd>
+<dt>Message</dt><dd><p>Main display text for the Heartbeat prompt.</p>
+</dd>
+<dt>Engagement Button Label</dt><dd><p><strong>Optional.</strong> If blank, the prompt will have rating stars. Otherwise, the
+prompt will have a button with the given label.</p>
+</dd>
+<dt>Thanks Message</dt><dd><p>Message to show after the user clicks the rating stars or button.</p>
+</dd>
+<dt>Post-Answer URL</dt><dd><p><strong>Optional.</strong> URL to open in a new tab after the user clicks the rating
+stars or button.</p>
+</dd>
+<dt>Learn More Message</dt><dd><p><strong>Optional.</strong> Text to use for the “Learn More” link. If blank, the link is
+not displayed.</p>
+</dd>
+<dt>Learn More URL</dt><dd><p><strong>Optional.</strong> URL to open in a new tab after the user clicks the
+“Learn More” link. If blank, the link is not displayed.</p>
+</dd>
+<dt>Include Telemetry UUID</dt><dd><p>If this is set to true, extra information is included in Telemetry and the
+Post Answer URL in order to correlate the two, such as linking Telemetry
+data with survey responses.</p>
+</dd>
+<dt>How often should this prompt be shown</dt><dd><p>This field has three values:</p>
+<ol class="arabic simple">
+<li><p>Show this prompt once</p></li>
+<li><p>Show this prompt until the user interacts with it, and then never again.</p></li>
+<li><p>Show users this prompt once every X days.</p></li>
+</ol>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="preference-experiment.html" class="btn btn-neutral float-right" title="preference-experiment: Temporarily Change a Preference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Actions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
