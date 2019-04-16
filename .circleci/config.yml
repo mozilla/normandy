@@ -6,7 +6,47 @@
 #
 version: 2
 jobs:
-  build_test_publish:
+  lint:
+    docker:
+      # Image with python 3.6 and node 8
+      - image: circleci/python:3.6-node-browsers
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Install python dependencies
+      - run:
+          name: Install python dependencies
+          command: pip install -U -r requirements/default.txt -c requirements/constraints.txt --require-hashes
+
+      - run:
+          name: Install therapist
+          command: pip install -U therapist
+
+      # Download and cache node dependencies
+      - restore_cache:
+          keys:
+          - v2-dependencies-{{ checksum "yarn.lock" }}
+          # fallback to using the latest cache if no exact match is found
+          - v2-dependencies-
+
+      - run:
+          name: Install node dependencies
+          command: yarn install --frozen-lockfile
+
+      - save_cache:
+          paths:
+            - "node_modules"
+          key: v2-dependencies-{{ checksum "yarn.lock" }}
+
+      # Run lint suite using therapist
+      - run:
+          name: Lint
+          command: therapist run --use-tracked-files
+
+  build-test-publish:
     docker:
       - image: mozilla/cidockerbases:docker-latest
 
@@ -49,10 +89,6 @@ jobs:
             ./bin/download_geolite2.sh
             docker-compose build
             docker-compose pull db
-
-      - run:
-          name: Linting
-          command: docker-compose run web lint
 
       - run:
           name: Python Tests
@@ -150,7 +186,8 @@ workflows:
   version: 2
   main:
     jobs:
-      - build_test_publish:
+      - lint
+      - build-test-publish:
           # run on all tags, as well as the default of all other commits
           filters:
             tags:
