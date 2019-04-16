@@ -22,6 +22,9 @@ actions:
       - "*.jsx"
     exclude:
       - ".eslintrc.js"
+
+  yarn-audit:
+    run: yarn audit
 shortcuts:
   lint:
     flags:
