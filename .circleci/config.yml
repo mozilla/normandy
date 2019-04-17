@@ -188,7 +188,11 @@ workflows:
   version: 2
   main:
     jobs:
-      - lint
+      - lint:
+          # run on all tags, as well as the default of all other commits
+          filters:
+            tags:
+              only: /.*/
       - build-test-publish:
           requires:
             - lint
