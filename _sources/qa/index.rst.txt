@@ -7,3 +7,4 @@ These documents are aimed at QA testers working on Normandy.
 
    example
    environments
+   test_engineering
