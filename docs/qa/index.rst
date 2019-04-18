@@ -3,7 +3,7 @@ QA Documentation
 These documents are aimed at QA testers working on Normandy.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    example
    environments
