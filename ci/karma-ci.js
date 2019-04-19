@@ -4,6 +4,8 @@ var path = require('path');
 var karma = require('karma');
 var karmaConfig = require('karma/lib/config');
 
+const JUNIT_OUTPUT = process.env.JUNIT_OUTPUT || '/artifacts/test_results/karma';
+
 var config = karmaConfig.parseConfig(
   path.join(__dirname, '/../karma.conf.js'),
   {
@@ -11,7 +13,7 @@ var config = karmaConfig.parseConfig(
     oneShot: true,
     reporters: ['spec', 'junit'],
     junitReporter: {
-      outputDir: '/artifacts/test_results/karma/',
+      outputDir: JUNIT_OUTPUT,
     },
     hostname: '0.0.0.0',
   },

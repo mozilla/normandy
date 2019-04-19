@@ -25,6 +25,14 @@ actions:
 
   yarn-audit:
     run: yarn audit
+
+  missing-migirations:
+    include: "*.py"
+    run: |
+      ./manage.py makemigrations --check --no-input --dry-run recipes studies || (
+        echo "You probably have migrations that need to be created" && exit 1
+      )
+
 shortcuts:
   lint:
     flags:
