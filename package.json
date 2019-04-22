@@ -50,7 +50,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "3.0.5",
     "webpack": "4.30.0",
-    "webpack-cli": "3.3.0"
+    "webpack-cli": "3.3.1"
   },
   "resolutions": {
     "deep-extend": ">=0.5.1",
