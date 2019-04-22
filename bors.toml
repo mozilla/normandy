@@ -1,10 +1,13 @@
 status = [
+  "ci/circleci: contract-tests",
+  "ci/circleci: docker-image-build",
+  "ci/circleci: docs-build",
+  "ci/circleci: js-tests",
   "ci/circleci: lint",
-  "ci/circleci: build-test-publish",
-  "ci/circleci: docs-build"
+  "ci/circleci: python-tests",
 ]
 # Avoid including verbose details from PR bodies
 cut_body_after = "\n---\n"
 block_labels = ["bors-dont-merge"]
 required_approvals = 1
-delete_merged_branches = true 
+delete_merged_branches = true
