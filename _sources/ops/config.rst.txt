@@ -409,38 +409,38 @@ in other Django projects.
 
    The name of the Google storage bucket to be used to store media files.
 
-.. envvar:: METRICS_USE_DEBUG_LOGS
+.. envvar:: DJANGO_METRICS_USE_DEBUG_LOGS
 
    :default: ``True`` in Development, ``False`` otherwise
 
    If true, metrics will be logged in a human readable format. This is on by
    default in development.
 
-.. envvar:: METRICS_USE_STATSD
+.. envvar:: DJANGO_METRICS_USE_STATSD
 
    :default: ``True`` in Production, ``False`` otherwise.
 
     If true, metrics will be sent to the configured statsd server. This is on
     by default in production.
 
-.. envvar:: METRICS_STATSD_HOST
+.. envvar:: DJANGO_METRICS_STATSD_HOST
 
    :default: "``localhost"``
 
-    If ``METRICS_USE_STATSD`` is enabled, the hostname to send statsd metrics
+    If ``DJANGO_METRICS_USE_STATSD`` is enabled, the hostname to send statsd metrics
     to.
 
-.. envvar:: METRICS_STATSD_PORT
+.. envvar:: DJANGO_METRICS_STATSD_PORT
 
    :default: ``8125``
 
-    If ``METRICS_USE_STATSD`` is enabled, the port to send statsd metrics to.
+    If ``DJANGO_METRICS_USE_STATSD`` is enabled, the port to send statsd metrics to.
 
-.. envvar:: METRICS_STATSD_NAMESPACE
+.. envvar:: DJANGO_METRICS_STATSD_NAMESPACE
 
    :default: ``""``
 
-    If ``METRICS_USE_STATSD`` is enabled, metrics sent will be prefixed with
+    If ``DJANGO_METRICS_USE_STATSD`` is enabled, metrics sent will be prefixed with
     this value.
 
 

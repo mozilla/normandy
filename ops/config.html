@@ -783,8 +783,8 @@ django-storages to access S3.</p>
 </dd></dl>
 
 <dl class="envvar">
-<dt id="envvar-METRICS_USE_DEBUG_LOGS">
-<code class="descname">METRICS_USE_DEBUG_LOGS</code><a class="headerlink" href="#envvar-METRICS_USE_DEBUG_LOGS" title="Permalink to this definition">¶</a></dt>
+<dt id="envvar-DJANGO_METRICS_USE_DEBUG_LOGS">
+<code class="descname">DJANGO_METRICS_USE_DEBUG_LOGS</code><a class="headerlink" href="#envvar-DJANGO_METRICS_USE_DEBUG_LOGS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> in Development, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise</p>
@@ -795,8 +795,8 @@ default in development.</p>
 </dd></dl>
 
 <dl class="envvar">
-<dt id="envvar-METRICS_USE_STATSD">
-<code class="descname">METRICS_USE_STATSD</code><a class="headerlink" href="#envvar-METRICS_USE_STATSD" title="Permalink to this definition">¶</a></dt>
+<dt id="envvar-DJANGO_METRICS_USE_STATSD">
+<code class="descname">DJANGO_METRICS_USE_STATSD</code><a class="headerlink" href="#envvar-DJANGO_METRICS_USE_STATSD" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> in Production, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
@@ -807,35 +807,35 @@ by default in production.</p>
 </dd></dl>
 
 <dl class="envvar">
-<dt id="envvar-METRICS_STATSD_HOST">
-<code class="descname">METRICS_STATSD_HOST</code><a class="headerlink" href="#envvar-METRICS_STATSD_HOST" title="Permalink to this definition">¶</a></dt>
+<dt id="envvar-DJANGO_METRICS_STATSD_HOST">
+<code class="descname">DJANGO_METRICS_STATSD_HOST</code><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_HOST" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>“<code class="docutils literal notranslate"><span class="pre">localhost&quot;</span></code></p>
-<p>If <code class="docutils literal notranslate"><span class="pre">METRICS_USE_STATSD</span></code> is enabled, the hostname to send statsd metrics
+<p>If <code class="docutils literal notranslate"><span class="pre">DJANGO_METRICS_USE_STATSD</span></code> is enabled, the hostname to send statsd metrics
 to.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="envvar">
-<dt id="envvar-METRICS_STATSD_PORT">
-<code class="descname">METRICS_STATSD_PORT</code><a class="headerlink" href="#envvar-METRICS_STATSD_PORT" title="Permalink to this definition">¶</a></dt>
+<dt id="envvar-DJANGO_METRICS_STATSD_PORT">
+<code class="descname">DJANGO_METRICS_STATSD_PORT</code><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_PORT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">8125</span></code></p>
-<p>If <code class="docutils literal notranslate"><span class="pre">METRICS_USE_STATSD</span></code> is enabled, the port to send statsd metrics to.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">DJANGO_METRICS_USE_STATSD</span></code> is enabled, the port to send statsd metrics to.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="envvar">
-<dt id="envvar-METRICS_STATSD_NAMESPACE">
-<code class="descname">METRICS_STATSD_NAMESPACE</code><a class="headerlink" href="#envvar-METRICS_STATSD_NAMESPACE" title="Permalink to this definition">¶</a></dt>
+<dt id="envvar-DJANGO_METRICS_STATSD_NAMESPACE">
+<code class="descname">DJANGO_METRICS_STATSD_NAMESPACE</code><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_NAMESPACE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p>
-<p>If <code class="docutils literal notranslate"><span class="pre">METRICS_USE_STATSD</span></code> is enabled, metrics sent will be prefixed with
+<p>If <code class="docutils literal notranslate"><span class="pre">DJANGO_METRICS_USE_STATSD</span></code> is enabled, metrics sent will be prefixed with
 this value.</p>
 </dd>
 </dl>
