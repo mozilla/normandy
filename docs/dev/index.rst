@@ -17,3 +17,4 @@ of the Normandy client.
    remote-settings
    troubleshooting
    ci
+   docker
