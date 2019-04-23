@@ -149,6 +149,13 @@ the endpoint ``/api/v3/``. No user interface is provided.
 
 .. _fork: http://help.github.com/fork-a-repo/
 
+Alternative Setup and Use
+_________________________
+
+If you would like to use docker instead please reference the docker_ section.
+
+.. _docker: Docker Setup for local development
+
 Autograph
 ---------
 If you want to execute recipes on your local instance using the recipe

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Continuous Integration &mdash; Normandy 0.1.0 documentation</title>
+  <title>Docker Setup for local development &mdash; Normandy 0.1.0 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Docker Setup for local development" href="docker.html" />
-    <link rel="prev" title="Troubleshooting" href="troubleshooting.html" /> 
+    <link rel="next" title="QA Documentation" href="../qa/index.html" />
+    <link rel="prev" title="Continuous Integration" href="ci.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,12 +95,12 @@
 <li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
 <li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Continuous Integration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#running-suite">Running Suite</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#no-volume-mounts">No Volume Mounts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Docker Setup for local development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="docker.html">Docker Setup for local development</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
@@ -152,13 +152,13 @@
         
           <li><a href="index.html">Developer Documentation</a> &raquo;</li>
         
-      <li>Continuous Integration</li>
+      <li>Docker Setup for local development</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/dev/ci.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/dev/docker.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -171,36 +171,52 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="continuous-integration">
-<h1>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h1>
-<p>Almost everything that is run in CI (using <a class="reference external" href="https://circleci.com/gh/mozilla/normandy">CircleCI</a>) is designed to be possible to run locally.
-This helps in that it’s easier to use your own laptop to debug potential problems that only
-happen in CI.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>“Almost everything”, because pushing to <a class="reference external" href="https://hub.docker.com/">Docker Hub</a> is not something you can do
-from your laptop.</p>
+  <div class="section" id="docker-setup-for-local-development">
+<h1>Docker Setup for local development<a class="headerlink" href="#docker-setup-for-local-development" title="Permalink to this headline">¶</a></h1>
+<p>The following describes how to set up an instance of the site on your
+computer for development using the provided docker and docker-compose
+files.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>This guide assumes you have already installed and set up the following:</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://git-scm.com/">Git</a></p></li>
+<li><p><a class="reference external" href="https://docs.docker.com/install/">Docker</a></p></li>
+<li><p><a class="reference external" href="https://docs.docker.com/compose/install/">Docker-Compose</a></p></li>
+</ol>
+<p>These docs assume a Unix-like operating system, although the site should, in
+theory, run on Windows as well. All the example commands given below are
+intended to be run in a terminal.</p>
 </div>
-<div class="section" id="running-suite">
-<h2>Running Suite<a class="headerlink" href="#running-suite" title="Permalink to this headline">¶</a></h2>
-<p>The steps in <code class="docutils literal notranslate"><span class="pre">.circleci/config.yml</span></code> should be sufficiently self-explanatory. Each step should
-work to just copy and paste into your own terminal.</p>
-<p>There are some exceptions though. For example, when a step is set up to run with
-<code class="docutils literal notranslate"><span class="pre">background:</span> <span class="pre">true</span></code> it means you can run it in its own dedicated terminal and run the
-other commands in another terminal.</p>
-</div>
-<div class="section" id="no-volume-mounts">
-<h2>No Volume Mounts<a class="headerlink" href="#no-volume-mounts" title="Permalink to this headline">¶</a></h2>
-<p>The reason we use a collector container is because you can’t use volume mounts in CircleCI.
-What that means is that if you edit any of the <code class="docutils literal notranslate"><span class="pre">.py</span></code> files, for example, after you have run
-a suite, you need to build again. For example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose -f ci/docker-compose.yml build web
-docker-compose -f ci/docker-compose.yml run web pytest
-vi normandy/base/middleware.py
-docker-compose -f ci/docker-compose.yml build web
-docker-compose -f ci/docker-compose.yml run web pytest
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>Clone this repository or your <a class="reference external" href="http://help.github.com/fork-a-repo/">fork</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/mozilla/normandy.git
+<span class="nb">cd</span> normandy
 </pre></div>
 </div>
+</li>
+<li><p>Start the docker images via <code class="docutils literal notranslate"><span class="pre">docker-compose</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose -f ci/docker-compose.yml up -d --build
+</pre></div>
+</div>
+</li>
+</ol>
+<p>This will build the development dockerfile and start the images for
+the database as well. If those images aren’t present, they will be
+downloaded.</p>
+<p>You can now edit code and make changes and these changes will exist inside
+of the running docker container named <code class="docutils literal notranslate"><span class="pre">web</span></code> using this command:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<p>docker-compose -f ci/docker-compose.yml exec web bash</p>
+</div></blockquote>
+<p>It is advised to follow steps 6-11 under the <a class="reference external" href="Installation">Installation</a> section.</p>
+<p>You can then navigate to <code class="docutils literal notranslate"><span class="pre">localhost:8000</span></code> to check that the Normandy API
+server has started.</p>
 </div>
 </div>
 
@@ -212,10 +228,10 @@ docker-compose -f ci/docker-compose.yml run web pytest
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="docker.html" class="btn btn-neutral float-right" title="Docker Setup for local development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../qa/index.html" class="btn btn-neutral float-right" title="QA Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="troubleshooting.html" class="btn btn-neutral float-left" title="Troubleshooting" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ci.html" class="btn btn-neutral float-left" title="Continuous Integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
