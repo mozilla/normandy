@@ -37,7 +37,13 @@ the database as well. If those images aren't present, they will be
 downloaded.
 
 You can now edit code and make changes and these changes will exist inside
-of the running docker container named ``web``.
+of the running docker container named ``web`` using this command:
+
+    .. code-block:: bash
+
+    docker-compose -f ci/docker-compose.yml exec web bash
+
+It is advised to follow steps 6-11 under the Installation_ section.
 
 You can then navigate to ``localhost:8000`` to check that the Normandy API
 server has started.
@@ -46,3 +52,4 @@ server has started.
 .. _Docker: https://docs.docker.com/install/
 .. _Docker-Compose: https://docs.docker.com/compose/install/
 .. _fork: http://help.github.com/fork-a-repo/
+.. _Installation: Installation
