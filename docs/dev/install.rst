@@ -149,10 +149,10 @@ the endpoint ``/api/v3/``. No user interface is provided.
 
 .. _fork: http://help.github.com/fork-a-repo/
 
-Docker
-______
+Alternative Setup and Use
+_________________________
 
-For local Docker setup please reference the docker_ section.
+If you would like to use docker instead please reference the docker_ section.
 
 .. _docker: Docker Setup for local development
 

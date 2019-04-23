@@ -29,12 +29,15 @@ Installation
 
    .. code-block:: bash
 
-    docker-compose -f docker-compose.yml -f docker-compose.development up -d --build
+    docker-compose -f ci/docker-compose.yml up -d --build
 
       
 This will build the development dockerfile and start the images for
 the database as well. If those images aren't present, they will be
 downloaded.
+
+You can now edit code and make changes and these changes will exist inside
+of the running docker container named ``web``.
 
 You can then navigate to ``localhost:8000`` to check that the Normandy API
 server has started.
