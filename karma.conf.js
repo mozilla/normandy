@@ -58,7 +58,7 @@ module.exports = function (config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Firefox'],
+    browsers: ['FirefoxHeadless'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -68,6 +68,15 @@ module.exports = function (config) {
     // how many browser should be started simultaneous
     concurrency: Infinity,
   };
+
+  if (process.env.JUNIT_REPORT_PATH) {
+    karmaConfig.reporters.push('junit');
+    karmaConfig.junitReporter = {
+      outputDir: process.env.JUNIT_REPORT_PATH,
+      outputFile: process.env.JUNIT_REPORT_NAME,
+      useBrowserNAme: false,
+    };
+  }
 
   config.set(karmaConfig);
 };
