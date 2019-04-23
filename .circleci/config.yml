@@ -85,6 +85,7 @@ jobs:
     docker:
       - image: mozilla/cidockerbases:docker-latest
     steps:
+      - checkout
       - setup_remote_docker:
           version: 17.09.0-ce
       - attach_workspace:
