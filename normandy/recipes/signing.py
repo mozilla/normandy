@@ -5,12 +5,13 @@ import logging
 import re
 from datetime import datetime
 
+import pytz
 import requests
 import ecdsa.util
 import fastecdsa.ecdsa
 from fastecdsa.encoding.pem import PEMEncoder
+from hashlib import sha256
 from pyasn1.codec.der.decoder import decode as der_decode
-from pyasn1.codec.native.encoder import encode as python_encode
 from pyasn1_modules import rfc5280
 from requests_hawk import HawkAuth
 
@@ -170,15 +171,10 @@ class WrongPublicKeySize(BadSignature):
 
 
 def read_timestamp_object(obj):
-    general_date_format = "%Y%m%d%H%M%SZ"
-    utc_date_format = "%y%m%d%H%M%SZ"
-
     if "generalTime" in obj:
-        timestamp = obj["generalTime"].decode()
-        return datetime.strptime(timestamp, general_date_format)
+        return obj["generalTime"].asDateTime
     elif "utcTime" in obj:
-        timestamp = obj["utcTime"].decode()
-        return datetime.strptime(timestamp, utc_date_format)
+        return obj["utcTime"].asDateTime
     else:
         raise BadCertificate(
             "Timestamp not in expected format. "
@@ -198,16 +194,55 @@ def verify_x5u(url, expire_early=None):
     req = requests.get(url)
     req.raise_for_status()
     pem = req.content.decode()
-    certs = parse_pem_to_certs(pem)
 
-    for cert in certs:
-        try:
-            validity = cert["tbsCertificate"]["validity"]
-            not_before = read_timestamp_object(validity["notBefore"])
-            not_after = read_timestamp_object(validity["notAfter"])
-        except KeyError as e:
-            raise BadCertificate(f"Certificate does not have expected shape: KeyError {e}")
-        check_validity(not_before, not_after, expire_early)
+    der_encoded_certs = extract_certs_from_pem(pem)
+    decoded_certs = [parse_cert_from_der(der) for der in der_encoded_certs]
+
+    if settings.CERTIFICATES_CHECK_VALIDITY:
+        for cert in decoded_certs:
+            # Check that the certificate is currently valid, and optionally check
+            # that it isn't expiring soon.
+            try:
+                validity = cert["tbsCertificate"]["validity"]
+                not_before = read_timestamp_object(validity["notBefore"])
+                not_after = read_timestamp_object(validity["notAfter"])
+            except KeyError as e:
+                raise BadCertificate(f"Certificate does not have expected shape: KeyError {e}")
+            check_validity(not_before, not_after, expire_early)
+
+    # If an root hash has been configured, check that the root certificate in
+    # the chain matches the expected value.
+    if settings.CERTIFICATES_EXPECTED_ROOT_HASH:
+        root_fingerprint = sha256(der_encoded_certs[-1]).hexdigest().lower()
+        expected = settings.CERTIFICATES_EXPECTED_ROOT_HASH.replace(":", "").lower()
+        if root_fingerprint != expected:
+            raise CertificateHasWrongRoot(expected=expected, actual=root_fingerprint)
+
+    # If an expected subject common name is configured, check that the signing
+    # certificate matches that expectation
+    if settings.CERTIFICATES_EXPECTED_SUBJECT_CN:
+        # Assume the first cert in the chain generated the signature
+        signing_cert = decoded_certs[0]
+        # Get the list of names (Including company name, common name, and country)
+        names = signing_cert["tbsCertificate"]["subject"][0]
+        # Find the common name within the list by filtering by the rfc-defined ID for it
+        common_name_object = next(
+            (name[0]["value"] for name in names if name[0]["type"] == rfc5280.id_at_commonName),
+            None,
+        )
+        # Decode the bytes of the common name object as a Directory String
+        common_name_string, rest = der_decode(
+            common_name_object.asOctets(), asn1Spec=rfc5280.DirectoryString()
+        )
+        assert not rest  # Assert we processed the entire input
+        # Get the first value from that Directory String (which might be one of
+        # several formats), convert it to bytes, and then finally decode it
+        # into a Python string.
+        common_name = next(common_name_string.values()).asOctets().decode()
+
+        expected = settings.CERTIFICATES_EXPECTED_SUBJECT_CN
+        if common_name != expected:
+            raise CertificateHasWrongSubject(expected=expected, actual=common_name)
 
     return True
 
@@ -222,7 +257,7 @@ def check_validity(not_before, not_after, expire_early):
     If expire_early is passed, an exception will be raised if the
     not_after date is too soon in the future.
     """
-    now = datetime.now()
+    now = datetime.utcnow().replace(tzinfo=pytz.utc)
     if not_before > not_after:
         raise BadCertificate(f"not_before ({not_before}) after not_after ({not_after})")
     if now < not_before:
@@ -280,9 +315,31 @@ class CertificateParseError(BadCertificate):
         return f"Could not parse certificate: {self.extra}"
 
 
-def parse_pem_to_certs(pem):
+class CertificateHasWrongRoot(BadCertificate):
+    def __init__(self, *, expected, actual):
+        self.expected = expected
+        self.actual = actual
+        return
+
+    @property
+    def detail(self):
+        return f"Certificate is not based on expected root hash. Got '{self.actual!r}' expected '{self.expected!r}'"
+
+
+class CertificateHasWrongSubject(BadCertificate):
+    def __init__(self, *, expected, actual):
+        self.expected = expected
+        self.actual = actual
+        return
+
+    @property
+    def detail(self):
+        return f"Certificate does not have the expected subject. Got {self.actual!r} expected {self.expected!r}"
+
+
+def extract_certs_from_pem(pem):
     """
-    Convert PEM formatted certificates into DER format.
+    Parse certificates out of a PEM file. Returns DER encoded strings.
 
     :param pem: String containing a list of PEM encoded certificates
     :returns: List of Python objects representing certificates
@@ -312,10 +369,10 @@ def parse_pem_to_certs(pem):
     if acc:
         raise CertificateParseError(f"Unexpected end of input. Leftover: {acc}")
 
-    certs_py = []
-    for der in certs_der:
-        cert, rest_of_input = der_decode(der, asn1Spec=rfc5280.Certificate())
-        assert not rest_of_input  # assert no left over input
-        certs_py.append(python_encode(cert))
+    return certs_der
 
-    return certs_py
+
+def parse_cert_from_der(der):
+    cert, rest_of_input = der_decode(der, asn1Spec=rfc5280.Certificate())
+    assert not rest_of_input  # assert no left over input
+    return cert

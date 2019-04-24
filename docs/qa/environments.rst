@@ -1,3 +1,5 @@
+.. _environments:
+
 Environments
 ============
 Mozilla runs several instances of Normandy; this document provides information
