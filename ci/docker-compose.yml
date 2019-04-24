@@ -24,4 +24,4 @@ services:
       - DATABASE_URL=postgres://postgres@db/postgres
       - ARTIFACTS_PATH=/artifacts
     volumes:
-      - ..:/app`
+      - ..:/app
