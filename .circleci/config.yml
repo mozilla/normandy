@@ -5,7 +5,7 @@
 # DOCKER_PASS
 #
 
-version: 2
+version: 2.1
 
 jobs:
   lint:
@@ -50,6 +50,10 @@ jobs:
           command: therapist run --use-tracked-files
 
   docker-image-build:
+    parameters:
+      saveToWorkspace:
+        type: boolean
+        default: true
     docker:
       - image: mozilla/cidockerbases:docker-latest
     steps:
@@ -70,18 +74,19 @@ jobs:
       - run:
           name: Build Docker image
           command: docker build -t normandy:web .
-      - run:
-          name: Save image into workspace
-          command: |
-            mkdir -p workspace
-            if [ "${CIRCLE_BRANCH}" == "master" ] || [ ! -z "${CIRCLE_TAG}" ]; then
-              docker save -o workspace/normandy-web.tar normandy:web
-              gzip workspace/normandy-web.tar
-            fi
-      - persist_to_workspace:
-          root: workspace
-          paths:
-            - normandy-web.tar.gz
+      - when:
+          condition: << parameters.saveToWorkspace >>
+          steps:
+            - run:
+                name: Save image into workspace
+                command: |
+                  mkdir -p workspace
+                  docker save -o workspace/normandy-web.tar normandy:web
+                  gzip workspace/normandy-web.tar
+            - persist_to_workspace:
+                root: workspace
+                paths:
+                  - normandy-web.tar.gz
 
   docker-image-publish:
     docker:
@@ -300,9 +305,21 @@ workflows:
       # Group: Building artifacts
       - docs-build
       - docker-image-build:
+          name: docker-image-build-save
+          # A version of the job that save the docker image to the workspace
+          saveToWorkspace: true
           filters:
             tags:
               only: /.*/
+            branches:
+              only: master
+      - docker-image-build:
+          name: docker-image-build-pr
+          # A version of the job that does not save the image, as an optimization
+          saveToWorkspace: false
+          filters:
+            branches:
+              ignore: master
 
       # Group: Publish
       # All of these should only run on master and tags
@@ -319,7 +336,7 @@ workflows:
             - contract-tests
             - js-tests
             - lint
-            - docker-image-build
+            - docker-image-build-save
           filters:
             branches:
               only: master

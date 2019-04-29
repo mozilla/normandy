@@ -1,6 +1,6 @@
 status = [
   "ci/circleci: contract-tests",
-  "ci/circleci: docker-image-build",
+  "ci/circleci: docker-image-build-pr",
   "ci/circleci: docs-build",
   "ci/circleci: js-tests",
   "ci/circleci: lint",
