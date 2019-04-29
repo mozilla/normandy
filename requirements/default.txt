@@ -202,10 +202,9 @@ requests==2.21.0 \
 requests-hawk==1.0.0 \
     --hash=sha256:aef0dff8053dcae2057774516386bed0a3bc03fabea9e18f3aa98f02672ea5d0 \
     --hash=sha256:c2626ab31ebef0c81b97781c44c2275bfcc6d8e8520fc4ced495f0f386f8fe26
-requests-mock==1.5.2 \
-    --hash=sha256:8ca0628dc66d3f212878932fd741b02aa197ad53fd2228164800a169a4a826af \
-    --hash=sha256:7a5fa99db5e3a2a961b6f20ed40ee6baeff73503cf0a553cc4d679409e6170fb \
-    # Pinning urllib3 >=1.21.1,<1.25
+requests-mock==1.6.0 \
+    --hash=sha256:12e17c7ad1397fd1df5ead7727eb3f1bdc9fe1c18293b0492e0e01b57997e38d \
+    --hash=sha256:dc9e416a095ee7c3360056990d52e5611fb94469352fc1c2dc85be1ff2189146    # Pinning urllib3 >=1.21.1,<1.25
 sort-requirements==1.3.0 \
     --hash=sha256:56de1172f5656aa9a0dfb7575913fff3d9ab80090e6bd4095fd6feec312c7d7c \
     --hash=sha256:8038315f8932b1496567f1241ea482aa900845d5a5116c7d23835e783a3a2082
