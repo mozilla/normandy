@@ -55,7 +55,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: 17.09.0-ce
+          docker_layer_caching: true
       - run:
           name: Create version.json
           command: |
@@ -74,8 +74,10 @@ jobs:
           name: Save image into workspace
           command: |
             mkdir -p workspace
-            docker save -o workspace/normandy-web.tar normandy:web
-            gzip workspace/normandy-web.tar
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ ! -z "${CIRCLE_TAG}" ]; then
+              docker save -o workspace/normandy-web.tar normandy:web
+              gzip workspace/normandy-web.tar
+            fi
       - persist_to_workspace:
           root: workspace
           paths:
