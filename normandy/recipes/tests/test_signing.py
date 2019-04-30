@@ -6,6 +6,9 @@ from unittest.mock import MagicMock, call
 from django.core.exceptions import ImproperlyConfigured
 
 import pytest
+import pytz
+from pyasn1.type import useful as pyasn1_useful
+from pyasn1_modules import rfc5280
 
 from normandy.base.tests import Whatever
 from normandy.recipes import signing
@@ -154,16 +157,36 @@ class TestVerifySignature(object):
             signing.verify_signature(self.data, signature, self.pubkey)
 
 
-class TestParsePemToCerts(object):
+class TestExtractCertsFromPem(object):
     def test_empty(self):
-        assert signing.parse_pem_to_certs("") == []
+        assert signing.extract_certs_from_pem("") == []
 
     def test_real_certs(self):
         path = os.path.join(os.path.dirname(__file__), "data", "test_certs.pem")
         with open(path) as f:
-            certs = signing.parse_pem_to_certs(f.read())
-
+            certs = signing.extract_certs_from_pem(f.read())
         assert len(certs) == 3
+
+    def test_incomplete_cert(self):
+        bad_data = "-----BEGIN CERTIFICATE-----\nMIIGXTCCBEWgAwIBAgIEAQAACjANBgkq"
+        with pytest.raises(signing.CertificateParseError) as exc:
+            signing.extract_certs_from_pem(bad_data)
+        assert "Unexpected end of input." in str(exc)
+
+    def test_not_a_cert(self):
+        bad_data = "hello world"
+        with pytest.raises(signing.CertificateParseError) as exc:
+            signing.extract_certs_from_pem(bad_data)
+        assert 'Unexpected input "hello world"' in str(exc)
+
+
+class TestParseCertsFromDer(object):
+    def test_real_certs(self):
+        path = os.path.join(os.path.dirname(__file__), "data", "test_certs.pem")
+        with open(path) as f:
+            ders = signing.extract_certs_from_pem(f.read())
+        certs = [signing.parse_cert_from_der(der) for der in ders]
+
         # Quick spot check on the CommonName value of the subjects of the certs
         # If these are correct, the entire objects were probably parsed correctly
         assert (
@@ -179,49 +202,37 @@ class TestParsePemToCerts(object):
             == b"\x13\x16root-ca-production-amo"
         )
 
-    def test_incomplete_cert(self):
-        bad_data = "-----BEGIN CERTIFICATE-----\nMIIGXTCCBEWgAwIBAgIEAQAACjANBgkq"
-        with pytest.raises(signing.CertificateParseError) as exc:
-            signing.parse_pem_to_certs(bad_data)
-        assert "Unexpected end of input." in str(exc)
-
-    def test_not_a_cert(self):
-        bad_data = "hello world"
-        with pytest.raises(signing.CertificateParseError) as exc:
-            signing.parse_pem_to_certs(bad_data)
-        assert 'Unexpected input "hello world"' in str(exc)
-
 
 class TestCheckValidity(object):
     def test_it_works(self):
-        now = datetime.now()
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
         not_before = now - timedelta(days=1)
         not_after = now + timedelta(days=1)
         assert signing.check_validity(not_before, not_after, None)
 
     def test_not_yet_valid(self):
-        now = datetime.now()
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
         not_before = now + timedelta(days=1)
         not_after = now + timedelta(days=2)
         with pytest.raises(signing.CertificateNotYetValid):
             signing.check_validity(not_before, not_after, None)
 
     def test_expired(self):
-        now = datetime.now()
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
         not_before = now - timedelta(days=2)
         not_after = now - timedelta(days=1)
         with pytest.raises(signing.CertificateExpired):
             signing.check_validity(not_before, not_after, None)
 
     def test_expiring_early_ok(self):
-        now = datetime.now()
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
         not_before = now - timedelta(days=1)
         not_after = now + timedelta(days=3)
         expire_early = timedelta(days=2)
         assert signing.check_validity(not_before, not_after, expire_early)
 
     def test_expiring_early_not_ok(self):
-        now = datetime.now()
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
         not_before = now - timedelta(days=1)
         not_after = now + timedelta(days=1)
         expire_early = timedelta(days=2)
@@ -230,97 +241,85 @@ class TestCheckValidity(object):
 
 
 class TestVerifyX5u(object):
-    def test_it_works(self, mocker):
-        mock_requests = mocker.patch("normandy.recipes.signing.requests")
-        mock_parse_pem_to_certs = mocker.patch("normandy.recipes.signing.parse_pem_to_certs")
+    def _fake_cert(self, not_before=None, not_after=None):
+        fake_cert = rfc5280.Certificate()
+        fake_cert["tbsCertificate"] = rfc5280.TBSCertificate()
+        fake_cert["tbsCertificate"]["validity"] = rfc5280.Validity()
 
-        date_format = "%y%m%d%H%M%SZ"
+        if not_before:
+            fake_cert["tbsCertificate"]["validity"]["notBefore"] = rfc5280.Time()
+            fake_cert["tbsCertificate"]["validity"]["notBefore"][
+                "utcTime"
+            ] = pyasn1_useful.UTCTime.fromDateTime(not_before)
+        if not_after:
+            fake_cert["tbsCertificate"]["validity"]["notAfter"] = rfc5280.Time()
+            fake_cert["tbsCertificate"]["validity"]["notAfter"][
+                "utcTime"
+            ] = pyasn1_useful.UTCTime.fromDateTime(not_after)
+
+        return fake_cert
+
+    def test_it_works(self, mocker, settings):
+        settings.CERTIFICATES_CHECK_VALIDITY = True
+        settings.CERTIFICATES_EXPECTED_ROOT_HASH = None
+        settings.CERTIFICATES_EXPECTED_SUBJECT_CN = None
+
+        mock_requests = mocker.patch("normandy.recipes.signing.requests")
+        mock_extract_certs_from_pem = mocker.patch(
+            "normandy.recipes.signing.extract_certs_from_pem"
+        )
+        mock_parse_cert_from_der = mocker.patch("normandy.recipes.signing.parse_cert_from_der")
+
         url = "https://example.com/cert.pem"
         now = datetime.now()
-        not_before = (now - timedelta(days=1)).strftime(date_format).encode()
-        not_after = (now + timedelta(days=1)).strftime(date_format).encode()
+        not_before = now - timedelta(days=1)
+        not_after = now + timedelta(days=1)
 
-        mock_parse_pem_to_certs.return_value = [
-            {
-                "tbsCertificate": {
-                    "validity": {
-                        "notBefore": {"utcTime": not_before},
-                        "notAfter": {"utcTime": not_after},
-                    }
-                }
-            },
-            {
-                "tbsCertificate": {
-                    "validity": {
-                        "notBefore": {"utcTime": not_before},
-                        "notAfter": {"utcTime": not_after},
-                    }
-                }
-            },
-        ]
+        mock_extract_certs_from_pem.return_value = ["a", "b"]
+        mock_parse_cert_from_der.return_value = self._fake_cert(
+            not_before=not_before, not_after=not_after
+        )
 
         assert signing.verify_x5u(url)
         assert mock_requests.get.called_once_with(url)
         body = mock_requests.get.return_value.content.decode.return_value
-        assert mock_parse_pem_to_certs.called_once_with(body)
+        assert mock_extract_certs_from_pem.called_once_with(body)
+        assert mock_parse_cert_from_der.called_twice()
 
-    def test_invalid_dates(self, mocker):
+    def test_invalid_dates(self, mocker, settings):
+        settings.CERTIFICATES_CHECK_VALIDITY = True
+        settings.CERTIFICATES_EXPECTED_ROOT_HASH = None
+        settings.CERTIFICATES_EXPECTED_SUBJECT_CN = None
+
         mock_requests = mocker.patch("normandy.recipes.signing.requests")
-        mock_parse_pem_to_certs = mocker.patch("normandy.recipes.signing.parse_pem_to_certs")
+        mock_extract_certs_from_pem = mocker.patch(
+            "normandy.recipes.signing.extract_certs_from_pem"
+        )
+        mock_parse_cert_from_der = mocker.patch("normandy.recipes.signing.parse_cert_from_der")
 
-        date_format = "%y%m%d%H%M%SZ"
         url = "https://example.com/cert.pem"
-        now = datetime.now()
-        not_before = (now - timedelta(days=2)).strftime(date_format).encode()
-        not_after = (now - timedelta(days=1)).strftime(date_format).encode()
+        now = datetime.now().replace(tzinfo=pytz.UTC)
+        not_before = now - timedelta(days=2)
+        not_after = now - timedelta(days=1)
 
-        mock_parse_pem_to_certs.return_value = [
-            {
-                "tbsCertificate": {
-                    "validity": {
-                        "notBefore": {"utcTime": not_before},
-                        "notAfter": {"utcTime": not_after},
-                    }
-                }
-            }
-        ]
+        mock_extract_certs_from_pem.return_value = ["a"]
+        mock_parse_cert_from_der.return_value = self._fake_cert(
+            not_before=not_before, not_after=not_after
+        )
 
         with pytest.raises(signing.CertificateExpired):
             signing.verify_x5u(url)
         assert mock_requests.get.called_once_with(url)
         body = mock_requests.get.return_value.content.decode.return_value
-        assert mock_parse_pem_to_certs.called_once_with(body)
-
-    def test_bad_unexpected_format(self, mocker):
-        mocker.patch("normandy.recipes.signing.requests")
-        mock_parse_pem_to_certs = mocker.patch("normandy.recipes.signing.parse_pem_to_certs")
-
-        date_format = "%Y%m%d%H%M%S"
-        url = "https://example.com/cert.pem"
-        now = datetime.now()
-        not_before = (now - timedelta(days=2)).strftime(date_format).encode()
-        not_after = (now - timedelta(days=1)).strftime(date_format).encode()
-
-        mock_parse_pem_to_certs.return_value = [
-            {
-                "tbsCertificate": {
-                    "validity": {
-                        "notBefore": {"unsupportedTimestamp": not_before},
-                        "notAfter": {"unsupportedTimestamp": not_after},
-                    }
-                }
-            }
-        ]
-
-        with pytest.raises(signing.BadCertificate) as exc:
-            signing.verify_x5u(url)
-        assert "Timestamp not in expected format" in str(exc)
-        assert "unsupportedTimestamp" in str(exc)
+        assert mock_extract_certs_from_pem.called_once_with(body)
+        assert mock_parse_cert_from_der.called_once_with(
+            mock_extract_certs_from_pem.return_value[0]
+        )
 
     def test_mixed_timestamp_format(self, mocker):
         # The certificate used for testing expired on 2018-04-24. This test is
         # only concerned with the parsing of the dates, so mock the call to the
-        # validate function and assert about the value also s of the dates.
+        # validate function and assert about the values of the dates.
         mock_requests = mocker.patch("normandy.recipes.signing.requests")
         mock_check_validity = mocker.patch("normandy.recipes.signing.check_validity")
         path = os.path.join(os.path.dirname(__file__), "data", "mixed_timestamps_certs.pem")
@@ -328,24 +327,66 @@ class TestVerifyX5u(object):
             mock_requests.get.return_value.content = f.read()
         assert signing.verify_x5u("https://example.com/cert.pem")
         assert mock_check_validity.mock_calls == [
-            call(datetime(2017, 12, 25), datetime(2018, 4, 24), None),
-            call(datetime(2017, 5, 4, 0, 12, 39), datetime(2019, 5, 4, 0, 12, 39), None),
-            call(datetime(2015, 3, 17, 22, 53, 57), datetime(2025, 3, 14, 22, 53, 57), None),
+            call(
+                datetime(2017, 12, 25, tzinfo=pytz.UTC),
+                datetime(2018, 4, 24, tzinfo=pytz.UTC),
+                None,
+            ),
+            call(
+                datetime(2017, 5, 4, 0, 12, 39, tzinfo=pytz.UTC),
+                datetime(2019, 5, 4, 0, 12, 39, tzinfo=pytz.UTC),
+                None,
+            ),
+            call(
+                datetime(2015, 3, 17, 22, 53, 57, tzinfo=pytz.UTC),
+                datetime(2025, 3, 14, 22, 53, 57, tzinfo=pytz.UTC),
+                None,
+            ),
         ]
+
+    def test_it_checks_cert_root(self, mocker, settings):
+        path = os.path.join(os.path.dirname(__file__), "data", "test_certs.pem")
+        with open(path) as f:
+            cert_pem = f.read()
+
+        settings.CERTIFICATES_CHECK_VALIDITY = False
+        settings.CERTIFICATES_EXPECTED_ROOT_HASH = "CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF:EE:CO:FF"
+        settings.CERTIFICATES_EXPECTED_SUBJECT_CN = None
+
+        mock_requests = mocker.patch("normandy.recipes.signing.requests")
+        mock_requests.get.return_value.content.decode.return_value = cert_pem
+
+        with pytest.raises(signing.CertificateHasWrongRoot):
+            signing.verify_x5u("https://example.com/cert.pem")
+
+    def test_it_checks_cert_subject(self, mocker, settings):
+        path = os.path.join(os.path.dirname(__file__), "data", "test_certs.pem")
+        with open(path) as f:
+            cert_pem = f.read()
+
+        settings.CERTIFICATES_CHECK_VALIDITY = False
+        settings.CERTIFICATES_EXPECTED_ROOT_HASH = None
+        settings.CERTIFICATES_EXPECTED_SUBJECT_CN = "wrong.subject.example.com"
+
+        mock_requests = mocker.patch("normandy.recipes.signing.requests")
+        mock_requests.get.return_value.content.decode.return_value = cert_pem
+
+        with pytest.raises(signing.CertificateHasWrongSubject):
+            signing.verify_x5u("https://example.com/cert.pem")
 
 
 class TestReadTimestampObject(object):
     def test_it_reads_utc_time_format(self):
-        dt = datetime(2018, 1, 25, 16, 1, 13, 0)
-        date_format = "%y%m%d%H%M%SZ"
-        timestamp = dt.strftime(date_format).encode()
-        assert signing.read_timestamp_object({"utcTime": timestamp}) == dt
+        dt = datetime(2018, 1, 25, 16, 1, 13, 0, tzinfo=pytz.UTC)
+        obj = rfc5280.Time()
+        obj["utcTime"] = pyasn1_useful.UTCTime.fromDateTime(dt)
+        assert signing.read_timestamp_object(obj) == dt
 
     def test_it_reads_general_time_format(self):
-        dt = datetime(2018, 1, 25, 16, 1, 13, 0)
-        date_format = "%Y%m%d%H%M%SZ"
-        timestamp = dt.strftime(date_format).encode()
-        assert signing.read_timestamp_object({"generalTime": timestamp}) == dt
+        dt = datetime(2018, 1, 25, 16, 1, 13, 0, tzinfo=pytz.UTC)
+        obj = rfc5280.Time()
+        obj["generalTime"] = pyasn1_useful.GeneralizedTime.fromDateTime(dt)
+        assert signing.read_timestamp_object(obj) == dt
 
     def test_it_errors_on_unsupported_formats(self):
         with pytest.raises(signing.BadCertificate) as exc:

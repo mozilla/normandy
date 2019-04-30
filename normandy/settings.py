@@ -180,7 +180,7 @@ class OIDC:
 
     # Note! We *could* just have a setting called 'OIDC_DOMAIN' and then use
     # https://$OIDC_DOMAIN/.well-known/openid-configuration and extract the
-    # 'userinfo_endoint' value from that during startup or something.
+    # 'userinfo_endpoint' value from that during startup or something.
     # As of May 2018, the likelyhood of this URL changing and the fact that it's
     # the only URL we need, let's just make the setting the URL that we need
     # for being able to authorization by access token.
@@ -384,6 +384,9 @@ class Base(Core, CORS, OIDC, Metrics):
 
     # How many days before expiration to warn for expired certificates
     CERTIFICATES_EXPIRE_EARLY_DAYS = values.IntegerValue(None)
+    CERTIFICATES_CHECK_VALIDITY = values.BooleanValue(True)
+    CERTIFICATES_EXPECTED_ROOT_HASH = values.Value(None)
+    CERTIFICATES_EXPECTED_SUBJECT_CN = values.Value("normandy.content-signature.mozilla.org")
 
     # Storage settings
     DEFAULT_FILE_STORAGE = values.Value("normandy.base.storage.NormandyS3Boto3Storage")
