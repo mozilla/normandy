@@ -671,10 +671,57 @@ requests can be approved by the same user who created it.</p>
 </dd></dl>
 
 <dl class="envvar">
+<dt id="envvar-DJANGO_CERTIFICATES_CHECK_VALIDITY">
+<code class="descname">DJANGO_CERTIFICATES_CHECK_VALIDITY</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_CHECK_VALIDITY" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+<p>Whether to check that certificates used for recipe signatures are checked
+for validity. This means that the date ranges in the certificate are
+checked against the current date. This should likely never be turned off
+in Production.</p>
+</dd></dl>
+
+<dl class="envvar">
 <dt id="envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS">
 <code class="descname">DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS" title="Permalink to this definition">¶</a></dt>
-<dd><p>If set, when checking certificates for validity, start failing
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>If set, when checking certificates for validity, start failing
 system checks this many days before the certificate would expire.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH">
+<code class="descname">DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+<p>If this is set to a string, certificates will be checked to be originating
+from a trusted source, by hashing the root certificate in the x5u
+certificate chain. For possible values of this setting, see the <a class="reference internal" href="../dev/concepts.html#recipes"><span class="std std-ref">list of
+environments</span></a>.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN">
+<code class="descname">DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">&quot;normandy.content-signature.mozilla.org&quot;</span></code></p>
+</dd>
+</dl>
+<p>If this is set to a string, certificates will be checked to have a
+<em>subject</em> with a matching common name. It is unlikely this should ever
+change, because the default value matches one that is hard-coded in
+Firefox.</p>
 </dd></dl>
 
 <dl class="envvar">

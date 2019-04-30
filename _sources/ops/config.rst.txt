@@ -330,10 +330,40 @@ in other Django projects.
 
    This defaults to ``False`` for local developer instances.
 
+.. envvar:: DJANGO_CERTIFICATES_CHECK_VALIDITY
+
+   :default: ``True``
+
+   Whether to check that certificates used for recipe signatures are checked
+   for validity. This means that the date ranges in the certificate are
+   checked against the current date. This should likely never be turned off
+   in Production.
+
 .. envvar:: DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS
+
+   :default: ``None``
 
    If set, when checking certificates for validity, start failing
    system checks this many days before the certificate would expire.
+
+.. envvar:: DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH
+
+   :default: ``None``
+
+   If this is set to a string, certificates will be checked to be originating
+   from a trusted source, by hashing the root certificate in the x5u
+   certificate chain. For possible values of this setting, see the :ref:`list of
+   environments <recipes>`.
+
+.. envvar:: DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN
+
+   :default: ``"normandy.content-signature.mozilla.org"``
+
+   If this is set to a string, certificates will be checked to have a
+   *subject* with a matching common name. It is unlikely this should ever
+   change, because the default value matches one that is hard-coded in
+   Firefox.
+
 
 .. envvar:: DJANGO_CORS_ORIGIN_ALLOW_ALL
 

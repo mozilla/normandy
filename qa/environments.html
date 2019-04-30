@@ -95,15 +95,15 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#staging">Staging</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id1">Preferences</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#dev">Dev</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id2">Preferences</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#local">Local</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dev">Dev</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id3">Preferences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#local">Local</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Preferences</a></li>
 </ul>
 </li>
 </ul>
@@ -179,7 +179,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="environments">
-<h1>Environments<a class="headerlink" href="#environments" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Environments<a class="headerlink" href="#environments" title="Permalink to this headline">¶</a></h1>
 <p>Mozilla runs several instances of Normandy; this document provides information
 about each one of them, including what preferences you need to set to point an
 instance of Firefox towards them</p>
@@ -223,8 +223,8 @@ does not use a VPN for the public API server.</p>
 <li><p><strong>Public Read-only API server:</strong> <a class="reference external" href="https://stage.normandy.nonprod.cloudops.mozgcp.net/">https://stage.normandy.nonprod.cloudops.mozgcp.net/</a></p></li>
 <li><p><strong>VPN-Only Admin API server:</strong> <a class="reference external" href="https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/">https://stage-admin.normandy.nonprod.cloudops.mozgcp.net/</a> (VPN Required)</p></li>
 </ul>
-<div class="section" id="id1">
-<h3>Preferences<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Preferences<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>Set the following preferences to have Firefox execute recipes from the staging
 server:</p>
 <dl class="describe">
@@ -251,8 +251,8 @@ the admin server.</p>
 <li><p><strong>Read-only API server:</strong> <a class="reference external" href="https://dev.normandy.nonprod.cloudops.mozgcp.net/">https://dev.normandy.nonprod.cloudops.mozgcp.net/</a></p></li>
 <li><p><strong>Admin API server:</strong> <a class="reference external" href="https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/">https://dev-admin.normandy.nonprod.cloudops.mozgcp.net/</a></p></li>
 </ul>
-<div class="section" id="id2">
-<h3>Preferences<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Preferences<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Set the following preferences to have Firefox execute recipes from the dev
 server:</p>
 <dl class="describe">
@@ -281,8 +281,8 @@ supported configuration for local development.</p>
 <p>The server run this way works as both a bearer auth server, and can be used
 with local Django authentication. It is not generally configured to use the
 legacy authentication method, though that is possible as well.</p>
-<div class="section" id="id3">
-<h3>Preferences<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Preferences<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>Set the following preferences to have Firefox execute recipes from a typical
 local server:</p>
 <dl class="describe">
