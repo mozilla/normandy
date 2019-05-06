@@ -125,8 +125,8 @@ google-cloud-core==0.29.1 \
 google-resumable-media==0.3.2 \
     --hash=sha256:2dae98ee716efe799db3578a7b902fbf5592fc5c77d3c0906fc4ef9b1b930861 \
     --hash=sha256:3e38923493ca0d7de0ad91c31acfefc393c78586db89364e91cb4f11990e51ba
-googleapis-common-protos==1.5.9 \
-    --hash=sha256:627ec53fab43d06c1b5c950e217fa9819e169daf753111a7f244e94bf8fb3384
+googleapis-common-protos==1.5.10 \
+    --hash=sha256:d564872083af40bbcc7091340f17db778a316525c7c76497d58d11b98ca2aa74
 graphene==2.1.3 \
     --hash=sha256:b8ec446d17fa68721636eaad3d6adc1a378cb6323e219814c8f98c9928fc9642 \
     --hash=sha256:faa26573b598b22ffd274e2fd7a4c52efa405dcca96e01a62239482246248aa3
