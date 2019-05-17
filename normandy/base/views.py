@@ -1,8 +1,11 @@
 import re
 
+from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+from django.utils.cache import patch_cache_control
+from graphene_django.views import GraphQLView
 
 
 DELIVERY_CONSOLE_URLS = {
@@ -38,3 +41,14 @@ def index(request):
 
 def favicon(request):
     return HttpResponseRedirect(static("img/favicon.ico"))
+
+
+class NormandyGraphQLView(GraphQLView):
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        if settings.API_CACHE_ENABLED and request.method.lower() == "get":
+            directives = {"public": True, "max_age": settings.API_CACHE_TIME}
+        else:
+            directives = {"no_cache": True, "no_store": True, "must_revalidate": True}
+        patch_cache_control(response, **directives)
+        return response
