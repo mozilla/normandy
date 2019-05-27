@@ -3,9 +3,9 @@
 asn1crypto==0.24.0 \
     --hash=sha256:2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87 \
     --hash=sha256:9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49
-django-extensions==2.1.6 \
-    --hash=sha256:109004f80b6f45ad1f56addaa59debca91d94aa0dc1cb19678b9364b4fe9b6f4 \
-    --hash=sha256:307766e5e6c1caffe76c5d99239d8115d14ae3f7cab2cd991fcffd763dad904b
+django-extensions==2.1.7 \
+    --hash=sha256:6766c573ffe63693cd485512a02f3b59622c884cbfeca241d1278ffdf0ac39ae \
+    --hash=sha256:c43e46cc95985c278afda645480b79f9a85cfe5a82c957accd08b8045793b707
 PyDriller==1.7 \
     --hash=sha256:2ee04febebc9bed9b8a027b399c3feb89e53b86b10653f171ea09514bcb9e987 \
     --hash=sha256:6405505cc886ad1351d376b18128fc269a9bc47248e9133e06da49b51248c42a
