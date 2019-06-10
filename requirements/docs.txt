@@ -1,8 +1,8 @@
 -r default.txt
 
-Sphinx==2.1.0 \
-    --hash=sha256:2c5becc0fd6706dc0aeb4703f9f1f8a1d1eecacf02e9ac5943cbae48b11e5e42 \
-    --hash=sha256:7a359a91fb04054ec77d68ff97cb8728f8cc322e25f22dc94299d67e0e6a7123
+Sphinx==2.1.1 \
+    --hash=sha256:15143166e786c7faa76fa990d3b6b38ebffe081ef81cffd1d656b07f3b28a1fa \
+    --hash=sha256:5fd62ba64235d77a81554d47ff6b17578171b6dbbc992221e9ebc684898fff59
 sphinx_rtd_theme==0.4.3 \
     --hash=sha256:00cf895504a7895ee433807c62094cf1e95f065843bf3acd17037c3e9a2becd4 \
     --hash=sha256:728607e34d60456d736cc7991fd236afb828b21b82f956c5ea75f94c8414040a
