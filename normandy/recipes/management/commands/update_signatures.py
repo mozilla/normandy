@@ -20,3 +20,4 @@ class Command(BaseCommand):
         else:
             call_command("update_recipe_signatures")
             call_command("update_action_signatures")
+        self.stdout.write("all signing done")

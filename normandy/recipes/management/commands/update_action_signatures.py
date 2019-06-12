@@ -40,6 +40,7 @@ class Command(BaseCommand):
                 action.save()
 
         metrics.gauge("signed", count, tags=["force"] if force else [])
+        self.stdout.write("action signing done")
 
     def get_outdated_actions(self):
         outdated_age = timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE)
