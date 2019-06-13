@@ -63,6 +63,7 @@ class Command(BaseCommand):
                 sig.delete()
 
         metrics.gauge("unsigned", count, tags=["force"] if force else [])
+        self.stdout.write("all signing done")
 
     def get_outdated_recipes(self):
         outdated_age = timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE)
