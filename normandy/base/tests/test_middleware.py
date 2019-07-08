@@ -82,7 +82,7 @@ class TestNormandySecurityMiddleware(object):
                 "headers": {
                     "X_HELLO": "world",
                     "CONTENT_TYPE": "text/plain",
-                    "CONTENT_LENGTH": 16,
+                    "CONTENT_LENGTH": "16",
                     "COOKIE": "",
                 },
             },
