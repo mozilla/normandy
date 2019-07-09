@@ -44,7 +44,3 @@ rules:
 
   generator-star-spacing: [warn]
 
-settings:
-  import/resolver:
-    webpack:
-      config: 'webpack.config.js'
