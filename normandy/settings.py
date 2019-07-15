@@ -139,9 +139,7 @@ class Core(Configuration):
     ACTIONS_ROOT_DIRECTORY = os.path.join(BASE_DIR, "client/actions")
 
     # Actions, when found on disk, whose name needs to be converted before saved in the ORM.
-    ACTIONS_ALIAS_NAMES = {
-        # empty, but we're keeping the functionality for now
-    }
+    ACTIONS_ALIAS_NAMES = {"single-preference-experiment": "preference-experiment"}
 
     # Path on disk where the @mozilla/normandy-action-argument-schemas is installed.
     # This node package is expected to have been installed as a pre-build step
