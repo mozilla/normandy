@@ -60,9 +60,9 @@ django-storages==1.7.1 \
 django_csp==3.5 \
     --hash=sha256:8b9997df89a7a936d7c397e051367f974aa1d1a97d0b32acb4300087b3bed071 \
     --hash=sha256:04600237701e6d6ff78ed7d41209ff923988148bf292c128f6b474b9befe444f
-djangorestframework==3.9.4 \
-    --hash=sha256:376f4b50340a46c15ae15ddd0c853085f4e66058f97e4dbe7d43ed62f5e60651 \
-    --hash=sha256:c12869cfd83c33d579b17b3cb28a2ae7322a53c3ce85580c2a2ebe4e3f56c4fb
+djangorestframework==3.10.1 \
+    --hash=sha256:1ca4a5599a5ec31f3d6238a687fcc1dd4c41b1d90edab9ad398fcbf87872b7ba \
+    --hash=sha256:c3c5edfdbc5dd33f9121bb84305bfd603d2c791f20cff9782772f44a7684a4e4
 dockerflow==2019.5.0 \
     --hash=sha256:1beb894ccdb28e022f61086b1117ae0e38790f18abfe90c782f249af1aa2442a \
     --hash=sha256:8c4ffdad72732b16409b6a5599ef338c845e28aac902d09008bb8fae17a157a3
