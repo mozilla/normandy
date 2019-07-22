@@ -265,8 +265,8 @@ Pygments==2.4.2 \
 pyparsing==2.4.1 \
     --hash=sha256:530d8bf8cc93a34019d08142593cf4d78a05c890da8cf87ffa3120af53772238 \
     --hash=sha256:f78e99616b6f1a4745c0580e170251ef1bbafc0d0513e270c4bd281bf29d2800
-pyrsistent==0.15.2 \
-    --hash=sha256:16692ee739d42cf5e39cef8d27649a8c1fdb7aa99887098f1460057c5eb75c3a
+pyrsistent==0.15.3 \
+    --hash=sha256:50cffebc87ca91b9d4be2dcc2e479272bcb466b5a0487b6c271f7ddea6917e14
 python-dateutil==2.8.0 \
     --hash=sha256:7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb \
     --hash=sha256:c89805f6f4d64db21ed966fda138f8a5ed7a4fdbc1a8ee329ce1b74e3c74da9e
