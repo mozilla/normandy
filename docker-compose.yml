@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.development
+    command: bash -c "/app/bin/wait-for-it.sh db:5432 -- ./bin/download_geolite2.sh;./bin/runsslserver.sh"
+    links:
+      - db
+    networks:
+      - public_nw
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+
+  db:
+    restart: always
+    image: postgres:9.6
+    volumes:
+      - db_volume:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: normandy
+    ports:
+      - "5432:5432"
+    networks:
+      - public_nw
+
+volumes:
+  db_volume:
+  static_volume:
+
+networks:
+  private_nw:
+    internal: true
+  public_nw:

@@ -8,6 +8,7 @@ from corsheaders.defaults import default_methods
 class Core(Configuration):
     """Settings that will never change per-environment."""
 
+
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -275,7 +276,7 @@ class Base(Core, CORS, OIDC, Metrics):
         }
 
     # Remote services
-    DATABASES = values.DatabaseURLValue("postgres://postgres@localhost/normandy")
+    DATABASES = values.DatabaseURLValue("postgres://postgres:postgres@db/normandy")
     CONN_MAX_AGE = values.IntegerValue(0)
     GEOIP2_DATABASE = values.Value(os.path.join(Core.BASE_DIR, "GeoLite2-Country.mmdb"))
     # Email settings

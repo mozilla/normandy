@@ -1,6 +1,10 @@
 FROM python:3.7-slim@sha256:63dac3b6ba1f35e062eccf221ac958301a98f8e741467ea2cb567c277b2c1fe2
+
 WORKDIR /app
+
 RUN groupadd --gid 10001 app && useradd -g app --uid 10001 --shell /usr/sbin/nologin app
+RUN chown app /app
+
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -21,10 +25,12 @@ COPY ./yarn.lock /app/yarn.lock
 RUN pip install --upgrade --no-cache-dir -r requirements/default.txt -r requirements/dev.txt && \
     yarn install --frozen-lockfile
 
-COPY . /app
+COPY --chown=app . /app
+
 RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media
+
 
 USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
@@ -33,6 +39,10 @@ ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     CMD_PREFIX="" \
     NEW_RELIC_CONFIG_FILE=newrelic.ini
 EXPOSE $PORT
+
+# Wait for the db to initialize
+COPY --chown=app bin/wait-for-it.sh /app/bin/wait-for-it.sh
+RUN chmod +x /app/bin/wait-for-it.sh
 
 CMD $CMD_PREFIX gunicorn \
     --log-file - \
