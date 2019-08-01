@@ -16,3 +16,5 @@ _build
 /product_details/
 htmlcov/
 yarn-error.log
+.bash_history
+.ipython/
