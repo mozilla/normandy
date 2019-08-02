@@ -368,10 +368,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@mozilla/normandy-action-argument-schemas@0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@mozilla/normandy-action-argument-schemas/-/normandy-action-argument-schemas-0.8.0.tgz#dc5509898ff262ca9534b1a17e2ec17444a9a0a7"
-  integrity sha512-Q17/4rNq7tLWjJfvjE4clTel1I8kx61B3QdtcWA9KwJ9Qu3K8pumu0xzFB9uPw/Gk2Q8Kxwdsqj2o0pTLuNOEw==
+"@mozilla/normandy-action-argument-schemas@0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@mozilla/normandy-action-argument-schemas/-/normandy-action-argument-schemas-0.8.1.tgz#916b5ada5887281d9b40f82ddd0d4b77def4c084"
+  integrity sha512-cAwlBgBcrIsdGTaqge5ZAKdxl/LGdMnnuR8m2jYJxZ8INzTT1QmztMXkLjxynl+yBf4/bzq4MozXPKHaCmLOxA==
 
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
