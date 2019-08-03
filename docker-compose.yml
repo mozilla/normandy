@@ -12,6 +12,8 @@ services:
       - public_nw
     volumes:
       - .:/app
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/normandy
     ports:
       - "8000:8000"
 
@@ -20,8 +22,6 @@ services:
     image: postgres:9.6
     volumes:
       - db_volume:/var/lib/postgresql
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db/normandy
     ports:
       - "5432:5432"
     networks:

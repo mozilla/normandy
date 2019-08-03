@@ -20,7 +20,6 @@ if [ ! -f $CERT ]; then
         echo "Moving existing SSL certificate from $OLD_CERT to $CERT"
         mv $OLD_CERT $CERT
     else
-        echo "something is ahppeneing"
         openssl req -new -x509 -nodes -sha256 -key $KEY \
             -subj "/C=US/ST=Test/L=Test/O=Mozilla/CN=normandy_dev" > $CERT
     fi
