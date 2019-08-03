@@ -1,6 +1,12 @@
 build:
 	docker-compose build
 
+createuser: build
+	docker-compose run app python manage.py createsuperuser
+
+check_migrations: build
+	docker-compose run app python manage.py makemigrations --check --dry-run --noinput
+
 makemigrations: build
 	docker-compose run app python manage.py makemigrations
 
@@ -24,7 +30,7 @@ load_data: migrate load_geo_location update_actions load_initial_data
 kill:
 	docker ps -a -q | xargs docker kill;docker ps -a -q | xargs docker rm
 
-test:
+test: build
 	docker-compose run -u root -e DJANGO_CONFIGURATION=Test app pytest
 
 shell: build

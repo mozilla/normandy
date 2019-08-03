@@ -21,7 +21,7 @@ services:
     volumes:
       - db_volume:/var/lib/postgresql
     environment:
-      POSTGRES_DB: normandy
+      - DATABASE_URL=postgres://postgres:postgres@db/normandy
     ports:
       - "5432:5432"
     networks:
