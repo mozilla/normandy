@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 
 from rest_framework.fields import CharField
 from rest_framework.reverse import reverse
-from rest_framework.serializers import HyperlinkedIdentityField
+from rest_framework.serializers import HyperlinkedIdentityField, JSONField
 
 
 class ContentFileField(CharField):
@@ -54,3 +54,8 @@ class ActionImplementationHyperlinkField(HyperlinkedIdentityField):
         if "request" not in self.context:
             self.context["request"] = None
         return super().to_representation(value)
+
+
+class FilterObjectField(JSONField):
+    def to_representation(self, value):
+        return super().to_representation(value.initial_data)

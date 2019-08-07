@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
@@ -180,6 +181,15 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def bug_number(self):
         return self.current_revision.bug_number
 
+    @current_revision_property()
+    def capabilities(self):
+        return self.current_revision.capabilities
+
+    @current_revision_property()
+    def extra_capabilities(self):
+        """A list of capabilities manually specified for this recipe."""
+        return self.current_revision.extra_capabilities
+
     @property
     def approval_request(self):
         try:
@@ -334,6 +344,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     )
     comment = models.TextField()
     bug_number = models.IntegerField(null=True)
+    extra_capabilities = ArrayField(models.CharField(max_length=255), default=list)
 
     class Meta:
         ordering = ("-created",)
@@ -352,6 +363,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             "identicon_seed": self.identicon_seed,
             "comment": self.comment,
             "bug_number": self.bug_number,
+            "extra_capabilities": self.extra_capabilities,
         }
 
     @property
@@ -370,9 +382,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             channels = ", ".join(["'{}'".format(c.slug) for c in self.channels.all()])
             parts.append("normandy.channel in [{}]".format(channels))
 
-        for obj in self.filter_object:
-            filter = filters.from_data(obj)
-            parts.append(filter.to_jexl())
+        parts.extend(filter.to_jexl() for filter in self.filter_object)
 
         if self.extra_filter_expression:
             parts.append(self.extra_filter_expression)
@@ -384,9 +394,16 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     @property
     def filter_object(self):
         if self.filter_object_json is not None:
-            return json.loads(self.filter_object_json)
+            return [filters.from_data(obj) for obj in json.loads(self.filter_object_json)]
         else:
             return []
+
+    @filter_object.setter
+    def filter_object(self, value):
+        if value is None:
+            self.filter_object_json = None
+        else:
+            self.filter_object_json = json.dumps([filter.initial_data for filter in value])
 
     @property
     def arguments(self):
@@ -419,6 +436,18 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     @property
     def enabled(self):
         return self.enabled_state.enabled if self.enabled_state else False
+
+    @property
+    def capabilities(self):
+        """Calculates the set of capabilities required for this recipe."""
+        capabilities = (
+            {"capabilities-v1"}
+            | set(self.extra_capabilities)
+            | self.action.capabilities
+        )
+        for filter in self.filter_object:
+            capabilities.update(filter.capabilities)
+        return capabilities
 
     def save(self, *args, **kwargs):
         self.action.validate_arguments(self.arguments, self)
@@ -639,6 +668,11 @@ class Action(DirtyFieldsMixin, models.Model):
         return Recipe.objects.only_enabled().filter(
             latest_revision_id__in=self.recipe_revisions.values_list("id", flat=True)
         )
+
+    @property
+    def capabilities(self):
+        """The set of capabilities needed for this action"""
+        return {f'action.${self.name}'}
 
     def __str__(self):
         return self.name

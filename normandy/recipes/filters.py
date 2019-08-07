@@ -26,11 +26,22 @@ from rest_framework import serializers
 
 
 class BaseFilter(serializers.Serializer):
-    type = serializers.CharField(required=False)
+    @classmethod
+    def create(cls, **kwargs):
+        data = {"type": cls.type}
+        data.update(kwargs)
+        obj = cls(data=data)
+        assert obj.is_valid(), obj.errors
+        return obj
 
     @property
     def type(self):
         raise NotImplementedError()
+
+    @property
+    def capabilities(self):
+        """The capabilities needed by this filter"""
+        raise NotImplementedError
 
     def to_jexl(self):
         """Render this filter to a JEXL expression"""
@@ -66,6 +77,11 @@ class ChannelFilter(BaseFilter):
         channels = ",".join(f'"{c}"' for c in self.initial_data["channels"])
         return f"normandy.channel in [{channels}]"
 
+    @property
+    def capabilities(self):
+        # no special capabilities needed
+        return set()
+
 
 class LocaleFilter(BaseFilter):
     """
@@ -98,6 +114,11 @@ class LocaleFilter(BaseFilter):
         locales = ",".join(f'"{l}"' for l in self.initial_data["locales"])
         return f"normandy.locale in [{locales}]"
 
+    @property
+    def capabilities(self):
+        # no special capabilities needed
+        return set()
+
 
 class CountryFilter(BaseFilter):
     """Match a user located in any of the listed countries.
@@ -128,6 +149,12 @@ class CountryFilter(BaseFilter):
     def to_jexl(self):
         countries = ",".join(f'"{c}"' for c in self.initial_data["countries"])
         return f"normandy.country in [{countries}]"
+
+    @property
+    def capabilities(self):
+        # no special capabilities needed
+        return set()
+
 
 
 class BucketSampleFilter(BaseFilter):
@@ -193,6 +220,10 @@ class BucketSampleFilter(BaseFilter):
         total = self.initial_data["total"]
         return f"[{inputs}]|bucketSample({start},{count},{total})"
 
+    @property
+    def capabilities(self):
+        return {"jexl.transforms.bucketSample"}
+
 
 class StableSampleFilter(BaseFilter):
     """
@@ -234,6 +265,10 @@ class StableSampleFilter(BaseFilter):
         rate = self.initial_data["rate"]
         return f"[{inputs}]|stableSample({rate})"
 
+    @property
+    def capabilities(self):
+        return {"jexl.transforms.stableSample"}
+
 
 class VersionFilter(BaseFilter):
     """
@@ -271,6 +306,11 @@ class VersionFilter(BaseFilter):
             f'(normandy.version>="{v}"&&normandy.version<"{v + 1}")'
             for v in self.initial_data["versions"]
         )
+
+    @property
+    def capabilities(self):
+        # no special capabilities needed
+        return set()
 
 
 by_type = {
