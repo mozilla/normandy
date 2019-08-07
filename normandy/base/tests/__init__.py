@@ -85,6 +85,7 @@ class MigrationTest(object):
 
     @pytest.fixture(autouse=True)
     def reset_migrations(self, migrations):
+        migrations.reset()
         yield
         migrations.reset()
 

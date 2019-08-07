@@ -14,7 +14,7 @@ from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.api.renderers import JavaScriptRenderer
 from normandy.base.decorators import api_cache_control
 from normandy.recipes.models import Action, ApprovalRequest, Client, Recipe, RecipeRevision
-from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
+from normandy.recipes.api.filters import EnabledStateFilter
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
     ApprovalRequestSerializer,
@@ -69,9 +69,6 @@ class ActionImplementationView(generics.RetrieveAPIView):
 class RecipeFilters(django_filters.FilterSet):
     enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name="latest_revision__action__name")
-    channels = CharSplitFilter("latest_revision__channels__slug")
-    locales = CharSplitFilter("latest_revision__locales__code")
-    countries = CharSplitFilter("latest_revision__countries__code")
 
     class Meta:
         model = Recipe
@@ -83,14 +80,9 @@ class RecipeViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 
     queryset = (
         Recipe.objects.all()
-        # Foreign keys
         .select_related("latest_revision")
         .select_related("latest_revision__action")
         .select_related("latest_revision__approval_request")
-        # Many-to-many
-        .prefetch_related("latest_revision__channels")
-        .prefetch_related("latest_revision__countries")
-        .prefetch_related("latest_revision__locales")
     )
     serializer_class = RecipeSerializer
     filterset_class = RecipeFilters
@@ -147,10 +139,6 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         .select_related("action")
         .select_related("approval_request")
         .select_related("recipe")
-        # Many-to-many
-        .prefetch_related("channels")
-        .prefetch_related("countries")
-        .prefetch_related("locales")
     )
     serializer_class = RecipeRevisionSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]

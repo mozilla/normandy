@@ -26,7 +26,7 @@ from normandy.recipes.models import (
     Recipe,
     RecipeRevision,
 )
-from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
+from normandy.recipes.api.filters import EnabledStateFilter
 from normandy.recipes.api.v3 import shield_identicon
 from normandy.recipes.api.v3.serializers import (
     ActionSerializer,
@@ -47,9 +47,6 @@ class RecipeFilters(django_filters.FilterSet):
     enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name="latest_revision__action__name")
     bug_number = django_filters.NumberFilter(field_name="latest_revision__bug_number")
-    channels = CharSplitFilter("latest_revision__channels__slug")
-    locales = CharSplitFilter("latest_revision__locales__code")
-    countries = CharSplitFilter("latest_revision__countries__code")
 
     class Meta:
         model = Recipe
@@ -82,16 +79,10 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
             "latest_revision__approval_request__approver",
         )
         .prefetch_related(
-            "approved_revision__channels",
-            "approved_revision__countries",
             "approved_revision__enabled_states",
             "approved_revision__enabled_states__creator",
-            "approved_revision__locales",
-            "latest_revision__channels",
-            "latest_revision__countries",
             "latest_revision__enabled_states",
             "latest_revision__enabled_states__creator",
-            "latest_revision__locales",
         )
     )
     serializer_class = RecipeSerializer
@@ -175,7 +166,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         RecipeRevision.objects.all()
         .select_related("action", "approval_request", "recipe")
-        .prefetch_related("enabled_states", "channels", "countries", "locales")
+        .prefetch_related("enabled_states")
     )
     serializer_class = RecipeRevisionSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]

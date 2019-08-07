@@ -14,7 +14,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from normandy.base.api.renderers import CanonicalJSONRenderer
-from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
+from normandy.base.utils import get_client_ip, sri_hash
 from normandy.recipes import filters
 from normandy.recipes.decorators import approved_revision_property, current_revision_property
 from normandy.recipes.geolocation import get_country_code
@@ -226,28 +226,11 @@ class Recipe(DirtyFieldsMixin, models.Model):
             data["filter_object_json"] = json.dumps(data.pop("filter_object"))
 
         if revision:
-            revisions = RecipeRevision.objects.filter(id=revision.id)
-
             revision_data = revision.data
             revision_data.update(data)
-
-            channels = revision_data.pop("channels")
-            revisions = filter_m2m(revisions, "channels", channels)
-
-            countries = revision_data.pop("countries")
-            revisions = filter_m2m(revisions, "countries", countries)
-
-            locales = revision_data.pop("locales")
-            revisions = filter_m2m(revisions, "locales", locales)
-
             data = revision_data
-            revisions = revisions.filter(**data)
-
-            is_clean = revisions.exists()
+            is_clean = RecipeRevision.objects.filter(id=revision.id).filter(**data).exists()
         else:
-            channels = data.pop("channels", [])
-            countries = data.pop("countries", [])
-            locales = data.pop("locales", [])
             is_clean = False
 
         if not is_clean or force:
@@ -262,15 +245,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
             self.latest_revision = RecipeRevision.objects.create(
                 recipe=self, parent=revision, **data
             )
-
-            for channel in channels:
-                self.latest_revision.channels.add(channel)
-
-            for country in countries:
-                self.latest_revision.countries.add(country)
-
-            for locale in locales:
-                self.latest_revision.locales.add(locale)
 
             self.save()
 
@@ -325,9 +299,6 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     arguments_json = models.TextField(default="{}", validators=[validate_json])
     extra_filter_expression = models.TextField(blank=False)
     filter_object_json = models.TextField(validators=[validate_json], null=True)
-    channels = models.ManyToManyField(Channel)
-    countries = models.ManyToManyField(Country)
-    locales = models.ManyToManyField(Locale)
     identicon_seed = IdenticonSeedField(max_length=64)
     enabled_state = models.ForeignKey(
         "EnabledState", null=True, on_delete=models.SET_NULL, related_name="current_for_revision"
@@ -346,9 +317,6 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             "arguments_json": self.arguments_json,
             "extra_filter_expression": self.extra_filter_expression,
             "filter_object_json": self.filter_object_json,
-            "channels": list(self.channels.all()) if self.id else [],
-            "countries": list(self.countries.all()) if self.id else [],
-            "locales": list(self.locales.all()) if self.id else [],
             "identicon_seed": self.identicon_seed,
             "comment": self.comment,
             "bug_number": self.bug_number,
@@ -357,18 +325,6 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     @property
     def filter_expression(self):
         parts = []
-
-        if self.locales.count():
-            locales = ", ".join(["'{}'".format(l.code) for l in self.locales.all()])
-            parts.append("normandy.locale in [{}]".format(locales))
-
-        if self.countries.count():
-            countries = ", ".join(["'{}'".format(c.code) for c in self.countries.all()])
-            parts.append("normandy.country in [{}]".format(countries))
-
-        if self.channels.count():
-            channels = ", ".join(["'{}'".format(c.slug) for c in self.channels.all()])
-            parts.append("normandy.channel in [{}]".format(channels))
 
         for obj in self.filter_object:
             filter = filters.from_data(obj)
