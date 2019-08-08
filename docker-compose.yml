@@ -22,6 +22,8 @@ services:
     image: postgres:9.6
     volumes:
       - db_volume:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: normandy
     ports:
       - "5432:5432"
     networks:
