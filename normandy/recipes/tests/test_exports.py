@@ -48,13 +48,13 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_PASSWORD = "p4ssw0rd"
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_USERNAME" in str(exc)
+        assert "REMOTE_SETTINGS_USERNAME" in str(exc.value)
 
         # Set empty USERNAME
         settings.REMOTE_SETTINGS_USERNAME = ""
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_USERNAME" in str(exc)
+        assert "REMOTE_SETTINGS_USERNAME" in str(exc.value)
 
         # Leave out PASSWORD
         settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
@@ -62,7 +62,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_PASSWORD = None
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_PASSWORD" in str(exc)
+        assert "REMOTE_SETTINGS_PASSWORD" in str(exc.value)
 
         # Leave out COLLECTION_ID
         settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
@@ -71,7 +71,7 @@ class TestRemoteSettings:
         settings.REMOTE_SETTINGS_COLLECTION_ID = None
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_COLLECTION_ID" in str(exc)
+        assert "REMOTE_SETTINGS_COLLECTION_ID" in str(exc.value)
 
     def test_check_connection(self, rs_settings, requestsmock):
         # Root URL should return currently authenticated user.
@@ -80,7 +80,7 @@ class TestRemoteSettings:
 
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
-        assert "Invalid Remote Settings credentials" in str(exc)
+        assert "Invalid Remote Settings credentials" in str(exc.value)
 
         requestsmock.get(
             f"{rs_settings.REMOTE_SETTINGS_URL}/",
@@ -112,7 +112,7 @@ class TestRemoteSettings:
         assert (
             f"Remote Settings collection {rs_settings.REMOTE_SETTINGS_COLLECTION_ID} "
             "is not writable"
-        ) in str(exc)
+        ) in str(exc.value)
 
         requestsmock.get(
             collection_url,
@@ -128,7 +128,7 @@ class TestRemoteSettings:
         assert (
             "Review was not disabled on Remote Settings collection "
             f"{rs_settings.REMOTE_SETTINGS_COLLECTION_ID}."
-        ) in str(exc)
+        ) in str(exc.value)
 
         requestsmock.get(
             f"{rs_settings.REMOTE_SETTINGS_URL}/",
