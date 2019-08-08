@@ -34,7 +34,7 @@ class TestAutographer(object):
         settings.AUTOGRAPH_HAWK_SECRET_KEY = "hawk secret key"
         with pytest.raises(ImproperlyConfigured) as exc:
             signing.Autographer()
-        assert "AUTOGRAPH_URL" in str(exc)
+        assert "AUTOGRAPH_URL" in str(exc.value)
 
         # Leave out HAWK_ID
         settings.AUTOGRAPH_URL = "https://autograph.example.com"
@@ -42,7 +42,7 @@ class TestAutographer(object):
         settings.AUTOGRAPH_HAWK_SECRET_KEY = "hawk secret key"
         with pytest.raises(ImproperlyConfigured) as exc:
             signing.Autographer()
-        assert "AUTOGRAPH_HAWK_ID" in str(exc)
+        assert "AUTOGRAPH_HAWK_ID" in str(exc.value)
 
         # Leave out HAWK_SECRET_KEY
         settings.AUTOGRAPH_URL = "https://autograph.example.com"
@@ -50,7 +50,7 @@ class TestAutographer(object):
         settings.AUTOGRAPH_HAWK_SECRET_KEY = None
         with pytest.raises(ImproperlyConfigured) as exc:
             signing.Autographer()
-        assert "AUTOGRAPH_HAWK_SECRET_KEY" in str(exc)
+        assert "AUTOGRAPH_HAWK_SECRET_KEY" in str(exc.value)
 
         # Include everything
         settings.AUTOGRAPH_URL = "https://autograph.example.com"
@@ -171,13 +171,13 @@ class TestExtractCertsFromPem(object):
         bad_data = "-----BEGIN CERTIFICATE-----\nMIIGXTCCBEWgAwIBAgIEAQAACjANBgkq"
         with pytest.raises(signing.CertificateParseError) as exc:
             signing.extract_certs_from_pem(bad_data)
-        assert "Unexpected end of input." in str(exc)
+        assert "Unexpected end of input." in str(exc.value)
 
     def test_not_a_cert(self):
         bad_data = "hello world"
         with pytest.raises(signing.CertificateParseError) as exc:
             signing.extract_certs_from_pem(bad_data)
-        assert 'Unexpected input "hello world"' in str(exc)
+        assert 'Unexpected input "hello world"' in str(exc.value)
 
 
 class TestParseCertsFromDer(object):
@@ -391,5 +391,5 @@ class TestReadTimestampObject(object):
     def test_it_errors_on_unsupported_formats(self):
         with pytest.raises(signing.BadCertificate) as exc:
             signing.read_timestamp_object({"unsupportedTimestamp": b"gibberish"})
-        assert "Timestamp not in expected format" in str(exc)
-        assert "unsupportedTimestamp" in str(exc)
+        assert "Timestamp not in expected format" in str(exc.value)
+        assert "unsupportedTimestamp" in str(exc.value)

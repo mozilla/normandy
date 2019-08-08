@@ -35,9 +35,9 @@ class TestFractionToKey(object):
             fraction_to_key(bad_val)
 
         # Check that it is the expected error, not some spurious error from elsewhere.
-        assert "must be between 0 and 1 inclusive" in str(exc)
+        assert "must be between 0 and 1 inclusive" in str(exc.value)
         # Check that the bad value is mentioned
-        assert str(bad_val) in str(exc)
+        assert str(bad_val) in str(exc.value)
 
     def test_result_length(self):
         for _ in range(100):

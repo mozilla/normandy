@@ -140,7 +140,7 @@ class TestMixedViewRouter(object):
         router = MixedViewRouter()
         with pytest.raises(TypeError) as err:
             router.register_view("view", View, allow_cdn=True)
-        assert "missing 1 required keyword-only argument: 'name'" in str(err)
+        assert "missing 1 required keyword-only argument: 'name'" in str(err.value)
 
     def test_get_urls_includes_non_viewset_views(self):
         router = MixedViewRouter()
