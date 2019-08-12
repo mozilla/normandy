@@ -132,8 +132,8 @@ kinto-http==10.4.1 \
 markus[datadog]==1.2.0 \
     --hash=sha256:86bbeb16de1b1920d291c81a39b7a7c61c94b665cd8d10c6b69c994ce4fd5bcc \
     --hash=sha256:9bce7bd152578703a8e4aa5a765c7c0d94bcdd69f7bc5e42d29b893e3abf2e5a
-newrelic==4.20.1.121 \
-    --hash=sha256:708ac6a75c76a59e3d6c0d714e2fbb1e4ec7d540f7d34bddd81e61bdb636e895
+newrelic==5.0.1.125 \
+    --hash=sha256:0685dea97cc7d3d15cd52779e13f8bc4aea3f67fd5bd5620873b48b55c935130
 psycopg2==2.8.3 \
     --hash=sha256:128d0fa910ada0157bba1cb74a9c5f92bb8a1dca77cf91a31eb274d1f889e001 \
     --hash=sha256:227fd46cf9b7255f07687e5bde454d7d67ae39ca77e170097cdef8ebfc30c323 \
