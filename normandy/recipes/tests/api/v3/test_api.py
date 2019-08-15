@@ -471,22 +471,22 @@ class TestRecipeAPI(object):
         def test_it_accepts_capabilities(self, api_client):
             action = ActionFactory()
             res = api_client.post(
-                '/api/v3/recipe/',
+                "/api/v3/recipe/",
                 {
-                    'action_id': action.id,
-                    'extra_capabilities': ["test.one", "test.two"],
-                    'arguments': {},
-                    'name': 'test recipe',
-                    'extra_filter_expression': 'true',
-                }
+                    "action_id": action.id,
+                    "extra_capabilities": ["test.one", "test.two"],
+                    "arguments": {},
+                    "name": "test recipe",
+                    "extra_filter_expression": "true",
+                },
             )
             assert res.status_code == 201, res.json()
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             # Passed extra capabilities:
-            assert recipe.extra_capabilities == ['test.one', 'test.two']
+            assert recipe.extra_capabilities == ["test.one", "test.two"]
             # Extra capabilities get included in capabilities
-            assert {'test.one', 'test.two'} <= set(recipe.capabilities)
+            assert {"test.one", "test.two"} <= set(recipe.capabilities)
 
     @pytest.mark.django_db
     class TestUpdates(object):
@@ -636,15 +636,14 @@ class TestRecipeAPI(object):
             ]
 
         def test_it_can_update_capabilities(self, api_client):
-            recipe = RecipeFactory(extra_capabilities=["always", 'original'])
+            recipe = RecipeFactory(extra_capabilities=["always", "original"])
             res = api_client.patch(
-                f"/api/v3/recipe/{recipe.id}/",
-                {"extra_capabilities": ["always", "changed"]},
+                f"/api/v3/recipe/{recipe.id}/", {"extra_capabilities": ["always", "changed"]}
             )
             assert res.status_code == 200
             recipe = Recipe.objects.get()
-            assert {'always', 'changed'} <= set(recipe.capabilities)
-            assert 'original' not in recipe.capabilities
+            assert {"always", "changed"} <= set(recipe.capabilities)
+            assert "original" not in recipe.capabilities
 
     @pytest.mark.django_db
     class TestFilterObjects(object):
@@ -1615,9 +1614,7 @@ class TestFilterObjects(object):
     def test_bad_filter_objects(self, api_client):
         res = self.make_recipe(api_client, filter_object={})  # not a list
         assert res.status_code == 400
-        assert res.json() == {
-            "filter_object": ['Expected a list of items but got type "dict".']
-        }
+        assert res.json() == {"filter_object": ['Expected a list of items but got type "dict".']}
 
         res = self.make_recipe(api_client, filter_object=["1 + 1 == 2"])  # not a list of objects
         assert res.status_code == 400

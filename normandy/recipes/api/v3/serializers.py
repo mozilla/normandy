@@ -126,7 +126,9 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     extra_filter_expression = serializers.CharField(
         required=False, allow_blank=True, write_only=True
     )
-    filter_object = serializers.ListField(child=FilterObjectField(), required=False, write_only=True)
+    filter_object = serializers.ListField(
+        child=FilterObjectField(), required=False, write_only=True
+    )
     name = serializers.CharField(write_only=True)
     identicon_seed = serializers.CharField(required=False, write_only=True)
     comment = serializers.CharField(required=False, write_only=True)

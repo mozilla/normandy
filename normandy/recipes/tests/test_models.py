@@ -22,7 +22,6 @@ from normandy.recipes.models import (
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
-    ChannelFactory,
     RecipeFactory,
     RecipeRevisionFactory,
     SignatureFactory,

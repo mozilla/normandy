@@ -1,6 +1,12 @@
 import pytest
 
-from normandy.recipes.filters import ChannelFilter, LocaleFilter, CountryFilter, BucketSampleFilter, StableSampleFilter
+from normandy.recipes.filters import (
+    ChannelFilter,
+    LocaleFilter,
+    CountryFilter,
+    BucketSampleFilter,
+    StableSampleFilter,
+)
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
 
@@ -27,7 +33,6 @@ class FilterTestsBase:
 
 
 class TestChannelFilter(FilterTestsBase):
-
     def create_basic_filter(self, channels=None):
         if channels:
             channel_objs = [ChannelFactory(slug=slug) for slug in channels]
@@ -41,7 +46,6 @@ class TestChannelFilter(FilterTestsBase):
 
 
 class TestLocaleFilter(FilterTestsBase):
-
     def create_basic_filter(self, locales=None):
         if locales:
             locale_objs = [LocaleFactory(code=code) for code in locales]
@@ -55,7 +59,6 @@ class TestLocaleFilter(FilterTestsBase):
 
 
 class TestCountryFilter(FilterTestsBase):
-
     def create_basic_filter(self, countries=None):
         if countries:
             country_objs = [CountryFactory(code=code) for code in countries]
@@ -69,7 +72,6 @@ class TestCountryFilter(FilterTestsBase):
 
 
 class TestBucketSamplefilter(FilterTestsBase):
-
     def create_basic_filter(self, input=None, start=123, count=10, total=1_000):
         if input is None:
             input = ["normandy.clientId"]
@@ -77,11 +79,10 @@ class TestBucketSamplefilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], start=10, count=20, total=1_000)
-        assert filter.to_jexl() == '[A]|bucketSample(10,20,1000)'
+        assert filter.to_jexl() == "[A]|bucketSample(10,20,1000)"
 
 
 class TestStableSamplefilter(FilterTestsBase):
-
     def create_basic_filter(self, input=None, rate=0.01):
         if input is None:
             input = ["normandy.clientId"]
@@ -89,4 +90,4 @@ class TestStableSamplefilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], rate=0.1)
-        assert filter.to_jexl() == '[A]|stableSample(0.1)'
+        assert filter.to_jexl() == "[A]|stableSample(0.1)"

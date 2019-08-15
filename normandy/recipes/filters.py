@@ -156,7 +156,6 @@ class CountryFilter(BaseFilter):
         return set()
 
 
-
 class BucketSampleFilter(BaseFilter):
     """
     Sample a portion of the users by defining a series of buckets, evenly

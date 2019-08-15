@@ -6,14 +6,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('recipes', '0014_auto_20190228_1128'),
-    ]
+    dependencies = [("recipes", "0014_auto_20190228_1128")]
 
     operations = [
         migrations.AddField(
-            model_name='reciperevision',
-            name='extra_capabilities',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=255), default=[], size=None),
-        ),
+            model_name="reciperevision",
+            name="extra_capabilities",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(max_length=255), default=list, size=None
+            ),
+        )
     ]
