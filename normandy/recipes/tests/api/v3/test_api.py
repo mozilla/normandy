@@ -1338,6 +1338,8 @@ class TestApprovalFlow(object):
         user2 = UserFactory(is_superuser=True)
         api_client.force_authenticate(user1)
 
+        settings.BASELINE_CAPABILITIES |= action.capabilities
+
         # Create a recipe
         res = api_client.post(
             "/api/v3/recipe/",
@@ -1387,6 +1389,10 @@ class TestApprovalFlow(object):
         assert res.status_code == 200
         recipe_data_1 = res.json()
         assert recipe_data_1["approved_revision"] is not None
+        assert (
+            Recipe.objects.get(id=recipe_data_1["id"]).capabilities
+            <= settings.BASELINE_CAPABILITIES
+        )
         self.verify_signatures(api_client, expected_count=1)
 
         # Make another change
@@ -1478,8 +1484,9 @@ class TestApprovalFlow(object):
         assert recipe_data_4["approved_revision"]["extra_filter_expression"] == "counter == 2"
         self.verify_signatures(api_client, expected_count=1)
 
-    def test_cancel_approval(self, api_client, mocked_autograph):
+    def test_cancel_approval(self, api_client, mocked_autograph, settings):
         action = ActionFactory()
+        settings.BASELINE_CAPABILITIES |= action.capabilities
         user1 = UserFactory(is_superuser=True)
         user2 = UserFactory(is_superuser=True)
         api_client.force_authenticate(user1)
@@ -1498,6 +1505,8 @@ class TestApprovalFlow(object):
         assert res.status_code == 201
         recipe_id = res.json()["id"]
         revision_id = res.json()["latest_revision"]["id"]
+
+        assert Recipe.objects.get(id=recipe_id).capabilities <= settings.BASELINE_CAPABILITIES
 
         # Request approval
         res = api_client.post(f"/api/v3/recipe_revision/{revision_id}/request_approval/")

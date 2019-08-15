@@ -84,7 +84,12 @@ class MigrationTest(object):
     """A base class for migration tests that resets migrations on teardown."""
 
     @pytest.fixture(autouse=True)
-    def reset_migrations(self, migrations):
+    def _check_migrations_enabled(self, django_db_use_migrations):
+        if not django_db_use_migrations:
+            skip_except_in_ci()
+
+    @pytest.fixture(autouse=True)
+    def _reset_migrations(self, migrations):
         yield
         migrations.reset()
 

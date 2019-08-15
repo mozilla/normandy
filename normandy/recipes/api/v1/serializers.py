@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from normandy.base.api.v1.serializers import UserSerializer
-from normandy.recipes.api.fields import ActionImplementationHyperlinkField
+from normandy.recipes.api.fields import ActionImplementationHyperlinkField, SortedListField
 from normandy.recipes.models import Action, ApprovalRequest, Recipe, RecipeRevision, Signature
 
 
@@ -81,6 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     )
     approval_request = ApprovalRequestSerializer(read_only=True)
     identicon_seed = serializers.CharField(required=False)
+    capabilities = SortedListField(child=serializers.CharField())
 
     class Meta:
         model = Recipe
@@ -99,7 +100,11 @@ class RecipeSerializer(serializers.ModelSerializer):
             "approved_revision_id",
             "approval_request",
             "identicon_seed",
+            "capabilities",
         ]
+
+    def get_capabilities(self, recipe):
+        return recipe.capabilities
 
 
 class MinimalRecipeSerializer(RecipeSerializer):
@@ -113,7 +118,15 @@ class MinimalRecipeSerializer(RecipeSerializer):
         # Attributes serialized here are made available to filter expressions via
         # normandy.recipe, and should be documented if they are intended to be
         # used in filter expressions.
-        fields = ["id", "name", "revision_id", "action", "arguments", "filter_expression"]
+        fields = [
+            "id",
+            "name",
+            "revision_id",
+            "action",
+            "arguments",
+            "filter_expression",
+            "capabilities",
+        ]
 
     def get_revision_id(self, recipe):
         # Certain parts of Telemetry expect this to be a string, so coerce it to
