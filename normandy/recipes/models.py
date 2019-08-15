@@ -672,7 +672,7 @@ class Action(DirtyFieldsMixin, models.Model):
     @property
     def capabilities(self):
         """The set of capabilities needed for this action"""
-        return {f'action.${self.name}'}
+        return {f'action.{self.name}'}
 
     def __str__(self):
         return self.name
