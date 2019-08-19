@@ -125,9 +125,9 @@ google-resumable-media==0.3.2 \
     --hash=sha256:3e38923493ca0d7de0ad91c31acfefc393c78586db89364e91cb4f11990e51ba
 googleapis-common-protos==1.6.0 \
     --hash=sha256:e61b8ed5e36b976b487c6e7b15f31bb10c7a0ca7bd5c0e837f4afab64b53a0c6
-graphene==2.1.7 \
-    --hash=sha256:77d61618132ccd084c343e64c22d806cee18dce73cc86e0f427378dbdeeac287 \
-    --hash=sha256:acf808d50d053b94f7958414d511489a9e490a7f9563b9be80f6875fc5723d2a
+graphene==2.1.8 \
+    --hash=sha256:09165f03e1591b76bf57b133482db9be6dac72c74b0a628d3c93182af9c5a896 \
+    --hash=sha256:2cbe6d4ef15cfc7b7805e0760a0e5b80747161ce1b0f990dfdc0d2cf497c12f9
 graphql-core==2.2.1 \
     --hash=sha256:1488f2a5c2272dc9ba66e3042a6d1c30cea0db4c80bd1e911c6791ad6187d91b \
     --hash=sha256:da64c472d720da4537a2e8de8ba859210b62841bd47a9be65ca35177f62fe0e4
