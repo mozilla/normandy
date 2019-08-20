@@ -6,12 +6,25 @@ asn1crypto==0.24.0 \
 django-extensions==2.2.1 \
     --hash=sha256:4aafdb865104eaa5d681b9976b36c52c9d441be89b7d782e40808f1c5c0c8f93 \
     --hash=sha256:8a2552fdeb222b23895ef52cdc28fc56efba976f6da07ca92937f6f5e626e345
+ipdb==0.12.2 \
+    --hash=sha256:473fdd798a099765f093231a8b1fabfa95b0b682fce12de0c74b61a4b4d8ee57
+ipdb==0.12.2 \
+    --hash=sha256:473fdd798a099765f093231a8b1fabfa95b0b682fce12de0c74b61a4b4d8ee57
+ipython==7.7.0 \
+    --hash=sha256:1d3a1692921e932751bc1a1f7bb96dc38671eeefdc66ed33ee4cbc57e92a410e \
+    --hash=sha256:537cd0176ff6abd06ef3e23f2d0c4c2c8a4d9277b7451544c6cbf56d1c79a83d
+ipython==7.7.0 \
+    --hash=sha256:1d3a1692921e932751bc1a1f7bb96dc38671eeefdc66ed33ee4cbc57e92a410e \
+    --hash=sha256:537cd0176ff6abd06ef3e23f2d0c4c2c8a4d9277b7451544c6cbf56d1c79a83d
 PyDriller==1.9.2 \
     --hash=sha256:44a998a26a38c529fc0597a51074dd86d72a83baa2bc535b5932f6e417ec30f2 \
     --hash=sha256:e4da6fe0f2c70b8c15152e9d7a8b5b16a7b5d50712de2794e2fcd3b90d9a6bf2
 pyOpenSSL==19.0.0 \
     --hash=sha256:c727930ad54b10fc157015014b666f2d8b41f70c0d03e83ab67624fd3dd5d1e6 \
     --hash=sha256:aeca66338f6de19d1aa46ed634c3b9ae519a64b458f8468aec688e7e3c20f200
+therapist==2.0.0 \
+    --hash=sha256:5f4e0a94f1a46b4773ad4d76fa4b9661f7cd8b3839613b94ee815759543512af \
+    --hash=sha256:7fce693fcd2093777ac5b3661e048f20709c4fea13084b5e52e7e92bc10994fb
 watchdog==0.9.0 \
     --hash=sha256:965f658d0732de3188211932aeb0bb457587f04f63ab4c1e33eab878e9de961d
 Werkzeug==0.15.5 \
