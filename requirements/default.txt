@@ -114,9 +114,9 @@ gevent==1.4.0 \
 google-cloud-storage==1.19.0 \
     --hash=sha256:1e1fce811753bd2570db3d468437d44052274641c7f637c50e1c2df16497b9f7 \
     --hash=sha256:21f94c073eb9be34ca545c4eef28ae66947386687d99cd3a82400bf1504cfbd8
-graphene-django==2.4.0 \
-    --hash=sha256:3101e8a8353c6b13f33261f5b0437deb3d3614d1c44b2d56932b158e3660c0cd \
-    --hash=sha256:5714c5dd1200800ddc12d0782b0d82db70aedf387575e5b57ee2cdee4f25c681    # Pinning aniso8601 >=3, <4
+graphene-django==2.5.0 \
+    --hash=sha256:25f2bdf41e30bc7b860c1c13bfb4ba5c3961712394f16e847d79a69fc25a06b1 \
+    --hash=sha256:d75b3e468d8d765d5964bc809e403b44bf7c37556c0464230a5083bccf14581b    # Pinning aniso8601 >=3, <4
 gunicorn==19.9.0 \
     --hash=sha256:aa8e0b40b4157b36a5df5e599f45c9c76d6af43845ba3b3b0efe2c70473c2471 \
     --hash=sha256:fa2662097c66f920f53f70621c6c58ca4a3c4d3434205e608e121b5b3b71f4f3
