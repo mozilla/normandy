@@ -57,3 +57,7 @@ up: build
 	docker-compose up
 
 refresh: kill migrate load_data
+
+# Usage: make generate_deploy_bug FROM=fromtag TO=totag
+generate_deploy_bug: build
+	docker-compose run app python bin/generate_deploy_bug.py $(FROM) $(TO)
