@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from django.db.utils import ProgrammingError
+
 import pytest
 import requests.exceptions
 
@@ -67,3 +69,27 @@ class TestSignaturesUseGoodCertificates(object):
         mock_verify_x5u.assert_called_once()
         assert len(errors) == 1
         assert errors[0].id == checks.ERROR_COULD_NOT_VERIFY_CERTIFICATE
+
+
+@pytest.mark.django_db
+class TestRecipeSignatureAreCorrect:
+    def test_it_warns_if_a_field_isnt_available(self, mocker):
+        """This is to allow for un-applied to migrations to not break running migrations."""
+        RecipeFactory(signed=True)
+        mock_canonical_json = mocker.patch("normandy.recipes.models.Recipe.canonical_json")
+        mock_canonical_json.side_effect = ProgrammingError("error for testing")
+        errors = checks.recipe_signatures_are_correct(None)
+        assert len(errors) == 1
+        assert errors[0].id == checks.WARNING_COULD_NOT_CHECK_SIGNATURES
+
+
+@pytest.mark.django_db
+class TestActionSignatureAreCorrect:
+    def test_it_warns_if_a_field_isnt_available(self, mocker):
+        """This is to allow for un-applied to migrations to not break running migrations."""
+        ActionFactory(signed=True)
+        mock_canonical_json = mocker.patch("normandy.recipes.models.Action.canonical_json")
+        mock_canonical_json.side_effect = ProgrammingError("error for testing")
+        errors = checks.action_signatures_are_correct(None)
+        assert len(errors) == 1
+        assert errors[0].id == checks.WARNING_COULD_NOT_CHECK_SIGNATURES
