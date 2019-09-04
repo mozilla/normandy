@@ -55,7 +55,6 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
 
     try:
         for recipe in signed_recipes:
-            print("@@@", recipe.canonical_json)
             data = recipe.canonical_json()
             signature = recipe.signature.signature
             pubkey = recipe.signature.public_key
