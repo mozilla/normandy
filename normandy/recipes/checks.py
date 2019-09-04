@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.apps import apps
 from django.conf import settings
-from django.core.checks import Error, Info, register as register_check
+from django.core.checks import Error, Info, Warning, register as register_check
 from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import OperationalError, ProgrammingError
 
@@ -15,6 +15,7 @@ from normandy.recipes import signing, geolocation
 INFO_COULD_NOT_RETRIEVE_ACTIONS = "normandy.recipes.I001"
 INFO_COULD_NOT_RETRIEVE_RECIPES = "normandy.recipes.I002"
 INFO_COULD_NOT_RETRIEVE_SIGNATURES = "normandy.recipes.I003"
+WARNING_COULD_NOT_CHECK_SIGNATURES = "normandy.recipes.W001"
 ERROR_MISMATCHED_ACTION_HASH = "normandy.recipes.E001"
 ERROR_INVALID_RECIPE_SIGNATURE = "normandy.recipes.E002"
 ERROR_BAD_SIGNING_CERTIFICATE = "normandy.recipes.E003"
@@ -50,8 +51,11 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
         signed_recipes = list(Recipe.objects.exclude(signature=None).select_related("signature"))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         errors.append(Info(f"Could not retrieve recipes: {e}", id=INFO_COULD_NOT_RETRIEVE_RECIPES))
-    else:
+        return errors
+
+    try:
         for recipe in signed_recipes:
+            print("@@@", recipe.canonical_json)
             data = recipe.canonical_json()
             signature = recipe.signature.signature
             pubkey = recipe.signature.public_key
@@ -62,6 +66,10 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
                     recipe=recipe, detail=e.detail
                 )
                 errors.append(Error(msg, id=ERROR_INVALID_RECIPE_SIGNATURE))
+    except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
+        errors.append(
+            Warning(f"Could not check signatures: {e}", id=WARNING_COULD_NOT_CHECK_SIGNATURES)
+        )
 
     return errors
 
@@ -75,7 +83,9 @@ def action_signatures_are_correct(app_configs, **kwargs):
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         msg = f"Could not retrieve actions: f{e}"
         errors.append(Info(msg, id=INFO_COULD_NOT_RETRIEVE_ACTIONS))
-    else:
+        return errors
+
+    try:
         for action in signed_actions:
             data = action.canonical_json()
             signature = action.signature.signature
@@ -85,6 +95,10 @@ def action_signatures_are_correct(app_configs, **kwargs):
             except signing.BadSignature as e:
                 msg = f"Action '{action}' (id={action.id}) has a bad signature: {e.detail}"
                 errors.append(Error(msg, id=ERROR_INVALID_ACTION_SIGNATURE))
+    except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
+        errors.append(
+            Warning(f"Could not check signatures: {e}", id=WARNING_COULD_NOT_CHECK_SIGNATURES)
+        )
 
     return errors
 
