@@ -178,8 +178,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.comment
 
     @current_revision_property()
-    def bug_number(self):
-        return self.current_revision.bug_number
+    def experimenter_slug(self):
+        return self.current_revision.experimenter_slug
 
     @current_revision_property()
     def capabilities(self):
@@ -343,7 +343,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         "EnabledState", null=True, on_delete=models.SET_NULL, related_name="current_for_revision"
     )
     comment = models.TextField()
-    bug_number = models.IntegerField(null=True)
+    experimenter_slug = models.CharField(null=True, max_length=255)
     extra_capabilities = ArrayField(models.CharField(max_length=255), default=list)
 
     class Meta:
@@ -362,7 +362,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             "locales": list(self.locales.all()) if self.id else [],
             "identicon_seed": self.identicon_seed,
             "comment": self.comment,
-            "bug_number": self.bug_number,
+            "experimenter_slug": self.experimenter_slug,
             "extra_capabilities": self.extra_capabilities,
         }
 

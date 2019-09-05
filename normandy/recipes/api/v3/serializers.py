@@ -72,7 +72,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             "action",
             "approval_request",
             "arguments",
-            "bug_number",
+            "experimenter_slug",
             "capabilities",
             "comment",
             "creator",
@@ -132,7 +132,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     name = serializers.CharField(write_only=True)
     identicon_seed = serializers.CharField(required=False, write_only=True)
     comment = serializers.CharField(required=False, write_only=True)
-    bug_number = serializers.IntegerField(required=False, write_only=True)
+    experimenter_slug = serializers.CharField(required=False, write_only=True)
     extra_capabilities = serializers.ListField(required=False, write_only=True)
 
     class Meta:
@@ -151,7 +151,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
             "name",
             "identicon_seed",
             "comment",
-            "bug_number",
+            "experimenter_slug",
             "extra_capabilities",
         ]
 
