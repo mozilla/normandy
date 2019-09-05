@@ -46,14 +46,14 @@ class ActionViewSet(CachingViewsetMixin, viewsets.ReadOnlyModelViewSet):
 class RecipeFilters(django_filters.FilterSet):
     enabled = EnabledStateFilter()
     action = django_filters.CharFilter(field_name="latest_revision__action__name")
-    bug_number = django_filters.NumberFilter(field_name="latest_revision__bug_number")
+    experimenter_slug = django_filters.CharFilter(field_name="latest_revision__experimenter_slug")
     channels = CharSplitFilter("latest_revision__channels__slug")
     locales = CharSplitFilter("latest_revision__locales__code")
     countries = CharSplitFilter("latest_revision__countries__code")
 
     class Meta:
         model = Recipe
-        fields = ["action", "enabled", "latest_revision__action", "bug_number"]
+        fields = ["action", "enabled", "latest_revision__action", "experimenter_slug"]
 
 
 class RecipeOrderingFilter(AliasedOrderingFilter):

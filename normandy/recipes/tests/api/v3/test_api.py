@@ -144,11 +144,6 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert "Cookies" not in res
 
-        def test_list_invalid_bug_number(self, api_client):
-            res = api_client.get("/api/v3/recipe/", {"bug_number": "not a number"})
-            assert res.status_code == 400
-            assert res.json()["bug_number"] == ["Enter a number."]
-
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
@@ -375,7 +370,7 @@ class TestRecipeAPI(object):
                 "non_field_errors": ["one of extra_filter_expression or filter_object is required"]
             }
 
-        def test_with_bug_number(self, api_client):
+        def test_with_experimenter_slug(self, api_client):
             action = ActionFactory()
 
             res = api_client.post(
@@ -386,13 +381,13 @@ class TestRecipeAPI(object):
                     "arguments": {},
                     "extra_filter_expression": "whatever",
                     "enabled": True,
-                    "bug_number": 42,
+                    "experimenter_slug": "some-experimenter-slug",
                 },
             )
             assert res.status_code == 201, res.json()
 
             recipe = Recipe.objects.get()
-            assert recipe.bug_number == 42
+            assert recipe.experimenter_slug == "some-experimenter-slug"
 
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()
@@ -581,14 +576,14 @@ class TestRecipeAPI(object):
             r.refresh_from_db()
             assert r.comment == "bar"
 
-        def test_update_recipe_bug(self, api_client):
+        def test_update_recipe_experimenter_slug(self, api_client):
             r = RecipeFactory()
 
-            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"bug_number": 42})
+            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"experimenter_slug": "a-new-slug"})
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.bug_number == 42
+            assert r.experimenter_slug == "a-new-slug"
 
         def test_updating_recipes_stores_the_user(self, api_client):
             recipe = RecipeFactory()
@@ -1120,16 +1115,16 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data["count"] == 0
 
-        def test_filter_by_bug_number(self, api_client):
+        def test_filter_by_experimenter_slug(self, api_client):
             RecipeFactory()
-            match1 = RecipeFactory(bug_number=1)
-            match2 = RecipeFactory(bug_number=1)
-            RecipeFactory(bug_number=2)
+            match1 = RecipeFactory(experimenter_slug="a-slug")
+            RecipeFactory(experimenter_slug="something-else")
+            RecipeFactory(experimenter_slug="some-other-slug")
 
-            res = api_client.get("/api/v3/recipe/?bug_number=1")
+            res = api_client.get("/api/v3/recipe/?experimenter_slug=a-slug")
             assert res.status_code == 200
-            assert res.data["count"] == 2
-            assert set(r["id"] for r in res.data["results"]) == set([match1.id, match2.id])
+            assert res.data["count"] == 1
+            assert set(r["id"] for r in res.data["results"]) == set([match1.id])
 
         def test_order_last_updated(self, api_client):
             r1 = RecipeFactory()
