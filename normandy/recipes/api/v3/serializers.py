@@ -4,7 +4,7 @@ from factory.fuzzy import FuzzyText
 
 from normandy.base.api.v3.serializers import UserSerializer
 from normandy.recipes import filters
-from normandy.recipes.api.fields import ActionImplementationHyperlinkField
+from normandy.recipes.api.fields import ActionImplementationHyperlinkField, FilterObjectField
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
@@ -58,10 +58,12 @@ class EnabledStateSerializer(CustomizableSerializerMixin, serializers.ModelSeria
 class RecipeRevisionSerializer(serializers.ModelSerializer):
     action = serializers.SerializerMethodField(read_only=True)
     approval_request = ApprovalRequestSerializer(read_only=True)
+    capabilities = serializers.ListField(read_only=True)
     comment = serializers.CharField(required=False)
     creator = UserSerializer(source="user", read_only=True)
     date_created = serializers.DateTimeField(source="created", read_only=True)
     enabled_states = EnabledStateSerializer(many=True, exclude_fields=["revision_id"])
+    filter_object = serializers.ListField(child=FilterObjectField())
     recipe = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -70,11 +72,14 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             "action",
             "approval_request",
             "arguments",
-            "bug_number",
+            "experimenter_slug",
+            "capabilities",
             "comment",
+            "creator",
             "date_created",
             "enabled_states",
             "enabled",
+            "extra_capabilities",
             "extra_filter_expression",
             "filter_expression",
             "filter_object",
@@ -82,7 +87,6 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             "identicon_seed",
             "name",
             "recipe",
-            "creator",
             "updated",
         ]
 
@@ -122,11 +126,14 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     extra_filter_expression = serializers.CharField(
         required=False, allow_blank=True, write_only=True
     )
-    filter_object = serializers.JSONField(required=False, write_only=True)
+    filter_object = serializers.ListField(
+        child=FilterObjectField(), required=False, write_only=True
+    )
     name = serializers.CharField(write_only=True)
     identicon_seed = serializers.CharField(required=False, write_only=True)
     comment = serializers.CharField(required=False, write_only=True)
-    bug_number = serializers.IntegerField(required=False, write_only=True)
+    experimenter_slug = serializers.CharField(required=False, write_only=True)
+    extra_capabilities = serializers.ListField(required=False, write_only=True)
 
     class Meta:
         model = Recipe
@@ -144,7 +151,8 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
             "name",
             "identicon_seed",
             "comment",
-            "bug_number",
+            "experimenter_slug",
+            "extra_capabilities",
         ]
 
     def get_action(self, instance):

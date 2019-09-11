@@ -144,11 +144,6 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert "Cookies" not in res
 
-        def test_list_invalid_bug_number(self, api_client):
-            res = api_client.get("/api/v3/recipe/", {"bug_number": "not a number"})
-            assert res.status_code == 400
-            assert res.json()["bug_number"] == ["Enter a number."]
-
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
@@ -375,7 +370,7 @@ class TestRecipeAPI(object):
                 "non_field_errors": ["one of extra_filter_expression or filter_object is required"]
             }
 
-        def test_with_bug_number(self, api_client):
+        def test_with_experimenter_slug(self, api_client):
             action = ActionFactory()
 
             res = api_client.post(
@@ -386,13 +381,13 @@ class TestRecipeAPI(object):
                     "arguments": {},
                     "extra_filter_expression": "whatever",
                     "enabled": True,
-                    "bug_number": 42,
+                    "experimenter_slug": "some-experimenter-slug",
                 },
             )
             assert res.status_code == 201, res.json()
 
             recipe = Recipe.objects.get()
-            assert recipe.bug_number == 42
+            assert recipe.experimenter_slug == "some-experimenter-slug"
 
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()
@@ -467,6 +462,26 @@ class TestRecipeAPI(object):
             recipe = Recipe.objects.get()
             assert recipe.extra_filter_expression == ""
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+
+        def test_it_accepts_capabilities(self, api_client):
+            action = ActionFactory()
+            res = api_client.post(
+                "/api/v3/recipe/",
+                {
+                    "action_id": action.id,
+                    "extra_capabilities": ["test.one", "test.two"],
+                    "arguments": {},
+                    "name": "test recipe",
+                    "extra_filter_expression": "true",
+                },
+            )
+            assert res.status_code == 201, res.json()
+            assert Recipe.objects.count() == 1
+            recipe = Recipe.objects.get()
+            # Passed extra capabilities:
+            assert recipe.extra_capabilities == ["test.one", "test.two"]
+            # Extra capabilities get included in capabilities
+            assert {"test.one", "test.two"} <= set(recipe.capabilities)
 
     @pytest.mark.django_db
     class TestUpdates(object):
@@ -561,14 +576,14 @@ class TestRecipeAPI(object):
             r.refresh_from_db()
             assert r.comment == "bar"
 
-        def test_update_recipe_bug(self, api_client):
+        def test_update_recipe_experimenter_slug(self, api_client):
             r = RecipeFactory()
 
-            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"bug_number": 42})
+            res = api_client.patch(f"/api/v3/recipe/{r.pk}/", {"experimenter_slug": "a-new-slug"})
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.bug_number == 42
+            assert r.experimenter_slug == "a-new-slug"
 
         def test_updating_recipes_stores_the_user(self, api_client):
             recipe = RecipeFactory()
@@ -615,6 +630,16 @@ class TestRecipeAPI(object):
                 "if extra_filter_expression is blank, at least one filter_object is required"
             ]
 
+        def test_it_can_update_capabilities(self, api_client):
+            recipe = RecipeFactory(extra_capabilities=["always", "original"])
+            res = api_client.patch(
+                f"/api/v3/recipe/{recipe.id}/", {"extra_capabilities": ["always", "changed"]}
+            )
+            assert res.status_code == 200
+            recipe = Recipe.objects.get()
+            assert {"always", "changed"} <= set(recipe.capabilities)
+            assert "original" not in recipe.capabilities
+
     @pytest.mark.django_db
     class TestFilterObjects(object):
         def make_recipe(self, api_client, **kwargs):
@@ -633,7 +658,7 @@ class TestRecipeAPI(object):
             res = self.make_recipe(api_client, filter_object={})  # not a list
             assert res.status_code == 400
             assert res.json() == {
-                "filter_object": {"non field errors": ["filter_object must be a list."]}
+                "filter_object": ['Expected a list of items but got type "dict".']
             }
 
             res = self.make_recipe(
@@ -1090,16 +1115,16 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data["count"] == 0
 
-        def test_filter_by_bug_number(self, api_client):
+        def test_filter_by_experimenter_slug(self, api_client):
             RecipeFactory()
-            match1 = RecipeFactory(bug_number=1)
-            match2 = RecipeFactory(bug_number=1)
-            RecipeFactory(bug_number=2)
+            match1 = RecipeFactory(experimenter_slug="a-slug")
+            RecipeFactory(experimenter_slug="something-else")
+            RecipeFactory(experimenter_slug="some-other-slug")
 
-            res = api_client.get("/api/v3/recipe/?bug_number=1")
+            res = api_client.get("/api/v3/recipe/?experimenter_slug=a-slug")
             assert res.status_code == 200
-            assert res.data["count"] == 2
-            assert set(r["id"] for r in res.data["results"]) == set([match1.id, match2.id])
+            assert res.data["count"] == 1
+            assert set(r["id"] for r in res.data["results"]) == set([match1.id])
 
         def test_order_last_updated(self, api_client):
             r1 = RecipeFactory()
@@ -1584,9 +1609,7 @@ class TestFilterObjects(object):
     def test_bad_filter_objects(self, api_client):
         res = self.make_recipe(api_client, filter_object={})  # not a list
         assert res.status_code == 400
-        assert res.json() == {
-            "filter_object": {"non field errors": ["filter_object must be a list."]}
-        }
+        assert res.json() == {"filter_object": ['Expected a list of items but got type "dict".']}
 
         res = self.make_recipe(api_client, filter_object=["1 + 1 == 2"])  # not a list of objects
         assert res.status_code == 400

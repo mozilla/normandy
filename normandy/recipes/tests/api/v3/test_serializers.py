@@ -19,7 +19,9 @@ from normandy.recipes.api.v3.serializers import (
 @pytest.mark.django_db()
 class TestRecipeSerializer:
     def test_it_works(self, rf):
-        recipe = RecipeFactory(arguments={"foo": "bar"}, bug_number=1436113)
+        recipe = RecipeFactory(
+            arguments={"foo": "bar"}, experimenter_slug="some-experimenter-slug"
+        )
         ApprovalRequestFactory(revision=recipe.latest_revision)
         request = rf.get("/")
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
@@ -155,7 +157,7 @@ class TestRecipeSerializer:
                         {"title": "consequetar", "weight": 1},
                     ],
                 },
-                "bug_number": 1436113,
+                "experimenter_slug": "some-experimenter-slug",
             }
         )
 
@@ -171,7 +173,7 @@ class TestRecipeSerializer:
                     {"title": "consequetar", "weight": 1},
                 ],
             },
-            "bug_number": 1436113,
+            "experimenter_slug": "some-experimenter-slug",
         }
         assert serializer.errors == {}
 

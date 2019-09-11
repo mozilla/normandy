@@ -27,6 +27,7 @@ from normandy.recipes.tests import (
     SignatureFactory,
     fake_sign,
 )
+from normandy.recipes.filters import StableSampleFilter
 
 
 @pytest.fixture
@@ -124,7 +125,7 @@ class TestValidateArgumentPreferenceExperiments(object):
             approval_request.approve(UserFactory(), "r+")
             rev.enable(UserFactory())
 
-        def test_preference_exeriments_unique_branch_slugs(self):
+        def test_preference_experiments_unique_branch_slugs(self):
             action = ActionFactory(name="preference-experiment")
             arguments = {
                 "slug": "test",
@@ -139,7 +140,7 @@ class TestValidateArgumentPreferenceExperiments(object):
             error = action.errors["duplicate_branch_slug"]
             assert exc_info.value.detail == {"arguments": {"branches": {2: {"slug": error}}}}
 
-        def test_preference_exeriments_unique_branch_values(self):
+        def test_preference_experiments_unique_branch_values(self):
             action = ActionFactory(name="preference-experiment")
             arguments = {
                 "slug": "test",
@@ -810,6 +811,28 @@ class TestRecipeRevision(object):
         with pytest.raises(ValidationError) as exc_info:
             rollout_recipe.approved_revision.enable(user=UserFactory())
         assert exc_info.value.message == "Rollback recipe 'Rollback' is currently enabled"
+
+    @pytest.mark.django_db
+    class TestCapabilitiesTests:
+        def test_v1_marker_is_automatically_included(self):
+            recipe = RecipeFactory()
+            assert "capabilities-v1" in recipe.capabilities
+
+        def test_uses_extra_capabilities(self):
+            recipe = RecipeFactory(extra_capabilities=["test.foo", "test.bar"])
+            assert "test.foo" in recipe.capabilities
+            assert "test.bar" in recipe.capabilities
+
+        def test_action_name_is_automatically_included(self):
+            action = ActionFactory()
+            recipe = RecipeFactory(action=action)
+            assert set(action.capabilities) <= set(recipe.capabilities)
+
+        def test_filter_object_capabilities_are_automatically_included(self):
+            filter_object = StableSampleFilter.create(input=["A"], rate=0.1)
+            recipe = RecipeFactory(filter_object=[filter_object])
+            assert filter_object.capabilities
+            assert filter_object.capabilities <= recipe.capabilities
 
 
 @pytest.mark.django_db

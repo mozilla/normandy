@@ -117,6 +117,11 @@ class RecipeFactory(factory.DjangoModelFactory):
             for locale in extracted:
                 self.locales.add(locale)
 
+    @factory.post_generation
+    def filter_object(self, create, extracted, **kwargs):
+        if extracted:
+            self.latest_revision.filter_object = extracted
+
     # This should always be before `enabler`
     @factory.post_generation
     def approver(self, create, extracted, **kwargs):
@@ -170,6 +175,7 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
     identicon_seed = FuzzyIdenticonSeed()
     comment = FuzzyUnicode()
     extra_filter_expression = factory.fuzzy.FuzzyChoice(["true", "false"])
+    extra_capabilities = []
 
     @factory.lazy_attribute
     def filter_object_json(self):
