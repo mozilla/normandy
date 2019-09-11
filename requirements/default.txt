@@ -30,6 +30,8 @@ boto3==1.9.224 \
     --hash=sha256:d695bb99dec048800fcba9657182d2db3a4cae5e6c3625a5b3a5cd785fb2d6d6
 contextlib2==0.5.5 \
     --hash=sha256:f5260a6e679d2ff42ec91ec5252f4eeffdcf21053db9113bd0a8e4d953769c00
+docpot==0.6.2 \
+    --hash=sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
