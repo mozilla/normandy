@@ -23,9 +23,9 @@ Babel==2.7.0 \
 backcall==0.1.0 \
     --hash=sha256:38ecd85be2c1e78f77fd91700c76e14667dc21e2713b63876c0eb901196e01e4 \
     --hash=sha256:bbbf4b1e5cd2bdb08f915895b51081c041bac22394fdfcfdfbe9f14b77c08bf2
-botocore==1.12.220 \
-    --hash=sha256:748fe4ee5cc8b10ef09e52c740b488402d6f6d4d1f0dde0c936da232b42b1bdd \
-    --hash=sha256:9ffd9264e4ad999d2929cfe1c7e413d4cdf76a8bd92f011dce31874f056d2e18
+botocore==1.12.224 \
+    --hash=sha256:197f118419b81c8e15db03b92220f9fa864de2f062d962dbbe1a30d42d080d50 \
+    --hash=sha256:e2009cc78a99d284aa40d8bdc6954a47f2afeeecd33492ba8ef9337b97d0044c
 cachetools==3.1.1 \
     --hash=sha256:428266a1c0d36dc5aca63a2d7c5942e88c2c898d72139fca0e97fdd2380517ae \
     --hash=sha256:8ea2d3ce97850f31e4a08b0e2b5e6c34997d7216a9d2c98e0f3978630d4da69a
@@ -126,9 +126,9 @@ google-auth==1.6.3 \
 google-cloud-core==1.0.3 \
     --hash=sha256:0ee17abc74ff02176bee221d4896a00a3c202f3fb07125a7d814ccabd20d7eb5 \
     --hash=sha256:10750207c1a9ad6f6e082d91dbff3920443bdaf1c344a782730489a9efa802f1
-google-resumable-media==0.3.3 \
-    --hash=sha256:49493999cf046b5a02f648e201f0c2fc718c5969c53326b4d2c0693b01bdc8bb \
-    --hash=sha256:ceff1b34d5bfff9d671b0ed598a0eeac175d9f6e1bc37709955ace424f63e156
+google-resumable-media==0.4.0 \
+    --hash=sha256:46ee131e55d16e350cf9dc7de6fc0653b55314e8645e2deb0633394adcd7e9c0 \
+    --hash=sha256:d14dff24e0c6cab676f9eff0049c42b8cdae78dff723be095ef3af2c4ba06dfa
 googleapis-common-protos==1.6.0 \
     --hash=sha256:e61b8ed5e36b976b487c6e7b15f31bb10c7a0ca7bd5c0e837f4afab64b53a0c6
 graphene==2.1.8 \
@@ -382,8 +382,8 @@ six==1.12.0 \
 smmap2==2.0.5 \
     --hash=sha256:0555a7bf4df71d1ef4218e4807bbf9b201f910174e6e08af2e138d4e517b4dde \
     --hash=sha256:29a9ffa0497e7f2be94ca0ed1ca1aa3cd4cf25a1f6b4f5f87f74b46ed91d609a
-snowballstemmer==1.9.0 \
-    --hash=sha256:9f3b9ffe0809d174f7047e121431acf99c89a7040f0ca84f94ba53a498e6d0c9
+snowballstemmer==1.9.1 \
+    --hash=sha256:713e53b79cbcf97bc5245a06080a33d54a77e7cce2f789c835a143bcdb5c033e
 sphinxcontrib-applehelp==1.0.1 \
     --hash=sha256:fb8dee85af95e5c30c91f10e7eb3c8967308518e0f7488a2828ef7bc191d0d5d \
     --hash=sha256:edaa0ab2b2bc74403149cb0209d6775c96de797dfd5b5e2a71981309efab3897
