@@ -126,9 +126,8 @@ gunicorn==19.9.0 \
 html5lib==1.0.1 \
     --hash=sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3 \
     --hash=sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736
-jsonschema==3.0.1 \
-    --hash=sha256:0c0a81564f181de3212efa2d17de1910f8732fa1b71c42266d983cd74304e20d \
-    --hash=sha256:a5f6559964a3851f59040d3b961de5e68e70971afb88ba519d27e6a039efff1a
+jsonschema==2.6.0 \
+    --hash=sha256:000e68abd33c972a5248544925a0cae7d1125f9bf6c58280d37546b946769a08
 kinto-http==10.4.1 \
     --hash=sha256:39935e0f224d6781c6b910358857247525db17e40d5cd79c261239c3c3dd933f \
     --hash=sha256:e91251c5d4bf35d05eb3bd10f4a27a846f68faa92be75ed3fe5bb858e7338535
@@ -209,6 +208,7 @@ sort-requirements==1.3.0 \
 statsd==3.3.0 \
     --hash=sha256:c610fb80347fca0ef62666d241bce64184bd7cc1efe582f9690e045c25535eaa \
     --hash=sha256:e3e6db4c246f7c59003e51c9720a51a7f39a396541cb9b147ff4b14d15b5dd1f
+tavern==0.26.4
 untangle==1.1.1 \
     --hash=sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb
 whitenoise==4.1.2 \

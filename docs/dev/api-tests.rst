@@ -1,7 +1,11 @@
 API Contract Tests
 ==================
+
 These tests are designed to look for changes to the recipe server API that are
 not expected.
+
+Requirements
+------------
 
 Before running these tests you will need the following installed:
 
@@ -21,6 +25,9 @@ the following:
 
 This creates the virtual environment, activates it, and installs the Python
 dependencies needed to run the tests.
+
+V1 API Tests
+------------
 
 To run these tests, use the following command from the root project directory.
 
@@ -73,3 +80,21 @@ underlying code throws an exception unless we tell it not to check.
 
 `--testrail=` tells pytest that we wish to report the results of TestRail
 decorated tests and where we can find the configuration file.
+
+V3 API Tests
+------------
+
+To run tests that verify that V3 API calls are behaving as expected, use the
+following command:
+
+.. code-block:: bash
+
+    test_v3_api --env staging
+
+to test against what is on staging or
+
+.. code-block:: bash
+
+    test_v3_api --env production
+
+to test against what is in production.
