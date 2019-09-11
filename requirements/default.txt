@@ -30,8 +30,6 @@ boto3==1.9.224 \
     --hash=sha256:d695bb99dec048800fcba9657182d2db3a4cae5e6c3625a5b3a5cd785fb2d6d6
 contextlib2==0.5.5 \
     --hash=sha256:f5260a6e679d2ff42ec91ec5252f4eeffdcf21053db9113bd0a8e4d953769c00
-docopt==0.6.2 \
-    --hash=sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491
 dj-database-url==0.5.0 \
     --hash=sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163 \
     --hash=sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9
@@ -72,7 +70,8 @@ djangorestframework==3.9.4 \
 dockerflow==2019.5.0 \
     --hash=sha256:1beb894ccdb28e022f61086b1117ae0e38790f18abfe90c782f249af1aa2442a \
     --hash=sha256:8c4ffdad72732b16409b6a5599ef338c845e28aac902d09008bb8fae17a157a3
-
+docopt==0.6.2 \
+    --hash=sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491
 drf-yasg==1.15.0 \
     --hash=sha256:2c03c569cd1f1711e30efe3a1a56998cf61aa224cb2991e9fdac22aa47fd41e5 \
     --hash=sha256:dfb96eb36b259c2e0da67515319a25e49f6bdd3a275412f34221cc5236d2b62a
