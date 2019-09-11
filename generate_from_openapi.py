@@ -16,15 +16,10 @@ def generate_tavern_yaml(json_path):
 def output_yaml(links, prefix=""):
     test_dict = {}
     for test_name in links.keys():
-        default_name = get_name(
-            prefix, test_name, links[test_name].action, links[test_name].url
-        )
+        default_name = get_name(prefix, test_name, links[test_name].action, links[test_name].url)
         test_dict["test_name"] = default_name
 
-        request = {
-            "url": links[test_name].url,
-            "method": str.upper(links[test_name].action),
-        }
+        request = {"url": links[test_name].url, "method": str.upper(links[test_name].action)}
 
         if links[test_name].encoding:
             request["headers"] = {"content-type": links[test_name].encoding}
