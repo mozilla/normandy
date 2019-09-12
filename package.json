@@ -17,7 +17,7 @@
   "license": "MPL-2.0",
   "dependencies": {
     "@mozilla/normandy-action-argument-schemas": "0.8.2",
-    "uuid": "3.3.2"
+    "uuid": "3.3.3"
   },
   "devDependencies": {
     "@babel/core": "7.6.0",
@@ -43,7 +43,7 @@
     "jasmine-core": "3.4.0",
     "jasmine-promises": "0.4.1",
     "karma": "4.2.0",
-    "karma-firefox-launcher": "1.1.0",
+    "karma-firefox-launcher": "1.2.0",
     "karma-jasmine": "2.0.1",
     "karma-junit-reporter": "1.2.0",
     "karma-sourcemap-loader": "0.3.7",
