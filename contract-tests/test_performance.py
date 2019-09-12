@@ -2,7 +2,6 @@ from urllib.parse import urljoin
 
 import html5lib
 import pytest
-from pytest_testrail.plugin import testrail
 
 
 """These are paths hit by self repair that need to be very fast"""
@@ -25,13 +24,11 @@ class TestHotPaths(object):
     site, such as cache headers.
     """
 
-    @testrail("C9490")
     def test_no_redirects(self, conf, requests_session, path):
         r = requests_session.get(conf.getoption("server") + path)
         r.raise_for_status()
         assert 200 <= r.status_code < 300
 
-    @testrail("C9491")
     def test_no_vary_cookie(self, conf, requests_session, path, only_readonly):
         r = requests_session.get(conf.getoption("server") + path)
         r.raise_for_status()

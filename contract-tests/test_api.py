@@ -5,7 +5,6 @@ import pytest
 from datetime import datetime
 
 from normandy.recipes import signing
-from pytest_testrail.plugin import testrail
 
 
 def canonical_json(data):
@@ -31,7 +30,6 @@ def check_action_schema_format(action):
         "are actually added to mozilla-central. "
     )
 )
-@testrail("C7108")
 def test_expected_action_types(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/action/")
     r.raise_for_status()
@@ -47,7 +45,6 @@ def test_expected_action_types(conf, requests_session):
         assert record["name"] in expected_records
 
 
-@testrail("C7109")
 def test_console_log(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/action/")
     r.raise_for_status()
@@ -72,7 +69,6 @@ def test_console_log(conf, requests_session):
     check_action_schema_format(record)
 
 
-@testrail("C7110")
 def test_show_heartbeat(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/action/")
     r.raise_for_status()
@@ -96,7 +92,6 @@ def test_show_heartbeat(conf, requests_session):
     check_action_schema_format(record)
 
 
-@testrail("C7113")
 def test_recipe_signatures(conf, requests_session):
     r = requests_session.get(conf.getoption("server") + "/api/v1/recipe/signed/")
     r.raise_for_status()
