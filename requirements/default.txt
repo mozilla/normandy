@@ -126,9 +126,9 @@ html5lib==1.0.1 \
 jsonschema==3.0.2 \
     --hash=sha256:5f9c0a719ca2ce14c5de2fd350a64fd2d13e8539db29836a86adc990bb1a068f \
     --hash=sha256:8d4a2b7b6c2237e0199c8ea1a6d3e05bf118e289ae2b9d7ba444182a2959560d
-kinto-http==10.4.1 \
-    --hash=sha256:39935e0f224d6781c6b910358857247525db17e40d5cd79c261239c3c3dd933f \
-    --hash=sha256:e91251c5d4bf35d05eb3bd10f4a27a846f68faa92be75ed3fe5bb858e7338535
+kinto-http==10.5.0 \
+    --hash=sha256:a516ef084cafdd7779a7ddd0eec0c98bde466a58c6e6a6ee1792eddd1b6c3481 \
+    --hash=sha256:c025b95f99432bb403a4ca842cb0b68ba5b4f95b54e21f16fc1b3af2c702dd53
 markus[datadog]==1.2.0 \
     --hash=sha256:86bbeb16de1b1920d291c81a39b7a7c61c94b665cd8d10c6b69c994ce4fd5bcc \
     --hash=sha256:9bce7bd152578703a8e4aa5a765c7c0d94bcdd69f7bc5e42d29b893e3abf2e5a
