@@ -210,4 +210,4 @@ tavern==0.30.3 \
 untangle==1.1.1 \
     --hash=sha256:e7cfa1ad57707e6b74cfea8b9fc50f7cbe9bbaf18401cc9d72192002bcd80bcb
 whitenoise==4.1.3 \
-    --hash=sha256:c9b7c47fdc1dba4d37bf2787a01a844dc7a52e174fcd22a2d429e0be65e1782
+    --hash=sha256:c9b7c47fdc1dba4d37bf2787a01a844dc7a521e174fcd22a2d429e0be65e1782
