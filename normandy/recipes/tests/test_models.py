@@ -406,6 +406,7 @@ class TestRecipe(object):
             "{"
             '"action":"action",'
             '"arguments":{"bar":2,"foo":1},'
+            '"capabilities":["action.action","capabilities-v1"],'
             '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
             '"name":"canonical",'
@@ -698,124 +699,129 @@ class TestRecipeRevision(object):
         with pytest.raises(EnabledState.NotActionable):
             recipe.latest_revision.disable(user=UserFactory())
 
-    def test_it_publishes_when_enabled(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test")
+    @pytest.mark.django_db
+    class TestRemoteSettings:
+        def test_it_publishes_when_enabled(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test")
 
-        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
-        approval_request.approve(approver=UserFactory(), comment="r+")
-        recipe.approved_revision.enable(user=UserFactory())
-
-        mocked_remotesettings.return_value.publish.assert_called_with(recipe)
-
-        # Publishes once when enabled twice.
-        with pytest.raises(EnabledState.NotActionable):
+            approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+            approval_request.approve(approver=UserFactory(), comment="r+")
             recipe.approved_revision.enable(user=UserFactory())
 
-        assert mocked_remotesettings.return_value.publish.call_count == 1
+            mocked_remotesettings.return_value.publish.assert_called_with(recipe)
 
-    def test_it_publishes_new_revisions_if_enabled(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
-        assert mocked_remotesettings.return_value.publish.call_count == 1
+            # Publishes once when enabled twice.
+            with pytest.raises(EnabledState.NotActionable):
+                recipe.approved_revision.enable(user=UserFactory())
 
-        recipe.revise(name="Modified")
-        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
-        approval_request.approve(approver=UserFactory(), comment="r+")
+            assert mocked_remotesettings.return_value.publish.call_count == 1
 
-        assert mocked_remotesettings.return_value.publish.call_count == 2
-        second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
-        modified_recipe, = second_call_args
-        assert modified_recipe.name == "Modified"
+        def test_it_publishes_new_revisions_if_enabled(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+            assert mocked_remotesettings.return_value.publish.call_count == 1
 
-    def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test")
+            recipe.revise(name="Modified")
+            approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+            approval_request.approve(approver=UserFactory(), comment="r+")
 
-        approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
-        approval_request.approve(approver=UserFactory(), comment="r+")
+            assert mocked_remotesettings.return_value.publish.call_count == 2
+            second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
+            modified_recipe, = second_call_args
+            assert modified_recipe.name == "Modified"
 
-        assert not mocked_remotesettings.return_value.publish.called
+        def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test")
 
-    def test_it_unpublishes_when_disabled(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+            approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
+            approval_request.approve(approver=UserFactory(), comment="r+")
 
-        recipe.approved_revision.disable(user=UserFactory())
+            assert not mocked_remotesettings.return_value.publish.called
 
-        mocked_remotesettings.return_value.unpublish.assert_called_with(recipe)
+        def test_it_unpublishes_when_disabled(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
 
-        # Unpublishes once when disabled twice.
-        with pytest.raises(EnabledState.NotActionable):
             recipe.approved_revision.disable(user=UserFactory())
 
-        assert mocked_remotesettings.return_value.publish.call_count == 1
+            mocked_remotesettings.return_value.unpublish.assert_called_with(recipe)
 
-    def test_it_publishes_several_times_when_reenabled(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+            # Unpublishes once when disabled twice.
+            with pytest.raises(EnabledState.NotActionable):
+                recipe.approved_revision.disable(user=UserFactory())
 
-        recipe.approved_revision.disable(user=UserFactory())
-        recipe.approved_revision.enable(user=UserFactory())
+            assert mocked_remotesettings.return_value.publish.call_count == 1
 
-        assert mocked_remotesettings.return_value.unpublish.call_count == 1
-        assert mocked_remotesettings.return_value.publish.call_count == 2
+        def test_it_publishes_several_times_when_reenabled(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
 
-    def test_it_rollbacks_changes_if_error_happens_on_publish(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test", approver=UserFactory())
-        error = remote_settings_exceptions.KintoException
-        mocked_remotesettings.return_value.publish.side_effect = error
-
-        with pytest.raises(error):
+            recipe.approved_revision.disable(user=UserFactory())
             recipe.approved_revision.enable(user=UserFactory())
 
-        saved = Recipe.objects.get(id=recipe.id)
-        assert not saved.approved_revision.enabled
+            assert mocked_remotesettings.return_value.unpublish.call_count == 1
+            assert mocked_remotesettings.return_value.publish.call_count == 2
 
-    def test_it_rollbacks_changes_if_error_happens_on_unpublish(self, mocked_remotesettings):
-        recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
-        error = remote_settings_exceptions.KintoException
-        mocked_remotesettings.return_value.unpublish.side_effect = error
+        def test_it_rollbacks_changes_if_error_happens_on_publish(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test", approver=UserFactory())
+            error = remote_settings_exceptions.KintoException
+            mocked_remotesettings.return_value.publish.side_effect = error
 
-        with pytest.raises(error):
-            recipe.approved_revision.disable(user=UserFactory())
+            with pytest.raises(error):
+                recipe.approved_revision.enable(user=UserFactory())
 
-        saved = Recipe.objects.get(id=recipe.id)
-        assert saved.approved_revision.enabled
+            saved = Recipe.objects.get(id=recipe.id)
+            assert not saved.approved_revision.enabled
 
-    def test_enable_rollback_enable_rollout_invariance(self):
-        rollout_recipe = RecipeFactory(
-            name="Rollout",
-            approver=UserFactory(),
-            enabler=UserFactory(),
-            action=ActionFactory(name="preference-rollout"),
-            arguments={"slug": "myslug"},
-        )
-        assert rollout_recipe.enabled
+        def test_it_rollbacks_changes_if_error_happens_on_unpublish(self, mocked_remotesettings):
+            recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
+            error = remote_settings_exceptions.KintoException
+            mocked_remotesettings.return_value.unpublish.side_effect = error
 
-        rollback_recipe = RecipeFactory(
-            name="Rollback",
-            action=ActionFactory(name="preference-rollback"),
-            arguments={"rolloutSlug": "myslug"},
-        )
-        approval_request = rollback_recipe.latest_revision.request_approval(creator=UserFactory())
-        approval_request.approve(approver=UserFactory(), comment="r+")
+            with pytest.raises(error):
+                recipe.approved_revision.disable(user=UserFactory())
 
-        with pytest.raises(ValidationError) as exc_info:
+            saved = Recipe.objects.get(id=recipe.id)
+            assert saved.approved_revision.enabled
+
+        def test_enable_rollback_enable_rollout_invariance(self):
+            rollout_recipe = RecipeFactory(
+                name="Rollout",
+                approver=UserFactory(),
+                enabler=UserFactory(),
+                action=ActionFactory(name="preference-rollout"),
+                arguments={"slug": "myslug"},
+            )
+            assert rollout_recipe.enabled
+
+            rollback_recipe = RecipeFactory(
+                name="Rollback",
+                action=ActionFactory(name="preference-rollback"),
+                arguments={"rolloutSlug": "myslug"},
+            )
+            approval_request = rollback_recipe.latest_revision.request_approval(
+                creator=UserFactory()
+            )
+            approval_request.approve(approver=UserFactory(), comment="r+")
+
+            with pytest.raises(ValidationError) as exc_info:
+                rollback_recipe.approved_revision.enable(user=UserFactory())
+            assert exc_info.value.message == "Rollout recipe 'Rollout' is currently enabled"
+
+            rollout_recipe.approved_revision.disable(user=UserFactory())
+            assert not rollout_recipe.enabled
+            # Now it should be possible to enable the rollback recipe.
             rollback_recipe.approved_revision.enable(user=UserFactory())
-        assert exc_info.value.message == "Rollout recipe 'Rollout' is currently enabled"
+            assert rollback_recipe.enabled
 
-        rollout_recipe.approved_revision.disable(user=UserFactory())
-        assert not rollout_recipe.enabled
-        # Now it should be possible to enable the rollback recipe.
-        rollback_recipe.approved_revision.enable(user=UserFactory())
-        assert rollback_recipe.enabled
-
-        # Can't make up your mind. Now try to enable the rollout recipe again even though
-        # the rollback recipe is enabled.
-        with pytest.raises(ValidationError) as exc_info:
-            rollout_recipe.approved_revision.enable(user=UserFactory())
-        assert exc_info.value.message == "Rollback recipe 'Rollback' is currently enabled"
+            # Can't make up your mind. Now try to enable the rollout recipe again even though
+            # the rollback recipe is enabled.
+            with pytest.raises(ValidationError) as exc_info:
+                rollout_recipe.approved_revision.enable(user=UserFactory())
+            assert exc_info.value.message == "Rollback recipe 'Rollback' is currently enabled"
 
     @pytest.mark.django_db
-    class TestCapabilitiesTests:
-        def test_v1_marker_is_automatically_included(self):
-            recipe = RecipeFactory()
+    class TestCapabilities:
+        def test_v1_marker_included_if_non_baseline_capabilities_are_present(self, settings):
+            recipe = RecipeFactory(extra_capabilities=["non-baseline"])
+            assert "non-baseline" not in settings.BASELINE_CAPABILITIES
             assert "capabilities-v1" in recipe.capabilities
 
         def test_uses_extra_capabilities(self):

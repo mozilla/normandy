@@ -190,6 +190,9 @@ class Recipe(DirtyFieldsMixin, models.Model):
         """A list of capabilities manually specified for this recipe."""
         return self.current_revision.extra_capabilities
 
+    def uses_only_baseline_capabilities(self):
+        return self.capabilities <= settings.BASELINE_CAPABILITIES
+
     @property
     def approval_request(self):
         try:
@@ -445,6 +448,13 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         )
         for filter in self.filter_object:
             capabilities.update(filter.capabilities)
+
+        # "capabilities-v1" is not a baseline capability. If all of the other
+        # capabilities are baseline capabilities, don't add it to the recipe.
+        # Otherwise, do.
+        if capabilities - settings.BASELINE_CAPABILITIES:
+            capabilities.add("capabilities-v1")
+
         return capabilities
 
     def save(self, *args, **kwargs):
@@ -498,7 +508,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
     def _validate_preference_rollout_rollback_enabled_invariance(self):
         """Raise ValidationError if you're trying to enable a preference-rollback
-        whose preference-rollout is still enabled. Same if you'ree trying to enable a
+        whose preference-rollout is still enabled. Same if you're trying to enable a
         preference-rollout whose preference-rollback is still enabled.
 
         If not applicable or not a problem, do nothing.

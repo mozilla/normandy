@@ -3,12 +3,12 @@ import logging
 import kinto_http
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-
-
-logger = logging.getLogger(__name__)
+from normandy.base.utils import ScopedSettings
 
 
 APPROVE_CHANGES_FLAG = {"status": "to-sign"}
+logger = logging.getLogger(__name__)
+rs_settings = ScopedSettings("REMOTE_SETTINGS_")
 
 
 def recipe_as_record(recipe):
@@ -49,12 +49,19 @@ class RemoteSettings:
     """
     Interacts with a RemoteSettings service.
 
-    Basically, a recipe becomes a record in the dedicated collection on Remote Settings.
-    When it is disabled, the associated record is deleted.
+    Recipes get published as records in one or both of the dedicated
+    collections on Remote Settings. When disabled, those records are removed.
 
     Since Normandy already has the required approval/signoff features, the integration
     bypasses the one of Remote Settings (leveraging a specific server configuration for this
     particular collection).
+
+    There are two collections used. One is the "baseline" collection, which
+    is used only for recipes that fit within the baseline capabilities, and
+    are therefore compatible with a broad range of clients. The second is the
+    "capabilities" collection, in which all recipes are published. Clients
+    that read from the capabilities collection are expected to process
+    capabilities and only execute compatible recipes.
 
     .. notes::
 
@@ -73,23 +80,16 @@ class RemoteSettings:
 
     """
 
-    MAIN_BUCKET_ID = "main"
-    """The name of the publicly readable bucket of Remote Settings where the approved
-    records are published.
-    """
-
     def __init__(self):
         # Kinto is the underlying implementation of Remote Settings. The client
         # is basically a tiny abstraction on top of the requests library.
         self.client = (
             kinto_http.Client(
-                server_url=settings.REMOTE_SETTINGS_URL,
-                auth=(settings.REMOTE_SETTINGS_USERNAME, settings.REMOTE_SETTINGS_PASSWORD),
-                bucket=settings.REMOTE_SETTINGS_BUCKET_ID,
-                collection=settings.REMOTE_SETTINGS_COLLECTION_ID,
-                retry=settings.REMOTE_SETTINGS_RETRY_REQUESTS,
+                server_url=rs_settings.URL,
+                auth=(rs_settings.USERNAME, rs_settings.PASSWORD),
+                retry=rs_settings.RETRY_REQUESTS,
             )
-            if settings.REMOTE_SETTINGS_URL
+            if rs_settings.URL
             else None
         )
 
@@ -100,7 +100,14 @@ class RemoteSettings:
         if self.client is None:
             return  # no check if disabled.
 
-        required_keys = ["COLLECTION_ID", "USERNAME", "PASSWORD"]
+        required_keys = [
+            "BASELINE_COLLECTION_ID",
+            "CAPABILITIES_COLLECTION_ID",
+            "WORKSPACE_BUCKET_ID",
+            "PUBLISH_BUCKET_ID",
+            "USERNAME",
+            "PASSWORD",
+        ]
         for key in required_keys:
             if not getattr(settings, f"REMOTE_SETTINGS_{key}"):
                 msg = f"set settings.REMOTE_SETTINGS_{key} to use Remote Settings integration"
@@ -109,44 +116,52 @@ class RemoteSettings:
         # Test authentication.
         server_info = self.client.server_info()
         is_authenticated = (
-            "user" in server_info
-            and settings.REMOTE_SETTINGS_USERNAME in server_info["user"]["id"]
+            "user" in server_info and rs_settings.USERNAME in server_info["user"]["id"]
         )
         if not is_authenticated:
             raise ImproperlyConfigured("Invalid Remote Settings credentials")
 
         # Test that collection is writable.
-        metadata = self.client.get_collection()
-        if server_info["user"]["id"] not in metadata["permissions"].get("write", []):
-            raise ImproperlyConfigured(
-                f"Remote Settings collection {settings.REMOTE_SETTINGS_COLLECTION_ID} "
-                "is not writable."
-            )
+        bucket_collection_pairs = [
+            (rs_settings.WORKSPACE_BUCKET_ID, rs_settings.BASELINE_COLLECTION_ID),
+            (rs_settings.WORKSPACE_BUCKET_ID, rs_settings.CAPABILITIES_COLLECTION_ID),
+            (rs_settings.PUBLISH_BUCKET_ID, rs_settings.BASELINE_COLLECTION_ID),
+            (rs_settings.PUBLISH_BUCKET_ID, rs_settings.CAPABILITIES_COLLECTION_ID),
+        ]
+        for bucket, collection in bucket_collection_pairs:
+            metadata = self.client.get_collection(id=collection, bucket=bucket)
+            if server_info["user"]["id"] not in metadata["permissions"].get("write", []):
+                raise ImproperlyConfigured(
+                    f"Remote Settings collection {collection} is not writable."
+                )
 
         # Test that collection has the proper review settings.
         capabilities = server_info["capabilities"]
         if "signer" in capabilities:
-            signer_config = capabilities["signer"]
-            normandy_resource = [
-                r
-                for r in signer_config["resources"]
-                if r["source"]["bucket"] == settings.REMOTE_SETTINGS_BUCKET_ID
-                and r["source"]["collection"] == settings.REMOTE_SETTINGS_COLLECTION_ID
-            ]
-            review_disabled = (
-                len(normandy_resource) == 1
-                and not normandy_resource[0].get(
-                    "to_review_enabled", signer_config["to_review_enabled"]
+            for collection in [
+                rs_settings.BASELINE_COLLECTION_ID,
+                rs_settings.CAPABILITIES_COLLECTION_ID,
+            ]:
+                signer_config = capabilities["signer"]
+                normandy_resource = [
+                    r
+                    for r in signer_config["resources"]
+                    if r["source"]["bucket"] == rs_settings.WORKSPACE_BUCKET_ID
+                    and r["source"]["collection"] == collection
+                ]
+                review_disabled = (
+                    len(normandy_resource) == 1
+                    and not normandy_resource[0].get(
+                        "to_review_enabled", signer_config["to_review_enabled"]
+                    )
+                    and not normandy_resource[0].get(
+                        "group_check_enabled", signer_config["group_check_enabled"]
+                    )
                 )
-                and not normandy_resource[0].get(
-                    "group_check_enabled", signer_config["group_check_enabled"]
-                )
-            )
-            if not review_disabled:
-                raise ImproperlyConfigured(
-                    "Review was not disabled on Remote Settings collection "
-                    f"{settings.REMOTE_SETTINGS_COLLECTION_ID}."
-                )
+                if not review_disabled:
+                    raise ImproperlyConfigured(
+                        f"Review was not disabled on Remote Settings collection {collection}."
+                    )
 
     def published_recipes(self):
         """
@@ -155,7 +170,37 @@ class RemoteSettings:
         if self.client is None:
             raise ImproperlyConfigured("Remote Settings is not enabled.")
 
-        return self.client.get_records(bucket=self.MAIN_BUCKET_ID)
+        capabilities_records = self.client.get_records(
+            bucket=rs_settings.PUBLISH_BUCKET_ID, collection=rs_settings.CAPABILITIES_COLLECTION_ID
+        )
+        baseline_records = self.client.get_records(
+            bucket=rs_settings.PUBLISH_BUCKET_ID, collection=rs_settings.BASELINE_COLLECTION_ID
+        )
+
+        capabilities_ids = set(r["id"] for r in capabilities_records)
+        baseline_ids = set(r["id"] for r in baseline_records)
+
+        # All baseline records *should* be present in the capabilities
+        # collection too. If not, that's concerning.
+        only_baseline_ids = baseline_ids - capabilities_ids
+        if only_baseline_ids:
+            logging.warn(
+                f"{len(only_baseline_ids)} records were found in the baseline collection "
+                f"that were not in the capabilities."
+            )
+            # Merge the list of records by id.
+            records_by_id = {}
+            for record in capabilities_records + baseline_records:
+                if record["id"] not in records_by_id:
+                    records_by_id[record["id"]] = record
+
+            records = records_by_id.values()
+        else:
+            # All records in baseline_records are also in capabilities_records,
+            # so just use the ones from capabilities
+            records = capabilities_records
+
+        return records
 
     def publish(self, recipe, approve_changes=True):
         """
@@ -164,12 +209,25 @@ class RemoteSettings:
         if self.client is None:
             return  # no-op if disabled.
 
+        baseline = False
+
         # 1. Put the record.
         record = recipe_as_record(recipe)
-        self.client.update_record(data=record)
+        self.client.update_record(
+            data=record,
+            bucket=rs_settings.WORKSPACE_BUCKET_ID,
+            collection=rs_settings.CAPABILITIES_COLLECTION_ID,
+        )
+        if recipe.uses_only_baseline_capabilities():
+            baseline = True
+            self.client.update_record(
+                data=record,
+                bucket=rs_settings.WORKSPACE_BUCKET_ID,
+                collection=rs_settings.BASELINE_COLLECTION_ID,
+            )
         # 2. Approve the changes immediately (multi-signoff is disabled).
         if approve_changes:
-            self.approve_changes()
+            self.approve_changes(baseline)
 
         logger.info(f"Published record '{recipe.id}' for recipe {recipe.name!r}")
 
@@ -180,22 +238,48 @@ class RemoteSettings:
         if self.client is None:
             return  # no-op if disabled.
 
-        # 1. Delete the record.
-        try:
-            self.client.delete_record(id=str(recipe.id))
+        # 1. Delete the record from both baseline and capabilities collections
+        either_existed = False
+        baseline = False
 
+        try:
+            self.client.delete_record(
+                id=str(recipe.id),
+                bucket=rs_settings.WORKSPACE_BUCKET_ID,
+                collection=rs_settings.CAPABILITIES_COLLECTION_ID,
+            )
+            either_existed = True
         except kinto_http.KintoException as e:
             if e.response.status_code == 404:
-                logger.warning(f"The recipe '{recipe.id}' was never published. Skip.")
-                return
-            raise
+                logger.warning(
+                    f"The recipe '{recipe.id}' was not published in the capabilities collection. Skip."
+                )
+            else:
+                raise
+
+        try:
+            self.client.delete_record(
+                id=str(recipe.id),
+                bucket=rs_settings.WORKSPACE_BUCKET_ID,
+                collection=rs_settings.BASELINE_COLLECTION_ID,
+            )
+            either_existed = True
+            baseline = True
+        except kinto_http.KintoException as e:
+            if e.response.status_code == 404:
+                logger.warning(
+                    f"The recipe '{recipe.id}' was not published in the baseline collection. Skip."
+                )
+            else:
+                raise
+
         # 2. Approve the changes immediately (multi-signoff is disabled).
-        if approve_changes:
-            self.approve_changes()
+        if either_existed and approve_changes:
+            self.approve_changes(baseline)
 
         logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name!r}")
 
-    def approve_changes(self):
+    def approve_changes(self, baseline=True):
         """
         Approve the changes made in the workspace collection.
 
@@ -207,25 +291,54 @@ class RemoteSettings:
             return  # no-op if disabled.
 
         try:
-            self.client.patch_collection(data=APPROVE_CHANGES_FLAG)
+            self.client.patch_collection(
+                id=rs_settings.CAPABILITIES_COLLECTION_ID,
+                data=APPROVE_CHANGES_FLAG,
+                bucket=rs_settings.WORKSPACE_BUCKET_ID,
+            )
+            if baseline:
+                self.client.patch_collection(
+                    id=rs_settings.BASELINE_COLLECTION_ID,
+                    data=APPROVE_CHANGES_FLAG,
+                    bucket=rs_settings.WORKSPACE_BUCKET_ID,
+                )
 
         except kinto_http.exceptions.KintoException:
             # Approval failed unexpectedly.
             # The changes in the `main-workspace` bucket must be reverted.
-            records_in_workspace = self.client.get_records()
-            records_in_prod = self.client.get_records(bucket=self.MAIN_BUCKET_ID)
-            in_prod_by_id = {r["id"]: r for r in records_in_prod}
-            # Compare records collection in prod vs. in workspace.
-            for record in records_in_workspace:
-                in_prod = in_prod_by_id.pop(record["id"], None)
-                if in_prod is None:
-                    # Record only exists in workspace, delete it.
-                    self.client.delete_record(id=record["id"])
-                elif not records_equal(record, in_prod):
-                    # Record was modified in workspace, restore it.
-                    self.client.update_record(data=in_prod)
-            # Remaining records only exist in prod, re-create them.
-            for in_prod in in_prod_by_id.values():
-                self.client.create_record(data=in_prod)
+            collections = [rs_settings.CAPABILITIES_COLLECTION_ID]
+            if baseline:
+                collections.append(rs_settings.BASELINE_COLLECTION_ID)
+
+            for collection in collections:
+                records_in_workspace = self.client.get_records(
+                    bucket=rs_settings.WORKSPACE_BUCKET_ID, collection=collection
+                )
+                records_in_prod = self.client.get_records(
+                    bucket=rs_settings.PUBLISH_BUCKET_ID, collection=collection
+                )
+                in_prod_by_id = {r["id"]: r for r in records_in_prod}
+                # Compare records collection in prod vs. in workspace.
+                for record in records_in_workspace:
+                    in_prod = in_prod_by_id.pop(record["id"], None)
+                    if in_prod is None:
+                        # Record only exists in workspace, delete it.
+                        self.client.delete_record(
+                            id=record["id"],
+                            bucket=rs_settings.WORKSPACE_BUCKET_ID,
+                            collection=collection,
+                        )
+                    elif not records_equal(record, in_prod):
+                        # Record was modified in workspace, restore it.
+                        self.client.update_record(
+                            data=in_prod,
+                            bucket=rs_settings.WORKSPACE_BUCKET_ID,
+                            collection=collection,
+                        )
+                # Remaining records only exist in prod, re-create them.
+                for in_prod in in_prod_by_id.values():
+                    self.client.create_record(
+                        data=in_prod, bucket=rs_settings.WORKSPACE_BUCKET_ID, collection=collection
+                    )
 
             raise
