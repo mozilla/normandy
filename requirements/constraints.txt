@@ -234,6 +234,8 @@ mohawk==1.0.0 \
 more-itertools==7.2.0 \
     --hash=sha256:409cd48d4db7052af495b09dec721011634af3753ae1ef92d2b32f73a745f832 \
     --hash=sha256:92b8c4b06dac4f0611c0729b2f2ede52b2e1bac1ab48f089c7ddc12e26bb60c4
+package==0.1.1 \
+    --hash=sha256:01eee19a56a936bd63222f0a3c531fcdba37b5ad1bd833b960d62fb960b4955e
 packaging==19.1 \
     --hash=sha256:a7ac867b97fdc07ee80a8058fe4435ccd274ecc3b0ed61d852d7d53055528cf9 \
     --hash=sha256:c491ca87294da7cc01902edbe30a5bc6c4c28172b5138ab4e4aa1b9d7bfaeafe
