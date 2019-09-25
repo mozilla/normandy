@@ -590,6 +590,7 @@ class ApprovalRequest(models.Model):
                     },
                 )
 
+    @transaction.atomic
     def approve(self, approver, comment):
         if self.approved is not None:
             raise self.NotActionable()
@@ -615,6 +616,7 @@ class ApprovalRequest(models.Model):
         if carryover_enabled:
             self.revision.enable(approver, carryover_from=carryover_enabled)
 
+    @transaction.atomic
     def reject(self, approver, comment):
         if self.approved is not None:
             raise self.NotActionable()
@@ -630,6 +632,7 @@ class ApprovalRequest(models.Model):
         recipe.update_signature()
         recipe.save()
 
+    @transaction.atomic
     def close(self):
         self.delete()
 
