@@ -154,7 +154,7 @@ class TestRemoteSettings:
             },
         )
 
-        # All collections should be writable
+        # Workspace collections should be writable
         bucket_collection_pairs = [
             (
                 rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID,
@@ -162,14 +162,6 @@ class TestRemoteSettings:
             ),
             (
                 rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID,
-                rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID,
-            ),
-            (
-                rs_settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID,
-                rs_settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID,
-            ),
-            (
-                rs_settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID,
                 rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID,
             ),
         ]
