@@ -125,14 +125,12 @@ class RemoteSettings:
         bucket_collection_pairs = [
             (rs_settings.WORKSPACE_BUCKET_ID, rs_settings.BASELINE_COLLECTION_ID),
             (rs_settings.WORKSPACE_BUCKET_ID, rs_settings.CAPABILITIES_COLLECTION_ID),
-            (rs_settings.PUBLISH_BUCKET_ID, rs_settings.BASELINE_COLLECTION_ID),
-            (rs_settings.PUBLISH_BUCKET_ID, rs_settings.CAPABILITIES_COLLECTION_ID),
         ]
         for bucket, collection in bucket_collection_pairs:
             metadata = self.client.get_collection(id=collection, bucket=bucket)
             if server_info["user"]["id"] not in metadata["permissions"].get("write", []):
                 raise ImproperlyConfigured(
-                    f"Remote Settings collection {collection} is not writable."
+                    f"Remote Settings collection {collection} is not writable in bucket {bucket}."
                 )
 
         # Test that collection has the proper review settings.
