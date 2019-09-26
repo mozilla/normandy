@@ -933,6 +933,29 @@ class TestApprovalRequest(object):
         assert recipe.enabled
         assert recipe.approved_revision.enabled_state.carryover_from == carryover_from
 
+    def test_error_during_approval_rolls_back_changes(self, mocker):
+        recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
+        old_approved_revision = recipe.approved_revision
+        recipe.revise(name="New name")
+        latest_revision = recipe.latest_revision
+        approval_request = recipe.latest_revision.request_approval(UserFactory())
+
+        # Simulate an error during signing
+        mocked_update_signature = mocker.patch.object(recipe, "update_signature")
+        mocked_update_signature.side_effect = Exception
+
+        with pytest.raises(Exception):
+            approval_request.approve(UserFactory(), "r+")
+
+        # Ensure the changes to the approval request and the recipe are rolled back and the recipe
+        # is still enabled
+        recipe.refresh_from_db()
+        approval_request.refresh_from_db()
+        assert approval_request.approved is None
+        assert recipe.approved_revision == old_approved_revision
+        assert recipe.latest_revision == latest_revision
+        assert recipe.enabled
+
 
 class TestClient(object):
     def test_geolocation(self, rf, settings):
