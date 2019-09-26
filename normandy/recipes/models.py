@@ -443,9 +443,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     @property
     def capabilities(self):
         """Calculates the set of capabilities required for this recipe."""
-        capabilities = (
-            {"capabilities-v1"} | set(self.extra_capabilities) | self.action.capabilities
-        )
+        capabilities = set(self.extra_capabilities) | self.action.capabilities
         for filter in self.filter_object:
             capabilities.update(filter.capabilities)
 

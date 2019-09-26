@@ -819,8 +819,15 @@ class TestRecipeRevision(object):
 
     @pytest.mark.django_db
     class TestCapabilities:
-        def test_v1_marker_included_if_non_baseline_capabilities_are_present(self, settings):
-            recipe = RecipeFactory(extra_capabilities=["non-baseline"])
+        def test_v1_marker_included_only_if_non_baseline_capabilities_are_present(self, settings):
+            action = ActionFactory()
+            settings.BASELINE_CAPABILITIES |= action.capabilities
+
+            recipe = RecipeFactory(extra_capabilities=[], action=action)
+            assert recipe.capabilities <= settings.BASELINE_CAPABILITIES
+            assert "capabilities-v1" not in recipe.capabilities
+
+            recipe = RecipeFactory(extra_capabilities=["non-baseline"], action=action)
             assert "non-baseline" not in settings.BASELINE_CAPABILITIES
             assert "capabilities-v1" in recipe.capabilities
 
