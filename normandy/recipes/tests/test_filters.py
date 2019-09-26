@@ -14,6 +14,8 @@ from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 class FilterTestsBase:
     """Common tests for all filter object types"""
 
+    should_be_baseline = True
+
     def create_basic_filter(self):
         """To be overwritten by subclasses to create test filters"""
         raise NotImplementedError
@@ -30,6 +32,14 @@ class FilterTestsBase:
         filter = self.create_basic_filter()
         # Would throw if not defined
         assert isinstance(filter.to_jexl(), str)
+
+    def test_uses_only_baseline_capabilities(self, settings):
+        filter = self.create_basic_filter()
+        capabilities = filter.capabilities
+        if self.should_be_baseline:
+            assert capabilities <= settings.BASELINE_CAPABILITIES
+        else:
+            assert capabilities > settings.BASELINE_CAPABILITIES
 
 
 class TestChannelFilter(FilterTestsBase):
