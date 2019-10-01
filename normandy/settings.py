@@ -405,21 +405,25 @@ class Base(Core, CORS, OIDC, Metrics):
     BASELINE_CAPABILITIES = values.SetValue(
         set(
             [
+                "action.addon-rollback",
+                "action.addon-rollout",
                 "action.addon-study",
+                "action.branched-addon-study",
                 "action.console-log",
+                "action.multi-preference-experiment",
+                "action.opt-out-study",
+                "action.preference-experiment",
                 "action.preference-rollback",
                 "action.preference-rollout",
                 "action.show-heartbeat",
                 "action.single-preference-experiment",
-                "action.opt-out-study",
-                "action.preference-experiment",
-                "jexl.transform.date",
-                "jexl.transform.stableSample",
                 "jexl.transform.bucketSample",
-                "jexl.transform.preferenceValue",
-                "jexl.transform.preferenceIsUserSet",
-                "jexl.transform.preferenceExists",
+                "jexl.transform.date",
                 "jexl.transform.keys",
+                "jexl.transform.preferenceExists",
+                "jexl.transform.preferenceIsUserSet",
+                "jexl.transform.preferenceValue",
+                "jexl.transform.stableSample",
             ]
         )
     )
