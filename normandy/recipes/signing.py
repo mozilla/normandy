@@ -95,7 +95,7 @@ BASE64_WRONG_LENGTH_RE = re.compile(
 )
 
 
-def verify_signature(data, signature, pubkey):
+def verify_signature_pubkey(data, signature, pubkey):
     """
     Verify a signature.
 

@@ -127,7 +127,7 @@ class TestAutographer(object):
         )
 
 
-class TestVerifySignature(object):
+class TestVerifySignaturePubkey(object):
 
     # known good data
     data = '{"action":"console-log","arguments":{"message":"telemetry available"},"enabled":true,"filter_expression":"telemetry != undefined","id":1,"last_updated":"2017-01-02T11:32:07.687408Z","name":"mython\'s system addon test","revision_id":"6dc874ded7d14af9ef9c147c5d2ceef9d15b56ca933681e574cd96a50b75946e"}'  # noqa
@@ -135,26 +135,26 @@ class TestVerifySignature(object):
     pubkey = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEVEKiCAIkwRg1VFsP8JOYdSF6a3qvgbRPoEK9eTuLbrB6QixozscKR4iWJ8ZOOX6RPCRgFdfVDoZqjFBFNJN9QtRBk0mVtHbnErx64d2vMF0oWencS1hyLW2whgOgOz7p"  # noqa
 
     def test_known_good_signature(self):
-        assert signing.verify_signature(self.data, self.signature, self.pubkey)
+        assert signing.verify_signature_pubkey(self.data, self.signature, self.pubkey)
 
     def test_raises_nice_error_for_too_short_signatures_bad_padding(self):
         signature = "a_too_short_signature"
 
         with pytest.raises(signing.WrongSignatureSize):
-            signing.verify_signature(self.data, signature, self.pubkey)
+            signing.verify_signature_pubkey(self.data, signature, self.pubkey)
 
     def test_raises_nice_error_for_too_short_signatures_good_base64(self):
         signature = "aa=="
 
         with pytest.raises(signing.WrongSignatureSize):
-            signing.verify_signature(self.data, signature, self.pubkey)
+            signing.verify_signature_pubkey(self.data, signature, self.pubkey)
 
     def test_raises_nice_error_for_wrong_signature(self):
         # change the signature, but keep it a valid signature
         signature = self.signature.replace("s", "S")
 
         with pytest.raises(signing.SignatureDoesNotMatch):
-            signing.verify_signature(self.data, signature, self.pubkey)
+            signing.verify_signature_pubkey(self.data, signature, self.pubkey)
 
 
 class TestExtractCertsFromPem(object):
