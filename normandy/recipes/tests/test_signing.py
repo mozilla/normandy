@@ -157,6 +157,31 @@ class TestVerifySignaturePubkey(object):
             signing.verify_signature_pubkey(self.data, signature, self.pubkey)
 
 
+class TestVerifySignatureX5U(object):
+    def test_happy_path(self, mocker):
+        mock_verify_x5u = mocker.patch("normandy.recipes.signing.verify_x5u")
+        mock_der_encode = mocker.patch("normandy.recipes.signing.der_encode")
+        mock_verify_signature_pubkey = mocker.patch(
+            "normandy.recipes.signing.verify_signature_pubkey"
+        )
+
+        data = "abc"
+        signature = "signature"
+        x5u = "http://example.com/cert"
+        cert_contents = b"cert_contents"
+        encoded_cert_contents = base64.b64encode(cert_contents).decode()
+
+        mock_der_encode.return_value = cert_contents
+
+        ret = signing.verify_signature_x5u(data, signature, x5u)
+
+        mock_verify_x5u.assert_called_with(x5u)
+        mock_der_encode.assert_called_with(mock_verify_x5u.return_value)
+        mock_verify_signature_pubkey.assert_called_with(data, signature, encoded_cert_contents)
+
+        assert ret == mock_verify_signature_pubkey.return_value
+
+
 class TestExtractCertsFromPem(object):
     def test_empty(self):
         assert signing.extract_certs_from_pem("") == []

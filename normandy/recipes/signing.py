@@ -12,6 +12,7 @@ import fastecdsa.ecdsa
 from fastecdsa.encoding.pem import PEMEncoder
 from hashlib import sha256
 from pyasn1.codec.der.decoder import decode as der_decode
+from pyasn1.codec.der.encoder import encode as der_encode
 from pyasn1_modules import rfc5280
 from requests_hawk import HawkAuth
 
@@ -93,6 +94,19 @@ BASE64_WRONG_LENGTH_RE = re.compile(
     r"Invalid base64-encoded string: number of data characters \(\d+\) cannot "
     r"be [123] more than a multiple of 4"
 )
+
+
+def verify_signature_x5u(data, signature, x5u):
+    """
+    Verify a signature, given the x5u of the public key.
+
+    If the signature is valid, returns True. If the signature is invalid, raise
+    an exception explaining why.
+    """
+    cert = verify_x5u(x5u)
+    encoded = der_encode(cert)
+    cert_b64 = base64.b64encode(encoded).decode()
+    return verify_signature_pubkey(data, signature, cert_b64)
 
 
 def verify_signature_pubkey(data, signature, pubkey):
