@@ -76,7 +76,6 @@ class TestAutographer(object):
                 "hash_algorithm": "sha384",
                 "ref": "fake_ref_1",
                 "signature": "fake_signature_1",
-                "public_key": "fake_pubkey_1",
             },
             {
                 "content-signature": (
@@ -86,7 +85,6 @@ class TestAutographer(object):
                 "hash_algorithm": "sha384",
                 "ref": "fake_ref_2",
                 "signature": "fake_signature_2",
-                "public_key": "fake_pubkey_2",
             },
         ]
 
@@ -100,19 +98,21 @@ class TestAutographer(object):
                 "timestamp": Whatever(),
                 "signature": "fake_signature_1",
                 "x5u": "https://example.com/fake_x5u_1",
-                "public_key": "fake_pubkey_1",
             },
             {
                 "timestamp": Whatever(),
                 "signature": "fake_signature_2",
                 "x5u": "https://example.com/fake_x5u_2",
-                "public_key": "fake_pubkey_2",
             },
         ]
 
         # Assert that logging happened
-        mock_logger.info.assert_called_with(
-            Whatever.contains("2"), extra={"code": signing.INFO_RECEIVED_SIGNATURES}
+        mock_logger.info.assert_has_calls(
+            [
+                call(Whatever.contains("2"), extra={"code": signing.INFO_RECEIVED_SIGNATURES}),
+                call(Whatever.contains("fake_ref_1")),
+                call(Whatever.contains("fake_ref_2")),
+            ]
         )
 
         # Assert the correct request was made

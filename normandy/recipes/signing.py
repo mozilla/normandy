@@ -80,15 +80,12 @@ class Autographer(object):
 
         signatures = []
         for res in signing_responses:
+            logger.info(f"Autograph response: {res['ref']}")
 
-            signatures.append(
-                {
-                    "timestamp": ts,
-                    "signature": res["signature"],
-                    "x5u": res.get("x5u"),
-                    "public_key": res["public_key"],
-                }
-            )
+            assert res["signature"], "Response from Autograph did not contain signature"
+            assert res["x5u"], "Response from Autograph did not contain x5u"
+
+            signatures.append({"timestamp": ts, "signature": res["signature"], "x5u": res["x5u"]})
         return signatures
 
 
