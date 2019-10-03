@@ -185,8 +185,9 @@ def verify_x5u(url, expire_early=None):
     """
     Verify the certificate chain at a URL.
 
-    If the certificates are valid, return True. Otherwise, raise an
-    exception explaining why they are not valid.
+    If the certificates are valid, return the end of the
+    chain. Otherwise, raise an exception explaining why they are not
+    valid.
     """
     req = requests.get(url)
     req.raise_for_status()
@@ -241,7 +242,7 @@ def verify_x5u(url, expire_early=None):
         if common_name != expected:
             raise CertificateHasWrongSubject(expected=expected, actual=common_name)
 
-    return True
+    return decoded_certs[0]
 
 
 def check_validity(not_before, not_after, expire_early):

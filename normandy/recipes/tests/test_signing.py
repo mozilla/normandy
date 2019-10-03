@@ -280,7 +280,7 @@ class TestVerifyX5u(object):
             not_before=not_before, not_after=not_after
         )
 
-        assert signing.verify_x5u(url)
+        assert signing.verify_x5u(url) == mock_parse_cert_from_der.return_value
         assert mock_requests.get.called_once_with(url)
         body = mock_requests.get.return_value.content.decode.return_value
         assert mock_extract_certs_from_pem.called_once_with(body)
