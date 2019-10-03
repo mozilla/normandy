@@ -14,6 +14,7 @@ urlpatterns += [
     url(r"", include("normandy.selfrepair.urls")),
     url(r"", include("normandy.health.urls")),
     url(r"", include("normandy.studies.urls")),
+    url(r"", include("normandy.capabilities.urls")),
     # Swagger
     url(r"^api/v1/", include("normandy.base.api.swagger_urls", namespace="v1")),
     url(r"^api/v3/", include("normandy.base.api.swagger_urls", namespace="v3")),
