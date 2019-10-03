@@ -58,8 +58,12 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
             data = recipe.canonical_json()
             signature = recipe.signature.signature
             pubkey = recipe.signature.public_key
+            x5u = recipe.signature.x5u
             try:
-                signing.verify_signature_pubkey(data, signature, pubkey)
+                if x5u:
+                    signing.verify_signature_x5u(data, signature, x5u)
+                else:
+                    signing.verify_signature_pubkey(data, signature, pubkey)
             except signing.BadSignature as e:
                 msg = "Recipe '{recipe}' (id={recipe.id}) has a bad signature: {detail}".format(
                     recipe=recipe, detail=e.detail
@@ -89,8 +93,12 @@ def action_signatures_are_correct(app_configs, **kwargs):
             data = action.canonical_json()
             signature = action.signature.signature
             pubkey = action.signature.public_key
+            x5u = action.signature.x5u
             try:
-                signing.verify_signature_pubkey(data, signature, pubkey)
+                if x5u:
+                    signing.verify_signature_x5u(data, signature, x5u)
+                else:
+                    signing.verify_signature_pubkey(data, signature, pubkey)
             except signing.BadSignature as e:
                 msg = f"Action '{action}' (id={action.id}) has a bad signature: {e.detail}"
                 errors.append(Error(msg, id=ERROR_INVALID_ACTION_SIGNATURE))
