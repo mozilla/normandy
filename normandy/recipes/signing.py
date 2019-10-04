@@ -12,6 +12,7 @@ import fastecdsa.ecdsa
 from fastecdsa.encoding.pem import PEMEncoder
 from hashlib import sha256
 from pyasn1.codec.der.decoder import decode as der_decode
+from pyasn1.codec.der.encoder import encode as der_encode
 from pyasn1_modules import rfc5280
 from requests_hawk import HawkAuth
 
@@ -80,15 +81,12 @@ class Autographer(object):
 
         signatures = []
         for res in signing_responses:
+            logger.info(f"Autograph response: {res['ref']}")
 
-            signatures.append(
-                {
-                    "timestamp": ts,
-                    "signature": res["signature"],
-                    "x5u": res.get("x5u"),
-                    "public_key": res["public_key"],
-                }
-            )
+            assert res["signature"], "Response from Autograph did not contain signature"
+            assert res["x5u"], "Response from Autograph did not contain x5u"
+
+            signatures.append({"timestamp": ts, "signature": res["signature"], "x5u": res["x5u"]})
         return signatures
 
 
@@ -98,7 +96,20 @@ BASE64_WRONG_LENGTH_RE = re.compile(
 )
 
 
-def verify_signature(data, signature, pubkey):
+def verify_signature_x5u(data, signature, x5u):
+    """
+    Verify a signature, given the x5u of the public key.
+
+    If the signature is valid, returns True. If the signature is invalid, raise
+    an exception explaining why.
+    """
+    cert = verify_x5u(x5u)
+    encoded = der_encode(cert)
+    cert_b64 = base64.b64encode(encoded).decode()
+    return verify_signature_pubkey(data, signature, cert_b64)
+
+
+def verify_signature_pubkey(data, signature, pubkey):
     """
     Verify a signature.
 
@@ -188,8 +199,9 @@ def verify_x5u(url, expire_early=None):
     """
     Verify the certificate chain at a URL.
 
-    If the certificates are valid, return True. Otherwise, raise an
-    exception explaining why they are not valid.
+    If the certificates are valid, return the end of the
+    chain. Otherwise, raise an exception explaining why they are not
+    valid.
     """
     req = requests.get(url)
     req.raise_for_status()
@@ -244,7 +256,7 @@ def verify_x5u(url, expire_early=None):
         if common_name != expected:
             raise CertificateHasWrongSubject(expected=expected, actual=common_name)
 
-    return True
+    return decoded_certs[0]
 
 
 def check_validity(not_before, not_after, expire_early):
