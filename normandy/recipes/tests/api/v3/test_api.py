@@ -497,7 +497,7 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             # Passed extra capabilities:
-            assert recipe.extra_capabilities == ["test.one", "test.two"]
+            assert recipe.latest_revision.extra_capabilities == ["test.one", "test.two"]
             # Extra capabilities get included in capabilities
             assert {"test.one", "test.two"} <= set(recipe.capabilities)
 

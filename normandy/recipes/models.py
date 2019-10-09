@@ -177,11 +177,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def capabilities(self):
         return self.current_revision.capabilities
 
-    @current_revision_property()
-    def extra_capabilities(self):
-        """A list of capabilities manually specified for this recipe."""
-        return self.current_revision.extra_capabilities
-
     def uses_only_baseline_capabilities(self):
         return self.capabilities <= settings.BASELINE_CAPABILITIES
 
