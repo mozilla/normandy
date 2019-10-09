@@ -387,7 +387,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
 
             recipe = Recipe.objects.get()
-            assert recipe.experimenter_slug == "some-experimenter-slug"
+            assert recipe.latest_revision.experimenter_slug == "some-experimenter-slug"
 
         def test_without_experimenter_slug(self, api_client):
             action = ActionFactory()
@@ -405,7 +405,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
 
             recipe = Recipe.objects.get()
-            assert recipe.experimenter_slug is None
+            assert recipe.latest_revision.experimenter_slug is None
 
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()
@@ -601,7 +601,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.experimenter_slug == "a-new-slug"
+            assert r.latest_revision.experimenter_slug == "a-new-slug"
 
         def test_updating_recipes_stores_the_user(self, api_client):
             recipe = RecipeFactory()

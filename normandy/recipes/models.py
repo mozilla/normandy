@@ -174,10 +174,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.comment
 
     @current_revision_property()
-    def experimenter_slug(self):
-        return self.current_revision.experimenter_slug
-
-    @current_revision_property()
     def capabilities(self):
         return self.current_revision.capabilities
 
