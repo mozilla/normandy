@@ -144,7 +144,7 @@ jobs:
       - run:
           name: Install and configure dependencies
           command: |
-            npm install -g gh-pages@2
+            yarn install --frozen-lockfile
             git config user.email "ci-build@normandy.mozilla.org"
             git config user.name "ci-build"
       - run:
