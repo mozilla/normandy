@@ -162,14 +162,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.channels
 
     @current_revision_property()
-    def countries(self):
-        return self.current_revision.countries
-
-    @current_revision_property()
-    def locales(self):
-        return self.current_revision.locales
-
-    @current_revision_property()
     def capabilities(self):
         return self.current_revision.capabilities
 
