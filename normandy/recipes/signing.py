@@ -96,11 +96,6 @@ BASE64_WRONG_LENGTH_RE = re.compile(
 )
 
 
-ECDSA_WRONG_LENGTH_RE = re.compile(
-    r"Invalid length of signature, expected \d+ bytes long, provided string is \d+ bytes long"
-)
-
-
 def verify_signature_x5u(data, signature, x5u):
     """
     Verify a signature, given the x5u of the public key.
@@ -144,11 +139,8 @@ def verify_signature_pubkey(data, signature, pubkey):
             raise WrongSignatureSize("Base64 encoded signature was not a multiple of 4")
         else:
             raise
-    except ecdsa.util.MalformedSignature as e:
-        if ECDSA_WRONG_LENGTH_RE.match(e.args[0]):
-            raise WrongSignatureSize()
-        else:
-            raise
+    except ecdsa.util.MalformedSignature:
+        raise WrongSignatureSize()
 
     verified = fastecdsa.ecdsa.verify(
         signature, data, verifying_pubkey, curve=fastecdsa.curve.P384, hashfunc=hashlib.sha384
