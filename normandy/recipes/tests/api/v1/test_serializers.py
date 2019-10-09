@@ -47,7 +47,6 @@ class TestRecipeSerializer:
                 "approver": None,
                 "comment": None,
             },
-            "identicon_seed": Whatever.startswith("v1:"),
             "capabilities": sorted(recipe.capabilities),
         }
 

@@ -170,10 +170,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.locales
 
     @current_revision_property()
-    def identicon_seed(self):
-        return self.current_revision.identicon_seed
-
-    @current_revision_property()
     def comment(self):
         return self.current_revision.comment
 

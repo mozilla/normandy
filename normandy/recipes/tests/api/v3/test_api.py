@@ -1243,7 +1243,7 @@ class TestRecipeRevisionAPI(object):
     def test_it_has_an_identicon_seed(self, api_client):
         recipe = RecipeFactory(enabler=UserFactory(), approver=UserFactory())
         res = api_client.get(f"/api/v3/recipe_revision/{recipe.latest_revision.id}/")
-        assert res.data["identicon_seed"] == recipe.identicon_seed
+        assert res.data["identicon_seed"] == recipe.latest_revision.identicon_seed
 
 
 @pytest.mark.django_db
