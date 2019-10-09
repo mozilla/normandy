@@ -389,6 +389,24 @@ class TestRecipeAPI(object):
             recipe = Recipe.objects.get()
             assert recipe.experimenter_slug == "some-experimenter-slug"
 
+        def test_without_experimenter_slug(self, api_client):
+            action = ActionFactory()
+
+            res = api_client.post(
+                "/api/v3/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "extra_filter_expression": "whatever",
+                    "enabled": True,
+                },
+            )
+            assert res.status_code == 201, res.json()
+
+            recipe = Recipe.objects.get()
+            assert recipe.experimenter_slug is None
+
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()
             api_client.post(

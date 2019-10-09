@@ -132,7 +132,9 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     name = serializers.CharField(write_only=True)
     identicon_seed = serializers.CharField(required=False, write_only=True)
     comment = serializers.CharField(required=False, write_only=True)
-    experimenter_slug = serializers.CharField(required=False, write_only=True)
+    experimenter_slug = serializers.CharField(
+        required=False, write_only=True, allow_null=True, allow_blank=True
+    )
     extra_capabilities = serializers.ListField(required=False, write_only=True)
 
     class Meta:
