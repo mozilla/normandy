@@ -592,7 +592,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.comment == "bar"
+            assert r.latest_revision.comment == "bar"
 
         def test_update_recipe_experimenter_slug(self, api_client):
             r = RecipeFactory()
