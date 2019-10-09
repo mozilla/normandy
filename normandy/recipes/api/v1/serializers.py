@@ -73,7 +73,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     action = serializers.SlugRelatedField(slug_field="name", queryset=Action.objects.all())
     arguments = serializers.JSONField()
-    extra_filter_expression = serializers.CharField()
     filter_expression = serializers.CharField(read_only=True)
     latest_revision_id = serializers.IntegerField(source="latest_revision.id", read_only=True)
     approved_revision_id = serializers.IntegerField(
@@ -94,7 +93,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             "revision_id",
             "action",
             "arguments",
-            "extra_filter_expression",
             "filter_expression",
             "latest_revision_id",
             "approved_revision_id",

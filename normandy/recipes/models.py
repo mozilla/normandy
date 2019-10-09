@@ -134,10 +134,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.filter_expression
 
     @current_revision_property()
-    def extra_filter_expression(self):
-        return self.current_revision.extra_filter_expression
-
-    @current_revision_property()
     def filter_object(self):
         return self.current_revision.filter_object
 

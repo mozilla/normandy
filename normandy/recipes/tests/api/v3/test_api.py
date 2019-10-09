@@ -440,7 +440,7 @@ class TestRecipeAPI(object):
 
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
@@ -478,7 +478,7 @@ class TestRecipeAPI(object):
 
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
         def test_it_accepts_capabilities(self, api_client):
@@ -623,7 +623,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_object
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
@@ -637,7 +637,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
 
             # Let's paranoid-check that you can't unset the filter_object too.
             res = api_client.patch(
