@@ -375,13 +375,21 @@ class TestUpdateAddonUrls(object):
 
 @pytest.mark.django_db
 class TestSyncRemoteSettings(object):
-    workspace_collection_url = (
-        f"/v1/buckets/{settings.REMOTE_SETTINGS_BUCKET_ID}/collections"
-        f"/{settings.REMOTE_SETTINGS_COLLECTION_ID}"
+    baseline_workspace_collection_url = (
+        f"/v1/buckets/{settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID}/collections"
+        f"/{settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID}"
     )
-    published_records_url = (
-        f"/v1/buckets/{exports.RemoteSettings.MAIN_BUCKET_ID}/collections"
-        f"/{settings.REMOTE_SETTINGS_COLLECTION_ID}/records"
+    capabilities_workspace_collection_url = (
+        f"/v1/buckets/{settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID}/collections"
+        f"/{settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID}"
+    )
+    baseline_published_records_url = (
+        f"/v1/buckets/{settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID}/collections"
+        f"/{settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID}/records"
+    )
+    capabilities_published_records_url = (
+        f"/v1/buckets/{settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID}/collections"
+        f"/{settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID}/records"
     )
 
     @pytest.mark.django_db
@@ -389,8 +397,8 @@ class TestSyncRemoteSettings(object):
         """
         Verify that the sync_remote_settings command doesn't throw an error.
         """
-        requestsmock.get(self.published_records_url, json={"data": []})
-
+        requestsmock.get(self.baseline_published_records_url, json={"data": []})
+        requestsmock.get(self.capabilities_published_records_url, json={"data": []})
         call_command("sync_remote_settings")
 
     def test_it_fails_if_not_enabled(self):
@@ -399,15 +407,24 @@ class TestSyncRemoteSettings(object):
             call_command("sync_remote_settings")
 
     def test_it_fails_if_server_not_reachable(self, rs_settings, requestsmock):
-        requestsmock.get(self.published_records_url, exc=requests.exceptions.ConnectionError)
+        requestsmock.get(
+            self.baseline_published_records_url, exc=requests.exceptions.ConnectionError
+        )
+        requestsmock.get(
+            self.capabilities_published_records_url, exc=requests.exceptions.ConnectionError
+        )
 
         with pytest.raises(requests.exceptions.ConnectionError):
             call_command("sync_remote_settings")
 
     def test_it_does_nothing_on_dry_run(self, rs_settings, requestsmock, mocked_remotesettings):
-        r1 = RecipeFactory(name="Test 1", approver=UserFactory())
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
-        requestsmock.get(self.published_records_url, json={"data": [exports.recipe_as_record(r1)]})
+        requestsmock.get(
+            self.baseline_published_records_url, json={"data": [exports.recipe_as_record(r1)]}
+        )
+        requestsmock.get(
+            self.capabilities_published_records_url, json={"data": [exports.recipe_as_record(r1)]}
+        )
 
         call_command("sync_remote_settings", "--dry-run")
 
@@ -418,63 +435,149 @@ class TestSyncRemoteSettings(object):
         # Some records will be created with PUT.
         requestsmock.put(requests_mock.ANY, json={})
         # A signature request will be sent.
-        requestsmock.patch(self.workspace_collection_url, json={})
+        requestsmock.patch(self.baseline_workspace_collection_url, json={})
+        requestsmock.patch(self.capabilities_workspace_collection_url, json={})
         # Instantiate local recipes.
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
+
+        rs_settings.BASELINE_CAPABILITIES |= r1.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r2.capabilities
+
         # Mock the server responses.
         # `r2` should be on the server
-        requestsmock.get(self.published_records_url, json={"data": [exports.recipe_as_record(r1)]})
+        requestsmock.get(
+            self.baseline_published_records_url, json={"data": [exports.recipe_as_record(r1)]}
+        )
+        requestsmock.get(
+            self.capabilities_published_records_url, json={"data": [exports.recipe_as_record(r1)]}
+        )
         # It will be created.
-        r2_url = self.workspace_collection_url + f"/records/{r2.id}"
-        requestsmock.put(r2_url, json={})
+        r2_baseline_url = self.baseline_workspace_collection_url + f"/records/{r2.id}"
+        r2_capabilities_url = self.capabilities_workspace_collection_url + f"/records/{r2.id}"
+        requestsmock.put(r2_baseline_url, json={})
+        requestsmock.put(r2_capabilities_url, json={})
+
+        # Ignore any requests before this point
+        requestsmock._adapter.request_history = []
 
         call_command("sync_remote_settings")
 
-        assert requestsmock.request_history[-2].method == "PUT"
-        assert requestsmock.request_history[-2].url.endswith(r2_url)
+        requests = requestsmock.request_history
+        # The first two requests should be to get the existing records
+        assert requests[0].method == "GET"
+        assert requests[0].url.endswith(self.capabilities_published_records_url)
+        assert requests[1].method == "GET"
+        assert requests[1].url.endswith(self.baseline_published_records_url)
+        # The next two should be to PUT the missing recipe2
+        assert requests[2].method == "PUT"
+        assert requests[2].url.endswith(r2_capabilities_url)
+        assert requests[3].method == "PUT"
+        assert requests[3].url.endswith(r2_baseline_url)
+        # The final two should be to approve the changes to the two collections
+        assert requests[4].method == "PATCH"
+        assert requests[4].url.endswith(self.capabilities_workspace_collection_url)
+        assert requests[5].method == "PATCH"
+        assert requests[5].url.endswith(self.baseline_workspace_collection_url)
+        # And there are no extra requests
+        assert len(requests) == 6
 
     def test_republishes_outdated_recipes(self, rs_settings, requestsmock):
         # Some records will be created with PUT.
         requestsmock.put(requests_mock.ANY, json={})
         # A signature request will be sent.
-        requestsmock.patch(self.workspace_collection_url, json={})
+        requestsmock.patch(self.baseline_workspace_collection_url, json={})
+        requestsmock.patch(self.capabilities_workspace_collection_url, json={})
         # Instantiate local recipes.
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
+
+        rs_settings.BASELINE_CAPABILITIES |= r1.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r2.capabilities
+
         # Mock the server responses.
         to_update = {**exports.recipe_as_record(r2), "name": "Outdated name"}
         requestsmock.get(
-            self.published_records_url, json={"data": [exports.recipe_as_record(r1), to_update]}
+            self.baseline_published_records_url,
+            json={"data": [exports.recipe_as_record(r1), to_update]},
+        )
+        requestsmock.get(
+            self.capabilities_published_records_url,
+            json={"data": [exports.recipe_as_record(r1), to_update]},
         )
         # It will be updated.
-        r2_url = self.workspace_collection_url + f"/records/{r2.id}"
-        requestsmock.put(r2_url, json={})
+        r2_baseline_url = self.baseline_workspace_collection_url + f"/records/{r2.id}"
+        r2_capabilities_url = self.capabilities_workspace_collection_url + f"/records/{r2.id}"
+        requestsmock.put(r2_baseline_url, json={})
+        requestsmock.put(r2_capabilities_url, json={})
 
+        # Ignore any requests before this point
+        requestsmock._adapter.request_history = []
         call_command("sync_remote_settings")
 
-        assert requestsmock.request_history[-2].method == "PUT"
-        assert requestsmock.request_history[-2].url.endswith(r2_url)
+        requests = requestsmock.request_history
+        # The first two requests should be to get the existing records
+        assert requests[0].method == "GET"
+        assert requests[0].url.endswith(self.capabilities_published_records_url)
+        assert requests[1].method == "GET"
+        assert requests[1].url.endswith(self.baseline_published_records_url)
+        # The next two should be to PUT the outdated recipe2
+        assert requests[2].method == "PUT"
+        assert requests[2].url.endswith(r2_capabilities_url)
+        assert requests[3].method == "PUT"
+        assert requests[3].url.endswith(r2_baseline_url)
+        # The final two should be to approve the changes to the two collections
+        assert requests[4].method == "PATCH"
+        assert requests[4].url.endswith(self.capabilities_workspace_collection_url)
+        assert requests[5].method == "PATCH"
+        assert requests[5].url.endswith(self.baseline_workspace_collection_url)
+        # And there are no extra requests
+        assert len(requests) == 6
 
     def test_unpublishes_extra_recipes(self, rs_settings, requestsmock):
         # Some records will be created with PUT.
         requestsmock.put(requests_mock.ANY, json={})
         # A signature request will be sent.
-        requestsmock.patch(self.workspace_collection_url, json={})
+        requestsmock.patch(self.baseline_workspace_collection_url, json={})
+        requestsmock.patch(self.capabilities_workspace_collection_url, json={})
         # Instantiate local recipes.
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", approver=UserFactory())
         # Mock the server responses.
         # `r2` should not be on the server (not enabled)
         requestsmock.get(
-            self.published_records_url,
+            self.baseline_published_records_url,
+            json={"data": [exports.recipe_as_record(r1), exports.recipe_as_record(r2)]},
+        )
+        requestsmock.get(
+            self.capabilities_published_records_url,
             json={"data": [exports.recipe_as_record(r1), exports.recipe_as_record(r2)]},
         )
         # It will be deleted.
-        r2_url = self.workspace_collection_url + f"/records/{r2.id}"
-        requestsmock.delete(r2_url, json={"data": {}})
+        r2_baseline_url = self.baseline_workspace_collection_url + f"/records/{r2.id}"
+        r2_capabilities_url = self.capabilities_workspace_collection_url + f"/records/{r2.id}"
+        requestsmock.delete(r2_baseline_url, json={"data": {}})
+        requestsmock.delete(r2_capabilities_url, json={"data": ""})
 
+        # Ignore any requests before this point
+        requestsmock._adapter.request_history = []
         call_command("sync_remote_settings")
 
-        assert requestsmock.request_history[-2].method == "DELETE"
-        assert requestsmock.request_history[-2].url.endswith(r2_url)
+        requests = requestsmock.request_history
+        # The first two requests should be to get the existing records
+        assert requests[0].method == "GET"
+        assert requests[0].url.endswith(self.capabilities_published_records_url)
+        assert requests[1].method == "GET"
+        assert requests[1].url.endswith(self.baseline_published_records_url)
+        # The next two should be to PUT the outdated recipe2
+        assert requests[2].method == "DELETE"
+        assert requests[2].url.endswith(r2_capabilities_url)
+        assert requests[3].method == "DELETE"
+        assert requests[3].url.endswith(r2_baseline_url)
+        # The final two should be to approve the changes to the two collections
+        assert requests[4].method == "PATCH"
+        assert requests[4].url.endswith(self.capabilities_workspace_collection_url)
+        assert requests[5].method == "PATCH"
+        assert requests[5].url.endswith(self.baseline_workspace_collection_url)
+        # And there are no extra requests
+        assert len(requests) == 6

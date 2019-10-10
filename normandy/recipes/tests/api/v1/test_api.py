@@ -172,16 +172,22 @@ class TestImplementationAPI(object):
 class TestRecipeAPI(object):
     @pytest.mark.django_db
     class TestListing(object):
+        # Note that the default behavior for this listing is to exclude recipes
+        # that require non-baseline capabilities, so each test re-defines what
+        # "baseline" means to include the recipes used in the test.
+
         def test_it_works(self, api_client):
             res = api_client.get("/api/v1/recipe/")
             assert res.status_code == 200
             assert res.data == []
 
-        def test_it_serves_recipes(self, api_client):
+        def test_it_serves_recipes(self, api_client, settings):
             recipe = RecipeFactory()
+            settings.BASELINE_CAPABILITIES |= recipe.capabilities
 
             res = api_client.get("/api/v1/recipe/")
             assert res.status_code == 200
+            assert len(res.data) == 1
             assert res.data[0]["name"] == recipe.name
 
         def test_available_if_admin_enabled(self, api_client, settings):
@@ -204,10 +210,16 @@ class TestRecipeAPI(object):
 
     @pytest.mark.django_db
     class TestDetail(object):
+        def test_it_works(self, api_client):
+            recipe = RecipeFactory()
+            res = api_client.get(f"/api/v1/recipe/{recipe.id}/")
+            assert res.status_code == 200, res.data
+            assert res.data["id"] == recipe.id
+
         def test_detail_view_includes_cache_headers(self, api_client):
             recipe = RecipeFactory()
             res = api_client.get(f"/api/v1/recipe/{recipe.id}/")
-            assert res.status_code == 200
+            assert res.status_code == 200, res.data
             # It isn't important to assert a particular value for max-age
             assert "max-age=" in res["Cache-Control"]
             assert "public" in res["Cache-Control"]
@@ -335,8 +347,14 @@ class TestRecipeAPI(object):
 
     @pytest.mark.django_db
     class TestSigned(object):
-        def test_signed_listing_works(self, api_client):
+        # Note that by default the signed endpoint only lists recipes with the
+        # baseline capabilities. Many of these tests modify the baseline
+        # capabilities to include the auto-generated capabilities (like
+        # "action.đzGBglYumiFMJ").
+
+        def test_signed_listing_works(self, api_client, settings):
             r1 = RecipeFactory(signed=True)
+            settings.BASELINE_CAPABILITIES |= r1.capabilities
             res = api_client.get("/api/v1/recipe/signed/")
             assert res.status_code == 200
             assert len(res.data) == 1
@@ -350,9 +368,10 @@ class TestRecipeAPI(object):
             assert "max-age=" in res["Cache-Control"]
             assert "public" in res["Cache-Control"]
 
-        def test_signed_only_lists_signed_recipes(self, api_client):
+        def test_signed_only_lists_signed_recipes(self, api_client, settings):
             r1 = RecipeFactory(signed=True)
             r2 = RecipeFactory(signed=True)
+            settings.BASELINE_CAPABILITIES |= r1.capabilities | r2.capabilities
             RecipeFactory(signed=False)
             res = api_client.get("/api/v1/recipe/signed/")
             assert res.status_code == 200
@@ -365,11 +384,14 @@ class TestRecipeAPI(object):
             assert res.data[1]["recipe"]["id"] == r2.id
             assert res.data[1]["signature"]["signature"] == r2.signature.signature
 
-        def test_signed_listing_filters_by_enabled(Self, api_client):
+        def test_signed_listing_filters_by_enabled(Self, api_client, settings):
             enabled_recipe = RecipeFactory(
                 signed=True, approver=UserFactory(), enabler=UserFactory()
             )
             disabled_recipe = RecipeFactory(signed=True)
+            settings.BASELINE_CAPABILITIES |= (
+                enabled_recipe.capabilities | disabled_recipe.capabilities
+            )
 
             res = api_client.get("/api/v1/recipe/signed/?enabled=1")
             assert res.status_code == 200
@@ -380,6 +402,63 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert len(res.data) == 1
             assert res.data[0]["recipe"]["id"] == disabled_recipe.id
+
+        def test_only_includes_baseline_capabilities_by_default(self, settings, api_client):
+            settings.BASELINE_CAPABILITIES = {"a"}
+            baseline_recipe = RecipeFactory(
+                signed=True,
+                approver=UserFactory(),
+                enabler=UserFactory(),
+                extra_capabilities=["a"],
+            )
+            # non-baseline recipe
+            RecipeFactory(
+                signed=True,
+                approver=UserFactory(),
+                enabler=UserFactory(),
+                extra_capabilities=["a", "b"],
+            )
+
+            # Recipes have some auto-generated capabilities as well. Such as action names. Add all of those too
+            settings.BASELINE_CAPABILITIES |= baseline_recipe.capabilities
+            assert "b" not in settings.BASELINE_CAPABILITIES
+
+            res = api_client.get("/api/v1/recipe/signed/")
+            assert res.status_code == 200
+            assert len(res.data) == 1
+            assert res.data[0]["recipe"]["id"] == baseline_recipe.id
+
+        def test_baseline_filter_can_be_configured(self, settings, api_client):
+            settings.BASELINE_CAPABILITIES = {"a"}
+            baseline_recipe = RecipeFactory(
+                signed=True,
+                approver=UserFactory(),
+                enabler=UserFactory(),
+                extra_capabilities=["a"],
+            )
+            non_baseline_recipe = RecipeFactory(
+                signed=True,
+                approver=UserFactory(),
+                enabler=UserFactory(),
+                extra_capabilities=["a", "b"],
+            )
+
+            # Recipes have some auto-generated capabilities as well. Such as action names. Add all of those too
+            settings.BASELINE_CAPABILITIES |= baseline_recipe.capabilities
+            assert "b" not in settings.BASELINE_CAPABILITIES
+
+            res = api_client.get("/api/v1/recipe/signed/?only_baseline_capabilities=false")
+            assert res.status_code == 200
+            assert len(res.data) == 2
+            assert set(d["recipe"]["id"] for d in res.data) == {
+                baseline_recipe.id,
+                non_baseline_recipe.id,
+            }
+
+            res = api_client.get("/api/v1/recipe/signed/?only_baseline_capabilities=true")
+            assert res.status_code == 200
+            assert len(res.data) == 1
+            assert res.data[0]["recipe"]["id"] == baseline_recipe.id
 
 
 @pytest.mark.django_db

@@ -32,32 +32,28 @@ def register():
 
 class DebugLogsBackend(BackendBase):
     def __init__(self, options):
+        super().__init__(options)
         if not settings.DEBUG:
             raise ImproperlyConfigured(
                 f"The {self.__class__.__name} can only be used if DEBUG=True"
             )
 
-    def _emit(self, type, stat, value, tags, *, op="="):
+    def emit(self, record):
         # round floats to 2 decimal points
-        if isinstance(value, float):
+        value = record.value
+        if record.stat_type == "timing":
+            value = f"{value:.1f}ms"
+
+        elif isinstance(value, float):
             if int(value) != value:
                 value = round(value * 100.0) / 100.0
 
-        result = f"[{type}] {stat} {op} {value}"
-        if tags:
-            tags_display = ", ".join(t for t in tags)
+        op = "="
+        if record.stat_type == "incr":
+            op = "+="
+
+        result = f"[{record.stat_type}] {record.key} {op} {record.value}"
+        if record.tags:
+            tags_display = ", ".join(t for t in record.tags)
             result += f" tags=[{tags_display}]"
         logger.debug(result)
-
-    def incr(self, stat, value, tags=None):
-        op = "+=" if value >= 0 else "-="
-        self._emit("incr", stat, value, tags, op=op)
-
-    def gauge(self, stat, value, tags=None):
-        self._emit("gauge", stat, value, tags)
-
-    def timing(self, stat, value, tags=None):
-        self._emit("timing", stat, f"{value:>.1f}ms", tags)
-
-    def histogram(self, stat, value, tags=None):
-        self._emit("histogram", stat, value, tags)

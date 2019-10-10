@@ -221,7 +221,7 @@ class BucketSampleFilter(BaseFilter):
 
     @property
     def capabilities(self):
-        return {"jexl.transforms.bucketSample"}
+        return {"jexl.transform.bucketSample"}
 
 
 class StableSampleFilter(BaseFilter):
@@ -266,7 +266,7 @@ class StableSampleFilter(BaseFilter):
 
     @property
     def capabilities(self):
-        return {"jexl.transforms.stableSample"}
+        return {"jexl.transform.stableSample"}
 
 
 class VersionFilter(BaseFilter):

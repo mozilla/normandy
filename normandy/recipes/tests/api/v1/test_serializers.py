@@ -48,7 +48,36 @@ class TestRecipeSerializer:
                 "comment": None,
             },
             "identicon_seed": Whatever.startswith("v1:"),
+            "capabilities": sorted(recipe.capabilities),
         }
+
+
+@pytest.mark.django_db()
+class TestMinimalRecipeSerializer:
+    def test_it_works(self, rf):
+        recipe = RecipeFactory(arguments={"foo": "bar"})
+        action = recipe.action
+        serializer = MinimalRecipeSerializer(recipe, context={"request": rf.get("/")})
+
+        assert serializer.data == {
+            "name": recipe.name,
+            "id": recipe.id,
+            "filter_expression": recipe.filter_expression,
+            "revision_id": str(recipe.revision_id),
+            "action": action.name,
+            "arguments": {"foo": "bar"},
+            "capabilities": sorted(recipe.capabilities),
+        }
+
+    def test_capabilities_are_sorted(self, rf):
+        # the extra_capabilities passed here are purposefully out of order
+        recipe = RecipeFactory(arguments={"foo": "bar"}, extra_capabilities=["b", "a"])
+        serializer = MinimalRecipeSerializer(recipe, context={"request": rf.get("/")})
+
+        capabilities = serializer.data["capabilities"]
+        assert capabilities == sorted(capabilities)
+        assert "a" in capabilities
+        assert "b" in capabilities
 
 
 @pytest.mark.django_db()
@@ -93,6 +122,7 @@ class TestSignedRecipeSerializer:
                 "revision_id": str(recipe.revision_id),
                 "action": action.name,
                 "arguments": recipe.arguments,
+                "capabilities": sorted(recipe.capabilities),
             },
         }
 

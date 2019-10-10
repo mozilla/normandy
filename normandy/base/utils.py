@@ -90,3 +90,21 @@ def sri_hash(data, url_safe=False):
     else:
         data_hash = b64encode(digest)
     return "sha384-" + data_hash.decode()
+
+
+class ScopedSettings:
+    """
+    Make a version of Django's settings that adds a prefix to all settings.
+
+    Example:
+
+        scoped = ScopedSettings("FOO_")
+        assert settings.FOO_BAR == scoped.BAR
+    """
+
+    def __init__(self, scope):
+        self.scope = scope
+
+    def __getattr__(self, name):
+        scoped_name = self.scope + name
+        return getattr(settings, scoped_name)
