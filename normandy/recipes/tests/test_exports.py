@@ -192,7 +192,7 @@ class TestRemoteSettings:
             # restore write permissions
             requestsmock.get(collection_url, json=allow_write_payload)
 
-        # Signer version should be > 5.1.0.
+        # Signer version should be >= 5.1.0.
         requestsmock.get(
             f"{rs_settings.REMOTE_SETTINGS_URL}/",
             json={
