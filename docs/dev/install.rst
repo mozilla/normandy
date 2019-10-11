@@ -266,6 +266,10 @@ an instance locally.
            -H 'Content-Type:application/json' \
            -u 'normandy:n0rm4ndy'
 
+      curl -X PUT ${SERVER}/buckets/main-workspace/collections/normandy-recipes-capabilities \
+           -H 'Content-Type:application/json' \
+           -u 'normandy:n0rm4ndy'
+
 With both configurations in place, Normandy should start without error.
 
 .. seealso::
