@@ -66,9 +66,9 @@ djangorestframework==3.10.3 \
 dockerflow==2019.9.0 \
     --hash=sha256:2d66cf55c68a02f5e5c4b65bd6a7a3398de8d1b473ac09a8b314d562bad6f43e \
     --hash=sha256:887cd21b4bcdead6f66628dc9879ed5f14eccb038732e68f90e4f476ce714e1c
-drf-yasg==1.16.1 \
-    --hash=sha256:68fded2ffdf46e03f33e766184b7d8f1e1a5236f94acfd0c4ba932a57b812566 \
-    --hash=sha256:fcef74709ead2b365410be3d12afbfd0a6e49d1efe615a15a929da7e950bb83c
+drf-yasg==1.17.0 \
+    --hash=sha256:4cfec631880ae527a91ec7cd3241aea2f82189f59e2f089119aa687761afb227 \
+    --hash=sha256:504cce09035cf1bace63b84d9d778b772f86bb37d8a71ed6f723346362e633b2
 ecdsa==0.13.3 \
     --hash=sha256:9814e700890991abeceeb2242586024d4758c8fc18445b194a49bd62d85861db \
     --hash=sha256:163c80b064a763ea733870feb96f9dd9b92216cfcacd374837af18e4e8ec3d4d
