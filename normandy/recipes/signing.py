@@ -104,7 +104,7 @@ def verify_signature_x5u(data, signature, x5u):
     an exception explaining why.
     """
     cert = verify_x5u(x5u)
-    encoded = der_encode(cert)
+    encoded = der_encode(cert["tbsCertificate"]["subjectPublicKeyInfo"])
     cert_b64 = base64.b64encode(encoded).decode()
     return verify_signature_pubkey(data, signature, cert_b64)
 
