@@ -173,10 +173,14 @@ class TestVerifySignatureX5U(object):
 
         mock_der_encode.return_value = cert_contents
 
+        public_key = "public_key"
+        cert = {"tbsCertificate": {"subjectPublicKeyInfo": public_key}}
+        mock_verify_x5u.return_value = cert
+
         ret = signing.verify_signature_x5u(data, signature, x5u)
 
         mock_verify_x5u.assert_called_with(x5u)
-        mock_der_encode.assert_called_with(mock_verify_x5u.return_value)
+        mock_der_encode.assert_called_with(public_key)
         mock_verify_signature_pubkey.assert_called_with(data, signature, encoded_cert_contents)
 
         assert ret == mock_verify_signature_pubkey.return_value
