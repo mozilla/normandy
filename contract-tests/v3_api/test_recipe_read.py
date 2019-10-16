@@ -2,11 +2,11 @@ import pytest
 
 from random import randint
 from support.assertions import assert_valid_schema
-
+from urllib.parse import urljoin
 
 def test_recipe_read(conf, requests_session):
     # Get random recipe and make sure it's valid
-    response = requests_session.get(conf.getoption("server") + "/api/v3/recipe/")
+    response = requests_session.get(urljoin(conf.getoption("server"), "/api/v3/recipe/"))
     data = response.json()
 
     if len(data["results"]) == 0:
@@ -15,7 +15,7 @@ def test_recipe_read(conf, requests_session):
     element = randint(0, len(data["results"]) - 1)
     recipe_id = data["results"][element]["id"]
     response = requests_session.get(
-        conf.getoption("server") + "/api/v3/recipe/{}".format(recipe_id)
+        urljoin(conf.getoption("server"), "/api/v3/recipe/{}".format(recipe_id))
     )
     data = response.json()
     assert response.status_code != 404
