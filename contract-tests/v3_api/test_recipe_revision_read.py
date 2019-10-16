@@ -4,6 +4,7 @@ from random import randint
 from support.assertions import assert_valid_schema
 from urllib.parse import urljoin
 
+
 def test_recipe_revision_read(conf, requests_session):
     # Get a random recipe revision from the list and verify it
     response = requests_session.get(urljoin(conf.getoption("server"), "/api/v3/recipe_revision/"))

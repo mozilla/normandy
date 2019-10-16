@@ -4,6 +4,7 @@ from random import randint
 from support.assertions import assert_valid_schema
 from urllib.parse import urljoin
 
+
 def test_recipe_history(conf, requests_session):
     # Get the ID of a random recipe and grab it's history
     response = requests_session.get(urljoin(conf.getoption("server"), "/api/v3/recipe/"))
