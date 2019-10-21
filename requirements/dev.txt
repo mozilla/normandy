@@ -1,8 +1,8 @@
 -r default.txt
 
-asn1crypto==1.1.0 \
-    --hash=sha256:5abe83e773026162e4869f4ac16edf7554f661e8cc0bb6d2be3bc6915456731b \
-    --hash=sha256:8f3f9470d4ba7aa53afb00278dc26aac22dc3a0d4ed1335fd772f034e094401e
+asn1crypto==1.2.0 \
+    --hash=sha256:7bb1cc02a5620b3d72da4ba070bda2f44f0e61b44dee910a302eddff802b6fb5 \
+    --hash=sha256:87620880a477123e01177a1f73d0f327210b43a3cdbd714efcd2fa49a8d7b384
 django-extensions==2.2.3 \
     --hash=sha256:526d84b16ee180e45e2305f19d3e01ff3f9f513133839c0b4478b97310ade82a \
     --hash=sha256:a78105d5a5e1c3ef44fbe41bc5a19102bda64dbad05515bf791ac6d5d2499ebf
