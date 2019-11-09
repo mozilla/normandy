@@ -161,14 +161,14 @@ def geoip_db_is_available(app_configs, **kwargs):
             errors.append(Error("GeoIP DB not available", id=ERROR_GEOIP_DB_NOT_AVAILABLE))
 
     if not errors:
-        # DB seems to be available, test a known value
-        expected = "US"
-        actual = geolocation.get_country_code("1.2.3.4")
-        if actual != expected:
+        # DB seems to be available, try and do a lookup that should resolve to
+        # some country. The specific country isn't important.
+        ip = "1.2.3.4"
+        country = geolocation.get_country_code(ip)
+        if country is None:
             errors.append(
                 Error(
-                    f"GeoIP DB returned unexpected result. Expected {expected} got {actual}",
-                    id=ERROR_GEOIP_DB_UNEXPECTED_RESULT,
+                    f"GeoIP DB returned no country for {ip!r}", id=ERROR_GEOIP_DB_UNEXPECTED_RESULT
                 )
             )
 
