@@ -194,8 +194,9 @@ document describes those concepts in detail.</p>
 <div class="section" id="actions">
 <span id="id1"></span><h2>Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h2>
 <p>An action is one of the capabilities provided by Normandy. As of Firefox 66,
-actions are implemented entirely within the browser as native code. Actions
-are identified in recipes by name, such as “preference-experiment” or
+actions are implemented entirely within the browser as native code (though
+previously they were served by the server and retrieved at runtime). Actions are
+identified in recipes by name, such as “preference-experiment” or
 “show-heartbeat”.</p>
 <p>Actions can accept a configuration object that is specified within the
 Normandy control interface. This configuration, which is part of a

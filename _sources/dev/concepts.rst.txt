@@ -18,8 +18,9 @@ document describes those concepts in detail.
 Actions
 -------
 An action is one of the capabilities provided by Normandy. As of Firefox 66,
-actions are implemented entirely within the browser as native code. Actions
-are identified in recipes by name, such as "preference-experiment" or
+actions are implemented entirely within the browser as native code (though
+previously they were served by the server and retrieved at runtime). Actions are
+identified in recipes by name, such as "preference-experiment" or
 "show-heartbeat".
 
 Actions can accept a configuration object that is specified within the

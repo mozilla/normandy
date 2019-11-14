@@ -176,12 +176,8 @@
 <span id="id1"></span><h1>Remote Settings<a class="headerlink" href="#remote-settings" title="Permalink to this headline">¶</a></h1>
 <p>Remote Settings is a Mozilla service that makes it easy to manage evergreen
 settings data in Firefox.</p>
-<p>When enabled on the Normandy server, the enabled recipes are published as
-Remote Settings records.</p>
-<p>When enabled on the client side, instead of polling regularly the Normandy
-API to obtain the list of recipes, the recipes are read from the Remote
-Settings synchronized data locally.</p>
-<p>Delivering Normandy recipes via Remote Settings allows us:</p>
+<p>As of Firefox 68, Normandy uses Remote Settings to serve/update its
+recipes. This allows us to:</p>
 <ul class="simple">
 <li><p>Unify the way we obtain fresh data from our services in Firefox</p></li>
 <li><p>Get rid of the specific data channel of Normandy</p></li>
@@ -212,25 +208,9 @@ Remote Settings server.</p>
 </div>
 <div class="section" id="client-side">
 <h2>Client side<a class="headerlink" href="#client-side" title="Permalink to this headline">¶</a></h2>
-<p>The Normandy client integration is available from Firefox 68 (<a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=1506175">Bug 1506175</a>, <a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=1538248">Bug 1538248</a>) and can be enabled
-by flipping this preference:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">features.normandy-remote-settings.enabled</span></code>: <code class="docutils literal notranslate"><span class="pre">true</span></code></p></li>
-</ul>
-<p>In order to populate the list of recipes to be picked up by the Recipe Runner, trigger a manual synchronization in the Browser console:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ChromeUtils</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s2">&quot;resource://normandy/lib/RecipeRunner.jsm&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
-
-<span class="nx">await</span> <span class="nx">RecipeRunner</span><span class="p">.</span><span class="nx">loadRecipes</span><span class="p">();</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://remote-settings.readthedocs.io/en/latest/tutorial-local-server.html#prepare-the-client">Client setup with a local Remote Settings server</a></p></li>
-</ul>
-</div>
-<p>The Normandy recipe runner will now be able to read the list of recipes to
-execute from the local Remote Settings database.</p>
+<p>The Normandy client integration was added in Firefox 66 (<a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=1506175">Bug 1506175</a>), refined through
+Firefox 67 and 68 (<a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=1538248">Bug 1538248</a>) and turned on by
+default in Firefox 68 (<a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=1513854">bug 1513854</a>).</p>
 </div>
 </div>
 
