@@ -4,11 +4,19 @@ Environments
 ============
 Mozilla runs several instances of Normandy; this document provides information
 about each one of them, including what preferences you need to set to point an
-instance of Firefox towards them
+instance of Firefox towards them.
 
 Each environment may have several hostnames associated with it. Generally,
 there is a public, read-only server, a legacy admin server, a new Bearer
-auth admin server, and an API CDN. Not all environments have all of these.
+auth admin server, a Remote Settings server, and an API CDN. Not all
+environments have all of these.
+
+To change the Remote Settings server, the easiest thing is to use the `Remote
+Settings Devtools`_. Otherwise when changing from one environment to another
+(i.e. prod to stage), you run the risk of previously-synced data lingering and
+preventing syncs from the new environment.
+
+.. _`Remote Settings Devtools`: https://github.com/mozilla/remote-settings-devtools
 
 Production
 ----------
