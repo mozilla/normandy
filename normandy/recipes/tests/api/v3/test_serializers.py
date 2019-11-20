@@ -33,6 +33,7 @@ class TestRecipeSerializer:
             ).data,
             "approved_revision": None,
             "signature": None,
+            "uses_only_baseline_capabilities": True,
         }
 
     def test_validation_with_invalid_action(self):

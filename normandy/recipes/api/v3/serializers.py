@@ -117,6 +117,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     approved_revision = RecipeRevisionSerializer(read_only=True)
     latest_revision = RecipeRevisionSerializer(read_only=True)
     signature = SignatureSerializer(read_only=True)
+    uses_only_baseline_capabilities = serializers.SerializerMethodField(read_only=True)
 
     # write-only fields
     action_id = serializers.PrimaryKeyRelatedField(
