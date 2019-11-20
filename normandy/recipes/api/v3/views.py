@@ -26,7 +26,11 @@ from normandy.recipes.models import (
     Recipe,
     RecipeRevision,
 )
-from normandy.recipes.api.filters import CharSplitFilter, EnabledStateFilter
+from normandy.recipes.api.filters import (
+    CharSplitFilter,
+    EnabledStateFilter,
+    BaselineCapabilitiesFilter,
+)
 from normandy.recipes.api.v3 import shield_identicon
 from normandy.recipes.api.v3.serializers import (
     ActionSerializer,
@@ -50,6 +54,7 @@ class RecipeFilters(django_filters.FilterSet):
     channels = CharSplitFilter("latest_revision__channels__slug")
     locales = CharSplitFilter("latest_revision__locales__code")
     countries = CharSplitFilter("latest_revision__countries__code")
+    uses_only_baseline_capabilities = BaselineCapabilitiesFilter()
 
     class Meta:
         model = Recipe

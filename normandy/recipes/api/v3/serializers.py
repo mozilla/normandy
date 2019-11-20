@@ -117,6 +117,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     approved_revision = RecipeRevisionSerializer(read_only=True)
     latest_revision = RecipeRevisionSerializer(read_only=True)
     signature = SignatureSerializer(read_only=True)
+    uses_only_baseline_capabilities = serializers.SerializerMethodField()
 
     # write-only fields
     action_id = serializers.PrimaryKeyRelatedField(
@@ -145,6 +146,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
             "id",
             "latest_revision",
             "signature",
+            "uses_only_baseline_capabilities",
             # write-only
             "action_id",
             "arguments",
@@ -162,6 +164,9 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
             instance.action, read_only=True, context={"request": self.context.get("request")}
         )
         return serializer.data
+
+    def get_uses_only_baseline_capabilities(self, obj):
+        return obj.uses_only_baseline_capabilities()
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
