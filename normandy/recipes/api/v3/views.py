@@ -168,6 +168,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         except EnabledState.NotActionable as e:
             return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
 
+        recipe.latest_revision.refresh_from_db()
         return Response(RecipeSerializer(recipe).data)
 
 
