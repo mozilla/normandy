@@ -28,8 +28,7 @@ class BaselineCapabilitiesFilter(django_filters.Filter):
 
         if value is not None:
             lc_value = value.lower()
-            if lc_value in ["false", "0"]:
-                baseline_only = False
+            baseline_only = lc_value in ["false", "0"]
 
         if baseline_only:
             recipes = list(qs)

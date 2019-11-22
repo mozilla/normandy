@@ -29,7 +29,7 @@ from normandy.recipes.models import (
 from normandy.recipes.api.filters import (
     CharSplitFilter,
     EnabledStateFilter,
-    BaselineCapabilitiesFilter
+    BaselineCapabilitiesFilter,
 )
 from normandy.recipes.api.v3 import shield_identicon
 from normandy.recipes.api.v3.serializers import (

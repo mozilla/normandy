@@ -159,7 +159,6 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data["count"] == 1
 
-
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
