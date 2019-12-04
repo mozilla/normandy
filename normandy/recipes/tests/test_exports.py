@@ -333,6 +333,7 @@ class TestRemoteSettings:
                 "name": recipe.name,
                 "revision_id": str(recipe.revision_id),
                 "capabilities": Whatever(lambda caps: set(caps) == recipe.capabilities),
+                "uses_only_baseline_capabilities": False,
             },
             "signature": {
                 "public_key": Whatever.regex(r"[a-zA-Z0-9/+]{160}"),
