@@ -90,7 +90,11 @@
 <li class="toctree-l2"><a class="reference internal" href="concepts.html">Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html">Developer Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">API Contract Tests</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">API Contract Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-tests">API Tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="coverage.html">Test Coverage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
@@ -171,6 +175,8 @@
 <h1>API Contract Tests<a class="headerlink" href="#api-contract-tests" title="Permalink to this headline">¶</a></h1>
 <p>These tests are designed to look for changes to the recipe server API that are
 not expected.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>Before running these tests you will need the following installed:</p>
 <ul class="simple">
 <li><p>Python 3.7.0 or greater</p></li>
@@ -187,12 +193,17 @@ pip install -r requirements/dev.txt
 </div>
 <p>This creates the virtual environment, activates it, and installs the Python
 dependencies needed to run the tests.</p>
-<p>To run these tests, use the following command from the root project directory.</p>
+</div>
+<div class="section" id="api-tests">
+<h2>API Tests<a class="headerlink" href="#api-tests" title="Permalink to this headline">¶</a></h2>
+<p>To run these tests against both the V1 and V3 APIs use the following command
+from the root project directory.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>py.test -v --server<span class="o">=</span>&lt;server&gt; contract-tests/
 </pre></div>
 </div>
 <p>where <code class="docutils literal notranslate"><span class="pre">&lt;server&gt;</span></code> is the server you want to test, such as
 <code class="docutils literal notranslate"><span class="pre">https://stage.normandy.cloudops.mozgcp.net</span></code> or <cite>https://localhost:8000</cite>.</p>
+</div>
 </div>
 
 
