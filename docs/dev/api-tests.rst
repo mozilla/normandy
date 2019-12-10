@@ -1,7 +1,11 @@
 API Contract Tests
 ==================
+
 These tests are designed to look for changes to the recipe server API that are
 not expected.
+
+Requirements
+------------
 
 Before running these tests you will need the following installed:
 
@@ -22,7 +26,11 @@ the following:
 This creates the virtual environment, activates it, and installs the Python
 dependencies needed to run the tests.
 
-To run these tests, use the following command from the root project directory.
+API Tests
+------------
+
+To run these tests against both the V1 and V3 APIs use the following command
+from the root project directory.
 
 .. code-block:: bash
 

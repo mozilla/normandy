@@ -1,6 +1,10 @@
 # Configuration file for running contract-tests
 import pytest
 import requests
+import urllib3
+
+# Disable any warnings about SSL connections
+urllib3.disable_warnings()
 
 
 def pytest_addoption(parser):
