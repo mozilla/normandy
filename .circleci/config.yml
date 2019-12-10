@@ -144,7 +144,7 @@ jobs:
       - run:
           name: Install and configure dependencies
           command: |
-            npm install -g gh-pages@2
+            yarn install --frozen-lockfile
             git config user.email "ci-build@normandy.mozilla.org"
             git config user.name "ci-build"
       - run:
@@ -155,7 +155,7 @@ jobs:
             - "5d:91:56:44:f2:f7:57:2a:29:88:f0:2e:37:fe:86:2a"
       - run:
           name: Deploy docs to gh-pages
-          command: gh-pages --dotfiles --message "[skip ci] Docs updates" --dist docs/_build/html
+          command: yarn gh-pages --dotfiles --message "[skip ci] Docs updates" --dist docs/_build/html
 
   python-tests:
     docker:

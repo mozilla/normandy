@@ -58,8 +58,12 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
             data = recipe.canonical_json()
             signature = recipe.signature.signature
             pubkey = recipe.signature.public_key
+            x5u = recipe.signature.x5u
             try:
-                signing.verify_signature(data, signature, pubkey)
+                if x5u:
+                    signing.verify_signature_x5u(data, signature, x5u)
+                else:
+                    signing.verify_signature_pubkey(data, signature, pubkey)
             except signing.BadSignature as e:
                 msg = "Recipe '{recipe}' (id={recipe.id}) has a bad signature: {detail}".format(
                     recipe=recipe, detail=e.detail
@@ -89,8 +93,12 @@ def action_signatures_are_correct(app_configs, **kwargs):
             data = action.canonical_json()
             signature = action.signature.signature
             pubkey = action.signature.public_key
+            x5u = action.signature.x5u
             try:
-                signing.verify_signature(data, signature, pubkey)
+                if x5u:
+                    signing.verify_signature_x5u(data, signature, x5u)
+                else:
+                    signing.verify_signature_pubkey(data, signature, pubkey)
             except signing.BadSignature as e:
                 msg = f"Action '{action}' (id={action.id}) has a bad signature: {e.detail}"
                 errors.append(Error(msg, id=ERROR_INVALID_ACTION_SIGNATURE))
@@ -153,14 +161,14 @@ def geoip_db_is_available(app_configs, **kwargs):
             errors.append(Error("GeoIP DB not available", id=ERROR_GEOIP_DB_NOT_AVAILABLE))
 
     if not errors:
-        # DB seems to be available, test a known value
-        expected = "US"
-        actual = geolocation.get_country_code("1.2.3.4")
-        if actual != expected:
+        # DB seems to be available, try and do a lookup that should resolve to
+        # some country. The specific country isn't important.
+        ip = "1.2.3.4"
+        country = geolocation.get_country_code(ip)
+        if country is None:
             errors.append(
                 Error(
-                    f"GeoIP DB returned unexpected result. Expected {expected} got {actual}",
-                    id=ERROR_GEOIP_DB_UNEXPECTED_RESULT,
+                    f"GeoIP DB returned no country for {ip!r}", id=ERROR_GEOIP_DB_UNEXPECTED_RESULT
                 )
             )
 

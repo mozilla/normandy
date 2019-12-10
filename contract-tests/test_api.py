@@ -100,17 +100,11 @@ def test_recipe_signatures(conf, requests_session):
     if len(data) == 0:
         pytest.skip("No signed recipes")
 
-    cert_urls = set()
-
     for item in data:
         canonical_recipe = canonical_json(item["recipe"])
         signature = item["signature"]["signature"]
-        pubkey = item["signature"]["public_key"]
-        cert_urls.add(item["signature"]["x5u"])
-        assert signing.verify_signature(canonical_recipe, signature, pubkey)
-
-    for url in cert_urls:
-        signing.verify_x5u(url)
+        x5u = item["signature"]["x5u"]
+        assert signing.verify_signature_x5u(canonical_recipe, signature, x5u)
 
 
 def test_action_signatures(conf, requests_session):
@@ -121,17 +115,11 @@ def test_action_signatures(conf, requests_session):
     if len(data) == 0:
         pytest.skip("No signed actions")
 
-    cert_urls = set()
-
     for item in data:
         canonical_action = canonical_json(item["action"])
         signature = item["signature"]["signature"]
-        pubkey = item["signature"]["public_key"]
-        cert_urls.add(item["signature"]["x5u"])
-        assert signing.verify_signature(canonical_action, signature, pubkey)
-
-    for url in cert_urls:
-        signing.verify_x5u(url)
+        x5u = item["signature"]["x5u"]
+        assert signing.verify_signature_x5u(canonical_action, signature, x5u)
 
 
 def test_recipe_api_is_json(conf, requests_session):

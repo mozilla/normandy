@@ -2,6 +2,9 @@
 import argparse
 import ast
 import re
+import logging
+import logging.config
+import sys
 
 from pydriller import RepositoryMining
 from pydriller.domain.commit import ModificationType
@@ -13,6 +16,7 @@ from pydriller.domain.commit import ModificationType
 
 
 PR_URL_TMPL = "https://github.com/mozilla/normandy/pull/{}"
+log = logging.getLogger("normandy.generate_deploy_bug")
 
 
 def get_pr_numbers(commit):
@@ -22,9 +26,24 @@ def get_pr_numbers(commit):
 
 
 def get_pr_title(commit, pr_num):
-    message_regex = re.compile(rf"^{pr_num}: (?P<message>.*)( [ra]=[^ ]*){{2,}}$", re.MULTILINE)
-    match = message_regex.search(commit.msg)
-    assert match
+    bors_message_regex = re.compile(
+        rf"^{pr_num}: (?P<message>.*)( [ra]=[^ ]*){{2,}}$", re.MULTILINE
+    )
+    green_button_message_regex = re.compile(
+        rf"^Merge pull request #{pr_num} from.*\n\n(?P<message>.*)$", re.MULTILINE
+    )
+
+    match = bors_message_regex.search(commit.msg)
+    if not match:
+        match = green_button_message_regex.search(commit.msg)
+        if match:
+            log.warning(
+                f"Green-button style merge found for PR {pr_num}, expected bors-style merge"
+            )
+
+    if not match:
+        log.error(f"Could not determine title for PR {pr_num}. Bailing.")
+        raise ValueError(f"Could not determine PR title for {pr_num}")
     return match.group("message")
 
 
@@ -63,64 +82,108 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("from_tag")
     parser.add_argument("to_tag")
+    parser.add_argument("--verbose", "-v", action="count", default=0)
     args = parser.parse_args()
+
+    log_level = logging.WARNING
+    if args.verbose >= 2:
+        log_level = logging.DEBUG
+    elif args.verbose >= 1:
+        log_level = logging.INFO
+
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {"development": {"format": "%(levelname)s %(name)s: %(message)s"}},
+            "handlers": {
+                "console": {
+                    "level": "DEBUG",
+                    "class": "logging.StreamHandler",
+                    "stream": sys.stderr,
+                    "formatter": "development",
+                }
+            },
+            "root": {"handlers": ["console"], "level": "WARNING"},
+            "loggers": {
+                "normandy": {"propagate": False, "handlers": ["console"], "level": log_level}
+            },
+        }
+    )
 
     pr_commits = []
     dependency_updates = []
     migrations = []
 
     mine = RepositoryMining(".", from_tag=args.from_tag, to_tag=args.to_tag)
+    num_commits_processed = 0
     for commit in mine.traverse_commits():
         for mod in commit.modifications:
             if mod.change_type == ModificationType.ADD and "/migrations/" in mod.new_path:
                 migrations.append(get_migration_desc(mod))
 
         if not commit.merge:
+            log.debug(f"Skipping {commit.hash[:7]}: Not a merge")
             # Not a PR merge
             continue
         commit.prs = get_pr_numbers(commit)
         if not commit.prs:
+            log.debug(f"Skipping {commit.hash[:7]}: No PR numbers")
             continue
 
         if is_dependency_update(commit):
+            log.debug(f"Processing commit {commit.hash[:7]} as dependency commit")
             dependency_updates.append(commit)
         else:
+            log.debug(f"Processing commit {commit.hash[:7]} as normal commit")
             pr_commits.append(commit)
+        num_commits_processed += 1
 
-    # output
+    if num_commits_processed == 0:
+        log.error("No commits processed")
+        raise Exception("No commits processed")
 
-    print(f"# Version {args.to_tag}")
-    print()
-    print(f"## PRs merged since {args.from_tag}")
-    print()
+    # Accrue output in a buffer and print all at once so that log lines don't pollute it
+    output = ""
+
+    def output_line(line=""):
+        nonlocal output
+        output += line + "\n"
+
+    output_line(f"# Version {args.to_tag}")
+    output_line()
+    output_line(f"## PRs merged since {args.from_tag}")
+    output_line()
 
     if not pr_commits:
-        print("None")
+        output_line("None")
 
     for commit in pr_commits:
         for pr in commit.prs:
-            print(f"* [PR {pr}]({PR_URL_TMPL.format(pr)}): {get_pr_title(commit, pr)}")
+            output_line(f"* [PR {pr}]({PR_URL_TMPL.format(pr)}): {get_pr_title(commit, pr)}")
 
-    print()
-    print("## Dependency updates")
-    print()
+    output_line()
+    output_line("## Dependency updates")
+    output_line()
 
     if not dependency_updates:
-        print("None")
+        output_line("None")
 
     for commit in dependency_updates:
         for pr in commit.prs:
             print(f"* [PR {pr}]({PR_URL_TMPL.format(pr)}): {get_pr_title(commit, pr)}")
 
-    print()
-    print("## Migrations")
-    print()
+    output_line()
+    output_line("## Migrations")
+    output_line()
 
     if not migrations:
-        print("None")
+        output_line("None")
 
     for migration in migrations:
-        print(f"* {migration['path']} - {migration['description']}")
+        output_line(f"* {migration['path']} - {migration['description']}")
+
+    print(f"\n\n{output}")
 
 
 if __name__ == "__main__":

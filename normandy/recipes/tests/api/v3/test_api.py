@@ -144,6 +144,22 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert "Cookies" not in res
 
+        def test_list_can_filter_baseline_recipes(self, rs_settings, api_client):
+            recipe1 = RecipeFactory(extra_capabilities=[])
+            rs_settings.BASELINE_CAPABILITIES |= recipe1.capabilities
+            assert recipe1.uses_only_baseline_capabilities()
+            recipe2 = RecipeFactory(extra_capabilities=["test-capability"])
+            assert not recipe2.uses_only_baseline_capabilities()
+
+            res = api_client.get("/api/v3/recipe/")
+            assert res.status_code == 200
+            assert res.data["count"] == 2
+
+            res = api_client.get("/api/v3/recipe/?uses_only_baseline_capabilities=true")
+            assert res.status_code == 200
+            assert res.data["count"] == 1
+            assert res.data["results"][0]["id"] == recipe1.id
+
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
@@ -388,6 +404,24 @@ class TestRecipeAPI(object):
 
             recipe = Recipe.objects.get()
             assert recipe.experimenter_slug == "some-experimenter-slug"
+
+        def test_without_experimenter_slug(self, api_client):
+            action = ActionFactory()
+
+            res = api_client.post(
+                "/api/v3/recipe/",
+                {
+                    "name": "Test Recipe",
+                    "action_id": action.id,
+                    "arguments": {},
+                    "extra_filter_expression": "whatever",
+                    "enabled": True,
+                },
+            )
+            assert res.status_code == 201, res.json()
+
+            recipe = Recipe.objects.get()
+            assert recipe.experimenter_slug is None
 
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()

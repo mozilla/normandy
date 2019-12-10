@@ -76,7 +76,6 @@ class TestAutographer(object):
                 "hash_algorithm": "sha384",
                 "ref": "fake_ref_1",
                 "signature": "fake_signature_1",
-                "public_key": "fake_pubkey_1",
             },
             {
                 "content-signature": (
@@ -86,7 +85,6 @@ class TestAutographer(object):
                 "hash_algorithm": "sha384",
                 "ref": "fake_ref_2",
                 "signature": "fake_signature_2",
-                "public_key": "fake_pubkey_2",
             },
         ]
 
@@ -100,19 +98,21 @@ class TestAutographer(object):
                 "timestamp": Whatever(),
                 "signature": "fake_signature_1",
                 "x5u": "https://example.com/fake_x5u_1",
-                "public_key": "fake_pubkey_1",
             },
             {
                 "timestamp": Whatever(),
                 "signature": "fake_signature_2",
                 "x5u": "https://example.com/fake_x5u_2",
-                "public_key": "fake_pubkey_2",
             },
         ]
 
         # Assert that logging happened
-        mock_logger.info.assert_called_with(
-            Whatever.contains("2"), extra={"code": signing.INFO_RECEIVED_SIGNATURES}
+        mock_logger.info.assert_has_calls(
+            [
+                call(Whatever.contains("2"), extra={"code": signing.INFO_RECEIVED_SIGNATURES}),
+                call(Whatever.contains("fake_ref_1")),
+                call(Whatever.contains("fake_ref_2")),
+            ]
         )
 
         # Assert the correct request was made
@@ -127,7 +127,7 @@ class TestAutographer(object):
         )
 
 
-class TestVerifySignature(object):
+class TestVerifySignaturePubkey(object):
 
     # known good data
     data = '{"action":"console-log","arguments":{"message":"telemetry available"},"enabled":true,"filter_expression":"telemetry != undefined","id":1,"last_updated":"2017-01-02T11:32:07.687408Z","name":"mython\'s system addon test","revision_id":"6dc874ded7d14af9ef9c147c5d2ceef9d15b56ca933681e574cd96a50b75946e"}'  # noqa
@@ -135,26 +135,55 @@ class TestVerifySignature(object):
     pubkey = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEVEKiCAIkwRg1VFsP8JOYdSF6a3qvgbRPoEK9eTuLbrB6QixozscKR4iWJ8ZOOX6RPCRgFdfVDoZqjFBFNJN9QtRBk0mVtHbnErx64d2vMF0oWencS1hyLW2whgOgOz7p"  # noqa
 
     def test_known_good_signature(self):
-        assert signing.verify_signature(self.data, self.signature, self.pubkey)
+        assert signing.verify_signature_pubkey(self.data, self.signature, self.pubkey)
 
     def test_raises_nice_error_for_too_short_signatures_bad_padding(self):
         signature = "a_too_short_signature"
 
         with pytest.raises(signing.WrongSignatureSize):
-            signing.verify_signature(self.data, signature, self.pubkey)
+            signing.verify_signature_pubkey(self.data, signature, self.pubkey)
 
     def test_raises_nice_error_for_too_short_signatures_good_base64(self):
         signature = "aa=="
 
         with pytest.raises(signing.WrongSignatureSize):
-            signing.verify_signature(self.data, signature, self.pubkey)
+            signing.verify_signature_pubkey(self.data, signature, self.pubkey)
 
     def test_raises_nice_error_for_wrong_signature(self):
         # change the signature, but keep it a valid signature
         signature = self.signature.replace("s", "S")
 
         with pytest.raises(signing.SignatureDoesNotMatch):
-            signing.verify_signature(self.data, signature, self.pubkey)
+            signing.verify_signature_pubkey(self.data, signature, self.pubkey)
+
+
+class TestVerifySignatureX5U(object):
+    def test_happy_path(self, mocker):
+        mock_verify_x5u = mocker.patch("normandy.recipes.signing.verify_x5u")
+        mock_der_encode = mocker.patch("normandy.recipes.signing.der_encode")
+        mock_verify_signature_pubkey = mocker.patch(
+            "normandy.recipes.signing.verify_signature_pubkey"
+        )
+
+        data = "abc"
+        signature = "signature"
+        x5u = "http://example.com/cert"
+        cert_contents = b"cert_contents"
+        encoded_cert_contents = base64.b64encode(cert_contents).decode()
+
+        mock_der_encode.return_value = cert_contents
+
+        public_key = "public_key"
+        cert = {"tbsCertificate": {"subjectPublicKeyInfo": public_key}}
+        mock_verify_x5u.return_value = cert
+
+        ret = signing.verify_signature_x5u(data, signature, x5u)
+
+        mock_verify_x5u.assert_called_with(x5u)
+        mock_der_encode.assert_called_with(public_key)
+        mock_verify_signature_pubkey.assert_called_with(data, signature, encoded_cert_contents)
+
+        assert ret == mock_verify_signature_pubkey.return_value
 
 
 class TestExtractCertsFromPem(object):
@@ -280,7 +309,7 @@ class TestVerifyX5u(object):
             not_before=not_before, not_after=not_after
         )
 
-        assert signing.verify_x5u(url)
+        assert signing.verify_x5u(url) == mock_parse_cert_from_der.return_value
         assert mock_requests.get.called_once_with(url)
         body = mock_requests.get.return_value.content.decode.return_value
         assert mock_extract_certs_from_pem.called_once_with(body)

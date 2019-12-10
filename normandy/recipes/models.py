@@ -346,7 +346,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         "EnabledState", null=True, on_delete=models.SET_NULL, related_name="current_for_revision"
     )
     comment = models.TextField()
-    experimenter_slug = models.CharField(null=True, max_length=255)
+    experimenter_slug = models.CharField(null=True, max_length=255, blank=True)
     extra_capabilities = ArrayField(models.CharField(max_length=255), default=list)
 
     class Meta:

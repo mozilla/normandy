@@ -7,6 +7,7 @@ from normandy.base.utils import ScopedSettings
 
 
 APPROVE_CHANGES_FLAG = {"status": "to-sign"}
+ROLLBACK_CHANGES_FLAG = {"status": "to-rollback"}
 logger = logging.getLogger(__name__)
 rs_settings = ScopedSettings("REMOTE_SETTINGS_")
 
@@ -24,25 +25,17 @@ def recipe_as_record(recipe):
         SignatureSerializer,
     )  # avoid circular imports
 
+    recipe_fields = {
+        **MinimalRecipeSerializer(recipe).data,
+        # Allow to filter retro compatible recipes in Remote Settings.
+        "uses_only_baseline_capabilities": recipe.uses_only_baseline_capabilities(),
+    }
     record = {
         "id": str(recipe.id),
-        "recipe": MinimalRecipeSerializer(recipe).data,
+        "recipe": recipe_fields,
         "signature": SignatureSerializer(recipe.signature).data,
     }
     return record
-
-
-def records_equal(a, b):
-    """Compare records, ignoring timestamps and collection schema version.
-
-    :param a: one record
-    :param b: another record
-    :returns: True if both are equal.
-    """
-    ignored_fields = ("last_modified", "schema")
-    ra = {k: v for k, v in a.items() if k not in ignored_fields}
-    rb = {k: v for k, v in b.items() if k not in ignored_fields}
-    return ra == rb
 
 
 class RemoteSettings:
@@ -141,6 +134,11 @@ class RemoteSettings:
                 rs_settings.CAPABILITIES_COLLECTION_ID,
             ]:
                 signer_config = capabilities["signer"]
+
+                # Since we use the rollback feature, make sure it's available.
+                if signer_config["version"] < "5.1.0":
+                    raise ImproperlyConfigured("kinto-signer 5.1.0+ is required")
+
                 normandy_resource = [
                     r
                     for r in signer_config["resources"]
@@ -304,39 +302,16 @@ class RemoteSettings:
         except kinto_http.exceptions.KintoException:
             # Approval failed unexpectedly.
             # The changes in the `main-workspace` bucket must be reverted.
-            collections = [rs_settings.CAPABILITIES_COLLECTION_ID]
+            self.client.patch_collection(
+                id=rs_settings.CAPABILITIES_COLLECTION_ID,
+                data=ROLLBACK_CHANGES_FLAG,
+                bucket=rs_settings.WORKSPACE_BUCKET_ID,
+            )
             if baseline:
-                collections.append(rs_settings.BASELINE_COLLECTION_ID)
-
-            for collection in collections:
-                records_in_workspace = self.client.get_records(
-                    bucket=rs_settings.WORKSPACE_BUCKET_ID, collection=collection
+                self.client.patch_collection(
+                    id=rs_settings.BASELINE_COLLECTION_ID,
+                    data=ROLLBACK_CHANGES_FLAG,
+                    bucket=rs_settings.WORKSPACE_BUCKET_ID,
                 )
-                records_in_prod = self.client.get_records(
-                    bucket=rs_settings.PUBLISH_BUCKET_ID, collection=collection
-                )
-                in_prod_by_id = {r["id"]: r for r in records_in_prod}
-                # Compare records collection in prod vs. in workspace.
-                for record in records_in_workspace:
-                    in_prod = in_prod_by_id.pop(record["id"], None)
-                    if in_prod is None:
-                        # Record only exists in workspace, delete it.
-                        self.client.delete_record(
-                            id=record["id"],
-                            bucket=rs_settings.WORKSPACE_BUCKET_ID,
-                            collection=collection,
-                        )
-                    elif not records_equal(record, in_prod):
-                        # Record was modified in workspace, restore it.
-                        self.client.update_record(
-                            data=in_prod,
-                            bucket=rs_settings.WORKSPACE_BUCKET_ID,
-                            collection=collection,
-                        )
-                # Remaining records only exist in prod, re-create them.
-                for in_prod in in_prod_by_id.values():
-                    self.client.create_record(
-                        data=in_prod, bucket=rs_settings.WORKSPACE_BUCKET_ID, collection=collection
-                    )
 
             raise

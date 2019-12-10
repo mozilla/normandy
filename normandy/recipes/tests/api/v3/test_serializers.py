@@ -33,6 +33,7 @@ class TestRecipeSerializer:
             ).data,
             "approved_revision": None,
             "signature": None,
+            "uses_only_baseline_capabilities": False,
         }
 
     def test_validation_with_invalid_action(self):
@@ -174,6 +175,76 @@ class TestRecipeSerializer:
                 ],
             },
             "experimenter_slug": "some-experimenter-slug",
+        }
+        assert serializer.errors == {}
+
+    def test_valid_with_missing_experimenter_slug(self):
+        mockAction = ActionFactory(name="show-heartbeat", arguments_schema=ARGUMENTS_SCHEMA)
+
+        serializer = RecipeSerializer(
+            data={
+                "name": "bar",
+                "enabled": True,
+                "extra_filter_expression": "[]",
+                "action_id": mockAction.id,
+                "arguments": {
+                    "surveyId": "lorem-ipsum-dolor",
+                    "surveys": [
+                        {"title": "adipscing", "weight": 1},
+                        {"title": "consequetar", "weight": 1},
+                    ],
+                },
+            }
+        )
+
+        assert serializer.is_valid()
+        assert serializer.validated_data == {
+            "name": "bar",
+            "extra_filter_expression": "[]",
+            "action": mockAction,
+            "arguments": {
+                "surveyId": "lorem-ipsum-dolor",
+                "surveys": [
+                    {"title": "adipscing", "weight": 1},
+                    {"title": "consequetar", "weight": 1},
+                ],
+            },
+        }
+        assert serializer.errors == {}
+
+    def test_valid_with_null_experimenter_slug(self):
+        mockAction = ActionFactory(name="show-heartbeat", arguments_schema=ARGUMENTS_SCHEMA)
+
+        serializer = RecipeSerializer(
+            data={
+                "name": "bar",
+                "enabled": True,
+                "extra_filter_expression": "[]",
+                "action_id": mockAction.id,
+                "arguments": {
+                    "surveyId": "lorem-ipsum-dolor",
+                    "surveys": [
+                        {"title": "adipscing", "weight": 1},
+                        {"title": "consequetar", "weight": 1},
+                    ],
+                },
+                "experimenter_slug": None,
+            }
+        )
+
+        assert serializer.is_valid()
+        assert serializer.validated_data == {
+            "name": "bar",
+            "extra_filter_expression": "[]",
+            "action": mockAction,
+            "arguments": {
+                "surveyId": "lorem-ipsum-dolor",
+                "surveys": [
+                    {"title": "adipscing", "weight": 1},
+                    {"title": "consequetar", "weight": 1},
+                ],
+            },
+            "experimenter_slug": None,
         }
         assert serializer.errors == {}
 
