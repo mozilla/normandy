@@ -20,11 +20,11 @@
     "uuid": "3.3.3"
   },
   "devDependencies": {
-    "@babel/core": "7.7.4",
+    "@babel/core": "7.7.7",
     "@babel/plugin-proposal-class-properties": "7.7.4",
     "@babel/plugin-proposal-function-bind": "7.7.4",
-    "@babel/plugin-proposal-object-rest-spread": "7.7.4",
-    "@babel/plugin-transform-modules-commonjs": "7.7.4",
+    "@babel/plugin-proposal-object-rest-spread": "7.7.7",
+    "@babel/plugin-transform-modules-commonjs": "7.7.5",
     "ajv": "6.10.2",
     "babel-eslint": "10.0.3",
     "babel-loader": "8.0.6",
