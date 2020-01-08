@@ -25,14 +25,9 @@ def recipe_as_record(recipe):
         SignatureSerializer,
     )  # avoid circular imports
 
-    recipe_fields = {
-        **MinimalRecipeSerializer(recipe).data,
-        # Allow to filter retro compatible recipes in Remote Settings.
-        "uses_only_baseline_capabilities": recipe.uses_only_baseline_capabilities(),
-    }
     record = {
         "id": str(recipe.id),
-        "recipe": recipe_fields,
+        "recipe": MinimalRecipeSerializer(recipe).data,
         "signature": SignatureSerializer(recipe.signature).data,
     }
     return record
