@@ -312,6 +312,47 @@ class VersionFilter(BaseFilter):
         return set()
 
 
+class VersionRangeFilter(BaseFilter):
+    """
+    Match a user running a version in the given range. Uses a version compare
+    filter instead of simple string comparison like VersionFilter.
+
+    The version range is half-open, like Python ranges: If min is 72 and max
+    is 75, 72.0 will be include, 75.0 will not be. `min <= version < max`.
+
+    ..attribute:: type
+
+        ``version_range``
+
+    .. attribute:: min_version
+
+        :example: ``72.0b5``
+
+    .. attribute:: max_version
+
+        :example: ``75.0.1``
+    """
+
+    type = "version_range"
+    min_version = serializers.CharField()
+    max_version = serializers.CharField()
+
+    def to_jexl(self):
+        min_version = self.initial_data["min_version"]
+        max_version = self.initial_data["max_version"]
+
+        return "&&".join(
+            [
+                f'(env.version|versionCompare("{min_version}")>=0)',  # browser version >= min_version
+                f'(env.version|versionCompare("{max_version}")<0)',  # browser version < max_version
+            ]
+        )
+
+    @property
+    def capabilities(self):
+        return {"jexl.context.env.version", "jexl.transform.versionCompare"}
+
+
 by_type = {
     f.type: f
     for f in [
@@ -321,6 +362,7 @@ by_type = {
         BucketSampleFilter,
         StableSampleFilter,
         VersionFilter,
+        VersionRangeFilter,
     ]
 }
 
