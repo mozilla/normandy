@@ -13,7 +13,7 @@ import requests.exceptions
 from markus.testing import MetricsMock
 from markus import GAUGE
 
-from normandy.base.tests import UserFactory
+from normandy.base.tests import UserFactory, Whatever
 from normandy.recipes import exports
 from normandy.recipes.models import Action, Recipe
 from normandy.recipes.tests import ActionFactory, RecipeFactory
@@ -254,6 +254,58 @@ class TestUpdateRecipeSignatures(object):
             mm.print_records()
             assert mm.has_record(GAUGE, stat="normandy.signing.recipes.signed", value=3)
             assert mm.has_record(GAUGE, stat="normandy.signing.recipes.unsigned", value=1)
+
+    def test_it_does_not_send_excessive_remote_settings_traffic(
+        self, mocker, settings, mocked_autograph
+    ):
+        # 10 to update
+        recipes = RecipeFactory.create_batch(
+            10, approver=UserFactory(), enabler=UserFactory(), signed=False
+        )
+        assert all(not r.uses_only_baseline_capabilities() for r in recipes)
+
+        # Set up a version of the Remote Settings helper with a mocked out client
+        client_mock = None
+
+        def rs_with_mocked_client():
+            nonlocal client_mock
+            assert client_mock is None
+            rs = exports.RemoteSettings()
+            client_mock = mocker.MagicMock()
+            rs.client = client_mock
+            return rs
+
+        mocker.patch(
+            "normandy.recipes.management.commands.update_recipe_signatures.RemoteSettings",
+            side_effect=rs_with_mocked_client,
+        )
+
+        call_command("update_recipe_signatures")
+
+        # Make sure that our mock was actually used
+        assert client_mock
+
+        # One signing request to the capabilities collection
+        assert client_mock.patch_collection.mock_calls == [
+            mocker.call(
+                id=settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID,
+                data={"status": "to-sign"},
+                bucket=settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID,
+            )
+        ]
+
+        # one publish to the capabilities collection per recipe
+        expected_calls = []
+        for recipe in recipes:
+            expected_calls.append(
+                mocker.call(
+                    data=Whatever(lambda r: r["id"] == recipe.id, name=f"Recipe {recipe.id}"),
+                    bucket=settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID,
+                    collection=settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID,
+                )
+            )
+        client_mock.update_record.has_calls(expected_calls, any_order=True)  # all expected calls
+        assert client_mock.update_record.call_count == len(expected_calls)  # no extra calls
 
 
 @pytest.mark.django_db

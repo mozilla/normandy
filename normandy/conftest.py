@@ -8,7 +8,7 @@ from graphene.test import Client as GrapheneClient
 from rest_framework.test import APIClient
 
 from normandy.schema import schema as normandy_schema
-from normandy.base.tests import UserFactory, skip_except_in_ci
+from normandy.base.tests import UserFactory
 from normandy.recipes import geolocation as geolocation_module
 from normandy.recipes.tests import fake_sign
 
@@ -34,7 +34,7 @@ def geolocation():
     """Fixture to load geolocation data."""
     geolocation_module.load_geoip_database()
     if geolocation_module.geoip_reader is None:
-        skip_except_in_ci()
+        pytest.skip()
     else:
         return geolocation_module
 
