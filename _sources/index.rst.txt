@@ -6,9 +6,7 @@ precise criteria.
 
 This documentation is primarily concerned with the server side components of
 Normandy. For details about the Firefox components, known as the Normandy
-Client, see the `Firefox Source Docs on the subject <fx-source-docs>`_.
-
-.. _fx-source-docs: https://firefox-source-docs.mozilla.org/toolkit/components/normandy/normandy/
+Client, see the `Firefox Source Docs on the subject <https://firefox-source-docs.mozilla.org/toolkit/components/normandy/normandy/>`_.
 
 .. toctree::
    :maxdepth: 2
