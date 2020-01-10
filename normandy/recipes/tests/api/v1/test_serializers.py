@@ -67,6 +67,7 @@ class TestMinimalRecipeSerializer:
             "action": action.name,
             "arguments": {"foo": "bar"},
             "capabilities": sorted(recipe.capabilities),
+            "uses_only_baseline_capabilities": False,
         }
 
     def test_capabilities_are_sorted(self, rf):
@@ -123,6 +124,7 @@ class TestSignedRecipeSerializer:
                 "action": action.name,
                 "arguments": recipe.arguments,
                 "capabilities": sorted(recipe.capabilities),
+                "uses_only_baseline_capabilities": False,
             },
         }
 

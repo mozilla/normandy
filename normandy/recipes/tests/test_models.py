@@ -410,7 +410,8 @@ class TestRecipe(object):
             '"filter_expression":"%(filter_expression)s",'
             '"id":%(id)s,'
             '"name":"canonical",'
-            '"revision_id":"%(revision_id)s"'
+            '"revision_id":"%(revision_id)s",'
+            '"uses_only_baseline_capabilities":false'
             "}"
         ) % {
             "id": recipe.id,

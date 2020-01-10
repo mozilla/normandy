@@ -113,6 +113,7 @@ class MinimalRecipeSerializer(RecipeSerializer):
     """
 
     revision_id = serializers.SerializerMethodField()
+    uses_only_baseline_capabilities = serializers.SerializerMethodField()
 
     class Meta(RecipeSerializer.Meta):
         # Attributes serialized here are made available to filter expressions via
@@ -126,6 +127,7 @@ class MinimalRecipeSerializer(RecipeSerializer):
             "arguments",
             "filter_expression",
             "capabilities",
+            "uses_only_baseline_capabilities",
         ]
 
     def get_revision_id(self, recipe):
@@ -135,6 +137,9 @@ class MinimalRecipeSerializer(RecipeSerializer):
             return str(recipe.current_revision.id)
         else:
             None
+
+    def get_uses_only_baseline_capabilities(self, recipe):
+        return recipe.uses_only_baseline_capabilities()
 
 
 class RecipeRevisionSerializer(serializers.ModelSerializer):
