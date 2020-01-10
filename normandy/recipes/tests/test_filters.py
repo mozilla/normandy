@@ -1,11 +1,13 @@
 import pytest
 
 from normandy.recipes.filters import (
-    ChannelFilter,
-    LocaleFilter,
-    CountryFilter,
     BucketSampleFilter,
+    ChannelFilter,
+    CountryFilter,
+    LocaleFilter,
     StableSampleFilter,
+    VersionFilter,
+    VersionRangeFilter,
 )
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
@@ -39,7 +41,35 @@ class FilterTestsBase:
         if self.should_be_baseline:
             assert capabilities <= settings.BASELINE_CAPABILITIES
         else:
-            assert capabilities > settings.BASELINE_CAPABILITIES
+            assert capabilities - settings.BASELINE_CAPABILITIES
+
+
+class TestVersionFilter(FilterTestsBase):
+    def create_basic_filter(self, versions=None):
+        if versions is None:
+            versions = [72, 74]
+        return VersionFilter.create(versions=versions)
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter(versions=[72, 74])
+        assert set(filter.to_jexl().split("||")) == {
+            '(normandy.version>="72"&&normandy.version<"73")',
+            '(normandy.version>="74"&&normandy.version<"75")',
+        }
+
+
+class TestVersionRangeFilter(FilterTestsBase):
+    should_be_baseline = False
+
+    def create_basic_filter(self, min_version="72.0b2", max_version="72.0b8"):
+        return VersionRangeFilter.create(min_version=min_version, max_version=max_version)
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter(min_version="72.0b2", max_version="75.0a1")
+        assert set(filter.to_jexl().split("&&")) == {
+            '(env.version|versionCompare("72.0b2")>=0)',
+            '(env.version|versionCompare("75.0a1")<0)',
+        }
 
 
 class TestChannelFilter(FilterTestsBase):
