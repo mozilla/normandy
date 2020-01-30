@@ -8,6 +8,7 @@ from normandy.recipes.filters import (
     StableSampleFilter,
     VersionFilter,
     VersionRangeFilter,
+    DateRangeFilter,
 )
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
@@ -71,6 +72,18 @@ class TestVersionRangeFilter(FilterTestsBase):
             '(env.version|versionCompare("75.0a1")<0)',
         }
 
+
+class TestDateRangeFilter(FilterTestsBase):
+
+    def create_basic_filter(self, not_before="2020-02-01T00:00:00Z", not_after="2020-03-01T00:00:00Z"):
+        return DateRangeFilter.create(not_before=not_before, not_after=not_after)
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("&&")) == {
+            '(normandy.request_time>"2020-02-01T00:00:00Z"|date)',
+            '(normandy.request_time<"2020-03-01T00:00:00Z"|date)',
+        }
 
 class TestChannelFilter(FilterTestsBase):
     def create_basic_filter(self, channels=None):

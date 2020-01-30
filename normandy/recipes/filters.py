@@ -353,6 +353,28 @@ class VersionRangeFilter(BaseFilter):
         return {"jexl.context.env.version", "jexl.transform.versionCompare"}
 
 
+class DateRangeFilter(BaseFilter):
+
+    type = "date_range"
+    not_before = serializers.DateTimeField()
+    not_after =  serializers.DateTimeField()
+
+    def to_jexl(self):
+        not_before = self.initial_data["not_before"]
+        not_after = self.initial_data["not_after"]
+
+        return "&&".join (
+            [
+                f'(normandy.request_time>"{not_before}"|date)',
+                f'(normandy.request_time<"{not_after}"|date)'
+            ]
+        )
+
+    @property
+    def capabilities(self):
+        # do we need to make sure 'date' is.. a capability? What is 'date'?
+        return set()
+
 by_type = {
     f.type: f
     for f in [
@@ -363,6 +385,7 @@ by_type = {
         StableSampleFilter,
         VersionFilter,
         VersionRangeFilter,
+        DateRangeFilter,
     ]
 }
 
