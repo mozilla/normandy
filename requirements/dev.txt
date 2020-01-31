@@ -1,7 +1,6 @@
 -r default.txt
 
-appnope==0.1.0 \
-   --hash sha256:5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0 
+
 asn1crypto==1.1.0 \
     --hash=sha256:5abe83e773026162e4869f4ac16edf7554f661e8cc0bb6d2be3bc6915456731b \
     --hash=sha256:8f3f9470d4ba7aa53afb00278dc26aac22dc3a0d4ed1335fd772f034e094401e

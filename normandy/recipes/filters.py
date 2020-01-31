@@ -365,15 +365,14 @@ class DateRangeFilter(BaseFilter):
 
         return "&&".join(
             [
-                f'(normandy.request_time>"{not_before}"|date)',
-                f'(normandy.request_time<"{not_after}"|date)',
+                f'(normandy.request_time>="{not_before}"|date)',
+                f'(normandy.request_time<="{not_after}"|date)',
             ]
         )
 
     @property
     def capabilities(self):
-        # do we need to make sure 'date' is.. a capability? What is 'date'?
-        return set()
+        return {"jexl.transform.date"}
 
 
 by_type = {
