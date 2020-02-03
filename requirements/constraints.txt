@@ -365,8 +365,9 @@ ruamel.yaml.clib==0.1.2 \
     --hash=sha256:eee7ecd2eee648884fae6c51ae50c814acdcc5d6340dc96c970158aebcd25ac6 \
     --hash=sha256:ef8d4522d231cb9b29f6cdd0edc8faac9d9715c60dc7becbd6eb82c915a98e5b \
     --hash=sha256:f504d45230cc9abf2810623b924ae048b224a90adb01f97db4e766cfdda8e6eb
-Rx==1.6.1 \
-    --hash=sha256:7357592bc7e881a95e0c2013b73326f704953301ab551fbc8133a6fadab84105
+Rx==3.0.1 \
+    --hash=sha256:00c4ab3ecd1ab9a55f310d05e20ae7f93d3cdd1150de5c56347e67a1ecd73963 \
+    --hash=sha256:c7d168618e3cec35fda9c9c8b5d7f966739df4b1a99b315eae1fc2d7d69e2512
 s3transfer==0.2.1 \
     --hash=sha256:6efc926738a3cd576c2a79725fed9afde92378aa5c6a957e3af010cb019fac9d \
     --hash=sha256:b780f2411b824cb541dbcd2c713d0cb61c7d1bcadae204cdddda2b35cef493ba
