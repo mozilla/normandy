@@ -54,9 +54,9 @@ django-mozilla-product-details==0.14.1 \
     --hash=sha256:b7428e2dae653c4b0e35fa15363dd26b74dba821bf384c5cd835da0f1566b841
 django-npm==1.0.0 \
     --hash=sha256:2e6bba65e728fa18b9db3c8dc0d4490b70cb7f43bacf60eb3654d7dcb6424272
-django-storages==1.7.2 \
-    --hash=sha256:87287b7ad2e789cd603373439994e1ac6f94d9dc2e5f8173d2a87aa3ed458bd9 \
-    --hash=sha256:f3b3def96493d3ccde37b864cea376472baf6e8a596504b209278801c510b807
+django-storages==1.9 \
+    --hash=sha256:2b02f9e24ae617a075c8e3f39a56fa26faa250c052f42958c2a3ee1c56d7a06e \
+    --hash=sha256:9bc1fff05d45eafeaedd3973defbb301e4065e1d813e71b0251c756108aad2dd
 django_csp==3.5 \
     --hash=sha256:8b9997df89a7a936d7c397e051367f974aa1d1a97d0b32acb4300087b3bed071 \
     --hash=sha256:04600237701e6d6ff78ed7d41209ff923988148bf292c128f6b474b9befe444f
