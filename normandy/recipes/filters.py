@@ -21,6 +21,7 @@ field, so the final JSON would look something like this:
 """
 
 from rest_framework import serializers
+from datetime import datetime
 
 # If you add a new filter to this file, remember to update the docs too!
 
@@ -393,6 +394,37 @@ class DateRangeFilter(BaseFilter):
         return {"jexl.transform.date"}
 
 
+class ProfileCreateDateFilter(BaseFilter):
+
+    type = "profile_creation_date"
+    direction = serializers.CharField()
+    date = serializers.DateField()
+
+    def to_jexl(self):
+        direction = self.initial_data["direction"]
+        date = self.initial_data["date"]
+
+        days = (datetime.strptime(date, "%Y-%M-%d") - datetime(1970, 1, 1)).days
+
+        if direction == "olderThan":
+            symbol = "<="
+        elif direction == "newerThan":
+            symbol = ">"
+        else:
+            raise serializers.ValidationError(f"Unrecognized direction {direction!r}")
+
+        return "||".join(
+            [
+                "(!normandy.telemetry.main)",
+                f"(normandy.telemetry.main.environment.profile.creationDate{symbol}{days})",
+            ]
+        )
+
+    @property
+    def capabilities(self):
+        return set()
+
+
 by_type = {
     f.type: f
     for f in [
@@ -404,6 +436,7 @@ by_type = {
         VersionFilter,
         VersionRangeFilter,
         DateRangeFilter,
+        ProfileCreateDateFilter,
     ]
 }
 

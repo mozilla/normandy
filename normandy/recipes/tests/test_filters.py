@@ -9,6 +9,7 @@ from normandy.recipes.filters import (
     VersionFilter,
     VersionRangeFilter,
     DateRangeFilter,
+    ProfileCreateDateFilter,
 )
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
@@ -43,6 +44,18 @@ class FilterTestsBase:
             assert capabilities <= settings.BASELINE_CAPABILITIES
         else:
             assert capabilities - settings.BASELINE_CAPABILITIES
+
+
+class TestProfileCreationDateFilter(FilterTestsBase):
+    def create_basic_filter(self, direction="olderThan", date="2020-02-01"):
+        return ProfileCreateDateFilter.create(direction=direction, date=date)
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("||")) == {
+            "(!normandy.telemetry.main)",
+            "(normandy.telemetry.main.environment.profile.creationDate<18262)",
+        }
 
 
 class TestVersionFilter(FilterTestsBase):
