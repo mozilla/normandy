@@ -236,9 +236,9 @@ maxminddb==1.5.2 \
 mccabe==0.6.1 \
     --hash=sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42 \
     --hash=sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f
-mohawk==1.0.0 \
-    --hash=sha256:aa57e6626a6ea323ab714779f23734de1d1feca8cb6fc00b65e65ce115c1696a \
-    --hash=sha256:fca4e34d8f5492f1c33141c98b96e168a089e5692ce65fb747e4bb613f5fe552
+mohawk==1.1.0 \
+    --hash=sha256:3ed296a30453d0b724679e0fd41e4e940497f8e461a9a9c3b7f36e43bab0fa09 \
+    --hash=sha256:d2a0e3ab10a209cc79e95e28f2dd54bd4a73fd1998ffe27b7ba0f962b6be9723
 more-itertools==7.2.0 \
     --hash=sha256:409cd48d4db7052af495b09dec721011634af3753ae1ef92d2b32f73a745f832 \
     --hash=sha256:92b8c4b06dac4f0611c0729b2f2ede52b2e1bac1ab48f089c7ddc12e26bb60c4
