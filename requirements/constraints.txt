@@ -250,8 +250,9 @@ parsimonious==0.8.1 \
 parso==0.6.0 \
     --hash=sha256:1376bdc8cb81377ca481976933773295218a2df47d3e1182ba76d372b1acb128 \
     --hash=sha256:597f36de5102a8db05ffdf7ecdc761838b86565a4a111604c6e78beaedf1b045
-pathspec==0.6.0 \
-    --hash=sha256:e285ccc8b0785beadd4c18e5708b12bb8fcf529a1e61215b3feff1d1e559ea5c
+pathspec==0.7.0 \
+    --hash=sha256:163b0632d4e31cef212976cf57b43d9fd6b0bac6e67c26015d611a647d5e7424 \
+    --hash=sha256:562aa70af2e0d434367d9790ad37aed893de47f1693e4201fd1d3dca15d19b96
 pathtools==0.1.2 \
     --hash=sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0
 pbr==2.0.0 \
