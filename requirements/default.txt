@@ -184,9 +184,9 @@ pyjexl==0.2.3 \
 pytest==5.3.5 \
     --hash=sha256:0d5fe9189a148acc3c3eb2ac8e1ac0742cb7618c084f3d228baaec0c254b318d \
     --hash=sha256:ff615c761e25eb25df19edddc0b970302d2a9091fbce0e7213298d85fb61fef6
-pytest-django==3.5.1 \
-    --hash=sha256:264fb4c506db5d48a6364c311a0b00b7b48a52715bad8839b2d8bee9b99ed6bb \
-    --hash=sha256:4adfe5fb3ed47f0ba55506dd3daf688b1f74d5e69148c10ad2dd2f79f40c0d62
+pytest-django==3.8.0 \
+    --hash=sha256:456fa6854d04ee625d6bbb8b38ca2259e7040a6f93333bfe8bc8159b7e987203 \
+    --hash=sha256:489b904f695f9fb880ce591cf5a4979880afb467763b1f180c07574554bdfd26
 pytest-mock==1.11.1 \
     --hash=sha256:34520283d459cdf1d0dbb58a132df804697f1b966ecedf808bbf3d255af8f659 \
     --hash=sha256:f1ab8aefe795204efe7a015900296d1719e7bf0f4a0558d71e8599da1d1309d0
