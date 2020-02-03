@@ -1,8 +1,8 @@
 -c constraints.txt
 
-backoff==1.8.1 \
-    --hash=sha256:3f1ed23d36c65ec16c143e432b12c19aaf12ed791317b91ab50dd14ac6255a3c \
-    --hash=sha256:53531e45432b18795f808c28dd9c5a4b32fe44aa713780ea892f07c3e6b36c11
+backoff==1.10.0 \
+    --hash=sha256:5e73e2cbe780e1915a204799dba0a01896f45f4385e636bcca7a0614d879d0cd \
+    --hash=sha256:b8fba021fac74055ac05eb7c7bfce4723aedde6cd0a504e5326bcb0bdd6d19a4
 bcrypt==3.1.7 \
     --hash=sha256:0258f143f3de96b7c14f762c770f5fc56ccd72f8a1857a451c1cd9a655d9ac89 \
     --hash=sha256:0b0069c752ec14172c5f78208f1863d7ad6755a6fae6fe76ec2c80d13be41e42 \
