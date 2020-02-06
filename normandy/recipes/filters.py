@@ -354,6 +354,24 @@ class VersionRangeFilter(BaseFilter):
 
 
 class DateRangeFilter(BaseFilter):
+    """
+    Match a user to a delivery that starts on or after the ``not_before`` date and
+    before the ``not_after`` date.
+
+    The date range is half-open, so `not_before <= normandy.request_time < not_after`.
+
+    .. attribute:: type
+
+        ``date_range``
+
+    .. attribute:: not_before
+
+       :example: ``2020-02-01T00:00:00Z``
+
+   .. attribute:: not_after
+
+      :example: ``2020-03-01T00:00:00Z``
+    """
 
     type = "date_range"
     not_before = serializers.DateTimeField()
@@ -366,7 +384,7 @@ class DateRangeFilter(BaseFilter):
         return "&&".join(
             [
                 f'(normandy.request_time>="{not_before}"|date)',
-                f'(normandy.request_time<="{not_after}"|date)',
+                f'(normandy.request_time<"{not_after}"|date)',
             ]
         )
 

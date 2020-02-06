@@ -83,7 +83,7 @@ class TestDateRangeFilter(FilterTestsBase):
         filter = self.create_basic_filter()
         assert set(filter.to_jexl().split("&&")) == {
             '(normandy.request_time>="2020-02-01T00:00:00Z"|date)',
-            '(normandy.request_time<="2020-03-01T00:00:00Z"|date)',
+            '(normandy.request_time<"2020-03-01T00:00:00Z"|date)',
         }
 
 
