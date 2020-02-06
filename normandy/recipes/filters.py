@@ -353,6 +353,46 @@ class VersionRangeFilter(BaseFilter):
         return {"jexl.context.env.version", "jexl.transform.versionCompare"}
 
 
+class DateRangeFilter(BaseFilter):
+    """
+    Match a user to a delivery that starts on or after the ``not_before`` date and
+    before the ``not_after`` date.
+
+    The date range is half-open, so `not_before <= normandy.request_time < not_after`.
+
+    .. attribute:: type
+
+        ``date_range``
+
+    .. attribute:: not_before
+
+       :example: ``2020-02-01T00:00:00Z``
+
+   .. attribute:: not_after
+
+      :example: ``2020-03-01T00:00:00Z``
+    """
+
+    type = "date_range"
+    not_before = serializers.DateTimeField()
+    not_after = serializers.DateTimeField()
+
+    def to_jexl(self):
+        not_before = self.initial_data["not_before"]
+        not_after = self.initial_data["not_after"]
+
+        return "&&".join(
+            [
+                f'(normandy.request_time>="{not_before}"|date)',
+                f'(normandy.request_time<"{not_after}"|date)',
+            ]
+        )
+
+    @property
+    def capabilities(self):
+        return {"jexl.transform.date"}
+
+
 by_type = {
     f.type: f
     for f in [
@@ -363,6 +403,7 @@ by_type = {
         StableSampleFilter,
         VersionFilter,
         VersionRangeFilter,
+        DateRangeFilter,
     ]
 }
 
