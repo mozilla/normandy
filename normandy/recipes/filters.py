@@ -395,6 +395,23 @@ class DateRangeFilter(BaseFilter):
 
 
 class ProfileCreateDateFilter(BaseFilter):
+    """
+        This filter is meant to distinguish between new and existing users.
+        Target users who have a profile creation date older than or newer than
+        a given date. This date must be specified in days since January 1st 1970.
+
+        .. attribute:: type
+
+            ``profile_creation_date``
+
+        .. attribute:: direction
+
+           :example: ``newer_than``
+
+       .. attribute:: date
+
+          :example: ``18657``
+    """
 
     type = "profile_creation_date"
     direction = serializers.CharField()
