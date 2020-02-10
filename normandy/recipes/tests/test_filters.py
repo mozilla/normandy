@@ -50,11 +50,19 @@ class TestProfileCreationDateFilter(FilterTestsBase):
     def create_basic_filter(self, direction="olderThan", date="2020-02-01"):
         return ProfileCreateDateFilter.create(direction=direction, date=date)
 
-    def test_generates_jexl(self):
+    def test_generates_jexl_older_than(self):
         filter = self.create_basic_filter()
         assert set(filter.to_jexl().split("||")) == {
             "(!normandy.telemetry.main)",
-            "(normandy.telemetry.main.environment.profile.creationDate<18262)",
+            "(normandy.telemetry.main.environment.profile.creationDate<=18262)",
+        }
+
+    def test_generates_jexl_newer_than(self):
+        filter = self.create_basic_filter(direction="newerThan", date="2020-02-01")
+
+        assert set(filter.to_jexl().split("||")) == {
+            "(!normandy.telemetry.main)",
+            "(normandy.telemetry.main.environment.profile.creationDate>18262)",
         }
 
 
