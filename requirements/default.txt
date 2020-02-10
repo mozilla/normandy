@@ -32,9 +32,9 @@ dj-database-url==0.5.0 \
 dj-inmemorystorage==2.0.0 \
     --hash=sha256:57a3d343a3f01ea10f2e4fd0583caa08716af9b4c939413cd495a519d98c8264 \
     --hash=sha256:72d3a3f25bbf097fb3766e2da87e2bcdaf1c1e1c45edefe74f8153db92948532
-Django==2.2.8 \
-    --hash=sha256:fa98ec9cc9bf5d72a08ebf3654a9452e761fbb8566e3f80de199cbc15477e891 \
-    --hash=sha256:a4ad4f6f9c6a4b7af7e2deec8d0cbff28501852e5010d6c2dc695d3d1fae7ca0
+Django==3.0.3 \
+    --hash=sha256:2f1ba1db8648484dd5c238fb62504777b7ad090c81c5f1fd8d5eb5ec21b5f283 \
+    --hash=sha256:c91c91a7ad6ef67a874a4f76f58ba534f9208412692a840e1d125eb5c279cb0a
 django-configurations==2.1 \
     --hash=sha256:e70433eeed10549d30bf5ca386c962505ff9f492893dd2483c52af536347adce \
     --hash=sha256:71d9acdff33aa034f0157b0b3d23629fe0cd499bf4d0b6d699b9ca0701d952e8
