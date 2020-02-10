@@ -134,10 +134,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.filter_expression
 
     @current_revision_property()
-    def extra_filter_expression(self):
-        return self.current_revision.extra_filter_expression
-
-    @current_revision_property()
     def filter_object(self):
         return self.current_revision.filter_object
 
@@ -162,33 +158,8 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.channels
 
     @current_revision_property()
-    def countries(self):
-        return self.current_revision.countries
-
-    @current_revision_property()
-    def locales(self):
-        return self.current_revision.locales
-
-    @current_revision_property()
-    def identicon_seed(self):
-        return self.current_revision.identicon_seed
-
-    @current_revision_property()
-    def comment(self):
-        return self.current_revision.comment
-
-    @current_revision_property()
-    def experimenter_slug(self):
-        return self.current_revision.experimenter_slug
-
-    @current_revision_property()
     def capabilities(self):
         return self.current_revision.capabilities
-
-    @current_revision_property()
-    def extra_capabilities(self):
-        """A list of capabilities manually specified for this recipe."""
-        return self.current_revision.extra_capabilities
 
     def uses_only_baseline_capabilities(self):
         return self.capabilities <= settings.BASELINE_CAPABILITIES

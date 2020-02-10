@@ -403,7 +403,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
 
             recipe = Recipe.objects.get()
-            assert recipe.experimenter_slug == "some-experimenter-slug"
+            assert recipe.latest_revision.experimenter_slug == "some-experimenter-slug"
 
         def test_without_experimenter_slug(self, api_client):
             action = ActionFactory()
@@ -421,7 +421,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201, res.json()
 
             recipe = Recipe.objects.get()
-            assert recipe.experimenter_slug is None
+            assert recipe.latest_revision.experimenter_slug is None
 
         def test_creating_recipes_stores_the_user(self, api_client):
             action = ActionFactory()
@@ -456,7 +456,7 @@ class TestRecipeAPI(object):
 
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
@@ -494,7 +494,7 @@ class TestRecipeAPI(object):
 
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
         def test_it_accepts_capabilities(self, api_client):
@@ -513,7 +513,7 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             # Passed extra capabilities:
-            assert recipe.extra_capabilities == ["test.one", "test.two"]
+            assert recipe.latest_revision.extra_capabilities == ["test.one", "test.two"]
             # Extra capabilities get included in capabilities
             assert {"test.one", "test.two"} <= set(recipe.capabilities)
 
@@ -608,7 +608,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.comment == "bar"
+            assert r.latest_revision.comment == "bar"
 
         def test_update_recipe_experimenter_slug(self, api_client):
             r = RecipeFactory()
@@ -617,7 +617,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.experimenter_slug == "a-new-slug"
+            assert r.latest_revision.experimenter_slug == "a-new-slug"
 
         def test_updating_recipes_stores_the_user(self, api_client):
             recipe = RecipeFactory()
@@ -639,7 +639,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_object
             assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
 
@@ -653,7 +653,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.extra_filter_expression == ""
+            assert recipe.latest_revision.extra_filter_expression == ""
 
             # Let's paranoid-check that you can't unset the filter_object too.
             res = api_client.patch(
@@ -1259,7 +1259,7 @@ class TestRecipeRevisionAPI(object):
     def test_it_has_an_identicon_seed(self, api_client):
         recipe = RecipeFactory(enabler=UserFactory(), approver=UserFactory())
         res = api_client.get(f"/api/v3/recipe_revision/{recipe.latest_revision.id}/")
-        assert res.data["identicon_seed"] == recipe.identicon_seed
+        assert res.data["identicon_seed"] == recipe.latest_revision.identicon_seed
 
 
 @pytest.mark.django_db

@@ -31,7 +31,6 @@ class TestRecipeSerializer:
             "id": recipe.id,
             "last_updated": Whatever(),
             "enabled": recipe.enabled,
-            "extra_filter_expression": recipe.extra_filter_expression,
             "filter_expression": recipe.filter_expression,
             "revision_id": recipe.revision_id,
             "action": action.name,
@@ -47,7 +46,6 @@ class TestRecipeSerializer:
                 "approver": None,
                 "comment": None,
             },
-            "identicon_seed": Whatever.startswith("v1:"),
             "capabilities": sorted(recipe.capabilities),
         }
 
