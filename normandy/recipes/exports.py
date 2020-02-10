@@ -216,11 +216,14 @@ class RemoteSettings:
                 bucket=rs_settings.WORKSPACE_BUCKET_ID,
                 collection=rs_settings.BASELINE_COLLECTION_ID,
             )
+
         # 2. Approve the changes immediately (multi-signoff is disabled).
+        log_action = "Batch published"
         if approve_changes:
             self.approve_changes(baseline)
+            log_action = "Published"
 
-        logger.info(f"Published record '{recipe.id}' for recipe {recipe.name!r}")
+        logger.info(f"{log_action} record '{recipe.id}' for recipe {recipe.name!r}")
 
     def unpublish(self, recipe, approve_changes=True):
         """
@@ -265,10 +268,12 @@ class RemoteSettings:
                 raise
 
         # 2. Approve the changes immediately (multi-signoff is disabled).
+        log_action = "Batch deleted"
         if either_existed and approve_changes:
             self.approve_changes(baseline)
+            log_action = "Deleted"
 
-        logger.info(f"Deleted record '{recipe.id}' of recipe {recipe.name!r}")
+        logger.info(f"{log_action} record '{recipe.id}' of recipe {recipe.name!r}")
 
     def approve_changes(self, baseline=True):
         """
@@ -293,6 +298,8 @@ class RemoteSettings:
                     data=APPROVE_CHANGES_FLAG,
                     bucket=rs_settings.WORKSPACE_BUCKET_ID,
                 )
+
+            logger.info("Changes were approved.")
 
         except kinto_http.exceptions.KintoException:
             # Approval failed unexpectedly.
