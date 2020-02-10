@@ -430,9 +430,9 @@ sphinxcontrib-qthelp==1.0.2 \
 sphinxcontrib-serializinghtml==1.1.3 \
     --hash=sha256:c0efb33f8052c04fd7a26c0a07f1678e8512e0faec19f4aa8f2473a8b81d5227 \
     --hash=sha256:db6615af393650bf1151a6cd39120c29abaf93cc60db8c48eb2dddbfdc3a9768
-sphinxcontrib-websupport==1.1.2 \
-    --hash=sha256:1501befb0fdf1d1c29a800fdbf4ef5dc5369377300ddbdd16d2cd40e54c6eefc \
-    --hash=sha256:e02f717baf02d0b6c3dd62cf81232ffca4c9d5c331e03766982e3ff9f1d2bc3f
+sphinxcontrib-websupport==1.2.0 \
+    --hash=sha256:50fb98fcb8ff2a8869af2afa6b8ee51b3baeb0b17dacd72505105bf15d506ead \
+    --hash=sha256:bad3fbd312bc36a31841e06e7617471587ef642bdacdbdddaa8cc30cf251b5ea
 sqlparse==0.3.0 \
     --hash=sha256:40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177 \
     --hash=sha256:7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873
