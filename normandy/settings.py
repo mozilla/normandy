@@ -45,6 +45,7 @@ class Core(Configuration):
         "normandy.base.middleware.NormandySecurityMiddleware",
         "normandy.base.middleware.NormandyWhiteNoiseMiddleware",
         "normandy.base.middleware.NormandyCommonMiddleware",
+        "normandy.base.middleware.show_yaml_in_browser_middleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "csp.middleware.CSPMiddleware",
     ]
@@ -104,6 +105,7 @@ class Core(Configuration):
         "DEFAULT_RENDERER_CLASSES": (
             "normandy.base.api.renderers.CanonicalJSONRenderer",
             "normandy.base.api.renderers.CustomBrowsableAPIRenderer",
+            "rest_framework_yaml.renderers.YAMLRenderer",
         ),
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 25,

@@ -146,3 +146,23 @@ def response_metrics_middleware(get_response):
         return response
 
     return middleware
+
+
+def show_yaml_in_browser_middleware(get_response):
+    """
+    If a browser requests a YAML resource, return it as plain text.
+    """
+
+    def middleware(request):
+        response = get_response(request)
+        content_type = response.get("content-type", "")
+        # If the response is YAML
+        if content_type.startswith("application/yaml"):
+            accept = request.headers.get("accept", "")
+            # And the requester seems like a browser
+            if "text/html" in accept and "application/yaml" not in accept:
+                # Convert the response to plain text
+                response["content-type"] = "text/plain"
+        return response
+
+    return middleware
