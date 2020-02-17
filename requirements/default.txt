@@ -113,9 +113,9 @@ gevent==1.4.0 \
     --hash=sha256:107f4232db2172f7e8429ed7779c10f2ed16616d75ffbe77e0e0c3fcdeb51a51 \
     --hash=sha256:28a0c5417b464562ab9842dd1fb0cc1524e60494641d973206ec24d6ec5f6909 \
     --hash=sha256:1eb7fa3b9bd9174dfe9c3b59b7a09b768ecd496debfc4976a9530a3e15c990d1
-google-cloud-storage==1.20.0 \
-    --hash=sha256:13a6a820311662eb91a99810568c2bca5ddc7e44e2163fed4cb3f4d47da132cf \
-    --hash=sha256:2e7e2435978bda1c209b70a9a00b8cbc53c3b00d6f09eb2c991ebba857babf24
+google-cloud-storage==1.26.0 \
+    --hash=sha256:22f25d1c627b9b688b8873ea48203f337dd5448a242089e688d99c2fa46a8b89 \
+    --hash=sha256:ffdfaeb319c47deaf5b25c6bf1f1f52a183ba6abb0bb80586509a9b68dc35d31
 graphene-django==2.6.0 \
     --hash=sha256:0d1404ab1ba7873a8e848d87d138f615391d100ed0c046482c164429cfb992ef \
     --hash=sha256:fa9e815f63e3c972773adc96c3f3c81e537dba0edcd0f1be92c799bc0b6ed0a8    # Pinning aniso8601 >=3, <4
