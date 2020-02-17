@@ -125,9 +125,9 @@ future==0.18.2 \
 gitdb2==3.0.2 \
     --hash=sha256:0375d983fd887d03c8942e81b1b0abc6c320cfb500cd3fe0d9c0eac87fbf2b52 \
     --hash=sha256:b2b3a67090c17dc61f8407ca485e79ae811225ab5ebcd98ac5ee01448e8987b5
-GitPython==3.0.3 \
-    --hash=sha256:631263cc670aa56ce3d3c414cf0fe2e840f2e913514b138ea28d88a477bbcd21 \
-    --hash=sha256:6e97b9f0954807f30c2dd8e3165731ed6c477a1b365f194b69d81d7940a08332
+GitPython==3.0.8 \
+    --hash=sha256:620b3c729bbc143b498cfea77e302999deedc55faec5b1067086c9ef90e101bc \
+    --hash=sha256:a43a5d88a5bbc3cf32bb5223e4b4e68fd716db5e9996cad6e561bbfee6e5f4af
 google-api-core==1.14.3 \
     --hash=sha256:b95895a9398026bc0500cf9b4a3f82c3f72c3f9150b26ff53af40c74e91c264a \
     --hash=sha256:df8adc4b97f5ab4328a0e745bee77877cf4a7d4601cb1cd5959d2bbf8fba57aa
