@@ -308,8 +308,9 @@ Pygments==2.5.2 \
     --hash=sha256:98c8aa5a9f778fcd1026a17361ddaf7330d1b7c62ae97c3bb0ae73e0b9b6b0fe
 pyjwt==1.7.1 \
     --hash=sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e
-pykwalify==1.6.1 \
-    --hash=sha256:0959032cf185c168256a623b80ff3d2ca57d704f78ca286b4155ebcd9fae9d49
+pykwalify==1.7.0 \
+    --hash=sha256:428733907fe5c458fbea5de63a755f938edccd622c7a1d0b597806141976f00e \
+    --hash=sha256:7e8b39c5a3a10bc176682b3bd9a7422c39ca247482df198b402e8015defcceb2
 pyparsing==2.4.2 \
     --hash=sha256:6f98a7b9397e206d78cc01df10131398f1c8b8510a2f4d97d9abd82e1aacdd80 \
     --hash=sha256:d9338df12903bbf5d65a0e4e87c2161968b10d2e489652bb47001d82a9b028b4
