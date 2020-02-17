@@ -145,9 +145,9 @@ googleapis-common-protos==1.51.0 \
 graphene==2.1.8 \
     --hash=sha256:09165f03e1591b76bf57b133482db9be6dac72c74b0a628d3c93182af9c5a896 \
     --hash=sha256:2cbe6d4ef15cfc7b7805e0760a0e5b80747161ce1b0f990dfdc0d2cf497c12f9
-graphql-core==2.2.1 \
-    --hash=sha256:1488f2a5c2272dc9ba66e3042a6d1c30cea0db4c80bd1e911c6791ad6187d91b \
-    --hash=sha256:da64c472d720da4537a2e8de8ba859210b62841bd47a9be65ca35177f62fe0e4
+graphql-core==3.0.3 \
+    --hash=sha256:31e9e62967cc3cb1afc0d4752e2576633adebbdcb14b4c62b9055413c239a48d \
+    --hash=sha256:e586db99173ffbfbc520a468246c2e1af83267f01ae6ee8a0ed9112453fa3a32
 graphql-relay==2.0.0 \
     --hash=sha256:0e94201af4089e1f81f07d7bd8f84799768e39d70fa1ea16d1df505b46cc6335 \
     --hash=sha256:75aa0758971e252964cb94068a4decd472d2a8295229f02189e3cbca1f10dbb5 \
