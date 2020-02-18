@@ -222,6 +222,7 @@ jobs:
         environment:
           POSTGRES_USER: postgres
           POSTGRES_DB: normandy
+          POSTGRES_HOST_AUTH_METHOD: trust
 
     environment:
       DJANGO_SETTINGS_MODULE: normandy.settings
