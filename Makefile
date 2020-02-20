@@ -3,7 +3,7 @@ geo_data: GeoLite2-Country.mmdb
 GeoLite2-Country.mmdb:
 	./bin/download_geolite2.sh
 
-build: geo_data
+build:
 	docker-compose build
 
 createuser: build
@@ -30,7 +30,7 @@ update_product_details: build
 load_initial_data: build
 	docker-compose run app python manage.py initial_data
 
-load_data: migrate load_geo_location update_actions load_initial_data
+load_data: migrate update_actions load_initial_data
 
 lint: SHELL:=/bin/bash -O extglob
 lint:
