@@ -162,7 +162,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.current_revision.capabilities
 
     def uses_only_baseline_capabilities(self):
-        return self.capabilities <= settings.BASELINE_CAPABILITIES
+        return self.current_revision.uses_only_baseline_capabilities()
 
     @property
     def approval_request(self):
@@ -425,6 +425,9 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             capabilities.add("capabilities-v1")
 
         return capabilities
+
+    def uses_only_baseline_capabilities(self):
+        return self.capabilities <= settings.BASELINE_CAPABILITIES
 
     def save(self, *args, **kwargs):
         self.action.validate_arguments(self.arguments, self)
