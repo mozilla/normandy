@@ -555,7 +555,7 @@ class TestRemoteSettings:
     ):
         ws_urls = rs_urls["workspace"]
 
-        recipe = RecipeFactory()
+        recipe = RecipeFactory(approver=UserFactory())
         rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
         assert recipe.uses_only_baseline_capabilities()
 
@@ -613,7 +613,7 @@ class TestRemoteSettings:
     ):
         ws_urls = rs_urls["workspace"]
 
-        recipe = RecipeFactory()
+        recipe = RecipeFactory(approver=UserFactory())
         assert not recipe.uses_only_baseline_capabilities()
 
         # Expect calls only to the capabilities collection

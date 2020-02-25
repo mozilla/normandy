@@ -8,6 +8,7 @@ from normandy.recipes.tests import (
     ApprovalRequestFactory,
     RecipeFactory,
     SignatureFactory,
+    UserFactory,
 )
 from normandy.recipes.api.v1.serializers import (
     ActionSerializer,
@@ -46,6 +47,7 @@ class TestRecipeSerializer:
                 "approver": None,
                 "comment": None,
             },
+            "identicon_seed": Whatever.startswith("v1:"),
             "capabilities": sorted(recipe.capabilities),
         }
 
@@ -53,7 +55,7 @@ class TestRecipeSerializer:
 @pytest.mark.django_db()
 class TestMinimalRecipeSerializer:
     def test_it_works(self, rf):
-        recipe = RecipeFactory(arguments={"foo": "bar"})
+        recipe = RecipeFactory(approver=UserFactory(), arguments={"foo": "bar"})
         action = recipe.action
         serializer = MinimalRecipeSerializer(recipe, context={"request": rf.get("/")})
 
@@ -70,7 +72,9 @@ class TestMinimalRecipeSerializer:
 
     def test_capabilities_are_sorted(self, rf):
         # the extra_capabilities passed here are purposefully out of order
-        recipe = RecipeFactory(arguments={"foo": "bar"}, extra_capabilities=["b", "a"])
+        recipe = RecipeFactory(
+            approver=UserFactory(), arguments={"foo": "bar"}, extra_capabilities=["b", "a"]
+        )
         serializer = MinimalRecipeSerializer(recipe, context={"request": rf.get("/")})
 
         capabilities = serializer.data["capabilities"]
@@ -91,7 +95,7 @@ class TestActionSerializer:
 @pytest.mark.django_db()
 class TestSignedRecipeSerializer:
     def test_it_works_with_signature(self, rf):
-        recipe = RecipeFactory(signed=True)
+        recipe = RecipeFactory(approver=UserFactory(), signed=True)
         context = {"request": rf.get("/")}
         combined_serializer = SignedRecipeSerializer(instance=recipe, context=context)
         recipe_serializer = MinimalRecipeSerializer(instance=recipe, context=context)
@@ -108,7 +112,7 @@ class TestSignedRecipeSerializer:
         }
 
     def test_it_works_with_no_signature(self, rf):
-        recipe = RecipeFactory(signed=False)
+        recipe = RecipeFactory(approver=UserFactory(), signed=False)
         action = recipe.action
         serializer = SignedRecipeSerializer(instance=recipe, context={"request": rf.get("/")})
 

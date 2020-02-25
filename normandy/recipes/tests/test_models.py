@@ -397,6 +397,7 @@ class TestRecipe(object):
             arguments_json='{"foo": 1, "bar": 2}',
             extra_filter_expression="2 + 2 == 4",
             name="canonical",
+            approver=UserFactory(),
             filter_object_json=None,
         )
         # Yes, this is really ugly, but we really do need to compare an exact
@@ -443,15 +444,15 @@ class TestRecipe(object):
         mock_autograph = mocker.patch("normandy.recipes.models.Autographer")
         mock_autograph.side_effect = ImproperlyConfigured
 
-        recipe = RecipeFactory(name="unchanged", signed=True)
+        recipe = RecipeFactory(approver=UserFactory(), name="unchanged", signed=True)
         original_signature = recipe.signature
         recipe.revise(name="changed")
-        assert recipe.name == "changed"
+        assert recipe.latest_revision.name == "changed"
         assert recipe.signature is not original_signature
         assert recipe.signature is None
 
     def test_setting_signature_doesnt_change_canonical_json(self):
-        recipe = RecipeFactory(name="unchanged", signed=False)
+        recipe = RecipeFactory(approver=UserFactory(), name="unchanged", signed=False)
         serialized = recipe.canonical_json()
         recipe.signature = SignatureFactory()
         recipe.save()

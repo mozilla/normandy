@@ -353,7 +353,7 @@ class TestRecipeAPI(object):
         # "action.đzGBglYumiFMJ").
 
         def test_signed_listing_works(self, api_client, settings):
-            r1 = RecipeFactory(signed=True)
+            r1 = RecipeFactory(approver=UserFactory(), signed=True)
             settings.BASELINE_CAPABILITIES |= r1.capabilities
             res = api_client.get("/api/v1/recipe/signed/")
             assert res.status_code == 200
@@ -369,8 +369,8 @@ class TestRecipeAPI(object):
             assert "public" in res["Cache-Control"]
 
         def test_signed_only_lists_signed_recipes(self, api_client, settings):
-            r1 = RecipeFactory(signed=True)
-            r2 = RecipeFactory(signed=True)
+            r1 = RecipeFactory(approver=UserFactory(), signed=True)
+            r2 = RecipeFactory(approver=UserFactory(), signed=True)
             settings.BASELINE_CAPABILITIES |= r1.capabilities | r2.capabilities
             RecipeFactory(signed=False)
             res = api_client.get("/api/v1/recipe/signed/")
@@ -388,7 +388,7 @@ class TestRecipeAPI(object):
             enabled_recipe = RecipeFactory(
                 signed=True, approver=UserFactory(), enabler=UserFactory()
             )
-            disabled_recipe = RecipeFactory(signed=True)
+            disabled_recipe = RecipeFactory(approver=UserFactory(), signed=True)
             settings.BASELINE_CAPABILITIES |= (
                 enabled_recipe.capabilities | disabled_recipe.capabilities
             )
