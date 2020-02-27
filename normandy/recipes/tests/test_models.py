@@ -538,11 +538,11 @@ class TestRecipe(object):
         recipe = RecipeFactory(name="my name")
 
         revision_id = recipe.latest_revision.id
-        last_updated = recipe.last_updated
+        last_updated = recipe.latest_revision.updated
 
         recipe.revise(name="my name")
         assert revision_id == recipe.latest_revision.id
-        assert last_updated == recipe.last_updated
+        assert last_updated == recipe.latest_revision.updated
 
     def test_recipe_revise_arguments(self):
         recipe = RecipeFactory(arguments_json="{}")
