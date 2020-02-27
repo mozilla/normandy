@@ -371,18 +371,18 @@ class TestRecipe(object):
         r3 = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
         assert r3.approved_revision.enabled is True
 
-    def test_revision_id_doesnt_change_if_no_changes(self):
+    def test_latest_revision_not_created_if_no_changes(self):
         """
-        revision_id should not increment if a recipe is saved with no
+        latest_revision should remain fixed if a recipe is saved with no
         changes.
         """
         recipe = RecipeFactory()
 
         # The factory saves a couple times so revision id is not 0
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
 
         recipe.save()
-        assert recipe.revision_id == revision_id
+        assert recipe.latest_revision.id == revision_id
 
     def test_filter_expression(self):
         r = RecipeFactory(extra_filter_expression="", filter_object_json=None)
@@ -416,7 +416,7 @@ class TestRecipe(object):
             "}"
         ) % {
             "id": recipe.id,
-            "revision_id": recipe.revision_id,
+            "revision_id": recipe.latest_revision.id,
             "filter_expression": filter_expression,
         }
         expected = expected.encode()
@@ -537,11 +537,11 @@ class TestRecipe(object):
     def test_recipe_doesnt_revise_when_clean(self):
         recipe = RecipeFactory(name="my name")
 
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
         last_updated = recipe.last_updated
 
         recipe.revise(name="my name")
-        assert revision_id == recipe.revision_id
+        assert revision_id == recipe.latest_revision.id
         assert last_updated == recipe.last_updated
 
     def test_recipe_revise_arguments(self):
@@ -551,9 +551,9 @@ class TestRecipe(object):
 
     def test_recipe_force_revise(self):
         recipe = RecipeFactory(name="my name")
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
         recipe.revise(name="my name", force=True)
-        assert revision_id != recipe.revision_id
+        assert revision_id != recipe.latest_revision.id
 
     def test_update_logging(self, mock_logger):
         recipe = RecipeFactory(name="my name")
@@ -562,12 +562,12 @@ class TestRecipe(object):
             Whatever.contains(str(recipe.id)), extra={"code": INFO_CREATE_REVISION}
         )
 
-    def test_revision_id_changes(self):
-        """Ensure that the revision id is incremented on each save"""
+    def test_latest_revision_changes(self):
+        """Ensure that a new revision is created on each save"""
         recipe = RecipeFactory()
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
         recipe.revise(action=ActionFactory())
-        assert recipe.revision_id != revision_id
+        assert recipe.latest_revision.id != revision_id
 
     def test_recipe_is_approved(self):
         recipe = RecipeFactory(name="old")

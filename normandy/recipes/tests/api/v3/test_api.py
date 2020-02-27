@@ -529,7 +529,7 @@ class TestRecipeAPI(object):
             recipe = RecipeFactory(
                 name="unchanged", extra_filter_expression="true", filter_object_json=None
             )
-            old_revision_id = recipe.revision_id
+            old_revision_id = recipe.latest_revision.id
 
             res = api_client.patch(
                 "/api/v3/recipe/%s/" % recipe.id,
@@ -540,7 +540,7 @@ class TestRecipeAPI(object):
             recipe = Recipe.objects.all()[0]
             assert recipe.latest_revision.name == "changed"
             assert recipe.latest_revision.filter_expression == "false"
-            assert recipe.revision_id != old_revision_id
+            assert recipe.latest_revision.id != old_revision_id
 
         def test_it_can_change_action_for_recipes(self, api_client):
             recipe = RecipeFactory()

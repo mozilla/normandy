@@ -331,7 +331,7 @@ class TestRemoteSettings:
                 "filter_expression": recipe.approved_revision.filter_expression,
                 "id": recipe.id,
                 "name": recipe.approved_revision.name,
-                "revision_id": str(recipe.revision_id),
+                "revision_id": str(recipe.approved_revision.id),
                 "capabilities": Whatever(lambda caps: set(caps) == recipe.capabilities),
                 "uses_only_baseline_capabilities": False,
             },
