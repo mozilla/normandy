@@ -67,7 +67,7 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    enabled = serializers.BooleanField(read_only=True)
+    enabled = serializers.BooleanField(source="approved_revision.enabled", default=False)
     last_updated = serializers.DateTimeField(read_only=True)
     revision_id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()

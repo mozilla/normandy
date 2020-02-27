@@ -133,7 +133,7 @@ class TestUpdateActions(object):
 
         call_command("update_actions")
         recipe.refresh_from_db()
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
     def test_it_only_updates_given_actions(self, mock_action):
         update_action = ActionFactory(name="update-action", implementation="old")

@@ -962,7 +962,7 @@ class TestRecipeAPI(object):
             assert res.data["approved_revision"]["enabled"] is True
 
             recipe = Recipe.objects.all()[0]
-            assert recipe.enabled
+            assert recipe.approved_revision.enabled
 
         def test_cannot_enable_unapproved_recipes(self, api_client):
             recipe = RecipeFactory()
@@ -980,14 +980,14 @@ class TestRecipeAPI(object):
 
         def test_it_can_disable_enabled_recipes(self, api_client):
             recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
-            assert recipe.enabled
+            assert recipe.approved_revision.enabled
 
             res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)
             assert res.status_code == 200
             assert res.data["approved_revision"]["enabled"] is False
 
             recipe = Recipe.objects.all()[0]
-            assert not recipe.enabled
+            assert not recipe.approved_revision.enabled
 
             # Can't disable it a second time.
             res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)

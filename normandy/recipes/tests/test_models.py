@@ -363,13 +363,13 @@ class TestRecipe(object):
     def test_enabled(self):
         """Test that the enabled property is correctly set."""
         r1 = RecipeFactory()
-        assert r1.enabled is False
+        assert r1.approved_revision is None
 
         r2 = RecipeFactory(approver=UserFactory())
-        assert r2.enabled is False
+        assert r2.approved_revision.enabled is False
 
         r3 = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
-        assert r3.enabled is True
+        assert r3.approved_revision.enabled is True
 
     def test_revision_id_doesnt_change_if_no_changes(self):
         """
@@ -494,7 +494,6 @@ class TestRecipe(object):
 
         sign_data_mock.side_effect = Exception("Can't sign yet")
         recipe = RecipeFactory(name="unchanged", action=action)
-        assert not recipe.enabled
         assert not recipe.is_approved
         assert recipe.signature is None
 
@@ -676,21 +675,21 @@ class TestRecipeRevision(object):
             recipe.latest_revision.enable(user=UserFactory())
 
         recipe.approved_revision.enable(user=UserFactory())
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
         with pytest.raises(EnabledState.NotActionable):
             recipe.approved_revision.enable(user=UserFactory())
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
         approval_request.approve(approver=UserFactory(), comment="r+")
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
     def test_disable(self):
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
         recipe.approved_revision.disable(user=UserFactory())
-        assert not recipe.enabled
+        assert not recipe.approved_revision.enabled
 
         with pytest.raises(EnabledState.NotActionable):
             recipe.approved_revision.disable(user=UserFactory())
@@ -790,7 +789,7 @@ class TestRecipeRevision(object):
                 action=ActionFactory(name="preference-rollout"),
                 arguments={"slug": "myslug"},
             )
-            assert rollout_recipe.enabled
+            assert rollout_recipe.approved_revision.enabled
 
             rollback_recipe = RecipeFactory(
                 name="Rollback",
@@ -807,10 +806,10 @@ class TestRecipeRevision(object):
             assert exc_info.value.message == "Rollout recipe 'Rollout' is currently enabled"
 
             rollout_recipe.approved_revision.disable(user=UserFactory())
-            assert not rollout_recipe.enabled
+            assert not rollout_recipe.approved_revision.enabled
             # Now it should be possible to enable the rollback recipe.
             rollback_recipe.approved_revision.enable(user=UserFactory())
-            assert rollback_recipe.enabled
+            assert rollback_recipe.approved_revision.enabled
 
             # Can't make up your mind. Now try to enable the rollout recipe again even though
             # the rollback recipe is enabled.
@@ -938,7 +937,7 @@ class TestApprovalRequest(object):
         recipe.revise(name="New name")
         approval_request = recipe.latest_revision.request_approval(UserFactory())
         approval_request.approve(UserFactory(), "r+")
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
         assert recipe.approved_revision.enabled_state.carryover_from == carryover_from
 
     def test_error_during_approval_rolls_back_changes(self, mocker):
@@ -962,7 +961,7 @@ class TestApprovalRequest(object):
         assert approval_request.approved is None
         assert recipe.approved_revision == old_approved_revision
         assert recipe.latest_revision == latest_revision
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
 
 class TestClient(object):

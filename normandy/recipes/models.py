@@ -17,7 +17,7 @@ from rest_framework.reverse import reverse
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
 from normandy.recipes import filters
-from normandy.recipes.decorators import approved_revision_property, current_revision_property
+from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
 from normandy.recipes.exports import RemoteSettings
@@ -117,10 +117,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def is_approved(self):
         return self.approved_revision is not None
 
-    @approved_revision_property(default=False)
-    def enabled(self):
-        return self.approved_revision.enabled
-
     @current_revision_property()
     def name(self):
         return self.current_revision.name
@@ -186,7 +182,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
             return
 
         # Don't sign recipe that aren't enabled
-        if not self.enabled:
+        if not (self.approved_revision and self.approved_revision.enabled):
             return
 
         logger.info(
@@ -578,7 +574,7 @@ class ApprovalRequest(models.Model):
 
         # Check if the recipe is enabled we should carry over it's enabled state
         carryover_enabled = None
-        if recipe.enabled:
+        if recipe.approved_revision and recipe.approved_revision.enabled:
             carryover_enabled = recipe.approved_revision.enabled_state
 
         recipe.approved_revision = self.revision

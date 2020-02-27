@@ -31,14 +31,3 @@ def current_revision_property(default=None):
         return RelatedFieldProperty(method, related_field="current_revision", default=default)
 
     return decorator
-
-
-def approved_revision_property(default=None):
-    """
-    A decorator that will return a default value if the instance has no `approved_revision`
-    """
-
-    def decorator(method):
-        return RelatedFieldProperty(method, related_field="approved_revision", default=default)
-
-    return decorator
