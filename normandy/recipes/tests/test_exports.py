@@ -332,7 +332,9 @@ class TestRemoteSettings:
                 "id": recipe.id,
                 "name": recipe.approved_revision.name,
                 "revision_id": str(recipe.approved_revision.id),
-                "capabilities": Whatever(lambda caps: set(caps) == recipe.capabilities),
+                "capabilities": Whatever(
+                    lambda caps: set(caps) == recipe.approved_revision.capabilities
+                ),
                 "uses_only_baseline_capabilities": False,
             },
             "signature": {
@@ -349,7 +351,7 @@ class TestRemoteSettings:
         """Test that requests are sent to Remote Settings on publish."""
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
 
         auth = (
             rs_settings.REMOTE_SETTINGS_USERNAME + ":" + rs_settings.REMOTE_SETTINGS_PASSWORD
@@ -399,7 +401,7 @@ class TestRemoteSettings:
         """Test that requests are sent to Remote Settings on unpublish."""
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
         urls = rs_urls["workspace"]
 
         auth = (
@@ -556,7 +558,7 @@ class TestRemoteSettings:
         ws_urls = rs_urls["workspace"]
 
         recipe = RecipeFactory(approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
         assert recipe.uses_only_baseline_capabilities()
 
         # Expect publish calls to both collections

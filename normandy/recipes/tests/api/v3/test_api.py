@@ -146,7 +146,7 @@ class TestRecipeAPI(object):
 
         def test_list_can_filter_baseline_recipes(self, rs_settings, api_client):
             recipe1 = RecipeFactory(extra_capabilities=[])
-            rs_settings.BASELINE_CAPABILITIES |= recipe1.capabilities
+            rs_settings.BASELINE_CAPABILITIES |= recipe1.latest_revision.capabilities
             assert recipe1.uses_only_baseline_capabilities()
             recipe2 = RecipeFactory(extra_capabilities=["test-capability"])
             assert not recipe2.uses_only_baseline_capabilities()
@@ -521,7 +521,7 @@ class TestRecipeAPI(object):
             # Passed extra capabilities:
             assert recipe.latest_revision.extra_capabilities == ["test.one", "test.two"]
             # Extra capabilities get included in capabilities
-            assert {"test.one", "test.two"} <= set(recipe.capabilities)
+            assert {"test.one", "test.two"} <= set(recipe.latest_revision.capabilities)
 
     @pytest.mark.django_db
     class TestUpdates(object):
@@ -680,8 +680,8 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200
             recipe = Recipe.objects.get()
-            assert {"always", "changed"} <= set(recipe.capabilities)
-            assert "original" not in recipe.capabilities
+            assert {"always", "changed"} <= set(recipe.latest_revision.capabilities)
+            assert "original" not in recipe.latest_revision.capabilities
 
     @pytest.mark.django_db
     class TestFilterObjects(object):
@@ -1428,7 +1428,7 @@ class TestApprovalFlow(object):
         recipe_data_1 = res.json()
         assert recipe_data_1["approved_revision"] is not None
         assert (
-            Recipe.objects.get(id=recipe_data_1["id"]).capabilities
+            Recipe.objects.get(id=recipe_data_1["id"]).latest_revision.capabilities
             <= settings.BASELINE_CAPABILITIES
         )
         self.verify_signatures(api_client, expected_count=1)
@@ -1544,7 +1544,10 @@ class TestApprovalFlow(object):
         recipe_id = res.json()["id"]
         revision_id = res.json()["latest_revision"]["id"]
 
-        assert Recipe.objects.get(id=recipe_id).capabilities <= settings.BASELINE_CAPABILITIES
+        assert (
+            Recipe.objects.get(id=recipe_id).latest_revision.capabilities
+            <= settings.BASELINE_CAPABILITIES
+        )
 
         # Request approval
         res = api_client.post(f"/api/v3/recipe_revision/{revision_id}/request_approval/")

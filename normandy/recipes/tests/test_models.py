@@ -806,28 +806,28 @@ class TestRecipeRevision(object):
             settings.BASELINE_CAPABILITIES |= action.capabilities
 
             recipe = RecipeFactory(extra_capabilities=[], action=action)
-            assert recipe.capabilities <= settings.BASELINE_CAPABILITIES
-            assert "capabilities-v1" not in recipe.capabilities
+            assert recipe.latest_revision.capabilities <= settings.BASELINE_CAPABILITIES
+            assert "capabilities-v1" not in recipe.latest_revision.capabilities
 
             recipe = RecipeFactory(extra_capabilities=["non-baseline"], action=action)
             assert "non-baseline" not in settings.BASELINE_CAPABILITIES
-            assert "capabilities-v1" in recipe.capabilities
+            assert "capabilities-v1" in recipe.latest_revision.capabilities
 
         def test_uses_extra_capabilities(self):
             recipe = RecipeFactory(extra_capabilities=["test.foo", "test.bar"])
-            assert "test.foo" in recipe.capabilities
-            assert "test.bar" in recipe.capabilities
+            assert "test.foo" in recipe.latest_revision.capabilities
+            assert "test.bar" in recipe.latest_revision.capabilities
 
         def test_action_name_is_automatically_included(self):
             action = ActionFactory()
             recipe = RecipeFactory(action=action)
-            assert set(action.capabilities) <= set(recipe.capabilities)
+            assert set(action.capabilities) <= set(recipe.latest_revision.capabilities)
 
         def test_filter_object_capabilities_are_automatically_included(self):
             filter_object = StableSampleFilter.create(input=["A"], rate=0.1)
             recipe = RecipeFactory(filter_object=[filter_object])
             assert filter_object.capabilities
-            assert filter_object.capabilities <= recipe.capabilities
+            assert filter_object.capabilities <= recipe.latest_revision.capabilities
 
 
 @pytest.mark.django_db

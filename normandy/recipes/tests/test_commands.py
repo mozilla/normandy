@@ -496,8 +496,8 @@ class TestSyncRemoteSettings(object):
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
 
-        rs_settings.BASELINE_CAPABILITIES |= r1.capabilities
-        rs_settings.BASELINE_CAPABILITIES |= r2.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r1.approved_revision.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r2.approved_revision.capabilities
 
         # Mock the server responses.
         # `r2` should be on the server
@@ -547,8 +547,8 @@ class TestSyncRemoteSettings(object):
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
 
-        rs_settings.BASELINE_CAPABILITIES |= r1.capabilities
-        rs_settings.BASELINE_CAPABILITIES |= r2.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r1.approved_revision.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r2.approved_revision.capabilities
 
         # Mock the server responses.
         to_update = {**exports.recipe_as_record(r2), "name": "Outdated name"}

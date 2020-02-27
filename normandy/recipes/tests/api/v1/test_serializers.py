@@ -48,7 +48,7 @@ class TestRecipeSerializer:
                 "comment": None,
             },
             "identicon_seed": Whatever.startswith("v1:"),
-            "capabilities": sorted(recipe.capabilities),
+            "capabilities": sorted(recipe.latest_revision.capabilities),
         }
 
 
@@ -66,7 +66,7 @@ class TestMinimalRecipeSerializer:
             "revision_id": str(recipe.approved_revision.id),
             "action": action.name,
             "arguments": {"foo": "bar"},
-            "capabilities": sorted(recipe.capabilities),
+            "capabilities": sorted(recipe.approved_revision.capabilities),
             "uses_only_baseline_capabilities": False,
         }
 
@@ -125,7 +125,7 @@ class TestSignedRecipeSerializer:
                 "revision_id": str(recipe.approved_revision.id),
                 "action": action.name,
                 "arguments": recipe.approved_revision.arguments,
-                "capabilities": sorted(recipe.capabilities),
+                "capabilities": sorted(recipe.approved_revision.capabilities),
                 "uses_only_baseline_capabilities": False,
             },
         }

@@ -20,14 +20,3 @@ class RelatedFieldProperty(object):
 
     def __delete__(self, instance):
         raise AttributeError("This property cannot be deleted.")
-
-
-def current_revision_property(default=None):
-    """
-    A decorator that will return a default value if the instance has no `current_revision`
-    """
-
-    def decorator(method):
-        return RelatedFieldProperty(method, related_field="current_revision", default=default)
-
-    return decorator

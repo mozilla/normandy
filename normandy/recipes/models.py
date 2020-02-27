@@ -17,7 +17,6 @@ from rest_framework.reverse import reverse
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
 from normandy.recipes import filters
-from normandy.recipes.decorators import current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
 from normandy.recipes.exports import RemoteSettings
@@ -116,10 +115,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     @property
     def is_approved(self):
         return self.approved_revision is not None
-
-    @current_revision_property()
-    def capabilities(self):
-        return self.current_revision.capabilities
 
     def uses_only_baseline_capabilities(self):
         return self.current_revision.uses_only_baseline_capabilities()
