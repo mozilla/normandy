@@ -128,7 +128,7 @@ class TestUpdateActions(object):
     def test_it_doesnt_disable_recipes(self, mock_action):
         action = ActionFactory(name="test-action", implementation="old")
         recipe = RecipeFactory(action=action, approver=UserFactory(), enabler=UserFactory())
-        action = recipe.action
+        action = recipe.approved_revision.action
         mock_action(action.name, "impl", action.arguments_schema)
 
         call_command("update_actions")

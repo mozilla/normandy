@@ -326,7 +326,7 @@ class TestRemoteSettings:
         assert record == {
             "id": str(recipe.id),
             "recipe": {
-                "action": recipe.action.name,
+                "action": recipe.approved_revision.action.name,
                 "arguments": recipe.arguments,
                 "filter_expression": recipe.filter_expression,
                 "id": recipe.id,

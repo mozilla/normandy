@@ -41,7 +41,7 @@ class TestAction(object):
         approver = UserFactory()
         enabler = UserFactory()
         recipe = RecipeFactory(approver=approver, enabler=enabler)
-        assert [recipe] == list(recipe.action.recipes_used_by)
+        assert [recipe] == list(recipe.approved_revision.action.recipes_used_by)
 
         action = ActionFactory()
         recipes = RecipeFactory.create_batch(2, action=action, approver=approver, enabler=enabler)
@@ -529,7 +529,7 @@ class TestRecipe(object):
         )
         a2 = ActionFactory()
         recipe.revise(name="changed", action=a2)
-        assert recipe.action == a2
+        assert recipe.latest_revision.action == a2
         assert recipe.latest_revision.name == "changed"
         assert recipe.arguments == {"message": "something"}
         assert recipe.filter_expression == "something !== undefined"

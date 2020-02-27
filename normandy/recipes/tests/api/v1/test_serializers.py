@@ -24,7 +24,7 @@ class TestRecipeSerializer:
     def test_it_works(self, rf):
         recipe = RecipeFactory(arguments={"foo": "bar"})
         approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        action = recipe.action
+        action = recipe.latest_revision.action
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
 
         assert serializer.data == {
@@ -56,7 +56,7 @@ class TestRecipeSerializer:
 class TestMinimalRecipeSerializer:
     def test_it_works(self, rf):
         recipe = RecipeFactory(approver=UserFactory(), arguments={"foo": "bar"})
-        action = recipe.action
+        action = recipe.approved_revision.action
         serializer = MinimalRecipeSerializer(recipe, context={"request": rf.get("/")})
 
         assert serializer.data == {
@@ -113,7 +113,7 @@ class TestSignedRecipeSerializer:
 
     def test_it_works_with_no_signature(self, rf):
         recipe = RecipeFactory(approver=UserFactory(), signed=False)
-        action = recipe.action
+        action = recipe.approved_revision.action
         serializer = SignedRecipeSerializer(instance=recipe, context={"request": rf.get("/")})
 
         assert serializer.data == {
