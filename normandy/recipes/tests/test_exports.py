@@ -328,7 +328,7 @@ class TestRemoteSettings:
             "recipe": {
                 "action": recipe.approved_revision.action.name,
                 "arguments": recipe.arguments,
-                "filter_expression": recipe.filter_expression,
+                "filter_expression": recipe.approved_revision.filter_expression,
                 "id": recipe.id,
                 "name": recipe.approved_revision.name,
                 "revision_id": str(recipe.revision_id),

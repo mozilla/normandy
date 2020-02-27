@@ -457,7 +457,10 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             assert recipe.latest_revision.extra_filter_expression == ""
-            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+            assert (
+                recipe.latest_revision.filter_expression
+                == f'normandy.channel in ["{channel.slug}"]'
+            )
 
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
             action = ActionFactory()
@@ -495,7 +498,10 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             assert recipe.latest_revision.extra_filter_expression == ""
-            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+            assert (
+                recipe.latest_revision.filter_expression
+                == f'normandy.channel in ["{channel.slug}"]'
+            )
 
         def test_it_accepts_capabilities(self, api_client):
             action = ActionFactory()
@@ -533,7 +539,7 @@ class TestRecipeAPI(object):
 
             recipe = Recipe.objects.all()[0]
             assert recipe.latest_revision.name == "changed"
-            assert recipe.filter_expression == "false"
+            assert recipe.latest_revision.filter_expression == "false"
             assert recipe.revision_id != old_revision_id
 
         def test_it_can_change_action_for_recipes(self, api_client):
@@ -641,7 +647,10 @@ class TestRecipeAPI(object):
             recipe.refresh_from_db()
             assert recipe.latest_revision.extra_filter_expression == ""
             assert recipe.filter_object
-            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+            assert (
+                recipe.latest_revision.filter_expression
+                == f'normandy.channel in ["{channel.slug}"]'
+            )
 
             # And you can omit it too
             res = api_client.patch(

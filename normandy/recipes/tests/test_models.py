@@ -386,10 +386,10 @@ class TestRecipe(object):
 
     def test_filter_expression(self):
         r = RecipeFactory(extra_filter_expression="", filter_object_json=None)
-        assert r.filter_expression == ""
+        assert r.latest_revision.filter_expression == ""
 
         r = RecipeFactory(extra_filter_expression="2 + 2 == 4", filter_object_json=None)
-        assert r.filter_expression == "2 + 2 == 4"
+        assert r.latest_revision.filter_expression == "2 + 2 == 4"
 
     def test_canonical_json(self):
         recipe = RecipeFactory(
@@ -532,7 +532,7 @@ class TestRecipe(object):
         assert recipe.latest_revision.action == a2
         assert recipe.latest_revision.name == "changed"
         assert recipe.arguments == {"message": "something"}
-        assert recipe.filter_expression == "something !== undefined"
+        assert recipe.latest_revision.filter_expression == "something !== undefined"
 
     def test_recipe_doesnt_revise_when_clean(self):
         recipe = RecipeFactory(name="my name")

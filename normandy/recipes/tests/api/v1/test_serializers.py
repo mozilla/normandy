@@ -32,7 +32,7 @@ class TestRecipeSerializer:
             "id": recipe.id,
             "last_updated": Whatever(),
             "enabled": False,
-            "filter_expression": recipe.filter_expression,
+            "filter_expression": recipe.latest_revision.filter_expression,
             "revision_id": recipe.revision_id,
             "action": action.name,
             "arguments": {"foo": "bar"},
@@ -62,7 +62,7 @@ class TestMinimalRecipeSerializer:
         assert serializer.data == {
             "name": recipe.approved_revision.name,
             "id": recipe.id,
-            "filter_expression": recipe.filter_expression,
+            "filter_expression": recipe.approved_revision.filter_expression,
             "revision_id": str(recipe.revision_id),
             "action": action.name,
             "arguments": {"foo": "bar"},
@@ -121,7 +121,7 @@ class TestSignedRecipeSerializer:
             "recipe": {
                 "name": recipe.approved_revision.name,
                 "id": recipe.id,
-                "filter_expression": recipe.filter_expression,
+                "filter_expression": recipe.approved_revision.filter_expression,
                 "revision_id": str(recipe.revision_id),
                 "action": action.name,
                 "arguments": recipe.arguments,

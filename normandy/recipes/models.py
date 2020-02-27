@@ -118,10 +118,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.approved_revision is not None
 
     @current_revision_property()
-    def filter_expression(self):
-        return self.current_revision.filter_expression
-
-    @current_revision_property()
     def filter_object(self):
         return self.current_revision.filter_object
 
