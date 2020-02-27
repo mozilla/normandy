@@ -118,10 +118,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.approved_revision is not None
 
     @current_revision_property()
-    def channels(self):
-        return self.current_revision.channels
-
-    @current_revision_property()
     def capabilities(self):
         return self.current_revision.capabilities
 
