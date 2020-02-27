@@ -547,7 +547,7 @@ class TestRecipe(object):
     def test_recipe_revise_arguments(self):
         recipe = RecipeFactory(arguments_json="{}")
         recipe.revise(arguments={"something": "value"})
-        assert recipe.arguments_json == '{"something": "value"}'
+        assert recipe.latest_revision.arguments_json == '{"something": "value"}'
 
     def test_recipe_force_revise(self):
         recipe = RecipeFactory(name="my name")
@@ -607,7 +607,7 @@ class TestRecipe(object):
     def test_revise_arguments(self):
         recipe = RecipeFactory(arguments_json="[]")
         recipe.revise(arguments=[{"id": 1}])
-        assert recipe.arguments_json == '[{"id": 1}]'
+        assert recipe.latest_revision.arguments_json == '[{"id": 1}]'
 
     def test_enabled_updates_signatures(self, mocked_autograph):
         recipe = RecipeFactory(name="first")
