@@ -118,10 +118,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.approved_revision is not None
 
     @current_revision_property()
-    def arguments(self):
-        return self.current_revision.arguments
-
-    @current_revision_property()
     def revision_id(self):
         return self.current_revision.id
 
@@ -468,7 +464,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
                 approved_revision__enabled_state__enabled=True,
             )
             for recipe in rollout_recipes:
-                if recipe.arguments["slug"] == slug:
+                if recipe.approved_revision.arguments["slug"] == slug:
                     raise ValidationError(
                         f"Rollout recipe {recipe.approved_revision.name!r} is currently enabled"
                     )
@@ -479,7 +475,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
                 approved_revision__enabled_state__enabled=True,
             )
             for recipe in rollback_recipes:
-                if recipe.arguments["rolloutSlug"] == slug:
+                if recipe.approved_revision.arguments["rolloutSlug"] == slug:
                     raise ValidationError(
                         f"Rollback recipe {recipe.approved_revision.name!r} is currently enabled"
                     )
@@ -715,10 +711,6 @@ class Action(DirtyFieldsMixin, models.Model):
 
         errors = default()
 
-        # Note, `recipe.arguments` refers to `recipe.current_revision.arguments`
-        # which in term is shorthand for
-        # `recipe.(approved_revision or latest_revision).arguments`.
-
         if self.name == "preference-experiment":
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
@@ -739,7 +731,9 @@ class Action(DirtyFieldsMixin, models.Model):
             experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 experiment_recipes = experiment_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments.get("slug") for r in experiment_recipes)
+            existing_slugs = set(
+                r.latest_revision.arguments.get("slug") for r in experiment_recipes
+            )
             if arguments.get("slug") in existing_slugs:
                 msg = self.errors["duplicate_experiment_slug"]
                 errors["slug"] = msg
@@ -749,7 +743,7 @@ class Action(DirtyFieldsMixin, models.Model):
             rollout_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 rollout_recipes = rollout_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments.get("slug") for r in rollout_recipes)
+            existing_slugs = set(r.latest_revision.arguments.get("slug") for r in rollout_recipes)
             if arguments.get("slug") in existing_slugs:
                 msg = self.errors["duplicate_rollout_slug"]
                 errors["slug"] = msg
@@ -757,7 +751,7 @@ class Action(DirtyFieldsMixin, models.Model):
         elif self.name == "preference-rollback":
             # Rollback slugs should match rollouts
             rollouts = Recipe.objects.filter(latest_revision__action__name="preference-rollout")
-            rollout_slugs = set(r.arguments["slug"] for r in rollouts)
+            rollout_slugs = set(r.latest_revision.arguments["slug"] for r in rollouts)
             if arguments["rolloutSlug"] not in rollout_slugs:
                 errors["slug"] = self.errors["rollout_slug_not_found"]
 
@@ -772,7 +766,7 @@ class Action(DirtyFieldsMixin, models.Model):
             # has different surveyIds *and* that any of these clash with an entirely
             # different recipe.
             for recipe in other_recipes:
-                if recipe.arguments["surveyId"] == arguments["surveyId"]:
+                if recipe.latest_revision.arguments["surveyId"] == arguments["surveyId"]:
                     errors["surveyId"] = self.errors["duplicate_survey_id"]
 
         elif self.name == "opt-out-study":
@@ -781,7 +775,7 @@ class Action(DirtyFieldsMixin, models.Model):
             if revision.recipe and revision.recipe.id:
                 other_recipes = other_recipes.exclude(id=revision.recipe.id)
             for recipe in other_recipes:
-                if recipe.arguments["name"] == arguments["name"]:
+                if recipe.latest_revision.arguments["name"] == arguments["name"]:
                     errors["name"] = self.errors["duplicate_study_name"]
 
         # Raise errors, if any

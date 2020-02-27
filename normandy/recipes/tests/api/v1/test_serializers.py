@@ -124,7 +124,7 @@ class TestSignedRecipeSerializer:
                 "filter_expression": recipe.approved_revision.filter_expression,
                 "revision_id": str(recipe.revision_id),
                 "action": action.name,
-                "arguments": recipe.arguments,
+                "arguments": recipe.approved_revision.arguments,
                 "capabilities": sorted(recipe.capabilities),
                 "uses_only_baseline_capabilities": False,
             },

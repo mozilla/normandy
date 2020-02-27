@@ -369,7 +369,7 @@ class TestUpdateAddonUrls(object):
 
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
-        assert recipe.arguments[addonUrl] == extension.xpi.url
+        assert recipe.latest_revision.arguments[addonUrl] == extension.xpi.url
 
     def test_signatures_are_updated(self, mocked_autograph, storage):
         extension = ExtensionFactory()
@@ -403,7 +403,10 @@ class TestUpdateAddonUrls(object):
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
         # Url should not be not updated
-        assert recipe.arguments[addonUrl] == "https://before.example.com/extensions/addon.xpi"
+        assert (
+            recipe.latest_revision.arguments[addonUrl]
+            == "https://before.example.com/extensions/addon.xpi"
+        )
 
     def test_it_works_for_multiple_extensions(self, storage):
         extension1 = ExtensionFactory(name="1.xpi")
@@ -421,8 +424,8 @@ class TestUpdateAddonUrls(object):
         recipe1 = Recipe.objects.get(id=recipe1.id)
         recipe2 = Recipe.objects.get(id=recipe2.id)
 
-        assert recipe1.arguments[addonUrl] == extension1.xpi.url
-        assert recipe2.arguments[addonUrl] == extension2.xpi.url
+        assert recipe1.latest_revision.arguments[addonUrl] == extension1.xpi.url
+        assert recipe2.latest_revision.arguments[addonUrl] == extension2.xpi.url
 
 
 @pytest.mark.django_db

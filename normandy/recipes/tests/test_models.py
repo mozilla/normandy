@@ -231,7 +231,7 @@ class TestValidateArgumentPreferenceExperiments(object):
             )
 
             # does not throw when saving the revision
-            arguments = {"rolloutSlug": rollout_recipe.arguments["slug"]}
+            arguments = {"rolloutSlug": rollout_recipe.latest_revision.arguments["slug"]}
             RecipeFactory(action=rollback_action, arguments=arguments)
 
         def test_slug_must_match_a_rollout(self):
@@ -531,7 +531,7 @@ class TestRecipe(object):
         recipe.revise(name="changed", action=a2)
         assert recipe.latest_revision.action == a2
         assert recipe.latest_revision.name == "changed"
-        assert recipe.arguments == {"message": "something"}
+        assert recipe.latest_revision.arguments == {"message": "something"}
         assert recipe.latest_revision.filter_expression == "something !== undefined"
 
     def test_recipe_doesnt_revise_when_clean(self):

@@ -570,7 +570,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.arguments == arguments
+            assert recipe.latest_revision.arguments == arguments
 
             res = api_client.get("/api/v3/recipe/%s/" % recipe.id)
             assert res.status_code == 200, res.json()
@@ -582,7 +582,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.arguments == arguments
+            assert recipe.latest_revision.arguments == arguments
 
             res = api_client.get("/api/v3/recipe/%s/" % recipe.id)
             assert res.status_code == 200, res.json()
