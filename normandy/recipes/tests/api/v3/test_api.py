@@ -646,7 +646,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
             assert recipe.latest_revision.extra_filter_expression == ""
-            assert recipe.filter_object
+            assert recipe.latest_revision.filter_object
             assert (
                 recipe.latest_revision.filter_expression
                 == f'normandy.channel in ["{channel.slug}"]'
