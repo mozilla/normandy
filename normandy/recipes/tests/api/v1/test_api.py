@@ -188,7 +188,7 @@ class TestRecipeAPI(object):
             res = api_client.get("/api/v1/recipe/")
             assert res.status_code == 200
             assert len(res.data) == 1
-            assert res.data[0]["name"] == recipe.name
+            assert res.data[0]["name"] == recipe.latest_revision.name
 
         def test_available_if_admin_enabled(self, api_client, settings):
             settings.ADMIN_ENABLED = True

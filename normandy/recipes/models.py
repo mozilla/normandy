@@ -104,10 +104,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
         pass
 
     def __repr__(self):
-        return '<Recipe "{name}">'.format(name=self.name)
+        return '<Recipe "{name}">'.format(name=self.latest_revision.name)
 
     def __str__(self):
-        return self.name
+        return self.latest_revision.name
 
     @property
     def current_revision(self):
@@ -116,10 +116,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     @property
     def is_approved(self):
         return self.approved_revision is not None
-
-    @current_revision_property()
-    def name(self):
-        return self.current_revision.name
 
     @current_revision_property()
     def action(self):
@@ -489,7 +485,9 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             )
             for recipe in rollout_recipes:
                 if recipe.arguments["slug"] == slug:
-                    raise ValidationError(f"Rollout recipe {recipe.name!r} is currently enabled")
+                    raise ValidationError(
+                        f"Rollout recipe {recipe.approved_revision.name!r} is currently enabled"
+                    )
         elif self.action.name == "preference-rollout":
             slug = self.arguments["slug"]
             rollback_recipes = Recipe.objects.filter(
@@ -498,7 +496,9 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             )
             for recipe in rollback_recipes:
                 if recipe.arguments["rolloutSlug"] == slug:
-                    raise ValidationError(f"Rollback recipe {recipe.name!r} is currently enabled")
+                    raise ValidationError(
+                        f"Rollback recipe {recipe.approved_revision.name!r} is currently enabled"
+                    )
 
 
 class EnabledState(models.Model):

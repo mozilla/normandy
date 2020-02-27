@@ -330,7 +330,7 @@ class TestRemoteSettings:
                 "arguments": recipe.arguments,
                 "filter_expression": recipe.filter_expression,
                 "id": recipe.id,
-                "name": recipe.name,
+                "name": recipe.approved_revision.name,
                 "revision_id": str(recipe.revision_id),
                 "capabilities": Whatever(lambda caps: set(caps) == recipe.capabilities),
                 "uses_only_baseline_capabilities": False,
@@ -390,7 +390,7 @@ class TestRemoteSettings:
         assert requests[3].method == "PATCH"
         assert requests[3].url == rs_urls["workspace"]["baseline"]["collection"]
         mock_logger.info.assert_called_with(
-            f"Published record '{recipe.id}' for recipe '{recipe.name}'"
+            f"Published record '{recipe.id}' for recipe '{recipe.approved_revision.name}'"
         )
 
     def test_unpublish_deletes_record_and_approves(
@@ -438,7 +438,7 @@ class TestRemoteSettings:
         assert requests[3].url == urls["baseline"]["collection"]
         assert requests[3].method == "PATCH"
         mock_logger.info.assert_called_with(
-            f"Deleted record '{recipe.id}' of recipe '{recipe.name}'"
+            f"Deleted record '{recipe.id}' of recipe '{recipe.approved_revision.name}'"
         )
 
     def test_publish_raises_an_error_if_request_fails(self, rs_urls, rs_settings, requestsmock):

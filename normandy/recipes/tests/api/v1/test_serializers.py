@@ -28,7 +28,7 @@ class TestRecipeSerializer:
         serializer = RecipeSerializer(recipe, context={"request": rf.get("/")})
 
         assert serializer.data == {
-            "name": recipe.name,
+            "name": recipe.latest_revision.name,
             "id": recipe.id,
             "last_updated": Whatever(),
             "enabled": False,
@@ -60,7 +60,7 @@ class TestMinimalRecipeSerializer:
         serializer = MinimalRecipeSerializer(recipe, context={"request": rf.get("/")})
 
         assert serializer.data == {
-            "name": recipe.name,
+            "name": recipe.approved_revision.name,
             "id": recipe.id,
             "filter_expression": recipe.filter_expression,
             "revision_id": str(recipe.revision_id),
@@ -119,7 +119,7 @@ class TestSignedRecipeSerializer:
         assert serializer.data == {
             "signature": None,
             "recipe": {
-                "name": recipe.name,
+                "name": recipe.approved_revision.name,
                 "id": recipe.id,
                 "filter_expression": recipe.filter_expression,
                 "revision_id": str(recipe.revision_id),

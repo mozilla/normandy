@@ -24,7 +24,7 @@ class TestSignaturesUseGoodCertificates(object):
         mock_verify_x5u.assert_called_once_with(recipe.signature.x5u, None)
         assert len(errors) == 1
         assert errors[0].id == checks.ERROR_BAD_SIGNING_CERTIFICATE
-        assert recipe.name in errors[0].msg
+        assert recipe.approved_revision.name in errors[0].msg
 
     def test_it_ignores_signatures_without_x5u(self):
         recipe = RecipeFactory(approver=UserFactory(), signed=True)

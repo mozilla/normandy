@@ -41,7 +41,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"Signing {count} recipes:")
             for recipe in recipes_to_update:
-                self.stdout.write(" * " + recipe.name)
+                self.stdout.write(" * " + recipe.approved_revision.name)
                 recipe.update_signature()
                 recipe.save()
                 remote_settings.publish(recipe, approve_changes=False)
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"Unsigning {count} disabled recipes:")
             for recipe in recipes_to_unsign:
-                self.stdout.write(" * " + recipe.name)
+                self.stdout.write(" * " + recipe.approved_revision.name)
                 sig = recipe.signature
                 recipe.signature = None
                 recipe.save()

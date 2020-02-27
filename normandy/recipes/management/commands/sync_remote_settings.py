@@ -61,21 +61,25 @@ class Command(BaseCommand):
         style = self.style.SUCCESS if not to_publish else self.style.MIGRATE_LABEL
         self.stdout.write(style(f"{len(to_publish)} recipes to publish:"))
         for r in to_publish:
-            self.stdout.write(f" * {r.name!r} (id={r.id!r})")
+            self.stdout.write(f" * {r.approved_revision.name!r} (id={r.id!r})")
             if not dry_run:
                 remote_settings.publish(r)
 
         style = self.style.SUCCESS if not to_update else self.style.MIGRATE_LABEL
         self.stdout.write(style(f"{len(to_update)} recipes to update:"))
         for r in to_update:
-            self.stdout.write(f" * {r.name!r} (id={r.id!r})")
+            self.stdout.write(f" * {r.approved_revision.name!r} (id={r.id!r})")
             if not dry_run:
                 remote_settings.publish(r)
 
         style = self.style.SUCCESS if not to_unpublish else self.style.MIGRATE_LABEL
         self.stdout.write(style(f"{len(to_unpublish)} recipes to unpublish:"))
         for r in to_unpublish:
-            name = r.name if r.name else self.style.WARNING("Unknown locally")
+            name = (
+                r.approved_revision.name
+                if r.approved_revision
+                else self.style.WARNING("Unknown locally")
+            )
             self.stdout.write(f" * {name!r} (id={r.id!r})")
             if not dry_run:
                 remote_settings.unpublish(r)

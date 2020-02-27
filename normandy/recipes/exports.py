@@ -223,7 +223,9 @@ class RemoteSettings:
             self.approve_changes(baseline)
             log_action = "Published"
 
-        logger.info(f"{log_action} record '{recipe.id}' for recipe {recipe.name!r}")
+        logger.info(
+            f"{log_action} record '{recipe.id}' for recipe {recipe.approved_revision.name!r}"
+        )
 
     def unpublish(self, recipe, approve_changes=True):
         """
@@ -273,7 +275,9 @@ class RemoteSettings:
             self.approve_changes(baseline)
             log_action = "Deleted"
 
-        logger.info(f"{log_action} record '{recipe.id}' of recipe {recipe.name!r}")
+        logger.info(
+            f"{log_action} record '{recipe.id}' of recipe {recipe.approved_revision.name!r}"
+        )
 
     def approve_changes(self, baseline=True):
         """

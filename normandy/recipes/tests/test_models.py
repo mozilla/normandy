@@ -530,7 +530,7 @@ class TestRecipe(object):
         a2 = ActionFactory()
         recipe.revise(name="changed", action=a2)
         assert recipe.action == a2
-        assert recipe.name == "changed"
+        assert recipe.latest_revision.name == "changed"
         assert recipe.arguments == {"message": "something"}
         assert recipe.filter_expression == "something !== undefined"
 
@@ -568,25 +568,6 @@ class TestRecipe(object):
         revision_id = recipe.revision_id
         recipe.revise(action=ActionFactory())
         assert recipe.revision_id != revision_id
-
-    def test_current_revision_property(self):
-        """Ensure current revision properties work as expected."""
-        recipe = RecipeFactory(name="first")
-        assert recipe.name == "first"
-
-        recipe.revise(name="second")
-        assert recipe.name == "second"
-
-        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        approval.approve(UserFactory(), "r+")
-        assert recipe.name == "second"
-
-        # When `revise` is called on a recipe with at least one approved revision, the new revision
-        # is treated as a draft and as such the `name` property of the recipe should return the
-        # `name` from the `approved_revision` not the `latest_revision`.
-        recipe.revise(name="third")
-        assert recipe.latest_revision.name == "third"  # The latest revision ("draft") is updated
-        assert recipe.name == "second"  # The current revision is unchanged
 
     def test_recipe_is_approved(self):
         recipe = RecipeFactory(name="old")
@@ -728,7 +709,7 @@ class TestRecipeRevision(object):
             assert mocked_remotesettings.return_value.publish.call_count == 2
             second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
             modified_recipe, = second_call_args
-            assert modified_recipe.name == "Modified"
+            assert modified_recipe.latest_revision.name == "Modified"
 
         def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
             recipe = RecipeFactory(name="Test")

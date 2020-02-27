@@ -114,7 +114,7 @@ class TestRecipeAPI(object):
 
             res = api_client.get("/api/v3/recipe/")
             assert res.status_code == 200
-            assert res.data["results"][0]["latest_revision"]["name"] == recipe.name
+            assert res.data["results"][0]["latest_revision"]["name"] == recipe.latest_revision.name
 
         def test_available_if_admin_enabled(self, api_client, settings):
             settings.ADMIN_ENABLED = True
@@ -532,7 +532,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             recipe = Recipe.objects.all()[0]
-            assert recipe.name == "changed"
+            assert recipe.latest_revision.name == "changed"
             assert recipe.filter_expression == "false"
             assert recipe.revision_id != old_revision_id
 
