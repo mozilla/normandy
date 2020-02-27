@@ -101,9 +101,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             "capabilities",
         ]
 
-    def get_capabilities(self, recipe):
-        return recipe.capabilities
-
 
 class MinimalRecipeSerializer(RecipeSerializer):
     """
