@@ -109,10 +109,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
         return self.latest_revision.name
 
     @property
-    def current_revision(self):
-        return self.approved_revision or self.latest_revision
-
-    @property
     def is_approved(self):
         return self.approved_revision is not None
 
