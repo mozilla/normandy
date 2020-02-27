@@ -36,7 +36,7 @@ class BaselineCapabilitiesFilter(django_filters.Filter):
                 raise TypeError("BaselineCapabilitiesFilter can only be used to filter recipes")
             match_ids = []
             for recipe in recipes:
-                if recipe.uses_only_baseline_capabilities():
+                if recipe.latest_revision.uses_only_baseline_capabilities():
                     match_ids.append(recipe.id)
             return Recipe.objects.filter(id__in=match_ids)
 

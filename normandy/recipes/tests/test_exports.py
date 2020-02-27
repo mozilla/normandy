@@ -478,7 +478,7 @@ class TestRemoteSettings:
         # This test forces the recipe to not use baseline capabilities to
         # simplify the test. This simplifies the test.
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        assert not recipe.uses_only_baseline_capabilities()
+        assert not recipe.approved_revision.uses_only_baseline_capabilities()
 
         capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
         # Creating the record works.
@@ -559,7 +559,7 @@ class TestRemoteSettings:
 
         recipe = RecipeFactory(approver=UserFactory())
         rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
-        assert recipe.uses_only_baseline_capabilities()
+        assert recipe.approved_revision.uses_only_baseline_capabilities()
 
         # Expect publish calls to both collections
         requestsmock.put(
@@ -616,7 +616,7 @@ class TestRemoteSettings:
         ws_urls = rs_urls["workspace"]
 
         recipe = RecipeFactory(approver=UserFactory())
-        assert not recipe.uses_only_baseline_capabilities()
+        assert not recipe.approved_revision.uses_only_baseline_capabilities()
 
         # Expect calls only to the capabilities collection
         requestsmock.put(

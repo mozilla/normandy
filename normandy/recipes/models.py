@@ -116,9 +116,6 @@ class Recipe(DirtyFieldsMixin, models.Model):
     def is_approved(self):
         return self.approved_revision is not None
 
-    def uses_only_baseline_capabilities(self):
-        return self.current_revision.uses_only_baseline_capabilities()
-
     @property
     def approval_request(self):
         try:

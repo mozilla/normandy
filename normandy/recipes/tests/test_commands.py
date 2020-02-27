@@ -262,7 +262,7 @@ class TestUpdateRecipeSignatures(object):
         recipes = RecipeFactory.create_batch(
             10, approver=UserFactory(), enabler=UserFactory(), signed=False
         )
-        assert all(not r.uses_only_baseline_capabilities() for r in recipes)
+        assert all(not r.approved_revision.uses_only_baseline_capabilities() for r in recipes)
 
         # Set up a version of the Remote Settings helper with a mocked out client
         client_mock = None

@@ -209,7 +209,7 @@ class RemoteSettings:
             bucket=rs_settings.WORKSPACE_BUCKET_ID,
             collection=rs_settings.CAPABILITIES_COLLECTION_ID,
         )
-        if recipe.uses_only_baseline_capabilities():
+        if recipe.approved_revision.uses_only_baseline_capabilities():
             baseline = True
             self.client.update_record(
                 data=record,
