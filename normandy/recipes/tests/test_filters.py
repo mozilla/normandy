@@ -1,4 +1,5 @@
 import pytest
+from rest_framework import serializers
 
 from normandy.recipes.filters import (
     BucketSampleFilter,
@@ -63,6 +64,15 @@ class TestProfileCreationDateFilter(FilterTestsBase):
             "(!normandy.telemetry.main)",
             "(normandy.telemetry.main.environment.profile.creationDate>18262)",
         }
+
+    def test_throws_error_on_bad_drection(self):
+        filter = self.create_basic_filter(direction="newer", date="2020-02-01")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+    def test_throws_error_on_bad_date(self):
+        with pytest.raises(AssertionError):
+            self.create_basic_filter(direction="newerThan", date="Jan 7, 2020")
 
 
 class TestVersionFilter(FilterTestsBase):
