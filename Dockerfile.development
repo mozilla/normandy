@@ -1,4 +1,4 @@
-FROM python:3.7-slim@sha256:3c41d5193d04cb2d6c60ea7f0302399162b1fa36ecbef7a3e6d1ad39f3a7f3b3
+FROM python:3.7-slim@sha256:d3f8c62226e90ff84d37706e89de808e771dba8eb10388d5f4b4fad8d607177c
 WORKDIR /app
 
 RUN groupadd --gid 10001 app && useradd -g app -d /app --uid 10001 --shell /usr/sbin/nologin app
