@@ -65,7 +65,7 @@ class TestProfileCreationDateFilter(FilterTestsBase):
             "(normandy.telemetry.main.environment.profile.creationDate>18262)",
         }
 
-    def test_throws_error_on_bad_drection(self):
+    def test_throws_error_on_bad_direction(self):
         filter = self.create_basic_filter(direction="newer", date="2020-02-01")
         with pytest.raises(serializers.ValidationError):
             filter.to_jexl()
