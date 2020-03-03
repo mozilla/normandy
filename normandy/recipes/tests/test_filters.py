@@ -169,6 +169,11 @@ class TestPlatformFilter(FilterTestsBase):
         filter = self.create_basic_filter(platforms=["all_linux"])
         assert set(filter.to_jexl().split("||")) == {"normandy.os.isLinux"}
 
+    def test_throws_error_on_bad_platform(self):
+        filter = self.create_basic_filter(platforms=["all_linu"])
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
 
 class TestBucketSamplefilter(FilterTestsBase):
     def create_basic_filter(self, input=None, start=123, count=10, total=1_000):

@@ -184,8 +184,10 @@ class PlatformFilter(BaseFilter):
                 platforms_jexl.append("normandy.os.isWindows")
             elif platform == "all_linux":
                 platforms_jexl.append("normandy.os.isLinux")
+            else:
+                raise serializers.ValidationError(f"Unrecognized platform {platform!r}")
 
-        return "||".join((f"{p}" for p in platforms_jexl))
+        return "||".join((p for p in platforms_jexl))
 
     @property
     def capabilities(self):
