@@ -34,11 +34,11 @@ load_data: migrate update_actions load_initial_data
 
 lint: SHELL:=/bin/bash -O extglob
 lint:
-	docker-compose run app therapist run --disable-git ./!(node_modules|assets|docs)
+	docker-compose run app therapist run --disable-git ./!(node_modules|assets|docs|venv)
 
 code_format: SHELL:=/bin/bash -O extglob
 code_format:
-	docker-compose run app therapist run --fix --disable-git ./!(node_modules|assets|docs)
+	docker-compose run app therapist run --fix --disable-git ./!(node_modules|assets|docs|venv)
 check: check_migrations lint test
 
 kill:
