@@ -157,6 +157,41 @@ class CountryFilter(BaseFilter):
         return set()
 
 
+class PlatformFilter(BaseFilter):
+    """Match a user based on what operating system they are using.
+
+    .. attribute:: type
+
+        ``platform``
+
+    .. attribute:: platforms
+
+        List of platforms to filter against. The choices are `all_linux`,
+        `all_windows`, and `all_mac`.
+
+        :example: ``["all_windows", "all_linux"]``
+    """
+
+    type = "platform"
+    platforms = serializers.ListField(child=serializers.CharField(), min_length=1)
+
+    def to_jexl(self):
+        platforms_jexl = []
+        for platform in self.initial_data["platforms"]:
+            if platform == "all_mac":
+                platforms_jexl.append("normandy.os.isMac")
+            elif platform == "all_windows":
+                platforms_jexl.append("normandy.os.isWindows")
+            elif platform == "all_linux":
+                platforms_jexl.append("normandy.os.isLinux")
+
+        return "||".join((f"{p}" for p in platforms_jexl))
+
+    @property
+    def capabilities(self):
+        return set()
+
+
 class BucketSampleFilter(BaseFilter):
     """
     Sample a portion of the users by defining a series of buckets, evenly
@@ -454,6 +489,7 @@ by_type = {
         VersionRangeFilter,
         DateRangeFilter,
         ProfileCreateDateFilter,
+        PlatformFilter,
     ]
 }
 

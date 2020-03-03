@@ -22,6 +22,7 @@ Filter Objects
 .. autoclass:: BucketSampleFilter()
 .. autoclass:: StableSampleFilter()
 .. autoclass:: VersionFilter()
+.. autoclass:: PlatformFilter()
 
 Filter Expressions
 ------------------
