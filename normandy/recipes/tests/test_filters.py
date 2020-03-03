@@ -11,6 +11,7 @@ from normandy.recipes.filters import (
     VersionRangeFilter,
     DateRangeFilter,
     ProfileCreateDateFilter,
+    PlatformFilter,
 )
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
@@ -154,6 +155,24 @@ class TestCountryFilter(FilterTestsBase):
     def test_generates_jexl(self):
         filter = self.create_basic_filter(countries=["SV", "MX"])
         assert filter.to_jexl() == 'normandy.country in ["SV","MX"]'
+
+
+class TestPlatformFilter(FilterTestsBase):
+    def create_basic_filter(self, platforms=["all_mac", "all_windows"]):
+        return PlatformFilter.create(platforms=platforms)
+
+    def test_generates_jexl_list_of_two(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("||")) == {"normandy.os.isMac", "normandy.os.isWindows"}
+
+    def test_generates_jexl_list_of_one(self):
+        filter = self.create_basic_filter(platforms=["all_linux"])
+        assert set(filter.to_jexl().split("||")) == {"normandy.os.isLinux"}
+
+    def test_throws_error_on_bad_platform(self):
+        filter = self.create_basic_filter(platforms=["all_linu"])
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
 
 
 class TestBucketSamplefilter(FilterTestsBase):
