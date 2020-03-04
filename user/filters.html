@@ -430,6 +430,111 @@ releases, and won’t consider channel.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="normandy.recipes.filters.VersionRangeFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">VersionRangeFilter</code><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user running a version in the given range. Uses a version compare
+filter instead of simple string comparison like VersionFilter.</p>
+<p>The version range is half-open, like Python ranges: If min is 72 and max
+is 75, 72.0 will be include, 75.0 will not be. <cite>min &lt;= version &lt; max</cite>.</p>
+<p>..attribute:: type</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">version_range</span></code></p>
+</div></blockquote>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.VersionRangeFilter.min_version">
+<code class="sig-name descname">min_version</code><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter.min_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">72.0b5</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.VersionRangeFilter.max_version">
+<code class="sig-name descname">max_version</code><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter.max_version" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">75.0.1</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.DateRangeFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">DateRangeFilter</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Match a user to a delivery that starts on or after the <code class="docutils literal notranslate"><span class="pre">not_before</span></code> date and
+before the <code class="docutils literal notranslate"><span class="pre">not_after</span></code> date.</p>
+<p>The date range is half-open, so <cite>not_before &lt;= normandy.request_time &lt; not_after</cite>.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.DateRangeFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">date_range</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.DateRangeFilter.not_before">
+<code class="sig-name descname">not_before</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_before" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2020-02-01T00:00:00Z</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.DateRangeFilter.not_after">
+<code class="sig-name descname">not_after</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_after" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2020-03-01T00:00:00Z</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.ProfileCreateDateFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">ProfileCreateDateFilter</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>This filter is meant to distinguish between new and existing users.
+Target users who have a profile creation date older than or newer than
+a given date.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.ProfileCreateDateFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">profile_creation_date</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.ProfileCreateDateFilter.direction">
+<code class="sig-name descname">direction</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.direction" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">newer_than</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.ProfileCreateDateFilter.date">
+<code class="sig-name descname">date</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.date" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2020-02-01</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="filter-expressions">
 <h2>Filter Expressions<a class="headerlink" href="#filter-expressions" title="Permalink to this headline">¶</a></h2>
