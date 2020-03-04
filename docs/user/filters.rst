@@ -23,6 +23,10 @@ Filter Objects
 .. autoclass:: StableSampleFilter()
 .. autoclass:: VersionFilter()
 .. autoclass:: PlatformFilter()
+.. autoclass:: VersionRangeFilter()
+.. autoclass:: DateRangeFilter()
+.. autoclass:: ProfileCreateDateFilter()
+
 
 Filter Expressions
 ------------------
