@@ -26,6 +26,9 @@ Filter Objects
 .. autoclass:: VersionRangeFilter()
 .. autoclass:: DateRangeFilter()
 .. autoclass:: ProfileCreateDateFilter()
+.. autoclass:: PrefExistsFilter()
+.. autoclass:: PrefCompareFilter()
+.. autoclass:: PrefUserSetFilter()
 
 
 Filter Expressions

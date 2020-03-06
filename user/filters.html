@@ -535,6 +535,82 @@ a given date.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="normandy.recipes.filters.PrefExistsFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PrefExistsFilter</code><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user based on if pref exists.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefExistsFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">pref</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefExistsFilter.value">
+<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean true or false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.PrefCompareFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PrefCompareFilter</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match based on a user’s pref having a particular value.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefCompareFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">pref</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefCompareFilter.value">
+<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>string, boolean, or number.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> or “10”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefCompareFilter.comparison">
+<code class="sig-name descname">comparison</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.comparison" title="Permalink to this definition">¶</a></dt>
+<dd><p>Options are <code class="docutils literal notranslate"><span class="pre">equal</span></code>, <code class="docutils literal notranslate"><span class="pre">not_equal</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than</span></code>,
+<code class="docutils literal notranslate"><span class="pre">less_than</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than_equal</span></code> and <code class="docutils literal notranslate"><span class="pre">less_than_equal</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.PrefUserSetFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PrefUserSetFilter</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user based on if the user set a preference.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefUserSetFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">pref</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PrefUserSetFilter.value">
+<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean true or false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="filter-expressions">
 <h2>Filter Expressions<a class="headerlink" href="#filter-expressions" title="Permalink to this headline">¶</a></h2>
