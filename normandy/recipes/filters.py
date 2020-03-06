@@ -223,24 +223,24 @@ class PrefCompareFilter(BaseFilter):
         value = self.initial_data["value"]
         pref = self.initial_data["pref"]
 
+        if comparison == "contains":
+            return f"{json.dumps(value)} in '{pref}'|preferenceValue"
         if comparison == "equal":
             symbol = "=="
         elif comparison == "not_equal":
             symbol = "!="
         elif comparison == "greater_than":
-            symbol = "<"
-        elif comparison == "greater_than_equal":
-            symbol = "<="
-        elif comparison == "less_than":
             symbol = ">"
-        elif comparison == "less_than_equal":
+        elif comparison == "greater_than_equal":
             symbol = ">="
-        elif comparison == "in":
-            symbol = "in"
+        elif comparison == "less_than":
+            symbol = "<"
+        elif comparison == "less_than_equal":
+            symbol = "<="
         else:
             raise serializers.ValidationError(f"Unrecognized comparison {comparison!r}")
 
-        return f"{json.dumps(value)} {symbol} '{pref}'|preferenceValue"
+        return f"'{pref}'|preferenceValue {symbol} {json.dumps(value)}"
 
     @property
     def capabilities(self):

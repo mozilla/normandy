@@ -186,30 +186,27 @@ class TestPrefCompareFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
-        assert filter.to_jexl() == "10 == 'browser.urlbar.maxRichResults'|preferenceValue"
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == 10"
 
-    def test_generates_jexl_greater_than(self):
-        filter = self.create_basic_filter(comparison="greater_than")
-        assert filter.to_jexl() == "10 < 'browser.urlbar.maxRichResults'|preferenceValue"
-
-    def test_generates_jexl_greater_than_equal(self):
-        filter = self.create_basic_filter(comparison="greater_than_equal")
-        assert filter.to_jexl() == "10 <= 'browser.urlbar.maxRichResults'|preferenceValue"
-
-    def test_generates_jexl_less_than(self):
-        filter = self.create_basic_filter(comparison="less_than")
-        assert filter.to_jexl() == "10 > 'browser.urlbar.maxRichResults'|preferenceValue"
-
-    def test_generates_jexl_less_than_equal(self):
-        filter = self.create_basic_filter(comparison="less_than_equal")
-        assert filter.to_jexl() == "10 >= 'browser.urlbar.maxRichResults'|preferenceValue"
+    @pytest.mark.parametrize(
+        "comparison,symbol",
+        [
+            ("greater_than", ">"),
+            ("greater_than_equal", ">="),
+            ("less_than", "<"),
+            ("less_than_equal", "<="),
+        ],
+    )
+    def test_generates_jexl_number_ops(self, comparison, symbol):
+        filter = self.create_basic_filter(comparison=comparison)
+        assert filter.to_jexl() == f"'browser.urlbar.maxRichResults'|preferenceValue {symbol} 10"
 
     def test_generates_jexl_boolean(self):
         filter = self.create_basic_filter(value=False)
-        assert filter.to_jexl() == "false == 'browser.urlbar.maxRichResults'|preferenceValue"
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == false"
 
     def test_generates_jexl_string_in(self):
-        filter = self.create_basic_filter(value="default", comparison="in")
+        filter = self.create_basic_filter(value="default", comparison="contains")
         assert filter.to_jexl() == "\"default\" in 'browser.urlbar.maxRichResults'|preferenceValue"
 
     def test_generates_jexl_error(self):
