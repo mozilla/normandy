@@ -22,10 +22,10 @@ field, so the final JSON would look something like this:
 
 from rest_framework import serializers
 from datetime import datetime
+import json
+
 
 # If you add a new filter to this file, remember to update the docs too!
-
-
 class BaseFilter(serializers.Serializer):
     @classmethod
     def create(cls, **kwargs):
@@ -192,6 +192,122 @@ class PlatformFilter(BaseFilter):
     @property
     def capabilities(self):
         return set()
+
+
+class PrefCompareFilter(BaseFilter):
+    """Match based on a user's pref having a particular value.
+
+    .. attribute:: type
+
+        ``pref``
+
+    .. attribute:: value
+
+        string, boolean, or number.
+
+        :example: ``true`` or ``"default"`` or "10"
+
+    .. attribute:: comparison
+
+        Options are ``equal``, ``not_equal``, ``greater_than``,
+        ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
+    """
+
+    type = "pref"
+    pref = serializers.CharField()
+    value = serializers.JSONField()
+    comparison = serializers.CharField()
+
+    def to_jexl(self):
+        comparison = self.initial_data["comparison"]
+        value = self.initial_data["value"]
+        pref = self.initial_data["pref"]
+
+        if comparison == "contains":
+            return f"{json.dumps(value)} in '{pref}'|preferenceValue"
+        if comparison == "equal":
+            symbol = "=="
+        elif comparison == "not_equal":
+            symbol = "!="
+        elif comparison == "greater_than":
+            symbol = ">"
+        elif comparison == "greater_than_equal":
+            symbol = ">="
+        elif comparison == "less_than":
+            symbol = "<"
+        elif comparison == "less_than_equal":
+            symbol = "<="
+        else:
+            raise serializers.ValidationError(f"Unrecognized comparison {comparison!r}")
+
+        return f"'{pref}'|preferenceValue {symbol} {json.dumps(value)}"
+
+    @property
+    def capabilities(self):
+        return {"jexl.transform.preferenceValue"}
+
+
+class PrefExistsFilter(BaseFilter):
+    """Match a user based on if pref exists.
+
+    .. attribute:: type
+
+        ``pref``
+
+    .. attribute:: value
+
+        Boolean true or false.
+
+        :example: ``true`` or ``false``
+    """
+
+    type = "pref"
+    pref = serializers.CharField()
+    value = serializers.BooleanField()
+
+    def to_jexl(self):
+        value = self.initial_data["value"]
+        pref = self.initial_data["pref"]
+
+        if value:
+            return f"'{pref}'|preferenceExists"
+        else:
+            return f"!('{pref}'|preferenceExists)"
+
+    @property
+    def capabilities(self):
+        return {"jexl.transform.preferenceExists"}
+
+
+class PrefUserSetFilter(BaseFilter):
+    """Match a user based on if the user set a preference.
+
+    .. attribute:: type
+
+        ``pref``
+
+    .. attribute:: value
+
+        Boolean true or false.
+
+        :example: ``true`` or ``false``
+    """
+
+    type = "pref"
+    pref = serializers.CharField()
+    value = serializers.BooleanField()
+
+    def to_jexl(self):
+        value = self.initial_data["value"]
+        pref = self.initial_data["pref"]
+        if value:
+            return f"'{pref}'|preferenceIsUserSet"
+        else:
+            return f"!('{pref}'|preferenceIsUserSet)"
+
+    @property
+    def capabilities(self):
+        return {"jexl.transform.preferenceIsUserSet"}
 
 
 class BucketSampleFilter(BaseFilter):
@@ -492,6 +608,9 @@ by_type = {
         DateRangeFilter,
         ProfileCreateDateFilter,
         PlatformFilter,
+        PrefExistsFilter,
+        PrefCompareFilter,
+        PrefUserSetFilter,
     ]
 }
 
