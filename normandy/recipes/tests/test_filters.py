@@ -12,7 +12,9 @@ from normandy.recipes.filters import (
     DateRangeFilter,
     ProfileCreateDateFilter,
     PlatformFilter,
-    PrefFilter,
+    PrefCompareFilter,
+    PrefExistsFilter,
+    PrefUserSetFilter,
 )
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
@@ -176,45 +178,70 @@ class TestPlatformFilter(FilterTestsBase):
             filter.to_jexl()
 
 
-class TestPrefFilter(FilterTestsBase):
+class TestPrefCompareFilter(FilterTestsBase):
     def create_basic_filter(
-        self, pref="browser.urlbar.maxRichResults", value="10", comparison="equal"
+        self, pref="browser.urlbar.maxRichResults", value=10, comparison="equal"
     ):
-        return PrefFilter.create(pref=pref, value=value, comparison=comparison)
+        return PrefCompareFilter.create(pref=pref, value=value, comparison=comparison)
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == 10"
+        assert filter.to_jexl() == "10 == 'browser.urlbar.maxRichResults'|preferenceValue"
 
     def test_generates_jexl_greater_than(self):
         filter = self.create_basic_filter(comparison="greater_than")
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue > 10"
+        assert filter.to_jexl() == "10 < 'browser.urlbar.maxRichResults'|preferenceValue"
 
-    def test_generates_jexl_is_user_set_true(self):
-        filter = self.create_basic_filter(comparison="is_user_set", value="true")
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceIsUserSet"
+    def test_generates_jexl_greater_than_equal(self):
+        filter = self.create_basic_filter(comparison="greater_than_equal")
+        assert filter.to_jexl() == "10 <= 'browser.urlbar.maxRichResults'|preferenceValue"
 
-    def test_generates_jexl_is_user_set_false(self):
-        filter = self.create_basic_filter(comparison="is_user_set", value="false")
-        assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceIsUserSet)"
+    def test_generates_jexl_less_than(self):
+        filter = self.create_basic_filter(comparison="less_than")
+        assert filter.to_jexl() == "10 > 'browser.urlbar.maxRichResults'|preferenceValue"
 
-    def test_generates_jexl_is_user_set_error(self):
-        filter = self.create_basic_filter(comparison="is_user_set", value="dog")
+    def test_generates_jexl_less_than_equal(self):
+        filter = self.create_basic_filter(comparison="less_than_equal")
+        assert filter.to_jexl() == "10 >= 'browser.urlbar.maxRichResults'|preferenceValue"
+
+    def test_generates_jexl_boolean(self):
+        filter = self.create_basic_filter(value=False)
+        assert filter.to_jexl() == "false == 'browser.urlbar.maxRichResults'|preferenceValue"
+
+    def test_generates_jexl_string_in(self):
+        filter = self.create_basic_filter(value="default", comparison="in")
+        assert filter.to_jexl() == "\"default\" in 'browser.urlbar.maxRichResults'|preferenceValue"
+
+    def test_generates_jexl_error(self):
+        filter = self.create_basic_filter(comparison="invalid")
         with pytest.raises(serializers.ValidationError):
             filter.to_jexl()
 
+
+class TestPrefExistsFilter(FilterTestsBase):
+    def create_basic_filter(self, pref="browser.urlbar.maxRichResults", value=True):
+        return PrefExistsFilter.create(pref=pref, value=value)
+
     def test_generates_jexl_pref_exists_true(self):
-        filter = self.create_basic_filter(comparison="preference_exists", value="true")
+        filter = self.create_basic_filter()
         assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceExists"
 
     def test_generates_jexl_pref_exists_false(self):
-        filter = self.create_basic_filter(comparison="preference_exists", value="false")
+        filter = self.create_basic_filter(value=False)
         assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceExists)"
 
-    def test_generates_jexl_is_pref_exists_error(self):
-        filter = self.create_basic_filter(comparison="preference_exists", value="dog")
-        with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+
+class TestPrefUserSetFilter(FilterTestsBase):
+    def create_basic_filter(self, pref="browser.urlbar.maxRichResults", value=True):
+        return PrefUserSetFilter.create(pref=pref, value=value)
+
+    def test_generates_jexl_is_user_set_true(self):
+        filter = self.create_basic_filter()
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceIsUserSet"
+
+    def test_generates_jexl_is_user_set_false(self):
+        filter = self.create_basic_filter(value=False)
+        assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceIsUserSet)"
 
 
 class TestBucketSamplefilter(FilterTestsBase):
