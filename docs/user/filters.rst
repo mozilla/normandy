@@ -29,6 +29,7 @@ Filter Objects
 .. autoclass:: PrefExistsFilter()
 .. autoclass:: PrefCompareFilter()
 .. autoclass:: PrefUserSetFilter()
+.. autoclass:: WindowsBuildNumberFilter()
 
 
 Filter Expressions
