@@ -48,21 +48,35 @@ class BaseFilter(serializers.Serializer):
         """Render this filter to a JEXL expression"""
         raise NotImplementedError
 
-    def to_operator(self, comparison):
+
+class BaseComparisonFilter(BaseFilter):
+    value = serializers.IntegerField()
+    comparison = serializers.CharField()
+
+    @property
+    def left_of_operator(self):
+        raise NotImplementedError("Not correctly implemented.")
+
+    def to_jexl(self):
+        comparison = self.initial_data["comparison"]
+        value = self.initial_data["value"]
+
         if comparison == "equal":
-            return "=="
+            operator = "=="
         elif comparison == "not_equal":
-            return "!="
+            operator = "!="
         elif comparison == "greater_than":
-            return ">"
+            operator = ">"
         elif comparison == "greater_than_equal":
-            return ">="
+            operator = ">="
         elif comparison == "less_than":
-            return "<"
+            operator = "<"
         elif comparison == "less_than_equal":
-            return "<="
+            operator = "<="
         else:
             raise serializers.ValidationError(f"Unrecognized comparison {comparison!r}")
+
+        return f"{self.left_of_operator} {operator} {value}"
 
 
 class ChannelFilter(BaseFilter):
@@ -563,22 +577,19 @@ class DateRangeFilter(BaseFilter):
         return {"jexl.transform.date"}
 
 
-class WindowsBuildNumberFilter(BaseFilter):
+class WindowsBuildNumberFilter(BaseComparisonFilter):
     type = "windows_build_number"
-    build_number = serializers.IntegerField()
-    comparison = serializers.CharField()
 
-    def to_jexl(self):
-        comparison = self.initial_data["comparison"]
-        build_number = self.initial_data["build_number"]
-
-        symbol = self.to_operator(comparison)
-
-        return f"(normandy.os.isWindows && normandy.os.windowsBuildNumber {symbol} {build_number})"
+    @property
+    def left_of_operator(self):
+        return "normandy.os.windowsBuildNumber"
 
     @property
     def capabilities(self):
         return set()
+
+    def to_jexl(self):
+        return f"(normandy.os.isWindows && {super().to_jexl()})"
 
 
 class ProfileCreateDateFilter(BaseFilter):

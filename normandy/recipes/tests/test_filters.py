@@ -123,8 +123,8 @@ class TestDateRangeFilter(FilterTestsBase):
 
 
 class TestWindowsBuildNumberFiter(FilterTestsBase):
-    def create_basic_filter(self, build_number=12345, comparison="equal"):
-        return WindowsBuildNumberFilter.create(build_number=build_number, comparison=comparison)
+    def create_basic_filter(self, value=12345, comparison="equal"):
+        return WindowsBuildNumberFilter.create(value=value, comparison=comparison)
 
     @pytest.mark.parametrize(
         "comparison,symbol",
