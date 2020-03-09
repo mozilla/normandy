@@ -19,7 +19,7 @@ jobs:
       # Use an in-memory database so that the migrations check doesn't try to access a real database
       DATABASE_URL: "sqlite://:memory:"
       # Ignore warning and info checks about not applying migrations, and about missing geoip database
-      DJANGO_SILENCED_SYSTEM_CHECKS: "dockerflow.health.W001,normandy.recipes.I001,normandy.recipes.I002,normandy.recipes.I003,normandy.recipes.E006"
+      DJANGO_SILENCED_SYSTEM_CHECKS: "dockerflow.health.W001,normandy.recipes.I00,normandy.recipes.I002,normandy.recipes.I003,normandy.recipes.E006"
 
     working_directory: ~/repo
 
@@ -193,28 +193,6 @@ jobs:
       - store_artifacts:
           path: test-reports
 
-  js-tests:
-    docker:
-      - image: mozilla/cidockerbases:firefox-latest
-
-    steps:
-      - checkout
-      - run:
-          name: Install node dependencies
-          command: yarn install --frozen-lockfile
-      - run:
-          name: JS tests
-          environment:
-            JUNIT_REPORT_PATH: ./junit/
-            JUNIT_REPORT_NAME: test-results.xml
-          command: |
-            mkdir -p $JUNIT_REPORT_PATH
-            yarn karma start ./karma.conf.js --single-run
-      - store_test_results:
-          path: test-reports
-      - store_artifacts:
-          path: test-reports
-
   contract-tests:
     docker:
       - image: circleci/python:3.7-node-browsers
@@ -272,7 +250,7 @@ jobs:
           name: Contract tests
           command: |
             mkdir test-reports
-            py.test contract-tests \
+            py.test contract-tests/v1_api/ \
               --tb=short -vvv \
               --junitxml=test-reports/junit.xml \
               --server http://localhost:8000
@@ -289,10 +267,6 @@ workflows:
 
       # Group: Tests and lints
       - python-tests:
-          filters:
-            tags:
-              only: /.*/
-      - js-tests:
           filters:
             tags:
               only: /.*/
@@ -335,9 +309,7 @@ workflows:
       - docker-image-publish:
           requires:
             - python-tests
-            - js-tests
             - contract-tests
-            - js-tests
             - lint
             - docker-image-build-save
           filters:
