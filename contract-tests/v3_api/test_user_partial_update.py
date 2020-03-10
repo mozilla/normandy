@@ -1,6 +1,3 @@
-import pytest
-import uuid
-
 from faker import Faker
 from support.assertions import assert_valid_schema
 from support.helpers import create_new_user

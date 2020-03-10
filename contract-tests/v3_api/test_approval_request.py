@@ -1,5 +1,3 @@
-import pytest
-
 from support.helpers import new_recipe
 from support.assertions import assert_valid_schema
 from urllib.parse import urljoin
@@ -58,5 +56,5 @@ def test_approval_request(conf, requests_session, headers):
     assert response.status_code not in (404, 500)
     assert_valid_schema(response.json())
     approval_request = response.json()["latest_revision"]["approval_request"]
-    assert approval_request["approved"] == True
+    assert approval_request["approved"] is True
     assert approval_request["comment"] == "r+"

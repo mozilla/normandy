@@ -1,7 +1,5 @@
-import os
 import pytest
 import subprocess
-import uuid
 
 from faker import Faker
 

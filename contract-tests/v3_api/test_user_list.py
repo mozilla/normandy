@@ -1,6 +1,3 @@
-import pytest
-import uuid
-
 from support.assertions import assert_valid_schema
 from urllib.parse import urljoin
 

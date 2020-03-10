@@ -1,6 +1,3 @@
-import pytest
-import uuid
-
 from faker import Faker
 from support.assertions import assert_valid_schema
 from urllib.parse import urljoin
@@ -16,7 +13,6 @@ def test_user_create(conf, requests_session, headers):
     group_id = response.json()["results"][0]["id"]
     group_name = response.json()["results"][0]["name"]
     fake = Faker()
-    email = fake.company_email()
 
     # Create a user, assigning them to the group we obtained
     user_data = {

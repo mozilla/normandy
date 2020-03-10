@@ -1,5 +1,3 @@
-import pytest
-
 from support.helpers import (
     approve_approval_request,
     create_approval_request,
@@ -53,9 +51,9 @@ def test_recipe_enable(conf, requests_session, headers):
     assert response.status_code not in (404, 500)
     assert_valid_schema(response.json())
     approval_request = response.json()["latest_revision"]["approval_request"]
-    assert approval_request["approved"] == True
+    assert approval_request["approved"] is True
     assert approval_request["comment"] == "r+"
-    assert response.json()["latest_revision"]["enabled"] == False
+    assert response.json()["latest_revision"]["enabled"] is False
 
     # Enable the recipe
     response = enable_recipe(
@@ -63,4 +61,4 @@ def test_recipe_enable(conf, requests_session, headers):
     )
     assert response.status_code not in (404, 500)
     assert_valid_schema(response.json())
-    assert response.json()["latest_revision"]["enabled"] == True
+    assert response.json()["latest_revision"]["enabled"] is True

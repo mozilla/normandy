@@ -1,4 +1,3 @@
-import requests
 import urllib3
 import uuid
 
@@ -27,7 +26,6 @@ def create_new_user(requests_session, server, headers):
     group_id = response.json()["results"][0]["id"]
     group_name = response.json()["results"][0]["name"]
     fake = Faker()
-    email = fake.company_email()
 
     # Create a user, assigning them to the group we obtained
     user_data = {

@@ -1,5 +1,3 @@
-import pytest
-
 from support.assertions import assert_valid_schema
 from urllib.parse import urljoin
 
