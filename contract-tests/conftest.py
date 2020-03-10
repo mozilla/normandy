@@ -8,7 +8,7 @@ import urllib3
 # Disable any warnings about SSL connections
 urllib3.disable_warnings()
 
-# Fix our path so our tests can see modules inside Normandy 
+# Fix our path so our tests can see modules inside Normandy
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -18,7 +18,6 @@ def pytest_addoption(parser):
         dest="server",
         default="http://localhost:8000",
         help="Server to run tests against",
-
     )
     parser.addoption(
         "--no-verify",
