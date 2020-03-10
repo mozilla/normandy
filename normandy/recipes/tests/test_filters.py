@@ -15,6 +15,7 @@ from normandy.recipes.filters import (
     PrefCompareFilter,
     PrefExistsFilter,
     PrefUserSetFilter,
+    WindowsBuildNumberFilter,
 )
 from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
 
@@ -119,6 +120,33 @@ class TestDateRangeFilter(FilterTestsBase):
             '(normandy.request_time>="2020-02-01T00:00:00Z"|date)',
             '(normandy.request_time<"2020-03-01T00:00:00Z"|date)',
         }
+
+
+class TestWindowsBuildNumberFiter(FilterTestsBase):
+    def create_basic_filter(self, value=12345, comparison="equal"):
+        return WindowsBuildNumberFilter.create(value=value, comparison=comparison)
+
+    @pytest.mark.parametrize(
+        "comparison,symbol",
+        [
+            ("equal", "=="),
+            ("greater_than", ">"),
+            ("greater_than_equal", ">="),
+            ("less_than", "<"),
+            ("less_than_equal", "<="),
+        ],
+    )
+    def test_generates_jexl_number_ops(self, comparison, symbol):
+        filter = self.create_basic_filter(comparison=comparison)
+        assert (
+            filter.to_jexl()
+            == f"(normandy.os.isWindows && normandy.os.windowsBuildNumber {symbol} 12345)"
+        )
+
+    def test_generates_jexl_error_on_bad_comparison(self):
+        filter = self.create_basic_filter(comparison="typo")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
 
 
 class TestChannelFilter(FilterTestsBase):

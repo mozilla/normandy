@@ -49,6 +49,36 @@ class BaseFilter(serializers.Serializer):
         raise NotImplementedError
 
 
+class BaseComparisonFilter(BaseFilter):
+    value = serializers.IntegerField()
+    comparison = serializers.CharField()
+
+    @property
+    def left_of_operator(self):
+        raise NotImplementedError("Not correctly implemented.")
+
+    def to_jexl(self):
+        comparison = self.initial_data["comparison"]
+        value = self.initial_data["value"]
+
+        if comparison == "equal":
+            operator = "=="
+        elif comparison == "not_equal":
+            operator = "!="
+        elif comparison == "greater_than":
+            operator = ">"
+        elif comparison == "greater_than_equal":
+            operator = ">="
+        elif comparison == "less_than":
+            operator = "<"
+        elif comparison == "less_than_equal":
+            operator = "<="
+        else:
+            raise serializers.ValidationError(f"Unrecognized comparison {comparison!r}")
+
+        return f"{self.left_of_operator} {operator} {value}"
+
+
 class ChannelFilter(BaseFilter):
     """
     Match a user on any of the listed channels.
@@ -545,6 +575,21 @@ class DateRangeFilter(BaseFilter):
     @property
     def capabilities(self):
         return {"jexl.transform.date"}
+
+
+class WindowsBuildNumberFilter(BaseComparisonFilter):
+    type = "windows_build_number"
+
+    @property
+    def left_of_operator(self):
+        return "normandy.os.windowsBuildNumber"
+
+    @property
+    def capabilities(self):
+        return set()
+
+    def to_jexl(self):
+        return f"(normandy.os.isWindows && {super().to_jexl()})"
 
 
 class ProfileCreateDateFilter(BaseFilter):
