@@ -253,17 +253,17 @@ class AddonActiveFilter(BaseFilter):
         any_or_all = self.initial_data["any_or_all"]
 
         if any_or_all == "all":
-            return "&&".join(
-                (f'normandy.addons["{addon}"].isActive' for addon in self.initial_data["addons"])
-            )
+            symbol = "&&"
         elif any_or_all == "any":
-            return "||".join(
-                (f'normandy.addons["{addon}"].isActive' for addon in self.initial_data["addons"])
-            )
+            symbol = "||"
         else:
             raise serializers.ValidationError(
                 f"Unrecognized string for any_or_all: {any_or_all!r}"
             )
+
+        return symbol.join(
+            (f'normandy.addons["{addon}"].isActive' for addon in self.initial_data["addons"])
+        )
 
     @property
     def capabilities(self):
@@ -299,17 +299,17 @@ class AddonInstalledFilter(BaseFilter):
         any_or_all = self.initial_data["any_or_all"]
 
         if any_or_all == "all":
-            return "&&".join(
-                (f'normandy.addons["{addon}"]' for addon in self.initial_data["addons"])
-            )
+            symbol = "&&"
         elif any_or_all == "any":
-            return "||".join(
-                (f'normandy.addons["{addon}"]' for addon in self.initial_data["addons"])
-            )
+            symbol = "||"
         else:
             raise serializers.ValidationError(
                 f"Unrecognized string for any_or_all: {any_or_all!r}"
             )
+
+        return symbol.join(
+            (f'normandy.addons["{addon}"]' for addon in self.initial_data["addons"])
+        )
 
     @property
     def capabilities(self):
