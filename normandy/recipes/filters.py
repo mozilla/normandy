@@ -224,6 +224,98 @@ class PlatformFilter(BaseFilter):
         return set()
 
 
+class AddonActiveFilter(BaseFilter):
+    """Match a user based on if a particular addon is active.
+
+    .. attribute:: type
+
+        ``addon_active``
+
+    .. attribute:: addons
+        List of addon ids to filter against.
+
+        :example: ``["uBlock0@raymondhill.net", "pioneer-opt-in@mozilla.org"]``
+
+    .. attribute:: any_or_all
+        This will determine whether the addons are connected with an "&&" operator,
+        meaning all the addons must be active for the filter to evaluate to true,
+        or an "||" operator, meaning any of the addons can be active to evaluate to
+        true.
+
+        :example: ``any`` or ``all``
+    """
+
+    type = "addon_active"
+    addons = serializers.ListField(child=serializers.CharField(), min_length=1)
+    any_or_all = serializers.CharField()
+
+    def to_jexl(self):
+        any_or_all = self.initial_data["any_or_all"]
+
+        if any_or_all == "all":
+            return "&&".join(
+                (f'normandy.addons["{addon}"].isActive' for addon in self.initial_data["addons"])
+            )
+        elif any_or_all == "any":
+            return "||".join(
+                (f'normandy.addons["{addon}"].isActive' for addon in self.initial_data["addons"])
+            )
+        else:
+            raise serializers.ValidationError(
+                f"Unrecognized string for any_or_all: {any_or_all!r}"
+            )
+
+    @property
+    def capabilities(self):
+        return set()
+
+
+class AddonInstalledFilter(BaseFilter):
+    """Match a user based on if a particular addon is installed.
+
+    .. attribute:: type
+
+        ``addon_installed``
+
+    .. attribute:: addons
+        List of addon ids to filter against.
+
+        :example: ``["uBlock0@raymondhill.net", "pioneer-opt-in@mozilla.org"]``
+
+    .. attribute:: any_or_all
+        This will determine whether the addons are connected with an "&&" operator,
+        meaning all the addons must be installed for the filter to evaluate to true,
+        or an "||" operator, meaning any of the addons can be installed to
+        evaluate to true.
+
+        :example: ``any`` or ``all``
+    """
+
+    type = "addon_active"
+    addons = serializers.ListField(child=serializers.CharField(), min_length=1)
+    any_or_all = serializers.CharField()
+
+    def to_jexl(self):
+        any_or_all = self.initial_data["any_or_all"]
+
+        if any_or_all == "all":
+            return "&&".join(
+                (f'normandy.addons["{addon}"]' for addon in self.initial_data["addons"])
+            )
+        elif any_or_all == "any":
+            return "||".join(
+                (f'normandy.addons["{addon}"]' for addon in self.initial_data["addons"])
+            )
+        else:
+            raise serializers.ValidationError(
+                f"Unrecognized string for any_or_all: {any_or_all!r}"
+            )
+
+    @property
+    def capabilities(self):
+        return set()
+
+
 class PrefCompareFilter(BaseFilter):
     """Match based on a user's pref having a particular value.
 

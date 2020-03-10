@@ -18,6 +18,8 @@ from normandy.recipes.filters import (
     WindowsBuildNumberFilter,
     WindowsVersionFilter,
     NegateFilter,
+    AddonActiveFilter,
+    AddonInstalledFilter,
 )
 from normandy.recipes.tests import (
     ChannelFactory,
@@ -254,6 +256,54 @@ class TestNegateFilter(FilterTestsBase):
     def test_generates_jexl(self):
         negate_filter = self.create_basic_filter()
         assert negate_filter.to_jexl() == '!(normandy.channel in ["release","beta"])'
+
+
+class TestAddonInstalledFilter(FilterTestsBase):
+    def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
+        return AddonInstalledFilter.create(addons=addons, any_or_all=any_or_all)
+
+    def test_generates_jexl_installed_not_active(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("||")) == {
+            'normandy.addons["@abcdef"]',
+            'normandy.addons["ghijk@lmnop"]',
+        }
+
+    def test_generates_jexl_installed_active(self):
+        filter = self.create_basic_filter(any_or_all="all")
+        assert set(filter.to_jexl().split("&&")) == {
+            'normandy.addons["@abcdef"]',
+            'normandy.addons["ghijk@lmnop"]',
+        }
+
+    def test_throws_error_on_bad_any_or_all(self):
+        filter = self.create_basic_filter(any_or_all="error")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+
+class TestAddonActiveFilter(FilterTestsBase):
+    def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
+        return AddonActiveFilter.create(addons=addons, any_or_all=any_or_all)
+
+    def test_generates_jexl_installed_not_active(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("||")) == {
+            'normandy.addons["@abcdef"].isActive',
+            'normandy.addons["ghijk@lmnop"].isActive',
+        }
+
+    def test_generates_jexl_installed_active(self):
+        filter = self.create_basic_filter(any_or_all="all")
+        assert set(filter.to_jexl().split("&&")) == {
+            'normandy.addons["@abcdef"].isActive',
+            'normandy.addons["ghijk@lmnop"].isActive',
+        }
+
+    def test_throws_error_on_bad_any_or_all(self):
+        filter = self.create_basic_filter(any_or_all="error")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
 
 
 class TestPrefCompareFilter(FilterTestsBase):
