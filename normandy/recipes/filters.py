@@ -49,6 +49,28 @@ class BaseFilter(serializers.Serializer):
         raise NotImplementedError
 
 
+class BaseAddonFilter(BaseFilter):
+    addons = serializers.ListField(child=serializers.CharField(), min_length=1)
+    any_or_all = serializers.CharField()
+
+    def get_formatted_string(self, addon):
+        raise NotImplementedError("Not correctly implemented.")
+
+    def to_jexl(self):
+        any_or_all = self.initial_data["any_or_all"]
+
+        symbol = {"all": "&&", "any": "||"}.get(any_or_all)
+
+        if not symbol:
+            raise serializers.ValidationError(
+                f"Unrecognized string for any_or_all: {any_or_all!r}"
+            )
+
+        return symbol.join(
+            self.get_formatted_string(addon) for addon in self.initial_data["addons"]
+        )
+
+
 class BaseComparisonFilter(BaseFilter):
     value = serializers.IntegerField()
     comparison = serializers.CharField()
@@ -224,7 +246,7 @@ class PlatformFilter(BaseFilter):
         return set()
 
 
-class AddonActiveFilter(BaseFilter):
+class AddonActiveFilter(BaseAddonFilter):
     """Match a user based on if a particular addon is active.
 
     .. attribute:: type
@@ -246,31 +268,16 @@ class AddonActiveFilter(BaseFilter):
     """
 
     type = "addon_active"
-    addons = serializers.ListField(child=serializers.CharField(), min_length=1)
-    any_or_all = serializers.CharField()
 
-    def to_jexl(self):
-        any_or_all = self.initial_data["any_or_all"]
-
-        if any_or_all == "all":
-            symbol = "&&"
-        elif any_or_all == "any":
-            symbol = "||"
-        else:
-            raise serializers.ValidationError(
-                f"Unrecognized string for any_or_all: {any_or_all!r}"
-            )
-
-        return symbol.join(
-            (f'normandy.addons["{addon}"].isActive' for addon in self.initial_data["addons"])
-        )
+    def get_formatted_string(self, addon):
+        return f'normandy.addons["{addon}"].isActive'
 
     @property
     def capabilities(self):
         return set()
 
 
-class AddonInstalledFilter(BaseFilter):
+class AddonInstalledFilter(BaseAddonFilter):
     """Match a user based on if a particular addon is installed.
 
     .. attribute:: type
@@ -291,25 +298,10 @@ class AddonInstalledFilter(BaseFilter):
         :example: ``any`` or ``all``
     """
 
-    type = "addon_active"
-    addons = serializers.ListField(child=serializers.CharField(), min_length=1)
-    any_or_all = serializers.CharField()
+    type = "addon_installed"
 
-    def to_jexl(self):
-        any_or_all = self.initial_data["any_or_all"]
-
-        if any_or_all == "all":
-            symbol = "&&"
-        elif any_or_all == "any":
-            symbol = "||"
-        else:
-            raise serializers.ValidationError(
-                f"Unrecognized string for any_or_all: {any_or_all!r}"
-            )
-
-        return symbol.join(
-            (f'normandy.addons["{addon}"]' for addon in self.initial_data["addons"])
-        )
+    def get_formatted_string(self, addon):
+        return f'normandy.addons["{addon}"]'
 
     @property
     def capabilities(self):
