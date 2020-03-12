@@ -17,7 +17,6 @@ from rest_framework.reverse import reverse
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
 from normandy.recipes import filters
-from normandy.recipes.decorators import approved_revision_property, current_revision_property
 from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.signing import Autographer
 from normandy.recipes.exports import RemoteSettings
@@ -104,65 +103,14 @@ class Recipe(DirtyFieldsMixin, models.Model):
         pass
 
     def __repr__(self):
-        return '<Recipe "{name}">'.format(name=self.name)
+        return '<Recipe "{name}">'.format(name=self.latest_revision.name)
 
     def __str__(self):
-        return self.name
-
-    @property
-    def current_revision(self):
-        return self.approved_revision or self.latest_revision
+        return self.latest_revision.name
 
     @property
     def is_approved(self):
         return self.approved_revision is not None
-
-    @approved_revision_property(default=False)
-    def enabled(self):
-        return self.approved_revision.enabled
-
-    @current_revision_property()
-    def name(self):
-        return self.current_revision.name
-
-    @current_revision_property()
-    def action(self):
-        return self.current_revision.action
-
-    @current_revision_property()
-    def filter_expression(self):
-        return self.current_revision.filter_expression
-
-    @current_revision_property()
-    def filter_object(self):
-        return self.current_revision.filter_object
-
-    @current_revision_property()
-    def arguments_json(self):
-        return self.current_revision.arguments_json
-
-    @current_revision_property()
-    def arguments(self):
-        return self.current_revision.arguments
-
-    @current_revision_property()
-    def revision_id(self):
-        return self.current_revision.id
-
-    @current_revision_property()
-    def last_updated(self):
-        return self.current_revision.updated
-
-    @current_revision_property()
-    def channels(self):
-        return self.current_revision.channels
-
-    @current_revision_property()
-    def capabilities(self):
-        return self.current_revision.capabilities
-
-    def uses_only_baseline_capabilities(self):
-        return self.capabilities <= settings.BASELINE_CAPABILITIES
 
     @property
     def approval_request(self):
@@ -186,7 +134,7 @@ class Recipe(DirtyFieldsMixin, models.Model):
             return
 
         # Don't sign recipe that aren't enabled
-        if not self.enabled:
+        if not (self.approved_revision and self.approved_revision.enabled):
             return
 
         logger.info(
@@ -426,6 +374,9 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
 
         return capabilities
 
+    def uses_only_baseline_capabilities(self):
+        return self.capabilities <= settings.BASELINE_CAPABILITIES
+
     def save(self, *args, **kwargs):
         self.action.validate_arguments(self.arguments, self)
 
@@ -489,8 +440,10 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
                 approved_revision__enabled_state__enabled=True,
             )
             for recipe in rollout_recipes:
-                if recipe.arguments["slug"] == slug:
-                    raise ValidationError(f"Rollout recipe {recipe.name!r} is currently enabled")
+                if recipe.approved_revision.arguments["slug"] == slug:
+                    raise ValidationError(
+                        f"Rollout recipe {recipe.approved_revision.name!r} is currently enabled"
+                    )
         elif self.action.name == "preference-rollout":
             slug = self.arguments["slug"]
             rollback_recipes = Recipe.objects.filter(
@@ -498,8 +451,10 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
                 approved_revision__enabled_state__enabled=True,
             )
             for recipe in rollback_recipes:
-                if recipe.arguments["rolloutSlug"] == slug:
-                    raise ValidationError(f"Rollback recipe {recipe.name!r} is currently enabled")
+                if recipe.approved_revision.arguments["rolloutSlug"] == slug:
+                    raise ValidationError(
+                        f"Rollback recipe {recipe.approved_revision.name!r} is currently enabled"
+                    )
 
 
 class EnabledState(models.Model):
@@ -575,7 +530,7 @@ class ApprovalRequest(models.Model):
 
         # Check if the recipe is enabled we should carry over it's enabled state
         carryover_enabled = None
-        if recipe.enabled:
+        if recipe.approved_revision and recipe.approved_revision.enabled:
             carryover_enabled = recipe.approved_revision.enabled_state
 
         recipe.approved_revision = self.revision
@@ -732,10 +687,6 @@ class Action(DirtyFieldsMixin, models.Model):
 
         errors = default()
 
-        # Note, `recipe.arguments` refers to `recipe.current_revision.arguments`
-        # which in term is shorthand for
-        # `recipe.(approved_revision or latest_revision).arguments`.
-
         if self.name == "preference-experiment":
             # Feature branch slugs should be unique within an experiment.
             branch_slugs = set()
@@ -756,7 +707,9 @@ class Action(DirtyFieldsMixin, models.Model):
             experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 experiment_recipes = experiment_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments.get("slug") for r in experiment_recipes)
+            existing_slugs = set(
+                r.latest_revision.arguments.get("slug") for r in experiment_recipes
+            )
             if arguments.get("slug") in existing_slugs:
                 msg = self.errors["duplicate_experiment_slug"]
                 errors["slug"] = msg
@@ -766,7 +719,7 @@ class Action(DirtyFieldsMixin, models.Model):
             rollout_recipes = Recipe.objects.filter(latest_revision__action=self)
             if revision.recipe and revision.recipe.id:
                 rollout_recipes = rollout_recipes.exclude(id=revision.recipe.id)
-            existing_slugs = set(r.arguments.get("slug") for r in rollout_recipes)
+            existing_slugs = set(r.latest_revision.arguments.get("slug") for r in rollout_recipes)
             if arguments.get("slug") in existing_slugs:
                 msg = self.errors["duplicate_rollout_slug"]
                 errors["slug"] = msg
@@ -774,7 +727,7 @@ class Action(DirtyFieldsMixin, models.Model):
         elif self.name == "preference-rollback":
             # Rollback slugs should match rollouts
             rollouts = Recipe.objects.filter(latest_revision__action__name="preference-rollout")
-            rollout_slugs = set(r.arguments["slug"] for r in rollouts)
+            rollout_slugs = set(r.latest_revision.arguments["slug"] for r in rollouts)
             if arguments["rolloutSlug"] not in rollout_slugs:
                 errors["slug"] = self.errors["rollout_slug_not_found"]
 
@@ -789,7 +742,7 @@ class Action(DirtyFieldsMixin, models.Model):
             # has different surveyIds *and* that any of these clash with an entirely
             # different recipe.
             for recipe in other_recipes:
-                if recipe.arguments["surveyId"] == arguments["surveyId"]:
+                if recipe.latest_revision.arguments["surveyId"] == arguments["surveyId"]:
                     errors["surveyId"] = self.errors["duplicate_survey_id"]
 
         elif self.name == "opt-out-study":
@@ -798,7 +751,7 @@ class Action(DirtyFieldsMixin, models.Model):
             if revision.recipe and revision.recipe.id:
                 other_recipes = other_recipes.exclude(id=revision.recipe.id)
             for recipe in other_recipes:
-                if recipe.arguments["name"] == arguments["name"]:
+                if recipe.latest_revision.arguments["name"] == arguments["name"]:
                     errors["name"] = self.errors["duplicate_study_name"]
 
         # Raise errors, if any

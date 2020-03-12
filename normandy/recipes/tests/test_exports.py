@@ -326,13 +326,15 @@ class TestRemoteSettings:
         assert record == {
             "id": str(recipe.id),
             "recipe": {
-                "action": recipe.action.name,
-                "arguments": recipe.arguments,
-                "filter_expression": recipe.filter_expression,
+                "action": recipe.approved_revision.action.name,
+                "arguments": recipe.approved_revision.arguments,
+                "filter_expression": recipe.approved_revision.filter_expression,
                 "id": recipe.id,
-                "name": recipe.name,
-                "revision_id": str(recipe.revision_id),
-                "capabilities": Whatever(lambda caps: set(caps) == recipe.capabilities),
+                "name": recipe.approved_revision.name,
+                "revision_id": str(recipe.approved_revision.id),
+                "capabilities": Whatever(
+                    lambda caps: set(caps) == recipe.approved_revision.capabilities
+                ),
                 "uses_only_baseline_capabilities": False,
             },
             "signature": {
@@ -349,7 +351,7 @@ class TestRemoteSettings:
         """Test that requests are sent to Remote Settings on publish."""
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
 
         auth = (
             rs_settings.REMOTE_SETTINGS_USERNAME + ":" + rs_settings.REMOTE_SETTINGS_PASSWORD
@@ -390,7 +392,7 @@ class TestRemoteSettings:
         assert requests[3].method == "PATCH"
         assert requests[3].url == rs_urls["workspace"]["baseline"]["collection"]
         mock_logger.info.assert_called_with(
-            f"Published record '{recipe.id}' for recipe '{recipe.name}'"
+            f"Published record '{recipe.id}' for recipe '{recipe.approved_revision.name}'"
         )
 
     def test_unpublish_deletes_record_and_approves(
@@ -399,7 +401,7 @@ class TestRemoteSettings:
         """Test that requests are sent to Remote Settings on unpublish."""
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
         urls = rs_urls["workspace"]
 
         auth = (
@@ -438,7 +440,7 @@ class TestRemoteSettings:
         assert requests[3].url == urls["baseline"]["collection"]
         assert requests[3].method == "PATCH"
         mock_logger.info.assert_called_with(
-            f"Deleted record '{recipe.id}' of recipe '{recipe.name}'"
+            f"Deleted record '{recipe.id}' of recipe '{recipe.approved_revision.name}'"
         )
 
     def test_publish_raises_an_error_if_request_fails(self, rs_urls, rs_settings, requestsmock):
@@ -476,7 +478,7 @@ class TestRemoteSettings:
         # This test forces the recipe to not use baseline capabilities to
         # simplify the test. This simplifies the test.
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        assert not recipe.uses_only_baseline_capabilities()
+        assert not recipe.approved_revision.uses_only_baseline_capabilities()
 
         capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
         # Creating the record works.
@@ -555,9 +557,9 @@ class TestRemoteSettings:
     ):
         ws_urls = rs_urls["workspace"]
 
-        recipe = RecipeFactory()
-        rs_settings.BASELINE_CAPABILITIES |= recipe.capabilities
-        assert recipe.uses_only_baseline_capabilities()
+        recipe = RecipeFactory(approver=UserFactory())
+        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
+        assert recipe.approved_revision.uses_only_baseline_capabilities()
 
         # Expect publish calls to both collections
         requestsmock.put(
@@ -613,8 +615,8 @@ class TestRemoteSettings:
     ):
         ws_urls = rs_urls["workspace"]
 
-        recipe = RecipeFactory()
-        assert not recipe.uses_only_baseline_capabilities()
+        recipe = RecipeFactory(approver=UserFactory())
+        assert not recipe.approved_revision.uses_only_baseline_capabilities()
 
         # Expect calls only to the capabilities collection
         requestsmock.put(

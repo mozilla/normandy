@@ -41,7 +41,7 @@ class TestAction(object):
         approver = UserFactory()
         enabler = UserFactory()
         recipe = RecipeFactory(approver=approver, enabler=enabler)
-        assert [recipe] == list(recipe.action.recipes_used_by)
+        assert [recipe] == list(recipe.approved_revision.action.recipes_used_by)
 
         action = ActionFactory()
         recipes = RecipeFactory.create_batch(2, action=action, approver=approver, enabler=enabler)
@@ -231,7 +231,7 @@ class TestValidateArgumentPreferenceExperiments(object):
             )
 
             # does not throw when saving the revision
-            arguments = {"rolloutSlug": rollout_recipe.arguments["slug"]}
+            arguments = {"rolloutSlug": rollout_recipe.latest_revision.arguments["slug"]}
             RecipeFactory(action=rollback_action, arguments=arguments)
 
         def test_slug_must_match_a_rollout(self):
@@ -363,33 +363,33 @@ class TestRecipe(object):
     def test_enabled(self):
         """Test that the enabled property is correctly set."""
         r1 = RecipeFactory()
-        assert r1.enabled is False
+        assert r1.approved_revision is None
 
         r2 = RecipeFactory(approver=UserFactory())
-        assert r2.enabled is False
+        assert r2.approved_revision.enabled is False
 
         r3 = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
-        assert r3.enabled is True
+        assert r3.approved_revision.enabled is True
 
-    def test_revision_id_doesnt_change_if_no_changes(self):
+    def test_latest_revision_not_created_if_no_changes(self):
         """
-        revision_id should not increment if a recipe is saved with no
+        latest_revision should remain fixed if a recipe is saved with no
         changes.
         """
         recipe = RecipeFactory()
 
         # The factory saves a couple times so revision id is not 0
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
 
         recipe.save()
-        assert recipe.revision_id == revision_id
+        assert recipe.latest_revision.id == revision_id
 
     def test_filter_expression(self):
         r = RecipeFactory(extra_filter_expression="", filter_object_json=None)
-        assert r.filter_expression == ""
+        assert r.latest_revision.filter_expression == ""
 
         r = RecipeFactory(extra_filter_expression="2 + 2 == 4", filter_object_json=None)
-        assert r.filter_expression == "2 + 2 == 4"
+        assert r.latest_revision.filter_expression == "2 + 2 == 4"
 
     def test_canonical_json(self):
         recipe = RecipeFactory(
@@ -397,6 +397,7 @@ class TestRecipe(object):
             arguments_json='{"foo": 1, "bar": 2}',
             extra_filter_expression="2 + 2 == 4",
             name="canonical",
+            approver=UserFactory(),
             filter_object_json=None,
         )
         # Yes, this is really ugly, but we really do need to compare an exact
@@ -415,7 +416,7 @@ class TestRecipe(object):
             "}"
         ) % {
             "id": recipe.id,
-            "revision_id": recipe.revision_id,
+            "revision_id": recipe.latest_revision.id,
             "filter_expression": filter_expression,
         }
         expected = expected.encode()
@@ -443,15 +444,15 @@ class TestRecipe(object):
         mock_autograph = mocker.patch("normandy.recipes.models.Autographer")
         mock_autograph.side_effect = ImproperlyConfigured
 
-        recipe = RecipeFactory(name="unchanged", signed=True)
+        recipe = RecipeFactory(approver=UserFactory(), name="unchanged", signed=True)
         original_signature = recipe.signature
         recipe.revise(name="changed")
-        assert recipe.name == "changed"
+        assert recipe.latest_revision.name == "changed"
         assert recipe.signature is not original_signature
         assert recipe.signature is None
 
     def test_setting_signature_doesnt_change_canonical_json(self):
-        recipe = RecipeFactory(name="unchanged", signed=False)
+        recipe = RecipeFactory(approver=UserFactory(), name="unchanged", signed=False)
         serialized = recipe.canonical_json()
         recipe.signature = SignatureFactory()
         recipe.save()
@@ -494,7 +495,6 @@ class TestRecipe(object):
 
         sign_data_mock.side_effect = Exception("Can't sign yet")
         recipe = RecipeFactory(name="unchanged", action=action)
-        assert not recipe.enabled
         assert not recipe.is_approved
         assert recipe.signature is None
 
@@ -529,31 +529,31 @@ class TestRecipe(object):
         )
         a2 = ActionFactory()
         recipe.revise(name="changed", action=a2)
-        assert recipe.action == a2
-        assert recipe.name == "changed"
-        assert recipe.arguments == {"message": "something"}
-        assert recipe.filter_expression == "something !== undefined"
+        assert recipe.latest_revision.action == a2
+        assert recipe.latest_revision.name == "changed"
+        assert recipe.latest_revision.arguments == {"message": "something"}
+        assert recipe.latest_revision.filter_expression == "something !== undefined"
 
     def test_recipe_doesnt_revise_when_clean(self):
         recipe = RecipeFactory(name="my name")
 
-        revision_id = recipe.revision_id
-        last_updated = recipe.last_updated
+        revision_id = recipe.latest_revision.id
+        last_updated = recipe.latest_revision.updated
 
         recipe.revise(name="my name")
-        assert revision_id == recipe.revision_id
-        assert last_updated == recipe.last_updated
+        assert revision_id == recipe.latest_revision.id
+        assert last_updated == recipe.latest_revision.updated
 
     def test_recipe_revise_arguments(self):
         recipe = RecipeFactory(arguments_json="{}")
         recipe.revise(arguments={"something": "value"})
-        assert recipe.arguments_json == '{"something": "value"}'
+        assert recipe.latest_revision.arguments_json == '{"something": "value"}'
 
     def test_recipe_force_revise(self):
         recipe = RecipeFactory(name="my name")
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
         recipe.revise(name="my name", force=True)
-        assert revision_id != recipe.revision_id
+        assert revision_id != recipe.latest_revision.id
 
     def test_update_logging(self, mock_logger):
         recipe = RecipeFactory(name="my name")
@@ -562,31 +562,12 @@ class TestRecipe(object):
             Whatever.contains(str(recipe.id)), extra={"code": INFO_CREATE_REVISION}
         )
 
-    def test_revision_id_changes(self):
-        """Ensure that the revision id is incremented on each save"""
+    def test_latest_revision_changes(self):
+        """Ensure that a new revision is created on each save"""
         recipe = RecipeFactory()
-        revision_id = recipe.revision_id
+        revision_id = recipe.latest_revision.id
         recipe.revise(action=ActionFactory())
-        assert recipe.revision_id != revision_id
-
-    def test_current_revision_property(self):
-        """Ensure current revision properties work as expected."""
-        recipe = RecipeFactory(name="first")
-        assert recipe.name == "first"
-
-        recipe.revise(name="second")
-        assert recipe.name == "second"
-
-        approval = ApprovalRequestFactory(revision=recipe.latest_revision)
-        approval.approve(UserFactory(), "r+")
-        assert recipe.name == "second"
-
-        # When `revise` is called on a recipe with at least one approved revision, the new revision
-        # is treated as a draft and as such the `name` property of the recipe should return the
-        # `name` from the `approved_revision` not the `latest_revision`.
-        recipe.revise(name="third")
-        assert recipe.latest_revision.name == "third"  # The latest revision ("draft") is updated
-        assert recipe.name == "second"  # The current revision is unchanged
+        assert recipe.latest_revision.id != revision_id
 
     def test_recipe_is_approved(self):
         recipe = RecipeFactory(name="old")
@@ -626,7 +607,7 @@ class TestRecipe(object):
     def test_revise_arguments(self):
         recipe = RecipeFactory(arguments_json="[]")
         recipe.revise(arguments=[{"id": 1}])
-        assert recipe.arguments_json == '[{"id": 1}]'
+        assert recipe.latest_revision.arguments_json == '[{"id": 1}]'
 
     def test_enabled_updates_signatures(self, mocked_autograph):
         recipe = RecipeFactory(name="first")
@@ -676,21 +657,21 @@ class TestRecipeRevision(object):
             recipe.latest_revision.enable(user=UserFactory())
 
         recipe.approved_revision.enable(user=UserFactory())
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
         with pytest.raises(EnabledState.NotActionable):
             recipe.approved_revision.enable(user=UserFactory())
 
         approval_request = recipe.latest_revision.request_approval(creator=UserFactory())
         approval_request.approve(approver=UserFactory(), comment="r+")
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
     def test_disable(self):
         recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
         recipe.approved_revision.disable(user=UserFactory())
-        assert not recipe.enabled
+        assert not recipe.approved_revision.enabled
 
         with pytest.raises(EnabledState.NotActionable):
             recipe.approved_revision.disable(user=UserFactory())
@@ -728,7 +709,7 @@ class TestRecipeRevision(object):
             assert mocked_remotesettings.return_value.publish.call_count == 2
             second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
             modified_recipe, = second_call_args
-            assert modified_recipe.name == "Modified"
+            assert modified_recipe.latest_revision.name == "Modified"
 
         def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
             recipe = RecipeFactory(name="Test")
@@ -790,7 +771,7 @@ class TestRecipeRevision(object):
                 action=ActionFactory(name="preference-rollout"),
                 arguments={"slug": "myslug"},
             )
-            assert rollout_recipe.enabled
+            assert rollout_recipe.approved_revision.enabled
 
             rollback_recipe = RecipeFactory(
                 name="Rollback",
@@ -807,10 +788,10 @@ class TestRecipeRevision(object):
             assert exc_info.value.message == "Rollout recipe 'Rollout' is currently enabled"
 
             rollout_recipe.approved_revision.disable(user=UserFactory())
-            assert not rollout_recipe.enabled
+            assert not rollout_recipe.approved_revision.enabled
             # Now it should be possible to enable the rollback recipe.
             rollback_recipe.approved_revision.enable(user=UserFactory())
-            assert rollback_recipe.enabled
+            assert rollback_recipe.approved_revision.enabled
 
             # Can't make up your mind. Now try to enable the rollout recipe again even though
             # the rollback recipe is enabled.
@@ -825,28 +806,28 @@ class TestRecipeRevision(object):
             settings.BASELINE_CAPABILITIES |= action.capabilities
 
             recipe = RecipeFactory(extra_capabilities=[], action=action)
-            assert recipe.capabilities <= settings.BASELINE_CAPABILITIES
-            assert "capabilities-v1" not in recipe.capabilities
+            assert recipe.latest_revision.capabilities <= settings.BASELINE_CAPABILITIES
+            assert "capabilities-v1" not in recipe.latest_revision.capabilities
 
             recipe = RecipeFactory(extra_capabilities=["non-baseline"], action=action)
             assert "non-baseline" not in settings.BASELINE_CAPABILITIES
-            assert "capabilities-v1" in recipe.capabilities
+            assert "capabilities-v1" in recipe.latest_revision.capabilities
 
         def test_uses_extra_capabilities(self):
             recipe = RecipeFactory(extra_capabilities=["test.foo", "test.bar"])
-            assert "test.foo" in recipe.capabilities
-            assert "test.bar" in recipe.capabilities
+            assert "test.foo" in recipe.latest_revision.capabilities
+            assert "test.bar" in recipe.latest_revision.capabilities
 
         def test_action_name_is_automatically_included(self):
             action = ActionFactory()
             recipe = RecipeFactory(action=action)
-            assert set(action.capabilities) <= set(recipe.capabilities)
+            assert set(action.capabilities) <= set(recipe.latest_revision.capabilities)
 
         def test_filter_object_capabilities_are_automatically_included(self):
             filter_object = StableSampleFilter.create(input=["A"], rate=0.1)
             recipe = RecipeFactory(filter_object=[filter_object])
             assert filter_object.capabilities
-            assert filter_object.capabilities <= recipe.capabilities
+            assert filter_object.capabilities <= recipe.latest_revision.capabilities
 
 
 @pytest.mark.django_db
@@ -938,7 +919,7 @@ class TestApprovalRequest(object):
         recipe.revise(name="New name")
         approval_request = recipe.latest_revision.request_approval(UserFactory())
         approval_request.approve(UserFactory(), "r+")
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
         assert recipe.approved_revision.enabled_state.carryover_from == carryover_from
 
     def test_error_during_approval_rolls_back_changes(self, mocker):
@@ -962,7 +943,7 @@ class TestApprovalRequest(object):
         assert approval_request.approved is None
         assert recipe.approved_revision == old_approved_revision
         assert recipe.latest_revision == latest_revision
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
 
 class TestClient(object):

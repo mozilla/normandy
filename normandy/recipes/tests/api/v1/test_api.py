@@ -183,12 +183,12 @@ class TestRecipeAPI(object):
 
         def test_it_serves_recipes(self, api_client, settings):
             recipe = RecipeFactory()
-            settings.BASELINE_CAPABILITIES |= recipe.capabilities
+            settings.BASELINE_CAPABILITIES |= recipe.latest_revision.capabilities
 
             res = api_client.get("/api/v1/recipe/")
             assert res.status_code == 200
             assert len(res.data) == 1
-            assert res.data[0]["name"] == recipe.name
+            assert res.data[0]["name"] == recipe.latest_revision.name
 
         def test_available_if_admin_enabled(self, api_client, settings):
             settings.ADMIN_ENABLED = True
@@ -353,8 +353,8 @@ class TestRecipeAPI(object):
         # "action.đzGBglYumiFMJ").
 
         def test_signed_listing_works(self, api_client, settings):
-            r1 = RecipeFactory(signed=True)
-            settings.BASELINE_CAPABILITIES |= r1.capabilities
+            r1 = RecipeFactory(approver=UserFactory(), signed=True)
+            settings.BASELINE_CAPABILITIES |= r1.latest_revision.capabilities
             res = api_client.get("/api/v1/recipe/signed/")
             assert res.status_code == 200
             assert len(res.data) == 1
@@ -369,9 +369,11 @@ class TestRecipeAPI(object):
             assert "public" in res["Cache-Control"]
 
         def test_signed_only_lists_signed_recipes(self, api_client, settings):
-            r1 = RecipeFactory(signed=True)
-            r2 = RecipeFactory(signed=True)
-            settings.BASELINE_CAPABILITIES |= r1.capabilities | r2.capabilities
+            r1 = RecipeFactory(approver=UserFactory(), signed=True)
+            r2 = RecipeFactory(approver=UserFactory(), signed=True)
+            settings.BASELINE_CAPABILITIES |= (
+                r1.approved_revision.capabilities | r2.approved_revision.capabilities
+            )
             RecipeFactory(signed=False)
             res = api_client.get("/api/v1/recipe/signed/")
             assert res.status_code == 200
@@ -388,9 +390,10 @@ class TestRecipeAPI(object):
             enabled_recipe = RecipeFactory(
                 signed=True, approver=UserFactory(), enabler=UserFactory()
             )
-            disabled_recipe = RecipeFactory(signed=True)
+            disabled_recipe = RecipeFactory(approver=UserFactory(), signed=True)
             settings.BASELINE_CAPABILITIES |= (
-                enabled_recipe.capabilities | disabled_recipe.capabilities
+                enabled_recipe.approved_revision.capabilities
+                | disabled_recipe.approved_revision.capabilities
             )
 
             res = api_client.get("/api/v1/recipe/signed/?enabled=1")
@@ -420,7 +423,7 @@ class TestRecipeAPI(object):
             )
 
             # Recipes have some auto-generated capabilities as well. Such as action names. Add all of those too
-            settings.BASELINE_CAPABILITIES |= baseline_recipe.capabilities
+            settings.BASELINE_CAPABILITIES |= baseline_recipe.approved_revision.capabilities
             assert "b" not in settings.BASELINE_CAPABILITIES
 
             res = api_client.get("/api/v1/recipe/signed/")
@@ -444,7 +447,7 @@ class TestRecipeAPI(object):
             )
 
             # Recipes have some auto-generated capabilities as well. Such as action names. Add all of those too
-            settings.BASELINE_CAPABILITIES |= baseline_recipe.capabilities
+            settings.BASELINE_CAPABILITIES |= baseline_recipe.approved_revision.capabilities
             assert "b" not in settings.BASELINE_CAPABILITIES
 
             res = api_client.get("/api/v1/recipe/signed/?only_baseline_capabilities=false")

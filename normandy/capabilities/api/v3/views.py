@@ -17,7 +17,7 @@ class CapabilitiesView(APIView):
             capabilities[cap] = {"is_baseline": True}
 
         for recipe in Recipe.objects.all():
-            for cap in recipe.capabilities:
+            for cap in recipe.latest_revision.capabilities:
                 capabilities.setdefault(cap, {"is_baseline": False})
 
         return Response(CapabilitiesInfoSerializer({"capabilities": capabilities}).data)

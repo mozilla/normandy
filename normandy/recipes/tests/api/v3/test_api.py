@@ -114,7 +114,7 @@ class TestRecipeAPI(object):
 
             res = api_client.get("/api/v3/recipe/")
             assert res.status_code == 200
-            assert res.data["results"][0]["latest_revision"]["name"] == recipe.name
+            assert res.data["results"][0]["latest_revision"]["name"] == recipe.latest_revision.name
 
         def test_available_if_admin_enabled(self, api_client, settings):
             settings.ADMIN_ENABLED = True
@@ -144,16 +144,28 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert "Cookies" not in res
 
-        def test_list_can_filter_baseline_recipes(self, rs_settings, api_client):
-            recipe1 = RecipeFactory(extra_capabilities=[])
-            rs_settings.BASELINE_CAPABILITIES |= recipe1.capabilities
-            assert recipe1.uses_only_baseline_capabilities()
-            recipe2 = RecipeFactory(extra_capabilities=["test-capability"])
-            assert not recipe2.uses_only_baseline_capabilities()
+        def test_list_can_filter_baseline_recipes(
+            self, rs_settings, api_client, mocked_remotesettings
+        ):
+            recipe1 = RecipeFactory(
+                extra_capabilities=[], approver=UserFactory(), enabler=UserFactory()
+            )
+            rs_settings.BASELINE_CAPABILITIES |= recipe1.latest_revision.capabilities
+            assert recipe1.latest_revision.uses_only_baseline_capabilities()
+            recipe2 = RecipeFactory(
+                extra_capabilities=["test-capability"],
+                approver=UserFactory(),
+                enabler=UserFactory(),
+            )
+            assert not recipe2.latest_revision.uses_only_baseline_capabilities()
+            # Only approved recipes are considered as part of uses_only_baseline_capabilities
+            recipe3 = RecipeFactory(extra_capabilities=[])
+            rs_settings.BASELINE_CAPABILITIES |= recipe3.latest_revision.capabilities
+            assert recipe3.latest_revision.uses_only_baseline_capabilities()
 
             res = api_client.get("/api/v3/recipe/")
             assert res.status_code == 200
-            assert res.data["count"] == 2
+            assert res.data["count"] == 3
 
             res = api_client.get("/api/v3/recipe/?uses_only_baseline_capabilities=true")
             assert res.status_code == 200
@@ -199,7 +211,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 201
 
             recipe, = Recipe.objects.all()
-            assert recipe.action.implementation is None
+            assert recipe.latest_revision.action.implementation is None
 
         def test_it_can_create_disabled_recipes(self, api_client):
             action = ActionFactory()
@@ -457,7 +469,10 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             assert recipe.latest_revision.extra_filter_expression == ""
-            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+            assert (
+                recipe.latest_revision.filter_expression
+                == f'normandy.channel in ["{channel.slug}"]'
+            )
 
         def test_it_can_create_extra_filter_expression_omitted(self, api_client):
             action = ActionFactory()
@@ -495,7 +510,10 @@ class TestRecipeAPI(object):
             assert Recipe.objects.count() == 1
             recipe = Recipe.objects.get()
             assert recipe.latest_revision.extra_filter_expression == ""
-            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+            assert (
+                recipe.latest_revision.filter_expression
+                == f'normandy.channel in ["{channel.slug}"]'
+            )
 
         def test_it_accepts_capabilities(self, api_client):
             action = ActionFactory()
@@ -515,7 +533,7 @@ class TestRecipeAPI(object):
             # Passed extra capabilities:
             assert recipe.latest_revision.extra_capabilities == ["test.one", "test.two"]
             # Extra capabilities get included in capabilities
-            assert {"test.one", "test.two"} <= set(recipe.capabilities)
+            assert {"test.one", "test.two"} <= set(recipe.latest_revision.capabilities)
 
     @pytest.mark.django_db
     class TestUpdates(object):
@@ -523,7 +541,7 @@ class TestRecipeAPI(object):
             recipe = RecipeFactory(
                 name="unchanged", extra_filter_expression="true", filter_object_json=None
             )
-            old_revision_id = recipe.revision_id
+            old_revision_id = recipe.latest_revision.id
 
             res = api_client.patch(
                 "/api/v3/recipe/%s/" % recipe.id,
@@ -532,9 +550,9 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             recipe = Recipe.objects.all()[0]
-            assert recipe.name == "changed"
-            assert recipe.filter_expression == "false"
-            assert recipe.revision_id != old_revision_id
+            assert recipe.latest_revision.name == "changed"
+            assert recipe.latest_revision.filter_expression == "false"
+            assert recipe.latest_revision.id != old_revision_id
 
         def test_it_can_change_action_for_recipes(self, api_client):
             recipe = RecipeFactory()
@@ -544,7 +562,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             recipe = Recipe.objects.get(pk=recipe.id)
-            assert recipe.action == action
+            assert recipe.latest_revision.action == action
 
         def test_it_can_change_arguments_for_recipes(self, api_client):
             recipe = RecipeFactory(arguments_json="{}")
@@ -564,7 +582,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.arguments == arguments
+            assert recipe.latest_revision.arguments == arguments
 
             res = api_client.get("/api/v3/recipe/%s/" % recipe.id)
             assert res.status_code == 200, res.json()
@@ -576,7 +594,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
-            assert recipe.arguments == arguments
+            assert recipe.latest_revision.arguments == arguments
 
             res = api_client.get("/api/v3/recipe/%s/" % recipe.id)
             assert res.status_code == 200, res.json()
@@ -599,7 +617,7 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
 
             r.refresh_from_db()
-            assert r.action == a
+            assert r.latest_revision.action == a
 
         def test_update_recipe_comment(self, api_client):
             r = RecipeFactory(comment="foo")
@@ -640,8 +658,11 @@ class TestRecipeAPI(object):
             assert res.status_code == 200, res.json()
             recipe.refresh_from_db()
             assert recipe.latest_revision.extra_filter_expression == ""
-            assert recipe.filter_object
-            assert recipe.filter_expression == f'normandy.channel in ["{channel.slug}"]'
+            assert recipe.latest_revision.filter_object
+            assert (
+                recipe.latest_revision.filter_expression
+                == f'normandy.channel in ["{channel.slug}"]'
+            )
 
             # And you can omit it too
             res = api_client.patch(
@@ -671,8 +692,8 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 200
             recipe = Recipe.objects.get()
-            assert {"always", "changed"} <= set(recipe.capabilities)
-            assert "original" not in recipe.capabilities
+            assert {"always", "changed"} <= set(recipe.latest_revision.capabilities)
+            assert "original" not in recipe.latest_revision.capabilities
 
     @pytest.mark.django_db
     class TestFilterObjects(object):
@@ -962,7 +983,7 @@ class TestRecipeAPI(object):
             assert res.data["approved_revision"]["enabled"] is True
 
             recipe = Recipe.objects.all()[0]
-            assert recipe.enabled
+            assert recipe.approved_revision.enabled
 
         def test_cannot_enable_unapproved_recipes(self, api_client):
             recipe = RecipeFactory()
@@ -980,14 +1001,14 @@ class TestRecipeAPI(object):
 
         def test_it_can_disable_enabled_recipes(self, api_client):
             recipe = RecipeFactory(approver=UserFactory(), enabler=UserFactory())
-            assert recipe.enabled
+            assert recipe.approved_revision.enabled
 
             res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)
             assert res.status_code == 200
             assert res.data["approved_revision"]["enabled"] is False
 
             recipe = Recipe.objects.all()[0]
-            assert not recipe.enabled
+            assert not recipe.approved_revision.enabled
 
             # Can't disable it a second time.
             res = api_client.post("/api/v3/recipe/%s/disable/" % recipe.id)
@@ -1194,14 +1215,14 @@ class TestRecipeAPI(object):
 
         def test_order_by_action_name(self, api_client):
             r1 = RecipeFactory(name="a")
-            r1.action.name = "Bee"
-            r1.action.save()
+            r1.latest_revision.action.name = "Bee"
+            r1.latest_revision.action.save()
             r2 = RecipeFactory(name="b")
-            r2.action.name = "Cee"
-            r2.action.save()
+            r2.latest_revision.action.name = "Cee"
+            r2.latest_revision.action.save()
             r3 = RecipeFactory(name="c")
-            r3.action.name = "Ahh"
-            r3.action.save()
+            r3.latest_revision.action.name = "Ahh"
+            r3.latest_revision.action.save()
 
             res = api_client.get("/api/v3/recipe/?ordering=action")
             assert res.status_code == 200
@@ -1419,7 +1440,7 @@ class TestApprovalFlow(object):
         recipe_data_1 = res.json()
         assert recipe_data_1["approved_revision"] is not None
         assert (
-            Recipe.objects.get(id=recipe_data_1["id"]).capabilities
+            Recipe.objects.get(id=recipe_data_1["id"]).latest_revision.capabilities
             <= settings.BASELINE_CAPABILITIES
         )
         self.verify_signatures(api_client, expected_count=1)
@@ -1535,7 +1556,10 @@ class TestApprovalFlow(object):
         recipe_id = res.json()["id"]
         revision_id = res.json()["latest_revision"]["id"]
 
-        assert Recipe.objects.get(id=recipe_id).capabilities <= settings.BASELINE_CAPABILITIES
+        assert (
+            Recipe.objects.get(id=recipe_id).latest_revision.capabilities
+            <= settings.BASELINE_CAPABILITIES
+        )
 
         # Request approval
         res = api_client.post(f"/api/v3/recipe_revision/{revision_id}/request_approval/")

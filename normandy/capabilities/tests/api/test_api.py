@@ -17,8 +17,11 @@ class TestServiceInfoView(object):
         res = api_client.get("/api/v3/capabilities/")
 
         assert res.status_code == 200
-        assert any(cap not in settings.BASELINE_CAPABILITIES for cap in recipe.capabilities)
-        for cap in recipe.capabilities:
+        assert any(
+            cap not in settings.BASELINE_CAPABILITIES
+            for cap in recipe.latest_revision.capabilities
+        )
+        for cap in recipe.latest_revision.capabilities:
             assert cap in res.data["capabilities"]
             assert res.data["capabilities"][cap]["is_baseline"] == (
                 cap in settings.BASELINE_CAPABILITIES

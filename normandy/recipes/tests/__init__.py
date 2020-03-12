@@ -146,6 +146,8 @@ class RecipeFactory(factory.DjangoModelFactory):
     # It is important that the signature be based on the actual data, and not
     # some static value so that tests can make assertions against what data was
     # signed.
+    # A recipe must be approved in order to be signed, so make sure
+    # you've passed approver.
     @factory.post_generation
     def signed(self, create, extracted=False, **kwargs):
         if extracted:

@@ -128,12 +128,12 @@ class TestUpdateActions(object):
     def test_it_doesnt_disable_recipes(self, mock_action):
         action = ActionFactory(name="test-action", implementation="old")
         recipe = RecipeFactory(action=action, approver=UserFactory(), enabler=UserFactory())
-        action = recipe.action
+        action = recipe.approved_revision.action
         mock_action(action.name, "impl", action.arguments_schema)
 
         call_command("update_actions")
         recipe.refresh_from_db()
-        assert recipe.enabled
+        assert recipe.approved_revision.enabled
 
     def test_it_only_updates_given_actions(self, mock_action):
         update_action = ActionFactory(name="update-action", implementation="old")
@@ -199,13 +199,13 @@ class TestUpdateRecipeSignatures(object):
         assert r.signature.signature != "old signature"
 
     def test_it_unsigns_disabled_recipes(self, mocked_autograph):
-        r = RecipeFactory(signed=True)
+        r = RecipeFactory(approver=UserFactory(), signed=True)
         call_command("update_recipe_signatures")
         r.refresh_from_db()
         assert r.signature is None
 
     def test_it_unsigns_out_of_date_disabled_recipes(self, settings, mocked_autograph):
-        r = RecipeFactory(signed=True, enabled=False)
+        r = RecipeFactory(approver=UserFactory(), signed=True, enabled=False)
         r.signature.timestamp -= timedelta(seconds=settings.AUTOGRAPH_SIGNATURE_MAX_AGE * 2)
         r.signature.save()
         call_command("update_recipe_signatures")
@@ -247,7 +247,7 @@ class TestUpdateRecipeSignatures(object):
         # 3 to sign
         RecipeFactory.create_batch(3, approver=UserFactory(), enabler=UserFactory(), signed=False)
         # and 1 to unsign
-        RecipeFactory(signed=True, enabled=False)
+        RecipeFactory(approver=UserFactory(), signed=True, enabled=False)
 
         with MetricsMock() as mm:
             call_command("update_recipe_signatures")
@@ -262,7 +262,7 @@ class TestUpdateRecipeSignatures(object):
         recipes = RecipeFactory.create_batch(
             10, approver=UserFactory(), enabler=UserFactory(), signed=False
         )
-        assert all(not r.uses_only_baseline_capabilities() for r in recipes)
+        assert all(not r.approved_revision.uses_only_baseline_capabilities() for r in recipes)
 
         # Set up a version of the Remote Settings helper with a mocked out client
         client_mock = None
@@ -369,7 +369,7 @@ class TestUpdateAddonUrls(object):
 
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
-        assert recipe.arguments[addonUrl] == extension.xpi.url
+        assert recipe.latest_revision.arguments[addonUrl] == extension.xpi.url
 
     def test_signatures_are_updated(self, mocked_autograph, storage):
         extension = ExtensionFactory()
@@ -403,7 +403,10 @@ class TestUpdateAddonUrls(object):
         # For reasons that I don't understand, recipe.update_from_db() doesn't work here.
         recipe = Recipe.objects.get(id=recipe.id)
         # Url should not be not updated
-        assert recipe.arguments[addonUrl] == "https://before.example.com/extensions/addon.xpi"
+        assert (
+            recipe.latest_revision.arguments[addonUrl]
+            == "https://before.example.com/extensions/addon.xpi"
+        )
 
     def test_it_works_for_multiple_extensions(self, storage):
         extension1 = ExtensionFactory(name="1.xpi")
@@ -421,8 +424,8 @@ class TestUpdateAddonUrls(object):
         recipe1 = Recipe.objects.get(id=recipe1.id)
         recipe2 = Recipe.objects.get(id=recipe2.id)
 
-        assert recipe1.arguments[addonUrl] == extension1.xpi.url
-        assert recipe2.arguments[addonUrl] == extension2.xpi.url
+        assert recipe1.latest_revision.arguments[addonUrl] == extension1.xpi.url
+        assert recipe2.latest_revision.arguments[addonUrl] == extension2.xpi.url
 
 
 @pytest.mark.django_db
@@ -493,8 +496,8 @@ class TestSyncRemoteSettings(object):
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
 
-        rs_settings.BASELINE_CAPABILITIES |= r1.capabilities
-        rs_settings.BASELINE_CAPABILITIES |= r2.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r1.approved_revision.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r2.approved_revision.capabilities
 
         # Mock the server responses.
         # `r2` should be on the server
@@ -544,8 +547,8 @@ class TestSyncRemoteSettings(object):
         r1 = RecipeFactory(name="Test 1", enabler=UserFactory(), approver=UserFactory())
         r2 = RecipeFactory(name="Test 2", enabler=UserFactory(), approver=UserFactory())
 
-        rs_settings.BASELINE_CAPABILITIES |= r1.capabilities
-        rs_settings.BASELINE_CAPABILITIES |= r2.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r1.approved_revision.capabilities
+        rs_settings.BASELINE_CAPABILITIES |= r2.approved_revision.capabilities
 
         # Mock the server responses.
         to_update = {**exports.recipe_as_record(r2), "name": "Outdated name"}

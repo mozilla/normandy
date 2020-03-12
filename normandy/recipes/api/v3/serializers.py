@@ -117,7 +117,9 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
     approved_revision = RecipeRevisionSerializer(read_only=True)
     latest_revision = RecipeRevisionSerializer(read_only=True)
     signature = SignatureSerializer(read_only=True)
-    uses_only_baseline_capabilities = serializers.SerializerMethodField()
+    uses_only_baseline_capabilities = serializers.BooleanField(
+        source="latest_revision.uses_only_baseline_capabilities", read_only=True
+    )
 
     # write-only fields
     action_id = serializers.PrimaryKeyRelatedField(
@@ -161,12 +163,11 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
 
     def get_action(self, instance):
         serializer = ActionSerializer(
-            instance.action, read_only=True, context={"request": self.context.get("request")}
+            instance.latest_revision.action,
+            read_only=True,
+            context={"request": self.context.get("request")},
         )
         return serializer.data
-
-    def get_uses_only_baseline_capabilities(self, obj):
-        return obj.uses_only_baseline_capabilities()
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
@@ -211,7 +212,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
         data = super().validate(data)
         action = data.get("action")
         if action is None:
-            action = self.instance.action
+            action = self.instance.latest_revision.action
 
         arguments = data.get("arguments")
         if arguments is not None:
