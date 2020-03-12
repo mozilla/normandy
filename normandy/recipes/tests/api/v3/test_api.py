@@ -144,16 +144,28 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert "Cookies" not in res
 
-        def test_list_can_filter_baseline_recipes(self, rs_settings, api_client):
-            recipe1 = RecipeFactory(extra_capabilities=[])
+        def test_list_can_filter_baseline_recipes(
+            self, rs_settings, api_client, mocked_remotesettings
+        ):
+            recipe1 = RecipeFactory(
+                extra_capabilities=[], approver=UserFactory(), enabler=UserFactory()
+            )
             rs_settings.BASELINE_CAPABILITIES |= recipe1.latest_revision.capabilities
             assert recipe1.latest_revision.uses_only_baseline_capabilities()
-            recipe2 = RecipeFactory(extra_capabilities=["test-capability"])
+            recipe2 = RecipeFactory(
+                extra_capabilities=["test-capability"],
+                approver=UserFactory(),
+                enabler=UserFactory(),
+            )
             assert not recipe2.latest_revision.uses_only_baseline_capabilities()
+            # Only approved recipes are considered as part of uses_only_baseline_capabilities
+            recipe3 = RecipeFactory(extra_capabilities=[])
+            rs_settings.BASELINE_CAPABILITIES |= recipe3.latest_revision.capabilities
+            assert recipe3.latest_revision.uses_only_baseline_capabilities()
 
             res = api_client.get("/api/v3/recipe/")
             assert res.status_code == 200
-            assert res.data["count"] == 2
+            assert res.data["count"] == 3
 
             res = api_client.get("/api/v3/recipe/?uses_only_baseline_capabilities=true")
             assert res.status_code == 200
