@@ -1,4 +1,4 @@
-FROM python:3.7-slim@sha256:d3f8c62226e90ff84d37706e89de808e771dba8eb10388d5f4b4fad8d607177c
+FROM python:3.7-slim@sha256:370b13236f1e398639050266be412c5e15404ce2fb590396ddb02ee8e23e35d8
 WORKDIR /app
 RUN groupadd --gid 10001 app && useradd -g app --uid 10001 --shell /usr/sbin/nologin app
 RUN apt-get update && \
