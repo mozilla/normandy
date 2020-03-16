@@ -380,7 +380,6 @@ class Base(Core, CORS, OIDC, Metrics):
     REMOTE_SETTINGS_PASSWORD = values.Value()
     REMOTE_SETTINGS_PUBLISH_BUCKET_ID = values.Value("main")
     REMOTE_SETTINGS_WORKSPACE_BUCKET_ID = values.Value("main-workspace")
-    REMOTE_SETTINGS_BASELINE_COLLECTION_ID = values.Value("normandy-recipes")
     REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID = values.Value("normandy-recipes-capabilities")
     REMOTE_SETTINGS_RETRY_REQUESTS = values.IntegerValue(3)
 

@@ -25,20 +25,10 @@ class TestRemoteSettings:
             "workspace": {"capabilities": {}, "baseline": {}},
             "publish": {"capabilities": {}, "baseline": {}},
         }
-        rv["workspace"]["baseline"]["collection"] = (
-            f"{rs_settings.REMOTE_SETTINGS_URL}"
-            f"/buckets/{rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID}"
-            f"/collections/{rs_settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID}"
-        )
         rv["workspace"]["capabilities"]["collection"] = (
             f"{rs_settings.REMOTE_SETTINGS_URL}"
             f"/buckets/{rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID}"
             f"/collections/{rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID}"
-        )
-        rv["publish"]["baseline"]["collection"] = (
-            f"{rs_settings.REMOTE_SETTINGS_URL}"
-            f"/buckets/{rs_settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID}"
-            f"/collections/{rs_settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID}"
         )
         rv["publish"]["capabilities"]["collection"] = (
             f"{rs_settings.REMOTE_SETTINGS_URL}"
@@ -47,13 +37,12 @@ class TestRemoteSettings:
         )
 
         for bucket in ["workspace", "publish"]:
-            for collection in ["baseline", "capabilities"]:
-                rv[bucket][collection]["records"] = (
-                    rv[bucket][collection]["collection"] + "/records"
-                )
-                rv[bucket][collection]["record"] = (
-                    rv[bucket][collection]["collection"] + "/records/{}"
-                )
+            rv[bucket]["capabilities"]["records"] = (
+                rv[bucket]["capabilities"]["collection"] + "/records"
+            )
+            rv[bucket]["capabilities"]["record"] = (
+                rv[bucket]["capabilities"]["collection"] + "/records/{}"
+            )
 
         return rv
 
@@ -65,7 +54,6 @@ class TestRemoteSettings:
         assert settings.REMOTE_SETTINGS_PASSWORD is None
         assert settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID == "main-workspace"
         assert settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID == "main"
-        assert settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID == "normandy-recipes"
         assert (
             settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID == "normandy-recipes-capabilities"
         )
@@ -106,21 +94,10 @@ class TestRemoteSettings:
             exports.RemoteSettings().check_config()
         assert "REMOTE_SETTINGS_PASSWORD" in str(exc.value)
 
-        # Leave out BASELINE_COLLECTION_ID
-        settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
-        settings.REMOTE_SETTINGS_USERNAME = "usename"
-        settings.REMOTE_SETTINGS_PASSWORD = "p4ssw0rd"
-        settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID = None
-        settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID = "normandy-recipes-capabilities"
-        with pytest.raises(ImproperlyConfigured) as exc:
-            exports.RemoteSettings().check_config()
-        assert "REMOTE_SETTINGS_BASELINE_COLLECTION_ID" in str(exc.value)
-
         # Leave out CAPABILITIES_COLLECTION_ID
         settings.REMOTE_SETTINGS_URL = "http://some-server/v1"
         settings.REMOTE_SETTINGS_USERNAME = "usename"
         settings.REMOTE_SETTINGS_PASSWORD = "p4ssw0rd"
-        settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID = "normandy-recipes"
         settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID = None
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
@@ -157,40 +134,30 @@ class TestRemoteSettings:
         )
 
         # Workspace collections should be writable
-        bucket_collection_pairs = [
-            (
-                rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID,
-                rs_settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID,
-            ),
-            (
-                rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID,
-                rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID,
-            ),
-        ]
+        bucket = rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID
+        collection = rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID
         # Allow writes for all collections
         allow_write_payload = {
             "data": {},
             "permissions": {"write": [f"account:{rs_settings.REMOTE_SETTINGS_USERNAME}"]},
         }
         readonly_payload = {"data": {}, "permissions": {}}
-        for bucket, collection in bucket_collection_pairs:
-            collection_url = (
-                f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{bucket}/collections/{collection}"
-            )
-            requestsmock.get(collection_url, json=allow_write_payload)
+        collection_url = (
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{bucket}/collections/{collection}"
+        )
+        requestsmock.get(collection_url, json=allow_write_payload)
 
-        for bucket, collection in bucket_collection_pairs:
-            collection_url = (
-                f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{bucket}/collections/{collection}"
-            )
-            # make the collection readonly
-            requestsmock.get(collection_url, json=readonly_payload)
-            # test it
-            with pytest.raises(ImproperlyConfigured) as exc:
-                exports.RemoteSettings().check_config()
-            assert f"Remote Settings collection {collection} is not writable" in str(exc.value)
-            # restore write permissions
-            requestsmock.get(collection_url, json=allow_write_payload)
+        collection_url = (
+            f"{rs_settings.REMOTE_SETTINGS_URL}/buckets/{bucket}/collections/{collection}"
+        )
+        # make the collection readonly
+        requestsmock.get(collection_url, json=readonly_payload)
+        # test it
+        with pytest.raises(ImproperlyConfigured) as exc:
+            exports.RemoteSettings().check_config()
+        assert f"Remote Settings collection {collection} is not writable" in str(exc.value)
+        # restore write permissions
+        requestsmock.get(collection_url, json=allow_write_payload)
 
         # Signer version should be >= 5.1.0.
         requestsmock.get(
@@ -204,7 +171,7 @@ class TestRemoteSettings:
             exports.RemoteSettings().check_config()
         assert "kinto-signer 5.1.0+ is required" in str(exc.value)
 
-        # Baseline collection review should be explicitly disabled.
+        # Capabilities collection review should be explicitly disabled.
         requestsmock.get(
             f"{rs_settings.REMOTE_SETTINGS_URL}/",
             json={
@@ -212,46 +179,6 @@ class TestRemoteSettings:
                 "capabilities": {"signer": {"version": "5.2.0", "resources": []}},
             },
         )
-        with pytest.raises(ImproperlyConfigured) as exc:
-            exports.RemoteSettings().check_config()
-        assert (
-            "Review was not disabled on Remote Settings collection "
-            f"{rs_settings.REMOTE_SETTINGS_BASELINE_COLLECTION_ID}."
-        ) in str(exc.value)
-
-        requestsmock.get(
-            f"{rs_settings.REMOTE_SETTINGS_URL}/",
-            json={
-                "user": {"id": f"account:{rs_settings.REMOTE_SETTINGS_USERNAME}"},
-                "capabilities": {
-                    "signer": {
-                        "version": "5.2.0",
-                        "to_review_enabled": True,
-                        "group_check_enabled": True,
-                        "resources": [
-                            {
-                                "source": {"bucket": "main-workspace", "collection": None},
-                                "destination": {"bucket": "main", "collection": None},
-                            },
-                            {
-                                "source": {
-                                    "bucket": "main-workspace",
-                                    "collection": "normandy-recipes",
-                                },
-                                "destination": {
-                                    "bucket": "main",
-                                    "collection": "normandy-recipes",
-                                },
-                                "to_review_enabled": False,
-                                "group_check_enabled": False,
-                            },
-                        ],
-                    }
-                },
-            },
-        )
-
-        # Capabilities collection review should be explicitly disabled.
         with pytest.raises(ImproperlyConfigured) as exc:
             exports.RemoteSettings().check_config()
         assert (
@@ -272,18 +199,6 @@ class TestRemoteSettings:
                             {
                                 "source": {"bucket": "main-workspace", "collection": None},
                                 "destination": {"bucket": "main", "collection": None},
-                            },
-                            {
-                                "source": {
-                                    "bucket": "main-workspace",
-                                    "collection": "normandy-recipes",
-                                },
-                                "destination": {
-                                    "bucket": "main",
-                                    "collection": "normandy-recipes",
-                                },
-                                "to_review_enabled": False,
-                                "group_check_enabled": False,
                             },
                             {
                                 "source": {
@@ -351,8 +266,6 @@ class TestRemoteSettings:
         """Test that requests are sent to Remote Settings on publish."""
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
-
         auth = (
             rs_settings.REMOTE_SETTINGS_USERNAME + ":" + rs_settings.REMOTE_SETTINGS_PASSWORD
         ).encode()
@@ -362,35 +275,29 @@ class TestRemoteSettings:
             "Authorization": f"Basic {base64.b64encode(auth).decode()}",
         }
 
-        for collection in ["baseline", "capabilities"]:
-            requestsmock.request(
-                "PUT",
-                rs_urls["workspace"][collection]["record"].format(recipe.id),
-                json={"data": {}},
-                request_headers=request_headers,
-            )
-            requestsmock.request(
-                "PATCH",
-                rs_urls["workspace"][collection]["collection"],
-                json={"data": {}},
-                request_headers=request_headers,
-            )
+        requestsmock.request(
+            "PUT",
+            rs_urls["workspace"]["capabilities"]["record"].format(recipe.id),
+            json={"data": {}},
+            request_headers=request_headers,
+        )
+        requestsmock.request(
+            "PATCH",
+            rs_urls["workspace"]["capabilities"]["collection"],
+            json={"data": {}},
+            request_headers=request_headers,
+        )
 
         remotesettings = exports.RemoteSettings()
         remotesettings.publish(recipe)
 
         requests = requestsmock.request_history
-        assert len(requests) == 4
+        assert len(requests) == 2
         assert requests[0].url == rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
         assert requests[0].method == "PUT"
         assert requests[0].json() == {"data": exports.recipe_as_record(recipe)}
-        assert requests[1].url == rs_urls["workspace"]["baseline"]["record"].format(recipe.id)
-        assert requests[1].method == "PUT"
-        assert requests[1].json() == {"data": exports.recipe_as_record(recipe)}
-        assert requests[2].method == "PATCH"
-        assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]
-        assert requests[3].method == "PATCH"
-        assert requests[3].url == rs_urls["workspace"]["baseline"]["collection"]
+        assert requests[1].method == "PATCH"
+        assert requests[1].url == rs_urls["workspace"]["capabilities"]["collection"]
         mock_logger.info.assert_called_with(
             f"Published record '{recipe.id}' for recipe '{recipe.approved_revision.name}'"
         )
@@ -401,7 +308,6 @@ class TestRemoteSettings:
         """Test that requests are sent to Remote Settings on unpublish."""
 
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
         urls = rs_urls["workspace"]
 
         auth = (
@@ -412,33 +318,28 @@ class TestRemoteSettings:
             "Content-Type": "application/json",
             "Authorization": f"Basic {base64.b64encode(auth).decode()}",
         }
-        for collection in ["baseline", "capabilities"]:
-            requestsmock.request(
-                "delete",
-                urls[collection]["record"].format(recipe.id),
-                json={"data": {}},
-                request_headers=request_headers,
-            )
-            requestsmock.request(
-                "patch",
-                urls[collection]["collection"],
-                json={"data": {}},
-                request_headers=request_headers,
-            )
+        requestsmock.request(
+            "delete",
+            urls["capabilities"]["record"].format(recipe.id),
+            json={"data": {}},
+            request_headers=request_headers,
+        )
+        requestsmock.request(
+            "patch",
+            urls["capabilities"]["collection"],
+            json={"data": {}},
+            request_headers=request_headers,
+        )
 
         remotesettings = exports.RemoteSettings()
         remotesettings.unpublish(recipe)
 
-        assert len(requestsmock.request_history) == 4
+        assert len(requestsmock.request_history) == 2
         requests = requestsmock.request_history
         assert requests[0].url == urls["capabilities"]["record"].format(recipe.id)
         assert requests[0].method == "DELETE"
-        assert requests[1].url == urls["baseline"]["record"].format(recipe.id)
-        assert requests[1].method == "DELETE"
-        assert requests[2].url == urls["capabilities"]["collection"]
-        assert requests[2].method == "PATCH"
-        assert requests[3].url == urls["baseline"]["collection"]
-        assert requests[3].method == "PATCH"
+        assert requests[1].url == urls["capabilities"]["collection"]
+        assert requests[1].method == "PATCH"
         mock_logger.info.assert_called_with(
             f"Deleted record '{recipe.id}' of recipe '{recipe.approved_revision.name}'"
         )
@@ -458,27 +359,21 @@ class TestRemoteSettings:
         self, rs_urls, rs_settings, requestsmock, mock_logger
     ):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        baseline_record_url = rs_urls["workspace"]["baseline"]["record"].format(recipe.id)
         capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
         warning_message = (
             f"The recipe '{recipe.id}' was not published in the {{}} collection. Skip."
         )
 
-        requestsmock.request("delete", baseline_record_url, status_code=404)
         requestsmock.request("delete", capabilities_record_url, status_code=404)
         remotesettings = exports.RemoteSettings()
         # Assert doesn't raise.
         remotesettings.unpublish(recipe)
-        assert mock_logger.warning.call_args_list == [
-            call(warning_message.format("capabilities")),
-            call(warning_message.format("baseline")),
-        ]
+        assert mock_logger.warning.call_args_list == [call(warning_message.format("capabilities"))]
 
     def test_publish_reverts_changes_if_approval_fails(self, rs_urls, rs_settings, requestsmock):
         # This test forces the recipe to not use baseline capabilities to
         # simplify the test. This simplifies the test.
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        assert not recipe.approved_revision.uses_only_baseline_capabilities()
 
         capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
         # Creating the record works.
@@ -512,15 +407,10 @@ class TestRemoteSettings:
 
     def test_unpublish_reverts_changes_if_approval_fails(self, rs_urls, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        baseline_record_url = rs_urls["workspace"]["baseline"]["record"].format(recipe.id)
         capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
         # Deleting the record works.
-        requestsmock.request("delete", baseline_record_url, json={"data": {"deleted": True}})
         requestsmock.request("delete", capabilities_record_url, json={"data": {"deleted": True}})
 
-        requestsmock.request(
-            "patch", rs_urls["workspace"]["baseline"]["collection"], json={"data": {}}
-        )
         requestsmock.register_uri(
             "patch",
             rs_urls["workspace"]["capabilities"]["collection"],
@@ -537,123 +427,13 @@ class TestRemoteSettings:
             remotesettings.unpublish(recipe)
 
         requests = requestsmock.request_history
-        assert len(requests) == 5
-        # Unpublish the recipe in both collections
+        assert len(requests) == 3
+        # Unpublish the recipe in collection
         assert requests[0].url == capabilities_record_url
         assert requests[0].method == "DELETE"
-        assert requests[1].url == baseline_record_url
-        assert requests[1].method == "DELETE"
         # Try (and fail) to approve the capabilities change
-        assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]
-        assert requests[2].method == "PATCH"
-        # so it rollsback both collections
-        assert requests[3].method == "PATCH"
-        assert requests[3].url == rs_urls["workspace"]["capabilities"]["collection"]
-        assert requests[4].method == "PATCH"
-        assert requests[4].url == rs_urls["workspace"]["baseline"]["collection"]
-
-    def test_publish_and_unpublish_baseline_recipe_to_both_collections(
-        self, rs_settings, rs_urls, requestsmock
-    ):
-        ws_urls = rs_urls["workspace"]
-
-        recipe = RecipeFactory(approver=UserFactory())
-        rs_settings.BASELINE_CAPABILITIES |= recipe.approved_revision.capabilities
-        assert recipe.approved_revision.uses_only_baseline_capabilities()
-
-        # Expect publish calls to both collections
-        requestsmock.put(
-            ws_urls["baseline"]["record"].format(recipe.id), json={"data": {}}, status_code=201
-        )
-        requestsmock.put(
-            ws_urls["capabilities"]["record"].format(recipe.id), json={"data": {}}, status_code=201
-        )
-        # Expect both workspaces to be approved
-        requestsmock.patch(ws_urls["baseline"]["collection"], json={"data": {}})
-        requestsmock.patch(ws_urls["capabilities"]["collection"], json={"data": {}})
-
-        remotesettings = exports.RemoteSettings()
-        remotesettings.publish(recipe)
-
-        requests = requestsmock.request_history
-        assert len(requests) == 4
-        # First it publishes a recipe to both collections
-        assert requests[0].method == "PUT"
-        assert requests[0].url == ws_urls["capabilities"]["record"].format(recipe.id)
-        assert requests[1].method == "PUT"
-        assert requests[1].url == ws_urls["baseline"]["record"].format(recipe.id)
-        # and then approves both changes
-        assert requests[2].method == "PATCH"
-        assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]
-        assert requests[3].method == "PATCH"
-        assert requests[3].url == rs_urls["workspace"]["baseline"]["collection"]
-
-        # reset request history
-        requestsmock._adapter.request_history = []
-
-        # Expect delete calls
-        requestsmock.delete(ws_urls["baseline"]["record"].format(recipe.id), json={"data": {}})
-        requestsmock.delete(ws_urls["capabilities"]["record"].format(recipe.id), json={"data": {}})
-
-        remotesettings.unpublish(recipe)
-
-        requests = requestsmock.request_history
-        assert len(requests) == 4
-        # First it removes the recipe from both collections
-        assert requests[0].method == "DELETE"
-        assert requests[0].url == ws_urls["capabilities"]["record"].format(recipe.id)
-        assert requests[1].method == "DELETE"
-        assert requests[1].url == ws_urls["baseline"]["record"].format(recipe.id)
-        # and then approves both changes
-        assert requests[2].method == "PATCH"
-        assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]
-        assert requests[3].method == "PATCH"
-        assert requests[3].url == rs_urls["workspace"]["baseline"]["collection"]
-
-    def test_publish_and_unpublish_non_baseline_recipe_only_to_capabilities_collection(
-        self, rs_settings, rs_urls, requestsmock
-    ):
-        ws_urls = rs_urls["workspace"]
-
-        recipe = RecipeFactory(approver=UserFactory())
-        assert not recipe.approved_revision.uses_only_baseline_capabilities()
-
-        # Expect calls only to the capabilities collection
-        requestsmock.put(
-            ws_urls["capabilities"]["record"].format(recipe.id), json={"data": {}}, status_code=201
-        )
-        requestsmock.patch(ws_urls["capabilities"]["collection"], json={"data": {}})
-
-        remotesettings = exports.RemoteSettings()
-        remotesettings.publish(recipe)
-
-        requests = requestsmock.request_history
-        assert len(requests) == 2
-        # First it publishes the recipe
-        assert requests[0].method == "PUT"
-        assert requests[0].url == ws_urls["capabilities"]["record"].format(recipe.id)
-        # and then approves the change
-        assert requests[1].method == "PATCH"
         assert requests[1].url == rs_urls["workspace"]["capabilities"]["collection"]
-
-        # reset request history
-        requestsmock._adapter.request_history = []
-
-        # Expect delete calls
-        requestsmock.delete(ws_urls["capabilities"]["record"].format(recipe.id), json={"data": {}})
-        # Baseline is expected, just in case the recipe changed from baseline to not baseline
-        requestsmock.delete(ws_urls["baseline"]["record"].format(recipe.id), status_code=404)
-
-        remotesettings.unpublish(recipe)
-
-        requests = requestsmock.request_history
-        assert len(requests) == 3
-        # First it removes the recipe
-        assert requests[0].method == "DELETE"
-        assert requests[0].url == ws_urls["capabilities"]["record"].format(recipe.id)
-        # Tries to delete from baseline, just in case
-        assert requests[1].method == "DELETE"
-        assert requests[1].url == ws_urls["baseline"]["record"].format(recipe.id)
-        # and then approves the change only from capabilities
+        assert requests[1].method == "PATCH"
+        # so it rollsback collection
         assert requests[2].method == "PATCH"
         assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]

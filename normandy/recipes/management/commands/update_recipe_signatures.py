@@ -35,7 +35,6 @@ class Command(BaseCommand):
             recipes_to_update = self.get_outdated_recipes()
 
         count = recipes_to_update.count()
-        any_baseline = False
         if count == 0:
             self.stdout.write("No out of date recipes to sign")
         else:
@@ -45,10 +44,8 @@ class Command(BaseCommand):
                 recipe.update_signature()
                 recipe.save()
                 remote_settings.publish(recipe, approve_changes=False)
-                if recipe.approved_revision.uses_only_baseline_capabilities():
-                    any_baseline = True
             # Approve all Remote Settings changes.
-            remote_settings.approve_changes(baseline=any_baseline)
+            remote_settings.approve_changes()
 
         metrics.gauge("signed", count, tags=["force"] if force else [])
 
