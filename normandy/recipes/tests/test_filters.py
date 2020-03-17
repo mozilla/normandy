@@ -17,6 +17,7 @@ from normandy.recipes.filters import (
     PrefUserSetFilter,
     WindowsBuildNumberFilter,
     WindowsVersionFilter,
+    NegateFilter,
 )
 from normandy.recipes.tests import (
     ChannelFactory,
@@ -243,6 +244,16 @@ class TestPlatformFilter(FilterTestsBase):
         filter = self.create_basic_filter(platforms=["all_linu"])
         with pytest.raises(serializers.ValidationError):
             filter.to_jexl()
+
+
+class TestNegateFilter(FilterTestsBase):
+    def create_basic_filter(self):
+        data_for_filter = {"type": "channel", "channels": ["release", "beta"]}
+        return NegateFilter.create(filter_to_negate=data_for_filter)
+
+    def test_generates_jexl(self):
+        negate_filter = self.create_basic_filter()
+        assert negate_filter.to_jexl() == '!(normandy.channel in ["release","beta"])'
 
 
 class TestPrefCompareFilter(FilterTestsBase):
