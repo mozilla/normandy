@@ -18,6 +18,7 @@ from normandy.recipes.models import (
     Recipe,
     RecipeRevision,
     Signature,
+    WindowsVersion,
 )
 
 
@@ -28,6 +29,15 @@ class ChannelFactory(factory.DjangoModelFactory):
 
     slug = "beta"
     name = "Beta"
+
+
+class WindowsVersionFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = WindowsVersion
+        django_get_or_create = ("slug",)
+
+    slug = "6.1"
+    name = "Windows 7"
 
 
 class CountryFactory(factory.DjangoModelFactory):

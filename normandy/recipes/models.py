@@ -44,6 +44,17 @@ class Channel(models.Model):
         return "<Channel {}>".format(self.slug)
 
 
+class WindowsVersion(models.Model):
+    slug = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ("slug",)
+
+    def __repr__(self):
+        return "<Windows Version {}>".format(self.slug)
+
+
 class Country(models.Model):
     code = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)

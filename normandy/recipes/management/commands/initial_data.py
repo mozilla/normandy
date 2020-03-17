@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django_countries import countries
 
-from normandy.recipes.models import Channel, Country
+from normandy.recipes.models import Channel, Country, WindowsVersion
 
 
 class Command(BaseCommand):
@@ -22,6 +22,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.add_release_channels()
         self.add_countries()
+        self.add_windows_versions()
 
     def add_release_channels(self):
         self.stdout.write("Adding Release Channels...", ending="")
@@ -40,4 +41,17 @@ class Command(BaseCommand):
         self.stdout.write("Adding Countries...", ending="")
         for code, name in countries:
             Country.objects.update_or_create(code=code, defaults={"name": name})
+        self.stdout.write("Done")
+
+    def add_windows_versions(self):
+        self.stdout.write("Adding Windows Versions...", ending="")
+        versions = {
+            "6.1": "Windows 7",
+            "6.2": "Windows 8",
+            "6.3": "Windows 8.1",
+            "10.0": "Windows 10.0",
+        }
+
+        for slug, name in versions.items():
+            WindowsVersion.objects.update_or_create(slug=slug, defaults={"name": name})
         self.stdout.write("Done")
