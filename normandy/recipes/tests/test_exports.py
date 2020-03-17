@@ -21,28 +21,21 @@ def mock_logger(mocker):
 class TestRemoteSettings:
     @pytest.fixture
     def rs_urls(self, rs_settings):
-        rv = {
-            "workspace": {"capabilities": {}, "baseline": {}},
-            "publish": {"capabilities": {}, "baseline": {}},
-        }
-        rv["workspace"]["capabilities"]["collection"] = (
+        rv = {"workspace": {}, "publish": {}}
+        rv["workspace"]["collection"] = (
             f"{rs_settings.REMOTE_SETTINGS_URL}"
             f"/buckets/{rs_settings.REMOTE_SETTINGS_WORKSPACE_BUCKET_ID}"
             f"/collections/{rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID}"
         )
-        rv["publish"]["capabilities"]["collection"] = (
+        rv["publish"]["collection"] = (
             f"{rs_settings.REMOTE_SETTINGS_URL}"
             f"/buckets/{rs_settings.REMOTE_SETTINGS_PUBLISH_BUCKET_ID}"
             f"/collections/{rs_settings.REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID}"
         )
 
         for bucket in ["workspace", "publish"]:
-            rv[bucket]["capabilities"]["records"] = (
-                rv[bucket]["capabilities"]["collection"] + "/records"
-            )
-            rv[bucket]["capabilities"]["record"] = (
-                rv[bucket]["capabilities"]["collection"] + "/records/{}"
-            )
+            rv[bucket]["records"] = rv[bucket]["collection"] + "/records"
+            rv[bucket]["record"] = rv[bucket]["collection"] + "/records/{}"
 
         return rv
 
@@ -277,13 +270,13 @@ class TestRemoteSettings:
 
         requestsmock.request(
             "PUT",
-            rs_urls["workspace"]["capabilities"]["record"].format(recipe.id),
+            rs_urls["workspace"]["record"].format(recipe.id),
             json={"data": {}},
             request_headers=request_headers,
         )
         requestsmock.request(
             "PATCH",
-            rs_urls["workspace"]["capabilities"]["collection"],
+            rs_urls["workspace"]["collection"],
             json={"data": {}},
             request_headers=request_headers,
         )
@@ -293,11 +286,11 @@ class TestRemoteSettings:
 
         requests = requestsmock.request_history
         assert len(requests) == 2
-        assert requests[0].url == rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
+        assert requests[0].url == rs_urls["workspace"]["record"].format(recipe.id)
         assert requests[0].method == "PUT"
         assert requests[0].json() == {"data": exports.recipe_as_record(recipe)}
         assert requests[1].method == "PATCH"
-        assert requests[1].url == rs_urls["workspace"]["capabilities"]["collection"]
+        assert requests[1].url == rs_urls["workspace"]["collection"]
         mock_logger.info.assert_called_with(
             f"Published record '{recipe.id}' for recipe '{recipe.approved_revision.name}'"
         )
@@ -320,15 +313,12 @@ class TestRemoteSettings:
         }
         requestsmock.request(
             "delete",
-            urls["capabilities"]["record"].format(recipe.id),
+            urls["record"].format(recipe.id),
             json={"data": {}},
             request_headers=request_headers,
         )
         requestsmock.request(
-            "patch",
-            urls["capabilities"]["collection"],
-            json={"data": {}},
-            request_headers=request_headers,
+            "patch", urls["collection"], json={"data": {}}, request_headers=request_headers
         )
 
         remotesettings = exports.RemoteSettings()
@@ -336,9 +326,9 @@ class TestRemoteSettings:
 
         assert len(requestsmock.request_history) == 2
         requests = requestsmock.request_history
-        assert requests[0].url == urls["capabilities"]["record"].format(recipe.id)
+        assert requests[0].url == urls["record"].format(recipe.id)
         assert requests[0].method == "DELETE"
-        assert requests[1].url == urls["capabilities"]["collection"]
+        assert requests[1].url == urls["collection"]
         assert requests[1].method == "PATCH"
         mock_logger.info.assert_called_with(
             f"Deleted record '{recipe.id}' of recipe '{recipe.approved_revision.name}'"
@@ -346,7 +336,7 @@ class TestRemoteSettings:
 
     def test_publish_raises_an_error_if_request_fails(self, rs_urls, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
+        record_url = rs_urls["workspace"]["record"].format(recipe.id)
         requestsmock.request("put", record_url, status_code=503)
 
         remotesettings = exports.RemoteSettings()
@@ -359,7 +349,7 @@ class TestRemoteSettings:
         self, rs_urls, rs_settings, requestsmock, mock_logger
     ):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
+        capabilities_record_url = rs_urls["workspace"]["record"].format(recipe.id)
         warning_message = (
             f"The recipe '{recipe.id}' was not published in the {{}} collection. Skip."
         )
@@ -375,12 +365,12 @@ class TestRemoteSettings:
         # simplify the test. This simplifies the test.
         recipe = RecipeFactory(name="Test", approver=UserFactory())
 
-        capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
+        capabilities_record_url = rs_urls["workspace"]["record"].format(recipe.id)
         # Creating the record works.
         requestsmock.request("put", capabilities_record_url, json={"data": {}}, status_code=201)
         requestsmock.register_uri(
             "patch",
-            rs_urls["workspace"]["capabilities"]["collection"],
+            rs_urls["workspace"]["collection"],
             [
                 # Approving fails.
                 {"status_code": 403},
@@ -400,20 +390,20 @@ class TestRemoteSettings:
         assert requests[0].url == capabilities_record_url
         # and then tries to approve it, which fails.
         assert requests[1].method == "PATCH"
-        assert requests[1].url == rs_urls["workspace"]["capabilities"]["collection"]
+        assert requests[1].url == rs_urls["workspace"]["collection"]
         # so it rollsback
         assert requests[2].method == "PATCH"
-        assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]
+        assert requests[2].url == rs_urls["workspace"]["collection"]
 
     def test_unpublish_reverts_changes_if_approval_fails(self, rs_urls, rs_settings, requestsmock):
         recipe = RecipeFactory(name="Test", approver=UserFactory())
-        capabilities_record_url = rs_urls["workspace"]["capabilities"]["record"].format(recipe.id)
+        capabilities_record_url = rs_urls["workspace"]["record"].format(recipe.id)
         # Deleting the record works.
         requestsmock.request("delete", capabilities_record_url, json={"data": {"deleted": True}})
 
         requestsmock.register_uri(
             "patch",
-            rs_urls["workspace"]["capabilities"]["collection"],
+            rs_urls["workspace"]["collection"],
             [
                 # Approving fails.
                 {"status_code": 403},
@@ -432,8 +422,8 @@ class TestRemoteSettings:
         assert requests[0].url == capabilities_record_url
         assert requests[0].method == "DELETE"
         # Try (and fail) to approve the capabilities change
-        assert requests[1].url == rs_urls["workspace"]["capabilities"]["collection"]
+        assert requests[1].url == rs_urls["workspace"]["collection"]
         assert requests[1].method == "PATCH"
         # so it rollsback collection
         assert requests[2].method == "PATCH"
-        assert requests[2].url == rs_urls["workspace"]["capabilities"]["collection"]
+        assert requests[2].url == rs_urls["workspace"]["collection"]

@@ -495,13 +495,13 @@ class TestSyncRemoteSettings(object):
         call_command("sync_remote_settings")
 
         requests = requestsmock.request_history
-        # The first two requests should be to get the existing records
+        # First request should be to get the existing records
         assert requests[0].method == "GET"
         assert requests[0].url.endswith(self.capabilities_published_records_url)
-        # The next two should be to PUT the missing recipe2
+        # The next should be to PUT the missing recipe2
         assert requests[1].method == "PUT"
         assert requests[1].url.endswith(r2_capabilities_url)
-        # The final two should be to approve the changes to the two collections
+        # The final one should be to approve the changes
         assert requests[2].method == "PATCH"
         assert requests[2].url.endswith(self.capabilities_workspace_collection_url)
         # And there are no extra requests
@@ -531,13 +531,13 @@ class TestSyncRemoteSettings(object):
         call_command("sync_remote_settings")
 
         requests = requestsmock.request_history
-        # The first two requests should be to get the existing records
+        # The first request should be to get the existing records
         assert requests[0].method == "GET"
         assert requests[0].url.endswith(self.capabilities_published_records_url)
-        # The next two should be to PUT the outdated recipe2
+        # The next one should be to PUT the outdated recipe2
         assert requests[1].method == "PUT"
         assert requests[1].url.endswith(r2_capabilities_url)
-        # The final two should be to approve the changes to the two collections
+        # The final one should be to approve the changes
         assert requests[2].method == "PATCH"
         assert requests[2].url.endswith(self.capabilities_workspace_collection_url)
         # And there are no extra requests
@@ -566,13 +566,13 @@ class TestSyncRemoteSettings(object):
         call_command("sync_remote_settings")
 
         requests = requestsmock.request_history
-        # The first two requests should be to get the existing records
+        # The first request should be to get the existing records
         assert requests[0].method == "GET"
         assert requests[0].url.endswith(self.capabilities_published_records_url)
-        # The next two should be to PUT the outdated recipe2
+        # The next one should be to PUT the outdated recipe2
         assert requests[1].method == "DELETE"
         assert requests[1].url.endswith(r2_capabilities_url)
-        # The final two should be to approve the changes to the two collections
+        # The final one should be to approve the changes
         assert requests[2].method == "PATCH"
         assert requests[2].url.endswith(self.capabilities_workspace_collection_url)
         # And there are no extra requests
