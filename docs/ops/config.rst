@@ -195,9 +195,9 @@ in other Django projects.
 
     The account password to authenticate as DJANGO_REMOTE_SETTINGS_USERNAME.
 
-.. envvar:: DJANGO_REMOTE_SETTINGS_COLLECTION_ID
+.. envvar:: DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID
 
-    :default: ``normandy-recipes``
+    :default: ``normandy-recipes-capabilities``
 
     The name of the Remote Settings collection where the recipes will be published.
 
