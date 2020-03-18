@@ -616,6 +616,47 @@ a given date.</p>
 <em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">WindowsBuildNumberFilter</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="class">
+<dt id="normandy.recipes.filters.WindowsVersionFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">WindowsVersionFilter</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Match a user based on what windows version they are running. This filter
+creates jexl that compares the windows NT version.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.WindowsVersionFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">windows_version</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.WindowsVersionFilter.value">
+<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.value" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">6.1</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.WindowsVersionFilter.comparison">
+<code class="sig-name descname">comparison</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.comparison" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">Options are ``equal``, ``not_equal``, ``greater_than``,</code></dt>
+<dt>
+<code class="sig-name descname">``less_than``, ``greater_than_equal`` and ``less_than_equal``.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">not_equal</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="filter-expressions">
 <h2>Filter Expressions<a class="headerlink" href="#filter-expressions" title="Permalink to this headline">¶</a></h2>
