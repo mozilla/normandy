@@ -34,9 +34,9 @@ class ChannelFactory(factory.DjangoModelFactory):
 class WindowsVersionFactory(factory.DjangoModelFactory):
     class Meta:
         model = WindowsVersion
-        django_get_or_create = ("slug",)
+        django_get_or_create = ("nt_version",)
 
-    slug = "6.1"
+    nt_version = 6.1
     name = "Windows 7"
 
 

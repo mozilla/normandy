@@ -602,7 +602,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
         ``windows_version``
 
     .. attribute:: value
-        string, must be one of the following: 6.1, 6.2, 6.3, 10.0
+        number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0
 
        :example: ``6.1``
 
@@ -614,7 +614,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
     """
 
     type = "windows_version"
-    value = serializers.CharField()
+    value = serializers.DecimalField(max_digits=3, decimal_places=1)
 
     @property
     def left_of_operator(self):
@@ -626,7 +626,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
     def validate_value(self, value):
         from normandy.recipes.models import WindowsVersion
 
-        if not WindowsVersion.objects.filter(slug=value).exists():
+        if not WindowsVersion.objects.filter(nt_version=value).exists():
             raise serializers.ValidationError(f"Unrecognized windows version slug {value!r}")
 
         return value
@@ -700,6 +700,7 @@ by_type = {
         PrefExistsFilter,
         PrefCompareFilter,
         PrefUserSetFilter,
+        WindowsVersionFilter,
     ]
 }
 

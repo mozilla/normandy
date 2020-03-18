@@ -45,14 +45,14 @@ class Channel(models.Model):
 
 
 class WindowsVersion(models.Model):
-    slug = models.CharField(max_length=255, unique=True)
+    nt_version = models.DecimalField(max_digits=3, decimal_places=1)
     name = models.CharField(max_length=255)
 
     class Meta:
-        ordering = ("slug",)
+        ordering = ("nt_version",)
 
     def __repr__(self):
-        return "<Windows Version {}>".format(self.slug)
+        return "<Windows Version {}>".format(self.nt_version)
 
 
 class Country(models.Model):

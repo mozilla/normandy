@@ -45,13 +45,13 @@ class Command(BaseCommand):
 
     def add_windows_versions(self):
         self.stdout.write("Adding Windows Versions...", ending="")
-        versions = {
-            "6.1": "Windows 7",
-            "6.2": "Windows 8",
-            "6.3": "Windows 8.1",
-            "10.0": "Windows 10.0",
-        }
+        versions = [
+            (6.1, "Windows 7"),
+            (6.2, "Windows 8"),
+            (6.3, "Windows 8.1"),
+            (10.0, "Windows 10"),
+        ]
 
-        for slug, name in versions.items():
-            WindowsVersion.objects.update_or_create(slug=slug, defaults={"name": name})
+        for nt_version, name in versions:
+            WindowsVersion.objects.update_or_create(nt_version=nt_version, defaults={"name": name})
         self.stdout.write("Done")

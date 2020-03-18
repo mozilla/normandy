@@ -156,8 +156,8 @@ class TestWindowsBuildNumberFilter(FilterTestsBase):
 
 
 class TestWindowsVersionFilter(FilterTestsBase):
-    def create_basic_filter(self, value="6.1", comparison="equal"):
-        WindowsVersionFactory(slug="6.1")
+    def create_basic_filter(self, value=6.1, comparison="equal"):
+        WindowsVersionFactory(nt_version=6.1)
 
         return WindowsVersionFilter.create(value=value, comparison=comparison)
 
