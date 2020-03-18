@@ -16,8 +16,14 @@ from normandy.recipes.filters import (
     PrefExistsFilter,
     PrefUserSetFilter,
     WindowsBuildNumberFilter,
+    WindowsVersionFilter,
 )
-from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
+from normandy.recipes.tests import (
+    ChannelFactory,
+    LocaleFactory,
+    CountryFactory,
+    WindowsVersionFactory,
+)
 
 
 @pytest.mark.django_db
@@ -122,7 +128,7 @@ class TestDateRangeFilter(FilterTestsBase):
         }
 
 
-class TestWindowsBuildNumberFiter(FilterTestsBase):
+class TestWindowsBuildNumberFilter(FilterTestsBase):
     def create_basic_filter(self, value=12345, comparison="equal"):
         return WindowsBuildNumberFilter.create(value=value, comparison=comparison)
 
@@ -147,6 +153,39 @@ class TestWindowsBuildNumberFiter(FilterTestsBase):
         filter = self.create_basic_filter(comparison="typo")
         with pytest.raises(serializers.ValidationError):
             filter.to_jexl()
+
+
+class TestWindowsVersionFilter(FilterTestsBase):
+    def create_basic_filter(self, value=6.1, comparison="equal"):
+        WindowsVersionFactory(nt_version=6.1)
+
+        return WindowsVersionFilter.create(value=value, comparison=comparison)
+
+    @pytest.mark.parametrize(
+        "comparison,symbol",
+        [
+            ("equal", "=="),
+            ("greater_than", ">"),
+            ("greater_than_equal", ">="),
+            ("less_than", "<"),
+            ("less_than_equal", "<="),
+        ],
+    )
+    def test_generates_jexl_number_ops(self, comparison, symbol):
+        filter = self.create_basic_filter(comparison=comparison)
+        assert (
+            filter.to_jexl()
+            == f"(normandy.os.isWindows && normandy.os.windowsVersion {symbol} 6.1)"
+        )
+
+    def test_generates_jexl_error_on_bad_comparison(self):
+        filter = self.create_basic_filter(comparison="typo")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+    def test_generates_jexl_error_on_bad_version(self):
+        with pytest.raises(AssertionError):
+            self.create_basic_filter(value="abcd")
 
 
 class TestChannelFilter(FilterTestsBase):

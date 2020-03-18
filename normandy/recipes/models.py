@@ -44,6 +44,17 @@ class Channel(models.Model):
         return "<Channel {}>".format(self.slug)
 
 
+class WindowsVersion(models.Model):
+    nt_version = models.DecimalField(max_digits=3, decimal_places=1)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ("nt_version",)
+
+    def __repr__(self):
+        return "<Windows Version {}>".format(self.nt_version)
+
+
 class Country(models.Model):
     code = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)

@@ -592,6 +592,50 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
         return f"(normandy.os.isWindows && {super().to_jexl()})"
 
 
+class WindowsVersionFilter(BaseComparisonFilter):
+    """
+    Match a user based on what windows version they are running. This filter
+    creates jexl that compares the windows NT version.
+
+    .. attribute:: type
+
+        ``windows_version``
+
+    .. attribute:: value
+        number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0
+
+       :example: ``6.1``
+
+   .. attribute:: comparison
+      Options are ``equal``, ``not_equal``, ``greater_than``,
+      ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
+
+      :example: ``not_equal``
+    """
+
+    type = "windows_version"
+    value = serializers.DecimalField(max_digits=3, decimal_places=1)
+
+    @property
+    def left_of_operator(self):
+        return "normandy.os.windowsVersion"
+
+    def to_jexl(self):
+        return f"(normandy.os.isWindows && {super().to_jexl()})"
+
+    def validate_value(self, value):
+        from normandy.recipes.models import WindowsVersion
+
+        if not WindowsVersion.objects.filter(nt_version=value).exists():
+            raise serializers.ValidationError(f"Unrecognized windows version slug {value!r}")
+
+        return value
+
+    @property
+    def capabilities(self):
+        return set()
+
+
 class ProfileCreateDateFilter(BaseFilter):
     """
     This filter is meant to distinguish between new and existing users.
@@ -656,6 +700,7 @@ by_type = {
         PrefExistsFilter,
         PrefCompareFilter,
         PrefUserSetFilter,
+        WindowsVersionFilter,
     ]
 }
 

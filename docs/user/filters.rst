@@ -30,6 +30,7 @@ Filter Objects
 .. autoclass:: PrefCompareFilter()
 .. autoclass:: PrefUserSetFilter()
 .. autoclass:: WindowsBuildNumberFilter()
+.. autoclass:: WindowsVersionFilter()
 
 
 Filter Expressions
