@@ -18,8 +18,8 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 COPY ./requirements /app/requirements
 COPY ./package.json /app/package.json
 COPY ./yarn.lock /app/yarn.lock
-RUN pip install --upgrade --no-cache-dir -r requirements/default.txt && \
-    yarn install --frozen-lockfile
+RUN pip install --upgrade --no-cache-dir -r requirements/default.txt
+RUN yarn install --frozen-lockfile
 
 COPY . /app
 RUN NODE_ENV=production yarn build && \
