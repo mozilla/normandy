@@ -257,7 +257,8 @@ jobs:
       - run:
           name: Build Docker image for test
           command: |
-            make refresh
+            make migrate
+            make load_data
             docker-compose up -d
       - run:
           name: Contract tests
