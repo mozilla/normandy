@@ -218,6 +218,7 @@ jobs:
   contract-tests:
     docker:
       - mozilla/cidockerbases:docker-latest
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: normandy
