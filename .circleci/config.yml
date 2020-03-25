@@ -217,7 +217,7 @@ jobs:
 
   contract-tests:
     machine:
-      image: mozilla/cidockerbase:docker-latest
+      image: ubuntu-1604:201903-01
       docker_layer_caching: true
     environment:
       DJANGO_SETTINGS_MODULE: normandy.settings
@@ -229,6 +229,9 @@ jobs:
       POSTGRES_HOST_AUTH_METHOD: trust
 
     steps:
+      - run:
+        name: Create Python 3 Environment
+        command: apt-get install -y python3
       - checkout
       - run:
           name: Create virtualenv
