@@ -231,8 +231,7 @@ jobs:
       DJANGO_SILENCED_SYSTEM_CHECKS: "normandy.recipes.E006,security.W001,security.W003,security.W004,security.W008,security.W009,security.W012,security.W016"
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching:true
+      - setup_remote_docker
       - run:
           name: Create virtualenv
           command: |
