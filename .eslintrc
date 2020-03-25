@@ -4,11 +4,8 @@ env:
 extends:
   - airbnb
 
-parser: babel-eslint
-
 plugins:
   - jasmine
-  - babel
 
 globals:
   PRODUCTION: false

@@ -85,17 +85,6 @@ class Core(Configuration):
         "npm.finders.NpmFinder",
     ]
 
-    NPM_DESTINATION_PREFIX = "npm"
-    NPM_FILE_PATTERNS = {
-        "babel-polyfill": ["dist/*.js"],
-        "font-awesome": ["css/*.css", "fonts/*"],
-        "uuid": ["uuid.js"],
-        "jquery": ["dist/*.js"],
-        "json-editor": ["dist/*.js"],
-        "wolfy87-eventemitter": ["EventEmitter.js"],
-        "mozjexl": ["dist/*.js"],
-    }
-
     REST_FRAMEWORK = {
         "DEFAULT_AUTHENTICATION_CLASSES": [
             "normandy.base.api.authentication.BearerTokenAuthentication"

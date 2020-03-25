@@ -21,8 +21,8 @@ export default class ShowHeartbeatAction extends Action {
     this.heartbeatStorage = normandy.createStorage('normandy-heartbeat');
 
     // context bindings
-    this.updateLastInteraction = ::this.updateLastInteraction;
-    this.updateLastShown = ::this.updateLastShown;
+    this.updateLastInteraction = this.updateLastInteraction.bind(this);
+    this.updateLastShown = this.updateLastShown.bind(this);
   }
 
   /**
