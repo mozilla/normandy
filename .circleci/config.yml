@@ -229,9 +229,6 @@ jobs:
       POSTGRES_HOST_AUTH_METHOD: trust
 
     steps:
-      - run:
-        name: Create Python 3 Environment
-        command: apt-get install -y python3
       - checkout
       - run:
           name: Create virtualenv
