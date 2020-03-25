@@ -1,6 +1,3 @@
-/* eslint-env node */
-/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template */
-
 // Karma configuration
 
 

@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 let _recipeId = 0;
 /**
  * Factory for creating recipe objects as returned by the API.

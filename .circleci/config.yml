@@ -193,28 +193,6 @@ jobs:
       - store_artifacts:
           path: test-reports
 
-  js-tests:
-    docker:
-      - image: mozilla/cidockerbases:firefox-latest
-
-    steps:
-      - checkout
-      - run:
-          name: Install node dependencies
-          command: yarn install --frozen-lockfile
-      - run:
-          name: JS tests
-          environment:
-            JUNIT_REPORT_PATH: ./junit/
-            JUNIT_REPORT_NAME: test-results.xml
-          command: |
-            mkdir -p $JUNIT_REPORT_PATH
-            yarn karma start ./karma.conf.js --single-run
-      - store_test_results:
-          path: test-reports
-      - store_artifacts:
-          path: test-reports
-
   contract-tests:
     docker:
       - image: circleci/python:3.7-node-browsers
@@ -292,10 +270,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - js-tests:
-          filters:
-            tags:
-              only: /.*/
       - lint:
           filters:
             tags:
@@ -335,9 +309,7 @@ workflows:
       - docker-image-publish:
           requires:
             - python-tests
-            - js-tests
             - contract-tests
-            - js-tests
             - lint
             - docker-image-build-save
           filters:
