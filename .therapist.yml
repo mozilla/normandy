@@ -14,15 +14,6 @@ actions:
     fix: sort-requirements {files}
     include: "requirements/*.txt"
 
-  eslint:
-    run: yarn eslint {files}
-    fix: yarn eslint --fix {files}
-    include:
-      - "*.js"
-      - "*.jsx"
-    exclude:
-      - ".eslintrc.js"
-
   yarn-audit:
     run: yarn audit
 
