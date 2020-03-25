@@ -5,13 +5,6 @@ const SHIELD_OPT_OUT_PREF = 'app.shield.optoutstudies.enabled';
 let seenExperimentNames = [];
 
 /**
- * Used for unit tests only to reset action state.
- */
-export function resetAction() {
-  seenExperimentNames = [];
-}
-
-/**
  * Enrolls a user in a preference experiment, in which we assign the user to an
  * experiment branch and modify a preference temporarily to measure how it
  * affects Firefox via Telemetry.

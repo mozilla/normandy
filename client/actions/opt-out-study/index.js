@@ -5,13 +5,6 @@ const SHIELD_OPT_OUT_PREF = 'app.shield.optoutstudies.enabled';
 let seenRecipeIds = [];
 
 /**
- * Used for unit tests only to reset action state.
- */
-export function resetAction() {
-  seenRecipeIds = [];
-}
-
-/**
  * Enrolls a user in an opt-out study, in which we install an add-on which
  * manages branch selection, changes to Firefox, etc.
  */
