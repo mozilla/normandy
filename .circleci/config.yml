@@ -217,8 +217,7 @@ jobs:
 
   contract-tests:
     docker:
-      - mozilla/cidockerbases:docker-latest
-
+      - image: mozilla/cidockerbases:docker-latest
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: normandy
@@ -227,7 +226,6 @@ jobs:
       DJANGO_CONFIGURATION: ProductionInsecure
       # Silence checks about missing geoip, and also the standard silenced warnings from ProductionInsecure in settings.py
       DJANGO_SILENCED_SYSTEM_CHECKS: "normandy.recipes.E006,security.W001,security.W003,security.W004,security.W008,security.W009,security.W012,security.W016"
-
     steps:
       - checkout
       - run:
