@@ -232,7 +232,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Create virtualenv
           command: |
@@ -257,7 +256,7 @@ jobs:
       - run:
           name: Build Docker image for test
           command: |
-            make migrate
+            make build
             make load_data
             docker-compose up -d
       - run:
