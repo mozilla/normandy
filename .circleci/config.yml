@@ -229,7 +229,6 @@ jobs:
       DJANGO_CONFIGURATION: ProductionInsecure
       # Silence checks about missing geoip, and also the standard silenced warnings from ProductionInsecure in settings.py
       DJANGO_SILENCED_SYSTEM_CHECKS: "normandy.recipes.E006,security.W001,security.W003,security.W004,security.W008,security.W009,security.W012,security.W016"
-    machine: true
     steps:
       - checkout
       - run:
@@ -253,11 +252,14 @@ jobs:
               "$CIRCLE_PROJECT_REPONAME" \
               "$CIRCLE_BUILD_URL" \
               > version.json
+      - setup_remote_docker
       - run:
           name: Build Docker image for test
           command: |
-            make build
-            make load_data
+            docker-compose build .
+            docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py migrate"
+            docker-compose run app python manage.py update_actions
+            docker-compose run app python manage.py initial_data
             docker-compose up -d
       - run:
           name: Contract tests
