@@ -217,7 +217,7 @@ jobs:
 
   contract-tests:
     machine:
-      image: circleci/python:3.7-node-browsers
+      image: ubuntu-1604:201903-01
       docker_layer_caching: true
     environment:
       DJANGO_SETTINGS_MODULE: normandy.settings
