@@ -638,18 +638,16 @@ class WindowsVersionFilter(BaseComparisonFilter):
 
 class NegateFilter(BaseFilter):
     """
-    This filter takes the JSON needed for a filter as an
-    argument,  and this filter will "negate" it.
+    This filter negates another filter.
 
 
     .. attribute:: type
 
         ``negate``
 
-    .. attribute:: data_for_filter
+    .. attribute:: filter_to_negate
 
-        This is a JSON object that would be passed to the filter
-        you want to negate.
+        The filter you want to negate.
 
        :example: `{ "type": "channel", "channels": ["release", "beta"]}`
     """
@@ -659,8 +657,7 @@ class NegateFilter(BaseFilter):
 
     def to_jexl(self):
         filter = from_data(self.initial_data["filter_to_negate"])
-        jexl = filter.to_jexl()
-        return f"!({jexl})"
+        return f"!({filter.to_jexl()})"
 
     @property
     def capabilities(self):
