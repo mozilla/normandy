@@ -31,6 +31,7 @@ Filter Objects
 .. autoclass:: PrefUserSetFilter()
 .. autoclass:: WindowsBuildNumberFilter()
 .. autoclass:: WindowsVersionFilter()
+.. autoclass:: NegateFilter()
 
 
 Filter Expressions

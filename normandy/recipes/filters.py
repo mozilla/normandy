@@ -636,6 +636,34 @@ class WindowsVersionFilter(BaseComparisonFilter):
         return set()
 
 
+class NegateFilter(BaseFilter):
+    """
+    This filter negates another filter.
+
+
+    .. attribute:: type
+
+        ``negate``
+
+    .. attribute:: filter_to_negate
+
+        The filter you want to negate.
+
+       :example: `{ "type": "channel", "channels": ["release", "beta"]}`
+    """
+
+    type = "negate"
+    filter_to_negate = serializers.JSONField()
+
+    def to_jexl(self):
+        filter = from_data(self.initial_data["filter_to_negate"])
+        return f"!({filter.to_jexl()})"
+
+    @property
+    def capabilities(self):
+        return set()
+
+
 class ProfileCreateDateFilter(BaseFilter):
     """
     This filter is meant to distinguish between new and existing users.
@@ -701,6 +729,8 @@ by_type = {
         PrefCompareFilter,
         PrefUserSetFilter,
         WindowsVersionFilter,
+        WindowsBuildNumberFilter,
+        NegateFilter,
     ]
 }
 
