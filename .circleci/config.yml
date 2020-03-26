@@ -231,6 +231,21 @@ jobs:
               "$CIRCLE_BUILD_URL" \
               > version.json
       - run:
+          name: Prepare DB
+          command: |
+            ./manage.py migrate
+            ./manage.py update_actions
+      - run:
+          name: Starting server
+          command: gunicorn normandy.wsgi:application --bind localhost:8000
+          background: true
+      - run:
+          name: Waiting for web server to be available
+          command: |
+            ./ci/wait-for-it.sh localhost:8000 \
+              --timeout=30 --strict \
+              -- echo "Done waiting. It should work now."
+      - run:
           name: Contract tests
           command: |
             mkdir test-reports
