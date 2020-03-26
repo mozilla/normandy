@@ -201,7 +201,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_DB: normandy
           POSTGRES_HOST_AUTH_METHOD: trust
-
     environment:
       DJANGO_SETTINGS_MODULE: normandy.settings
       DJANGO_CONFIGURATION: ProductionInsecure
@@ -210,6 +209,7 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Create virtualenv
           command: |
@@ -232,20 +232,10 @@ jobs:
               "$CIRCLE_BUILD_URL" \
               > version.json
       - run:
-          name: Prepare DB
+          name: Build Docker image for test
           command: |
-            ./manage.py migrate
-            ./manage.py update_actions
-      - run:
-          name: Starting server
-          command: gunicorn normandy.wsgi:application --bind localhost:8000
-          background: true
-      - run:
-          name: Waiting for web server to be available
-          command: |
-            ./ci/wait-for-it.sh localhost:8000 \
-              --timeout=30 --strict \
-              -- echo "Done waiting. It should work now."
+            make refresh
+            docker-compose up
       - run:
           name: Contract tests
           command: |
