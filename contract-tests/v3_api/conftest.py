@@ -1,20 +1,15 @@
 import pytest
 import subprocess
 
-from faker import Faker
-
 
 @pytest.fixture(scope="session")
 def headers():
-    # Create a test user
-    fake = Faker()
-    email = fake.company_email()
-    user = fake.user_name()
-
-    # Add them as a superuser to the system running in Docker
+    # Add a superuser to the system running in Docker
     docker_compose = (
         subprocess.check_output("which docker-compose", shell=True).decode("ascii").strip("\n")
     )
+    email = "test-user@example.com"
+    user = "testuser"
     subprocess.call(
         "{} run app python manage.py createsuperuser --noinput --email={} --user={}".format(
             docker_compose, email, user
