@@ -22,6 +22,16 @@ Filter Objects
 .. autoclass:: BucketSampleFilter()
 .. autoclass:: StableSampleFilter()
 .. autoclass:: VersionFilter()
+.. autoclass:: PlatformFilter()
+.. autoclass:: VersionRangeFilter()
+.. autoclass:: DateRangeFilter()
+.. autoclass:: ProfileCreateDateFilter()
+.. autoclass:: PrefExistsFilter()
+.. autoclass:: PrefCompareFilter()
+.. autoclass:: PrefUserSetFilter()
+.. autoclass:: WindowsBuildNumberFilter()
+.. autoclass:: WindowsVersionFilter()
+
 
 Filter Expressions
 ------------------

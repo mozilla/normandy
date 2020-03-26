@@ -1,9 +1,6 @@
-/* eslint-env node */
-/* eslint-disable no-var, func-names, prefer-arrow-callback, prefer-template, comma-dangle */
 var path = require('path');
 var webpack = require('webpack');
 var childProcess = require('child_process');
-var MinifyPlugin = require('babel-minify-webpack-plugin');
 
 const BOLD = '\u001b[1m';
 const END_BOLD = '\u001b[39m\u001b[22m';
@@ -22,11 +19,7 @@ var plugins = [
   }),
 ];
 
-if (production) {
-  plugins = plugins.concat([
-    new MinifyPlugin()
-  ]);
-} else {
+if (!production) {
   plugins = plugins.concat([
     new webpack.NoEmitOnErrorsPlugin(),
   ]);
@@ -74,16 +67,6 @@ module.exports = function (webpackEnvOptions) {
     output: {
       path: path.resolve('./assets/bundles/'),
       filename: jsNamePattern,
-    },
-
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader',
-        },
-      ],
     },
   };
 };

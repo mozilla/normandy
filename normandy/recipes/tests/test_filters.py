@@ -1,4 +1,5 @@
 import pytest
+from rest_framework import serializers
 
 from normandy.recipes.filters import (
     BucketSampleFilter,
@@ -9,8 +10,20 @@ from normandy.recipes.filters import (
     VersionFilter,
     VersionRangeFilter,
     DateRangeFilter,
+    ProfileCreateDateFilter,
+    PlatformFilter,
+    PrefCompareFilter,
+    PrefExistsFilter,
+    PrefUserSetFilter,
+    WindowsBuildNumberFilter,
+    WindowsVersionFilter,
 )
-from normandy.recipes.tests import ChannelFactory, LocaleFactory, CountryFactory
+from normandy.recipes.tests import (
+    ChannelFactory,
+    LocaleFactory,
+    CountryFactory,
+    WindowsVersionFactory,
+)
 
 
 @pytest.mark.django_db
@@ -43,6 +56,34 @@ class FilterTestsBase:
             assert capabilities <= settings.BASELINE_CAPABILITIES
         else:
             assert capabilities - settings.BASELINE_CAPABILITIES
+
+
+class TestProfileCreationDateFilter(FilterTestsBase):
+    def create_basic_filter(self, direction="olderThan", date="2020-02-01"):
+        return ProfileCreateDateFilter.create(direction=direction, date=date)
+
+    def test_generates_jexl_older_than(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("||")) == {
+            "(!normandy.telemetry.main)",
+            "(normandy.telemetry.main.environment.profile.creationDate<=18262)",
+        }
+
+    def test_generates_jexl_newer_than(self):
+        filter = self.create_basic_filter(direction="newerThan", date="2020-02-01")
+        assert set(filter.to_jexl().split("||")) == {
+            "(!normandy.telemetry.main)",
+            "(normandy.telemetry.main.environment.profile.creationDate>18262)",
+        }
+
+    def test_throws_error_on_bad_direction(self):
+        filter = self.create_basic_filter(direction="newer", date="2020-02-01")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+    def test_throws_error_on_bad_date(self):
+        with pytest.raises(AssertionError):
+            self.create_basic_filter(direction="newerThan", date="Jan 7, 2020")
 
 
 class TestVersionFilter(FilterTestsBase):
@@ -87,6 +128,66 @@ class TestDateRangeFilter(FilterTestsBase):
         }
 
 
+class TestWindowsBuildNumberFilter(FilterTestsBase):
+    def create_basic_filter(self, value=12345, comparison="equal"):
+        return WindowsBuildNumberFilter.create(value=value, comparison=comparison)
+
+    @pytest.mark.parametrize(
+        "comparison,symbol",
+        [
+            ("equal", "=="),
+            ("greater_than", ">"),
+            ("greater_than_equal", ">="),
+            ("less_than", "<"),
+            ("less_than_equal", "<="),
+        ],
+    )
+    def test_generates_jexl_number_ops(self, comparison, symbol):
+        filter = self.create_basic_filter(comparison=comparison)
+        assert (
+            filter.to_jexl()
+            == f"(normandy.os.isWindows && normandy.os.windowsBuildNumber {symbol} 12345)"
+        )
+
+    def test_generates_jexl_error_on_bad_comparison(self):
+        filter = self.create_basic_filter(comparison="typo")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+
+class TestWindowsVersionFilter(FilterTestsBase):
+    def create_basic_filter(self, value=6.1, comparison="equal"):
+        WindowsVersionFactory(nt_version=6.1)
+
+        return WindowsVersionFilter.create(value=value, comparison=comparison)
+
+    @pytest.mark.parametrize(
+        "comparison,symbol",
+        [
+            ("equal", "=="),
+            ("greater_than", ">"),
+            ("greater_than_equal", ">="),
+            ("less_than", "<"),
+            ("less_than_equal", "<="),
+        ],
+    )
+    def test_generates_jexl_number_ops(self, comparison, symbol):
+        filter = self.create_basic_filter(comparison=comparison)
+        assert (
+            filter.to_jexl()
+            == f"(normandy.os.isWindows && normandy.os.windowsVersion {symbol} 6.1)"
+        )
+
+    def test_generates_jexl_error_on_bad_comparison(self):
+        filter = self.create_basic_filter(comparison="typo")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+    def test_generates_jexl_error_on_bad_version(self):
+        with pytest.raises(AssertionError):
+            self.create_basic_filter(value="abcd")
+
+
 class TestChannelFilter(FilterTestsBase):
     def create_basic_filter(self, channels=None):
         if channels:
@@ -124,6 +225,87 @@ class TestCountryFilter(FilterTestsBase):
     def test_generates_jexl(self):
         filter = self.create_basic_filter(countries=["SV", "MX"])
         assert filter.to_jexl() == 'normandy.country in ["SV","MX"]'
+
+
+class TestPlatformFilter(FilterTestsBase):
+    def create_basic_filter(self, platforms=["all_mac", "all_windows"]):
+        return PlatformFilter.create(platforms=platforms)
+
+    def test_generates_jexl_list_of_two(self):
+        filter = self.create_basic_filter()
+        assert set(filter.to_jexl().split("||")) == {"normandy.os.isMac", "normandy.os.isWindows"}
+
+    def test_generates_jexl_list_of_one(self):
+        filter = self.create_basic_filter(platforms=["all_linux"])
+        assert set(filter.to_jexl().split("||")) == {"normandy.os.isLinux"}
+
+    def test_throws_error_on_bad_platform(self):
+        filter = self.create_basic_filter(platforms=["all_linu"])
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+
+class TestPrefCompareFilter(FilterTestsBase):
+    def create_basic_filter(
+        self, pref="browser.urlbar.maxRichResults", value=10, comparison="equal"
+    ):
+        return PrefCompareFilter.create(pref=pref, value=value, comparison=comparison)
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter()
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == 10"
+
+    @pytest.mark.parametrize(
+        "comparison,symbol",
+        [
+            ("greater_than", ">"),
+            ("greater_than_equal", ">="),
+            ("less_than", "<"),
+            ("less_than_equal", "<="),
+        ],
+    )
+    def test_generates_jexl_number_ops(self, comparison, symbol):
+        filter = self.create_basic_filter(comparison=comparison)
+        assert filter.to_jexl() == f"'browser.urlbar.maxRichResults'|preferenceValue {symbol} 10"
+
+    def test_generates_jexl_boolean(self):
+        filter = self.create_basic_filter(value=False)
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == false"
+
+    def test_generates_jexl_string_in(self):
+        filter = self.create_basic_filter(value="default", comparison="contains")
+        assert filter.to_jexl() == "\"default\" in 'browser.urlbar.maxRichResults'|preferenceValue"
+
+    def test_generates_jexl_error(self):
+        filter = self.create_basic_filter(comparison="invalid")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+
+class TestPrefExistsFilter(FilterTestsBase):
+    def create_basic_filter(self, pref="browser.urlbar.maxRichResults", value=True):
+        return PrefExistsFilter.create(pref=pref, value=value)
+
+    def test_generates_jexl_pref_exists_true(self):
+        filter = self.create_basic_filter()
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceExists"
+
+    def test_generates_jexl_pref_exists_false(self):
+        filter = self.create_basic_filter(value=False)
+        assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceExists)"
+
+
+class TestPrefUserSetFilter(FilterTestsBase):
+    def create_basic_filter(self, pref="browser.urlbar.maxRichResults", value=True):
+        return PrefUserSetFilter.create(pref=pref, value=value)
+
+    def test_generates_jexl_is_user_set_true(self):
+        filter = self.create_basic_filter()
+        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceIsUserSet"
+
+    def test_generates_jexl_is_user_set_false(self):
+        filter = self.create_basic_filter(value=False)
+        assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceIsUserSet)"
 
 
 class TestBucketSamplefilter(FilterTestsBase):

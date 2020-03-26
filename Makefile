@@ -34,15 +34,24 @@ load_data: migrate update_actions load_initial_data
 
 lint: SHELL:=/bin/bash -O extglob
 lint:
-	docker-compose run app therapist run --disable-git ./!(node_modules|assets|docs)
+	docker-compose run app therapist run --disable-git ./!(node_modules|assets|docs|venv)
 
 code_format: SHELL:=/bin/bash -O extglob
 code_format:
-	docker-compose run app therapist run --fix --disable-git ./!(node_modules|assets|docs)
+	docker-compose run app therapist run --fix --disable-git ./!(node_modules|assets|docs|venv)
 check: check_migrations lint test
 
-kill:
-	docker ps -a -q | xargs docker kill;docker ps -a -q | xargs docker rm
+compose_stop:
+	docker-compose kill
+
+compose_rm:
+	docker-compose rm -f -v
+	
+volumes_rm:
+	docker volume ls -q | xargs docker volume rm -f | echo
+
+kill: compose_stop compose_rm volumes_rm
+	echo "All containers removed!"
 
 test: build
 	docker-compose run -e DJANGO_CONFIGURATION=Test app sh -c "/app/bin/wait-for-it.sh db:5432 -- pytest"

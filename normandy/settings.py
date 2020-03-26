@@ -45,6 +45,7 @@ class Core(Configuration):
         "normandy.base.middleware.NormandySecurityMiddleware",
         "normandy.base.middleware.NormandyWhiteNoiseMiddleware",
         "normandy.base.middleware.NormandyCommonMiddleware",
+        "normandy.base.middleware.show_yaml_in_browser_middleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "csp.middleware.CSPMiddleware",
     ]
@@ -84,17 +85,6 @@ class Core(Configuration):
         "npm.finders.NpmFinder",
     ]
 
-    NPM_DESTINATION_PREFIX = "npm"
-    NPM_FILE_PATTERNS = {
-        "babel-polyfill": ["dist/*.js"],
-        "font-awesome": ["css/*.css", "fonts/*"],
-        "uuid": ["uuid.js"],
-        "jquery": ["dist/*.js"],
-        "json-editor": ["dist/*.js"],
-        "wolfy87-eventemitter": ["EventEmitter.js"],
-        "mozjexl": ["dist/*.js"],
-    }
-
     REST_FRAMEWORK = {
         "DEFAULT_AUTHENTICATION_CLASSES": [
             "normandy.base.api.authentication.BearerTokenAuthentication"
@@ -104,6 +94,7 @@ class Core(Configuration):
         "DEFAULT_RENDERER_CLASSES": (
             "normandy.base.api.renderers.CanonicalJSONRenderer",
             "normandy.base.api.renderers.CustomBrowsableAPIRenderer",
+            "rest_framework_yaml.renderers.YAMLRenderer",
         ),
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": 25,
@@ -378,7 +369,6 @@ class Base(Core, CORS, OIDC, Metrics):
     REMOTE_SETTINGS_PASSWORD = values.Value()
     REMOTE_SETTINGS_PUBLISH_BUCKET_ID = values.Value("main")
     REMOTE_SETTINGS_WORKSPACE_BUCKET_ID = values.Value("main-workspace")
-    REMOTE_SETTINGS_BASELINE_COLLECTION_ID = values.Value("normandy-recipes")
     REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID = values.Value("normandy-recipes-capabilities")
     REMOTE_SETTINGS_RETRY_REQUESTS = values.IntegerValue(3)
 

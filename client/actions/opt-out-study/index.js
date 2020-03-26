@@ -5,13 +5,6 @@ const SHIELD_OPT_OUT_PREF = 'app.shield.optoutstudies.enabled';
 let seenRecipeIds = [];
 
 /**
- * Used for unit tests only to reset action state.
- */
-export function resetAction() {
-  seenRecipeIds = [];
-}
-
-/**
  * Enrolls a user in an opt-out study, in which we install an add-on which
  * manages branch selection, changes to Firefox, etc.
  */
@@ -74,7 +67,6 @@ export async function postExecutionHook(normandy) {
     if (!seenRecipeIds.includes(study.recipeId)) {
       normandy.log(`Stopping study for recipe ${study.recipeId}.`, 'debug');
       try {
-        // eslint-disable-next-line no-await-in-loop
         await studies.stop(study.recipeId, 'recipe-not-seen');
       } catch (err) {
         normandy.log(`Error while stopping study for recipe ${study.recipeId}: ${err}`, 'error');
