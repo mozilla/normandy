@@ -262,14 +262,14 @@ class TestAddonInstalledFilter(FilterTestsBase):
     def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
         return AddonInstalledFilter.create(addons=addons, any_or_all=any_or_all)
 
-    def test_generates_jexl_installed_not_active(self):
+    def test_generates_jexl_installed_any(self):
         filter = self.create_basic_filter()
         assert set(filter.to_jexl().split("||")) == {
             'normandy.addons["@abcdef"]',
             'normandy.addons["ghijk@lmnop"]',
         }
 
-    def test_generates_jexl_installed_active(self):
+    def test_generates_jexl_installed_all(self):
         filter = self.create_basic_filter(any_or_all="all")
         assert set(filter.to_jexl().split("&&")) == {
             'normandy.addons["@abcdef"]',
@@ -286,14 +286,14 @@ class TestAddonActiveFilter(FilterTestsBase):
     def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
         return AddonActiveFilter.create(addons=addons, any_or_all=any_or_all)
 
-    def test_generates_jexl_installed_not_active(self):
+    def test_generates_jexl_active_any(self):
         filter = self.create_basic_filter()
         assert set(filter.to_jexl().split("||")) == {
             'normandy.addons["@abcdef"].isActive',
             'normandy.addons["ghijk@lmnop"].isActive',
         }
 
-    def test_generates_jexl_installed_active(self):
+    def test_generates_jexl_active_all(self):
         filter = self.create_basic_filter(any_or_all="all")
         assert set(filter.to_jexl().split("&&")) == {
             'normandy.addons["@abcdef"].isActive',

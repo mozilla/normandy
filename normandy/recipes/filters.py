@@ -835,6 +835,8 @@ by_type = {
         WindowsVersionFilter,
         WindowsBuildNumberFilter,
         NegateFilter,
+        AddonActiveFilter,
+        AddonInstalledFilter,
     ]
 }
 
