@@ -49,6 +49,28 @@ class BaseFilter(serializers.Serializer):
         raise NotImplementedError
 
 
+class BaseAddonFilter(BaseFilter):
+    addons = serializers.ListField(child=serializers.CharField(), min_length=1)
+    any_or_all = serializers.CharField()
+
+    def get_formatted_string(self, addon):
+        raise NotImplementedError("Not correctly implemented.")
+
+    def to_jexl(self):
+        any_or_all = self.initial_data["any_or_all"]
+
+        symbol = {"all": "&&", "any": "||"}.get(any_or_all)
+
+        if not symbol:
+            raise serializers.ValidationError(
+                f"Unrecognized string for any_or_all: {any_or_all!r}"
+            )
+
+        return symbol.join(
+            self.get_formatted_string(addon) for addon in self.initial_data["addons"]
+        )
+
+
 class BaseComparisonFilter(BaseFilter):
     value = serializers.IntegerField()
     comparison = serializers.CharField()
@@ -218,6 +240,68 @@ class PlatformFilter(BaseFilter):
                 raise serializers.ValidationError(f"Unrecognized platform {platform!r}")
 
         return "||".join((p for p in platforms_jexl))
+
+    @property
+    def capabilities(self):
+        return set()
+
+
+class AddonActiveFilter(BaseAddonFilter):
+    """Match a user based on if a particular addon is active.
+
+    .. attribute:: type
+
+        ``addon_active``
+
+    .. attribute:: addons
+        List of addon ids to filter against.
+
+        :example: ``["uBlock0@raymondhill.net", "pioneer-opt-in@mozilla.org"]``
+
+    .. attribute:: any_or_all
+        This will determine whether the addons are connected with an "&&" operator,
+        meaning all the addons must be active for the filter to evaluate to true,
+        or an "||" operator, meaning any of the addons can be active to evaluate to
+        true.
+
+        :example: ``any`` or ``all``
+    """
+
+    type = "addon_active"
+
+    def get_formatted_string(self, addon):
+        return f'normandy.addons["{addon}"].isActive'
+
+    @property
+    def capabilities(self):
+        return set()
+
+
+class AddonInstalledFilter(BaseAddonFilter):
+    """Match a user based on if a particular addon is installed.
+
+    .. attribute:: type
+
+        ``addon_installed``
+
+    .. attribute:: addons
+        List of addon ids to filter against.
+
+        :example: ``["uBlock0@raymondhill.net", "pioneer-opt-in@mozilla.org"]``
+
+    .. attribute:: any_or_all
+        This will determine whether the addons are connected with an "&&" operator,
+        meaning all the addons must be installed for the filter to evaluate to true,
+        or an "||" operator, meaning any of the addons can be installed to
+        evaluate to true.
+
+        :example: ``any`` or ``all``
+    """
+
+    type = "addon_installed"
+
+    def get_formatted_string(self, addon):
+        return f'normandy.addons["{addon}"]'
 
     @property
     def capabilities(self):
@@ -751,6 +835,8 @@ by_type = {
         WindowsVersionFilter,
         WindowsBuildNumberFilter,
         NegateFilter,
+        AddonActiveFilter,
+        AddonInstalledFilter,
     ]
 }
 

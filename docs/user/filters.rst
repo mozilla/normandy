@@ -32,6 +32,8 @@ Filter Objects
 .. autoclass:: WindowsBuildNumberFilter()
 .. autoclass:: WindowsVersionFilter()
 .. autoclass:: NegateFilter()
+.. autoclass:: AddonActiveFilter()
+.. autoclass:: AddonInstalledFilter()
 
 
 Filter Expressions
