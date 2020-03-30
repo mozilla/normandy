@@ -24,6 +24,12 @@ actions:
         echo "You probably have migrations that need to be created" && exit 1
       )
 
+  poetry-check:
+    include:
+      - "pyproject.toml"
+      - "poetry.lock"
+    run: poetry check --no-interaction
+
 shortcuts:
   lint:
     flags:

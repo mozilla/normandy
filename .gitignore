@@ -18,3 +18,4 @@ htmlcov/
 yarn-error.log
 .bash_history
 .ipython/
+normandy.egg-info
