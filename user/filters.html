@@ -718,6 +718,90 @@ creates jexl that compares the windows NT version.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="normandy.recipes.filters.AddonActiveFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AddonActiveFilter</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user based on if a particular addon is active.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AddonActiveFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">addon_active</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AddonActiveFilter.addons">
+<code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.addons" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">List of addon ids to filter against.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;uBlock0&#64;raymondhill.net&quot;,</span> <span class="pre">&quot;pioneer-opt-in&#64;mozilla.org&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AddonActiveFilter.any_or_all">
+<code class="sig-name descname">any_or_all</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">This will determine whether the addons are connected with an &quot;&amp;&amp;&quot; operator,</code></dt>
+<dt>
+<code class="sig-name descname">meaning all the addons must be active for the filter to evaluate to true,</code></dt>
+<dt>
+<code class="sig-name descname">or an &quot;||&quot; operator, meaning any of the addons can be active to evaluate to</code></dt>
+<dt>
+<code class="sig-name descname">true.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">any</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.AddonInstalledFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AddonInstalledFilter</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a user based on if a particular addon is installed.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AddonInstalledFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">addon_installed</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AddonInstalledFilter.addons">
+<code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.addons" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">List of addon ids to filter against.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;uBlock0&#64;raymondhill.net&quot;,</span> <span class="pre">&quot;pioneer-opt-in&#64;mozilla.org&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AddonInstalledFilter.any_or_all">
+<code class="sig-name descname">any_or_all</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">This will determine whether the addons are connected with an &quot;&amp;&amp;&quot; operator,</code></dt>
+<dt>
+<code class="sig-name descname">meaning all the addons must be installed for the filter to evaluate to true,</code></dt>
+<dt>
+<code class="sig-name descname">or an &quot;||&quot; operator, meaning any of the addons can be installed to</code></dt>
+<dt>
+<code class="sig-name descname">evaluate to true.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">any</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="filter-expressions">
 <h2>Filter Expressions<a class="headerlink" href="#filter-expressions" title="Permalink to this headline">¶</a></h2>
