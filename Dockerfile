@@ -15,15 +15,26 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     echo 'deb https://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install yarn
 
-COPY ./requirements /app/requirements
+# Install Poetry
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+ENV PATH "/root/.poetry/bin:${PATH}"
+
+# Make and activate a Python virtualenv
+RUN python -m venv /opt/venv
+ENV PATH "/opt/venv/bin:${PATH}"
+ENV VIRTUAL_ENV="/opt/venv"
+
+# Install dependencies
 COPY ./package.json /app/package.json
 COPY ./yarn.lock /app/yarn.lock
-RUN pip install --upgrade --no-cache-dir -r requirements/default.txt && \
-    yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile
+COPY ./pyproject.toml /app/pyproject.toml
+COPY ./poetry.lock /app/poetry.lock
+RUN poetry install --no-dev --no-root --no-interaction --verbose
 
 COPY . /app
 RUN NODE_ENV=production yarn build && \
-    DJANGO_CONFIGURATION=Build ./manage.py collectstatic --no-input && \
+    DJANGO_CONFIGURATION=Build python ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media
 
 USER app

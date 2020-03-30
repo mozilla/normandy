@@ -8,7 +8,7 @@ Prerequisites
 This guide assumes you have already installed and set up the following:
 
 1. Git_
-2. `Python 3.7`_, `pip 8`_ or higher, and virtualenv_
+2. `Python 3.7`_, and `Poetry`_
 3. `Node.js 8`_ and NPM 5 or higher
 4. `Postgres 9.4`_
 5. ``openssl``
@@ -23,6 +23,7 @@ intended to be run in a terminal.
 .. _Node.js 8: https://nodejs.org/en/
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/
 .. _Postgres 9.4: http://www.postgresql.org/
+.. _Poetry: https://python-poetry.org/docs/
 
 Installation
 ------------
@@ -33,29 +34,16 @@ Installation
       git clone https://github.com/mozilla/normandy.git
       cd normandy
 
-2. Create a virtualenv for Normandy and activate it:
+2. Install the dependencies using Poetry:
 
    .. code-block:: bash
 
-      virtualenv venv
-      source ./venv/bin/activate
+      poetry install
 
-   .. note::
+3. Activate the poetry virtual environment. The easiest way to do this is to start a
+   new shell with Poetry.
 
-      Whenever you want to work on Normandy in a new terminal you'll have to
-      re-activate the virtualenv. Read the virtualenv_ documentation to learn
-      more about how virtualenv works.
-
-3. Install the dependencies using pip:
-
-   .. code-block:: bash
-
-      pip install -r requirements/dev.txt
-
-   .. seealso::
-
-      :ref:`pip-install-error`
-         How to troubleshoot errors during ``pip install``.
+      poetry shell
 
 4. (Optional) Install frontend dependencies using yarn_
    and build the legacy action code:

@@ -15,6 +15,5 @@ of the Normandy client.
    coverage
    feature-experiments
    remote-settings
-   troubleshooting
    ci
    docker
