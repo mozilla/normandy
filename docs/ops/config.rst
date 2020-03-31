@@ -169,6 +169,20 @@ in other Django projects.
     The time in seconds to cache the public keys retrieved from x5u URLs when
     verifying signatures. Set to 0 to disable caching.
 
+.. envvar:: DJANGO_X5U_ERROR_CACHE_TIME
+
+    :default: ``5``
+
+    The time in seconds to cache errors while trying to retrieve public keys
+    from x5u URLs when verifying signatures. Set to 0 to disable error caching.
+
+.. envvar:: DJANGO_X5U_REQUEST_TIMEOUT
+
+    :default: ``0.5``
+
+    The time in seconds to wait to receive a response from the server when
+    requesting x5u URLs to verify signatures. A value of 0 means no timeout.
+
 .. envvar:: DJANGO_AUTOGRAPH_X5U_CACHE_BUST
 
     :default: Unset

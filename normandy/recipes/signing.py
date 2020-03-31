@@ -22,8 +22,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django.utils.functional import cached_property
 
-from normandy.constants import REQUEST_TIMEOUT
-
 
 INFO_RECEIVED_SIGNATURES = "normandy.autograph.I001"
 
@@ -193,19 +191,29 @@ def verify_x5u(url, expire_early=None):
     chain. Otherwise, raise an exception explaining why they are not
     valid.
     """
-
     cache_key = f"fetch-x5u-pem::{url}"
 
     pem = None
     if settings.X5U_CACHE_TIME:
         pem = cache.get(cache_key)
 
+    if isinstance(pem, Exception):
+        # Cached exceptions don't retain any useful information, so we have to
+        # make a new one.
+        raise CachedRequestException(url=url)
+
     if pem is None:
-        req = requests.get(url, timeout=REQUEST_TIMEOUT)
-        req.raise_for_status()
-        pem = req.content.decode()
-        if settings.X5U_CACHE_TIME:
-            cache.set(cache_key, pem, settings.X5U_CACHE_TIME)
+        try:
+            resp = requests.get(url, timeout=settings.X5U_REQUEST_TIMEOUT)
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            if settings.X5U_CACHE_TIME:
+                cache.set(cache_key, exc, settings.X5U_CACHE_TIME)
+            raise
+
+        pem = resp.content.decode()
+        if settings.X5U_ERROR_CACHE_TIME:
+            cache.set(cache_key, pem, settings.X5U_ERROR_CACHE_TIME)
 
     der_encoded_certs = extract_certs_from_pem(pem)
     decoded_certs = [parse_cert_from_der(der) for der in der_encoded_certs]
@@ -331,7 +339,6 @@ class CertificateHasWrongRoot(BadCertificate):
     def __init__(self, *, expected, actual):
         self.expected = expected
         self.actual = actual
-        return
 
     @property
     def detail(self):
@@ -342,11 +349,19 @@ class CertificateHasWrongSubject(BadCertificate):
     def __init__(self, *, expected, actual):
         self.expected = expected
         self.actual = actual
-        return
 
     @property
     def detail(self):
         return f"Certificate does not have the expected subject. Got {self.actual!r} expected {self.expected!r}"
+
+
+class CachedRequestException(BadCertificate):
+    def __init__(self, *, url):
+        self.url = url
+
+    @property
+    def detail(self):
+        return f"Verification for URL recently failed, and this failure is cached: {self.url!r}"
 
 
 def extract_certs_from_pem(pem):

@@ -69,6 +69,12 @@ def recipe_signatures_are_correct(app_configs, **kwargs):
                     recipe=recipe, detail=e.detail
                 )
                 errors.append(Error(msg, id=ERROR_INVALID_RECIPE_SIGNATURE))
+            except requests.RequestException as exc:
+                msg = (
+                    f"The signature for recipe with ID {recipe.id} could not be be verified due to "
+                    f"network error when requesting the url {x5u!r}. {exc}"
+                )
+                errors.append(Error(msg, id=ERROR_COULD_NOT_VERIFY_CERTIFICATE))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         errors.append(
             Warning(f"Could not check signatures: {e}", id=WARNING_COULD_NOT_CHECK_SIGNATURES)
@@ -102,6 +108,12 @@ def action_signatures_are_correct(app_configs, **kwargs):
             except signing.BadSignature as e:
                 msg = f"Action '{action}' (id={action.id}) has a bad signature: {e.detail}"
                 errors.append(Error(msg, id=ERROR_INVALID_ACTION_SIGNATURE))
+            except requests.RequestException as exc:
+                msg = (
+                    f"The signature for action with ID {action.id} could not be be verified due to "
+                    f"network error when requesting the url {x5u!r}. {exc}"
+                )
+                errors.append(Error(msg, id=ERROR_COULD_NOT_VERIFY_CERTIFICATE))
     except (ProgrammingError, OperationalError, ImproperlyConfigured) as e:
         errors.append(
             Warning(f"Could not check signatures: {e}", id=WARNING_COULD_NOT_CHECK_SIGNATURES)
