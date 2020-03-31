@@ -173,14 +173,16 @@
             
   <div class="section" id="api-contract-tests">
 <h1>API Contract Tests<a class="headerlink" href="#api-contract-tests" title="Permalink to this headline">¶</a></h1>
-<p>These tests are designed to look for changes to the recipe server API that are
+<p>These tests are designed to look for changes to the recipe server APIs that are
 not expected.</p>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>Before running these tests you will need the following installed:</p>
 <ul class="simple">
+<li><p>Docker (<a class="reference external" href="https://docker.com">https://docker.com</a>)</p></li>
+<li><p>The <cite>make</cite> CLI tool</p></li>
 <li><p>Python 3.7.0 or greater</p></li>
-<li><p>virtualenv (<a class="reference external" href="https://virtualenv.pypa.io/en/latest/virtualenv">https://virtualenv.pypa.io/en/latest/virtualenv</a>) installed</p></li>
+<li><p>virtualenv (<a class="reference external" href="https://virtualenv.pypa.io/en/latest/virtualenv">https://virtualenv.pypa.io/en/latest/virtualenv</a>)</p></li>
 </ul>
 <p>Before running these tests you need to create a virtual environment using
 Python 3.7.0 or greater. If you have an existing environment running
@@ -193,6 +195,18 @@ pip install -r requirements/dev.txt
 </div>
 <p>This creates the virtual environment, activates it, and installs the Python
 dependencies needed to run the tests.</p>
+<p>With the virtual environment created, then you need to build the Dockerized
+version of the application and populate it with some data that can be used
+for testing purposes</p>
+<p>To do so, use the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make refresh
+docker-compose up -d
+</pre></div>
+</div>
+<p><cite>make refresh</cite> builds a Normandy image and a Postgresql image. It then populates
+the application data we can use for testing purposes.</p>
+<p><cite>docker-compose up -d</cite> makes sure the Normandy application and Postgres database
+are up and running and ready to run the API contract tests against.</p>
 </div>
 <div class="section" id="api-tests">
 <h2>API Tests<a class="headerlink" href="#api-tests" title="Permalink to this headline">¶</a></h2>
