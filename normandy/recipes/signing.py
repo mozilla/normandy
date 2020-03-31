@@ -17,9 +17,12 @@ from pyasn1_modules import rfc5280
 from requests_hawk import HawkAuth
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 from django.utils.functional import cached_property
+
+from normandy.constants import REQUEST_TIMEOUT
 
 
 INFO_RECEIVED_SIGNATURES = "normandy.autograph.I001"
@@ -190,9 +193,19 @@ def verify_x5u(url, expire_early=None):
     chain. Otherwise, raise an exception explaining why they are not
     valid.
     """
-    req = requests.get(url)
-    req.raise_for_status()
-    pem = req.content.decode()
+
+    cache_key = f"fetch-x5u-pem::{url}"
+
+    pem = None
+    if settings.X5U_CACHE_TIME:
+        pem = cache.get(cache_key)
+
+    if pem is None:
+        req = requests.get(url, timeout=REQUEST_TIMEOUT)
+        req.raise_for_status()
+        pem = req.content.decode()
+        if settings.X5U_CACHE_TIME:
+            cache.set(cache_key, pem, settings.X5U_CACHE_TIME)
 
     der_encoded_certs = extract_certs_from_pem(pem)
     decoded_certs = [parse_cert_from_der(der) for der in der_encoded_certs]

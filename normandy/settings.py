@@ -351,6 +351,7 @@ class Base(Core, CORS, OIDC, Metrics):
     API_CACHE_ENABLED = values.BooleanValue(True)
     PERMANENT_REDIRECT_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 30)
     HTTPS_REDIRECT_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 30)
+    X5U_CACHE_TIME = values.IntegerValue(60 * 10)
 
     # If true, approvals must come from two separate users. If false, the same
     # user can approve their own request.

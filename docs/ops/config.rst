@@ -162,6 +162,13 @@ in other Django projects.
     possible while still guaranteeing that actions will get resigned during the
     overlap period.
 
+.. envvar:: DJANGO_X5U_CACHE_TIME
+
+    :default: ``600`` (10 minutes)
+
+    The time in seconds to cache the public keys retrieved from x5u URLs when
+    verifying signatures. Set to 0 to disable caching.
+
 .. envvar:: DJANGO_AUTOGRAPH_X5U_CACHE_BUST
 
     :default: Unset
@@ -363,7 +370,6 @@ in other Django projects.
    *subject* with a matching common name. It is unlikely this should ever
    change, because the default value matches one that is hard-coded in
    Firefox.
-
 
 .. envvar:: DJANGO_CORS_ORIGIN_ALLOW_ALL
 
