@@ -9,11 +9,6 @@ actions:
     include: "*.py"
     exclude: "docs/"
 
-  sort-requirements:
-    run: sort-requirements --check {files}
-    fix: sort-requirements {files}
-    include: "requirements/*.txt"
-
   yarn-audit:
     run: yarn audit
 
@@ -23,6 +18,12 @@ actions:
       ./manage.py makemigrations --check --no-input --dry-run recipes studies || (
         echo "You probably have migrations that need to be created" && exit 1
       )
+
+  poetry-check:
+    include:
+      - "pyproject.toml"
+      - "poetry.lock"
+    run: poetry check --no-interaction
 
 shortcuts:
   lint:
