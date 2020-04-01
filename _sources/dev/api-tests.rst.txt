@@ -12,21 +12,20 @@ Before running these tests you will need the following installed:
 * Docker (https://docker.com)
 * The `make` CLI tool
 * Python 3.7.0 or greater
-* virtualenv (https://virtualenv.pypa.io/en/latest/virtualenv)
+* `Poetry <https://python-poetry.org/docs/>`_ installed
 
-Before running these tests you need to create a virtual environment using
-Python 3.7.0 or greater. If you have an existing environment running
-Normandy, you can re-use that environment and skip this step. To create it do
-the following:
+Before running these tests you need to setup up an environment for the
+Normandy tests using Python 3.7.0 or greater. If you have an existing
+environment running Normandy, you can re-use that environment and skip this
+step. You can create that environment with the following:
 
 .. code-block:: bash
 
-    virtualenv -p /path/to/python3.7 venv
-    source venv/bin/activate
-    pip install -r requirements/dev.txt
+    poetry install
+    poetry shell
 
-This creates the virtual environment, activates it, and installs the Python
-dependencies needed to run the tests.
+This creates the virtual environment, installs the Python dependencies
+needed to run the tests, and activates the environment.
 
 With the virtual environment created, then you need to build the Dockerized
 version of the application and populate it with some data that can be used

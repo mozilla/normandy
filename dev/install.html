@@ -104,7 +104,6 @@
 <li class="toctree-l2"><a class="reference internal" href="coverage.html">Test Coverage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="feature-experiments.html">Feature Experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="remote-settings.html">Remote Settings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docker.html">Docker Setup for local development</a></li>
 </ul>
@@ -186,7 +185,7 @@ computer for development.</p>
 <p>This guide assumes you have already installed and set up the following:</p>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="https://git-scm.com/">Git</a></p></li>
-<li><p><a class="reference external" href="https://www.python.org/">Python 3.7</a>, <a class="reference external" href="https://pip.pypa.io/en/stable/">pip 8</a> or higher, and <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">virtualenv</a></p></li>
+<li><p><a class="reference external" href="https://www.python.org/">Python 3.7</a>, and <a class="reference external" href="https://python-poetry.org/docs/">Poetry</a></p></li>
 <li><p><a class="reference external" href="https://nodejs.org/en/">Node.js 8</a> and NPM 5 or higher</p></li>
 <li><p><a class="reference external" href="http://www.postgresql.org/">Postgres 9.4</a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">openssl</span></code></p></li>
@@ -204,29 +203,16 @@ intended to be run in a terminal.</p>
 </pre></div>
 </div>
 </li>
-<li><p>Create a virtualenv for Normandy and activate it:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>virtualenv venv
-<span class="nb">source</span> ./venv/bin/activate
+<li><p>Install the dependencies using Poetry:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry install
 </pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Whenever you want to work on Normandy in a new terminal you’ll have to
-re-activate the virtualenv. Read the <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">virtualenv</a> documentation to learn
-more about how virtualenv works.</p>
 </div>
 </li>
-<li><p>Install the dependencies using pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r requirements/dev.txt
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="troubleshooting.html#pip-install-error"><span class="std std-ref">Errors during pip install</span></a></dt><dd><p>How to troubleshoot errors during <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>.</p>
-</dd>
-</dl>
-</div>
+<li><p>Activate the poetry virtual environment. The easiest way to do this is to start a
+new shell with Poetry.</p>
+<blockquote>
+<div><p>poetry shell</p>
+</div></blockquote>
 </li>
 <li><p>(Optional) Install frontend dependencies using <a class="reference external" href="https://yarnpkg.com/lang/en/docs/install/">yarn</a>
 and build the legacy action code:</p>
