@@ -207,13 +207,13 @@ def verify_x5u(url, expire_early=None):
             resp = requests.get(url, timeout=settings.X5U_REQUEST_TIMEOUT)
             resp.raise_for_status()
         except requests.RequestException as exc:
-            if settings.X5U_CACHE_TIME:
-                cache.set(cache_key, exc, settings.X5U_CACHE_TIME)
+            if settings.X5U_ERROR_CACHE_TIME:
+                cache.set(cache_key, exc, settings.X5U_ERROR_CACHE_TIME)
             raise
 
         pem = resp.content.decode()
-        if settings.X5U_ERROR_CACHE_TIME:
-            cache.set(cache_key, pem, settings.X5U_ERROR_CACHE_TIME)
+        if settings.X5U_CACHE_TIME:
+            cache.set(cache_key, pem, settings.X5U_CACHE_TIME)
 
     der_encoded_certs = extract_certs_from_pem(pem)
     decoded_certs = [parse_cert_from_der(der) for der in der_encoded_certs]
