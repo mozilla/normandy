@@ -421,6 +421,42 @@ overlap period.</p>
 </dd></dl>
 
 <dl class="envvar">
+<dt id="envvar-DJANGO_X5U_CACHE_TIME">
+<code class="sig-name descname">DJANGO_X5U_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_X5U_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">600</span></code> (10 minutes)</p>
+</dd>
+</dl>
+<p>The time in seconds to cache the public keys retrieved from x5u URLs when
+verifying signatures. Set to 0 to disable caching.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_X5U_ERROR_CACHE_TIME">
+<code class="sig-name descname">DJANGO_X5U_ERROR_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_X5U_ERROR_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p>
+</dd>
+</dl>
+<p>The time in seconds to cache errors while trying to retrieve public keys
+from x5u URLs when verifying signatures. Set to 0 to disable error caching.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-DJANGO_X5U_REQUEST_TIMEOUT">
+<code class="sig-name descname">DJANGO_X5U_REQUEST_TIMEOUT</code><a class="headerlink" href="#envvar-DJANGO_X5U_REQUEST_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code></p>
+</dd>
+</dl>
+<p>The time in seconds to wait to receive a response from the server when
+requesting x5u URLs to verify signatures. A value of 0 means no timeout.</p>
+</dd></dl>
+
+<dl class="envvar">
 <dt id="envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST">
 <code class="sig-name descname">DJANGO_AUTOGRAPH_X5U_CACHE_BUST</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
