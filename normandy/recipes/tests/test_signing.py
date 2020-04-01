@@ -292,6 +292,7 @@ class TestVerifyX5u(object):
         settings.CERTIFICATES_CHECK_VALIDITY = True
         settings.CERTIFICATES_EXPECTED_ROOT_HASH = None
         settings.CERTIFICATES_EXPECTED_SUBJECT_CN = None
+        settings.X5U_CACHE_TIME = 0  # don't cache, since mocks can't be cached
 
         mock_requests = mocker.patch("normandy.recipes.signing.requests")
         mock_extract_certs_from_pem = mocker.patch(
@@ -319,6 +320,7 @@ class TestVerifyX5u(object):
         settings.CERTIFICATES_CHECK_VALIDITY = True
         settings.CERTIFICATES_EXPECTED_ROOT_HASH = None
         settings.CERTIFICATES_EXPECTED_SUBJECT_CN = None
+        settings.X5U_CACHE_TIME = 0  # don't cache, since mocks can't be cached
 
         mock_requests = mocker.patch("normandy.recipes.signing.requests")
         mock_extract_certs_from_pem = mocker.patch(
