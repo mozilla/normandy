@@ -44,6 +44,10 @@ def requests_session(conf):
 def only_readonly(requests_session, conf):
     """Check if the current server is a readonly server, skip if it is not"""
     r = requests_session.get(conf.getoption("server") + "/__version__")
+
+    if r.status_code == 404:
+        pytest.skip("__version__ endpoint does not exist")
+
     r.raise_for_status()
     data = r.json()
 

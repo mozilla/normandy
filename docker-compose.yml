@@ -17,9 +17,29 @@ services:
       - ssl_volume:/app/etc/ssl/
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db/normandy
+      - DJANGO_ALLOWED_HOSTS=*
     ports:
       - "8000:8000"
 
+  test:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.development
+    command: bash -c "/app/bin/wait-for-it.sh db:5432 -- ./bin/download_geolite2.sh;./bin/runsslserver.sh 0.0.0.0:8000"
+    links:
+      - app
+    networks:
+      - public_nw
+      - private_nw
+    volumes:
+      - .:/app
+      - node_modules_volume:/app/node_modules/
+      - ssl_volume:/app/etc/ssl/
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/normandy
+    ports:
+      - "8000:8000"
+ 
   db:
     restart: always
     image: postgres:9.6

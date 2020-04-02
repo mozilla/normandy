@@ -70,3 +70,18 @@ refresh: kill migrate load_data
 # Usage: make generate_deploy_bug FROM=fromtag TO=totag
 generate_deploy_bug: build
 	docker-compose run app python bin/generate_deploy_bug.py $(FROM) $(TO)
+
+# Used for running the contract tests in two containers instead of running locally
+contract_update_actions: build
+	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py update_actions"
+
+contract_load_initial_data:
+	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py initial_data"
+
+contract_user:
+	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py createsuperuser --noinput --email=test-user@example.com --user=testuser"
+
+run_container_contract_tests:
+	docker-compose run test sh -c "/app/bin/wait-for-it.sh db:5432 -- pytest contract-tests/ --server https://app:8000"
+
+containerized_tests: kill build migrate contract_update_actions contract_load_initial_data contract_user run_container_contract_tests
