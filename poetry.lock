@@ -326,7 +326,7 @@ description = "django-cors-headers is a Django application for handling the serv
 name = "django-cors-headers"
 optional = false
 python-versions = ">=3.5"
-version = "3.1.1"
+version = "3.2.1"
 
 [package.dependencies]
 Django = ">=1.11"
@@ -1260,7 +1260,6 @@ version = "2.5.0"
 [[package]]
 category = "main"
 description = "C parser in Python"
-marker = "sys_platform == \"win32\" and platform_python_implementation == \"CPython\""
 name = "pycparser"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1862,7 +1861,6 @@ brotli = ["brotli"]
 [[package]]
 category = "main"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
 python-versions = ">=3.6"
@@ -1876,7 +1874,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 
 [metadata]
-content-hash = "18d9dad9a976a81cf1636a8b76230041f9b9566b69027199cc9e55739ea75def"
+content-hash = "06268aed11b27362edfc969d725cc3c620ce79d08ea64bc75ecec89fca0118ba"
 python-versions = ">=3.7,<3.8"
 
 [metadata.files]
@@ -2062,8 +2060,8 @@ django-configurations = [
     {file = "django_configurations-2.1-py2.py3-none-any.whl", hash = "sha256:e70433eeed10549d30bf5ca386c962505ff9f492893dd2483c52af536347adce"},
 ]
 django-cors-headers = [
-    {file = "django-cors-headers-3.1.1.tar.gz", hash = "sha256:5762ec9c2d59f38c76828dc1d4308baca4bc0d3e1d6f217683e7a24a1c4611a3"},
-    {file = "django_cors_headers-3.1.1-py3-none-any.whl", hash = "sha256:ee02f4b699e9b6645602a46d0adb430ee940a1bf8df64f77e516f8d7711fee60"},
+    {file = "django-cors-headers-3.2.1.tar.gz", hash = "sha256:a5960addecc04527ab26617e51b8ed42f0adab4594b24bb0f3c33e2bd3857c3f"},
+    {file = "django_cors_headers-3.2.1-py3-none-any.whl", hash = "sha256:a785b5f446f6635810776d9f5f5d23e6a2a2f728ea982648370afaf0dfdf2627"},
 ]
 django-countries = [
     {file = "django-countries-5.5.tar.gz", hash = "sha256:1cefad9ec804d6a0318b91c5394b5aef00336755928f44d0a6420507719d65c8"},
