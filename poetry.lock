@@ -546,7 +546,7 @@ description = "Fast elliptic curve digital signatures"
 name = "fastecdsa"
 optional = false
 python-versions = "*"
-version = "1.7.4"
+version = "1.7.5"
 
 [package.dependencies]
 six = "*"
@@ -1260,7 +1260,6 @@ version = "2.5.0"
 [[package]]
 category = "main"
 description = "C parser in Python"
-marker = "sys_platform == \"win32\" and platform_python_implementation == \"CPython\""
 name = "pycparser"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1862,7 +1861,6 @@ brotli = ["brotli"]
 [[package]]
 category = "main"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
 python-versions = ">=3.6"
@@ -1876,7 +1874,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 
 [metadata]
-content-hash = "18d9dad9a976a81cf1636a8b76230041f9b9566b69027199cc9e55739ea75def"
+content-hash = "b43673bdf4176a07f346da81f4e782f28ac045e9eb9f86b0b33e236e8bb4790a"
 python-versions = ">=3.7,<3.8"
 
 [metadata.files]
@@ -2133,9 +2131,9 @@ faker = [
     {file = "Faker-4.0.2.tar.gz", hash = "sha256:2d3f866ef25e1a5af80e7b0ceeacc3c92dec5d0fdbad3e2cb6adf6e60b22188f"},
 ]
 fastecdsa = [
-    {file = "fastecdsa-1.7.4-cp27-cp27m-macosx_10_13_x86_64.whl", hash = "sha256:9d253175f74a96b7aa9c4ce266f96d1c663ca9f12a7e997c9cbe9dc58ea06f0e"},
-    {file = "fastecdsa-1.7.4-cp37-cp37m-macosx_10_13_x86_64.whl", hash = "sha256:12e952e2a70e2a896083f4cf304b4653f108ead4aac9c63ac8333343182fceac"},
-    {file = "fastecdsa-1.7.4.tar.gz", hash = "sha256:b40816ebc663d88b312c503533432bfa6bf7dc50133682d02ecc4ac158d79d5c"},
+    {file = "fastecdsa-1.7.5-cp27-cp27m-macosx_10_13_x86_64.whl", hash = "sha256:0ac46a3a5a116eea4847d1560234057ecac812d5deb12ff76d98dd15ad6dab12"},
+    {file = "fastecdsa-1.7.5-cp37-cp37m-macosx_10_13_x86_64.whl", hash = "sha256:4fed79ab9b15f47419c697f97d976a9ffaf648294605dd0ea4a038dbf23c88b4"},
+    {file = "fastecdsa-1.7.5.tar.gz", hash = "sha256:bd3b7808cc2bea1e8b3c4dd5928ecfc14072403ab2a47580a7a8350800e6fedd"},
 ]
 flake8 = [
     {file = "flake8-3.7.8-py2.py3-none-any.whl", hash = "sha256:8e9dfa3cecb2400b3738a42c54c3043e821682b9c840b0448c0503f781130696"},
