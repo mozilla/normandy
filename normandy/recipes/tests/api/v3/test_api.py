@@ -210,7 +210,7 @@ class TestRecipeAPI(object):
             )
             assert res.status_code == 201
 
-            recipe, = Recipe.objects.all()
+            (recipe,) = Recipe.objects.all()
             assert recipe.latest_revision.action.implementation is None
 
         def test_it_can_create_disabled_recipes(self, api_client):

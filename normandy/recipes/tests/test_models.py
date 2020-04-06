@@ -708,7 +708,7 @@ class TestRecipeRevision(object):
 
             assert mocked_remotesettings.return_value.publish.call_count == 2
             second_call_args, _ = mocked_remotesettings.return_value.publish.call_args_list[1]
-            modified_recipe, = second_call_args
+            (modified_recipe,) = second_call_args
             assert modified_recipe.latest_revision.name == "Modified"
 
         def test_it_does_not_publish_when_approved_if_not_enabled(self, mocked_remotesettings):
