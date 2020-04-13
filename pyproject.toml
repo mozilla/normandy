@@ -31,7 +31,7 @@ django-npm = "^1.0.0"
 django-storages = "^1.7.2"
 django_csp = "^3.5"
  # DRF does not follow semver, 3.11 is a breaking change
-djangorestframework = "3.10.*"
+djangorestframework = "3.11.*"
 djangorestframework-yaml = "^1.0.3"
 dockerflow = "^2019.9.0"
 drf-yasg = "^1.17.0"
