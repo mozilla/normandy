@@ -74,7 +74,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [tool.poetry.dev-dependencies]
 asn1crypto = "^1.1.0"
 django-extensions = "^2.2.3"
-ipdb = "^0.12.2"
+ipdb = "^0.13.0"
 ipython = "^7.8.0"
 PyDriller = "^1.9.2"
 pyOpenSSL = "^19.0.0"
