@@ -327,7 +327,7 @@ class PrefCompareFilter(BaseFilter):
         ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
     """
 
-    type = "pref"
+    type = "preference_value"
     pref = serializers.CharField()
     value = serializers.JSONField()
     comparison = serializers.CharField()
@@ -375,7 +375,7 @@ class PrefExistsFilter(BaseFilter):
         :example: ``true`` or ``false``
     """
 
-    type = "pref"
+    type = "preference_exists"
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
@@ -398,7 +398,7 @@ class PrefUserSetFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``pref``
+        ``preference_is_user_set``
 
     .. attribute:: value
 
@@ -407,7 +407,7 @@ class PrefUserSetFilter(BaseFilter):
         :example: ``true`` or ``false``
     """
 
-    type = "pref"
+    type = "preference_is_user_set"
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
@@ -816,29 +816,43 @@ class ProfileCreateDateFilter(BaseFilter):
         return set()
 
 
-by_type = {
-    f.type: f
-    for f in [
-        ChannelFilter,
-        LocaleFilter,
-        CountryFilter,
-        BucketSampleFilter,
-        StableSampleFilter,
-        VersionFilter,
-        VersionRangeFilter,
-        DateRangeFilter,
-        ProfileCreateDateFilter,
-        PlatformFilter,
-        PrefExistsFilter,
-        PrefCompareFilter,
-        PrefUserSetFilter,
-        WindowsVersionFilter,
-        WindowsBuildNumberFilter,
-        NegateFilter,
-        AddonActiveFilter,
-        AddonInstalledFilter,
-    ]
-}
+def _calculate_by_type():
+    todo = set([BaseFilter])
+    all_filter_classes = set()
+
+    while todo:
+        parent = todo.pop()
+        subclasses = parent.__subclasses__()
+        todo = todo.union(subclasses)
+        all_filter_classes = all_filter_classes.union(subclasses)
+
+    by_type = {}
+
+    for filter_class in all_filter_classes:
+        filter_type = None
+        if isinstance(filter_class.type, str):
+            filter_type = filter_class.type
+        elif isinstance(filter_class.type, property):
+            # This is (currently) one of the two base classes. It's safe to ignore
+            continue
+        else:
+            raise Exception(
+                f"Unexpected type for type attribute of filter class. "
+                f"Class: {filter_class!r} Type Attribute: {type(filter_class.type)}"
+            )
+
+        if filter_type in by_type.keys():
+            raise Exception(
+                f"Duplicate filter type {filter_type!r}, shared by at least "
+                f"{by_type[filter_type].__name__} and {filter_class.__name__}."
+            )
+
+        by_type[filter_type] = filter_class
+
+    return by_type
+
+
+by_type = _calculate_by_type()
 
 
 def from_data(data):
