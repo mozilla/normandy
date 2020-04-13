@@ -64,7 +64,7 @@ requests-mock = "^1.7.0"
 statsd = "^3.3.0"
 untangle = "^1.1.1"
 whitenoise = "^4.1.4"
-Sphinx = {version = "^2.2.0", optional = true}
+Sphinx = {version = "^3.0.0", optional = true}
 sphinx_rtd_theme = {version = "^0.4.3", optional = true}
 sphinxcontrib-httpdomain = {version = "^1.7.0", optional = true}
 
