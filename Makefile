@@ -78,10 +78,8 @@ contract_update_actions: build
 contract_load_initial_data:
 	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py initial_data"
 
-contract_user:
+create_superuser:
 	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py createsuperuser --noinput --email=test-user@example.com --user=testuser"
 
-run_container_contract_tests:
-	docker-compose run test sh -c "/app/bin/wait-for-it.sh db:5432 -- pytest contract-tests/ --server https://app:8000"
-
-containerized_tests: kill build migrate contract_update_actions contract_load_initial_data contract_user run_container_contract_tests
+containerized_tests: kill build migrate update_actions load_initial_data create_superuser
+	docker-compose run test sh -c "/app/bin/wait-for-it.sh db:5432 -- pyteset contract-tests/ --server https://app:8080"
