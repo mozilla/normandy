@@ -556,10 +556,7 @@ description = "Fast elliptic curve digital signatures"
 name = "fastecdsa"
 optional = false
 python-versions = "*"
-version = "1.7.5"
-
-[package.dependencies]
-six = "*"
+version = "2.1.1"
 
 [[package]]
 category = "main"
@@ -1274,7 +1271,6 @@ version = "2.5.0"
 [[package]]
 category = "main"
 description = "C parser in Python"
-marker = "sys_platform == \"win32\" and platform_python_implementation == \"CPython\""
 name = "pycparser"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1898,7 +1894,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 
 [metadata]
-content-hash = "62e8c00f4673bd41dda65deb0a36472cf1a73673d8a4f2d0b2442386723785ca"
+content-hash = "c7fa7ec1894129a6f7fde9a977ebe23ff4c9517c5d6b820d08e9261398cc0da6"
 python-versions = ">=3.7,<3.8"
 
 [metadata.files]
@@ -2153,9 +2149,11 @@ faker = [
     {file = "Faker-4.0.2.tar.gz", hash = "sha256:2d3f866ef25e1a5af80e7b0ceeacc3c92dec5d0fdbad3e2cb6adf6e60b22188f"},
 ]
 fastecdsa = [
-    {file = "fastecdsa-1.7.5-cp27-cp27m-macosx_10_13_x86_64.whl", hash = "sha256:0ac46a3a5a116eea4847d1560234057ecac812d5deb12ff76d98dd15ad6dab12"},
-    {file = "fastecdsa-1.7.5-cp37-cp37m-macosx_10_13_x86_64.whl", hash = "sha256:4fed79ab9b15f47419c697f97d976a9ffaf648294605dd0ea4a038dbf23c88b4"},
-    {file = "fastecdsa-1.7.5.tar.gz", hash = "sha256:bd3b7808cc2bea1e8b3c4dd5928ecfc14072403ab2a47580a7a8350800e6fedd"},
+    {file = "fastecdsa-2.1.1-cp35-cp35m-macosx_10_14_x86_64.whl", hash = "sha256:fbf5529c234dc33202bd279092f887e610bb5874ab029a57cf8d2877b0b30907"},
+    {file = "fastecdsa-2.1.1-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:b73e39991735a0c530d2b89b838c5ece5faeccde6b2147e03f8085156a422041"},
+    {file = "fastecdsa-2.1.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:3efcf27581d74c4c2753c8cb887da3ce258daed06e2260053dffc8ad28a68197"},
+    {file = "fastecdsa-2.1.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:ac9bfaea46bcca9c0abb52269f50d4e2e73521bcf22527f297f5bc291db8ece9"},
+    {file = "fastecdsa-2.1.1.tar.gz", hash = "sha256:e793f2fea23a10e09b677bc4270734c5d8419981aa779a869b2b9e33a0f40c2d"},
 ]
 flake8 = [
     {file = "flake8-3.7.9-py2.py3-none-any.whl", hash = "sha256:49356e766643ad15072a789a20915d3c91dc89fd313ccd71802303fd67e4deca"},
