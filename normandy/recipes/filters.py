@@ -20,9 +20,11 @@ field, so the final JSON would look something like this:
     }
 """
 
-from rest_framework import serializers
-from datetime import datetime
 import json
+from datetime import datetime
+
+from pyjexl import JEXL
+from rest_framework import serializers
 
 
 # If you add a new filter to this file, remember to update the docs too!
@@ -814,6 +816,71 @@ class ProfileCreateDateFilter(BaseFilter):
     @property
     def capabilities(self):
         return set()
+
+
+class JexlFilter(BaseFilter):
+    """
+    This filter allows the user to specify raw JEXL that will then be
+    included as a normal filter object.
+
+    It will combine with other filter objects like an other filter object,
+    that is it will be treated as a boolean expression and ANDed with it's
+    peers. The JEXL will by checked for syntactical validity. The expression
+    will be surrounded with parenthesis.
+
+    This filter should only be used when no other filter object can be used.
+
+    .. attribute:: type
+
+       ``jexl``
+
+    .. attribute:: expression
+       The expression to evaluate.
+
+       :example: ``2 + 2 >= 4``
+
+    .. attribute:: capabilities
+       An array of the capabilities required by the expression. May be empty
+       if the expression does not require any capabilities.
+
+       :example: ``["capabilities-v1"]``
+
+    .. attribute:: comment
+       A note about what this expression does. This field is not used
+       anywhere, but is present in the API to make it clearer what this
+       filter does.
+
+       :example: Only users that saw about:welcome.
+    """
+
+    type = "jexl"
+    expression = serializers.CharField()
+    capabilities = serializers.ListField(child=serializers.CharField(min_length=1), min_length=0)
+    comment = serializers.CharField(min_length=1)
+
+    def to_jexl(self):
+        built_expression = "(" + self.initial_data["expression"] + ")"
+        jexl = JEXL()
+
+        # Add mock transforms for validation. See
+        # https://mozilla.github.io/normandy/user/filters.html#transforms
+        # for a list of what transforms we expect to be available.
+        jexl.add_transform("date", lambda x: x)
+        jexl.add_transform("stableSample", lambda x: x)
+        jexl.add_transform("bucketSample", lambda x: x)
+        jexl.add_transform("preferenceValue", lambda x: x)
+        jexl.add_transform("preferenceIsUserSet", lambda x: x)
+        jexl.add_transform("preferenceExists", lambda x: x)
+
+        errors = list(jexl.validate(built_expression))
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return built_expression
+
+    @property
+    def capabilities(self):
+        return set(self.initial_data["capabilities"])
 
 
 def _calculate_by_type():
