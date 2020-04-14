@@ -251,7 +251,7 @@ class AddonActiveFilter(BaseAddonFilter):
 
     .. attribute:: type
 
-        ``addon_active``
+        ``addonActive``
 
     .. attribute:: addons
         List of addon ids to filter against.
@@ -267,7 +267,7 @@ class AddonActiveFilter(BaseAddonFilter):
         :example: ``any`` or ``all``
     """
 
-    type = "addon_active"
+    type = "addonActive"
 
     def get_formatted_string(self, addon):
         return f'normandy.addons["{addon}"].isActive'
@@ -282,7 +282,7 @@ class AddonInstalledFilter(BaseAddonFilter):
 
     .. attribute:: type
 
-        ``addon_installed``
+        ``addonInstalled``
 
     .. attribute:: addons
         List of addon ids to filter against.
@@ -298,7 +298,7 @@ class AddonInstalledFilter(BaseAddonFilter):
         :example: ``any`` or ``all``
     """
 
-    type = "addon_installed"
+    type = "addonInstalled"
 
     def get_formatted_string(self, addon):
         return f'normandy.addons["{addon}"]'
@@ -313,7 +313,7 @@ class PrefCompareFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``pref``
+        ``preferenceValue``
 
     .. attribute:: value
 
@@ -327,7 +327,7 @@ class PrefCompareFilter(BaseFilter):
         ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
     """
 
-    type = "preference_value"
+    type = "preferenceValue"
     pref = serializers.CharField()
     value = serializers.JSONField()
     comparison = serializers.CharField()
@@ -366,7 +366,7 @@ class PrefExistsFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``pref``
+        ``preferenceExists``
 
     .. attribute:: value
 
@@ -375,7 +375,7 @@ class PrefExistsFilter(BaseFilter):
         :example: ``true`` or ``false``
     """
 
-    type = "preference_exists"
+    type = "preferenceExists"
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
@@ -398,7 +398,7 @@ class PrefUserSetFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``preference_is_user_set``
+        ``preferenceIsUserSet``
 
     .. attribute:: value
 
@@ -407,7 +407,7 @@ class PrefUserSetFilter(BaseFilter):
         :example: ``true`` or ``false``
     """
 
-    type = "preference_is_user_set"
+    type = "preferenceIsUserSet"
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
@@ -590,7 +590,7 @@ class VersionRangeFilter(BaseFilter):
 
     ..attribute:: type
 
-        ``version_range``
+        ``versionRange``
 
     .. attribute:: min_version
 
@@ -601,7 +601,7 @@ class VersionRangeFilter(BaseFilter):
         :example: ``75.0.1``
     """
 
-    type = "version_range"
+    type = "versionRange"
     min_version = serializers.CharField()
     max_version = serializers.CharField()
 
@@ -630,7 +630,7 @@ class DateRangeFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``date_range``
+        ``dateRange``
 
     .. attribute:: not_before
 
@@ -641,7 +641,7 @@ class DateRangeFilter(BaseFilter):
       :example: ``2020-03-01T00:00:00Z``
     """
 
-    type = "date_range"
+    type = "dateRange"
     not_before = serializers.DateTimeField()
     not_after = serializers.DateTimeField()
 
@@ -668,7 +668,7 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
 
     .. attribute:: type
 
-        ``windows_build_number``
+        ``windowsBuildNumber``
 
     .. attribute:: value
         integer
@@ -682,7 +682,7 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
       :example: ``not_equal``
     """
 
-    type = "windows_build_number"
+    type = "windowsBuildNumber"
 
     @property
     def left_of_operator(self):
@@ -703,7 +703,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
 
     .. attribute:: type
 
-        ``windows_version``
+        ``windowsVersion``
 
     .. attribute:: value
         number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0
@@ -717,7 +717,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
       :example: ``not_equal``
     """
 
-    type = "windows_version"
+    type = "windowsVersion"
     value = serializers.DecimalField(max_digits=3, decimal_places=1)
 
     @property
@@ -776,7 +776,7 @@ class ProfileCreateDateFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``profile_creation_date``
+        ``profileCreationDate``
 
     .. attribute:: direction
 
@@ -787,7 +787,7 @@ class ProfileCreateDateFilter(BaseFilter):
       :example: ``2020-02-01``
     """
 
-    type = "profile_creation_date"
+    type = "profileCreationDate"
     direction = serializers.CharField()
     date = serializers.DateField()
 
@@ -817,6 +817,14 @@ class ProfileCreateDateFilter(BaseFilter):
 
 
 def _calculate_by_type():
+    """
+    Gather all filters and build a map of types to filters.
+
+    This is done by iterating over all the subclasses, both direct and
+    indirect, of `BaseFilter` and checking their types. Only filters who have
+    their type defined as a static string are used. Duplicate types will
+    cause an error.
+    """
     todo = set([BaseFilter])
     all_filter_classes = set()
 

@@ -1,4 +1,5 @@
 import pytest
+import re
 from rest_framework import serializers
 
 from normandy.recipes import filters
@@ -45,6 +46,11 @@ class FilterTestsBase:
         filter_instance = self.create_basic_filter()
         filter_class = filter_instance.__class__
         assert filter_class in filters.by_type.values()
+
+    def test_its_type_is_camelcase(self):
+        filter_instance = self.create_basic_filter()
+        assert re.match("[a-zA-Z]+", filter_instance.type)
+        assert "_" not in filter_instance.type
 
 
 class TestProfileCreationDateFilter(FilterTestsBase):
