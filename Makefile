@@ -1,4 +1,4 @@
-geo_data: GeoLite2-Country.mmdb 
+geo_data: GeoLite2-Country.mmdb
 
 GeoLite2-Country.mmdb:
 	./bin/download_geolite2.sh
@@ -54,7 +54,7 @@ kill: compose_stop compose_rm volumes_rm
 	echo "All containers removed!"
 
 test: build
-	docker-compose run -e DJANGO_CONFIGURATION=Test app sh -c "/app/bin/wait-for-it.sh db:5432 -- pytest"
+	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- pytest"
 
 shell: build
 	docker-compose run app python manage.py shell
