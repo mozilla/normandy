@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@mozilla/normandy-action-argument-schemas@0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@mozilla/normandy-action-argument-schemas/-/normandy-action-argument-schemas-0.8.2.tgz#5836dad70c0145240dc57c8ae33f705b318c6ca8"
-  integrity sha512-+Mnydw3tX7oUTncATsfwOpOkiV5qjqwmBTI6pn0koxzCLHHYTDpENOR6jBXlbcBpfQPnUqhYzMkA5e0PyO6O9g==
+"@mozilla/normandy-action-argument-schemas@0.10":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@mozilla/normandy-action-argument-schemas/-/normandy-action-argument-schemas-0.10.0.tgz#34ce7855125334f8ff695ac0ce0c8b1042f04fcf"
+  integrity sha512-5ii7PJpVy4pETsBn9f9PQ4YoR4qBOgODCa8IDdqiMn/z5bdEdECaKHqPQrXP2HAhXwvN9gz8zXbXgaYtKpC2FQ==
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
