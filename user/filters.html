@@ -802,6 +802,66 @@ creates jexl that compares the windows NT version.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="normandy.recipes.filters.JexlFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">JexlFilter</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This filter allows the user to specify raw JEXL that will then be
+included as a normal filter object.</p>
+<p>It will combine with other filter objects like an other filter object,
+that is it will be treated as a boolean expression and ANDed with it’s
+peers. The JEXL will by checked for syntactical validity. The expression
+will be surrounded with parenthesis.</p>
+<p>This filter should only be used when no other filter object can be used.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.JexlFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">jexl</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.JexlFilter.expression">
+<code class="sig-name descname">expression</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.expression" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">The expression to evaluate.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">&gt;=</span> <span class="pre">4</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.JexlFilter.capabilities">
+<code class="sig-name descname">capabilities</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.capabilities" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">An array of the capabilities required by the expression. May be empty</code></dt>
+<dt>
+<code class="sig-name descname">if the expression does not require any capabilities.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;capabilities-v1&quot;]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.JexlFilter.comment">
+<code class="sig-name descname">comment</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.comment" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">A note about what this expression does. This field is not used</code></dt>
+<dt>
+<code class="sig-name descname">anywhere, but is present in the API to make it clearer what this</code></dt>
+<dt>
+<code class="sig-name descname">filter does.</code></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p>Only users that saw <a class="reference external" href="about:welcome">about:welcome</a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="filter-expressions">
 <h2>Filter Expressions<a class="headerlink" href="#filter-expressions" title="Permalink to this headline">¶</a></h2>
