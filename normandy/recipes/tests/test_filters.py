@@ -383,3 +383,27 @@ class TestStableSampleFilter(FilterTestsBase):
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], rate=0.1)
         assert filter.to_jexl() == "[A]|stableSample(0.1)"
+
+
+class TestJexlFilter(FilterTestsBase):
+    should_be_baseline = False
+
+    def create_basic_filter(self, expression="true", capabilities=None, comment="a comment"):
+        if capabilities is None:
+            capabilities = ["capabilities-v1"]
+        return filters.JexlFilter.create(
+            expression=expression, capabilities=capabilities, comment=comment
+        )
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter(expression="2 + 2")
+        assert filter.to_jexl() == "(2 + 2)"
+
+    def test_it_rejects_invalid_jexl(self):
+        filter = self.create_basic_filter(expression="this is an invalid expression")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+    def test_it_has_capabilities(self):
+        filter = self.create_basic_filter(capabilities=["a.b", "c.d"])
+        assert filter.capabilities == {"a.b", "c.d"}
