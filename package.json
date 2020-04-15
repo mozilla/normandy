@@ -14,7 +14,7 @@
   },
   "license": "MPL-2.0",
   "dependencies": {
-    "@mozilla/normandy-action-argument-schemas": "0.8.2"
+    "@mozilla/normandy-action-argument-schemas": "0.10"
   },
   "devDependencies": {
     "gh-pages": "2.2.0",
