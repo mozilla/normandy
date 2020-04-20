@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@mozilla/normandy-action-argument-schemas@0.10":
+"@mozilla/normandy-action-argument-schemas@0.10.0":
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/@mozilla/normandy-action-argument-schemas/-/normandy-action-argument-schemas-0.10.0.tgz#34ce7855125334f8ff695ac0ce0c8b1042f04fcf"
   integrity sha512-5ii7PJpVy4pETsBn9f9PQ4YoR4qBOgODCa8IDdqiMn/z5bdEdECaKHqPQrXP2HAhXwvN9gz8zXbXgaYtKpC2FQ==
