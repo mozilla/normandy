@@ -1,8 +1,6 @@
 FROM python:3.7-slim@sha256:2167a93238e072810d8ff839b4673a331f53276d03c3e9ef655727b7de530f1d
 WORKDIR /app
 
-RUN groupadd --gid 10001 app && useradd -g app -d /app --uid 10001 --shell /usr/sbin/nologin app
-
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -34,13 +32,12 @@ COPY ./pyproject.toml /app/pyproject.toml
 COPY ./poetry.lock /app/poetry.lock
 RUN poetry install --no-root --extras docs
 
-COPY --chown=app . /app
+COPY . /app
 
 RUN NODE_ENV=production yarn build && \
     DJANGO_CONFIGURATION=Build python ./manage.py collectstatic --no-input && \
-    mkdir -p media && chown app:app media
+    mkdir -p media
 
-USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Development \
     PORT=8000 \
