@@ -197,8 +197,6 @@ jobs:
           path: test-reports
 
   contract-tests:
-    machine:
-      docker_layer_caching: true
     steps:
       - setup_remote_docker
       - checkout
