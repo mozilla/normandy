@@ -197,7 +197,9 @@ jobs:
           path: test-reports
 
   contract-tests:
-    machine: true
+    machine:
+      docker_layer_caching: true
+      image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run:
