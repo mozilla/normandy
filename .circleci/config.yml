@@ -196,7 +196,7 @@ jobs:
       - store_artifacts:
           path: test-reports
 
-  contract_tests:
+  contract-tests:
     machine:
       docker_layer_caching: true
     steps:
