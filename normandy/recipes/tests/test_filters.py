@@ -1,26 +1,8 @@
 import pytest
+import re
 from rest_framework import serializers
 
-from normandy.recipes.filters import (
-    BucketSampleFilter,
-    ChannelFilter,
-    CountryFilter,
-    LocaleFilter,
-    StableSampleFilter,
-    VersionFilter,
-    VersionRangeFilter,
-    DateRangeFilter,
-    ProfileCreateDateFilter,
-    PlatformFilter,
-    PrefCompareFilter,
-    PrefExistsFilter,
-    PrefUserSetFilter,
-    WindowsBuildNumberFilter,
-    WindowsVersionFilter,
-    NegateFilter,
-    AddonActiveFilter,
-    AddonInstalledFilter,
-)
+from normandy.recipes import filters
 from normandy.recipes.tests import (
     ChannelFactory,
     LocaleFactory,
@@ -60,10 +42,20 @@ class FilterTestsBase:
         else:
             assert capabilities - settings.BASELINE_CAPABILITIES
 
+    def test_it_is_in_the_by_type_list(self):
+        filter_instance = self.create_basic_filter()
+        filter_class = filter_instance.__class__
+        assert filter_class in filters.by_type.values()
+
+    def test_its_type_is_camelcase(self):
+        filter_instance = self.create_basic_filter()
+        assert re.match("[a-zA-Z]+", filter_instance.type)
+        assert "_" not in filter_instance.type
+
 
 class TestProfileCreationDateFilter(FilterTestsBase):
     def create_basic_filter(self, direction="olderThan", date="2020-02-01"):
-        return ProfileCreateDateFilter.create(direction=direction, date=date)
+        return filters.ProfileCreateDateFilter.create(direction=direction, date=date)
 
     def test_generates_jexl_older_than(self):
         filter = self.create_basic_filter()
@@ -93,7 +85,7 @@ class TestVersionFilter(FilterTestsBase):
     def create_basic_filter(self, versions=None):
         if versions is None:
             versions = [72, 74]
-        return VersionFilter.create(versions=versions)
+        return filters.VersionFilter.create(versions=versions)
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(versions=[72, 74])
@@ -107,7 +99,7 @@ class TestVersionRangeFilter(FilterTestsBase):
     should_be_baseline = False
 
     def create_basic_filter(self, min_version="72.0b2", max_version="72.0b8"):
-        return VersionRangeFilter.create(min_version=min_version, max_version=max_version)
+        return filters.VersionRangeFilter.create(min_version=min_version, max_version=max_version)
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(min_version="72.0b2", max_version="75.0a1")
@@ -121,7 +113,7 @@ class TestDateRangeFilter(FilterTestsBase):
     def create_basic_filter(
         self, not_before="2020-02-01T00:00:00Z", not_after="2020-03-01T00:00:00Z"
     ):
-        return DateRangeFilter.create(not_before=not_before, not_after=not_after)
+        return filters.DateRangeFilter.create(not_before=not_before, not_after=not_after)
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
@@ -133,7 +125,7 @@ class TestDateRangeFilter(FilterTestsBase):
 
 class TestWindowsBuildNumberFilter(FilterTestsBase):
     def create_basic_filter(self, value=12345, comparison="equal"):
-        return WindowsBuildNumberFilter.create(value=value, comparison=comparison)
+        return filters.WindowsBuildNumberFilter.create(value=value, comparison=comparison)
 
     @pytest.mark.parametrize(
         "comparison,symbol",
@@ -162,7 +154,7 @@ class TestWindowsVersionFilter(FilterTestsBase):
     def create_basic_filter(self, value=6.1, comparison="equal"):
         WindowsVersionFactory(nt_version=6.1)
 
-        return WindowsVersionFilter.create(value=value, comparison=comparison)
+        return filters.WindowsVersionFilter.create(value=value, comparison=comparison)
 
     @pytest.mark.parametrize(
         "comparison,symbol",
@@ -197,7 +189,7 @@ class TestChannelFilter(FilterTestsBase):
             channel_objs = [ChannelFactory(slug=slug) for slug in channels]
         else:
             channel_objs = [ChannelFactory()]
-        return ChannelFilter.create(channels=[c.slug for c in channel_objs])
+        return filters.ChannelFilter.create(channels=[c.slug for c in channel_objs])
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(channels=["release", "beta"])
@@ -210,7 +202,7 @@ class TestLocaleFilter(FilterTestsBase):
             locale_objs = [LocaleFactory(code=code) for code in locales]
         else:
             locale_objs = [LocaleFactory()]
-        return LocaleFilter.create(locales=[l.code for l in locale_objs])
+        return filters.LocaleFilter.create(locales=[l.code for l in locale_objs])
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(locales=["en-US", "en-CA"])
@@ -223,7 +215,7 @@ class TestCountryFilter(FilterTestsBase):
             country_objs = [CountryFactory(code=code) for code in countries]
         else:
             country_objs = [CountryFactory()]
-        return CountryFilter.create(countries=[c.code for c in country_objs])
+        return filters.CountryFilter.create(countries=[c.code for c in country_objs])
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(countries=["SV", "MX"])
@@ -232,7 +224,7 @@ class TestCountryFilter(FilterTestsBase):
 
 class TestPlatformFilter(FilterTestsBase):
     def create_basic_filter(self, platforms=["all_mac", "all_windows"]):
-        return PlatformFilter.create(platforms=platforms)
+        return filters.PlatformFilter.create(platforms=platforms)
 
     def test_generates_jexl_list_of_two(self):
         filter = self.create_basic_filter()
@@ -251,7 +243,7 @@ class TestPlatformFilter(FilterTestsBase):
 class TestNegateFilter(FilterTestsBase):
     def create_basic_filter(self):
         data_for_filter = {"type": "channel", "channels": ["release", "beta"]}
-        return NegateFilter.create(filter_to_negate=data_for_filter)
+        return filters.NegateFilter.create(filter_to_negate=data_for_filter)
 
     def test_generates_jexl(self):
         negate_filter = self.create_basic_filter()
@@ -260,7 +252,7 @@ class TestNegateFilter(FilterTestsBase):
 
 class TestAddonInstalledFilter(FilterTestsBase):
     def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
-        return AddonInstalledFilter.create(addons=addons, any_or_all=any_or_all)
+        return filters.AddonInstalledFilter.create(addons=addons, any_or_all=any_or_all)
 
     def test_generates_jexl_installed_any(self):
         filter = self.create_basic_filter()
@@ -284,7 +276,7 @@ class TestAddonInstalledFilter(FilterTestsBase):
 
 class TestAddonActiveFilter(FilterTestsBase):
     def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
-        return AddonActiveFilter.create(addons=addons, any_or_all=any_or_all)
+        return filters.AddonActiveFilter.create(addons=addons, any_or_all=any_or_all)
 
     def test_generates_jexl_active_any(self):
         filter = self.create_basic_filter()
@@ -310,7 +302,7 @@ class TestPrefCompareFilter(FilterTestsBase):
     def create_basic_filter(
         self, pref="browser.urlbar.maxRichResults", value=10, comparison="equal"
     ):
-        return PrefCompareFilter.create(pref=pref, value=value, comparison=comparison)
+        return filters.PrefCompareFilter.create(pref=pref, value=value, comparison=comparison)
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
@@ -345,7 +337,7 @@ class TestPrefCompareFilter(FilterTestsBase):
 
 class TestPrefExistsFilter(FilterTestsBase):
     def create_basic_filter(self, pref="browser.urlbar.maxRichResults", value=True):
-        return PrefExistsFilter.create(pref=pref, value=value)
+        return filters.PrefExistsFilter.create(pref=pref, value=value)
 
     def test_generates_jexl_pref_exists_true(self):
         filter = self.create_basic_filter()
@@ -358,7 +350,7 @@ class TestPrefExistsFilter(FilterTestsBase):
 
 class TestPrefUserSetFilter(FilterTestsBase):
     def create_basic_filter(self, pref="browser.urlbar.maxRichResults", value=True):
-        return PrefUserSetFilter.create(pref=pref, value=value)
+        return filters.PrefUserSetFilter.create(pref=pref, value=value)
 
     def test_generates_jexl_is_user_set_true(self):
         filter = self.create_basic_filter()
@@ -369,23 +361,49 @@ class TestPrefUserSetFilter(FilterTestsBase):
         assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceIsUserSet)"
 
 
-class TestBucketSamplefilter(FilterTestsBase):
+class TestBucketSampleFilter(FilterTestsBase):
     def create_basic_filter(self, input=None, start=123, count=10, total=1_000):
         if input is None:
             input = ["normandy.clientId"]
-        return BucketSampleFilter.create(input=input, start=start, count=count, total=total)
+        return filters.BucketSampleFilter.create(
+            input=input, start=start, count=count, total=total
+        )
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], start=10, count=20, total=1_000)
         assert filter.to_jexl() == "[A]|bucketSample(10,20,1000)"
 
 
-class TestStableSamplefilter(FilterTestsBase):
+class TestStableSampleFilter(FilterTestsBase):
     def create_basic_filter(self, input=None, rate=0.01):
         if input is None:
             input = ["normandy.clientId"]
-        return StableSampleFilter.create(input=input, rate=rate)
+        return filters.StableSampleFilter.create(input=input, rate=rate)
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], rate=0.1)
         assert filter.to_jexl() == "[A]|stableSample(0.1)"
+
+
+class TestJexlFilter(FilterTestsBase):
+    should_be_baseline = False
+
+    def create_basic_filter(self, expression="true", capabilities=None, comment="a comment"):
+        if capabilities is None:
+            capabilities = ["capabilities-v1"]
+        return filters.JexlFilter.create(
+            expression=expression, capabilities=capabilities, comment=comment
+        )
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter(expression="2 + 2")
+        assert filter.to_jexl() == "(2 + 2)"
+
+    def test_it_rejects_invalid_jexl(self):
+        filter = self.create_basic_filter(expression="this is an invalid expression")
+        with pytest.raises(serializers.ValidationError):
+            filter.to_jexl()
+
+    def test_it_has_capabilities(self):
+        filter = self.create_basic_filter(capabilities=["a.b", "c.d"])
+        assert filter.capabilities == {"a.b", "c.d"}

@@ -34,6 +34,7 @@ Filter Objects
 .. autoclass:: NegateFilter()
 .. autoclass:: AddonActiveFilter()
 .. autoclass:: AddonInstalledFilter()
+.. autoclass:: JexlFilter()
 
 
 Filter Expressions

@@ -20,9 +20,11 @@ field, so the final JSON would look something like this:
     }
 """
 
-from rest_framework import serializers
-from datetime import datetime
 import json
+from datetime import datetime
+
+from pyjexl import JEXL
+from rest_framework import serializers
 
 
 # If you add a new filter to this file, remember to update the docs too!
@@ -251,7 +253,7 @@ class AddonActiveFilter(BaseAddonFilter):
 
     .. attribute:: type
 
-        ``addon_active``
+        ``addonActive``
 
     .. attribute:: addons
         List of addon ids to filter against.
@@ -267,7 +269,7 @@ class AddonActiveFilter(BaseAddonFilter):
         :example: ``any`` or ``all``
     """
 
-    type = "addon_active"
+    type = "addonActive"
 
     def get_formatted_string(self, addon):
         return f'normandy.addons["{addon}"].isActive'
@@ -282,7 +284,7 @@ class AddonInstalledFilter(BaseAddonFilter):
 
     .. attribute:: type
 
-        ``addon_installed``
+        ``addonInstalled``
 
     .. attribute:: addons
         List of addon ids to filter against.
@@ -298,7 +300,7 @@ class AddonInstalledFilter(BaseAddonFilter):
         :example: ``any`` or ``all``
     """
 
-    type = "addon_installed"
+    type = "addonInstalled"
 
     def get_formatted_string(self, addon):
         return f'normandy.addons["{addon}"]'
@@ -313,7 +315,7 @@ class PrefCompareFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``pref``
+        ``preferenceValue``
 
     .. attribute:: value
 
@@ -327,7 +329,7 @@ class PrefCompareFilter(BaseFilter):
         ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
     """
 
-    type = "pref"
+    type = "preferenceValue"
     pref = serializers.CharField()
     value = serializers.JSONField()
     comparison = serializers.CharField()
@@ -366,7 +368,7 @@ class PrefExistsFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``pref``
+        ``preferenceExists``
 
     .. attribute:: value
 
@@ -375,7 +377,7 @@ class PrefExistsFilter(BaseFilter):
         :example: ``true`` or ``false``
     """
 
-    type = "pref"
+    type = "preferenceExists"
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
@@ -398,7 +400,7 @@ class PrefUserSetFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``pref``
+        ``preferenceIsUserSet``
 
     .. attribute:: value
 
@@ -407,7 +409,7 @@ class PrefUserSetFilter(BaseFilter):
         :example: ``true`` or ``false``
     """
 
-    type = "pref"
+    type = "preferenceIsUserSet"
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
@@ -590,7 +592,7 @@ class VersionRangeFilter(BaseFilter):
 
     ..attribute:: type
 
-        ``version_range``
+        ``versionRange``
 
     .. attribute:: min_version
 
@@ -601,7 +603,7 @@ class VersionRangeFilter(BaseFilter):
         :example: ``75.0.1``
     """
 
-    type = "version_range"
+    type = "versionRange"
     min_version = serializers.CharField()
     max_version = serializers.CharField()
 
@@ -630,7 +632,7 @@ class DateRangeFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``date_range``
+        ``dateRange``
 
     .. attribute:: not_before
 
@@ -641,7 +643,7 @@ class DateRangeFilter(BaseFilter):
       :example: ``2020-03-01T00:00:00Z``
     """
 
-    type = "date_range"
+    type = "dateRange"
     not_before = serializers.DateTimeField()
     not_after = serializers.DateTimeField()
 
@@ -668,7 +670,7 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
 
     .. attribute:: type
 
-        ``windows_build_number``
+        ``windowsBuildNumber``
 
     .. attribute:: value
         integer
@@ -682,7 +684,7 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
       :example: ``not_equal``
     """
 
-    type = "windows_build_number"
+    type = "windowsBuildNumber"
 
     @property
     def left_of_operator(self):
@@ -703,7 +705,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
 
     .. attribute:: type
 
-        ``windows_version``
+        ``windowsVersion``
 
     .. attribute:: value
         number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0
@@ -717,7 +719,7 @@ class WindowsVersionFilter(BaseComparisonFilter):
       :example: ``not_equal``
     """
 
-    type = "windows_version"
+    type = "windowsVersion"
     value = serializers.DecimalField(max_digits=3, decimal_places=1)
 
     @property
@@ -776,7 +778,7 @@ class ProfileCreateDateFilter(BaseFilter):
 
     .. attribute:: type
 
-        ``profile_creation_date``
+        ``profileCreationDate``
 
     .. attribute:: direction
 
@@ -787,7 +789,7 @@ class ProfileCreateDateFilter(BaseFilter):
       :example: ``2020-02-01``
     """
 
-    type = "profile_creation_date"
+    type = "profileCreationDate"
     direction = serializers.CharField()
     date = serializers.DateField()
 
@@ -816,29 +818,116 @@ class ProfileCreateDateFilter(BaseFilter):
         return set()
 
 
-by_type = {
-    f.type: f
-    for f in [
-        ChannelFilter,
-        LocaleFilter,
-        CountryFilter,
-        BucketSampleFilter,
-        StableSampleFilter,
-        VersionFilter,
-        VersionRangeFilter,
-        DateRangeFilter,
-        ProfileCreateDateFilter,
-        PlatformFilter,
-        PrefExistsFilter,
-        PrefCompareFilter,
-        PrefUserSetFilter,
-        WindowsVersionFilter,
-        WindowsBuildNumberFilter,
-        NegateFilter,
-        AddonActiveFilter,
-        AddonInstalledFilter,
-    ]
-}
+class JexlFilter(BaseFilter):
+    """
+    This filter allows the user to specify raw JEXL that will then be
+    included as a normal filter object.
+
+    It will combine with other filter objects like an other filter object,
+    that is it will be treated as a boolean expression and ANDed with it's
+    peers. The JEXL will by checked for syntactical validity. The expression
+    will be surrounded with parenthesis.
+
+    This filter should only be used when no other filter object can be used.
+
+    .. attribute:: type
+
+       ``jexl``
+
+    .. attribute:: expression
+       The expression to evaluate.
+
+       :example: ``2 + 2 >= 4``
+
+    .. attribute:: capabilities
+       An array of the capabilities required by the expression. May be empty
+       if the expression does not require any capabilities.
+
+       :example: ``["capabilities-v1"]``
+
+    .. attribute:: comment
+       A note about what this expression does. This field is not used
+       anywhere, but is present in the API to make it clearer what this
+       filter does.
+
+       :example: Only users that saw about:welcome.
+    """
+
+    type = "jexl"
+    expression = serializers.CharField()
+    capabilities = serializers.ListField(child=serializers.CharField(min_length=1), min_length=0)
+    comment = serializers.CharField(min_length=1)
+
+    def to_jexl(self):
+        built_expression = "(" + self.initial_data["expression"] + ")"
+        jexl = JEXL()
+
+        # Add mock transforms for validation. See
+        # https://mozilla.github.io/normandy/user/filters.html#transforms
+        # for a list of what transforms we expect to be available.
+        jexl.add_transform("date", lambda x: x)
+        jexl.add_transform("stableSample", lambda x: x)
+        jexl.add_transform("bucketSample", lambda x: x)
+        jexl.add_transform("preferenceValue", lambda x: x)
+        jexl.add_transform("preferenceIsUserSet", lambda x: x)
+        jexl.add_transform("preferenceExists", lambda x: x)
+
+        errors = list(jexl.validate(built_expression))
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return built_expression
+
+    @property
+    def capabilities(self):
+        return set(self.initial_data["capabilities"])
+
+
+def _calculate_by_type():
+    """
+    Gather all filters and build a map of types to filters.
+
+    This is done by iterating over all the subclasses, both direct and
+    indirect, of `BaseFilter` and checking their types. Only filters who have
+    their type defined as a static string are used. Duplicate types will
+    cause an error.
+    """
+    todo = set([BaseFilter])
+    all_filter_classes = set()
+
+    while todo:
+        parent = todo.pop()
+        subclasses = parent.__subclasses__()
+        todo = todo.union(subclasses)
+        all_filter_classes = all_filter_classes.union(subclasses)
+
+    by_type = {}
+
+    for filter_class in all_filter_classes:
+        filter_type = None
+        if isinstance(filter_class.type, str):
+            filter_type = filter_class.type
+        elif isinstance(filter_class.type, property):
+            # This is (currently) one of the two base classes. It's safe to ignore
+            continue
+        else:
+            raise Exception(
+                f"Unexpected type for type attribute of filter class. "
+                f"Class: {filter_class!r} Type Attribute: {type(filter_class.type)}"
+            )
+
+        if filter_type in by_type.keys():
+            raise Exception(
+                f"Duplicate filter type {filter_type!r}, shared by at least "
+                f"{by_type[filter_type].__name__} and {filter_class.__name__}."
+            )
+
+        by_type[filter_type] = filter_class
+
+    return by_type
+
+
+by_type = _calculate_by_type()
 
 
 def from_data(data):
