@@ -200,9 +200,7 @@ jobs:
     machine:
       docker_layer_caching: true
     steps:
-      - run:
-          name: Docker compose info
-          command: docker-compose -v
+      - setup_remote_docker
       - checkout
       - run:
           name: Run contract tests in containers
