@@ -197,8 +197,8 @@ jobs:
           path: test-reports
 
   contract-tests:
+    machine: true
     steps:
-      - setup_remote_docker
       - checkout
       - run:
           name: Run contract tests in containers
