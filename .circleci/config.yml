@@ -197,11 +197,11 @@ jobs:
           path: test-reports
 
   contract-tests:
-    machine:
-      docker_layer_caching: true
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: ubuntu-1604:201903-01
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Run contract tests in containers
           command: make contract_tests
