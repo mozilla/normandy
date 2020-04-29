@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile.development
-    command: bash -c "/app/bin/wait-for-it.sh db:5432 -- ./bin/download_geolite2.sh;./bin/runsslserver.sh 0.0.0.0:8000"
+    command: bash -c "/app/bin/wait-for-it.sh db:5432 -- ./bin/download_geolite2.sh;./bin/runsslserver.sh 0:8000"
     links:
       - db
     networks:
@@ -25,7 +25,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile.development
-    command: bash -c "/app/bin/wait-for-it.sh db:5432 -- ./bin/download_geolite2.sh;./bin/runsslserver.sh 0.0.0.0:8123"
+    command: bash -c "/app/bin/wait-for-it.sh db:5432 -- ./bin/download_geolite2.sh;./bin/runsslserver.sh 0:8123"
     depends_on: 
       - app
     networks:
