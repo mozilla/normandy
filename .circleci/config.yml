@@ -201,7 +201,6 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Run contract tests in containers
           command: make contract_tests
