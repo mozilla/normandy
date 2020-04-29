@@ -75,5 +75,5 @@ generate_deploy_bug: build
 create_superuser:
 	docker-compose run app sh -c "/app/bin/wait-for-it.sh db:5432 -- python manage.py createsuperuser --noinput --email=test-user@example.com --user=testuser"
 
-contract_tests: refresh create_superuser
+contract_tests: refresh create_superuser up
 	docker-compose run test sh -c "/app/bin/wait-for-it.sh db:5432 -- pytest contract-tests/ --server https://app:8000"
