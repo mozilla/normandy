@@ -197,8 +197,8 @@ jobs:
           path: test-reports
 
   contract-tests:
-    docker:
-      - image: circleci/python:3.7-node-browsers
+    machine:
+      docker_layer_caching: true
     steps:
       - checkout
       - setup_remote_docker
