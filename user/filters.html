@@ -516,8 +516,8 @@ a given date.</p>
 <dt id="normandy.recipes.filters.ProfileCreateDateFilter.direction">
 <code class="sig-name descname">direction</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.direction" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Example</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">newer_than</span></code></p>
+<dt class="field-odd">Options</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">newerThan</span></code> or <code class="docutils literal notranslate"><span class="pre">olderThan</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -655,8 +655,7 @@ number, they are running.</p>
 <dl class="class">
 <dt id="normandy.recipes.filters.WindowsVersionFilter">
 <em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">WindowsVersionFilter</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Match a user based on what windows version they are running. This filter
+<dd><p>Under Development. Match a user based on what windows version they are running. This filter
 creates jexl that compares the windows NT version.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.WindowsVersionFilter.type">
@@ -665,28 +664,18 @@ creates jexl that compares the windows NT version.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsVersionFilter.value">
-<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.value" title="Permalink to this definition">¶</a></dt>
+<dt id="normandy.recipes.filters.WindowsVersionFilter.versions_list">
+<code class="sig-name descname">versions_list</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.versions_list" title="Permalink to this definition">¶</a></dt>
 <dt>
-<code class="sig-name descname">number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0</code></dt>
+<code class="sig-name descname">list of versions as decimal numbers. Versions will be validated against</code></dt>
+<dt>
+<code class="sig-name descname">DB table of supported NT versions.</code></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Example</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">6.1</span></code></p>
+<dt class="field-odd">Options</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">6.1</span></code>, <code class="docutils literal notranslate"><span class="pre">6.2</span></code>, <code class="docutils literal notranslate"><span class="pre">6.3</span></code>, <code class="docutils literal notranslate"><span class="pre">10.0</span></code></p>
 </dd>
-</dl>
-</dd></dl>
-
-</div></blockquote>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsVersionFilter.comparison">
-<code class="sig-name descname">comparison</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.comparison" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">Options are ``equal``, ``not_equal``, ``greater_than``,</code></dt>
-<dt>
-<code class="sig-name descname">``less_than``, ``greater_than_equal`` and ``less_than_equal``.</code></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Example</dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">not_equal</span></code></p>
+<dt class="field-even">Example</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">[6.1,</span> <span class="pre">6.2]</span></code></p>
 </dd>
 </dl>
 </dd></dl>
