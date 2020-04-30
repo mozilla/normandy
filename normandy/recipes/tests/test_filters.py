@@ -151,36 +151,19 @@ class TestWindowsBuildNumberFilter(FilterTestsBase):
 
 
 class TestWindowsVersionFilter(FilterTestsBase):
-    def create_basic_filter(self, value=6.1, comparison="equal"):
+    def create_basic_filter(self, versions_list=[6.1]):
         WindowsVersionFactory(nt_version=6.1)
+        return filters.WindowsVersionFilter.create(versions_list=versions_list)
 
-        return filters.WindowsVersionFilter.create(value=value, comparison=comparison)
-
-    @pytest.mark.parametrize(
-        "comparison,symbol",
-        [
-            ("equal", "=="),
-            ("greater_than", ">"),
-            ("greater_than_equal", ">="),
-            ("less_than", "<"),
-            ("less_than_equal", "<="),
-        ],
-    )
-    def test_generates_jexl_number_ops(self, comparison, symbol):
-        filter = self.create_basic_filter(comparison=comparison)
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter()
         assert (
-            filter.to_jexl()
-            == f"(normandy.os.isWindows && normandy.os.windowsVersion {symbol} 6.1)"
+            filter.to_jexl() == f"(normandy.os.isWindows && normandy.os.windowsVersion in [6.1])"
         )
-
-    def test_generates_jexl_error_on_bad_comparison(self):
-        filter = self.create_basic_filter(comparison="typo")
-        with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
 
     def test_generates_jexl_error_on_bad_version(self):
         with pytest.raises(AssertionError):
-            self.create_basic_filter(value="abcd")
+            filters.WindowsVersionFilter.create(versions_list=[8.9])
 
 
 class TestChannelFilter(FilterTestsBase):

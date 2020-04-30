@@ -698,44 +698,41 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
         return f"(normandy.os.isWindows && {super().to_jexl()})"
 
 
-class WindowsVersionFilter(BaseComparisonFilter):
+class WindowsVersionFilter(BaseFilter):
     """
-    Match a user based on what windows version they are running. This filter
+    Under Development. Match a user based on what windows version they are running. This filter
     creates jexl that compares the windows NT version.
 
     .. attribute:: type
 
         ``windowsVersion``
 
-    .. attribute:: value
-        number, decimal, must be one of the following: 6.1, 6.2, 6.3, 10.0
+    .. attribute:: versions_list
+        list of versions as decimal numbers. Versions will be validated against
+        DB table of supported NT versions.
 
-       :example: ``6.1``
+        :options: ``6.1``, ``6.2``, ``6.3``, ``10.0``
 
-   .. attribute:: comparison
-      Options are ``equal``, ``not_equal``, ``greater_than``,
-      ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
+        :example: ``[6.1, 6.2]``
 
-      :example: ``not_equal``
     """
 
     type = "windowsVersion"
-    value = serializers.DecimalField(max_digits=3, decimal_places=1)
-
-    @property
-    def left_of_operator(self):
-        return "normandy.os.windowsVersion"
+    versions_list = serializers.ListField(
+        child=serializers.DecimalField(max_digits=3, decimal_places=1), min_length=1
+    )
 
     def to_jexl(self):
-        return f"(normandy.os.isWindows && {super().to_jexl()})"
+        return f"(normandy.os.isWindows && normandy.os.windowsVersion in {self.initial_data['versions_list']})"
 
-    def validate_value(self, value):
+    def validate_versions_list(self, versions_list):
         from normandy.recipes.models import WindowsVersion
 
-        if not WindowsVersion.objects.filter(nt_version=value).exists():
-            raise serializers.ValidationError(f"Unrecognized windows version slug {value!r}")
-
-        return value
+        all_versions = WindowsVersion.objects.values_list("nt_version", flat=True)
+        for version in versions_list:
+            if version not in all_versions:
+                raise serializers.ValidationError(f"Unrecognized windows version slug {version!r}")
+        return versions_list
 
     @property
     def capabilities(self):
@@ -782,7 +779,7 @@ class ProfileCreateDateFilter(BaseFilter):
 
     .. attribute:: direction
 
-       :example: ``newer_than``
+       :Options: ``newerThan`` or ``olderThan``
 
    .. attribute:: date
 
