@@ -20,17 +20,6 @@ services:
       - DJANGO_ALLOWED_HOSTS=*
     ports:
       - "8000:8000"
-
-  test:
-    build:
-      context: ./
-      dockerfile: ./Dockerfile.development
-    depends_on: 
-      - app
-    networks:
-      - private_nw
-    volumes:
-      - .:/app
  
   db:
     restart: always
@@ -44,6 +33,17 @@ services:
       - "5432:5432"
     networks:
       - private_nw
+
+  test:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.development
+    depends_on:
+      - app
+    networks:
+      - private_nw
+    volumes:
+      - .:/app
 
 volumes:
   db_volume:
