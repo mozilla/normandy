@@ -203,7 +203,10 @@ jobs:
       - checkout
       - run:
           name: Run contract tests in containers
-          command: echo "pass"
+          command: |
+            mkdir etc/ssl
+            chmod a+rwx etc/ssl
+            make contract_tests
 
 workflows:
   version: 2
