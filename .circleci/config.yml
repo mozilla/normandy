@@ -197,86 +197,16 @@ jobs:
           path: test-reports
 
   contract-tests:
-    docker:
-      - image: circleci/python:3.7-node-browsers
-      - image: circleci/postgres:9.6
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: normandy
-          POSTGRES_HOST_AUTH_METHOD: trust
-    environment:
-      DJANGO_SETTINGS_MODULE: normandy.settings
-      DJANGO_CONFIGURATION: ProductionInsecure
-      # Silence checks about missing geoip, and also the standard silenced warnings from ProductionInsecure in settings.py
-      DJANGO_SILENCED_SYSTEM_CHECKS: "normandy.recipes.E006,security.W001,security.W003,security.W004,security.W008,security.W009,security.W012,security.W016"
-
-    steps:
-      - checkout
-      - run:
-          name: Create virtualenv
-          command: |
-            python3 -m venv ~/venv
-            echo "source ~/venv/bin/activate" >> $BASH_ENV
-      - run:
-          name: Install python dependencies
-          command: poetry install --no-dev --no-interaction --verbose
-      - run:
-          name: Install node dependencies
-          command: yarn install --frozen-lockfile
-      - run:
-          name: Create version.json
-          command: |
-            printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' \
-              "$CIRCLE_SHA1" \
-              "${CIRCLE_TAG-}" \
-              "$CIRCLE_PROJECT_USERNAME" \
-              "$CIRCLE_PROJECT_REPONAME" \
-              "$CIRCLE_BUILD_URL" \
-              > version.json
-      - run:
-          name: Prepare DB
-          command: |
-            ./manage.py migrate
-            ./manage.py update_actions
-      - run:
-          name: Starting server
-          command: gunicorn normandy.wsgi:application --bind localhost:8000
-          background: true
-      - run:
-          name: Waiting for web server to be available
-          command: |
-            ./ci/wait-for-it.sh localhost:8000 \
-              --timeout=30 --strict \
-              -- echo "Done waiting. It should work now."
-      - run:
-          name: Contract tests
-          command: |
-            mkdir test-reports
-            py.test contract-tests/v1_api/ \
-              --tb=short -vvv \
-              --junitxml=test-reports/junit.xml \
-              --server http://localhost:8000
-
-  containerized-tests:
     machine:
       docker_layer_caching: true
     steps:
-      - run:
-          name: Install Docker Compose
-          command: |
-            set -x
-            bash -c "curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
-            chmod +x /usr/local/bin/docker-compose
-      - run:
-          name: Docker info
-          command: docker -v
-      - run:
-          name: Docker compose info
-          command: docker-compose -v
       - checkout
       - run:
           name: Run contract tests in containers
-          command: make containerized_tests
+          command: |
+            mkdir etc/ssl
+            chmod a+rwx etc/ssl
+            make contract_tests
 
 workflows:
   version: 2
