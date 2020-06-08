@@ -34,8 +34,7 @@ RUN poetry install --no-root --extras docs
 
 COPY . /app
 
-RUN NODE_ENV=production yarn build && \
-    DJANGO_CONFIGURATION=Build python ./manage.py collectstatic --no-input && \
+RUN DJANGO_CONFIGURATION=Build python ./manage.py collectstatic --no-input && \
     mkdir -p media
 
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
