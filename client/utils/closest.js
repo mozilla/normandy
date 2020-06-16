@@ -1,4 +1,12 @@
 /**
+ * This folder contains source files for the action bundles that are
+ * stored in the `/assets/` folder.
+ *
+ * It has been retained for archival purposes but should be considered
+ * dead code.
+ */
+
+/**
  * Given an element and a query selector ('.class', '#whatever', etc),
  * climbs the DOM tree from the given el to determine if there is an element
  * that matches that selector, and if so, returns a reference to that element.
