@@ -17,11 +17,11 @@ from rest_framework.reverse import reverse
 from normandy.base.api.renderers import CanonicalJSONRenderer
 from normandy.base.utils import filter_m2m, get_client_ip, sri_hash
 from normandy.recipes import filters
-from normandy.recipes.geolocation import get_country_code
-from normandy.recipes.signing import Autographer
 from normandy.recipes.exports import RemoteSettings
-from normandy.recipes.validators import validate_json
+from normandy.recipes.geolocation import get_country_code
 from normandy.recipes.fields import IdenticonSeedField
+from normandy.recipes.signing import Autographer
+from normandy.recipes.validators import JSONSchemaValidator, validate_json
 
 
 INFO_REQUESTING_RECIPE_SIGNATURES = "normandy.recipes.I001"
@@ -163,7 +163,10 @@ class Recipe(DirtyFieldsMixin, models.Model):
         revision = self.latest_revision
 
         if "arguments" in data:
-            data["arguments_json"] = json.dumps(data.pop("arguments"))
+            arguments = data.pop("arguments")
+            data["arguments_json"] = json.dumps(arguments)
+        else:
+            arguments = None
 
         if "filter_object" in data:
             data["filter_object_json"] = json.dumps(data.pop("filter_object"))
@@ -192,6 +195,17 @@ class Recipe(DirtyFieldsMixin, models.Model):
             countries = data.pop("countries", [])
             locales = data.pop("locales", [])
             is_clean = False
+
+        if arguments is not None:
+            schema = None
+            if "action_id" in data:
+                schema = Action.objects.get(action_id=data["action_id"]).arguments_schema
+            elif revision:
+                schema = revision.action.arguments_schema
+
+            if schema is not None:
+                schema_validator = JSONSchemaValidator(schema)
+                schema_validator.validate(arguments)
 
         if not is_clean or force:
             logger.info(
@@ -697,6 +711,18 @@ class Action(DirtyFieldsMixin, models.Model):
             return defaultdict(default)
 
         errors = default()
+
+        # Check for any JSON Schema violations
+        schemaValidator = JSONSchemaValidator(self.arguments_schema)
+        for error in schemaValidator.iter_errors(arguments):
+            current_level = errors
+            path = list(error.path)
+            for part in path[:-1]:
+                current_level = current_level[part]
+            current_level[path[-1]] = error.message
+
+        if errors:
+            raise serializers.ValidationError({"arguments": errors})
 
         if self.name == "preference-experiment":
             # Feature branch slugs should be unique within an experiment.

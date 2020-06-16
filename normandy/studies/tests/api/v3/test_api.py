@@ -8,7 +8,7 @@ import pytest
 from django.db import transaction
 
 from normandy.base.tests import Whatever
-from normandy.recipes.tests import ActionFactory, RecipeFactory
+from normandy.recipes.tests import ActionFactory, RecipeFactory, OptOutStudyArgumentsFactory
 from normandy.studies.models import Extension
 from normandy.studies.tests import (
     ExtensionFactory,
@@ -222,8 +222,8 @@ class TestExtensionAPI(object):
         xpi = WebExtensionFileFactory()
         e = ExtensionFactory(xpi__from_func=xpi.open)
         a = ActionFactory(name="opt-out-study")
-        r = RecipeFactory(action=a, arguments={"extensionId": e.id})
-        r.revise(arguments={"extensionId": 0})
+        r = RecipeFactory(action=a, arguments={"extensionId": e.id + 1})
+        r.revise(OptOutStudyArgumentsFactory(extensionId=e.id))
         res = api_client.patch(f"/api/v3/extension/{e.id}/", {"name": "new name"})
         assert res.status_code == 200
         assert res.data["name"] == "new name"
@@ -243,7 +243,7 @@ class TestExtensionAPI(object):
         e = ExtensionFactory(xpi__from_func=xpi.open)
         a = ActionFactory(name="opt-out-study")
         r = RecipeFactory(action=a, arguments={"extensionId": e.id})
-        r.revise(arguments={"extensionId": 0})
+        r.revise(arguments=OptOutStudyArgumentsFactory(extensionId=e.id + 1))
         res = api_client.delete(f"/api/v3/extension/{e.id}/")
         assert res.status_code == 204
         assert Extension.objects.count() == 0

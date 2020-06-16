@@ -1,11 +1,13 @@
 import hashlib
+import os
 import json
 
+from django.conf import settings
 from django.utils import timezone
 
 import factory
 
-from normandy.base.tests import FuzzyUnicode, UserFactory
+from normandy.base.tests import FuzzyUnicode, UserFactory, FuzzySlug
 from normandy.base.utils import sri_hash
 from normandy.recipes.models import (
     Action,
@@ -58,6 +60,28 @@ class LocaleFactory(factory.DjangoModelFactory):
     name = "Swedish"
 
 
+_action_schemas = None
+
+
+def get_action_schemas():
+    global _action_schemas
+    if _action_schemas is None:
+        action_schemas_fp = os.path.join(settings.ACTIONS_SCHEMA_DIRECTORY, "schemas.json")
+        with open(action_schemas_fp) as f:
+            action_schemas = json.load(f)
+
+        aliases = settings.ACTIONS_ALIAS_NAMES
+        updates = {}
+        for name in action_schemas:
+            if name in aliases:
+                alias = aliases[name]
+                updates[alias] = action_schemas[name]
+        action_schemas.update(**updates)
+
+        _action_schemas = action_schemas
+    return _action_schemas
+
+
 class ActionFactory(factory.DjangoModelFactory):
     class Meta:
         model = Action
@@ -83,6 +107,19 @@ class ActionFactory(factory.DjangoModelFactory):
         elif extracted is False:
             self.signature = None
             self.save()
+
+    @factory.post_generation
+    def arguments_schema(self, create, extracted=None, **kwargs):
+        if extracted is not None:
+            self.arguments_schema = extracted
+            return
+
+        action_schemas = get_action_schemas()
+
+        if self.name in action_schemas:
+            self.arguments_schema = action_schemas[self.name]
+        else:
+            self.arguments_schema = {}
 
 
 class RecipeFactory(factory.DjangoModelFactory):
@@ -176,6 +213,67 @@ class FuzzyIdenticonSeed(factory.fuzzy.FuzzyText):
         super().__init__(prefix="v1:", **kwargs)
 
 
+class DictFactory(factory.Factory):
+    class Meta:
+        abstract = True
+        model = dict
+
+
+class PreferenceExperimentBranchFactory(DictFactory):
+    slug = FuzzySlug()
+    ratio = factory.fuzzy.FuzzyInteger(1, 100)
+    value = factory.fuzzy.FuzzyText()
+
+
+class PreferenceExperimentArgumentsFactory(DictFactory):
+    slug = FuzzySlug()
+    preferenceName = factory.Sequence(lambda n: f"experiment.pref-{n}")
+    preferenceType = "string"
+
+    @factory.post_generation
+    def branches(self, create, extracted=None, **kwargs):
+        if extracted is not None:
+            self["branches"] = [
+                PreferenceExperimentBranchFactory(**kwargs, **branch) for branch in extracted
+            ]
+        else:
+            self["branches"] = PreferenceExperimentBranchFactory.create_batch(2, **kwargs)
+
+
+class PreferenceRolloutPreferenceFactory(DictFactory):
+    preferenceName = factory.Sequence(lambda n: f"rollout.pref-{n}")
+    value = factory.fuzzy.FuzzyText()
+
+
+class PreferenceRolloutArgumentsFactory(DictFactory):
+    slug = FuzzySlug()
+
+    @factory.post_generation
+    def preferences(arguments, create, extracted=None, **kwargs):
+        if extracted is not None:
+            arguments["preferences"] = [
+                PreferenceRolloutPreferenceFactory(**kwargs, **spec) for spec in extracted
+            ]
+        else:
+            arguments["preferences"] = PreferenceRolloutPreferenceFactory.create_batch(2, **kwargs)
+
+
+class OptOutStudyArgumentsFactory(DictFactory):
+    name = factory.fuzzy.FuzzyText()
+    description = factory.faker.Faker("paragraph")
+    addonUrl = factory.lazy_attribute(
+        lambda x: f"https://example.com/{x}" + factory.faker.Faker("file_path").generate()
+    )
+    extensionApiId = factory.fuzzy.FuzzyInteger(1, 1000)
+
+
+argument_factories = {
+    "preference-experiment": PreferenceExperimentArgumentsFactory,
+    "preference-rollout": PreferenceRolloutArgumentsFactory,
+    "opt-out-study": OptOutStudyArgumentsFactory,
+}
+
+
 @factory.use_strategy(factory.BUILD_STRATEGY)
 class RecipeRevisionFactory(factory.DjangoModelFactory):
     class Meta:
@@ -199,6 +297,16 @@ class RecipeRevisionFactory(factory.DjangoModelFactory):
             BucketSampleFilterFactory(),
         ]
         return json.dumps(filters)
+
+    @factory.post_generation
+    def arguments(revision, create, extracted=None, **kwargs):
+        arguments_factory = argument_factories.get(revision.action.name)
+        if arguments_factory:
+            if extracted is None:
+                extracted = {}
+            revision.arguments = arguments_factory(**kwargs, **extracted)
+        elif extracted is not None:
+            revision.arguments = {**extracted, **kwargs}
 
 
 class DictFactory(factory.Factory):

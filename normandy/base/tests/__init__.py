@@ -58,6 +58,13 @@ class FuzzyUnicode(fuzzy.FuzzyText):
         super(FuzzyUnicode, self).__init__(prefix=prefix, **kwargs)
 
 
+class FuzzySlug(fuzzy.FuzzyText):
+    """A FuzzyText factory that is suitable for slugs."""
+
+    def __init__(self, **kwargs):
+        super().__init__(chars="abcdefghijklmnopqrstuvwxyz-", **kwargs)
+
+
 class UserFactory(DjangoModelFactory):
     username = FuzzyUnicode()
     email = Sequence(lambda n: "test%s@example.com" % n)
