@@ -9,9 +9,6 @@ actions:
     include: "*.py"
     exclude: "docs/"
 
-  yarn-audit:
-    run: yarn audit
-
   missing-migirations:
     include: "*.py"
     run: |

@@ -33,8 +33,7 @@ COPY ./poetry.lock /app/poetry.lock
 RUN poetry install --no-dev --no-root --no-interaction --verbose
 
 COPY . /app
-RUN NODE_ENV=production yarn build && \
-    DJANGO_CONFIGURATION=Build python ./manage.py collectstatic --no-input && \
+RUN DJANGO_CONFIGURATION=Build python ./manage.py collectstatic --no-input && \
     mkdir -p media && chown app:app media
 
 USER app

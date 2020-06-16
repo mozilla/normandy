@@ -1,3 +1,11 @@
+/**
+ * This folder contains source files for the action bundles that are
+ * stored in the `/assets/` folder.
+ *
+ * It has been retained for archival purposes but should be considered
+ * dead code.
+ */
+
 import { Action, registerAction, registerAsyncCallback } from '../utils';
 
 const SHIELD_OPT_OUT_PREF = 'app.shield.optoutstudies.enabled';

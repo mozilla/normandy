@@ -2,7 +2,6 @@
 db.sqlite3
 .DS_Store
 __pycache__/
-/assets/
 /static/
 /media/
 GeoLite2-Country.mmdb
