@@ -22,10 +22,12 @@ from normandy.recipes.models import (
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
+    fake_sign,
+    OptOutStudyArgumentsFactory,
+    PreferenceExperimentArgumentsFactory,
     RecipeFactory,
     RecipeRevisionFactory,
     SignatureFactory,
-    fake_sign,
 )
 from normandy.recipes.filters import StableSampleFilter
 
@@ -98,8 +100,10 @@ class TestAction(object):
 
 
 @pytest.mark.django_db
-class TestValidateArgumentPreferenceExperiments(object):
+class TestArgumentValidation(object):
     """
+    Test that individual action types correctly validate their arguments.
+
     This tests methods on Action, usually by creating Recipe instances.
     """
 
@@ -112,10 +116,9 @@ class TestValidateArgumentPreferenceExperiments(object):
     class TestPreferenceExperiments(object):
         def test_no_errors(self):
             action = ActionFactory(name="preference-experiment")
-            arguments = {
-                "slug": "a",
-                "branches": [{"slug": "a", "value": "a"}, {"slug": "b", "value": "b"}],
-            }
+            arguments = PreferenceExperimentArgumentsFactory(
+                slug="a", branches=[{"slug": "a", "value": "a"}, {"slug": "b", "value": "b"}],
+            )
             # does not throw when saving the revision
             recipe = RecipeFactory(action=action, arguments=arguments)
 
@@ -127,14 +130,14 @@ class TestValidateArgumentPreferenceExperiments(object):
 
         def test_preference_experiments_unique_branch_slugs(self):
             action = ActionFactory(name="preference-experiment")
-            arguments = {
-                "slug": "test",
-                "branches": [
+            arguments = PreferenceExperimentArgumentsFactory(
+                slug="test",
+                branches=[
                     {"slug": "unique", "value": "a"},
                     {"slug": "duplicate", "value": "b"},
                     {"slug": "duplicate", "value": "c"},
                 ],
-            }
+            )
             with pytest.raises(serializers.ValidationError) as exc_info:
                 action.validate_arguments(arguments, RecipeRevisionFactory())
             error = action.errors["duplicate_branch_slug"]
@@ -142,14 +145,14 @@ class TestValidateArgumentPreferenceExperiments(object):
 
         def test_preference_experiments_unique_branch_values(self):
             action = ActionFactory(name="preference-experiment")
-            arguments = {
-                "slug": "test",
-                "branches": [
+            arguments = PreferenceExperimentArgumentsFactory(
+                slug="test",
+                branches=[
                     {"slug": "a", "value": "unique"},
                     {"slug": "b", "value": "duplicate"},
                     {"slug": "c", "value": "duplicate"},
                 ],
-            }
+            )
             with pytest.raises(serializers.ValidationError) as exc_info:
                 action.validate_arguments(arguments, RecipeRevisionFactory())
             error = action.errors["duplicate_branch_value"]
@@ -157,15 +160,15 @@ class TestValidateArgumentPreferenceExperiments(object):
 
         def test_unique_experiment_slug_no_collision(self):
             action = ActionFactory(name="preference-experiment")
-            arguments_a = {"slug": "a", "branches": []}
-            arguments_b = {"slug": "b", "branches": []}
+            arguments_a = PreferenceExperimentArgumentsFactory()
+            arguments_b = PreferenceExperimentArgumentsFactory()
             # Does not throw when saving revisions
             RecipeFactory(action=action, arguments=arguments_a)
             RecipeFactory(action=action, arguments=arguments_b)
 
         def test_unique_experiment_slug_new_collision(self):
             action = ActionFactory(name="preference-experiment")
-            arguments = {"slug": "a", "branches": []}
+            arguments = PreferenceExperimentArgumentsFactory(slug="a")
             RecipeFactory(action=action, arguments=arguments)
 
             with pytest.raises(serializers.ValidationError) as exc_info1:
@@ -175,8 +178,12 @@ class TestValidateArgumentPreferenceExperiments(object):
 
         def test_unique_experiment_slug_update_collision(self):
             action = ActionFactory(name="preference-experiment")
-            arguments_a = {"slug": "a", "branches": []}
-            arguments_b = {"slug": "b", "branches": []}
+            arguments_a = PreferenceExperimentArgumentsFactory(
+                slug="a", branches=[{"slug": "one"}]
+            )
+            arguments_b = PreferenceExperimentArgumentsFactory(
+                slug="b", branches=[{"slug": "two"}]
+            )
             # Does not throw when saving revisions
             RecipeFactory(action=action, arguments=arguments_a)
             recipe = RecipeFactory(action=action, arguments=arguments_b)
@@ -225,10 +232,11 @@ class TestValidateArgumentPreferenceExperiments(object):
     class TestPreferenceRollback(object):
         def test_no_errors(self):
             rollback_action = ActionFactory(name="preference-rollback")
+            assert rollback_action.arguments_schema != {}
             rollout_action = ActionFactory(name="preference-rollout")
-            rollout_recipe = RecipeFactory(
-                action=rollout_action, arguments={"slug": "test-rollout"}
-            )
+            assert rollout_action.arguments_schema != {}
+
+            rollout_recipe = RecipeFactory(action=rollout_action)
 
             # does not throw when saving the revision
             arguments = {"rolloutSlug": rollout_recipe.latest_revision.arguments["slug"]}
@@ -246,8 +254,7 @@ class TestValidateArgumentPreferenceExperiments(object):
     class TestOptOutStudy(object):
         def test_no_errors(self):
             action = ActionFactory(name="opt-out-study")
-            arguments = {"name": "foo"}
-            recipe = RecipeFactory(action=action, arguments=arguments)
+            recipe = RecipeFactory(action=action)
 
             # Approve and enable the revision
             rev = recipe.latest_revision
@@ -267,8 +274,8 @@ class TestValidateArgumentPreferenceExperiments(object):
 
         def test_unique_name_update_collision(self):
             action = ActionFactory(name="opt-out-study")
-            arguments_a = {"name": "foo"}
-            arguments_b = {"name": "bar"}
+            arguments_a = OptOutStudyArgumentsFactory()
+            arguments_b = OptOutStudyArgumentsFactory()
             RecipeFactory(action=action, arguments=arguments_a)
             recipe = RecipeFactory(action=action, arguments=arguments_b)
 
