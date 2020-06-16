@@ -33,7 +33,7 @@ django_csp = "^3.5"
  # DRF does not follow semver, 3.11 is a breaking change
 djangorestframework = "3.10.*"
 djangorestframework-yaml = "^2.0.0"
-dockerflow = "^2019.9.0"
+dockerflow = "^2020.0.0"
 drf-yasg = "^1.17.0"
 ecdsa = "^0.13.3"
 factory_boy = "^2.12.0"
