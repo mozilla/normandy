@@ -75,9 +75,8 @@ class TestRecipeSerializer:
                 "name": "Any name",
                 "extra_filter_expression": "true",
                 "arguments": {
-                    "surveyId": "",
                     "surveys": [
-                        {"title": "", "weight": 1},
+                        {"weight": 1},
                         {"title": "bar", "weight": 1},
                         {"title": "foo", "weight": 0},
                         {"title": "baz", "weight": "lorem ipsum"},
@@ -90,9 +89,9 @@ class TestRecipeSerializer:
             serializer.is_valid(raise_exception=True)
 
         assert serializer.errors["arguments"] == {
-            "surveyId": "This field may not be blank.",
+            "surveyId": Whatever(lambda err: str(err) == "This field is required."),
             "surveys": {
-                0: {"title": "This field may not be blank."},
+                0: {"title": "This field is required."},
                 2: {"weight": "0 is less than the minimum of 1"},
                 3: {"weight": "'lorem ipsum' is not of type 'integer'"},
             },

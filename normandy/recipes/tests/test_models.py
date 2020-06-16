@@ -302,7 +302,7 @@ class TestArgumentValidation(object):
         def test_unique_branch_slugs(self):
             action = ActionFactory(name="multi-preference-experiment")
             arguments = MultiPreferenceExperimentArgumentsFactory(
-                branches=[{"slug": "unique"}, {"slug": "duplicate"}, {"slug": "duplicate"},],
+                branches=[{"slug": "unique"}, {"slug": "duplicate"}, {"slug": "duplicate"}],
             )
             with pytest.raises(serializers.ValidationError) as exc_info:
                 action.validate_arguments(arguments, RecipeRevisionFactory())
@@ -342,6 +342,26 @@ class TestArgumentValidation(object):
                 recipe.revise(arguments=arguments_a)
             error = action.errors["duplicate_experiment_slug"]
             assert exc_info1.value.detail == {"arguments": {"slug": error}}
+
+        def test_blank_pref_value(self):
+            action = ActionFactory(name="multi-preference-experiment")
+            # Should not throw
+            RecipeFactory(
+                action=action,
+                arguments=MultiPreferenceExperimentArgumentsFactory(
+                    branches=[
+                        {
+                            "preferences": {
+                                "test.pref-1": {
+                                    "preferenceValue": "",
+                                    "preferenceBranchType": "default",
+                                    "preferenceType": "string",
+                                }
+                            }
+                        }
+                    ]
+                ),
+            )
 
 
 @pytest.mark.django_db
