@@ -539,6 +539,56 @@ class StableSampleFilter(BaseFilter):
         return {"jexl.transform.stableSample"}
 
 
+class NamespaceSampleFilter(BaseFilter):
+    """
+    Like ``BucketSampleFilter``, with two major differences:
+
+        - The number of buckets is locked at 10,000
+        - Instead of taking arbitrary inputs, only a namespace is accepted,
+          as a string, and the user's client ID is added automatically.
+
+    .. attribute:: type
+
+        ``namespaceSample``
+
+    .. attribute:: namespace
+
+       The namespace to use for the sample, as a simple unquoted string.
+
+       :example: ``global-v2``
+
+    .. attribute:: start
+
+       The bucket to begin at.
+
+       :example: ``70``
+
+    .. attribute:: count
+
+       The number of buckets to include. The size of the included population
+       will be ``count / 10,000``. For example, a count of 50 would be 0.5%
+       of the population.
+
+       :example: ``50``
+    """
+
+    type = "namespaceSample"
+    start = serializers.FloatField()
+    count = serializers.FloatField(min_value=0)
+    namespace = serializers.CharField(min_length=1)
+
+    def to_jexl(self):
+        namespace = self.initial_data["namespace"]
+        start = self.initial_data["start"]
+        count = self.initial_data["count"]
+        total = 10_000
+        return f'["{namespace}",normandy.userId]|bucketSample({start},{count},{total})'
+
+    @property
+    def capabilities(self):
+        return {"jexl.transform.bucketSample"}
+
+
 class VersionFilter(BaseFilter):
     """
     Match a user running any of the listed versions. This will include dot

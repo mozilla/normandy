@@ -356,6 +356,10 @@ class TestBucketSampleFilter(FilterTestsBase):
         filter = self.create_basic_filter(input=["A"], start=10, count=20, total=1_000)
         assert filter.to_jexl() == "[A]|bucketSample(10,20,1000)"
 
+    def test_supports_floats(self):
+        filter = self.create_basic_filter(input=["A"], start=10, count=0.5, total=1_000)
+        assert filter.to_jexl() == "[A]|bucketSample(10,0.5,1000)"
+
 
 class TestStableSampleFilter(FilterTestsBase):
     def create_basic_filter(self, input=None, rate=0.01):
@@ -366,6 +370,21 @@ class TestStableSampleFilter(FilterTestsBase):
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], rate=0.1)
         assert filter.to_jexl() == "[A]|stableSample(0.1)"
+
+
+class TestNamespaceSampleFilter(FilterTestsBase):
+    def create_basic_filter(self, namespace="global-v42", start=123, count=10):
+        return filters.NamespaceSampleFilter.create(namespace=namespace, start=start, count=count)
+
+    def test_generates_jexl(self):
+        filter = self.create_basic_filter(namespace="fancy-rollout", start=10, count=20)
+        assert filter.to_jexl() == '["fancy-rollout",normandy.userId]|bucketSample(10,20,10000)'
+
+    def test_supports_floats(self):
+        filter = self.create_basic_filter(namespace="risky-experiment", start=123, count=0.5)
+        assert (
+            filter.to_jexl() == '["risky-experiment",normandy.userId]|bucketSample(123,0.5,10000)'
+        )
 
 
 class TestJexlFilter(FilterTestsBase):
