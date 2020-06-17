@@ -19,6 +19,7 @@ Filter Objects
 .. autoclass:: ChannelFilter()
 .. autoclass:: LocaleFilter()
 .. autoclass:: CountryFilter()
+.. autoclass:: NamespaceSampleFilter()
 .. autoclass:: BucketSampleFilter()
 .. autoclass:: StableSampleFilter()
 .. autoclass:: VersionFilter()
