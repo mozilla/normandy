@@ -5,6 +5,9 @@ import requests
 import sys
 import urllib3
 
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 # Disable any warnings about SSL connections
 urllib3.disable_warnings()
 
@@ -37,6 +40,10 @@ def conf(request):
 def requests_session(conf):
     session = requests.Session()
     session.verify = conf.getoption("verify")
+    retry_strategy = Retry(total=3)
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http", adapter)
+    session.mount("https", adapter)
     return session
 
 
