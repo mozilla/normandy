@@ -199,6 +199,7 @@ jobs:
   contract-tests:
     machine:
       docker_layer_caching: true
+      resource_class: large
     steps:
       - checkout
       - run:
