@@ -1,4 +1,4 @@
-FROM python:3.7-slim@sha256:2167a93238e072810d8ff839b4673a331f53276d03c3e9ef655727b7de530f1d
+FROM python:3.7-slim@sha256:225c394936740d17b1bd6aaa68731c53668947d2b38e44056b4b4a101c1ae6db
 WORKDIR /app
 
 RUN apt-get update && \
