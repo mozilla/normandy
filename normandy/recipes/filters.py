@@ -23,8 +23,9 @@ field, so the final JSON would look something like this:
 import json
 from datetime import datetime
 
-from pyjexl import JEXL
 from rest_framework import serializers
+
+from normandy.base.jexl import get_normandy_jexl
 
 
 # If you add a new filter to this file, remember to update the docs too!
@@ -401,6 +402,12 @@ class PrefUserSetFilter(BaseFilter):
     .. attribute:: type
 
         ``preferenceIsUserSet``
+
+    .. attribute:: pref
+
+        The preference to check
+
+        :example: ``app.normandy.enabled``
 
     .. attribute:: value
 
@@ -817,6 +824,75 @@ class NegateFilter(BaseFilter):
         return set()
 
 
+class _CompositeFilter(BaseFilter):
+    """Internal building block to combine many filters using a single operator"""
+
+    def _get_operator(self):
+        raise NotImplementedError()
+
+    def _get_subfilters(self):
+        raise NotImplementedError()
+
+    def to_jexl(self):
+        parts = [f.to_jexl() for f in self._get_subfilters()]
+        expr = self._get_operator().join(parts)
+        return f"({expr})"
+
+    @property
+    def capabilities(self):
+        return set.union(*(subfilter.capabilities for subfilter in self._get_subfilters()))
+
+
+class AndFilter(_CompositeFilter):
+    """
+    This filter combines one or more other filters, requiring all subfilters to match.
+
+    .. attribute:: type
+
+        ``and``
+
+    .. attribute:: subfilters
+
+        The filters to combine
+
+        :example: `[{"type": "locale", "locales": "en-US"}, {"type": "country", "countries": "US"}]`
+    """
+
+    type = "and"
+    subfilters = serializers.ListField(child=serializers.JSONField(), min_length=1)
+
+    def _get_operator(self):
+        return "&&"
+
+    def _get_subfilters(self):
+        return [from_data(filter) for filter in self.initial_data["subfilters"]]
+
+
+class OrFilter(_CompositeFilter):
+    """
+    This filter combines one or more other filters, requiring at least one subfilter to match.
+
+    .. attribute:: type
+
+        ``or``
+
+    .. attribute:: subfilters
+
+        The filters to combine
+
+        :example: `[{"type": "locale", "locales": "en-US"}, {"type": "country", "countries": "US"}]`
+    """
+
+    type = "or"
+    subfilters = serializers.ListField(child=serializers.JSONField(), min_length=1)
+
+    def _get_operator(self):
+        return "||"
+
+    def _get_subfilters(self):
+        return [from_data(filter) for filter in self.initial_data["subfilters"]]
+
+
 class ProfileCreateDateFilter(BaseFilter):
     """
     This filter is meant to distinguish between new and existing users.
@@ -907,17 +983,7 @@ class JexlFilter(BaseFilter):
 
     def to_jexl(self):
         built_expression = "(" + self.initial_data["expression"] + ")"
-        jexl = JEXL()
-
-        # Add mock transforms for validation. See
-        # https://mozilla.github.io/normandy/user/filters.html#transforms
-        # for a list of what transforms we expect to be available.
-        jexl.add_transform("date", lambda x: x)
-        jexl.add_transform("stableSample", lambda x: x)
-        jexl.add_transform("bucketSample", lambda x: x)
-        jexl.add_transform("preferenceValue", lambda x: x)
-        jexl.add_transform("preferenceIsUserSet", lambda x: x)
-        jexl.add_transform("preferenceExists", lambda x: x)
+        jexl = get_normandy_jexl()
 
         errors = list(jexl.validate(built_expression))
         if errors:
@@ -928,6 +994,55 @@ class JexlFilter(BaseFilter):
     @property
     def capabilities(self):
         return set(self.initial_data["capabilities"])
+
+
+class PresetFilter(_CompositeFilter):
+    """
+    A named preset of filters.
+
+    .. attribute:: type
+
+       ``preset``
+
+    .. attribute:: expression
+       The name of the preset to evaluate
+
+       :example: ``pocket-1``
+
+    """
+
+    type = "preset"
+    name = serializers.CharField()
+
+    def _get_operator(self):
+        return "&&"
+
+    def _get_subfilters(self):
+        def not_user_set(pref):
+            return {"type": "preferenceIsUserSet", "pref": pref, "value": False}
+
+        subfilter_data = None
+        preset_name = self.initial_data["name"]
+
+        if preset_name == "pocket-1":
+            subfilter_data = [
+                {
+                    "type": "or",
+                    "subfilters": [
+                        not_user_set("browser.newtabpage.enabled"),
+                        not_user_set("browser.startup.homepage"),
+                    ],
+                },
+                not_user_set("browser.newtabpage.activity-stream.showSearch"),
+                not_user_set("browser.newtabpage.activity-stream.feeds.topsites"),
+                not_user_set("browser.newtabpage.activity-stream.feeds.section.topstories"),
+                not_user_set("browser.newtabpage.activity-stream.feeds.section.highlights"),
+            ]
+
+        if subfilter_data is None:
+            raise serializers.ValidationError([f"Unknown preset type {preset_name}"])
+
+        return [from_data(d) for d in subfilter_data]
 
 
 def _calculate_by_type():

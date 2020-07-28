@@ -1,7 +1,9 @@
 import pytest
 import re
+from collections import defaultdict
 from rest_framework import serializers
 
+from normandy.base.jexl import get_normandy_jexl
 from normandy.recipes import filters
 from normandy.recipes.tests import (
     ChannelFactory,
@@ -32,7 +34,11 @@ class FilterTestsBase:
     def test_jexl_works(self):
         filter = self.create_basic_filter()
         # Would throw if not defined
-        assert isinstance(filter.to_jexl(), str)
+        expr = filter.to_jexl()
+        assert isinstance(expr, str)
+        jexl = get_normandy_jexl()
+        errors = jexl.validate(expr)
+        assert list(errors) == []
 
     def test_uses_only_baseline_capabilities(self, settings):
         filter = self.create_basic_filter()
@@ -233,6 +239,72 @@ class TestNegateFilter(FilterTestsBase):
         assert negate_filter.to_jexl() == '!(normandy.channel in ["release","beta"])'
 
 
+class TestAndFilter(FilterTestsBase):
+    def create_basic_filter(self, subfilters=None):
+        if subfilters is None:
+            subfilters = [
+                {"type": "channel", "channels": ["release", "beta"]},
+                {"type": "locale", "locales": ["en-US", "de"]},
+            ]
+        return filters.AndFilter.create(subfilters=subfilters)
+
+    def test_generates_jexl_zero_subfilters(self):
+        with pytest.raises(AssertionError) as excinfo:
+            self.create_basic_filter(subfilters=[])
+        assert "has at least 1 element" in str(excinfo.value)
+
+    def test_generates_jexl_one_subfilter(self):
+        negate_filter = self.create_basic_filter(
+            subfilters=[{"type": "channel", "channels": ["release"]}]
+        )
+        assert negate_filter.to_jexl() == '(normandy.channel in ["release"])'
+
+    def test_generates_jexl_two_subfilters(self):
+        negate_filter = self.create_basic_filter(
+            subfilters=[
+                {"type": "channel", "channels": ["release"]},
+                {"type": "locale", "locales": ["en-US"]},
+            ]
+        )
+        assert (
+            negate_filter.to_jexl()
+            == '(normandy.channel in ["release"]&&normandy.locale in ["en-US"])'
+        )
+
+
+class TestOrFilter(FilterTestsBase):
+    def create_basic_filter(self, subfilters=None):
+        if subfilters is None:
+            subfilters = [
+                {"type": "channel", "channels": ["release", "beta"]},
+                {"type": "locale", "locales": ["en-US", "de"]},
+            ]
+        return filters.OrFilter.create(subfilters=subfilters)
+
+    def test_generates_jexl_zero_subfilters(self):
+        with pytest.raises(AssertionError) as excinfo:
+            self.create_basic_filter(subfilters=[])
+        assert "has at least 1 element" in str(excinfo.value)
+
+    def test_generates_jexl_one_subfilter(self):
+        negate_filter = self.create_basic_filter(
+            subfilters=[{"type": "channel", "channels": ["release"]}]
+        )
+        assert negate_filter.to_jexl() == '(normandy.channel in ["release"])'
+
+    def test_generates_jexl_two_subfilters(self):
+        negate_filter = self.create_basic_filter(
+            subfilters=[
+                {"type": "channel", "channels": ["release"]},
+                {"type": "locale", "locales": ["en-US"]},
+            ]
+        )
+        assert (
+            negate_filter.to_jexl()
+            == '(normandy.channel in ["release"]||normandy.locale in ["en-US"])'
+        )
+
+
 class TestAddonInstalledFilter(FilterTestsBase):
     def create_basic_filter(self, addons=["@abcdef", "ghijk@lmnop"], any_or_all="any"):
         return filters.AddonInstalledFilter.create(addons=addons, any_or_all=any_or_all)
@@ -409,3 +481,48 @@ class TestJexlFilter(FilterTestsBase):
     def test_it_has_capabilities(self):
         filter = self.create_basic_filter(capabilities=["a.b", "c.d"])
         assert filter.capabilities == {"a.b", "c.d"}
+
+
+class TestPresetFilter(FilterTestsBase):
+    def create_basic_filter(self, name="pocket-1"):
+        return filters.PresetFilter.create(name=name)
+
+    def test_pocket_1(self):
+        filter_object = self.create_basic_filter(name="pocket-1")
+        # The preset is an and filter
+        assert filter_object._get_operator() == "&&"
+
+        # Pull out the first level subfilters
+        subfilters = defaultdict(lambda: [])
+        for filter in filter_object._get_subfilters():
+            subfilters[type(filter)].append(filter)
+
+        # There should be one or filter
+        or_filters = subfilters.pop(filters.OrFilter)
+        assert len(or_filters) == 1
+        or_subfilters = or_filters[0]._get_subfilters()
+        # It should be made up of negative PrefUserSet filters
+        for f in or_subfilters:
+            assert isinstance(f, filters.PrefUserSetFilter)
+            assert f.initial_data["value"] is False
+        # And it should use the exected prefs
+        assert set(f.initial_data["pref"] for f in or_subfilters) == set(
+            ["browser.newtabpage.enabled", "browser.startup.homepage"]
+        )
+
+        # There should be a bunch more negative PrefUserSet filters at the top level
+        pref_subfilters = subfilters.pop(filters.PrefUserSetFilter)
+        for f in pref_subfilters:
+            assert f.initial_data["value"] is False
+        # and they should be the expected prefs
+        assert set(f.initial_data["pref"] for f in pref_subfilters) == set(
+            [
+                "browser.newtabpage.activity-stream.showSearch",
+                "browser.newtabpage.activity-stream.feeds.topsites",
+                "browser.newtabpage.activity-stream.feeds.section.topstories",
+                "browser.newtabpage.activity-stream.feeds.section.highlights",
+            ]
+        )
+
+        # There should be no other filters
+        assert subfilters == {}, "no unexpected filters"
