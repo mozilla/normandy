@@ -1,8 +1,8 @@
-from pyjexl import JEXL
 from rest_framework import serializers
 from factory.fuzzy import FuzzyText
 
 from normandy.base.api.v3.serializers import UserSerializer
+from normandy.base.jexl import get_normandy_jexl
 from normandy.recipes import filters
 from normandy.recipes.api.fields import ActionImplementationHyperlinkField, FilterObjectField
 from normandy.recipes.models import (
@@ -190,17 +190,7 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
 
     def validate_extra_filter_expression(self, value):
         if value:
-            jexl = JEXL()
-
-            # Add mock transforms for validation. See
-            # https://mozilla.github.io/normandy/user/filters.html#transforms
-            # for a list of what transforms we expect to be available.
-            jexl.add_transform("date", lambda x: x)
-            jexl.add_transform("stableSample", lambda x: x)
-            jexl.add_transform("bucketSample", lambda x: x)
-            jexl.add_transform("preferenceValue", lambda x: x)
-            jexl.add_transform("preferenceIsUserSet", lambda x: x)
-            jexl.add_transform("preferenceExists", lambda x: x)
+            jexl = get_normandy_jexl()
 
             errors = list(jexl.validate(value))
             if errors:
