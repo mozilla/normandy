@@ -1005,44 +1005,50 @@ class PresetFilter(_CompositeFilter):
        ``preset``
 
     .. attribute:: expression
-       The name of the preset to evaluate
 
-       :example: ``pocket-1``
+       The name of the preset to evaluate.
+
+       .. autoattribute:: preset_choices
 
     """
 
     type = "preset"
     name = serializers.CharField()
 
+    preset_choices = ["pocket-1"]
+    """Presets available to use with this filter."""
+
     def _get_operator(self):
         return "&&"
 
     def _get_subfilters(self):
+        preset_name = self.initial_data["name"]
+        if preset_name not in self.preset_choices:
+            raise serializers.ValidationError([f"Unknown preset type {preset_name}"])
+
+        preset_name_identifier = preset_name.replace("-", "_")
+        generator_name = f"_get_subfilters_{preset_name_identifier}"
+        subfilter_data = getattr(self, generator_name)()
+
+        return [from_data(d) for d in subfilter_data]
+
+    def _get_subfilters_pocket_1(self):
         def not_user_set(pref):
             return {"type": "preferenceIsUserSet", "pref": pref, "value": False}
 
-        subfilter_data = None
-        preset_name = self.initial_data["name"]
-
-        if preset_name == "pocket-1":
-            subfilter_data = [
-                {
-                    "type": "or",
-                    "subfilters": [
-                        not_user_set("browser.newtabpage.enabled"),
-                        not_user_set("browser.startup.homepage"),
-                    ],
-                },
-                not_user_set("browser.newtabpage.activity-stream.showSearch"),
-                not_user_set("browser.newtabpage.activity-stream.feeds.topsites"),
-                not_user_set("browser.newtabpage.activity-stream.feeds.section.topstories"),
-                not_user_set("browser.newtabpage.activity-stream.feeds.section.highlights"),
-            ]
-
-        if subfilter_data is None:
-            raise serializers.ValidationError([f"Unknown preset type {preset_name}"])
-
-        return [from_data(d) for d in subfilter_data]
+        return [
+            {
+                "type": "or",
+                "subfilters": [
+                    not_user_set("browser.newtabpage.enabled"),
+                    not_user_set("browser.startup.homepage"),
+                ],
+            },
+            not_user_set("browser.newtabpage.activity-stream.showSearch"),
+            not_user_set("browser.newtabpage.activity-stream.feeds.topsites"),
+            not_user_set("browser.newtabpage.activity-stream.feeds.section.topstories"),
+            not_user_set("browser.newtabpage.activity-stream.feeds.section.highlights"),
+        ]
 
 
 def _calculate_by_type():

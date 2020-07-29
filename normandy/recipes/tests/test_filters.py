@@ -487,6 +487,14 @@ class TestPresetFilter(FilterTestsBase):
     def create_basic_filter(self, name="pocket-1"):
         return filters.PresetFilter.create(name=name)
 
+    def test_all_choices_have_generators(self):
+        f = filters.PresetFilter()
+        choices = f.preset_choices
+        for choice in choices:
+            identifier = choice.replace("-", "_")
+            generator_name = f"_get_subfilters_{identifier}"
+            getattr(f, generator_name)()
+
     def test_pocket_1(self):
         filter_object = self.create_basic_filter(name="pocket-1")
         # The preset is an and filter
