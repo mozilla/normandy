@@ -1004,7 +1004,7 @@ class PresetFilter(_CompositeFilter):
 
        ``preset``
 
-    .. attribute:: expression
+    .. attribute:: name
 
        The name of the preset to evaluate.
 
