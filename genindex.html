@@ -169,6 +169,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -190,10 +191,10 @@
 </li>
       <li><a href="user/filters.html#addon.version">addon.version (addon attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user/filters.html#normandy.recipes.filters.AddonActiveFilter">AddonActiveFilter (class in normandy.recipes.filters)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user/filters.html#normandy.recipes.filters.AddonInstalledFilter">AddonInstalledFilter (class in normandy.recipes.filters)</a>
 </li>
       <li><a href="user/filters.html#normandy.recipes.filters.AddonActiveFilter.addons">addons (normandy.recipes.filters.AddonActiveFilter attribute)</a>
@@ -202,6 +203,8 @@
         <li><a href="user/filters.html#normandy.recipes.filters.AddonInstalledFilter.addons">(normandy.recipes.filters.AddonInstalledFilter attribute)</a>
 </li>
       </ul></li>
+      <li><a href="user/filters.html#normandy.recipes.filters.AndFilter">AndFilter (class in normandy.recipes.filters)</a>
+</li>
       <li><a href="user/filters.html#normandy.recipes.filters.AddonActiveFilter.any_or_all">any_or_all (normandy.recipes.filters.AddonActiveFilter attribute)</a>
 
       <ul>
@@ -485,6 +488,8 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="user/filters.html#normandy.recipes.filters.PresetFilter.name">name (normandy.recipes.filters.PresetFilter attribute)</a>
+</li>
       <li><a href="user/filters.html#normandy.recipes.filters.NamespaceSampleFilter.namespace">namespace (normandy.recipes.filters.NamespaceSampleFilter attribute)</a>
 </li>
       <li><a href="user/filters.html#normandy.recipes.filters.NamespaceSampleFilter">NamespaceSampleFilter (class in normandy.recipes.filters)</a>
@@ -556,6 +561,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="user/filters.html#normandy.recipes.filters.OrFilter">OrFilter (class in normandy.recipes.filters)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -563,19 +576,25 @@
 </li>
       <li><a href="user/filters.html#normandy.recipes.filters.PlatformFilter.platforms">platforms (normandy.recipes.filters.PlatformFilter attribute)</a>
 </li>
+      <li><a href="user/filters.html#normandy.recipes.filters.PrefUserSetFilter.pref">pref (normandy.recipes.filters.PrefUserSetFilter attribute)</a>
+</li>
       <li><a href="user/filters.html#normandy.recipes.filters.PrefCompareFilter">PrefCompareFilter (class in normandy.recipes.filters)</a>
 </li>
       <li><a href="user/filters.html#preferenceExists">preferenceExists() (built-in function)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user/filters.html#preferenceIsUserSet">preferenceIsUserSet() (built-in function)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user/filters.html#preferenceValue">preferenceValue() (built-in function)</a>
 </li>
       <li><a href="user/filters.html#normandy.recipes.filters.PrefExistsFilter">PrefExistsFilter (class in normandy.recipes.filters)</a>
 </li>
       <li><a href="user/filters.html#normandy.recipes.filters.PrefUserSetFilter">PrefUserSetFilter (class in normandy.recipes.filters)</a>
+</li>
+      <li><a href="user/filters.html#normandy.recipes.filters.PresetFilter.preset_choices">preset_choices (normandy.recipes.filters.PresetFilter attribute)</a>
+</li>
+      <li><a href="user/filters.html#normandy.recipes.filters.PresetFilter">PresetFilter (class in normandy.recipes.filters)</a>
 </li>
       <li><a href="user/filters.html#normandy.recipes.filters.ProfileCreateDateFilter">ProfileCreateDateFilter (class in normandy.recipes.filters)</a>
 </li>
@@ -597,14 +616,20 @@
 </li>
       <li><a href="user/filters.html#stableSample">stableSample() (built-in function)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user/filters.html#normandy.recipes.filters.StableSampleFilter">StableSampleFilter (class in normandy.recipes.filters)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user/filters.html#normandy.recipes.filters.BucketSampleFilter.start">start (normandy.recipes.filters.BucketSampleFilter attribute)</a>
 
       <ul>
         <li><a href="user/filters.html#normandy.recipes.filters.NamespaceSampleFilter.start">(normandy.recipes.filters.NamespaceSampleFilter attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="user/filters.html#normandy.recipes.filters.AndFilter.subfilters">subfilters (normandy.recipes.filters.AndFilter attribute)</a>
+
+      <ul>
+        <li><a href="user/filters.html#normandy.recipes.filters.OrFilter.subfilters">(normandy.recipes.filters.OrFilter attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -619,6 +644,8 @@
 
       <ul>
         <li><a href="user/filters.html#normandy.recipes.filters.AddonInstalledFilter.type">(normandy.recipes.filters.AddonInstalledFilter attribute)</a>
+</li>
+        <li><a href="user/filters.html#normandy.recipes.filters.AndFilter.type">(normandy.recipes.filters.AndFilter attribute)</a>
 </li>
         <li><a href="user/filters.html#normandy.recipes.filters.BucketSampleFilter.type">(normandy.recipes.filters.BucketSampleFilter attribute)</a>
 </li>
@@ -636,6 +663,8 @@
 </li>
         <li><a href="user/filters.html#normandy.recipes.filters.NegateFilter.type">(normandy.recipes.filters.NegateFilter attribute)</a>
 </li>
+        <li><a href="user/filters.html#normandy.recipes.filters.OrFilter.type">(normandy.recipes.filters.OrFilter attribute)</a>
+</li>
         <li><a href="user/filters.html#normandy.recipes.filters.PlatformFilter.type">(normandy.recipes.filters.PlatformFilter attribute)</a>
 </li>
         <li><a href="user/filters.html#normandy.recipes.filters.PrefCompareFilter.type">(normandy.recipes.filters.PrefCompareFilter attribute)</a>
@@ -643,6 +672,8 @@
         <li><a href="user/filters.html#normandy.recipes.filters.PrefExistsFilter.type">(normandy.recipes.filters.PrefExistsFilter attribute)</a>
 </li>
         <li><a href="user/filters.html#normandy.recipes.filters.PrefUserSetFilter.type">(normandy.recipes.filters.PrefUserSetFilter attribute)</a>
+</li>
+        <li><a href="user/filters.html#normandy.recipes.filters.PresetFilter.type">(normandy.recipes.filters.PresetFilter attribute)</a>
 </li>
         <li><a href="user/filters.html#normandy.recipes.filters.ProfileCreateDateFilter.type">(normandy.recipes.filters.ProfileCreateDateFilter attribute)</a>
 </li>

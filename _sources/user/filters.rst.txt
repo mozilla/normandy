@@ -33,8 +33,11 @@ Filter Objects
 .. autoclass:: WindowsBuildNumberFilter()
 .. autoclass:: WindowsVersionFilter()
 .. autoclass:: NegateFilter()
+.. autoclass:: AndFilter()
+.. autoclass:: OrFilter()
 .. autoclass:: AddonActiveFilter()
 .. autoclass:: AddonInstalledFilter()
+.. autoclass:: PresetFilter()
 .. autoclass:: JexlFilter()
 
 

@@ -656,6 +656,17 @@ a given date.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="normandy.recipes.filters.PrefUserSetFilter.pref">
+<code class="sig-name descname">pref</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.pref" title="Permalink to this definition">¶</a></dt>
+<dd><p>The preference to check</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">app.normandy.enabled</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="normandy.recipes.filters.PrefUserSetFilter.value">
 <code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean true or false.</p>
@@ -765,6 +776,52 @@ creates jexl that compares the windows NT version.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="normandy.recipes.filters.AndFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AndFilter</code><a class="headerlink" href="#normandy.recipes.filters.AndFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This filter combines one or more other filters, requiring all subfilters to match.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AndFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.AndFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">and</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.AndFilter.subfilters">
+<code class="sig-name descname">subfilters</code><a class="headerlink" href="#normandy.recipes.filters.AndFilter.subfilters" title="Permalink to this definition">¶</a></dt>
+<dd><p>The filters to combine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><cite>[{“type”: “locale”, “locales”: “en-US”}, {“type”: “country”, “countries”: “US”}]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.OrFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">OrFilter</code><a class="headerlink" href="#normandy.recipes.filters.OrFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This filter combines one or more other filters, requiring at least one subfilter to match.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.OrFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.OrFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">or</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.OrFilter.subfilters">
+<code class="sig-name descname">subfilters</code><a class="headerlink" href="#normandy.recipes.filters.OrFilter.subfilters" title="Permalink to this definition">¶</a></dt>
+<dd><p>The filters to combine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p><cite>[{“type”: “locale”, “locales”: “en-US”}, {“type”: “country”, “countries”: “US”}]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="normandy.recipes.filters.AddonActiveFilter">
 <em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AddonActiveFilter</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user based on if a particular addon is active.</p>
@@ -844,6 +901,30 @@ creates jexl that compares the windows NT version.</p>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">any</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code></p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.PresetFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PresetFilter</code><a class="headerlink" href="#normandy.recipes.filters.PresetFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A named preset of filters.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PresetFilter.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">preset</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PresetFilter.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the preset to evaluate.</p>
+<dl class="attribute">
+<dt id="normandy.recipes.filters.PresetFilter.preset_choices">
+<code class="sig-name descname">preset_choices</code><em class="property"> = ['pocket-1']</em><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.preset_choices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Presets available to use with this filter.</p>
+</dd></dl>
+
 </dd></dl>
 
 </dd></dl>
