@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import factory.fuzzy
 import pytest
 import re
 from collections import defaultdict
@@ -64,18 +67,29 @@ class TestProfileCreationDateFilter(FilterTestsBase):
         return filters.ProfileCreateDateFilter.create(direction=direction, date=date)
 
     def test_generates_jexl_older_than(self):
-        filter = self.create_basic_filter()
+        filter = self.create_basic_filter(date="2020-07-30")
         assert set(filter.to_jexl().split("||")) == {
             "(!normandy.telemetry.main)",
-            "(normandy.telemetry.main.environment.profile.creationDate<=18262)",
+            "(normandy.telemetry.main.environment.profile.creationDate<=18473)",
         }
 
     def test_generates_jexl_newer_than(self):
         filter = self.create_basic_filter(direction="newerThan", date="2020-02-01")
         assert set(filter.to_jexl().split("||")) == {
             "(!normandy.telemetry.main)",
-            "(normandy.telemetry.main.environment.profile.creationDate>18262)",
+            "(normandy.telemetry.main.environment.profile.creationDate>18293)",
         }
+
+    def test_issue_2242(self):
+        """Make sure that dates are parsed correctly"""
+        epoch = datetime.utcfromtimestamp(0)
+        datetime_factory = factory.fuzzy.FuzzyNaiveDateTime(epoch)
+        dt = datetime_factory.fuzz()
+        # Profile Creation Date is measured in days since epoch.
+        daystamp = (dt - epoch).days
+
+        filter = self.create_basic_filter(date=f"{dt.year}-{dt.month}-{dt.day}")
+        assert str(daystamp) in filter.to_jexl()
 
     def test_throws_error_on_bad_direction(self):
         filter = self.create_basic_filter(direction="newer", date="2020-02-01")

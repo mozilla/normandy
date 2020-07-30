@@ -920,7 +920,7 @@ class ProfileCreateDateFilter(BaseFilter):
         direction = self.initial_data["direction"]
         date = self.initial_data["date"]
 
-        days = (datetime.strptime(date, "%Y-%M-%d") - datetime(1970, 1, 1)).days
+        days = (datetime.strptime(date, "%Y-%m-%d") - datetime(1970, 1, 1)).days
 
         if direction == "olderThan":
             symbol = "<="
