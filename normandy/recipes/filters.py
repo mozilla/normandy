@@ -922,19 +922,17 @@ class ProfileCreateDateFilter(BaseFilter):
 
         days = (datetime.strptime(date, "%Y-%m-%d") - datetime(1970, 1, 1)).days
 
+        expr = ""
+
         if direction == "olderThan":
             symbol = "<="
         elif direction == "newerThan":
             symbol = ">"
+            expr = "(!normandy.telemetry.main)||"
         else:
             raise serializers.ValidationError(f"Unrecognized direction {direction!r}")
 
-        return "||".join(
-            [
-                "(!normandy.telemetry.main)",
-                f"(normandy.telemetry.main.environment.profile.creationDate{symbol}{days})",
-            ]
-        )
+        return expr + f"(normandy.telemetry.main.environment.profile.creationDate{symbol}{days})"
 
     @property
     def capabilities(self):
