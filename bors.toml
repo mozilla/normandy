@@ -1,5 +1,4 @@
 status = [
-  "ci/circleci: contract-tests",
   "ci/circleci: docker-image-build-pr",
   "ci/circleci: docs-build",
   "ci/circleci: lint",
