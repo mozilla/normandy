@@ -4,15 +4,15 @@ import jsonschema
 from django.core.exceptions import ValidationError
 
 
-# Add path to required validator so we can get property name
+# Add path to the required validator so we can add a `path` field pointing to the field that is required.
 def _required(validator, requirements, instance, schema):
     """Validate 'required' properties."""
     if not validator.is_type(instance, "object"):
         return
 
     for index, requirement in enumerate(requirements):
-        if instance.get(requirement, "") == "":
-            error = jsonschema.ValidationError("This field may not be blank.", path=[requirement])
+        if instance.get(requirement) is None:
+            error = jsonschema.ValidationError("This field is required.", path=[requirement])
             yield error
 
 

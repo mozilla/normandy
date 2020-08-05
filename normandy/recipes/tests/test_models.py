@@ -23,6 +23,7 @@ from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
     fake_sign,
+    MultiPreferenceExperimentArgumentsFactory,
     OptOutStudyArgumentsFactory,
     PreferenceExperimentArgumentsFactory,
     RecipeFactory,
@@ -283,6 +284,84 @@ class TestArgumentValidation(object):
                 recipe.revise(arguments=arguments_a)
             error = action.errors["duplicate_study_name"]
             assert exc_info1.value.detail == {"arguments": {"name": error}}
+
+    @pytest.mark.django_db
+    class TestMultiPreferenceExperiments(object):
+        def test_no_errors(self):
+            action = ActionFactory(name="multi-preference-experiment")
+            assert action.arguments_schema != {}
+            # does not throw when saving the revision
+            recipe = RecipeFactory(action=action)
+
+            # Approve and enable the revision
+            rev = recipe.latest_revision
+            approval_request = rev.request_approval(UserFactory())
+            approval_request.approve(UserFactory(), "r+")
+            rev.enable(UserFactory())
+
+        def test_unique_branch_slugs(self):
+            action = ActionFactory(name="multi-preference-experiment")
+            arguments = MultiPreferenceExperimentArgumentsFactory(
+                branches=[{"slug": "unique"}, {"slug": "duplicate"}, {"slug": "duplicate"}],
+            )
+            with pytest.raises(serializers.ValidationError) as exc_info:
+                action.validate_arguments(arguments, RecipeRevisionFactory())
+            error = action.errors["duplicate_branch_slug"]
+            assert exc_info.value.detail == {"arguments": {"branches": {2: {"slug": error}}}}
+
+        def test_unique_experiment_slug_no_collision(self):
+            """Two recipes with different slugs can be saved"""
+            action = ActionFactory(name="multi-preference-experiment")
+            arguments_a = MultiPreferenceExperimentArgumentsFactory()
+            arguments_b = MultiPreferenceExperimentArgumentsFactory()
+            # Does not throw when saving revisions
+            RecipeFactory(action=action, arguments=arguments_a)
+            RecipeFactory(action=action, arguments=arguments_b)
+
+        def test_unique_experiment_slug_new_collision(self):
+            """A new recipe can't be made if its slug matches an existing one"""
+            action = ActionFactory(name="multi-preference-experiment")
+            arguments = MultiPreferenceExperimentArgumentsFactory()
+            RecipeFactory(action=action, arguments=arguments)
+
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                RecipeFactory(action=action, arguments=arguments)
+            error = action.errors["duplicate_experiment_slug"]
+            assert exc_info1.value.detail == {"arguments": {"slug": error}}
+
+        def test_unique_experiment_slug_update_collision(self):
+            """A recipe can't be updated to have the same slug as another existing recipe"""
+            action = ActionFactory(name="multi-preference-experiment")
+            arguments_a = MultiPreferenceExperimentArgumentsFactory()
+            arguments_b = MultiPreferenceExperimentArgumentsFactory()
+            # Does not throw when saving revisions
+            RecipeFactory(action=action, arguments=arguments_a)
+            recipe = RecipeFactory(action=action, arguments=arguments_b)
+
+            with pytest.raises(serializers.ValidationError) as exc_info1:
+                recipe.revise(arguments=arguments_a)
+            error = action.errors["duplicate_experiment_slug"]
+            assert exc_info1.value.detail == {"arguments": {"slug": error}}
+
+        def test_blank_pref_value(self):
+            action = ActionFactory(name="multi-preference-experiment")
+            # Should not throw
+            RecipeFactory(
+                action=action,
+                arguments=MultiPreferenceExperimentArgumentsFactory(
+                    branches=[
+                        {
+                            "preferences": {
+                                "test.pref-1": {
+                                    "preferenceValue": "",
+                                    "preferenceBranchType": "default",
+                                    "preferenceType": "string",
+                                }
+                            }
+                        }
+                    ]
+                ),
+            )
 
 
 @pytest.mark.django_db

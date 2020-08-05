@@ -287,13 +287,11 @@ class TestRecipeAPI(object):
                     "enabled": True,
                     "extra_filter_expression": "true",
                     "action_id": action.id,
-                    "arguments": {"message": ""},
+                    "arguments": {},
                 },
             )
             assert res.status_code == 400
-            assert res.json()["arguments"]["message"] == (
-                serializers.CharField.default_error_messages["blank"]
-            )
+            assert res.json()["arguments"]["message"] == "This field is required."
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0
@@ -365,7 +363,7 @@ class TestRecipeAPI(object):
             }
             res = api_client.post("/api/v3/recipe/", data)
             assert res.status_code == 400
-            assert res.data == {"arguments": {"message": "This field may not be blank."}}
+            assert res.data == {"arguments": {"message": "This field is required."}}
 
             recipes = Recipe.objects.all()
             assert recipes.count() == 0

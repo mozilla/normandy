@@ -267,10 +267,41 @@ class OptOutStudyArgumentsFactory(DictFactory):
     extensionApiId = factory.fuzzy.FuzzyInteger(1, 1000)
 
 
+class MultiPreferenceExperimentBranchFactory(DictFactory):
+    slug = FuzzySlug()
+    ratio = factory.fuzzy.FuzzyInteger(1, 100)
+    preferences = factory.Sequence(
+        lambda n: {
+            f"multi-experiment.pref-{n}": {
+                "preferenceBranchType": "default",
+                "preferenceValue": "test",
+                "preferenceType": "string",
+            }
+        }
+    )
+    value = factory.fuzzy.FuzzyText()
+
+
+class MultiPreferenceExperimentArgumentsFactory(DictFactory):
+    slug = FuzzySlug()
+    userFacingName = factory.faker.Faker("sentence")
+    userFacingDescription = factory.faker.Faker("paragraph")
+
+    @factory.post_generation
+    def branches(self, create, extracted=None, **kwargs):
+        if extracted is not None:
+            self["branches"] = [
+                MultiPreferenceExperimentBranchFactory(**kwargs, **branch) for branch in extracted
+            ]
+        else:
+            self["branches"] = MultiPreferenceExperimentBranchFactory.create_batch(2, **kwargs)
+
+
 argument_factories = {
     "preference-experiment": PreferenceExperimentArgumentsFactory,
     "preference-rollout": PreferenceRolloutArgumentsFactory,
     "opt-out-study": OptOutStudyArgumentsFactory,
+    "multi-preference-experiment": MultiPreferenceExperimentArgumentsFactory,
 }
 
 

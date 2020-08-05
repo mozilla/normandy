@@ -751,6 +751,27 @@ class Action(DirtyFieldsMixin, models.Model):
                 msg = self.errors["duplicate_experiment_slug"]
                 errors["slug"] = msg
 
+        if self.name == "multi-preference-experiment":
+            # Feature branch slugs should be unique within an experiment.
+            branch_slugs = set()
+            for i, branch in enumerate(arguments.get("branches")):
+                if branch["slug"] in branch_slugs:
+                    msg = self.errors["duplicate_branch_slug"]
+                    errors["branches"][i]["slug"] = msg
+
+                branch_slugs.add(branch["slug"])
+
+            # Experiment slugs should be unique.
+            experiment_recipes = Recipe.objects.filter(latest_revision__action=self)
+            if revision.recipe and revision.recipe.id:
+                experiment_recipes = experiment_recipes.exclude(id=revision.recipe.id)
+            existing_slugs = set(
+                r.latest_revision.arguments.get("slug") for r in experiment_recipes
+            )
+            if arguments.get("slug") in existing_slugs:
+                msg = self.errors["duplicate_experiment_slug"]
+                errors["slug"] = msg
+
         elif self.name == "preference-rollout":
             # Rollout slugs should be unique
             rollout_recipes = Recipe.objects.filter(latest_revision__action=self)
