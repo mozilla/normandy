@@ -827,7 +827,9 @@ class TestRecipeRevision(object):
             assert mocked_remotesettings.return_value.unpublish.call_count == 1
             assert mocked_remotesettings.return_value.publish.call_count == 2
 
-        def test_it_rollbacks_changes_if_error_happens_on_publish(self, mocked_remotesettings):
+        def test_it_does_not_rollback_changes_if_rs_error_happens_on_publish(
+            self, mocked_remotesettings
+        ):
             recipe = RecipeFactory(name="Test", approver=UserFactory())
             error = remote_settings_exceptions.KintoException
             mocked_remotesettings.return_value.publish.side_effect = error
@@ -836,9 +838,11 @@ class TestRecipeRevision(object):
                 recipe.approved_revision.enable(user=UserFactory())
 
             saved = Recipe.objects.get(id=recipe.id)
-            assert not saved.approved_revision.enabled
+            assert saved.approved_revision.enabled
 
-        def test_it_rollbacks_changes_if_error_happens_on_unpublish(self, mocked_remotesettings):
+        def test_it_does_not_rollback_changes_if_rs_error_happens_on_unpublish(
+            self, mocked_remotesettings
+        ):
             recipe = RecipeFactory(name="Test", approver=UserFactory(), enabler=UserFactory())
             error = remote_settings_exceptions.KintoException
             mocked_remotesettings.return_value.unpublish.side_effect = error
@@ -847,7 +851,7 @@ class TestRecipeRevision(object):
                 recipe.approved_revision.disable(user=UserFactory())
 
             saved = Recipe.objects.get(id=recipe.id)
-            assert saved.approved_revision.enabled
+            assert not saved.approved_revision.enabled
 
         def test_enable_rollback_enable_rollout_invariance(self):
             rollout_recipe = RecipeFactory(
