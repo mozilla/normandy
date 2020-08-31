@@ -115,7 +115,7 @@ jobs:
 
   docs-build:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
@@ -162,7 +162,7 @@ jobs:
 
   python-tests:
     docker:
-      - image: circleci/python:3.7-node-browsers
+      - image: circleci/python:3.8-node-browsers
       - image: circleci/postgres:9.6
         environment:
           POSTGRES_HOST_AUTH_METHOD: trust
