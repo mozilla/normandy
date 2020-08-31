@@ -2,6 +2,7 @@ import factory
 import json
 import tempfile
 import zipfile
+from factory.django import DjangoModelFactory
 
 from normandy.base.tests import FuzzyUnicode
 from normandy.studies.models import Extension
@@ -124,7 +125,7 @@ class LegacyAddonFileFactory(XPIFileFactory):
         self.add_file("install.rdf", INSTALL_RDF_TEMPLATE.format(insert).encode())
 
 
-class ExtensionFactory(factory.DjangoModelFactory):
+class ExtensionFactory(DjangoModelFactory):
     name = FuzzyUnicode()
     xpi = factory.django.FileField(from_func=lambda: WebExtensionFileFactory().open())
 

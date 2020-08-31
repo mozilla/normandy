@@ -4,7 +4,8 @@ from datetime import datetime
 
 from django.contrib.auth.models import Group, User
 
-from factory import DjangoModelFactory, fuzzy, Sequence
+from factory import fuzzy, Sequence
+from factory.django import DjangoModelFactory
 import pytest
 
 
