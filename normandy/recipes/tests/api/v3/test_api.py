@@ -13,6 +13,7 @@ from normandy.base.api.permissions import AdminEnabledOrReadOnly
 from normandy.base.tests import UserFactory, Whatever
 from normandy.base.utils import canonical_json_dumps
 from normandy.recipes.models import ApprovalRequest, Recipe, RecipeRevision
+from normandy.recipes import filters as filter_objects
 from normandy.recipes.tests import (
     ActionFactory,
     ApprovalRequestFactory,
@@ -171,6 +172,51 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data["count"] == 1
             assert res.data["results"][0]["id"] == recipe1.id
+
+        def test_list_can_filter_by_filter_object_fields(self, api_client):
+            locale = LocaleFactory()
+            recipe1 = RecipeFactory(
+                filter_object=[
+                    filter_objects.BucketSampleFilter.create(
+                        start=100,
+                        count=200,
+                        total=10_000,
+                        input=["normandy.userId", '"global-v4'],
+                    ),
+                    filter_objects.LocaleFilter.create(locales=[locale.code]),
+                ]
+            )
+            recipe2 = RecipeFactory(
+                filter_object=[
+                    filter_objects.PresetFilter.create(name="pocket-1"),
+                    filter_objects.LocaleFilter.create(locales=[locale.code]),
+                ]
+            )
+
+            # All recipes are visible
+            res = api_client.get("/api/v3/recipe/")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe1.id, recipe2.id}
+
+            # Filters can find simple-strings
+            res = api_client.get("/api/v3/recipe/?filter_object=name:pocket")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe2.id}
+
+            # Filters can find partial values in lists
+            res = api_client.get("/api/v3/recipe/?filter_object=input:global-v4")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe1.id}
+
+            # Filters can find multiple results
+            res = api_client.get(f"/api/v3/recipe/?filter_object=locales:{locale.code}")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe1.id, recipe2.id}
+
+            # Filters can find nothing
+            res = api_client.get("/api/v3/recipe/?filter_object=doesnt:exist")
+            assert res.status_code == 200
+            assert res.data["count"] == 0
 
     @pytest.mark.django_db
     class TestCreation(object):

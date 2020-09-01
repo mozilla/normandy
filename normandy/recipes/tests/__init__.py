@@ -168,6 +168,7 @@ class RecipeFactory(factory.DjangoModelFactory):
     def filter_object(self, create, extracted, **kwargs):
         if extracted:
             self.latest_revision.filter_object = extracted
+            self.latest_revision.save()
 
     # This should always be before `enabler`
     @factory.post_generation
