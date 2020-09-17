@@ -47,7 +47,7 @@ class BaseFilter(serializers.Serializer):
         """The capabilities needed by this filter"""
         raise NotImplementedError
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         """Render this filter to a JEXL expression"""
         raise NotImplementedError
 
@@ -59,7 +59,7 @@ class BaseAddonFilter(BaseFilter):
     def get_formatted_string(self, addon):
         raise NotImplementedError("Not correctly implemented.")
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         any_or_all = self.initial_data["any_or_all"]
 
         symbol = {"all": "&&", "any": "||"}.get(any_or_all)
@@ -82,7 +82,7 @@ class BaseComparisonFilter(BaseFilter):
     def left_of_operator(self):
         raise NotImplementedError("Not correctly implemented.")
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         comparison = self.initial_data["comparison"]
         value = self.initial_data["value"]
 
@@ -129,7 +129,7 @@ class ChannelFilter(BaseFilter):
                 raise serializers.ValidationError(f"Unrecognized channel slug {slug!r}")
         return value
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         channels = ",".join(f'"{c}"' for c in self.initial_data["channels"])
         return f"normandy.channel in [{channels}]"
 
@@ -166,7 +166,7 @@ class LocaleFilter(BaseFilter):
                 raise serializers.ValidationError(f"Unrecognized locale code {code!r}")
         return value
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         locales = ",".join(f'"{l}"' for l in self.initial_data["locales"])
         return f"normandy.locale in [{locales}]"
 
@@ -202,7 +202,7 @@ class CountryFilter(BaseFilter):
                 raise serializers.ValidationError(f"Unrecognized country code {code!r}")
         return value
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         countries = ",".join(f'"{c}"' for c in self.initial_data["countries"])
         return f"normandy.country in [{countries}]"
 
@@ -230,7 +230,7 @@ class PlatformFilter(BaseFilter):
     type = "platform"
     platforms = serializers.ListField(child=serializers.CharField(), min_length=1)
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         platforms_jexl = []
         for platform in self.initial_data["platforms"]:
             if platform == "all_mac":
@@ -257,11 +257,13 @@ class AddonActiveFilter(BaseAddonFilter):
         ``addonActive``
 
     .. attribute:: addons
+
         List of addon ids to filter against.
 
         :example: ``["uBlock0@raymondhill.net", "pioneer-opt-in@mozilla.org"]``
 
     .. attribute:: any_or_all
+
         This will determine whether the addons are connected with an "&&" operator,
         meaning all the addons must be active for the filter to evaluate to true,
         or an "||" operator, meaning any of the addons can be active to evaluate to
@@ -288,11 +290,13 @@ class AddonInstalledFilter(BaseAddonFilter):
         ``addonInstalled``
 
     .. attribute:: addons
+
         List of addon ids to filter against.
 
         :example: ``["uBlock0@raymondhill.net", "pioneer-opt-in@mozilla.org"]``
 
     .. attribute:: any_or_all
+
         This will determine whether the addons are connected with an "&&" operator,
         meaning all the addons must be installed for the filter to evaluate to true,
         or an "||" operator, meaning any of the addons can be installed to
@@ -335,7 +339,7 @@ class PrefCompareFilter(BaseFilter):
     value = serializers.JSONField()
     comparison = serializers.CharField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         comparison = self.initial_data["comparison"]
         value = self.initial_data["value"]
         pref = self.initial_data["pref"]
@@ -382,7 +386,7 @@ class PrefExistsFilter(BaseFilter):
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         value = self.initial_data["value"]
         pref = self.initial_data["pref"]
 
@@ -420,7 +424,7 @@ class PrefUserSetFilter(BaseFilter):
     pref = serializers.CharField()
     value = serializers.BooleanField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         value = self.initial_data["value"]
         pref = self.initial_data["pref"]
         if value:
@@ -489,7 +493,7 @@ class BucketSampleFilter(BaseFilter):
     total = serializers.FloatField(min_value=0)
     input = serializers.ListField(child=serializers.CharField(), min_length=1)
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         inputs = ",".join(f"{i}" for i in self.initial_data["input"])
         start = self.initial_data["start"]
         count = self.initial_data["count"]
@@ -536,7 +540,7 @@ class StableSampleFilter(BaseFilter):
     rate = serializers.FloatField(min_value=0, max_value=1)
     input = serializers.ListField(child=serializers.CharField(), min_length=1)
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         inputs = ",".join(f"{i}" for i in self.initial_data["input"])
         rate = self.initial_data["rate"]
         return f"[{inputs}]|stableSample({rate})"
@@ -584,7 +588,7 @@ class NamespaceSampleFilter(BaseFilter):
     count = serializers.FloatField(min_value=0)
     namespace = serializers.CharField(min_length=1)
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         namespace = self.initial_data["namespace"]
         start = self.initial_data["start"]
         count = self.initial_data["count"]
@@ -615,7 +619,7 @@ class VersionFilter(BaseFilter):
     versions = serializers.ListField(child=serializers.IntegerField(min_value=40), min_length=1)
     """Version's doc string"""
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         # This could be improved to generate more compact JEXL by noticing
         # adjacent versions, and combining them into a single range. i.e. if
         # `versions` is [55, 56, 57], this could generate
@@ -664,7 +668,7 @@ class VersionRangeFilter(BaseFilter):
     min_version = serializers.CharField()
     max_version = serializers.CharField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         min_version = self.initial_data["min_version"]
         max_version = self.initial_data["max_version"]
 
@@ -695,16 +699,16 @@ class DateRangeFilter(BaseFilter):
 
        :example: ``2020-02-01T00:00:00Z``
 
-   .. attribute:: not_after
+    .. attribute:: not_after
 
-      :example: ``2020-03-01T00:00:00Z``
+       :example: ``2020-03-01T00:00:00Z``
     """
 
     type = "dateRange"
     not_before = serializers.DateTimeField()
     not_after = serializers.DateTimeField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         not_before = self.initial_data["not_before"]
         not_after = self.initial_data["not_after"]
 
@@ -730,11 +734,13 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
         ``windowsBuildNumber``
 
     .. attribute:: value
-        integer
+
+       The Windows build number to compare to, as an integer.
 
        :example: ``15063``
 
    .. attribute:: comparison
+
       Options are ``equal``, ``not_equal``, ``greater_than``,
       ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
 
@@ -751,8 +757,8 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
     def capabilities(self):
         return set()
 
-    def to_jexl(self):
-        return f"(normandy.os.isWindows && {super().to_jexl()})"
+    def to_jexl(self, revision):
+        return f"(normandy.os.isWindows && {super().to_jexl(revision)})"
 
 
 class WindowsVersionFilter(BaseFilter):
@@ -765,7 +771,8 @@ class WindowsVersionFilter(BaseFilter):
         ``windowsVersion``
 
     .. attribute:: versions_list
-        list of versions as decimal numbers. Versions will be validated against
+
+        List of versions as decimal numbers. Versions will be validated against
         DB table of supported NT versions.
 
         :options: ``6.1``, ``6.2``, ``6.3``, ``10.0``
@@ -779,7 +786,7 @@ class WindowsVersionFilter(BaseFilter):
         child=serializers.DecimalField(max_digits=3, decimal_places=1), min_length=1
     )
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         return f"(normandy.os.isWindows && normandy.os.windowsVersion in {self.initial_data['versions_list']})"
 
     def validate_versions_list(self, versions_list):
@@ -815,9 +822,9 @@ class NegateFilter(BaseFilter):
     type = "negate"
     filter_to_negate = serializers.JSONField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         filter = from_data(self.initial_data["filter_to_negate"])
-        return f"!({filter.to_jexl()})"
+        return f"!({filter.to_jexl(revision)})"
 
     @property
     def capabilities(self):
@@ -833,8 +840,8 @@ class _CompositeFilter(BaseFilter):
     def _get_subfilters(self):
         raise NotImplementedError()
 
-    def to_jexl(self):
-        parts = [f.to_jexl() for f in self._get_subfilters()]
+    def to_jexl(self, revision):
+        parts = [f.to_jexl(revision) for f in self._get_subfilters()]
         expr = self._get_operator().join(parts)
         return f"({expr})"
 
@@ -907,16 +914,16 @@ class ProfileCreateDateFilter(BaseFilter):
 
        :Options: ``newerThan`` or ``olderThan``
 
-   .. attribute:: date
+    .. attribute:: date
 
-      :example: ``2020-02-01``
+       :example: ``2020-02-01``
     """
 
     type = "profileCreationDate"
     direction = serializers.CharField()
     date = serializers.DateField()
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         direction = self.initial_data["direction"]
         date = self.initial_data["date"]
 
@@ -956,17 +963,20 @@ class JexlFilter(BaseFilter):
        ``jexl``
 
     .. attribute:: expression
+
        The expression to evaluate.
 
        :example: ``2 + 2 >= 4``
 
     .. attribute:: capabilities
+
        An array of the capabilities required by the expression. May be empty
        if the expression does not require any capabilities.
 
        :example: ``["capabilities-v1"]``
 
     .. attribute:: comment
+
        A note about what this expression does. This field is not used
        anywhere, but is present in the API to make it clearer what this
        filter does.
@@ -979,7 +989,7 @@ class JexlFilter(BaseFilter):
     capabilities = serializers.ListField(child=serializers.CharField(min_length=1), min_length=0)
     comment = serializers.CharField(min_length=1)
 
-    def to_jexl(self):
+    def to_jexl(self, revision):
         built_expression = "(" + self.initial_data["expression"] + ")"
         jexl = get_normandy_jexl()
 
@@ -1047,6 +1057,46 @@ class PresetFilter(_CompositeFilter):
             not_user_set("browser.newtabpage.activity-stream.feeds.section.topstories"),
             not_user_set("browser.newtabpage.activity-stream.feeds.section.highlights"),
         ]
+
+
+class QaOnlyFilter(BaseFilter):
+    """
+    A filter that requires the pref ``app.normandy.testing`` to include the
+    slug of the recipe (or other logical identifer, for action types without
+    slugs), primarily for soft-launching recipes for early testing.
+    """
+
+    type = "qaOnly"
+
+    def to_jexl(self, revision):
+        slug = None
+        if revision.action.name in [
+            "multi-preference-experiment",
+            "preference-rollout",
+            "branched-addon-study",
+        ]:
+            slug = revision.arguments["slug"]
+        elif revision.action.name == "show-heartbeat":
+            slug = revision.arguments["surveyId"]
+
+        if slug is None:
+            raise serializers.ValidationError(
+                f"Don't know how to add a qa-only filter to {revision.action.name} recipes"
+            )
+
+        subfilter = from_data(
+            {
+                "comparison": "contains",
+                "pref": "app.normandy.testing-for-recipes",
+                "type": "preferenceValue",
+                "value": slug,
+            }
+        )
+        return subfilter.to_jexl(revision)
+
+    @property
+    def capabilities(self):
+        return {"jexl.transform.preferenceValue"}
 
 
 def _calculate_by_type():

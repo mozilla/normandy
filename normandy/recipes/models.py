@@ -329,7 +329,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             channels = ", ".join(["'{}'".format(c.slug) for c in self.channels.all()])
             parts.append("normandy.channel in [{}]".format(channels))
 
-        parts.extend(filter.to_jexl() for filter in self.filter_object)
+        parts.extend(filter.to_jexl(self) for filter in self.filter_object)
 
         if self.extra_filter_expression:
             parts.append(self.extra_filter_expression)

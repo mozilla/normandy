@@ -39,6 +39,7 @@ Filter Objects
 .. autoclass:: AddonInstalledFilter()
 .. autoclass:: PresetFilter()
 .. autoclass:: JexlFilter()
+.. autoclass:: QaOnlyFilter()
 
 
 Filter Expressions
