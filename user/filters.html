@@ -523,8 +523,7 @@ is 75, 72.0 will be include, 75.0 will not be. <cite>min &lt;= version &lt; max<
 <dl class="class">
 <dt id="normandy.recipes.filters.DateRangeFilter">
 <em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">DateRangeFilter</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Match a user to a delivery that starts on or after the <code class="docutils literal notranslate"><span class="pre">not_before</span></code> date and
+<dd><p>Match a user to a delivery that starts on or after the <code class="docutils literal notranslate"><span class="pre">not_before</span></code> date and
 before the <code class="docutils literal notranslate"><span class="pre">not_after</span></code> date.</p>
 <p>The date range is half-open, so <cite>not_before &lt;= normandy.request_time &lt; not_after</cite>.</p>
 <dl class="attribute">
@@ -543,7 +542,6 @@ before the <code class="docutils literal notranslate"><span class="pre">not_afte
 </dl>
 </dd></dl>
 
-</div></blockquote>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.DateRangeFilter.not_after">
 <code class="sig-name descname">not_after</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_after" title="Permalink to this definition">¶</a></dt>
@@ -559,8 +557,7 @@ before the <code class="docutils literal notranslate"><span class="pre">not_afte
 <dl class="class">
 <dt id="normandy.recipes.filters.ProfileCreateDateFilter">
 <em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">ProfileCreateDateFilter</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>This filter is meant to distinguish between new and existing users.
+<dd><p>This filter is meant to distinguish between new and existing users.
 Target users who have a profile creation date older than or newer than
 a given date.</p>
 <dl class="attribute">
@@ -579,7 +576,6 @@ a given date.</p>
 </dl>
 </dd></dl>
 
-</div></blockquote>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.ProfileCreateDateFilter.date">
 <code class="sig-name descname">date</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.date" title="Permalink to this definition">¶</a></dt>
@@ -694,9 +690,8 @@ number, they are running.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.WindowsBuildNumberFilter.value">
 <code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.value" title="Permalink to this definition">¶</a></dt>
-<dt id="normandy.recipes.filters.WindowsBuildNumberFilter.integer">
-<code class="sig-name descname">integer</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.integer" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>The Windows build number to compare to, as an integer.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">15063</span></code></p>
 </dd>
@@ -707,11 +702,9 @@ number, they are running.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.WindowsBuildNumberFilter.comparison">
 <code class="sig-name descname">comparison</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.comparison" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">Options are ``equal``, ``not_equal``, ``greater_than``,</code></dt>
-<dt>
-<code class="sig-name descname">``less_than``, ``greater_than_equal`` and ``less_than_equal``.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>Options are <code class="docutils literal notranslate"><span class="pre">equal</span></code>, <code class="docutils literal notranslate"><span class="pre">not_equal</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than</span></code>,
+<code class="docutils literal notranslate"><span class="pre">less_than</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than_equal</span></code> and <code class="docutils literal notranslate"><span class="pre">less_than_equal</span></code>.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">not_equal</span></code></p>
 </dd>
@@ -734,11 +727,9 @@ creates jexl that compares the windows NT version.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.WindowsVersionFilter.versions_list">
 <code class="sig-name descname">versions_list</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.versions_list" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">list of versions as decimal numbers. Versions will be validated against</code></dt>
-<dt>
-<code class="sig-name descname">DB table of supported NT versions.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>List of versions as decimal numbers. Versions will be validated against
+DB table of supported NT versions.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Options</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">6.1</span></code>, <code class="docutils literal notranslate"><span class="pre">6.2</span></code>, <code class="docutils literal notranslate"><span class="pre">6.3</span></code>, <code class="docutils literal notranslate"><span class="pre">10.0</span></code></p>
 </dd>
@@ -834,9 +825,8 @@ creates jexl that compares the windows NT version.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.AddonActiveFilter.addons">
 <code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.addons" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">List of addon ids to filter against.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>List of addon ids to filter against.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;uBlock0&#64;raymondhill.net&quot;,</span> <span class="pre">&quot;pioneer-opt-in&#64;mozilla.org&quot;]</span></code></p>
 </dd>
@@ -846,15 +836,11 @@ creates jexl that compares the windows NT version.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.AddonActiveFilter.any_or_all">
 <code class="sig-name descname">any_or_all</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">This will determine whether the addons are connected with an &quot;&amp;&amp;&quot; operator,</code></dt>
-<dt>
-<code class="sig-name descname">meaning all the addons must be active for the filter to evaluate to true,</code></dt>
-<dt>
-<code class="sig-name descname">or an &quot;||&quot; operator, meaning any of the addons can be active to evaluate to</code></dt>
-<dt>
-<code class="sig-name descname">true.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>This will determine whether the addons are connected with an “&amp;&amp;” operator,
+meaning all the addons must be active for the filter to evaluate to true,
+or an “||” operator, meaning any of the addons can be active to evaluate to
+true.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">any</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code></p>
 </dd>
@@ -876,9 +862,8 @@ creates jexl that compares the windows NT version.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.AddonInstalledFilter.addons">
 <code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.addons" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">List of addon ids to filter against.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>List of addon ids to filter against.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;uBlock0&#64;raymondhill.net&quot;,</span> <span class="pre">&quot;pioneer-opt-in&#64;mozilla.org&quot;]</span></code></p>
 </dd>
@@ -888,15 +873,11 @@ creates jexl that compares the windows NT version.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.AddonInstalledFilter.any_or_all">
 <code class="sig-name descname">any_or_all</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">This will determine whether the addons are connected with an &quot;&amp;&amp;&quot; operator,</code></dt>
-<dt>
-<code class="sig-name descname">meaning all the addons must be installed for the filter to evaluate to true,</code></dt>
-<dt>
-<code class="sig-name descname">or an &quot;||&quot; operator, meaning any of the addons can be installed to</code></dt>
-<dt>
-<code class="sig-name descname">evaluate to true.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>This will determine whether the addons are connected with an “&amp;&amp;” operator,
+meaning all the addons must be installed for the filter to evaluate to true,
+or an “||” operator, meaning any of the addons can be installed to
+evaluate to true.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">any</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code></p>
 </dd>
@@ -948,9 +929,8 @@ will be surrounded with parenthesis.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.JexlFilter.expression">
 <code class="sig-name descname">expression</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.expression" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">The expression to evaluate.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>The expression to evaluate.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">&gt;=</span> <span class="pre">4</span></code></p>
 </dd>
@@ -960,11 +940,9 @@ will be surrounded with parenthesis.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.JexlFilter.capabilities">
 <code class="sig-name descname">capabilities</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.capabilities" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">An array of the capabilities required by the expression. May be empty</code></dt>
-<dt>
-<code class="sig-name descname">if the expression does not require any capabilities.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>An array of the capabilities required by the expression. May be empty
+if the expression does not require any capabilities.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;capabilities-v1&quot;]</span></code></p>
 </dd>
@@ -974,19 +952,24 @@ will be surrounded with parenthesis.</p>
 <dl class="attribute">
 <dt id="normandy.recipes.filters.JexlFilter.comment">
 <code class="sig-name descname">comment</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.comment" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">A note about what this expression does. This field is not used</code></dt>
-<dt>
-<code class="sig-name descname">anywhere, but is present in the API to make it clearer what this</code></dt>
-<dt>
-<code class="sig-name descname">filter does.</code></dt>
-<dd><dl class="field-list simple">
+<dd><p>A note about what this expression does. This field is not used
+anywhere, but is present in the API to make it clearer what this
+filter does.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p>Only users that saw <a class="reference external" href="about:welcome">about:welcome</a>.</p>
 </dd>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="normandy.recipes.filters.QaOnlyFilter">
+<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">QaOnlyFilter</code><a class="headerlink" href="#normandy.recipes.filters.QaOnlyFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A filter that requires the pref <code class="docutils literal notranslate"><span class="pre">app.normandy.testing</span></code> to include the
+slug of the recipe (or other logical identifer, for action types without
+slugs), primarily for soft-launching recipes for early testing.</p>
 </dd></dl>
 
 </div>
