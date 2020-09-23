@@ -298,11 +298,21 @@ class MultiPreferenceExperimentArgumentsFactory(DictFactory):
             self["branches"] = MultiPreferenceExperimentBranchFactory.create_batch(2, **kwargs)
 
 
+class ShowHeartbeatArgumentsFactory(DictFactory):
+    surveyId = FuzzySlug()
+
+
+class BranchedAddonStudyArgumentsFactory(DictFactory):
+    slug = FuzzySlug()
+
+
 argument_factories = {
     "preference-experiment": PreferenceExperimentArgumentsFactory,
     "preference-rollout": PreferenceRolloutArgumentsFactory,
     "opt-out-study": OptOutStudyArgumentsFactory,
+    "branched-addon-study": BranchedAddonStudyArgumentsFactory,
     "multi-preference-experiment": MultiPreferenceExperimentArgumentsFactory,
+    "show-heartbeat": ShowHeartbeatArgumentsFactory,
 }
 
 

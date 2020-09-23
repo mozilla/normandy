@@ -10,8 +10,9 @@ from normandy.base.jexl import get_normandy_jexl
 from normandy.recipes import filters
 from normandy.recipes.tests import (
     ChannelFactory,
-    LocaleFactory,
     CountryFactory,
+    LocaleFactory,
+    RecipeRevisionFactory,
     WindowsVersionFactory,
 )
 
@@ -26,6 +27,9 @@ class FilterTestsBase:
         """To be overwritten by subclasses to create test filters"""
         raise NotImplementedError
 
+    def create_revision(self, *args, **kwargs):
+        return RecipeRevisionFactory(*args, **kwargs)
+
     def test_it_can_be_constructed(self):
         self.create_basic_filter()
 
@@ -36,8 +40,9 @@ class FilterTestsBase:
 
     def test_jexl_works(self):
         filter = self.create_basic_filter()
+        rev = self.create_revision()
         # Would throw if not defined
-        expr = filter.to_jexl()
+        expr = filter.to_jexl(rev)
         assert isinstance(expr, str)
         jexl = get_normandy_jexl()
         errors = jexl.validate(expr)
@@ -69,12 +74,13 @@ class TestProfileCreationDateFilter(FilterTestsBase):
     def test_generates_jexl_older_than(self):
         filter = self.create_basic_filter(direction="olderThan", date="2020-07-30")
         assert (
-            filter.to_jexl() == "(normandy.telemetry.main.environment.profile.creationDate<=18473)"
+            filter.to_jexl(self.create_revision())
+            == "(normandy.telemetry.main.environment.profile.creationDate<=18473)"
         )
 
     def test_generates_jexl_newer_than(self):
         filter = self.create_basic_filter(direction="newerThan", date="2020-02-01")
-        assert set(filter.to_jexl().split("||")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("||")) == {
             "(!normandy.telemetry.main)",
             "(normandy.telemetry.main.environment.profile.creationDate>18293)",
         }
@@ -88,12 +94,12 @@ class TestProfileCreationDateFilter(FilterTestsBase):
         daystamp = (dt - epoch).days
 
         filter = self.create_basic_filter(date=f"{dt.year}-{dt.month}-{dt.day}")
-        assert str(daystamp) in filter.to_jexl()
+        assert str(daystamp) in filter.to_jexl(self.create_revision())
 
     def test_throws_error_on_bad_direction(self):
         filter = self.create_basic_filter(direction="newer", date="2020-02-01")
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
     def test_throws_error_on_bad_date(self):
         with pytest.raises(AssertionError):
@@ -108,7 +114,7 @@ class TestVersionFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(versions=[72, 74])
-        assert set(filter.to_jexl().split("||")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("||")) == {
             '(normandy.version>="72"&&normandy.version<"73")',
             '(normandy.version>="74"&&normandy.version<"75")',
         }
@@ -122,7 +128,7 @@ class TestVersionRangeFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(min_version="72.0b2", max_version="75.0a1")
-        assert set(filter.to_jexl().split("&&")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("&&")) == {
             '(env.version|versionCompare("72.0b2")>=0)',
             '(env.version|versionCompare("75.0a1")<0)',
         }
@@ -136,7 +142,7 @@ class TestDateRangeFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
-        assert set(filter.to_jexl().split("&&")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("&&")) == {
             '(normandy.request_time>="2020-02-01T00:00:00Z"|date)',
             '(normandy.request_time<"2020-03-01T00:00:00Z"|date)',
         }
@@ -159,14 +165,14 @@ class TestWindowsBuildNumberFilter(FilterTestsBase):
     def test_generates_jexl_number_ops(self, comparison, symbol):
         filter = self.create_basic_filter(comparison=comparison)
         assert (
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
             == f"(normandy.os.isWindows && normandy.os.windowsBuildNumber {symbol} 12345)"
         )
 
     def test_generates_jexl_error_on_bad_comparison(self):
         filter = self.create_basic_filter(comparison="typo")
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
 
 class TestWindowsVersionFilter(FilterTestsBase):
@@ -177,7 +183,8 @@ class TestWindowsVersionFilter(FilterTestsBase):
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
         assert (
-            filter.to_jexl() == f"(normandy.os.isWindows && normandy.os.windowsVersion in [6.1])"
+            filter.to_jexl(self.create_revision())
+            == f"(normandy.os.isWindows && normandy.os.windowsVersion in [6.1])"
         )
 
     def test_generates_jexl_error_on_bad_version(self):
@@ -195,7 +202,7 @@ class TestChannelFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(channels=["release", "beta"])
-        assert filter.to_jexl() == 'normandy.channel in ["release","beta"]'
+        assert filter.to_jexl(self.create_revision()) == 'normandy.channel in ["release","beta"]'
 
 
 class TestLocaleFilter(FilterTestsBase):
@@ -208,7 +215,7 @@ class TestLocaleFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(locales=["en-US", "en-CA"])
-        assert filter.to_jexl() == 'normandy.locale in ["en-US","en-CA"]'
+        assert filter.to_jexl(self.create_revision()) == 'normandy.locale in ["en-US","en-CA"]'
 
 
 class TestCountryFilter(FilterTestsBase):
@@ -221,7 +228,7 @@ class TestCountryFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(countries=["SV", "MX"])
-        assert filter.to_jexl() == 'normandy.country in ["SV","MX"]'
+        assert filter.to_jexl(self.create_revision()) == 'normandy.country in ["SV","MX"]'
 
 
 class TestPlatformFilter(FilterTestsBase):
@@ -230,16 +237,19 @@ class TestPlatformFilter(FilterTestsBase):
 
     def test_generates_jexl_list_of_two(self):
         filter = self.create_basic_filter()
-        assert set(filter.to_jexl().split("||")) == {"normandy.os.isMac", "normandy.os.isWindows"}
+        assert set(filter.to_jexl(self.create_revision()).split("||")) == {
+            "normandy.os.isMac",
+            "normandy.os.isWindows",
+        }
 
     def test_generates_jexl_list_of_one(self):
         filter = self.create_basic_filter(platforms=["all_linux"])
-        assert set(filter.to_jexl().split("||")) == {"normandy.os.isLinux"}
+        assert set(filter.to_jexl(self.create_revision()).split("||")) == {"normandy.os.isLinux"}
 
     def test_throws_error_on_bad_platform(self):
         filter = self.create_basic_filter(platforms=["all_linu"])
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
 
 class TestNegateFilter(FilterTestsBase):
@@ -249,7 +259,10 @@ class TestNegateFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         negate_filter = self.create_basic_filter()
-        assert negate_filter.to_jexl() == '!(normandy.channel in ["release","beta"])'
+        assert (
+            negate_filter.to_jexl(self.create_revision())
+            == '!(normandy.channel in ["release","beta"])'
+        )
 
 
 class TestAndFilter(FilterTestsBase):
@@ -270,7 +283,7 @@ class TestAndFilter(FilterTestsBase):
         negate_filter = self.create_basic_filter(
             subfilters=[{"type": "channel", "channels": ["release"]}]
         )
-        assert negate_filter.to_jexl() == '(normandy.channel in ["release"])'
+        assert negate_filter.to_jexl(self.create_revision()) == '(normandy.channel in ["release"])'
 
     def test_generates_jexl_two_subfilters(self):
         negate_filter = self.create_basic_filter(
@@ -280,7 +293,7 @@ class TestAndFilter(FilterTestsBase):
             ]
         )
         assert (
-            negate_filter.to_jexl()
+            negate_filter.to_jexl(self.create_revision())
             == '(normandy.channel in ["release"]&&normandy.locale in ["en-US"])'
         )
 
@@ -303,7 +316,7 @@ class TestOrFilter(FilterTestsBase):
         negate_filter = self.create_basic_filter(
             subfilters=[{"type": "channel", "channels": ["release"]}]
         )
-        assert negate_filter.to_jexl() == '(normandy.channel in ["release"])'
+        assert negate_filter.to_jexl(self.create_revision()) == '(normandy.channel in ["release"])'
 
     def test_generates_jexl_two_subfilters(self):
         negate_filter = self.create_basic_filter(
@@ -313,7 +326,7 @@ class TestOrFilter(FilterTestsBase):
             ]
         )
         assert (
-            negate_filter.to_jexl()
+            negate_filter.to_jexl(self.create_revision())
             == '(normandy.channel in ["release"]||normandy.locale in ["en-US"])'
         )
 
@@ -324,14 +337,14 @@ class TestAddonInstalledFilter(FilterTestsBase):
 
     def test_generates_jexl_installed_any(self):
         filter = self.create_basic_filter()
-        assert set(filter.to_jexl().split("||")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("||")) == {
             'normandy.addons["@abcdef"]',
             'normandy.addons["ghijk@lmnop"]',
         }
 
     def test_generates_jexl_installed_all(self):
         filter = self.create_basic_filter(any_or_all="all")
-        assert set(filter.to_jexl().split("&&")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("&&")) == {
             'normandy.addons["@abcdef"]',
             'normandy.addons["ghijk@lmnop"]',
         }
@@ -339,7 +352,7 @@ class TestAddonInstalledFilter(FilterTestsBase):
     def test_throws_error_on_bad_any_or_all(self):
         filter = self.create_basic_filter(any_or_all="error")
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
 
 class TestAddonActiveFilter(FilterTestsBase):
@@ -348,14 +361,14 @@ class TestAddonActiveFilter(FilterTestsBase):
 
     def test_generates_jexl_active_any(self):
         filter = self.create_basic_filter()
-        assert set(filter.to_jexl().split("||")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("||")) == {
             'normandy.addons["@abcdef"].isActive',
             'normandy.addons["ghijk@lmnop"].isActive',
         }
 
     def test_generates_jexl_active_all(self):
         filter = self.create_basic_filter(any_or_all="all")
-        assert set(filter.to_jexl().split("&&")) == {
+        assert set(filter.to_jexl(self.create_revision()).split("&&")) == {
             'normandy.addons["@abcdef"].isActive',
             'normandy.addons["ghijk@lmnop"].isActive',
         }
@@ -363,7 +376,7 @@ class TestAddonActiveFilter(FilterTestsBase):
     def test_throws_error_on_bad_any_or_all(self):
         filter = self.create_basic_filter(any_or_all="error")
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
 
 class TestPrefCompareFilter(FilterTestsBase):
@@ -374,7 +387,10 @@ class TestPrefCompareFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter()
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == 10"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "'browser.urlbar.maxRichResults'|preferenceValue == 10"
+        )
 
     @pytest.mark.parametrize(
         "comparison,symbol",
@@ -387,20 +403,29 @@ class TestPrefCompareFilter(FilterTestsBase):
     )
     def test_generates_jexl_number_ops(self, comparison, symbol):
         filter = self.create_basic_filter(comparison=comparison)
-        assert filter.to_jexl() == f"'browser.urlbar.maxRichResults'|preferenceValue {symbol} 10"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == f"'browser.urlbar.maxRichResults'|preferenceValue {symbol} 10"
+        )
 
     def test_generates_jexl_boolean(self):
         filter = self.create_basic_filter(value=False)
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceValue == false"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "'browser.urlbar.maxRichResults'|preferenceValue == false"
+        )
 
     def test_generates_jexl_string_in(self):
         filter = self.create_basic_filter(value="default", comparison="contains")
-        assert filter.to_jexl() == "\"default\" in 'browser.urlbar.maxRichResults'|preferenceValue"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "\"default\" in 'browser.urlbar.maxRichResults'|preferenceValue"
+        )
 
     def test_generates_jexl_error(self):
         filter = self.create_basic_filter(comparison="invalid")
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
 
 class TestPrefExistsFilter(FilterTestsBase):
@@ -409,11 +434,17 @@ class TestPrefExistsFilter(FilterTestsBase):
 
     def test_generates_jexl_pref_exists_true(self):
         filter = self.create_basic_filter()
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceExists"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "'browser.urlbar.maxRichResults'|preferenceExists"
+        )
 
     def test_generates_jexl_pref_exists_false(self):
         filter = self.create_basic_filter(value=False)
-        assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceExists)"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "!('browser.urlbar.maxRichResults'|preferenceExists)"
+        )
 
 
 class TestPrefUserSetFilter(FilterTestsBase):
@@ -422,11 +453,17 @@ class TestPrefUserSetFilter(FilterTestsBase):
 
     def test_generates_jexl_is_user_set_true(self):
         filter = self.create_basic_filter()
-        assert filter.to_jexl() == "'browser.urlbar.maxRichResults'|preferenceIsUserSet"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "'browser.urlbar.maxRichResults'|preferenceIsUserSet"
+        )
 
     def test_generates_jexl_is_user_set_false(self):
         filter = self.create_basic_filter(value=False)
-        assert filter.to_jexl() == "!('browser.urlbar.maxRichResults'|preferenceIsUserSet)"
+        assert (
+            filter.to_jexl(self.create_revision())
+            == "!('browser.urlbar.maxRichResults'|preferenceIsUserSet)"
+        )
 
 
 class TestBucketSampleFilter(FilterTestsBase):
@@ -439,11 +476,11 @@ class TestBucketSampleFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], start=10, count=20, total=1_000)
-        assert filter.to_jexl() == "[A]|bucketSample(10,20,1000)"
+        assert filter.to_jexl(self.create_revision()) == "[A]|bucketSample(10,20,1000)"
 
     def test_supports_floats(self):
         filter = self.create_basic_filter(input=["A"], start=10, count=0.5, total=1_000)
-        assert filter.to_jexl() == "[A]|bucketSample(10,0.5,1000)"
+        assert filter.to_jexl(self.create_revision()) == "[A]|bucketSample(10,0.5,1000)"
 
 
 class TestStableSampleFilter(FilterTestsBase):
@@ -454,7 +491,7 @@ class TestStableSampleFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(input=["A"], rate=0.1)
-        assert filter.to_jexl() == "[A]|stableSample(0.1)"
+        assert filter.to_jexl(self.create_revision()) == "[A]|stableSample(0.1)"
 
 
 class TestNamespaceSampleFilter(FilterTestsBase):
@@ -463,12 +500,16 @@ class TestNamespaceSampleFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(namespace="fancy-rollout", start=10, count=20)
-        assert filter.to_jexl() == '["fancy-rollout",normandy.userId]|bucketSample(10,20,10000)'
+        assert (
+            filter.to_jexl(self.create_revision())
+            == '["fancy-rollout",normandy.userId]|bucketSample(10,20,10000)'
+        )
 
     def test_supports_floats(self):
         filter = self.create_basic_filter(namespace="risky-experiment", start=123, count=0.5)
         assert (
-            filter.to_jexl() == '["risky-experiment",normandy.userId]|bucketSample(123,0.5,10000)'
+            filter.to_jexl(self.create_revision())
+            == '["risky-experiment",normandy.userId]|bucketSample(123,0.5,10000)'
         )
 
 
@@ -484,12 +525,12 @@ class TestJexlFilter(FilterTestsBase):
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(expression="2 + 2")
-        assert filter.to_jexl() == "(2 + 2)"
+        assert filter.to_jexl(self.create_revision()) == "(2 + 2)"
 
     def test_it_rejects_invalid_jexl(self):
         filter = self.create_basic_filter(expression="this is an invalid expression")
         with pytest.raises(serializers.ValidationError):
-            filter.to_jexl()
+            filter.to_jexl(self.create_revision())
 
     def test_it_has_capabilities(self):
         filter = self.create_basic_filter(capabilities=["a.b", "c.d"])
@@ -547,3 +588,48 @@ class TestPresetFilter(FilterTestsBase):
 
         # There should be no other filters
         assert subfilters == {}, "no unexpected filters"
+
+
+class TestQaOnlyFilter(FilterTestsBase):
+    def create_basic_filter(self):
+        return filters.QaOnlyFilter.create()
+
+    def create_revision(self, *args, **kwargs):
+        kwargs.setdefault("action__name", "multi-preference-experiment")
+        return super().create_revision(*args, **kwargs)
+
+    def test_it_works_for_multi_preference_experiment(self):
+        rev = self.create_revision(action__name="multi-preference-experiment")
+        filter = self.create_basic_filter()
+        slug = rev.arguments["slug"]
+        assert (
+            filter.to_jexl(rev)
+            == f"\"{slug}\" in 'app.normandy.testing-for-recipes'|preferenceValue"
+        )
+
+    def test_it_works_for_branched_addon_study(self):
+        rev = self.create_revision(action__name="branched-addon-study")
+        filter = self.create_basic_filter()
+        slug = rev.arguments["slug"]
+        assert (
+            filter.to_jexl(rev)
+            == f"\"{slug}\" in 'app.normandy.testing-for-recipes'|preferenceValue"
+        )
+
+    def test_it_works_for_preference_rollout(self):
+        rev = self.create_revision(action__name="preference-rollout")
+        filter = self.create_basic_filter()
+        slug = rev.arguments["slug"]
+        assert (
+            filter.to_jexl(rev)
+            == f"\"{slug}\" in 'app.normandy.testing-for-recipes'|preferenceValue"
+        )
+
+    def test_it_works_for_heartbeat(self):
+        rev = self.create_revision(action__name="show-heartbeat")
+        filter = self.create_basic_filter()
+        slug = rev.arguments["surveyId"]
+        assert (
+            filter.to_jexl(rev)
+            == f"\"{slug}\" in 'app.normandy.testing-for-recipes'|preferenceValue"
+        )
