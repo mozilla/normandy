@@ -21,10 +21,10 @@ class MixedViewRouter(SimpleRouter):
 
         return urls
 
-    def register(self, prefix, viewset, base_name=None, allow_cdn=True):
+    def register(self, prefix, viewset, basename=None, allow_cdn=True):
         if not allow_cdn:
             raise NotImplementedError("Can't pass allow_cdn=False for viewsets")
-        super().register(prefix, viewset, base_name=base_name)
+        super().register(prefix, viewset, basename=basename)
 
     def register_view(self, prefix, View, *, name, allow_cdn=True, **kwargs):
         url_pattern = url(r"^{}/$".format(prefix), View.as_view(), name=name, **kwargs)
