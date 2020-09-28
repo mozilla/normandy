@@ -1,8 +1,7 @@
 import re
 
 from django.contrib.admindocs.views import simplify_regex
-
-from rest_framework.compat import URLPattern, URLResolver, get_original_route
+from django.urls import URLPattern, URLResolver
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(r"<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>")
@@ -72,7 +71,7 @@ def get_api_endpoints(patterns=None, namespace="", prefix=""):
     api_endpoints = []
 
     for pattern in patterns:
-        path_regex = prefix + get_original_route(pattern)
+        path_regex = prefix + str(pattern.pattern)
 
         if isinstance(pattern, URLPattern):
             path = get_path_from_regex(path_regex)
