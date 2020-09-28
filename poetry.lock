@@ -481,7 +481,10 @@ description = "Web APIs for Django, made easy."
 name = "djangorestframework"
 optional = false
 python-versions = ">=3.5"
-version = "3.10.3"
+version = "3.12.0"
+
+[package.dependencies]
+django = ">=2.2"
 
 [[package]]
 category = "main"
@@ -1994,7 +1997,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 
 [metadata]
-content-hash = "8ba0c4f51b2775c003b26c47c50277bcf05f9923f170fd81b68fe66233c99271"
+content-hash = "1ddc008b92f16b938b2fa8eccbe17dae5449e6275e4cc983106f37f44ade6305"
 lock-version = "1.0"
 python-versions = ">=3.7,<3.8"
 
@@ -2232,8 +2235,8 @@ django-storages = [
     {file = "django_storages-1.9.1-py2.py3-none-any.whl", hash = "sha256:3103991c2ee8cef8a2ff096709973ffe7106183d211a79f22cf855f33533d924"},
 ]
 djangorestframework = [
-    {file = "djangorestframework-3.10.3-py3-none-any.whl", hash = "sha256:5488aed8f8df5ec1d70f04b2114abc52ae6729748a176c453313834a9ee179c8"},
-    {file = "djangorestframework-3.10.3.tar.gz", hash = "sha256:dc81cbf9775c6898a580f6f1f387c4777d12bd87abf0f5406018d32ccae71090"},
+    {file = "djangorestframework-3.12.0-py3-none-any.whl", hash = "sha256:7fb1c91a8f9aa5ccb39d1568925a6433659dacfc1af7ac757b293d6451ddb9e1"},
+    {file = "djangorestframework-3.12.0.tar.gz", hash = "sha256:9d5b07a2dd29b4fb18da2e6a888051f34b286b3bfc1c3fe885a17e16e389c569"},
 ]
 djangorestframework-yaml = [
     {file = "djangorestframework-yaml-2.0.0.tar.gz", hash = "sha256:1b2cfd7482425f3c6924a8eb803d6f73276e76b03293cd7144c755753e029f15"},
