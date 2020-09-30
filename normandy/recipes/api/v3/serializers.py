@@ -41,10 +41,15 @@ class ApprovalRequestSerializer(serializers.ModelSerializer):
     approver = UserSerializer()
     created = serializers.DateTimeField(read_only=True)
     creator = UserSerializer()
+    revision = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ApprovalRequest
-        fields = ["approved", "approver", "comment", "created", "creator", "id"]
+        fields = ["approved", "approver", "comment", "created", "creator", "id", "revision"]
+
+    def get_revision(self, instance):
+        serializer = RecipeRevisionLinkSerializer(instance.revision)
+        return serializer.data
 
 
 class EnabledStateSerializer(CustomizableSerializerMixin, serializers.ModelSerializer):
@@ -297,3 +302,13 @@ class RecipeSerializer(CustomizableSerializerMixin, serializers.ModelSerializer)
 class RecipeLinkSerializer(RecipeSerializer):
     class Meta(RecipeSerializer.Meta):
         fields = ["approved_revision_id", "id", "latest_revision_id"]
+
+
+class RecipeRevisionLinkSerializer(RecipeRevisionSerializer):
+    recipe_id = serializers.SerializerMethodField(read_only=True)
+
+    class Meta(RecipeSerializer.Meta):
+        fields = ["id", "recipe_id"]
+
+    def get_recipe_id(self, instance):
+        return instance.recipe.id

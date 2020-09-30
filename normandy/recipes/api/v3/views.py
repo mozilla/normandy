@@ -27,6 +27,7 @@ from normandy.recipes.models import (
     RecipeRevision,
 )
 from normandy.recipes.api.filters import (
+    ApprovalStateFilter,
     CharSplitFilter,
     EnabledStateFilter,
     BaselineCapabilitiesFilter,
@@ -205,10 +206,23 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
+class ApprovalRequestFilters(django_filters.FilterSet):
+    approved = ApprovalStateFilter()
+
+    class Meta:
+        model = ApprovalRequest
+        fields = ["approved"]
+
+
 class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ApprovalRequest.objects.all()
+    queryset = (
+        ApprovalRequest.objects.all()
+        # prefetch?
+        .select_related("revision", "revision__recipe",)
+    )
     serializer_class = ApprovalRequestSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
+    filterset_class = ApprovalRequestFilters
 
     @action(detail=True, methods=["POST"])
     def approve(self, request, pk=None):

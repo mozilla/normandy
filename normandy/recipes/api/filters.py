@@ -16,6 +16,22 @@ class EnabledStateFilter(django_filters.Filter):
         return qs
 
 
+class ApprovalStateFilter(django_filters.Filter):
+    """A special case filter for filtering approval requests by their approval state"""
+
+    def filter(self, qs, value):
+        if value is None:
+            return qs
+
+        lc_value = value.lower()
+        if lc_value in ["true", "1", "approved"]:
+            return qs.filter(approved=True)
+        elif lc_value in ["false", "0", "rejected"]:
+            return qs.filter(approved=False)
+        elif lc_value in ["null", "pending"]:
+            return qs.filter(approved=None)
+
+
 class BaselineCapabilitiesFilter(django_filters.Filter):
     """Filters recipe by whether they use only baseline capabilities, defaulting to only baseline."""
 
