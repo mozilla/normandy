@@ -1403,6 +1403,36 @@ class TestApprovalRequestAPI(object):
         with pytest.raises(ApprovalRequest.DoesNotExist):
             ApprovalRequest.objects.get(pk=a.pk)
 
+    def test_list(self, api_client):
+        approval_requests = ApprovalRequestFactory.create_batch(5)
+        res = api_client.get("/api/v3/approval_request/")
+        assert res.status_code == 200
+        assert set(a.id for a in approval_requests) == set(a["id"] for a in res.data["results"])
+
+    def test_filter_by_approval(self, api_client):
+        pending = ApprovalRequestFactory(approved=None)
+        approved = ApprovalRequestFactory(approved=True)
+        rejected = ApprovalRequestFactory(approved=False)
+
+        # First check that all of them show up
+        res = api_client.get("/api/v3/approval_request/")
+        assert res.status_code == 200
+        assert {approved.id, pending.id, rejected.id} == set(a["id"] for a in res.data["results"])
+
+        # Now check that filtering works as expected
+        patterns = [
+            (["true", "1", "approved"], approved.id),
+            (["false", "0", "rejected"], rejected.id),
+            (["null", "pending"], pending.id),
+        ]
+        for (aliases, expected_id) in patterns:
+            for alias in aliases:
+                res = api_client.get(f"/api/v3/approval_request/?approved={alias}")
+                assert res.status_code == 200, f"Expected {alias} to give a 200 status"
+                assert {expected_id} == set(
+                    a["id"] for a in res.data["results"]
+                ), f"Expected alias {alias!r} to return the right approval request"
+
 
 @pytest.mark.django_db
 class TestApprovalFlow(object):
