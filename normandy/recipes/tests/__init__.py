@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 
 import factory
+from factory.django import DjangoModelFactory
 
 from normandy.base.tests import FuzzyUnicode, UserFactory, FuzzySlug
 from normandy.base.utils import sri_hash
@@ -24,7 +25,7 @@ from normandy.recipes.models import (
 )
 
 
-class ChannelFactory(factory.DjangoModelFactory):
+class ChannelFactory(DjangoModelFactory):
     class Meta:
         model = Channel
         django_get_or_create = ("slug",)
@@ -33,7 +34,7 @@ class ChannelFactory(factory.DjangoModelFactory):
     name = "Beta"
 
 
-class WindowsVersionFactory(factory.DjangoModelFactory):
+class WindowsVersionFactory(DjangoModelFactory):
     class Meta:
         model = WindowsVersion
         django_get_or_create = ("nt_version",)
@@ -42,7 +43,7 @@ class WindowsVersionFactory(factory.DjangoModelFactory):
     name = "Windows 7"
 
 
-class CountryFactory(factory.DjangoModelFactory):
+class CountryFactory(DjangoModelFactory):
     class Meta:
         model = Country
         django_get_or_create = ("code",)
@@ -51,7 +52,7 @@ class CountryFactory(factory.DjangoModelFactory):
     name = "Sweden"
 
 
-class LocaleFactory(factory.DjangoModelFactory):
+class LocaleFactory(DjangoModelFactory):
     class Meta:
         model = Locale
         django_get_or_create = ("code",)
@@ -82,7 +83,7 @@ def get_action_schemas():
     return _action_schemas
 
 
-class ActionFactory(factory.DjangoModelFactory):
+class ActionFactory(DjangoModelFactory):
     class Meta:
         model = Action
 
@@ -122,7 +123,7 @@ class ActionFactory(factory.DjangoModelFactory):
             self.arguments_schema = {}
 
 
-class RecipeFactory(factory.DjangoModelFactory):
+class RecipeFactory(DjangoModelFactory):
     class Meta:
         model = Recipe
 
@@ -306,7 +307,7 @@ argument_factories = {
 
 
 @factory.use_strategy(factory.BUILD_STRATEGY)
-class RecipeRevisionFactory(factory.DjangoModelFactory):
+class RecipeRevisionFactory(DjangoModelFactory):
     class Meta:
         model = RecipeRevision
 
@@ -396,14 +397,14 @@ class BucketSampleFilterFactory(DictFactory):
     count = factory.LazyAttribute(lambda o: factory.fuzzy.FuzzyInteger(0, o.total).fuzz())
 
 
-class ApprovalRequestFactory(factory.DjangoModelFactory):
+class ApprovalRequestFactory(DjangoModelFactory):
     class Meta:
         model = ApprovalRequest
 
     revision = factory.SubFactory(RecipeRevisionFactory)
 
 
-class EnabledStateFactory(factory.DjangoModelFactory):
+class EnabledStateFactory(DjangoModelFactory):
     class Meta:
         model = EnabledState
 
@@ -411,7 +412,7 @@ class EnabledStateFactory(factory.DjangoModelFactory):
     revision = factory.SubFactory(RecipeRevisionFactory)
 
 
-class SignatureFactory(factory.DjangoModelFactory):
+class SignatureFactory(DjangoModelFactory):
     class Meta:
         model = Signature
         exclude = ["data"]
