@@ -132,7 +132,7 @@ jobs:
 
   docs-build:
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.9
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -185,7 +185,7 @@ jobs:
 
   python-tests:
     docker:
-      - image: circleci/python:3.7-node-browsers
+      - image: circleci/python:3.9-node-browsers
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
