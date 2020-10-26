@@ -10,7 +10,7 @@ def simple_filters_to_filter_objects(apps, schema_editor):
 
         if revision.locales.count():
             filter_object.append(
-                {"type": "locale", "locales": [l.code for l in revision.locales.all()]}
+                {"type": "locale", "locales": [locale.code for locale in revision.locales.all()]}
             )
             revision.locales.set([])
 
@@ -47,7 +47,9 @@ def filter_objects_to_simple_filters(apps, schema_editor):
             elif filter["type"] == "country":
                 revision.countries.set([Country.objects.get(code=c) for c in filter["countries"]])
             elif filter["type"] == "locale":
-                revision.locales.set([Locale.objects.get(code=l) for l in filter["locales"]])
+                revision.locales.set(
+                    [Locale.objects.get(code=locale) for locale in filter["locales"]]
+                )
             else:
                 remaining_filters.append(filter)
 

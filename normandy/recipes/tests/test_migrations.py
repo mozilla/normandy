@@ -14,7 +14,7 @@ class Test0003Through0005(MigrationTest):
         parts = []
 
         if revision.locales.count():
-            locales = ", ".join(["'{}'".format(l.code) for l in revision.locales.all()])
+            locales = ", ".join(["'{}'".format(locale.code) for locale in revision.locales.all()])
             parts.append("normandy.locale in [{}]".format(locales))
 
         if revision.countries.count():

@@ -17,5 +17,5 @@ def cspreport(request):
         logger.error(f"csp error: {detail}", extra=data)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
     except (ValueError, KeyError):
-        logger.warn(f"unparsable csp error", extra={"body": request.body.decode()})
+        logger.warn("unparsable csp error", extra={"body": request.body.decode()})
         return Response({"error": "unparsable csp report"}, status=status.HTTP_400_BAD_REQUEST)
