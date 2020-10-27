@@ -173,11 +173,11 @@ class TestExtensionAPI(object):
         e1 = ExtensionFactory(name="a")
         e2 = ExtensionFactory(name="b")
 
-        res = api_client.get(f"/api/v3/extension/?ordering=name")
+        res = api_client.get("/api/v3/extension/?ordering=name")
         assert res.status_code == 200
         assert [r["id"] for r in res.data["results"]] == [e1.id, e2.id]
 
-        res = api_client.get(f"/api/v3/extension/?ordering=-name")
+        res = api_client.get("/api/v3/extension/?ordering=-name")
         assert res.status_code == 200
         assert [r["id"] for r in res.data["results"]] == [e2.id, e1.id]
 
@@ -186,11 +186,11 @@ class TestExtensionAPI(object):
         e2 = ExtensionFactory()
         assert e1.id < e2.id
 
-        res = api_client.get(f"/api/v3/extension/?ordering=id")
+        res = api_client.get("/api/v3/extension/?ordering=id")
         assert res.status_code == 200
         assert [r["id"] for r in res.data["results"]] == [e1.id, e2.id]
 
-        res = api_client.get(f"/api/v3/extension/?ordering=-id")
+        res = api_client.get("/api/v3/extension/?ordering=-id")
         assert res.status_code == 200
         assert [r["id"] for r in res.data["results"]] == [e2.id, e1.id]
 
@@ -199,11 +199,11 @@ class TestExtensionAPI(object):
         ExtensionFactory()
         ExtensionFactory()
 
-        res = api_client.get(f"/api/v3/extension/?ordering=bogus")
+        res = api_client.get("/api/v3/extension/?ordering=bogus")
         assert res.status_code == 200
         first_ordering = [r["id"] for r in res.data["results"]]
 
-        res = api_client.get(f"/api/v3/extension/?ordering=-bogus")
+        res = api_client.get("/api/v3/extension/?ordering=-bogus")
         assert res.status_code == 200
         assert [r["id"] for r in res.data["results"]] == first_ordering
 

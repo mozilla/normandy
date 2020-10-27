@@ -292,7 +292,9 @@ class Filters(views.APIView):
                 ],
                 "channels": [{"key": c.slug, "value": c.name} for c in Channel.objects.all()],
                 "countries": [{"key": c.code, "value": c.name} for c in Country.objects.all()],
-                "locales": [{"key": l.code, "value": l.name} for l in Locale.objects.all()],
+                "locales": [
+                    {"key": locale.code, "value": locale.name} for locale in Locale.objects.all()
+                ],
             }
         )
 

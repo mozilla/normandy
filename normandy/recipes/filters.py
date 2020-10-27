@@ -167,7 +167,7 @@ class LocaleFilter(BaseFilter):
         return value
 
     def to_jexl(self, revision):
-        locales = ",".join(f'"{l}"' for l in self.initial_data["locales"])
+        locales = ",".join(f'"{locale}"' for locale in self.initial_data["locales"])
         return f"normandy.locale in [{locales}]"
 
     @property

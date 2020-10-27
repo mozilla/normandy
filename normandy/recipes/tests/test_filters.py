@@ -184,7 +184,7 @@ class TestWindowsVersionFilter(FilterTestsBase):
         filter = self.create_basic_filter()
         assert (
             filter.to_jexl(self.create_revision())
-            == f"(normandy.os.isWindows && normandy.os.windowsVersion in [6.1])"
+            == "(normandy.os.isWindows && normandy.os.windowsVersion in [6.1])"
         )
 
     def test_generates_jexl_error_on_bad_version(self):
@@ -211,7 +211,7 @@ class TestLocaleFilter(FilterTestsBase):
             locale_objs = [LocaleFactory(code=code) for code in locales]
         else:
             locale_objs = [LocaleFactory()]
-        return filters.LocaleFilter.create(locales=[l.code for l in locale_objs])
+        return filters.LocaleFilter.create(locales=[locale.code for locale in locale_objs])
 
     def test_generates_jexl(self):
         filter = self.create_basic_filter(locales=["en-US", "en-CA"])

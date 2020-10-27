@@ -318,7 +318,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         parts = []
 
         if self.locales.count():
-            locales = ", ".join(["'{}'".format(l.code) for l in self.locales.all()])
+            locales = ", ".join(["'{}'".format(locale.code) for locale in self.locales.all()])
             parts.append("normandy.locale in [{}]".format(locales))
 
         if self.countries.count():
