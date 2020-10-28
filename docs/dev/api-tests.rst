@@ -11,7 +11,7 @@ Before running these tests you will need the following installed:
 
 * Docker (https://docker.com)
 * The `make` CLI tool
-* Python 3.7.0 or greater
+* Python 3.9
 * `Poetry <https://python-poetry.org/docs/>`_ installed
 
 Before running these tests you need to setup up an environment for the
@@ -57,4 +57,3 @@ from the root project directory.
 
 where ``<server>`` is the server you want to test, such as
 ``https://stage.normandy.cloudops.mozgcp.net`` or `https://localhost:8000`.
-
