@@ -21,7 +21,7 @@ class Core(Configuration):
         "product_details",
         "rest_framework",
         "graphene_django",
-        "drf_yasg",
+        "drf_yasg2",
         "storages",
         "raven.contrib.django.raven_compat",
         "corsheaders",

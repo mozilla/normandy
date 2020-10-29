@@ -477,11 +477,14 @@ Django = ">=1.11"
 
 [[package]]
 name = "djangorestframework"
-version = "3.10.3"
+version = "3.12.1"
 description = "Web APIs for Django, made easy."
 category = "main"
 optional = false
 python-versions = ">=3.5"
+
+[package.dependencies]
+django = ">=2.2"
 
 [[package]]
 name = "djangorestframework-yaml"
@@ -521,26 +524,32 @@ optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
-name = "drf-yasg"
-version = "1.17.1"
-description = "Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code."
+name = "drf-yasg2"
+version = "1.19.4"
+description = "Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = "*"
 
 [package.extras]
+dist = ["bump2version", "wheel"]
+docs = ["djangorestframework-camel-case (>=0.2.0)", "Pillow (>=4.3.0)", "readme-renderer (>=24.0)", "sphinx-rtd-theme (>=0.2.4)", "Sphinx (>=1.7.0)", "twine (>=1.12.1)"]
+format = ["autoflake (>=1.4.0)", "black (>=20.8.0)", "isort (>=4.2.0)"]
+heroku = ["dj-database-url (>=0.4.2)", "gunicorn (>=19.7.1)", "psycopg2 (>=2.7.3)", "whitenoise (>=3.3.1)"]
+lint = ["flake8 (>=3.5.0)"]
+tests = ["dj-database-url (>=0.4.2)", "django-cors-headers (>=3.0.2)", "django-filter (>=1.1.0)", "django-oauth-toolkit (>=1.3.2)", "djangorestframework-camel-case (>=1.0.3)", "djangorestframework-recursive (>=0.1.2)", "Pillow (>=4.3.0)", "pytest (>=4.6.11)", "pytest-django (>=3.10.0)", "tox (>=3.3.0)", "user-agents (>=1.1.0)"]
 validation = ["swagger-spec-validator (>=2.1.0)"]
 
 [package.dependencies]
 coreapi = ">=2.3.3"
 coreschema = ">=0.0.4"
-Django = ">=1.11.7"
-djangorestframework = ">=3.8"
+django = ">=2.2.0"
+djangorestframework = ">=3.8.0"
 inflection = ">=0.3.1"
-packaging = "*"
-"ruamel.yaml" = ">=0.15.34"
-six = ">=1.10.0"
-uritemplate = ">=3.0.0"
+packaging = ">=18.0"
+"ruamel.yaml" = ">=0.16.12"
+six = ">=1.15.0"
+uritemplate = ">=3.0.1"
 
 [[package]]
 name = "ecdsa"
@@ -559,11 +568,15 @@ six = ">=1.9.0"
 
 [[package]]
 name = "factory-boy"
-version = "2.12.0"
+version = "3.0.1"
 description = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby."
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=3.5"
+
+[package.extras]
+dev = ["coverage", "django", "flake8", "isort", "pillow", "sqlalchemy", "mongoengine", "wheel (>=0.32.0)", "tox", "zest.releaser"]
+doc = ["sphinx", "sphinx-rtd-theme"]
 
 [package.dependencies]
 Faker = ">=0.7.0"
@@ -1564,7 +1577,7 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "ruamel.yaml"
-version = "0.16.10"
+version = "0.16.12"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 category = "main"
 optional = false
@@ -1606,7 +1619,7 @@ six = "*"
 
 [[package]]
 name = "six"
-version = "1.14.0"
+version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
 category = "main"
 optional = false
@@ -1975,7 +1988,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [metadata]
 lock-version = "1.0"
 python-versions = "~3.9"
-content-hash = "692fdb2d641a7153b90812ed379aec9d36b5cafd8d561aafaf8cccd208a47660"
+content-hash = "a2d0a469b9c0efed5f84fe3c0618247ff68623cdd9d69de7abfe021f6afb393a"
 
 [metadata.files]
 aiohttp = [
@@ -2210,8 +2223,8 @@ django-storages = [
     {file = "django_storages-1.9.1-py2.py3-none-any.whl", hash = "sha256:3103991c2ee8cef8a2ff096709973ffe7106183d211a79f22cf855f33533d924"},
 ]
 djangorestframework = [
-    {file = "djangorestframework-3.10.3-py3-none-any.whl", hash = "sha256:5488aed8f8df5ec1d70f04b2114abc52ae6729748a176c453313834a9ee179c8"},
-    {file = "djangorestframework-3.10.3.tar.gz", hash = "sha256:dc81cbf9775c6898a580f6f1f387c4777d12bd87abf0f5406018d32ccae71090"},
+    {file = "djangorestframework-3.12.1-py3-none-any.whl", hash = "sha256:5c5071fcbad6dce16f566d492015c829ddb0df42965d488b878594aabc3aed21"},
+    {file = "djangorestframework-3.12.1.tar.gz", hash = "sha256:d54452aedebb4b650254ca092f9f4f5df947cb1de6ab245d817b08b4f4156249"},
 ]
 djangorestframework-yaml = [
     {file = "djangorestframework-yaml-2.0.0.tar.gz", hash = "sha256:1b2cfd7482425f3c6924a8eb803d6f73276e76b03293cd7144c755753e029f15"},
@@ -2226,17 +2239,16 @@ docutils = [
     {file = "docutils-0.15.2-py3-none-any.whl", hash = "sha256:6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0"},
     {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
 ]
-drf-yasg = [
-    {file = "drf-yasg-1.17.1.tar.gz", hash = "sha256:5572e9d5baab9f6b49318169df9789f7399d0e3c7bdac8fdb8dfccf1d5d2b1ca"},
-    {file = "drf_yasg-1.17.1-py2.py3-none-any.whl", hash = "sha256:7d7af27ad16e18507e9392b2afd6b218fbffc432ec8dbea053099a2241e184ff"},
+drf-yasg2 = [
+    {file = "drf_yasg2-1.19.4-py3-none-any.whl", hash = "sha256:75e661ca5cf15eb44fcfab408c7b864f87c20794f564aa08b3a31817a857f19d"},
+    {file = "drf_yasg2-1.19.4.tar.gz", hash = "sha256:7037a8041eb5d1073fa504a284fc889685f93d0bfd008a963db1b366db786734"},
 ]
 ecdsa = [
     {file = "ecdsa-0.16.0-py2.py3-none-any.whl", hash = "sha256:ca359c971594dceebf334f3d623dae43163ab161c7d09f28cae70a86df26eb7a"},
     {file = "ecdsa-0.16.0.tar.gz", hash = "sha256:494c6a853e9ed2e9be33d160b41d47afc50a6629b993d2b9c5ad7bb226add892"},
 ]
 factory-boy = [
-    {file = "factory_boy-2.12.0-py2.py3-none-any.whl", hash = "sha256:728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee"},
-    {file = "factory_boy-2.12.0.tar.gz", hash = "sha256:faf48d608a1735f0d0a3c9cbf536d64f9132b547dae7ba452c4d99a79e84a370"},
+    {file = "factory_boy-3.0.1.tar.gz", hash = "sha256:2ce2f665045d9f15145a6310565fcb8255d52fc6fd867f3b783b3ac3de6cf10e"},
 ]
 faker = [
     {file = "Faker-4.0.3-py3-none-any.whl", hash = "sha256:53bf2c8a2de8af271466e7b9cc2f08ecf83c4c947981680eb61080779a0adace"},
@@ -2722,8 +2734,8 @@ rsa = [
     {file = "rsa-4.0.tar.gz", hash = "sha256:1a836406405730121ae9823e19c6e806c62bbad73f890574fff50efa4122c487"},
 ]
 "ruamel.yaml" = [
-    {file = "ruamel.yaml-0.16.10-py2.py3-none-any.whl", hash = "sha256:0962fd7999e064c4865f96fb1e23079075f4a2a14849bcdc5cdba53a24f9759b"},
-    {file = "ruamel.yaml-0.16.10.tar.gz", hash = "sha256:099c644a778bf72ffa00524f78dd0b6476bca94a1da344130f4bf3381ce5b954"},
+    {file = "ruamel.yaml-0.16.12-py2.py3-none-any.whl", hash = "sha256:012b9470a0ea06e4e44e99e7920277edf6b46eee0232a04487ea73a7386340a5"},
+    {file = "ruamel.yaml-0.16.12.tar.gz", hash = "sha256:076cc0bc34f1966d920a49f18b52b6ad559fbe656a0748e3535cf7b3f29ebf9e"},
 ]
 rx = [
     {file = "Rx-1.6.1-py2.py3-none-any.whl", hash = "sha256:7357592bc7e881a95e0c2013b73326f704953301ab551fbc8133a6fadab84105"},
@@ -2738,8 +2750,8 @@ singledispatch = [
     {file = "singledispatch-3.4.0.3.tar.gz", hash = "sha256:5b06af87df13818d14f08a028e42f566640aef80805c3b50c5056b086e3c2b9c"},
 ]
 six = [
-    {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
-    {file = "six-1.14.0.tar.gz", hash = "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"},
+    {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
+    {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 smmap = [
     {file = "smmap-3.0.2-py2.py3-none-any.whl", hash = "sha256:52ea78b3e708d2c2b0cfe93b6fc3fbeec53db913345c26be6ed84c11ed8bebc1"},
