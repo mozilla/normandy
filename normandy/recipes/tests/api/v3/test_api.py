@@ -227,6 +227,46 @@ class TestRecipeAPI(object):
                 "filter_object": "Filters must be of the format `key1:val1,key2:val2,..."
             }
 
+        def test_list_can_filter_by_filter_object_type(self, api_client):
+            locale = LocaleFactory()
+            recipe1 = RecipeFactory(
+                filter_object=[
+                    filter_objects.BucketSampleFilter.create(
+                        start=100,
+                        count=200,
+                        total=10_000,
+                        input=["normandy.userId", '"global-v4"'],
+                    ),
+                    filter_objects.LocaleFilter.create(locales=[locale.code]),
+                ]
+            )
+            recipe2 = RecipeFactory(
+                filter_object=[
+                    filter_objects.PresetFilter.create(name="pocket-1"),
+                    filter_objects.LocaleFilter.create(locales=[locale.code]),
+                ]
+            )
+
+            # All recipes are visible
+            res = api_client.get("/api/v3/recipe/")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe1.id, recipe2.id}
+
+            # Filters can find types that exist on both
+            res = api_client.get("/api/v3/recipe/?filter_object=type:locale")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe1.id, recipe2.id}
+
+            # Filters can find a type that exists on just one
+            res = api_client.get("/api/v3/recipe/?filter_object=type:bucket")
+            assert res.status_code == 200
+            assert {r["id"] for r in res.data["results"]} == {recipe1.id}
+
+            # Filters can find nothing
+            res = api_client.get("/api/v3/recipe/?filter_object=type:unused")
+            assert res.status_code == 200
+            assert res.data["count"] == 0
+
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
