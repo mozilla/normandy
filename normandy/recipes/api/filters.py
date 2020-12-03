@@ -1,4 +1,5 @@
 import django_filters
+from rest_framework import serializers
 
 from normandy.recipes.models import Recipe
 
@@ -87,10 +88,17 @@ class FilterObjectFieldFilter(django_filters.Filter):
         if value is None:
             return qs
 
-        needles = {k: v for k, v in [p.split(":") for p in value.split(",")]}
+        needles = []
+        for segment in value.split(","):
+            if ":" not in segment:
+                raise serializers.ValidationError(
+                    {"filter_object": "Filters must be of the format `key1:val1,key2:val2,..."}
+                )
+            key, val = segment.split(":", 1)
+            needles.append((key, val))
 
         # Let the database do a first pass filter
-        for k, v in needles.items():
+        for k, v in needles:
             qs = qs.filter(latest_revision__filter_object_json__contains=k)
             qs = qs.filter(latest_revision__filter_object_json__contains=v)
 
@@ -105,7 +113,7 @@ class FilterObjectFieldFilter(django_filters.Filter):
             recipe_matches = True
 
             # Recipes needs to have all the keys and values in the needles
-            for k, v in needles.items():
+            for k, v in needles:
                 for filter_object in recipe.latest_revision.filter_object:
                     # Don't consider invalid filter objects
                     if not filter_object.is_valid():
