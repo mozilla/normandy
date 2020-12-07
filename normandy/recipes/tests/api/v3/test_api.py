@@ -218,6 +218,15 @@ class TestRecipeAPI(object):
             assert res.status_code == 200
             assert res.data["count"] == 0
 
+        def test_list_invalid_filter_by_filter_object(self, api_client):
+            # The filter is supposed to be of the form
+            # `key1:val1,key2:val2,...`. What if we don't follow that format?
+            res = api_client.get("/api/v3/recipe/?filter_object=nocolon")
+            assert res.status_code == 400
+            assert res.data == {
+                "filter_object": "Filters must be of the format `key1:val1,key2:val2,..."
+            }
+
     @pytest.mark.django_db
     class TestCreation(object):
         def test_it_can_create_recipes(self, api_client):
