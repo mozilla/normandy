@@ -50,7 +50,6 @@ html5lib = "^1.0.1"
 jsonschema = "^3.1.1"
 kinto-http = "^10.6.0"
 markus = {version = "^2.1.0", extras = ["datadog"]}
-newrelic = "^5.2.1.129"
 psycopg2 = "^2.8.3"
 pyasn1 = "^0.4.7"
 pyasn1-modules = "^0.2.7"

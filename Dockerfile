@@ -40,8 +40,7 @@ USER app
 ENV DJANGO_SETTINGS_MODULE=normandy.settings \
     DJANGO_CONFIGURATION=Production \
     PORT=8000 \
-    CMD_PREFIX="" \
-    NEW_RELIC_CONFIG_FILE=newrelic.ini
+    CMD_PREFIX=""
 EXPOSE $PORT
 
 CMD $CMD_PREFIX gunicorn \
