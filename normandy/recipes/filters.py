@@ -43,6 +43,14 @@ class BaseFilter(serializers.Serializer):
         raise NotImplementedError()
 
     @property
+    def data(self):
+        # Technically the filter's data doesn't include type, since it is hard
+        # coded. However type is an implicit part of the data still. Make it explicit.
+        ret = super().data
+        ret["type"] = self.type
+        return ret
+
+    @property
     def capabilities(self):
         """The capabilities needed by this filter"""
         raise NotImplementedError
