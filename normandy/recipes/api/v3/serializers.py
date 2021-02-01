@@ -4,7 +4,10 @@ from factory.fuzzy import FuzzyText
 from normandy.base.api.v3.serializers import UserSerializer
 from normandy.base.jexl import get_normandy_jexl
 from normandy.recipes import filters
-from normandy.recipes.api.fields import ActionImplementationHyperlinkField, FilterObjectField
+from normandy.recipes.api.fields import (
+    ActionImplementationHyperlinkField,
+    FilterObjectField,
+)
 from normandy.recipes.models import (
     Action,
     ApprovalRequest,
@@ -90,6 +93,7 @@ class RecipeRevisionSerializer(serializers.ModelSerializer):
             "filter_object",
             "id",
             "identicon_seed",
+            "metadata",
             "name",
             "recipe",
             "updated",

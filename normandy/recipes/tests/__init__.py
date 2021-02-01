@@ -329,6 +329,7 @@ class RecipeRevisionFactory(DjangoModelFactory):
     comment = FuzzyUnicode()
     extra_filter_expression = factory.fuzzy.FuzzyChoice(["true", "false"])
     extra_capabilities = []
+    metadata = {}
 
     @factory.lazy_attribute
     def filter_object_json(self):
