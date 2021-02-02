@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
@@ -292,6 +292,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     comment = models.TextField()
     experimenter_slug = models.CharField(null=True, max_length=255, blank=True)
     extra_capabilities = ArrayField(models.CharField(max_length=255), default=list)
+    metadata = JSONField(default=dict)
 
     class Meta:
         ordering = ("-created",)
@@ -311,6 +312,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
             "comment": self.comment,
             "experimenter_slug": self.experimenter_slug,
             "extra_capabilities": self.extra_capabilities,
+            "metadata": self.metadata,
         }
 
     @property

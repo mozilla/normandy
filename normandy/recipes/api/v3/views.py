@@ -205,6 +205,20 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
             ApprovalRequestSerializer(approval_request).data, status=status.HTTP_201_CREATED
         )
 
+    @action(detail=True, methods=["GET", "OPTIONS", "PATCH"])
+    def metadata(self, request, pk=None):
+        revision = self.get_object()
+
+        if request.method == "PATCH":
+            revision.metadata.update(request.data)
+            for key, val in request.data.items():
+                if val is None:
+                    del revision.metadata[key]
+
+            revision.save()
+
+        return Response(revision.metadata, status=status.HTTP_200_OK)
+
 
 class ApprovalRequestFilters(django_filters.FilterSet):
     approved = ApprovalStateFilter()

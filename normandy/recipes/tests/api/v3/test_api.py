@@ -1375,6 +1375,35 @@ class TestRecipeRevisionAPI(object):
         res = api_client.get(f"/api/v3/recipe_revision/{recipe.latest_revision.id}/")
         assert res.data["identicon_seed"] == recipe.latest_revision.identicon_seed
 
+    def test_metadata(self, api_client):
+        revision = RecipeFactory(metadata={"test1": "a"}).latest_revision
+        assert revision.metadata == {"test1": "a"}
+        url = f"/api/v3/recipe_revision/{revision.id}/"
+        metadata_url = url + "metadata/"
+
+        res = api_client.get(url)
+        assert res.status_code == 200
+        assert res.data["metadata"] == {"test1": "a"}
+
+        res = api_client.patch(metadata_url, {"test1": "b"})
+        assert res.status_code == 200
+        revision.refresh_from_db()
+        assert revision.metadata == {"test1": "b"}
+
+        res = api_client.patch(metadata_url, {"test2": "c"})
+        assert res.status_code == 200
+        revision.refresh_from_db()
+        assert revision.metadata == {"test1": "b", "test2": "c"}
+
+        res = api_client.patch(metadata_url, {"test1": None})
+        assert res.status_code == 200
+        revision.refresh_from_db()
+        assert revision.metadata == {"test2": "c"}
+
+        res = api_client.get(metadata_url)
+        assert res.status_code == 200
+        assert res.data == {"test2": "c"}
+
 
 @pytest.mark.django_db
 class TestApprovalRequestAPI(object):
