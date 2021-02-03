@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import connection
@@ -1403,6 +1403,48 @@ class TestRecipeRevisionAPI(object):
         res = api_client.get(metadata_url)
         assert res.status_code == 200
         assert res.data == {"test2": "c"}
+
+    def test_filter_by_date(self, api_client):
+        r1 = RecipeFactory(created=datetime(2019, 1, 1)).latest_revision
+        r2 = RecipeFactory(created=datetime(2020, 1, 1)).latest_revision
+        r3 = RecipeFactory(created=datetime(2021, 1, 1)).latest_revision
+
+        res = api_client.get("/api/v3/recipe_revision/")
+        assert res.status_code == 200, res.data
+        assert set(rev["id"] for rev in res.data["results"]) == set(
+            [r1.id, r2.id, r3.id]
+        ), "no filters returns everything"
+        assert set(rev["date_created"][:4] for rev in res.data["results"]) == set(
+            ["2019", "2020", "2021"]
+        ), "correct dates are in the API"
+
+        res = api_client.get("/api/v3/recipe_revision/?created_before=2020-06-01")
+        assert res.status_code == 200, res.data
+        assert set(rev["id"] for rev in res.data["results"]) == set(
+            [r1.id, r2.id]
+        ), "before filter works"
+
+        res = api_client.get("/api/v3/recipe_revision/?created_after=2019-06-01")
+        assert res.status_code == 200, res.data
+        assert set(rev["id"] for rev in res.data["results"]) == set(
+            [r2.id, r3.id]
+        ), "after filter works"
+
+        res = api_client.get(
+            "/api/v3/recipe_revision/?created_after=2019-06-01&created_before=2020-06-01"
+        )
+        assert res.status_code == 200, res.data
+        assert set(rev["id"] for rev in res.data["results"]) == set(
+            [r2.id]
+        ), "before and after can be combined"
+
+        res = api_client.get("/api/v3/recipe_revision/?created_before=1965-01-01")
+        assert res.status_code == 200, res.data
+        assert len(res.data["results"]) == 0, "before can find nothing"
+
+        res = api_client.get("/api/v3/recipe_revision/?created_after=2055-01-01")
+        assert res.status_code == 200, res.data
+        assert len(res.data["results"]) == 0, "after can find nothing"
 
 
 @pytest.mark.django_db

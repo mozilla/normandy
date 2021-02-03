@@ -325,6 +325,7 @@ class RecipeRevisionFactory(DjangoModelFactory):
     name = FuzzyUnicode()
     action = factory.SubFactory(ActionFactory)
     recipe = factory.SubFactory(RecipeFactory)
+    # created = factory.fuzzy.FuzzyDateTime(start_dt=datetime(2015, 1, 1, tzinfo=timezone.utc))
     identicon_seed = FuzzyIdenticonSeed()
     comment = FuzzyUnicode()
     extra_filter_expression = factory.fuzzy.FuzzyChoice(["true", "false"])
@@ -351,6 +352,11 @@ class RecipeRevisionFactory(DjangoModelFactory):
             revision.arguments = arguments_factory(**kwargs, **extracted)
         elif extracted is not None:
             revision.arguments = {**extracted, **kwargs}
+
+    @factory.post_generation
+    def created(revision, create, extracted=None, **kwargs):
+        if extracted:
+            revision.created = extracted
 
 
 class DictFactory(factory.Factory):
