@@ -182,10 +182,10 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
 
 class RecipeRevisionFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        if before := request.query_params.get("created_before"):
-            queryset = queryset.filter(created__lt=before)
-        if after := request.query_params.get("created_after"):
-            queryset = queryset.filter(created__gt=after)
+        if start := request.query_params.get("created_start"):
+            queryset = queryset.filter(created__gte=start)
+        if end := request.query_params.get("created_end"):
+            queryset = queryset.filter(created__lte=end)
         return queryset
 
 
