@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 
 import django_filters
-from rest_framework import permissions, status, views, viewsets
+from rest_framework import permissions, status, views, viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
@@ -180,6 +180,15 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
         return Response(RecipeSerializer(recipe).data)
 
 
+class RecipeRevisionFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if start := request.query_params.get("created_start"):
+            queryset = queryset.filter(created__gte=start)
+        if end := request.query_params.get("created_end"):
+            queryset = queryset.filter(created__lte=end)
+        return queryset
+
+
 class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         RecipeRevision.objects.all()
@@ -188,6 +197,7 @@ class RecipeRevisionViewSet(viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = RecipeRevisionSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
+    filter_backends = [RecipeRevisionFilterBackend]
 
     @action(detail=True, methods=["POST"])
     def request_approval(self, request, pk=None):

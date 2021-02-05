@@ -301,6 +301,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
     def data(self):
         return {
             "name": self.name,
+            "created": self.created,
             "action": self.action,
             "arguments_json": self.arguments_json,
             "extra_filter_expression": self.extra_filter_expression,
