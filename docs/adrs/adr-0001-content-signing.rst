@@ -85,7 +85,7 @@ canonical JSON serialization of the recipe.
 .. code-block:: json
 
   {
-    "recipe": { ... },
+    "recipe": {},
     "signature": {
       "timestamp": "2021-02-12T19:25:36.504464Z",
       "signature": "7tlSH4_w5I4aKb_EDKggZK31fxmLI5c9LmoTBDfO5…",
