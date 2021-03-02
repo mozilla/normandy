@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ADR 0001 - Ensuring recipe integrity using Content Signature &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Architectural Decision Records" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Architectural Decision Records</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ADR 0001 - Ensuring recipe integrity using Content Signature</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decision-drivers">Decision Drivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#considered-options">Considered Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decision-outcome">Decision Outcome</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positive-consequences">Positive Consequences</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#negative-consequences">Negative Consequences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pros-and-cons-of-the-options">Pros and Cons of the Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#individual-recipe-signatures">1. Individual recipe signatures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#https-only">HTTPS Only</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#whole-collection-signatures">Whole-collection signatures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#response-signing">Response signing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Architectural Decision Records</a> &raquo;</li>
+        
+      <li>ADR 0001 - Ensuring recipe integrity using Content Signature</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/adrs/adr-0001-content-signing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adr-0001-ensuring-recipe-integrity-using-content-signature">
+<h1>ADR 0001 - Ensuring recipe integrity using Content Signature<a class="headerlink" href="#adr-0001-ensuring-recipe-integrity-using-content-signature" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Status</dt>
+<dd class="field-odd"><p>retrospective</p>
+</dd>
+<dt class="field-even">Last Updated</dt>
+<dd class="field-even"><p>2021-02-18</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a <em>retrospective</em> ADR, that documents a past decision well after
+the time the decision was actually made. It’s accuracy may be limited by
+the distance in time between the decision and the time of record.</p>
+</div>
+<div class="section" id="context-and-problem-statement">
+<h2>Context and Problem Statement<a class="headerlink" href="#context-and-problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Normandy is a system to remotely control Firefox, and in that role is very
+powerful. At its extreme, it can execute arbitrary code with some work via
+extension installation, and change arbitrary preferences simply. This power
+is very useful, but needs to be carefully managed to make sure that we don’t
+supply attackers with a ready made attack vector. This ADR covers one of the
+techniques used to protect Firefox.</p>
+</div>
+<div class="section" id="decision-drivers">
+<h2>Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Normandy has extremely powerful control over all Firefox clients.</p></li>
+<li><p>There should be protections to reduce the chance that an unintended recipe is
+executed.</p></li>
+<li><p>There are dozens of Normandy recipes potentially active at once, and they
+change frequently and in an uncoordinated way.</p></li>
+<li><p>Balrog, a system that Normandy is partially replacing in some ways, has
+signed payloads</p></li>
+<li><p>The recipes served may vary by client</p>
+<ul>
+<li><p>2021 Note: This ended up not being true for very long, but it did impact
+our decision.</p></li>
+</ul>
+</li>
+<li><p>Extensions can run arbitrary chrome-privileged code.</p>
+<ul>
+<li><p>2021 Note: This decision was made before Web Extensions were mandatory.</p></li>
+</ul>
+</li>
+<li><p>TLS intercepting middleboxes exist for a significant number of users.</p></li>
+</ul>
+</div>
+<div class="section" id="considered-options">
+<h2>Considered Options<a class="headerlink" href="#considered-options" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Individual recipe signatures</p></li>
+<li><p>HTTPS only</p></li>
+<li><p>Whole-collection signatures</p></li>
+<li><p>Response signing</p></li>
+</ol>
+</div>
+<div class="section" id="decision-outcome">
+<h2>Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permalink to this headline">¶</a></h2>
+<p>Chosen option: Option 1, Individual recipe signatures. This option provides
+strong security, and a good balance between handling frequent changes with
+performance and compute cost.</p>
+<div class="section" id="positive-consequences">
+<h3>Positive Consequences<a class="headerlink" href="#positive-consequences" title="Permalink to this headline">¶</a></h3>
+<p>In the years since we have made this decision, it has been a key factor in at
+least one security incident, and has given us confidence that the recipes we
+serve to clients are what we meant them to be.</p>
+</div>
+<div class="section" id="negative-consequences">
+<h3>Negative Consequences<a class="headerlink" href="#negative-consequences" title="Permalink to this headline">¶</a></h3>
+<p>Especially in the time when this feature was new, the signatures generated
+would often become out of sync, invalid, or be generated with the wrong data.
+This caused several experiments to outright fail, or to be compromised in
+subtle ways. It required extra work for developers, ops, experiment owners,
+and managers.</p>
+</div>
+</div>
+<div class="section" id="pros-and-cons-of-the-options">
+<h2>Pros and Cons of the Options<a class="headerlink" href="#pros-and-cons-of-the-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="individual-recipe-signatures">
+<h3>1. Individual recipe signatures<a class="headerlink" href="#individual-recipe-signatures" title="Permalink to this headline">¶</a></h3>
+<p>Each recipe carries with it a signature that validates both the content and
+the source of the data. The signature is over the byte representation of the
+canonical JSON serialization of the recipe.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;recipe&quot;</span><span class="p">:</span> <span class="p">{},</span>
+  <span class="nt">&quot;signature&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-02-12T19:25:36.504464Z&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;signature&quot;</span><span class="p">:</span> <span class="s2">&quot;7tlSH4_w5I4aKb_EDKggZK31fxmLI5c9LmoTBDfO5…&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;x5u&quot;</span><span class="p">:</span> <span class="s2">&quot;https://content-signature-2.cdn.mozilla.net/chains/...&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the curious, “x5u” stands for “X.509 URI”, which RFC 7515 defines as</p>
+<blockquote>
+<div><p>The “x5u” (X.509 URL) Header Parameter is a URI that refers to a resource
+for the X.509 public key certificate or certificate chain corresponding to
+the key used to digitally sign the [payload].</p>
+<p class="attribution">—<a class="reference external" href="https://tools.ietf.org/html/rfc7515#section-4.1.5">https://tools.ietf.org/html/rfc7515#section-4.1.5</a></p>
+</div></blockquote>
+<p>The x5u is used to validate the source of the signature.</p>
+</div>
+<ul class="simple">
+<li><p>Good, because spoofing a recipe is very difficult.</p></li>
+<li><p>Good, because recipes are valid for a limited amount of time, reducing the risk of replay attacks.</p></li>
+<li><p>Good, because signing a recipe can be separated in time from authoring a
+recipe, allowing for safer edits.</p></li>
+<li><p>Good, because we can verify that the data we are serving is correct.</p></li>
+<li><p>Good, because recipe signatures can in theory be valid or invalid alone,
+reducing single-point-of-failure.</p></li>
+<li><p>Good, because subsets of the recipe collection can be served.</p></li>
+<li><p>Bad, because it adds a dependent service, Autograph.</p></li>
+<li><p>Bad, managing recipe signatures is a complicated additional step that must be
+handled by the server.</p></li>
+<li><p>Bad, because canonical JSON serialization must be synchronized between client and server.</p></li>
+</ul>
+</div>
+<div class="section" id="https-only">
+<h3>HTTPS Only<a class="headerlink" href="#https-only" title="Permalink to this headline">¶</a></h3>
+<p>Use only the protections provided by HTTPS. The contents of recipes would be
+served from an API without any extra verification steps. The validity of the
+origin and contents of the message would be entirely</p>
+<ul class="simple">
+<li><p>Good, because it requires no additional work.</p></li>
+<li><p>Good, because TLS is well understood.</p></li>
+<li><p>Good, because have a lot of experience running HTTPS servers.</p></li>
+<li><p>Bad, because there are far more trusted root TLS certs, none of which we control.</p>
+<ul>
+<li><p>This could be mitigated by pinning a certificate for the service.</p>
+<ul>
+<li><p>Good, because it provides more security.</p></li>
+<li><p>Bad, because it makes the system more brittle, giving up some of HTTPS’s simplicity.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Bad, because it cannot protect against local attackers modifying data.</p></li>
+</ul>
+</div>
+<div class="section" id="whole-collection-signatures">
+<h3>Whole-collection signatures<a class="headerlink" href="#whole-collection-signatures" title="Permalink to this headline">¶</a></h3>
+<p>Sign the entire collection as a single unit, and update the collection
+signature when any recipe changes. This is the approach that Remote Settings
+uses. The signature is over the byte representation of the JSON serialized,
+sorted collection.</p>
+<ul class="simple">
+<li><p>Good, because spoofing a recipe set is very difficult.</p></li>
+<li><p>Good, because recipe sets are valid for a limited amount of time, reducing
+the risk of replay attacks.</p></li>
+<li><p>Good, because signing a recipe can be separated in time from authoring a
+recipe, allowing for safer edits.</p></li>
+<li><p>Bad, because we can verify that the data we are serving is correct.</p></li>
+<li><p>Bad, because it adds a dependent service, Autograph.</p></li>
+<li><p>Bad, managing collection signatures is a complicated additional step that
+must be handled by the server.</p></li>
+<li><p>Bad, because canonical JSON serialization must be synchronized between client and server.</p></li>
+<li><p>Bad, because a problem with the signature causes all recipes to fail</p></li>
+</ul>
+</div>
+<div class="section" id="response-signing">
+<h3>Response signing<a class="headerlink" href="#response-signing" title="Permalink to this headline">¶</a></h3>
+<p>Dynamically sign responses in whole or part as they are served. This would
+involve creating a new short lived signature for each unique request served
+by Normandy.</p>
+<ul class="simple">
+<li><p>Good, because it could serve a subset of recipes.</p></li>
+<li><p>Good, because spoofing a recipe set is very difficult.</p></li>
+<li><p>Good, because recipes are valid for a limited amount of time, reducing the risk of replay attacks.</p></li>
+<li><p>Good, because signing a recipe can be separated in time from authoring a
+recipe, allowing for safer edits.</p></li>
+<li><p>Bad, because Autograph could not handle this kind of throughput.</p></li>
+<li><p>Bad, because it is harder to verify that ephemeral signatures are correct.</p></li>
+<li><p>Bad, because a problem with the signature causes all recipes to fail</p></li>
+<li><p>Bad, because it either adds a dependent service, Autograph, or adds cryptography to Normandy.</p></li>
+<li><p>Bad, because canonical JSON serialization must be synchronized between client and server.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Architectural Decision Records" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

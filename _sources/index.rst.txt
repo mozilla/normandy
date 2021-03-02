@@ -15,3 +15,4 @@ Client, see the `Firefox Source Docs on the subject <https://firefox-source-docs
    dev/index
    qa/index
    ops/index
+   adrs/index
