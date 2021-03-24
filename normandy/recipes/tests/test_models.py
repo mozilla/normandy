@@ -916,8 +916,8 @@ class TestRecipeRevision(object):
         def test_filter_object_capabilities_are_automatically_included(self):
             filter_object = StableSampleFilter.create(input=["A"], rate=0.1)
             recipe = RecipeFactory(filter_object=[filter_object])
-            assert filter_object.capabilities
-            assert filter_object.capabilities <= recipe.latest_revision.capabilities
+            assert filter_object.get_capabilities()
+            assert filter_object.get_capabilities() <= recipe.latest_revision.capabilities
 
 
 @pytest.mark.django_db
