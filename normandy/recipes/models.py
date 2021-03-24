@@ -392,7 +392,7 @@ class RecipeRevision(DirtyFieldsMixin, models.Model):
         """Calculates the set of capabilities required for this recipe."""
         capabilities = set(self.extra_capabilities) | self.action.capabilities
         for filter in self.filter_object:
-            capabilities.update(filter.capabilities)
+            capabilities.update(filter.get_capabilities())
 
         # "capabilities-v1" is not a baseline capability. If all of the other
         # capabilities are baseline capabilities, don't add it to the recipe.

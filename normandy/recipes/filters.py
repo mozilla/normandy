@@ -50,8 +50,7 @@ class BaseFilter(serializers.Serializer):
         ret["type"] = self.type
         return ret
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         """The capabilities needed by this filter"""
         raise NotImplementedError
 
@@ -141,8 +140,7 @@ class ChannelFilter(BaseFilter):
         channels = ",".join(f'"{c}"' for c in self.initial_data["channels"])
         return f"normandy.channel in [{channels}]"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         # no special capabilities needed
         return set()
 
@@ -178,8 +176,7 @@ class LocaleFilter(BaseFilter):
         locales = ",".join(f'"{locale}"' for locale in self.initial_data["locales"])
         return f"normandy.locale in [{locales}]"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         # no special capabilities needed
         return set()
 
@@ -214,8 +211,7 @@ class CountryFilter(BaseFilter):
         countries = ",".join(f'"{c}"' for c in self.initial_data["countries"])
         return f"normandy.country in [{countries}]"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         # no special capabilities needed
         return set()
 
@@ -252,8 +248,7 @@ class PlatformFilter(BaseFilter):
 
         return "||".join((p for p in platforms_jexl))
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
 
@@ -285,8 +280,7 @@ class AddonActiveFilter(BaseAddonFilter):
     def get_formatted_string(self, addon):
         return f'normandy.addons["{addon}"].isActive'
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
 
@@ -318,8 +312,7 @@ class AddonInstalledFilter(BaseAddonFilter):
     def get_formatted_string(self, addon):
         return f'normandy.addons["{addon}"]'
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
 
@@ -371,8 +364,7 @@ class PrefCompareFilter(BaseFilter):
 
         return f"'{pref}'|preferenceValue {symbol} {json.dumps(value)}"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.preferenceValue"}
 
 
@@ -403,8 +395,7 @@ class PrefExistsFilter(BaseFilter):
         else:
             return f"!('{pref}'|preferenceExists)"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.preferenceExists"}
 
 
@@ -440,8 +431,7 @@ class PrefUserSetFilter(BaseFilter):
         else:
             return f"!('{pref}'|preferenceIsUserSet)"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.preferenceIsUserSet"}
 
 
@@ -508,8 +498,7 @@ class BucketSampleFilter(BaseFilter):
         total = self.initial_data["total"]
         return f"[{inputs}]|bucketSample({start},{count},{total})"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.bucketSample"}
 
 
@@ -553,8 +542,7 @@ class StableSampleFilter(BaseFilter):
         rate = self.initial_data["rate"]
         return f"[{inputs}]|stableSample({rate})"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.stableSample"}
 
 
@@ -603,8 +591,7 @@ class NamespaceSampleFilter(BaseFilter):
         total = 10_000
         return f'["{namespace}",normandy.userId]|bucketSample({start},{count},{total})'
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.bucketSample"}
 
 
@@ -645,8 +632,7 @@ class VersionFilter(BaseFilter):
             for v in self.initial_data["versions"]
         )
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         # no special capabilities needed
         return set()
 
@@ -687,8 +673,7 @@ class VersionRangeFilter(BaseFilter):
             ]
         )
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.context.env.version", "jexl.transform.versionCompare"}
 
 
@@ -727,8 +712,7 @@ class DateRangeFilter(BaseFilter):
             ]
         )
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.date"}
 
 
@@ -761,8 +745,7 @@ class WindowsBuildNumberFilter(BaseComparisonFilter):
     def left_of_operator(self):
         return "normandy.os.windowsBuildNumber"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
     def to_jexl(self, revision):
@@ -806,8 +789,7 @@ class WindowsVersionFilter(BaseFilter):
                 raise serializers.ValidationError(f"Unrecognized windows version slug {version!r}")
         return versions_list
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
 
@@ -834,8 +816,7 @@ class NegateFilter(BaseFilter):
         filter = from_data(self.initial_data["filter_to_negate"])
         return f"!({filter.to_jexl(revision)})"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
 
@@ -853,9 +834,8 @@ class _CompositeFilter(BaseFilter):
         expr = self._get_operator().join(parts)
         return f"({expr})"
 
-    @property
-    def capabilities(self):
-        return set.union(*(subfilter.capabilities for subfilter in self._get_subfilters()))
+    def get_capabilities(self):
+        return set.union(*(subfilter.get_capabilities() for subfilter in self._get_subfilters()))
 
 
 class AndFilter(_CompositeFilter):
@@ -949,8 +929,7 @@ class ProfileCreateDateFilter(BaseFilter):
 
         return expr + f"(normandy.telemetry.main.environment.profile.creationDate{symbol}{days})"
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set()
 
 
@@ -997,6 +976,16 @@ class JexlFilter(BaseFilter):
     capabilities = serializers.ListField(child=serializers.CharField(min_length=1), min_length=0)
     comment = serializers.CharField(min_length=1)
 
+    def validate_capabilities(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError(
+                f"{self.__class__.__name__} data must have a list of capabilities"
+            )
+        if not all(isinstance(x, str) for x in value):
+            raise serializers.ValidationError(
+                "{self.__class__.__name__} capabilities must be lists of strings"
+            )
+
     def to_jexl(self, revision):
         built_expression = "(" + self.initial_data["expression"] + ")"
         jexl = get_normandy_jexl()
@@ -1007,8 +996,7 @@ class JexlFilter(BaseFilter):
 
         return built_expression
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return set(self.initial_data["capabilities"])
 
 
@@ -1102,8 +1090,7 @@ class QaOnlyFilter(BaseFilter):
         )
         return subfilter.to_jexl(revision)
 
-    @property
-    def capabilities(self):
+    def get_capabilities(self):
         return {"jexl.transform.preferenceValue"}
 
 

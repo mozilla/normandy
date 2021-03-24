@@ -36,7 +36,7 @@ class FilterTestsBase:
     def test_has_capabilities(self):
         filter = self.create_basic_filter()
         # Would throw if not defined
-        assert isinstance(filter.capabilities, set)
+        assert isinstance(filter.get_capabilities(), set)
 
     def test_jexl_works(self):
         filter = self.create_basic_filter()
@@ -49,8 +49,10 @@ class FilterTestsBase:
         assert list(errors) == []
 
     def test_uses_only_baseline_capabilities(self, settings):
+        if self.should_be_baseline == "skip":
+            return
         filter = self.create_basic_filter()
-        capabilities = filter.capabilities
+        capabilities = filter.get_capabilities()
         if self.should_be_baseline:
             assert capabilities <= settings.BASELINE_CAPABILITIES
         else:
@@ -514,7 +516,7 @@ class TestNamespaceSampleFilter(FilterTestsBase):
 
 
 class TestJexlFilter(FilterTestsBase):
-    should_be_baseline = False
+    should_be_baseline = "skip"
 
     def create_basic_filter(self, expression="true", capabilities=None, comment="a comment"):
         if capabilities is None:
@@ -534,7 +536,22 @@ class TestJexlFilter(FilterTestsBase):
 
     def test_it_has_capabilities(self):
         filter = self.create_basic_filter(capabilities=["a.b", "c.d"])
-        assert filter.capabilities == {"a.b", "c.d"}
+        assert filter.get_capabilities() == {"a.b", "c.d"}
+
+    def test_empty_capabilities_is_ok(self):
+        filter = self.create_basic_filter(capabilities=[])
+        assert filter.get_capabilities() == set()
+        filter.to_jexl(None)  # should not throw
+
+    def test_throws_error_on_non_iterable_capabilities(self):
+        with pytest.raises(AssertionError) as excinfo:
+            self.create_basic_filter(capabilities=5)
+        assert excinfo.value.args[0]["capabilities"][0].code == "not_a_list"
+
+    def test_throws_error_on_non_list_capabilities(self):
+        with pytest.raises(AssertionError) as excinfo:
+            self.create_basic_filter(capabilities="a mistake")
+        assert excinfo.value.args[0]["capabilities"][0].code == "not_a_list"
 
 
 class TestPresetFilter(FilterTestsBase):
