@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ADR 0002 - Syncing data to Firefox with Remote Settings &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="ADR 0001 - Ensuring recipe integrity using Content Signature" href="adr-0001-content-signing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Architectural Decision Records</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="adr-0001-content-signing.html">ADR 0001 - Ensuring recipe integrity using Content Signature</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ADR 0002 - Syncing data to Firefox with Remote Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decision-drivers">Decision Drivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#considered-options">Considered Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decision-outcome">Decision Outcome</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positive-consequences">Positive Consequences</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#negative-consequences">Negative Consequences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pros-and-cons-of-the-options">Pros and Cons of the Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fetch-all-recipes-from-normandy-via-an-http-request-each-run">1. Fetch all recipes from Normandy via an HTTP request each run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implement-a-smart-syncing-system">2. Implement a smart syncing system</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#process-recipes-on-the-server">3. Process recipes on the server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#use-remote-settings-to-sync-recipes">4. Use Remote Settings to sync recipes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Architectural Decision Records</a> &raquo;</li>
+        
+      <li>ADR 0002 - Syncing data to Firefox with Remote Settings</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/adrs/adr-0002-remote-settings.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adr-0002-syncing-data-to-firefox-with-remote-settings">
+<h1>ADR 0002 - Syncing data to Firefox with Remote Settings<a class="headerlink" href="#adr-0002-syncing-data-to-firefox-with-remote-settings" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Status: retrospective</p></li>
+<li><p>Last Updated: 2021-05-03</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a <em>retrospective</em> ADR, that documents a past decision well after
+the time the decision was actually made. It’s accuracy may be limited by
+the distance in time between the decision and the time of record.</p>
+</div>
+<div class="section" id="context-and-problem-statement">
+<h2>Context and Problem Statement<a class="headerlink" href="#context-and-problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Normandy maintains a collection of recipes, and Firefox needs to access this
+collection periodically to determine if any of the recipes are applicable to
+that instance of Firefox. How should Firefox sync the collection of recipes
+from Normandy Server?</p>
+</div>
+<div class="section" id="decision-drivers">
+<h2>Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The collection of recipes changes slowly, and so refetching the entire
+collection every time is wasteful.</p></li>
+<li><p>It is important to have up-to-date versions of the recipes, so the update
+interval should be relatively short.</p></li>
+<li><p>Updates to the collection of recipes should be secure.</p></li>
+</ul>
+</div>
+<div class="section" id="considered-options">
+<h2>Considered Options<a class="headerlink" href="#considered-options" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Fetch all recipes from Normandy via an HTTP request each run</p></li>
+<li><p>Implement a smart syncing system that would only download changed recipes</p></li>
+<li><p>Process recipe filters on the server, reducing the data that clients download</p></li>
+<li><p>Use Remote Settings to sync recipes to Firefox</p></li>
+</ol>
+</div>
+<div class="section" id="decision-outcome">
+<h2>Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permalink to this headline">¶</a></h2>
+<p>Chosen option: “option 4”, Use Remote Settings. This option provides
+efficient updates without sacrificing update frequency or user privacy, and
+is a wise use of our limited development resources, since it re-uses existing
+tools. Ultimately it provided a better product, after some additional
+engineering work.</p>
+<div class="section" id="positive-consequences">
+<h3>Positive Consequences<a class="headerlink" href="#positive-consequences" title="Permalink to this headline">¶</a></h3>
+<p>As a result of using Remote Settings to synchronize data to clients,
+Normandy’s servers have lighter load, clients have less to download, and
+uptake is faster thanks to Remote Settings’s push notification support.
+Additionally, Normandy helped design some changes to Remote Settings that
+make server-to-server work loads better. Additionally, Normandy served as an
+example for other Remote Settings integration, including as an inspiration
+for Nimbus’s sync model.</p>
+</div>
+<div class="section" id="negative-consequences">
+<h3>Negative Consequences<a class="headerlink" href="#negative-consequences" title="Permalink to this headline">¶</a></h3>
+<p>Switching to Remote Settings was not without its growing pains. There were
+several problems relating to the push notification system. When clients
+updated recipes in relation to a push service, they would often overwhelm
+various services, including Normandy’s Classify-Client (which got rewritten
+in Rust for performance), Telemetry (rate limiting was added to mitigate
+this), and Remote Settings itself (caching bugs were revealed and fixed).</p>
+<p>Additionally, this adds another layer of indirection that can make tracking
+down issues more complicated. When unexpected behavior is found, there is
+another system to consider.</p>
+</div>
+</div>
+<div class="section" id="pros-and-cons-of-the-options">
+<h2>Pros and Cons of the Options<a class="headerlink" href="#pros-and-cons-of-the-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fetch-all-recipes-from-normandy-via-an-http-request-each-run">
+<h3>1. Fetch all recipes from Normandy via an HTTP request each run<a class="headerlink" href="#fetch-all-recipes-from-normandy-via-an-http-request-each-run" title="Permalink to this headline">¶</a></h3>
+<p>This is the behavior that Normandy was originally designed, built, and ran
+for several years with. All active recipes are listed with the needed details
+in a single API endpoint that clients can fetch, and each client calls this
+endpoint every time it processes Normandy recipes.</p>
+<ul class="simple">
+<li><p>Good, because it is proven to work in real world uses cases for several years.</p></li>
+<li><p>Good, because it gives Normandy more control over its syncing process.</p></li>
+<li><p>Bad, because it produces higher load on the servers than needed.</p></li>
+<li><p>Bad, because clients needlessly redownload data multiple times.</p></li>
+<li><p>Bad, because a service interruption causes client side issues, ranging from
+wasted resources and retries to experiment failure.</p></li>
+</ul>
+</div>
+<div class="section" id="implement-a-smart-syncing-system">
+<h3>2. Implement a smart syncing system<a class="headerlink" href="#implement-a-smart-syncing-system" title="Permalink to this headline">¶</a></h3>
+<p>Clients could keep track of a last modified timestamp, or some other system
+that could allow them to communicate their sync state to the server. The
+server would then send them only changed recipes.</p>
+<ul class="simple">
+<li><p>Good, because it reduces the amount of data transferred.</p></li>
+<li><p>Good, because Normandy don’t have to rely on a new outside services.</p></li>
+<li><p>Bad, because it is a complicated system to implement on both server and client side.</p></li>
+<li><p>Bad, because it re-invents a system already accessible in Firefox.</p></li>
+</ul>
+</div>
+<div class="section" id="process-recipes-on-the-server">
+<h3>3. Process recipes on the server<a class="headerlink" href="#process-recipes-on-the-server" title="Permalink to this headline">¶</a></h3>
+<p>Instead of downloading all recipes and filtering them locally, clients would
+assemble a filtering context and then send it to the server. The server would
+evaluate the filter rules of each recipe, and then reply to the client with
+only the relevant recipes.</p>
+<ul class="simple">
+<li><p>Good, because it reduces the amount of data transferred (though doesn’t
+entirely deduplicate those transfers).</p></li>
+<li><p>Good, because it simplifies the execution model of Normandy, giving us more
+insight and control into the system.</p></li>
+<li><p>Bad, because it either reduces our filtering capabilities, or requires
+sending more sensitive data to Normandy.</p></li>
+<li><p>Bad, because it is more expensive to host. It requires increased
+per-request-processing and responses are not very cacheable with current
+filter criteria.</p></li>
+</ul>
+</div>
+<div class="section" id="use-remote-settings-to-sync-recipes">
+<h3>4. Use Remote Settings to sync recipes<a class="headerlink" href="#use-remote-settings-to-sync-recipes" title="Permalink to this headline">¶</a></h3>
+<p>Normandy server would maintain a Remote Settings collection with all active
+recipes. Clients would use the existing Remote Settings protocol to
+efficiently synchronize data between the server and a local store.</p>
+<ul class="simple">
+<li><p>Good, because less data is transferred.</p></li>
+<li><p>Good, because it uses pre-existing components that are already well tested.</p></li>
+<li><p>Good, because at the time, Remote Settings and Normandy were managed by the same team.</p></li>
+<li><p>Good, because we can push-notifications.</p></li>
+<li><p>Bad, because it increases the complexity of the system.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="adr-0001-content-signing.html" class="btn btn-neutral float-left" title="ADR 0001 - Ensuring recipe integrity using Content Signature" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
