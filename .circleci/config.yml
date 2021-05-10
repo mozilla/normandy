@@ -189,7 +189,7 @@ jobs:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/postgres:9.6
+      - image: circleci/postgres:13.2
         environment:
           POSTGRES_HOST_AUTH_METHOD: trust
         auth:
