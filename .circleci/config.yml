@@ -159,7 +159,7 @@ jobs:
 
   docs-publish:
     docker:
-      - image: node:10
+      - image: node:16
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
