@@ -323,6 +323,12 @@ class PrefCompareFilter(BaseFilter):
 
         ``preferenceValue``
 
+    .. attribute:: pref
+
+        The preference to change.
+
+        :example: ``fission.experiment.max-origins.qualified``
+
     .. attribute:: value
 
         string, boolean, or number.
