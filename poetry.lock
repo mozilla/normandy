@@ -308,15 +308,15 @@ python-versions = "*"
 
 [[package]]
 name = "dj-inmemorystorage"
-version = "1.4.1"
+version = "2.1.0"
 description = "A non-persistent in-memory data storage backend for Django."
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-Django = ">=1.4"
-six = ">=1.4.1"
+Django = ">=1.11"
+six = ">=1.10"
 
 [[package]]
 name = "django"
@@ -1983,7 +1983,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "697a0cf351539ce67a2b585d51accf75caa1d8255810e3386d6ca750cbeaf9ac"
+content-hash = "3427840748691e68872720344f091ecdf1816781546dc51713daf6770eb4af81"
 
 [metadata.files]
 aiohttp = [
@@ -2184,8 +2184,8 @@ dj-database-url = [
     {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
 ]
 dj-inmemorystorage = [
-    {file = "dj-inmemorystorage-1.4.1.tar.gz", hash = "sha256:fa921269b83ffc762411e36d446fa07b602a4ad74632ae1819844d32e6fb12bd"},
-    {file = "dj_inmemorystorage-1.4.1-py2.py3-none-any.whl", hash = "sha256:2b587f9320ea26f9ed1c62fefaf05c817735eda989d6439072b73d1b59b1c591"},
+    {file = "dj-inmemorystorage-2.1.0.tar.gz", hash = "sha256:1771801613414262803a1a1e97dafd2b7a563e78fbcbfa2b6f841c9d8e7b872a"},
+    {file = "dj_inmemorystorage-2.1.0-py2.py3-none-any.whl", hash = "sha256:81aa007a7cdb1899b3cd92404f656c82cd690a831b8698a43045f859d7276945"},
 ]
 django = [
     {file = "Django-2.2.22-py3-none-any.whl", hash = "sha256:e831105edb153af1324de44d06091ca75520a227456387dda4a47d2f1cc2731a"},
