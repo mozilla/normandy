@@ -724,25 +724,25 @@ class DateRangeFilter(BaseFilter):
 
 class WindowsBuildNumberFilter(BaseComparisonFilter):
     """
-    Match a user based on what windows version, as represented by build
-    number, they are running.
+     Match a user based on what windows version, as represented by build
+     number, they are running.
 
-    .. attribute:: type
+     .. attribute:: type
 
-        ``windowsBuildNumber``
+         ``windowsBuildNumber``
 
-    .. attribute:: value
+     .. attribute:: value
 
-       The Windows build number to compare to, as an integer.
+        The Windows build number to compare to, as an integer.
 
-       :example: ``15063``
+        :example: ``15063``
 
-   .. attribute:: comparison
+    .. attribute:: comparison
 
-      Options are ``equal``, ``not_equal``, ``greater_than``,
-      ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
+       Options are ``equal``, ``not_equal``, ``greater_than``,
+       ``less_than``, ``greater_than_equal`` and ``less_than_equal``.
 
-      :example: ``not_equal``
+       :example: ``not_equal``
     """
 
     type = "windowsBuildNumber"

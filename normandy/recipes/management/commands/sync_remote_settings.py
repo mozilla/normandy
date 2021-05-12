@@ -14,8 +14,7 @@ def compare_remote(recipe, record):
 
 
 class Command(BaseCommand):
-    """Check that Remote Settings published content is consistent and up-to-date.
-    """
+    """Check that Remote Settings published content is consistent and up-to-date."""
 
     help = "Sync recipes with Remote Settings"
 

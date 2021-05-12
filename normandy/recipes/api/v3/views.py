@@ -242,7 +242,10 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         ApprovalRequest.objects.all()
         # prefetch?
-        .select_related("revision", "revision__recipe",)
+        .select_related(
+            "revision",
+            "revision__recipe",
+        )
     )
     serializer_class = ApprovalRequestSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]
