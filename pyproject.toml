@@ -39,7 +39,7 @@ ecdsa = "^0.16.0"
 factory_boy = "^3.0.0"
 fastecdsa = "^1.7.4"
 # Flake8 does not follow semver, and introduces backwards incompatible changes in minor updates
-flake8 = "3.8.*"
+flake8 = "3.9.*"
 flake8-junit-report = "^2.1.0"
 geoip2 = "^4.0.0"
 gevent = "^20.0.0"
