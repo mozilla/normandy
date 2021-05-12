@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ADR 0002 - How to validate Normandy data in Remote Settings &mdash; Normandy 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="ADR 0002 - Syncing data to Firefox with Remote Settings" href="adr-0002-remote-settings.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Developer Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qa/index.html">QA Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops/index.html">Operations Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Architectural Decision Records</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="adr-0001-content-signing.html">ADR 0001 - Ensuring recipe integrity using Content Signature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adr-0002-remote-settings.html">ADR 0002 - Syncing data to Firefox with Remote Settings</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ADR 0002 - How to validate Normandy data in Remote Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decision-drivers">Decision Drivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#considered-options">Considered Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decision-outcome">Decision Outcome</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positive-consequences">Positive Consequences</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#negative-consequences">Negative Consequences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pros-and-cons-of-the-options">Pros and Cons of the Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#option-1-use-only-remote-settings-signatures">Option 1 - Use only Remote Settings signatures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#option-2-use-both-remote-settings-signatures-and-normandy-signatures">Option 2 - Use both Remote Settings signatures and Normandy signatures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#don-t-use-remote-settings-at-all">Don’t use Remote Settings at all</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Normandy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Architectural Decision Records</a> &raquo;</li>
+        
+      <li>ADR 0002 - How to validate Normandy data in Remote Settings</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/adrs/adr-0003-double-signatures.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adr-0002-how-to-validate-normandy-data-in-remote-settings">
+<h1>ADR 0002 - How to validate Normandy data in Remote Settings<a class="headerlink" href="#adr-0002-how-to-validate-normandy-data-in-remote-settings" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Status: retrospective</p></li>
+<li><p>Last Updated: 2021-05-07</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a <em>retrospective</em> ADR, that documents a past decision well after
+the time the decision was actually made. It’s accuracy may be limited by
+the distance in time between the decision and the time of record.</p>
+</div>
+<div class="section" id="context-and-problem-statement">
+<h2>Context and Problem Statement<a class="headerlink" href="#context-and-problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>Normandy supports two methods of getting recipe data to Firefox clients.</p>
+<ol class="arabic simple">
+<li><p>The original system of making all recipes available via an HTTP API.
+Clients refetch all recipes every time they sync.</p></li>
+<li><p>The newer system based on Remote Settings. Normandy updates Remote
+Settings as recipes change, and clients fetch only changed records from
+Remote Settings. See <a class="reference external" href="./adr-0001-content-signing.html">ADR 0001</a> for
+more details.</p></li>
+</ol>
+<p>Normandy and Remote Settings sign their data differently. Remote Settings
+signs the entire collection as a single object. Normandy signs each recipe
+individually.</p>
+<p>It is not obvious how signing and verification should work for clients
+syncing through Remote Settings.</p>
+</div>
+<div class="section" id="decision-drivers">
+<h2>Decision Drivers<a class="headerlink" href="#decision-drivers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Remote Settings signatures are only validated when synchronizing.</p>
+<ul>
+<li><p>2021 Note: Remote Settings now offers a way to validate signatures on
+demand, but did not when this decision was made.</p></li>
+</ul>
+</li>
+<li><p>Normandy re-validates signatures every time recipes are processed on the
+client.</p></li>
+<li><p>Both Normandy and Remote Settings use Autograph to sign data.</p></li>
+<li><p>Normandy recipes are a vector for attacking Firefox.</p></li>
+<li><p>The new sync method is a change to Firefox that will take some time to
+saturate the user base. The old system will need to be maintained for some
+time.</p></li>
+</ul>
+</div>
+<div class="section" id="considered-options">
+<h2>Considered Options<a class="headerlink" href="#considered-options" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Use only Remote Settings signatures</p></li>
+<li><p>Use both Remote Settings signatures and Normandy signatures</p></li>
+<li><p>Don’t use Remote Settings at all</p></li>
+</ol>
+</div>
+<div class="section" id="decision-outcome">
+<h2>Decision Outcome<a class="headerlink" href="#decision-outcome" title="Permalink to this headline">¶</a></h2>
+<p>Chosen option: Option 2, “Use both Remote Settings and Normandy signatures”,
+because it is a relatively small amount of extra work, and Normandy
+signatures have desirable security features that Remote Settings’s signatures
+do not.</p>
+<div class="section" id="positive-consequences">
+<h3>Positive Consequences<a class="headerlink" href="#positive-consequences" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>This allowed us to use the same recipe format for both kinds of clients
+without any additional work.</p></li>
+<li><p>This gave us protection against local attackers modifying Remote Settings’s
+store on disk.</p></li>
+<li><p>This was one of the motivating example that lead to Remote Settings
+eventually adding verify on demand functionality.</p></li>
+<li><p>Defense in depth: An attacker would have to compromise both Normandy and
+Remote settings to attack Firefox via Normandy recipes.</p></li>
+</ul>
+</div>
+<div class="section" id="negative-consequences">
+<h3>Negative Consequences<a class="headerlink" href="#negative-consequences" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>The long term version of the system, that doesn’t support legacy clients,
+seems weirdly paranoid.</p></li>
+<li><p>The long term version of the system has more parts to maintain.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="pros-and-cons-of-the-options">
+<h2>Pros and Cons of the Options<a class="headerlink" href="#pros-and-cons-of-the-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="option-1-use-only-remote-settings-signatures">
+<h3>Option 1 - Use only Remote Settings signatures<a class="headerlink" href="#option-1-use-only-remote-settings-signatures" title="Permalink to this headline">¶</a></h3>
+<p>For Firefox clients that support Remote Settings sync, don’t do any further
+signature verification after receiving signatures from Remote Settings. Trust
+that Remote Settings signatures are sufficient.</p>
+<ul class="simple">
+<li><p>Good, because it is a simpler system.</p></li>
+<li><p>Good, because it makes Normandy more similar to other systems that use Remote
+Settings.</p></li>
+<li><p>Bad, because Remote Settings does not re-verify recipes that are on disk.</p>
+<ul>
+<li><p>2021 Note: This can now be overridden.</p></li>
+</ul>
+</li>
+<li><p>Bad, because it makes the migration from the old recipe sync system to the
+new one a larger step.</p></li>
+<li><p>Bad, because it makes the old and new server systems less similar.</p></li>
+</ul>
+</div>
+<div class="section" id="option-2-use-both-remote-settings-signatures-and-normandy-signatures">
+<h3>Option 2 - Use both Remote Settings signatures and Normandy signatures<a class="headerlink" href="#option-2-use-both-remote-settings-signatures-and-normandy-signatures" title="Permalink to this headline">¶</a></h3>
+<p>Continue to sign Normandy recipes using Normandy’s existing signature system,
+and send both the recipe and the signature object using Remote Settings. The
+collection as a whole will be verify by Remote Setting’s signing
+infrastructure, and the recipe individually will be verified by Normandy’s
+infrastructure.</p>
+<ul class="simple">
+<li><p>Good, because it provides additional defense in depth. More systems need to
+be compromised to send false recipes.</p></li>
+<li><p>Good, because it makes Normandy Server’s two sync modes more similar to each
+other.</p></li>
+<li><p>Good, because it defends against recipes changing on-disk.</p></li>
+<li><p>Bad, because it is more complex than using only Remote Settings signatures.</p></li>
+<li><p>Bad, because it makes Normandy less similar to other services that use Remote
+Settings.</p></li>
+</ul>
+</div>
+<div class="section" id="don-t-use-remote-settings-at-all">
+<h3>Don’t use Remote Settings at all<a class="headerlink" href="#don-t-use-remote-settings-at-all" title="Permalink to this headline">¶</a></h3>
+<p>This is the status quo. It avoids the signing question entirely by simply not
+using Remote Settings. See <a class="reference external" href="./adr-0001-content-signing.html">ADR 0001</a> for
+more details about this option.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="adr-0002-remote-settings.html" class="btn btn-neutral float-left" title="ADR 0002 - Syncing data to Firefox with Remote Settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2016-2018, Mozilla Foundation
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
