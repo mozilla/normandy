@@ -73,9 +73,11 @@ class Extension(DirtyFieldsMixin, models.Model):
                     with zf.open("install.rdf", "r") as rdf_file:
                         try:
                             data = untangle.parse(rdf_file.read().decode())
-                        except SAXParseException:
+                        except SAXParseException as e:
                             raise ValidationError(
-                                {"xpi": 'Legacy addon "install.rdf" is corrupt.'}
+                                {
+                                    "xpi": f'Legacy addon "install.rdf" is corrupt: {e.getMessage()}.'
+                                }
                             )
 
                     try:
