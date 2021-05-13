@@ -1088,7 +1088,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
 [[package]]
 name = "markus"
-version = "2.2.0"
+version = "3.0.0"
 description = "Metrics system for generating statistics about your app"
 category = "main"
 optional = false
@@ -1985,7 +1985,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "78cecce176deff3b1d0ffb980072b0b7fce95da71856765eec513a6b8714fc33"
+content-hash = "83cb93a14418ab88f98306c649cabc09664da45cde4c7060d6afa95464844d50"
 
 [metadata.files]
 aiohttp = [
@@ -2538,8 +2538,8 @@ markupsafe = [
     {file = "MarkupSafe-1.1.1.tar.gz", hash = "sha256:29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"},
 ]
 markus = [
-    {file = "markus-2.2.0-py3-none-any.whl", hash = "sha256:ed9a275aa4cbfc02e5cf0f2abbd34bc3720c43e432c1448ac7cc36c507111103"},
-    {file = "markus-2.2.0.tar.gz", hash = "sha256:f088183e7fef11a4f563f496069ab600942e072dd82e5301b0b896e8fd8b6bcb"},
+    {file = "markus-3.0.0-py3-none-any.whl", hash = "sha256:7affb46f91c17e0cda1043a997c19e5b18131ba590c835dd7ef6311dcdd4ecdc"},
+    {file = "markus-3.0.0.tar.gz", hash = "sha256:ba511498ae28163424edb127a424e4a9fbf3f4f8d29bddb2e48cc10df62f7832"},
 ]
 matplotlib-inline = [
     {file = "matplotlib-inline-0.1.2.tar.gz", hash = "sha256:f41d5ff73c9f5385775d5c0bc13b424535c8402fe70ea8210f93e11f3683993e"},
