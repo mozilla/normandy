@@ -1898,11 +1898,11 @@ watchdog = ["watchdog"]
 
 [[package]]
 name = "whitenoise"
-version = "4.1.4"
+version = "5.2.0"
 description = "Radically simplified static file serving for WSGI applications"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.5, <4"
 
 [package.extras]
 brotli = ["brotli"]
@@ -1925,7 +1925,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "b013e19e9320f3e8b1cb3d799b38b3c32ccdbace303d178ffd51ad4818294421"
+content-hash = "c084a45f05055b36ccd8e38d3a17c15180d307c37733a5a929ebe42a5545a8b9"
 
 [metadata.files]
 aiohttp = [
@@ -2902,8 +2902,8 @@ werkzeug = [
     {file = "Werkzeug-2.0.0.tar.gz", hash = "sha256:3389bbfe6d40c6dd25e6d3f974155163c8b3de5bbda6a89342d4ab93fae80ba0"},
 ]
 whitenoise = [
-    {file = "whitenoise-4.1.4-py2.py3-none-any.whl", hash = "sha256:6dfea214b7c12efd689007abf9afa87a426586e9dbc051873ad2c8e535e2a1ac"},
-    {file = "whitenoise-4.1.4.tar.gz", hash = "sha256:22f79cf8f1f509639330f93886acaece8ec5ac5e9600c3b981d33c34e8a42dfd"},
+    {file = "whitenoise-5.2.0-py2.py3-none-any.whl", hash = "sha256:05d00198c777028d72d8b0bbd234db605ef6d60e9410125124002518a48e515d"},
+    {file = "whitenoise-5.2.0.tar.gz", hash = "sha256:05ce0be39ad85740a78750c86a93485c40f08ad8c62a6006de0233765996e5c7"},
 ]
 yarl = [
     {file = "yarl-1.6.3-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:0355a701b3998dcd832d0dc47cc5dedf3874f966ac7f870e0f3a6788d802d434"},
