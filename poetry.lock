@@ -1519,7 +1519,7 @@ test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.1
 
 [[package]]
 name = "rope"
-version = "0.18.0"
+version = "0.19.0"
 description = "a python refactoring library..."
 category = "dev"
 optional = false
@@ -1928,7 +1928,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "49ebad1a0feeb52b8a66ded70506e6f1a3e7e05fe96072564a2adf0b784d024d"
+content-hash = "04762ee815a9e01725b76c4644bf33222606a8d3b6b3149b09c7a874452c8cb9"
 
 [metadata.files]
 aiohttp = [
@@ -2724,7 +2724,7 @@ requests-mock = [
     {file = "requests_mock-1.9.2-py2.py3-none-any.whl", hash = "sha256:5c8ef0254c14a84744be146e9799dc13ebc4f6186058112d9aeed96b131b58e2"},
 ]
 rope = [
-    {file = "rope-0.18.0.tar.gz", hash = "sha256:786b5c38c530d4846aa68a42604f61b4e69a493390e3ca11b88df0fbfdc3ed04"},
+    {file = "rope-0.19.0.tar.gz", hash = "sha256:64e6d747532e1f5c8009ec5aae3e5523a5bcedf516f39a750d57d8ed749d90da"},
 ]
 rsa = [
     {file = "rsa-4.7.2-py3-none-any.whl", hash = "sha256:78f9a9bf4e7be0c5ded4583326e7461e3a3c5aae24073648b4bdfa797d78c9d2"},
