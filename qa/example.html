@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Example &mdash; Normandy 0.1.0 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -51,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+            <a href="../index.html" class="icon icon-home"> Normandy
           
 
           
@@ -143,6 +148,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -156,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/qa/example.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -182,9 +189,9 @@ pop-up notification with some configurable text, and only prompts users once.</p
 <p>The first step is to add a new function to the driver that will trigger the
 notification on the client. The driver is implemented in the system add-on,
 so we update the add-on to implement the function:</p>
-<dl class="function">
-<dt id="showNotification">
-<code class="sig-name descname">showNotification</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="headerlink" href="#showNotification" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="showNotification">
+<span class="sig-name descname"><span class="pre">showNotification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">message</span></em><span class="sig-paren">)</span><a class="headerlink" href="#showNotification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display a pop-up notification to the user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
@@ -203,7 +210,7 @@ be available to actions to use.</p>
 <p>Next, we must develop an <a class="reference internal" href="../dev/concepts.html#actions"><span class="std std-ref">action</span></a> that uses <code class="docutils literal notranslate"><span class="pre">showNotification</span></code>
 to display the notification given in the action’s arguments. This includes the
 logic for only showing the notification if the user hasn’t seen it before:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">NotificationAction</span> <span class="p">{</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="nx">NotificationAction</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">normandy</span><span class="p">,</span> <span class="nx">recipe</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">normandy</span> <span class="o">=</span> <span class="nx">normandy</span><span class="p">;</span> <span class="c1">// The driver object</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">recipe</span> <span class="o">=</span> <span class="nx">recipe</span><span class="p">;</span> <span class="c1">// Contains recipe arguments and other data</span>
@@ -212,10 +219,10 @@ logic for only showing the notification if the user hasn’t seen it before:</p>
     <span class="k">this</span><span class="p">.</span><span class="nx">storage</span> <span class="o">=</span> <span class="nx">normandy</span><span class="p">.</span><span class="nx">createStorage</span><span class="p">(</span><span class="nx">recipe</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
   <span class="p">}</span>
 
-  <span class="nx">async</span> <span class="nx">execute</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">async</span> <span class="nx">execute</span><span class="p">()</span> <span class="p">{</span>
     <span class="c1">// Check if we&#39;ve shown the notification previously, and show it if we</span>
     <span class="c1">// have not.</span>
-    <span class="kr">const</span> <span class="nx">haveShownPreviously</span> <span class="o">=</span> <span class="nx">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;shownPreviously&#39;</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">haveShownPreviously</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;shownPreviously&#39;</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">haveShownPreviously</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">storage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;shownPreviously&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">showNotification</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">recipe</span><span class="p">.</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
@@ -331,37 +338,29 @@ Future runs of that specific recipe will not show a notification.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="environments.html" class="btn btn-neutral float-right" title="Environments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="QA Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="environments.html" class="btn btn-neutral float-right" title="Environments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="QA Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2016-2018, Mozilla Foundation
+        &#169; Copyright 2016-2018, Mozilla Foundation.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

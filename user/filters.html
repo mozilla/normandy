@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Filters &mdash; Normandy 0.1.0 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -51,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+            <a href="../index.html" class="icon icon-home"> Normandy
           
 
           
@@ -151,6 +156,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -164,7 +171,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/user/filters.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -207,19 +214,19 @@ field, so the final JSON would look something like this:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="class">
-<dt id="normandy.recipes.filters.ChannelFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">ChannelFilter</code><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ChannelFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">ChannelFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user on any of the listed channels.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.ChannelFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ChannelFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">channel</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.ChannelFilter.channels">
-<code class="sig-name descname">channels</code><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter.channels" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ChannelFilter.channels">
+<span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#normandy.recipes.filters.ChannelFilter.channels" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[&quot;release&quot;,</span> <span class="pre">&quot;beta&quot;]</span></code></p>
@@ -229,19 +236,19 @@ field, so the final JSON would look something like this:</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.LocaleFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">LocaleFilter</code><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.LocaleFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">LocaleFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user on any of the listed locales.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.LocaleFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.LocaleFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">locale</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.LocaleFilter.locales">
-<code class="sig-name descname">locales</code><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter.locales" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.LocaleFilter.locales">
+<span class="sig-name descname"><span class="pre">locales</span></span><a class="headerlink" href="#normandy.recipes.filters.LocaleFilter.locales" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use full <code class="docutils literal notranslate"><span class="pre">xx-YY</span></code> locale codes instead of short <code class="docutils literal notranslate"><span class="pre">xx</span></code> codes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -252,19 +259,19 @@ field, so the final JSON would look something like this:</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.CountryFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">CountryFilter</code><a class="headerlink" href="#normandy.recipes.filters.CountryFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.CountryFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">CountryFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.CountryFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user located in any of the listed countries.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.CountryFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.CountryFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.CountryFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.CountryFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">country</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.CountryFilter.countries">
-<code class="sig-name descname">countries</code><a class="headerlink" href="#normandy.recipes.filters.CountryFilter.countries" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.CountryFilter.countries">
+<span class="sig-name descname"><span class="pre">countries</span></span><a class="headerlink" href="#normandy.recipes.filters.CountryFilter.countries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use two letter country codes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -275,9 +282,9 @@ field, so the final JSON would look something like this:</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.NamespaceSampleFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">NamespaceSampleFilter</code><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NamespaceSampleFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">NamespaceSampleFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like <code class="docutils literal notranslate"><span class="pre">BucketSampleFilter</span></code>, with two major differences:</p>
 <blockquote>
 <div><ul class="simple">
@@ -286,15 +293,15 @@ field, so the final JSON would look something like this:</p>
 as a string, and the user’s client ID is added automatically.</p></li>
 </ul>
 </div></blockquote>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.NamespaceSampleFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NamespaceSampleFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">namespaceSample</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.NamespaceSampleFilter.namespace">
-<code class="sig-name descname">namespace</code><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.namespace" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NamespaceSampleFilter.namespace">
+<span class="sig-name descname"><span class="pre">namespace</span></span><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.namespace" title="Permalink to this definition">¶</a></dt>
 <dd><p>The namespace to use for the sample, as a simple unquoted string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -303,9 +310,9 @@ as a string, and the user’s client ID is added automatically.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.NamespaceSampleFilter.start">
-<code class="sig-name descname">start</code><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.start" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NamespaceSampleFilter.start">
+<span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>The bucket to begin at.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -314,9 +321,9 @@ as a string, and the user’s client ID is added automatically.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.NamespaceSampleFilter.count">
-<code class="sig-name descname">count</code><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.count" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NamespaceSampleFilter.count">
+<span class="sig-name descname"><span class="pre">count</span></span><a class="headerlink" href="#normandy.recipes.filters.NamespaceSampleFilter.count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of buckets to include. The size of the included population
 will be <code class="docutils literal notranslate"><span class="pre">count</span> <span class="pre">/</span> <span class="pre">10,000</span></code>. For example, a count of 50 would be 0.5%
 of the population.</p>
@@ -329,9 +336,9 @@ of the population.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.BucketSampleFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">BucketSampleFilter</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.BucketSampleFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">BucketSampleFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample a portion of the users by defining a series of buckets, evenly
 distributing users into those buckets, and then selecting a range of
 those buckets.</p>
@@ -346,15 +353,15 @@ to check 50 buckets starting from bucket 70, then buckets 70-99 and 0-19
 will be checked.</p>
 <p>This works by hashing the inputs, and comparing the resulting hash to the
 possible hash space.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.BucketSampleFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.BucketSampleFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">bucketSample</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.BucketSampleFilter.input">
-<code class="sig-name descname">input</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.input" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.BucketSampleFilter.input">
+<span class="sig-name descname"><span class="pre">input</span></span><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.input" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of <a class="reference internal" href="#filter-context"><span class="std std-ref">Context</span></a> values to consider for the sample.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -363,9 +370,9 @@ possible hash space.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.BucketSampleFilter.start">
-<code class="sig-name descname">start</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.start" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.BucketSampleFilter.start">
+<span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>The bucket to begin at.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -374,9 +381,9 @@ possible hash space.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.BucketSampleFilter.count">
-<code class="sig-name descname">count</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.count" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.BucketSampleFilter.count">
+<span class="sig-name descname"><span class="pre">count</span></span><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.count" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of buckets to include. The size of the included population
 will be <code class="docutils literal notranslate"><span class="pre">count</span> <span class="pre">/</span> <span class="pre">total</span></code>.</p>
 <dl class="field-list simple">
@@ -386,9 +393,9 @@ will be <code class="docutils literal notranslate"><span class="pre">count</span
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.BucketSampleFilter.total">
-<code class="sig-name descname">total</code><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.total" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.BucketSampleFilter.total">
+<span class="sig-name descname"><span class="pre">total</span></span><a class="headerlink" href="#normandy.recipes.filters.BucketSampleFilter.total" title="Permalink to this definition">¶</a></dt>
 <dd><p>The total number of buckets considered in the space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -399,9 +406,9 @@ will be <code class="docutils literal notranslate"><span class="pre">count</span
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.StableSampleFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">StableSampleFilter</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.StableSampleFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">StableSampleFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample a portion of users. With a rate of <code class="docutils literal notranslate"><span class="pre">0.3</span></code>, 3 out of every 10
 users will be selected by this filter.</p>
 <p>This is consistent but unpredictable: a given set of inputs will always
@@ -411,15 +418,15 @@ over the entire sample space, and any variations in the inputs are spread
 out over the entire space.</p>
 <p>This works by hashing the inputs, and then checking if the hash falls above
 or below the sample point of the hash space.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.StableSampleFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.StableSampleFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">stableSample</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.StableSampleFilter.input">
-<code class="sig-name descname">input</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.input" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.StableSampleFilter.input">
+<span class="sig-name descname"><span class="pre">input</span></span><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.input" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of <a class="reference internal" href="#filter-context"><span class="std std-ref">Context</span></a> values to consider for the sample.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -428,9 +435,9 @@ or below the sample point of the hash space.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.StableSampleFilter.rate">
-<code class="sig-name descname">rate</code><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.rate" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.StableSampleFilter.rate">
+<span class="sig-name descname"><span class="pre">rate</span></span><a class="headerlink" href="#normandy.recipes.filters.StableSampleFilter.rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>The portion of the sample that should match.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -441,20 +448,20 @@ or below the sample point of the hash space.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.VersionFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">VersionFilter</code><a class="headerlink" href="#normandy.recipes.filters.VersionFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.VersionFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">VersionFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.VersionFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user running any of the listed versions. This will include dot
 releases, and won’t consider channel.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.VersionFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.VersionFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.VersionFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.VersionFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.VersionFilter.versions">
-<code class="sig-name descname">versions</code><a class="headerlink" href="#normandy.recipes.filters.VersionFilter.versions" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.VersionFilter.versions">
+<span class="sig-name descname"><span class="pre">versions</span></span><a class="headerlink" href="#normandy.recipes.filters.VersionFilter.versions" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[59,</span> <span class="pre">61,</span> <span class="pre">62]</span></code></p>
@@ -464,19 +471,19 @@ releases, and won’t consider channel.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.PlatformFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PlatformFilter</code><a class="headerlink" href="#normandy.recipes.filters.PlatformFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PlatformFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">PlatformFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.PlatformFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user based on what operating system they are using.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PlatformFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PlatformFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PlatformFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.PlatformFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">platform</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PlatformFilter.platforms">
-<code class="sig-name descname">platforms</code><a class="headerlink" href="#normandy.recipes.filters.PlatformFilter.platforms" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PlatformFilter.platforms">
+<span class="sig-name descname"><span class="pre">platforms</span></span><a class="headerlink" href="#normandy.recipes.filters.PlatformFilter.platforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of platforms to filter against. The choices are <cite>all_linux</cite>,
 <cite>all_windows</cite>, and <cite>all_mac</cite>.</p>
 <dl class="field-list simple">
@@ -488,9 +495,9 @@ releases, and won’t consider channel.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.VersionRangeFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">VersionRangeFilter</code><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.VersionRangeFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">VersionRangeFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user running a version in the given range. Uses a version compare
 filter instead of simple string comparison like VersionFilter.</p>
 <p>The version range is half-open, like Python ranges: If min is 72 and max
@@ -499,9 +506,9 @@ is 75, 72.0 will be include, 75.0 will not be. <cite>min &lt;= version &lt; max<
 <blockquote>
 <div><p><code class="docutils literal notranslate"><span class="pre">versionRange</span></code></p>
 </div></blockquote>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.VersionRangeFilter.min_version">
-<code class="sig-name descname">min_version</code><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter.min_version" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.VersionRangeFilter.min_version">
+<span class="sig-name descname"><span class="pre">min_version</span></span><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter.min_version" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">72.0b5</span></code></p>
@@ -509,9 +516,9 @@ is 75, 72.0 will be include, 75.0 will not be. <cite>min &lt;= version &lt; max<
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.VersionRangeFilter.max_version">
-<code class="sig-name descname">max_version</code><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter.max_version" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.VersionRangeFilter.max_version">
+<span class="sig-name descname"><span class="pre">max_version</span></span><a class="headerlink" href="#normandy.recipes.filters.VersionRangeFilter.max_version" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">75.0.1</span></code></p>
@@ -521,21 +528,21 @@ is 75, 72.0 will be include, 75.0 will not be. <cite>min &lt;= version &lt; max<
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.DateRangeFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">DateRangeFilter</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.DateRangeFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">DateRangeFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user to a delivery that starts on or after the <code class="docutils literal notranslate"><span class="pre">not_before</span></code> date and
 before the <code class="docutils literal notranslate"><span class="pre">not_after</span></code> date.</p>
 <p>The date range is half-open, so <cite>not_before &lt;= normandy.request_time &lt; not_after</cite>.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.DateRangeFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.DateRangeFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">dateRange</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.DateRangeFilter.not_before">
-<code class="sig-name descname">not_before</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_before" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.DateRangeFilter.not_before">
+<span class="sig-name descname"><span class="pre">not_before</span></span><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_before" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2020-02-01T00:00:00Z</span></code></p>
@@ -543,9 +550,9 @@ before the <code class="docutils literal notranslate"><span class="pre">not_afte
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.DateRangeFilter.not_after">
-<code class="sig-name descname">not_after</code><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_after" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.DateRangeFilter.not_after">
+<span class="sig-name descname"><span class="pre">not_after</span></span><a class="headerlink" href="#normandy.recipes.filters.DateRangeFilter.not_after" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2020-03-01T00:00:00Z</span></code></p>
@@ -555,21 +562,21 @@ before the <code class="docutils literal notranslate"><span class="pre">not_afte
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.ProfileCreateDateFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">ProfileCreateDateFilter</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ProfileCreateDateFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">ProfileCreateDateFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>This filter is meant to distinguish between new and existing users.
 Target users who have a profile creation date older than or newer than
 a given date.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.ProfileCreateDateFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ProfileCreateDateFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">profileCreationDate</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.ProfileCreateDateFilter.direction">
-<code class="sig-name descname">direction</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.direction" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ProfileCreateDateFilter.direction">
+<span class="sig-name descname"><span class="pre">direction</span></span><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.direction" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Options</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">newerThan</span></code> or <code class="docutils literal notranslate"><span class="pre">olderThan</span></code></p>
@@ -577,9 +584,9 @@ a given date.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.ProfileCreateDateFilter.date">
-<code class="sig-name descname">date</code><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.date" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.ProfileCreateDateFilter.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#normandy.recipes.filters.ProfileCreateDateFilter.date" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Example</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2020-02-01</span></code></p>
@@ -589,19 +596,19 @@ a given date.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.PrefExistsFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PrefExistsFilter</code><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefExistsFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">PrefExistsFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user based on if pref exists.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefExistsFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefExistsFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">preferenceExists</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefExistsFilter.value">
-<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefExistsFilter.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefExistsFilter.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean true or false.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -612,19 +619,19 @@ a given date.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.PrefCompareFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PrefCompareFilter</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefCompareFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">PrefCompareFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match based on a user’s pref having a particular value.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefCompareFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefCompareFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">preferenceValue</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefCompareFilter.pref">
-<code class="sig-name descname">pref</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.pref" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefCompareFilter.pref">
+<span class="sig-name descname"><span class="pre">pref</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.pref" title="Permalink to this definition">¶</a></dt>
 <dd><p>The preference to change.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -633,9 +640,9 @@ a given date.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefCompareFilter.value">
-<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefCompareFilter.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>string, boolean, or number.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -644,28 +651,28 @@ a given date.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefCompareFilter.comparison">
-<code class="sig-name descname">comparison</code><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.comparison" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefCompareFilter.comparison">
+<span class="sig-name descname"><span class="pre">comparison</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefCompareFilter.comparison" title="Permalink to this definition">¶</a></dt>
 <dd><p>Options are <code class="docutils literal notranslate"><span class="pre">equal</span></code>, <code class="docutils literal notranslate"><span class="pre">not_equal</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than</span></code>,
 <code class="docutils literal notranslate"><span class="pre">less_than</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than_equal</span></code> and <code class="docutils literal notranslate"><span class="pre">less_than_equal</span></code>.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.PrefUserSetFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PrefUserSetFilter</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefUserSetFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">PrefUserSetFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user based on if the user set a preference.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefUserSetFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefUserSetFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">preferenceIsUserSet</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefUserSetFilter.pref">
-<code class="sig-name descname">pref</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.pref" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefUserSetFilter.pref">
+<span class="sig-name descname"><span class="pre">pref</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.pref" title="Permalink to this definition">¶</a></dt>
 <dd><p>The preference to check</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -674,9 +681,9 @@ a given date.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PrefUserSetFilter.value">
-<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PrefUserSetFilter.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#normandy.recipes.filters.PrefUserSetFilter.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean true or false.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -687,21 +694,21 @@ a given date.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.WindowsBuildNumberFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">WindowsBuildNumberFilter</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsBuildNumberFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">WindowsBuildNumberFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Match a user based on what windows version, as represented by build
 number, they are running.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsBuildNumberFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsBuildNumberFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">windowsBuildNumber</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsBuildNumberFilter.value">
-<code class="sig-name descname">value</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsBuildNumberFilter.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Windows build number to compare to, as an integer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -711,9 +718,9 @@ number, they are running.</p>
 </dd></dl>
 
 </div></blockquote>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsBuildNumberFilter.comparison">
-<code class="sig-name descname">comparison</code><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.comparison" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsBuildNumberFilter.comparison">
+<span class="sig-name descname"><span class="pre">comparison</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsBuildNumberFilter.comparison" title="Permalink to this definition">¶</a></dt>
 <dd><p>Options are <code class="docutils literal notranslate"><span class="pre">equal</span></code>, <code class="docutils literal notranslate"><span class="pre">not_equal</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than</span></code>,
 <code class="docutils literal notranslate"><span class="pre">less_than</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_than_equal</span></code> and <code class="docutils literal notranslate"><span class="pre">less_than_equal</span></code>.</p>
 <dl class="field-list simple">
@@ -725,20 +732,20 @@ number, they are running.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.WindowsVersionFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">WindowsVersionFilter</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsVersionFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">WindowsVersionFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Under Development. Match a user based on what windows version they are running. This filter
 creates jexl that compares the windows NT version.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsVersionFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsVersionFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">windowsVersion</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.WindowsVersionFilter.versions_list">
-<code class="sig-name descname">versions_list</code><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.versions_list" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.WindowsVersionFilter.versions_list">
+<span class="sig-name descname"><span class="pre">versions_list</span></span><a class="headerlink" href="#normandy.recipes.filters.WindowsVersionFilter.versions_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of versions as decimal numbers. Versions will be validated against
 DB table of supported NT versions.</p>
 <dl class="field-list simple">
@@ -753,19 +760,19 @@ DB table of supported NT versions.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.NegateFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">NegateFilter</code><a class="headerlink" href="#normandy.recipes.filters.NegateFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NegateFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">NegateFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.NegateFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>This filter negates another filter.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.NegateFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.NegateFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NegateFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.NegateFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">negate</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.NegateFilter.filter_to_negate">
-<code class="sig-name descname">filter_to_negate</code><a class="headerlink" href="#normandy.recipes.filters.NegateFilter.filter_to_negate" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.NegateFilter.filter_to_negate">
+<span class="sig-name descname"><span class="pre">filter_to_negate</span></span><a class="headerlink" href="#normandy.recipes.filters.NegateFilter.filter_to_negate" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>The filter you want to negate.</p>
 </div></blockquote>
@@ -778,19 +785,19 @@ DB table of supported NT versions.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.AndFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AndFilter</code><a class="headerlink" href="#normandy.recipes.filters.AndFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AndFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">AndFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.AndFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>This filter combines one or more other filters, requiring all subfilters to match.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AndFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.AndFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AndFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.AndFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">and</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AndFilter.subfilters">
-<code class="sig-name descname">subfilters</code><a class="headerlink" href="#normandy.recipes.filters.AndFilter.subfilters" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AndFilter.subfilters">
+<span class="sig-name descname"><span class="pre">subfilters</span></span><a class="headerlink" href="#normandy.recipes.filters.AndFilter.subfilters" title="Permalink to this definition">¶</a></dt>
 <dd><p>The filters to combine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -801,19 +808,19 @@ DB table of supported NT versions.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.OrFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">OrFilter</code><a class="headerlink" href="#normandy.recipes.filters.OrFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.OrFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">OrFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.OrFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>This filter combines one or more other filters, requiring at least one subfilter to match.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.OrFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.OrFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.OrFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.OrFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">or</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.OrFilter.subfilters">
-<code class="sig-name descname">subfilters</code><a class="headerlink" href="#normandy.recipes.filters.OrFilter.subfilters" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.OrFilter.subfilters">
+<span class="sig-name descname"><span class="pre">subfilters</span></span><a class="headerlink" href="#normandy.recipes.filters.OrFilter.subfilters" title="Permalink to this definition">¶</a></dt>
 <dd><p>The filters to combine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -824,19 +831,19 @@ DB table of supported NT versions.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.AddonActiveFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AddonActiveFilter</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonActiveFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">AddonActiveFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user based on if a particular addon is active.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AddonActiveFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonActiveFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">addonActive</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AddonActiveFilter.addons">
-<code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.addons" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonActiveFilter.addons">
+<span class="sig-name descname"><span class="pre">addons</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.addons" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of addon ids to filter against.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -845,9 +852,9 @@ DB table of supported NT versions.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AddonActiveFilter.any_or_all">
-<code class="sig-name descname">any_or_all</code><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonActiveFilter.any_or_all">
+<span class="sig-name descname"><span class="pre">any_or_all</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonActiveFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will determine whether the addons are connected with an “&amp;&amp;” operator,
 meaning all the addons must be active for the filter to evaluate to true,
 or an “||” operator, meaning any of the addons can be active to evaluate to
@@ -861,19 +868,19 @@ true.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.AddonInstalledFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">AddonInstalledFilter</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonInstalledFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">AddonInstalledFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Match a user based on if a particular addon is installed.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AddonInstalledFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonInstalledFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">addonInstalled</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AddonInstalledFilter.addons">
-<code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.addons" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonInstalledFilter.addons">
+<span class="sig-name descname"><span class="pre">addons</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.addons" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of addon ids to filter against.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -882,9 +889,9 @@ true.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.AddonInstalledFilter.any_or_all">
-<code class="sig-name descname">any_or_all</code><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.AddonInstalledFilter.any_or_all">
+<span class="sig-name descname"><span class="pre">any_or_all</span></span><a class="headerlink" href="#normandy.recipes.filters.AddonInstalledFilter.any_or_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will determine whether the addons are connected with an “&amp;&amp;” operator,
 meaning all the addons must be installed for the filter to evaluate to true,
 or an “||” operator, meaning any of the addons can be installed to
@@ -898,23 +905,23 @@ evaluate to true.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.PresetFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">PresetFilter</code><a class="headerlink" href="#normandy.recipes.filters.PresetFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PresetFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">PresetFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.PresetFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>A named preset of filters.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PresetFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PresetFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">preset</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PresetFilter.name">
-<code class="sig-name descname">name</code><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.name" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PresetFilter.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the preset to evaluate.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.PresetFilter.preset_choices">
-<code class="sig-name descname">preset_choices</code><em class="property"> = ['pocket-1']</em><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.preset_choices" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.PresetFilter.preset_choices">
+<span class="sig-name descname"><span class="pre">preset_choices</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['pocket-1']</span></em><a class="headerlink" href="#normandy.recipes.filters.PresetFilter.preset_choices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Presets available to use with this filter.</p>
 </dd></dl>
 
@@ -922,9 +929,9 @@ evaluate to true.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.JexlFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">JexlFilter</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.JexlFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">JexlFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.JexlFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>This filter allows the user to specify raw JEXL that will then be
 included as a normal filter object.</p>
 <p>It will combine with other filter objects like an other filter object,
@@ -932,15 +939,15 @@ that is it will be treated as a boolean expression and ANDed with it’s
 peers. The JEXL will by checked for syntactical validity. The expression
 will be surrounded with parenthesis.</p>
 <p>This filter should only be used when no other filter object can be used.</p>
-<dl class="attribute">
-<dt id="normandy.recipes.filters.JexlFilter.type">
-<code class="sig-name descname">type</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.JexlFilter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.type" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">jexl</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.JexlFilter.expression">
-<code class="sig-name descname">expression</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.expression" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.JexlFilter.expression">
+<span class="sig-name descname"><span class="pre">expression</span></span><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.expression" title="Permalink to this definition">¶</a></dt>
 <dd><p>The expression to evaluate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Example</dt>
@@ -949,9 +956,9 @@ will be surrounded with parenthesis.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.JexlFilter.capabilities">
-<code class="sig-name descname">capabilities</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.capabilities" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.JexlFilter.capabilities">
+<span class="sig-name descname"><span class="pre">capabilities</span></span><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.capabilities" title="Permalink to this definition">¶</a></dt>
 <dd><p>An array of the capabilities required by the expression. May be empty
 if the expression does not require any capabilities.</p>
 <dl class="field-list simple">
@@ -961,9 +968,9 @@ if the expression does not require any capabilities.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipes.filters.JexlFilter.comment">
-<code class="sig-name descname">comment</code><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.comment" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="normandy.recipes.filters.JexlFilter.comment">
+<span class="sig-name descname"><span class="pre">comment</span></span><a class="headerlink" href="#normandy.recipes.filters.JexlFilter.comment" title="Permalink to this definition">¶</a></dt>
 <dd><p>A note about what this expression does. This field is not used
 anywhere, but is present in the API to make it clearer what this
 filter does.</p>
@@ -976,9 +983,9 @@ filter does.</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="normandy.recipes.filters.QaOnlyFilter">
-<em class="property">class </em><code class="sig-prename descclassname">normandy.recipes.filters.</code><code class="sig-name descname">QaOnlyFilter</code><a class="headerlink" href="#normandy.recipes.filters.QaOnlyFilter" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="normandy.recipes.filters.QaOnlyFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">normandy.recipes.filters.</span></span><span class="sig-name descname"><span class="pre">QaOnlyFilter</span></span><a class="headerlink" href="#normandy.recipes.filters.QaOnlyFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>A filter that requires the pref <code class="docutils literal notranslate"><span class="pre">app.normandy.testing</span></code> to include the
 slug of the recipe (or other logical identifer, for action types without
 slugs), primarily for soft-launching recipes for early testing.</p>
@@ -1014,32 +1021,32 @@ types, such as numbers, strings (single or double quoted), and booleans. JEXL
 also supports several operators for combining values, such as arithmetic,
 boolean operators, comparisons, and string concatenation.</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Arithmetic</span>
-<span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">3</span> <span class="c1">// == 1</span>
+<span class="mf">2</span> <span class="o">+</span> <span class="mf">2</span> <span class="o">-</span> <span class="mf">3</span> <span class="c1">// == 1</span>
 
 <span class="c1">// Numerical comparisons</span>
-<span class="mi">5</span> <span class="o">&gt;</span> <span class="mi">7</span> <span class="c1">// == false</span>
+<span class="mf">5</span> <span class="o">&gt;</span> <span class="mf">7</span> <span class="c1">// == false</span>
 
 <span class="c1">// Boolean operators</span>
-<span class="kc">false</span> <span class="o">||</span> <span class="mi">5</span> <span class="o">&gt;</span> <span class="mi">4</span> <span class="c1">// == true</span>
+<span class="kc">false</span> <span class="o">||</span> <span class="mf">5</span> <span class="o">&gt;</span> <span class="mf">4</span> <span class="c1">// == true</span>
 
 <span class="c1">// String concatenation</span>
 <span class="s2">&quot;Mozilla&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;Firefox&quot;</span> <span class="c1">// == &quot;Mozilla Firefox&quot;</span>
 </pre></div>
 </div>
 <p>Expressions can be grouped using parenthesis:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">((</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span> <span class="c1">// == 7</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">((</span><span class="mf">2</span> <span class="o">+</span> <span class="mf">3</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3</span><span class="p">)</span> <span class="o">-</span> <span class="mf">3</span> <span class="c1">// == 7</span>
 </pre></div>
 </div>
 <p>JEXL also supports lists and objects (known as dictionaries in other languages)
 as well as attribute access:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">].</span><span class="nx">length</span> <span class="c1">// == 3</span>
-<span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="mi">2</span><span class="p">}.</span><span class="nx">foo</span> <span class="c1">// == 1</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">].</span><span class="nx">length</span> <span class="c1">// == 3</span>
+<span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="mf">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="mf">2</span><span class="p">}.</span><span class="nx">foo</span> <span class="c1">// == 1</span>
 </pre></div>
 </div>
 <p>Unlike JavaScript, JEXL supports an <code class="docutils literal notranslate"><span class="pre">in</span></code> operator for checking if a substring
 is in a string or if an element is in an array:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;bar&quot;</span> <span class="k">in</span> <span class="s2">&quot;foobarbaz&quot;</span> <span class="c1">// == true</span>
-<span class="mi">3</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="c1">// == true</span>
+<span class="mf">3</span> <span class="k">in</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]</span> <span class="c1">// == true</span>
 </pre></div>
 </div>
 <p>The context passed to JEXL can be expressed using identifiers, which also
@@ -1059,29 +1066,29 @@ additional arguments passed in the expression:</p>
 <p>This section defines the context passed to filter expressions when they are
 evaluated. In other words, this is the client information available within
 filter expressions.</p>
-<dl class="data">
-<dt id="normandy">
-<code class="sig-name descname">normandy</code><a class="headerlink" href="#normandy" title="Permalink to this definition">¶</a></dt>
+<dl class="js data">
+<dt class="sig sig-object js" id="normandy">
+<span class="sig-name descname"><span class="pre">normandy</span></span><a class="headerlink" href="#normandy" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <code class="docutils literal notranslate"><span class="pre">normandy</span></code> object contains general information about the client.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.userId">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">userId</code><a class="headerlink" href="#normandy.userId" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.userId">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">userId</span></span><a class="headerlink" href="#normandy.userId" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29">v4 UUID</a> uniquely identifying the user. This is uncorrelated with any
 other unique IDs, such as Telemetry IDs.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.version">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">version</code><a class="headerlink" href="#normandy.version" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.version">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#normandy.version" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'47.0.1'</span></code></p>
 <p>String containing the user’s Firefox version.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.channel">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">channel</code><a class="headerlink" href="#normandy.channel" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.channel">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">channel</span></span><a class="headerlink" href="#normandy.channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>String containing the update channel. Valid values include, but are not
 limited to:</p>
 <ul class="simple">
@@ -1093,15 +1100,15 @@ limited to:</p>
 </ul>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.isDefaultBrowser">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">isDefaultBrowser</code><a class="headerlink" href="#normandy.isDefaultBrowser" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.isDefaultBrowser">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">isDefaultBrowser</span></span><a class="headerlink" href="#normandy.isDefaultBrowser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean specifying whether Firefox is set as the user’s default browser.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.searchEngine">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">searchEngine</code><a class="headerlink" href="#normandy.searchEngine" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.searchEngine">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">searchEngine</span></span><a class="headerlink" href="#normandy.searchEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'google'</span></code></p>
 <p>String containing the user’s default search engine identifier. Identifiers
 are lowercase, and may by locale-specific (Wikipedia, for examnple, often has
@@ -1118,58 +1125,58 @@ locale-specific codes like <code class="docutils literal notranslate"><span clas
 </ul>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.syncSetup">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">syncSetup</code><a class="headerlink" href="#normandy.syncSetup" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.syncSetup">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">syncSetup</span></span><a class="headerlink" href="#normandy.syncSetup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean containing whether the user has set up Firefox Sync.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.syncDesktopDevices">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">syncDesktopDevices</code><a class="headerlink" href="#normandy.syncDesktopDevices" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.syncDesktopDevices">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">syncDesktopDevices</span></span><a class="headerlink" href="#normandy.syncDesktopDevices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer specifying the number of desktop clients the user has added to their
 Firefox Sync account.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.syncMobileDevices">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">syncMobileDevices</code><a class="headerlink" href="#normandy.syncMobileDevices" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.syncMobileDevices">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">syncMobileDevices</span></span><a class="headerlink" href="#normandy.syncMobileDevices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer specifying the number of mobile clients the user has added to their
 Firefox Sync account.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.syncTotalDevices">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">syncTotalDevices</code><a class="headerlink" href="#normandy.syncTotalDevices" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.syncTotalDevices">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">syncTotalDevices</span></span><a class="headerlink" href="#normandy.syncTotalDevices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer specifying the total number of clients the user has added to their
 Firefox Sync account.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.plugins">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">plugins</code><a class="headerlink" href="#normandy.plugins" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.plugins">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">plugins</span></span><a class="headerlink" href="#normandy.plugins" title="Permalink to this definition">¶</a></dt>
 <dd><p>An object mapping of plugin names to <code class="xref js js-class docutils literal notranslate"><span class="pre">Plugin()</span></code> objects describing
 the plugins installed on the client.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.locale">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">locale</code><a class="headerlink" href="#normandy.locale" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.locale">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">locale</span></span><a class="headerlink" href="#normandy.locale" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'en-US'</span></code></p>
 <p>String containing the user’s locale.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.country">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">country</code><a class="headerlink" href="#normandy.country" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.country">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">country</span></span><a class="headerlink" href="#normandy.country" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Example:</strong> <code class="docutils literal notranslate"><span class="pre">'US'</span></code></p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO 3166-1 alpha-2</a> country code for the country that the user is located
 in. This is determined via IP-based geolocation.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.request_time">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">request_time</code><a class="headerlink" href="#normandy.request_time" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.request_time">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">request_time</span></span><a class="headerlink" href="#normandy.request_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Date object set to the time and date that the user requested recipes from
 Normandy. Useful for comparing against date ranges that a recipe is valid
 for.</p>
@@ -1179,17 +1186,17 @@ for.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.distribution">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">distribution</code><a class="headerlink" href="#normandy.distribution" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.distribution">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">distribution</span></span><a class="headerlink" href="#normandy.distribution" title="Permalink to this definition">¶</a></dt>
 <dd><p>String set to the user’s distribution ID. This is commonly used to target
 funnelcake builds of Firefox.</p>
 <p>On Firefox versions prior to 48.0, this value is set to <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.telemetry">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">telemetry</code><a class="headerlink" href="#normandy.telemetry" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.telemetry">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">telemetry</span></span><a class="headerlink" href="#normandy.telemetry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object containing data for the most recent <a class="reference external" href="https://firefox-source-docs.mozilla.org/toolkit/components/telemetry/telemetry/index.html#">Telemetry</a> packet of each type.
 This allows you to target recipes at users based on their Telemetry data.</p>
 <p>The object is keyed off the ping type, as documented in the
@@ -1204,35 +1211,35 @@ example). The value is the contents of the ping.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.doNotTrack">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">doNotTrack</code><a class="headerlink" href="#normandy.doNotTrack" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.doNotTrack">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">doNotTrack</span></span><a class="headerlink" href="#normandy.doNotTrack" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean specifying whether the user has enabled Do Not Track.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.experiments">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">experiments</code><a class="headerlink" href="#normandy.experiments" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.experiments">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">experiments</span></span><a class="headerlink" href="#normandy.experiments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object with several arrays containing the unique slugs for experiments that
 the user has participated in. Currently, this is limited to preference
 experiments.</p>
-<dl class="attribute">
-<dt id="normandy.normandy.experiments.all">
-<code class="sig-prename descclassname">normandy.normandy.experiments.</code><code class="sig-name descname">all</code><a class="headerlink" href="#normandy.normandy.experiments.all" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.normandy.experiments.all">
+<span class="sig-prename descclassname"><span class="pre">normandy.normandy.experiments.</span></span><span class="sig-name descname"><span class="pre">all</span></span><a class="headerlink" href="#normandy.normandy.experiments.all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Array of experiment slugs for every experiment that the user has  enrolled
 in, whether currently active or expired.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.experiments.active">
-<code class="sig-prename descclassname">normandy.experiments.</code><code class="sig-name descname">active</code><a class="headerlink" href="#normandy.experiments.active" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.experiments.active">
+<span class="sig-prename descclassname"><span class="pre">normandy.experiments.</span></span><span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#normandy.experiments.active" title="Permalink to this definition">¶</a></dt>
 <dd><p>Array of experiment slugs for active experiments that the user is enrolled
 in.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.experiments.expired">
-<code class="sig-prename descclassname">normandy.experiments.</code><code class="sig-name descname">expired</code><a class="headerlink" href="#normandy.experiments.expired" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.experiments.expired">
+<span class="sig-prename descclassname"><span class="pre">normandy.experiments.</span></span><span class="sig-name descname"><span class="pre">expired</span></span><a class="headerlink" href="#normandy.experiments.expired" title="Permalink to this definition">¶</a></dt>
 <dd><p>Array of experiment slugs for expired experiments that the user has
 enrolled in.</p>
 </dd></dl>
@@ -1250,20 +1257,20 @@ enrolled in.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipe">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">recipe</code><a class="headerlink" href="#normandy.recipe" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.recipe">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">recipe</span></span><a class="headerlink" href="#normandy.recipe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object containing information about the recipe being checked. Only documented
 attributes are guaranteed to be available.</p>
-<dl class="attribute">
-<dt id="normandy.normandy.recipe.id">
-<code class="sig-prename descclassname">normandy.normandy.recipe.</code><code class="sig-name descname">id</code><a class="headerlink" href="#normandy.normandy.recipe.id" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.normandy.recipe.id">
+<span class="sig-prename descclassname"><span class="pre">normandy.normandy.recipe.</span></span><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#normandy.normandy.recipe.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unique ID number for the recipe.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.recipe.arguments">
-<code class="sig-prename descclassname">normandy.recipe.</code><code class="sig-name descname">arguments</code><a class="headerlink" href="#normandy.recipe.arguments" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.recipe.arguments">
+<span class="sig-prename descclassname"><span class="pre">normandy.recipe.</span></span><span class="sig-name descname"><span class="pre">arguments</span></span><a class="headerlink" href="#normandy.recipe.arguments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object containing the arguments entered for the recipe. The shape of this
 object varies depending on the recipe, and use of this property is only
 recommended if you are familiar with the argument schema.</p>
@@ -1271,9 +1278,9 @@ recommended if you are familiar with the argument schema.</p>
 
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.isFirstRun">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">isFirstRun</code><a class="headerlink" href="#normandy.isFirstRun" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.isFirstRun">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">isFirstRun</span></span><a class="headerlink" href="#normandy.isFirstRun" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean that indicates whether the user has just started Firefox for the
 first time with their current profile. This is only <code class="docutils literal notranslate"><span class="pre">true</span></code> once
 per-profile, and is set to <code class="docutils literal notranslate"><span class="pre">false</span></code> immediately after the first set of
@@ -1282,46 +1289,46 @@ recipes are executed.</p>
 <code class="docutils literal notranslate"><span class="pre">!normandy.isFirstRun</span></code> in their filter expression.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="normandy.addons">
-<code class="sig-prename descclassname">normandy.</code><code class="sig-name descname">addons</code><a class="headerlink" href="#normandy.addons" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.addons">
+<span class="sig-prename descclassname"><span class="pre">normandy.</span></span><span class="sig-name descname"><span class="pre">addons</span></span><a class="headerlink" href="#normandy.addons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object containing information about installed add-ons. The keys on this
 object are add-on IDs. The values contain the following attributes:</p>
-<dl class="attribute">
-<dt id="normandy.addon.id">
-<code class="sig-prename descclassname">normandy.addon.</code><code class="sig-name descname">id</code><a class="headerlink" href="#normandy.addon.id" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="normandy.addon.id">
+<span class="sig-prename descclassname"><span class="pre">normandy.addon.</span></span><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#normandy.addon.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>String ID of the add-on.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="addon.installDate">
-<code class="sig-prename descclassname">addon.</code><code class="sig-name descname">installDate</code><a class="headerlink" href="#addon.installDate" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="addon.installDate">
+<span class="sig-prename descclassname"><span class="pre">addon.</span></span><span class="sig-name descname"><span class="pre">installDate</span></span><a class="headerlink" href="#addon.installDate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Date object indicating when the add-on was installed.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="addon.isActive">
-<code class="sig-prename descclassname">addon.</code><code class="sig-name descname">isActive</code><a class="headerlink" href="#addon.isActive" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="addon.isActive">
+<span class="sig-prename descclassname"><span class="pre">addon.</span></span><span class="sig-name descname"><span class="pre">isActive</span></span><a class="headerlink" href="#addon.isActive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Boolean indicating whether the add-on is active (disabling an add-on but
 not uninstalling it will set this to <code class="docutils literal notranslate"><span class="pre">false</span></code>).</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="addon.name">
-<code class="sig-prename descclassname">addon.</code><code class="sig-name descname">name</code><a class="headerlink" href="#addon.name" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="addon.name">
+<span class="sig-prename descclassname"><span class="pre">addon.</span></span><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#addon.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>String containing the user-visible name of the add-on.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="addon.type">
-<code class="sig-prename descclassname">addon.</code><code class="sig-name descname">type</code><a class="headerlink" href="#addon.type" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="addon.type">
+<span class="sig-prename descclassname"><span class="pre">addon.</span></span><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#addon.type" title="Permalink to this definition">¶</a></dt>
 <dd><p>String indicating the add-on type. Common values are <code class="docutils literal notranslate"><span class="pre">extension</span></code>,
 <code class="docutils literal notranslate"><span class="pre">theme</span></code>, and <code class="docutils literal notranslate"><span class="pre">plugin</span></code>.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="addon.version">
-<code class="sig-prename descclassname">addon.</code><code class="sig-name descname">version</code><a class="headerlink" href="#addon.version" title="Permalink to this definition">¶</a></dt>
+<dl class="js attribute">
+<dt class="sig sig-object js" id="addon.version">
+<span class="sig-prename descclassname"><span class="pre">addon.</span></span><span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#addon.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>String containing the add-on’s version number.</p>
 </dd></dl>
 
@@ -1343,9 +1350,9 @@ not uninstalling it will set this to <code class="docutils literal notranslate">
 <p>This section describes the special operators available to filter expressions on
 top of the standard operators in JEXL. They’re documented as functions, and the
 parameters correspond to the operands.</p>
-<dl class="function">
-<dt id="intersect">
-<code class="sig-name descname">intersect</code><span class="sig-paren">(</span><em class="sig-param">list1</em>, <em class="sig-param">list2</em><span class="sig-paren">)</span><a class="headerlink" href="#intersect" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="intersect">
+<span class="sig-name descname"><span class="pre">intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">list1</span></em>, <em class="sig-param"><span class="pre">list2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#intersect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of all values in <code class="docutils literal notranslate"><span class="pre">list1</span></code> that are also present in
 <code class="docutils literal notranslate"><span class="pre">list2</span></code>. Values are compared using strict equality. If <code class="docutils literal notranslate"><span class="pre">list1</span></code> or
 <code class="docutils literal notranslate"><span class="pre">list2</span></code> are not arrays, the returned value is <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
@@ -1358,7 +1365,7 @@ parameters correspond to the operands.</p>
 </dd>
 </dl>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Evaluates to [2, 3]</span>
-<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="nx">intersect</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]</span> <span class="nx">intersect</span> <span class="p">[</span><span class="mf">5</span><span class="p">,</span> <span class="mf">6</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">7</span><span class="p">,</span> <span class="mf">3</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1369,9 +1376,9 @@ parameters correspond to the operands.</p>
 <p>This section describes the transforms available to filter expressions, and what
 they do. They’re documented as functions, and the first parameter to each
 function is the value being transformed.</p>
-<dl class="function">
-<dt id="stableSample">
-<code class="sig-name descname">stableSample</code><span class="sig-paren">(</span><em class="sig-param">input</em>, <em class="sig-param">rate</em><span class="sig-paren">)</span><a class="headerlink" href="#stableSample" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="stableSample">
+<span class="sig-name descname"><span class="pre">stableSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">input</span></em>, <em class="sig-param"><span class="pre">rate</span></em><span class="sig-paren">)</span><a class="headerlink" href="#stableSample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly returns <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> based on the given sample rate. Used
 to sample over the set of matched users.</p>
 <p>Sampling with this transform is stable over the input, meaning that the same
@@ -1397,9 +1404,9 @@ would add up such that the recipe is seen by more than the percent sampled.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
-<dt id="bucketSample">
-<code class="sig-name descname">bucketSample</code><span class="sig-paren">(</span><em class="sig-param">input</em>, <em class="sig-param">start</em>, <em class="sig-param">count</em>, <em class="sig-param">total</em><span class="sig-paren">)</span><a class="headerlink" href="#bucketSample" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="bucketSample">
+<span class="sig-name descname"><span class="pre">bucketSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">input</span></em>, <em class="sig-param"><span class="pre">start</span></em>, <em class="sig-param"><span class="pre">count</span></em>, <em class="sig-param"><span class="pre">total</span></em><span class="sig-paren">)</span><a class="headerlink" href="#bucketSample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code> if the current user falls within a “bucket” in
 the given range.</p>
 <p>Bucket sampling randomly groups users into a list of “buckets”, in this case
@@ -1416,8 +1423,8 @@ can ensure they are not shown to the same people by using the
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Half of all users will match the first filter and not the</span>
 <span class="c1">// second one, while the other half will match the second and not</span>
 <span class="c1">// the first, _even across multiple recipes_.</span>
-<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">]</span><span class="o">|</span><span class="nx">bucketSample</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
-<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">]</span><span class="o">|</span><span class="nx">bucketSample</span><span class="p">(</span><span class="mi">5000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">]</span><span class="o">|</span><span class="nx">bucketSample</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">5000</span><span class="p">,</span> <span class="mf">10000</span><span class="p">)</span>
+<span class="p">[</span><span class="nx">normandy</span><span class="p">.</span><span class="nx">userId</span><span class="p">]</span><span class="o">|</span><span class="nx">bucketSample</span><span class="p">(</span><span class="mf">5000</span><span class="p">,</span> <span class="mf">5000</span><span class="p">,</span> <span class="mf">10000</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The range to check wraps around the total bucket range. This means that if
@@ -1439,9 +1446,9 @@ search will wrap to the start of the range again.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="date">
-<code class="sig-name descname">date</code><span class="sig-paren">(</span><em class="sig-param">dateString</em><span class="sig-paren">)</span><a class="headerlink" href="#date" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="date">
+<span class="sig-name descname"><span class="pre">date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dateString</span></em><span class="sig-paren">)</span><a class="headerlink" href="#date" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses a string as a date and returns a Date object. Date strings should be
 in <a class="reference external" href="https://www.w3.org/TR/NOTE-datetime">ISO 8601</a> format.</p>
 <dl class="field-list simple">
@@ -1456,9 +1463,9 @@ in <a class="reference external" href="https://www.w3.org/TR/NOTE-datetime">ISO 
 </div>
 </dd></dl>
 
-<dl class="function">
-<dt id="keys">
-<code class="sig-name descname">keys</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#keys" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of the given object’s own keys (specifically, its enumerable
 properties). Similar to <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys">Object.keys</a>, except that if given a non-object,
 <code class="docutils literal notranslate"><span class="pre">keys</span></code> will return <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
@@ -1470,16 +1477,16 @@ properties). Similar to <a class="reference external" href="https://developer.mo
 </dd>
 </dl>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Evaluates to [&#39;foo&#39;, &#39;bar&#39;]</span>
-<span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span><span class="mi">2</span><span class="p">}</span><span class="o">|</span><span class="nx">keys</span>
+<span class="p">{</span><span class="nx">foo</span><span class="o">:</span> <span class="mf">1</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span><span class="mf">2</span><span class="p">}</span><span class="o">|</span><span class="nx">keys</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <div class="section" id="preference-filters">
 <h4>Preference Filters<a class="headerlink" href="#preference-filters" title="Permalink to this headline">¶</a></h4>
-<dl class="function">
-<dt id="preferenceValue">
-<code class="sig-name descname">preferenceValue</code><span class="sig-paren">(</span><em class="sig-param">prefKey</em>, <em class="sig-param">defaultValue</em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceValue" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="preferenceValue">
+<span class="sig-name descname"><span class="pre">preferenceValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">prefKey</span></em>, <em class="sig-param"><span class="pre">defaultValue</span></em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceValue" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1493,14 +1500,14 @@ properties). Similar to <a class="reference external" href="https://developer.mo
 </dd>
 </dl>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Match users with more than 2 content processes</span>
-<span class="s1">&#39;dom.ipc.processCount&#39;</span><span class="o">|</span><span class="nx">preferenceValue</span> <span class="o">&gt;</span> <span class="mi">2</span>
+<span class="s1">&#39;dom.ipc.processCount&#39;</span><span class="o">|</span><span class="nx">preferenceValue</span> <span class="o">&gt;</span> <span class="mf">2</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="function">
-<dt id="preferenceIsUserSet">
-<code class="sig-name descname">preferenceIsUserSet</code><span class="sig-paren">(</span><em class="sig-param">prefKey</em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceIsUserSet" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="preferenceIsUserSet">
+<span class="sig-name descname"><span class="pre">preferenceIsUserSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">prefKey</span></em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceIsUserSet" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1518,9 +1525,9 @@ value, or <code class="docutils literal notranslate"><span class="pre">false</sp
 </div>
 </dd></dl>
 
-<dl class="function">
-<dt id="preferenceExists">
-<code class="sig-name descname">preferenceExists</code><span class="sig-paren">(</span><em class="sig-param">prefKey</em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceExists" title="Permalink to this definition">¶</a></dt>
+<dl class="js function">
+<dt class="sig sig-object js" id="preferenceExists">
+<span class="sig-name descname"><span class="pre">preferenceExists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">prefKey</span></em><span class="sig-paren">)</span><a class="headerlink" href="#preferenceExists" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1607,37 +1614,29 @@ which is not running.</p></li>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="peer_approval.html" class="btn btn-neutral float-right" title="Peer Approval" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="User Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="peer_approval.html" class="btn btn-neutral float-right" title="Peer Approval" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="User Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2016-2018, Mozilla Foundation
+        &#169; Copyright 2016-2018, Mozilla Foundation.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

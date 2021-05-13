@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Environments &mdash; Normandy 0.1.0 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -51,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+            <a href="../index.html" class="icon icon-home"> Normandy
           
 
           
@@ -155,6 +160,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -168,7 +175,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/qa/environments.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -209,14 +216,14 @@ time of a few minutes.</p>
 <p>Set the following preferences to have Firefox execute recipes from the
 production server:</p>
 <dl class="describe">
-<dt>
-<code class="sig-name descname">app.normandy.api_url</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">app.normandy.api_url</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">https://normandy.cdn.mozilla.net/api/v1</span></code></p>
 </dd></dl>
 
 <dl class="describe">
-<dt>
-<code class="sig-name descname">security.content.signature.root_hash</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">security.content.signature.root_hash</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">97:E8:BA:9C:F1:2F:B3:DE:53:CC:42:A4:E6:57:7E:D6:4D:F4:93:C2:47:B4:14:FE:A0:36:81:8D:38:23:56:0E</span></code></p>
 </dd></dl>
 
@@ -237,14 +244,14 @@ does not use a VPN for the public API server.</p>
 <p>Set the following preferences to have Firefox execute recipes from the staging
 server:</p>
 <dl class="describe">
-<dt>
-<code class="sig-name descname">app.normandy.api_url</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">app.normandy.api_url</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">https://stage.normandy.nonprod.cloudops.mozgcp.net/api/v1</span></code></p>
 </dd></dl>
 
 <dl class="describe">
-<dt>
-<code class="sig-name descname">security.content.signature.root_hash</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">security.content.signature.root_hash</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">3C:01:44:6A:BE:90:36:CE:A9:A0:9A:CA:A3:A5:20:AC:62:8F:20:A7:AE:32:CE:86:1C:B2:EF:B7:0F:A0:C7:45</span></code></p>
 </dd></dl>
 
@@ -265,14 +272,14 @@ the admin server.</p>
 <p>Set the following preferences to have Firefox execute recipes from the dev
 server:</p>
 <dl class="describe">
-<dt>
-<code class="sig-name descname">app.normandy.api_url</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">app.normandy.api_url</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">https://dev.normandy.nonprod.cloudops.mozgcp.net/api/v1</span></code></p>
 </dd></dl>
 
 <dl class="describe">
-<dt>
-<code class="sig-name descname">security.content.signature.root_hash</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">security.content.signature.root_hash</span></span></dt>
 <dd><p>TODO: The value is currently unknown. It would be the root hash used for Autograph
 development servers.</p>
 </dd></dl>
@@ -295,16 +302,16 @@ legacy authentication method, though that is possible as well.</p>
 <p>Set the following preferences to have Firefox execute recipes from a typical
 local server:</p>
 <dl class="describe">
-<dt>
-<code class="sig-name descname">app.normandy.api_url</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">app.normandy.api_url</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">https://localhost:8000/api/v1</span></code></p>
 <p>Note that the Normandy API must be accessed via HTTPS, even for local
 development.</p>
 </dd></dl>
 
 <dl class="describe">
-<dt>
-<code class="sig-name descname">security.content.signature.root_hash</code></dt>
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">security.content.signature.root_hash</span></span></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">4C:35:B1:C3:E3:12:D9:55:E7:78:ED:D0:A7:E7:8A:38:83:04:EF:01:BF:FA:03:29:B2:46:9F:3C:C5:EC:36:04</span></code></p>
 </dd></dl>
 
@@ -317,37 +324,29 @@ development.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="test_engineering.html" class="btn btn-neutral float-right" title="Normandy Test Engineering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="example.html" class="btn btn-neutral float-left" title="Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="test_engineering.html" class="btn btn-neutral float-right" title="Normandy Test Engineering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="example.html" class="btn btn-neutral float-left" title="Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2016-2018, Mozilla Foundation
+        &#169; Copyright 2016-2018, Mozilla Foundation.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

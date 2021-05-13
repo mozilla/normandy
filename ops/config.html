@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Configuration &mdash; Normandy 0.1.0 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -26,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -51,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Normandy
+            <a href="../index.html" class="icon icon-home"> Normandy
           
 
           
@@ -140,6 +145,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -153,7 +160,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/ops/config.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -181,9 +188,9 @@ Django settings are available for configuration.</p>
 default in Docker images.. Other configurations may have defaults not
 listed here.</p>
 </div>
-<dl class="envvar">
-<dt id="envvar-DATABASE_URL">
-<code class="sig-name descname">DATABASE_URL</code><a class="headerlink" href="#envvar-DATABASE_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DATABASE_URL">
+<span class="sig-name descname"><span class="pre">DATABASE_URL</span></span><a class="headerlink" href="#envvar-DATABASE_URL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">postgres://postgres&#64;localhost/normandy</span></code></p>
@@ -195,9 +202,9 @@ listed here.</p>
 <p>A database URL, including any username and password, if needed.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_ALLOWED_HOSTS">
-<code class="sig-name descname">DJANGO_ALLOWED_HOSTS</code><a class="headerlink" href="#envvar-DJANGO_ALLOWED_HOSTS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_ALLOWED_HOSTS">
+<span class="sig-name descname"><span class="pre">DJANGO_ALLOWED_HOSTS</span></span><a class="headerlink" href="#envvar-DJANGO_ALLOWED_HOSTS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>Empty string</p>
@@ -213,9 +220,9 @@ setting is required to be set. If there are other protections (such as
 load balancers), setting this to <code class="docutils literal notranslate"><span class="pre">*</span></code> presents no risk.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CONFIGURATION">
-<code class="sig-name descname">DJANGO_CONFIGURATION</code><a class="headerlink" href="#envvar-DJANGO_CONFIGURATION" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CONFIGURATION">
+<span class="sig-name descname"><span class="pre">DJANGO_CONFIGURATION</span></span><a class="headerlink" href="#envvar-DJANGO_CONFIGURATION" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Production</span></code></p>
@@ -235,9 +242,9 @@ values are</p>
 </ul>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_DEBUG">
-<code class="sig-name descname">DJANGO_DEBUG</code><a class="headerlink" href="#envvar-DJANGO_DEBUG" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_DEBUG">
+<span class="sig-name descname"><span class="pre">DJANGO_DEBUG</span></span><a class="headerlink" href="#envvar-DJANGO_DEBUG" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p>
@@ -250,9 +257,9 @@ values are</p>
 enabled on permanent servers. It is inefficient and leaks memory.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_MEDIA_URL">
-<code class="sig-name descname">DJANGO_MEDIA_URL</code><a class="headerlink" href="#envvar-DJANGO_MEDIA_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_MEDIA_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_MEDIA_URL</span></span><a class="headerlink" href="#envvar-DJANGO_MEDIA_URL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/media/</span></code></p>
@@ -266,9 +273,9 @@ host-relative (<code class="docutils literal notranslate"><span class="pre">/med
 (<code class="docutils literal notranslate"><span class="pre">https://cdn.example.com/</span></code>) work. Should end in a slash.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_SECRET_KEY">
-<code class="sig-name descname">DJANGO_SECRET_KEY</code><a class="headerlink" href="#envvar-DJANGO_SECRET_KEY" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_SECRET_KEY">
+<span class="sig-name descname"><span class="pre">DJANGO_SECRET_KEY</span></span><a class="headerlink" href="#envvar-DJANGO_SECRET_KEY" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Required</dt>
 <dd class="field-odd"><p>True</p>
@@ -283,9 +290,9 @@ should be a long, random string. This field is required to be set in
 most environments.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_STATIC_URL">
-<code class="sig-name descname">DJANGO_STATIC_URL</code><a class="headerlink" href="#envvar-DJANGO_STATIC_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_STATIC_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_STATIC_URL</span></span><a class="headerlink" href="#envvar-DJANGO_STATIC_URL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/static/</span></code></p>
@@ -298,9 +305,9 @@ most environments.</p>
 host-relative and host-absolute URLs work. Should end in a slash.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CONN_MAX_AGE">
-<code class="sig-name descname">DJANGO_CONN_MAX_AGE</code><a class="headerlink" href="#envvar-DJANGO_CONN_MAX_AGE" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CONN_MAX_AGE">
+<span class="sig-name descname"><span class="pre">DJANGO_CONN_MAX_AGE</span></span><a class="headerlink" href="#envvar-DJANGO_CONN_MAX_AGE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
@@ -319,9 +326,9 @@ every database connection immediately. Each worker (as controlled by
 <h2>Normandy settings<a class="headerlink" href="#normandy-settings" title="Permalink to this headline">¶</a></h2>
 <p>These settings are specific to Normandy. In other words, they won’t be present
 in other Django projects.</p>
-<dl class="envvar">
-<dt id="envvar-DJANGO_GEOIP2_DATABASE">
-<code class="sig-name descname">DJANGO_GEOIP2_DATABASE</code><a class="headerlink" href="#envvar-DJANGO_GEOIP2_DATABASE" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_GEOIP2_DATABASE">
+<span class="sig-name descname"><span class="pre">DJANGO_GEOIP2_DATABASE</span></span><a class="headerlink" href="#envvar-DJANGO_GEOIP2_DATABASE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">/app/GeoIP2-Country.mmdb</span></code></p>
@@ -330,9 +337,9 @@ in other Django projects.</p>
 <p>Path to a Maxmind GeoIP Country database.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_ADMIN_ENABLED">
-<code class="sig-name descname">DJANGO_ADMIN_ENABLED</code><a class="headerlink" href="#envvar-DJANGO_ADMIN_ENABLED" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_ADMIN_ENABLED">
+<span class="sig-name descname"><span class="pre">DJANGO_ADMIN_ENABLED</span></span><a class="headerlink" href="#envvar-DJANGO_ADMIN_ENABLED" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p>
@@ -343,9 +350,9 @@ production servers. Servers with this setting set to <code class="docutils liter
 require write access to Postgres.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_IMMUTABLE_CACHE_TIME">
-<code class="sig-name descname">DJANGO_IMMUTABLE_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_IMMUTABLE_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_IMMUTABLE_CACHE_TIME">
+<span class="sig-name descname"><span class="pre">DJANGO_IMMUTABLE_CACHE_TIME</span></span><a class="headerlink" href="#envvar-DJANGO_IMMUTABLE_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">31536000</span></code> (1 year)</p>
@@ -355,9 +362,9 @@ require write access to Postgres.</p>
 are cached for with the HTTP <code class="docutils literal notranslate"><span class="pre">Cache-Control</span></code> header.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_NUM_PROXIES">
-<code class="sig-name descname">DJANGO_NUM_PROXIES</code><a class="headerlink" href="#envvar-DJANGO_NUM_PROXIES" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_NUM_PROXIES">
+<span class="sig-name descname"><span class="pre">DJANGO_NUM_PROXIES</span></span><a class="headerlink" href="#envvar-DJANGO_NUM_PROXIES" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
@@ -367,9 +374,9 @@ are cached for with the HTTP <code class="docutils literal notranslate"><span cl
 the <code class="docutils literal notranslate"><span class="pre">X-Forwarded-For</span></code> header.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_RAVEN_CONFIG_DSN">
-<code class="sig-name descname">DJANGO_RAVEN_CONFIG_DSN</code><a class="headerlink" href="#envvar-DJANGO_RAVEN_CONFIG_DSN" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_RAVEN_CONFIG_DSN">
+<span class="sig-name descname"><span class="pre">DJANGO_RAVEN_CONFIG_DSN</span></span><a class="headerlink" href="#envvar-DJANGO_RAVEN_CONFIG_DSN" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -378,9 +385,9 @@ the <code class="docutils literal notranslate"><span class="pre">X-Forwarded-For
 <p>Optional. The DSN for Raven to report errors to Sentry.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_RAVEN_CONFIG_RELEASE">
-<code class="sig-name descname">DJANGO_RAVEN_CONFIG_RELEASE</code><a class="headerlink" href="#envvar-DJANGO_RAVEN_CONFIG_RELEASE" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_RAVEN_CONFIG_RELEASE">
+<span class="sig-name descname"><span class="pre">DJANGO_RAVEN_CONFIG_RELEASE</span></span><a class="headerlink" href="#envvar-DJANGO_RAVEN_CONFIG_RELEASE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -390,28 +397,28 @@ the <code class="docutils literal notranslate"><span class="pre">X-Forwarded-For
 production Docker images.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AUTOGRAPH_URL">
-<code class="sig-name descname">DJANGO_AUTOGRAPH_URL</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AUTOGRAPH_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_AUTOGRAPH_URL</span></span><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_URL" title="Permalink to this definition">¶</a></dt>
 <dd><p>The URL where an <a class="reference external" href="https://github.com/mozilla-services/autograph/">Autograph</a> server can be reached. If left blank, content
 signing will be disabled.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AUTOGRAPH_HAWK_ID">
-<code class="sig-name descname">DJANGO_AUTOGRAPH_HAWK_ID</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_HAWK_ID" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AUTOGRAPH_HAWK_ID">
+<span class="sig-name descname"><span class="pre">DJANGO_AUTOGRAPH_HAWK_ID</span></span><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_HAWK_ID" title="Permalink to this definition">¶</a></dt>
 <dd><p>The pre-arranged ID to use for Hawk authentication with Autograph.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AUTOGRAPH_SECRET_KEY">
-<code class="sig-name descname">DJANGO_AUTOGRAPH_SECRET_KEY</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_SECRET_KEY" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AUTOGRAPH_SECRET_KEY">
+<span class="sig-name descname"><span class="pre">DJANGO_AUTOGRAPH_SECRET_KEY</span></span><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_SECRET_KEY" title="Permalink to this definition">¶</a></dt>
 <dd><p>The pre-arranged secret key to use for Hawk authentication with Autograph.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE">
-<code class="sig-name descname">DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE">
+<span class="sig-name descname"><span class="pre">DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE</span></span><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_SIGNATURE_MAX_AGE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">604800</span></code> (1 week)</p>
@@ -425,9 +432,9 @@ possible while still guaranteeing that actions will get resigned during the
 overlap period.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_X5U_CACHE_TIME">
-<code class="sig-name descname">DJANGO_X5U_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_X5U_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_X5U_CACHE_TIME">
+<span class="sig-name descname"><span class="pre">DJANGO_X5U_CACHE_TIME</span></span><a class="headerlink" href="#envvar-DJANGO_X5U_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">600</span></code> (10 minutes)</p>
@@ -437,9 +444,9 @@ overlap period.</p>
 verifying signatures. Set to 0 to disable caching.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_X5U_ERROR_CACHE_TIME">
-<code class="sig-name descname">DJANGO_X5U_ERROR_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_X5U_ERROR_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_X5U_ERROR_CACHE_TIME">
+<span class="sig-name descname"><span class="pre">DJANGO_X5U_ERROR_CACHE_TIME</span></span><a class="headerlink" href="#envvar-DJANGO_X5U_ERROR_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p>
@@ -449,9 +456,9 @@ verifying signatures. Set to 0 to disable caching.</p>
 from x5u URLs when verifying signatures. Set to 0 to disable error caching.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_X5U_REQUEST_TIMEOUT">
-<code class="sig-name descname">DJANGO_X5U_REQUEST_TIMEOUT</code><a class="headerlink" href="#envvar-DJANGO_X5U_REQUEST_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_X5U_REQUEST_TIMEOUT">
+<span class="sig-name descname"><span class="pre">DJANGO_X5U_REQUEST_TIMEOUT</span></span><a class="headerlink" href="#envvar-DJANGO_X5U_REQUEST_TIMEOUT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code></p>
@@ -461,9 +468,9 @@ from x5u URLs when verifying signatures. Set to 0 to disable error caching.</p>
 requesting x5u URLs to verify signatures. A value of 0 means no timeout.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST">
-<code class="sig-name descname">DJANGO_AUTOGRAPH_X5U_CACHE_BUST</code><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST">
+<span class="sig-name descname"><span class="pre">DJANGO_AUTOGRAPH_X5U_CACHE_BUST</span></span><a class="headerlink" href="#envvar-DJANGO_AUTOGRAPH_X5U_CACHE_BUST" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>Unset</p>
@@ -475,9 +482,9 @@ re-fetch the certificate chain in cases where they’re caching an expired or
 otherwise invalid copy of the chain.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_REMOTE_SETTINGS_URL">
-<code class="sig-name descname">DJANGO_REMOTE_SETTINGS_URL</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_REMOTE_SETTINGS_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_REMOTE_SETTINGS_URL</span></span><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_URL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>Unset</p>
@@ -488,9 +495,9 @@ otherwise invalid copy of the chain.</p>
 <p>If left blank, the publication of recipes will be disabled.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_REMOTE_SETTINGS_USERNAME">
-<code class="sig-name descname">DJANGO_REMOTE_SETTINGS_USERNAME</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_USERNAME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_REMOTE_SETTINGS_USERNAME">
+<span class="sig-name descname"><span class="pre">DJANGO_REMOTE_SETTINGS_USERNAME</span></span><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_USERNAME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>Unset</p>
@@ -500,9 +507,9 @@ otherwise invalid copy of the chain.</p>
 Remote Settings collection.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_REMOTE_SETTINGS_PASSWORD">
-<code class="sig-name descname">DJANGO_REMOTE_SETTINGS_PASSWORD</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_PASSWORD" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_REMOTE_SETTINGS_PASSWORD">
+<span class="sig-name descname"><span class="pre">DJANGO_REMOTE_SETTINGS_PASSWORD</span></span><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_PASSWORD" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>Unset</p>
@@ -511,9 +518,9 @@ Remote Settings collection.</p>
 <p>The account password to authenticate as DJANGO_REMOTE_SETTINGS_USERNAME.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID">
-<code class="sig-name descname">DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID">
+<span class="sig-name descname"><span class="pre">DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID</span></span><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_CAPABILITIES_COLLECTION_ID" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">normandy-recipes-capabilities</span></code></p>
@@ -522,9 +529,9 @@ Remote Settings collection.</p>
 <p>The name of the Remote Settings collection where the recipes will be published.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_REMOTE_SETTINGS_BUCKET_ID">
-<code class="sig-name descname">DJANGO_REMOTE_SETTINGS_BUCKET_ID</code><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_BUCKET_ID" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_REMOTE_SETTINGS_BUCKET_ID">
+<span class="sig-name descname"><span class="pre">DJANGO_REMOTE_SETTINGS_BUCKET_ID</span></span><a class="headerlink" href="#envvar-DJANGO_REMOTE_SETTINGS_BUCKET_ID" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">main-workspace</span></code></p>
@@ -533,9 +540,9 @@ Remote Settings collection.</p>
 <p>The name of the Remote Settings bucket where the recipes will be published.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-REMOTE_SETTINGS_RETRY_REQUESTS">
-<code class="sig-name descname">REMOTE_SETTINGS_RETRY_REQUESTS</code><a class="headerlink" href="#envvar-REMOTE_SETTINGS_RETRY_REQUESTS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-REMOTE_SETTINGS_RETRY_REQUESTS">
+<span class="sig-name descname"><span class="pre">REMOTE_SETTINGS_RETRY_REQUESTS</span></span><a class="headerlink" href="#envvar-REMOTE_SETTINGS_RETRY_REQUESTS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p>
@@ -545,9 +552,9 @@ Remote Settings collection.</p>
 requests will be retried if the specified number is superior to zero.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_API_CACHE_TIME">
-<code class="sig-name descname">DJANGO_API_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_API_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_API_CACHE_TIME">
+<span class="sig-name descname"><span class="pre">DJANGO_API_CACHE_TIME</span></span><a class="headerlink" href="#envvar-DJANGO_API_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
@@ -558,9 +565,9 @@ set to 0 in non-production environments to ease testing. In production
 environments, setting this value too low can be a denial-of-service risk.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_API_CACHE_ENABLED">
-<code class="sig-name descname">DJANGO_API_CACHE_ENABLED</code><a class="headerlink" href="#envvar-DJANGO_API_CACHE_ENABLED" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_API_CACHE_ENABLED">
+<span class="sig-name descname"><span class="pre">DJANGO_API_CACHE_ENABLED</span></span><a class="headerlink" href="#envvar-DJANGO_API_CACHE_ENABLED" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
@@ -572,9 +579,9 @@ headers indicating that they can be cached according to
 indicating that they should never be cached.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_PERMANENT_REDIRECT_CACHE_TIME">
-<code class="sig-name descname">DJANGO_PERMANENT_REDIRECT_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_PERMANENT_REDIRECT_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_PERMANENT_REDIRECT_CACHE_TIME">
+<span class="sig-name descname"><span class="pre">DJANGO_PERMANENT_REDIRECT_CACHE_TIME</span></span><a class="headerlink" href="#envvar-DJANGO_PERMANENT_REDIRECT_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2592000</span></code> (30 days)</p>
@@ -583,9 +590,9 @@ indicating that they should never be cached.</p>
 <p>The time in seconds to set in cache headers for permanent redirects.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_HTTPS_REDIRECT_CACHE_TIME">
-<code class="sig-name descname">DJANGO_HTTPS_REDIRECT_CACHE_TIME</code><a class="headerlink" href="#envvar-DJANGO_HTTPS_REDIRECT_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_HTTPS_REDIRECT_CACHE_TIME">
+<span class="sig-name descname"><span class="pre">DJANGO_HTTPS_REDIRECT_CACHE_TIME</span></span><a class="headerlink" href="#envvar-DJANGO_HTTPS_REDIRECT_CACHE_TIME" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">2592000</span></code> (30 days)</p>
@@ -595,9 +602,9 @@ indicating that they should never be cached.</p>
 to change from HTTP to HTTPS.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_LOGGING_USE_JSON">
-<code class="sig-name descname">DJANGO_LOGGING_USE_JSON</code><a class="headerlink" href="#envvar-DJANGO_LOGGING_USE_JSON" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_LOGGING_USE_JSON">
+<span class="sig-name descname"><span class="pre">DJANGO_LOGGING_USE_JSON</span></span><a class="headerlink" href="#envvar-DJANGO_LOGGING_USE_JSON" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
@@ -607,9 +614,9 @@ to change from HTTP to HTTPS.</p>
 Otherwise logs will be unstructured.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CSP_REPORT_URI">
-<code class="sig-name descname">DJANGO_CSP_REPORT_URI</code><a class="headerlink" href="#envvar-DJANGO_CSP_REPORT_URI" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CSP_REPORT_URI">
+<span class="sig-name descname"><span class="pre">DJANGO_CSP_REPORT_URI</span></span><a class="headerlink" href="#envvar-DJANGO_CSP_REPORT_URI" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -621,9 +628,9 @@ this URL. See the <a class="reference external" href="report-uri">MDN documentat
 info.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CDN_URL">
-<code class="sig-name descname">DJANGO_CDN_URL</code><a class="headerlink" href="#envvar-DJANGO_CDN_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CDN_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_CDN_URL</span></span><a class="headerlink" href="#envvar-DJANGO_CDN_URL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -634,9 +641,9 @@ enforce that immutable content is routed through the CDN. Must end with a
 slash (<code class="docutils literal notranslate"><span class="pre">/</span></code>).</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_APP_SERVER_URL">
-<code class="sig-name descname">DJANGO_APP_SERVER_URL</code><a class="headerlink" href="#envvar-DJANGO_APP_SERVER_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_APP_SERVER_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_APP_SERVER_URL</span></span><a class="headerlink" href="#envvar-DJANGO_APP_SERVER_URL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -647,9 +654,9 @@ is used for content that cannot be cached. If not specified, Normandy will
 assume direct access. Must end with a slash (<code class="docutils literal notranslate"><span class="pre">/</span></code>).</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_USE_OIDC">
-<code class="sig-name descname">DJANGO_USE_OIDC</code><a class="headerlink" href="#envvar-DJANGO_USE_OIDC" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_USE_OIDC">
+<span class="sig-name descname"><span class="pre">DJANGO_USE_OIDC</span></span><a class="headerlink" href="#envvar-DJANGO_USE_OIDC" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
@@ -675,9 +682,9 @@ as any user, with no checks.</p>
 </div>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER">
-<code class="sig-name descname">DJANGO_OIDC_REMOTE_AUTH_HEADER</code><a class="headerlink" href="#envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER">
+<span class="sig-name descname"><span class="pre">DJANGO_OIDC_REMOTE_AUTH_HEADER</span></span><a class="headerlink" href="#envvar-DJANGO_OIDC_REMOTE_AUTH_HEADER" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">HTTP_REMOTE_USER</span></code></p>
@@ -690,16 +697,16 @@ capitalized, dashes replaced with underscores, and be prefixed with <code class=
 <code class="docutils literal notranslate"><span class="pre">HTTP_OIDC_CLAIM_USER_PROFILE_EMAIL</span></code>.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_OIDC_LOGOUT_URL">
-<code class="sig-name descname">DJANGO_OIDC_LOGOUT_URL</code><a class="headerlink" href="#envvar-DJANGO_OIDC_LOGOUT_URL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_OIDC_LOGOUT_URL">
+<span class="sig-name descname"><span class="pre">DJANGO_OIDC_LOGOUT_URL</span></span><a class="headerlink" href="#envvar-DJANGO_OIDC_LOGOUT_URL" title="Permalink to this definition">¶</a></dt>
 <dd><p>If <span class="target" id="index-4"></span><a class="reference internal" href="#envvar-DJANGO_USE_OIDC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_USE_OIDC</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this settings must be set to
 the URL that a user can visit to logout. It may be a relative URL.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_PEER_APPROVAL_ENFORCED">
-<code class="sig-name descname">DJANGO_PEER_APPROVAL_ENFORCED</code><a class="headerlink" href="#envvar-DJANGO_PEER_APPROVAL_ENFORCED" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_PEER_APPROVAL_ENFORCED">
+<span class="sig-name descname"><span class="pre">DJANGO_PEER_APPROVAL_ENFORCED</span></span><a class="headerlink" href="#envvar-DJANGO_PEER_APPROVAL_ENFORCED" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
@@ -711,9 +718,9 @@ requests can be approved by the same user who created it.</p>
 <p>This defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code> for local developer instances.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CERTIFICATES_CHECK_VALIDITY">
-<code class="sig-name descname">DJANGO_CERTIFICATES_CHECK_VALIDITY</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_CHECK_VALIDITY" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CERTIFICATES_CHECK_VALIDITY">
+<span class="sig-name descname"><span class="pre">DJANGO_CERTIFICATES_CHECK_VALIDITY</span></span><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_CHECK_VALIDITY" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
@@ -725,9 +732,9 @@ checked against the current date. This should likely never be turned off
 in Production.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS">
-<code class="sig-name descname">DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS">
+<span class="sig-name descname"><span class="pre">DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS</span></span><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPIRE_EARLY_DAYS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -737,9 +744,9 @@ in Production.</p>
 system checks this many days before the certificate would expire.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH">
-<code class="sig-name descname">DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH">
+<span class="sig-name descname"><span class="pre">DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH</span></span><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPECTED_ROOT_HASH" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
@@ -751,9 +758,9 @@ certificate chain. For possible values of this setting, see the <a class="refere
 environments</span></a>.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN">
-<code class="sig-name descname">DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN</code><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN">
+<span class="sig-name descname"><span class="pre">DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN</span></span><a class="headerlink" href="#envvar-DJANGO_CERTIFICATES_EXPECTED_SUBJECT_CN" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">&quot;normandy.content-signature.mozilla.org&quot;</span></code></p>
@@ -765,9 +772,9 @@ change, because the default value matches one that is hard-coded in
 Firefox.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CORS_ORIGIN_ALLOW_ALL">
-<code class="sig-name descname">DJANGO_CORS_ORIGIN_ALLOW_ALL</code><a class="headerlink" href="#envvar-DJANGO_CORS_ORIGIN_ALLOW_ALL" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CORS_ORIGIN_ALLOW_ALL">
+<span class="sig-name descname"><span class="pre">DJANGO_CORS_ORIGIN_ALLOW_ALL</span></span><a class="headerlink" href="#envvar-DJANGO_CORS_ORIGIN_ALLOW_ALL" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
@@ -782,9 +789,9 @@ In all environments other than <code class="docutils literal notranslate"><span 
 </div>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CORS_ORIGIN_WHITELIST">
-<code class="sig-name descname">DJANGO_CORS_ORIGIN_WHITELIST</code><a class="headerlink" href="#envvar-DJANGO_CORS_ORIGIN_WHITELIST" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CORS_ORIGIN_WHITELIST">
+<span class="sig-name descname"><span class="pre">DJANGO_CORS_ORIGIN_WHITELIST</span></span><a class="headerlink" href="#envvar-DJANGO_CORS_ORIGIN_WHITELIST" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p>
@@ -796,9 +803,9 @@ Ideally this should list all the client-side apps that should be allowed
 to make remote XHR requests.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_CORS_ALLOW_METHODS">
-<code class="sig-name descname">DJANGO_CORS_ALLOW_METHODS</code><a class="headerlink" href="#envvar-DJANGO_CORS_ALLOW_METHODS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_CORS_ALLOW_METHODS">
+<span class="sig-name descname"><span class="pre">DJANGO_CORS_ALLOW_METHODS</span></span><a class="headerlink" href="#envvar-DJANGO_CORS_ALLOW_METHODS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">['DELETE',</span> <span class="pre">'GET',</span> <span class="pre">'OPTIONS',</span> <span class="pre">'PATCH',</span> <span class="pre">'POST',</span> <span class="pre">'PUT']</span></code></p>
@@ -809,9 +816,9 @@ reduced to “read-only” methods when using the <code class="docutils literal 
 configuration.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_OIDC_USER_ENDPOINT">
-<code class="sig-name descname">DJANGO_OIDC_USER_ENDPOINT</code><a class="headerlink" href="#envvar-DJANGO_OIDC_USER_ENDPOINT" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_OIDC_USER_ENDPOINT">
+<span class="sig-name descname"><span class="pre">DJANGO_OIDC_USER_ENDPOINT</span></span><a class="headerlink" href="#envvar-DJANGO_OIDC_USER_ENDPOINT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">https://auth.mozilla.auth0.com/userinfo</span></code></p>
@@ -823,9 +830,9 @@ The value for this setting is usually listed in
 <code class="docutils literal notranslate"><span class="pre">/.well-known/openid-configuration</span></code> on the OIDC provider.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_DEFAULT_FILE_STORAGE">
-<code class="sig-name descname">DJANGO_DEFAULT_FILE_STORAGE</code><a class="headerlink" href="#envvar-DJANGO_DEFAULT_FILE_STORAGE" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_DEFAULT_FILE_STORAGE">
+<span class="sig-name descname"><span class="pre">DJANGO_DEFAULT_FILE_STORAGE</span></span><a class="headerlink" href="#envvar-DJANGO_DEFAULT_FILE_STORAGE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">normandy.base.storage.S3Boto3PermissiveStorage</span></code></p>
@@ -841,38 +848,38 @@ For GCP, use <code class="docutils literal notranslate"><span class="pre">norman
 <code class="docutils literal notranslate"><span class="pre">DJANGO_GS_BUCKET_NAME</span></code>.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AWS_ACCESS_KEY_ID">
-<code class="sig-name descname">DJANGO_AWS_ACCESS_KEY_ID</code><a class="headerlink" href="#envvar-DJANGO_AWS_ACCESS_KEY_ID" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AWS_ACCESS_KEY_ID">
+<span class="sig-name descname"><span class="pre">DJANGO_AWS_ACCESS_KEY_ID</span></span><a class="headerlink" href="#envvar-DJANGO_AWS_ACCESS_KEY_ID" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Access Key ID for an AWS user with read/write access to the S3 bucket.
 This is required by <a class="reference external" href="https://github.com/jschneier/django-storages">django-storages</a> to access S3.</p>
 <blockquote>
 <div></div></blockquote>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AWS_SECRET_ACCESS_KEY">
-<code class="sig-name descname">DJANGO_AWS_SECRET_ACCESS_KEY</code><a class="headerlink" href="#envvar-DJANGO_AWS_SECRET_ACCESS_KEY" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AWS_SECRET_ACCESS_KEY">
+<span class="sig-name descname"><span class="pre">DJANGO_AWS_SECRET_ACCESS_KEY</span></span><a class="headerlink" href="#envvar-DJANGO_AWS_SECRET_ACCESS_KEY" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Secret Access Key for the AWS user identified by
 <span class="target" id="index-5"></span><a class="reference internal" href="#envvar-DJANGO_AWS_ACCESS_KEY_ID"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_AWS_ACCESS_KEY_ID</span></code></a>. This is also required by
 django-storages to access S3.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_AWS_STORAGE_BUCKET_NAME">
-<code class="sig-name descname">DJANGO_AWS_STORAGE_BUCKET_NAME</code><a class="headerlink" href="#envvar-DJANGO_AWS_STORAGE_BUCKET_NAME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_AWS_STORAGE_BUCKET_NAME">
+<span class="sig-name descname"><span class="pre">DJANGO_AWS_STORAGE_BUCKET_NAME</span></span><a class="headerlink" href="#envvar-DJANGO_AWS_STORAGE_BUCKET_NAME" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the S3 bucket to be used to store media files.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_GS_BUCKET_NAME">
-<code class="sig-name descname">DJANGO_GS_BUCKET_NAME</code><a class="headerlink" href="#envvar-DJANGO_GS_BUCKET_NAME" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_GS_BUCKET_NAME">
+<span class="sig-name descname"><span class="pre">DJANGO_GS_BUCKET_NAME</span></span><a class="headerlink" href="#envvar-DJANGO_GS_BUCKET_NAME" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the Google storage bucket to be used to store media files.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_METRICS_USE_DEBUG_LOGS">
-<code class="sig-name descname">DJANGO_METRICS_USE_DEBUG_LOGS</code><a class="headerlink" href="#envvar-DJANGO_METRICS_USE_DEBUG_LOGS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_METRICS_USE_DEBUG_LOGS">
+<span class="sig-name descname"><span class="pre">DJANGO_METRICS_USE_DEBUG_LOGS</span></span><a class="headerlink" href="#envvar-DJANGO_METRICS_USE_DEBUG_LOGS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> in Development, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise</p>
@@ -882,9 +889,9 @@ django-storages to access S3.</p>
 default in development.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_METRICS_USE_STATSD">
-<code class="sig-name descname">DJANGO_METRICS_USE_STATSD</code><a class="headerlink" href="#envvar-DJANGO_METRICS_USE_STATSD" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_METRICS_USE_STATSD">
+<span class="sig-name descname"><span class="pre">DJANGO_METRICS_USE_STATSD</span></span><a class="headerlink" href="#envvar-DJANGO_METRICS_USE_STATSD" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> in Production, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
@@ -894,9 +901,9 @@ by default in production.</p>
 </dl>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_METRICS_STATSD_HOST">
-<code class="sig-name descname">DJANGO_METRICS_STATSD_HOST</code><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_HOST" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_METRICS_STATSD_HOST">
+<span class="sig-name descname"><span class="pre">DJANGO_METRICS_STATSD_HOST</span></span><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_HOST" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p>“<code class="docutils literal notranslate"><span class="pre">localhost&quot;</span></code></p>
@@ -906,9 +913,9 @@ to.</p>
 </dl>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_METRICS_STATSD_PORT">
-<code class="sig-name descname">DJANGO_METRICS_STATSD_PORT</code><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_PORT" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_METRICS_STATSD_PORT">
+<span class="sig-name descname"><span class="pre">DJANGO_METRICS_STATSD_PORT</span></span><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_PORT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">8125</span></code></p>
@@ -917,9 +924,9 @@ to.</p>
 </dl>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-DJANGO_METRICS_STATSD_NAMESPACE">
-<code class="sig-name descname">DJANGO_METRICS_STATSD_NAMESPACE</code><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_NAMESPACE" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-DJANGO_METRICS_STATSD_NAMESPACE">
+<span class="sig-name descname"><span class="pre">DJANGO_METRICS_STATSD_NAMESPACE</span></span><a class="headerlink" href="#envvar-DJANGO_METRICS_STATSD_NAMESPACE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p>
@@ -934,9 +941,9 @@ this value.</p>
 <h2>Gunicorn settings<a class="headerlink" href="#gunicorn-settings" title="Permalink to this headline">¶</a></h2>
 <p>These settings control how Gunicorn starts, when the default command of the
 provided Dockerfile is used.</p>
-<dl class="envvar">
-<dt id="envvar-GUNICORN_WORKER_CLASS">
-<code class="sig-name descname">GUNICORN_WORKER_CLASS</code><a class="headerlink" href="#envvar-GUNICORN_WORKER_CLASS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-GUNICORN_WORKER_CLASS">
+<span class="sig-name descname"><span class="pre">GUNICORN_WORKER_CLASS</span></span><a class="headerlink" href="#envvar-GUNICORN_WORKER_CLASS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">sync</span></code></p>
@@ -949,9 +956,9 @@ provided Dockerfile is used.</p>
 <code class="docutils literal notranslate"><span class="pre">eventlet</span></code>.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-GUNICORN_MAX_REQUESTS">
-<code class="sig-name descname">GUNICORN_MAX_REQUESTS</code><a class="headerlink" href="#envvar-GUNICORN_MAX_REQUESTS" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-GUNICORN_MAX_REQUESTS">
+<span class="sig-name descname"><span class="pre">GUNICORN_MAX_REQUESTS</span></span><a class="headerlink" href="#envvar-GUNICORN_MAX_REQUESTS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> (no cycling)</p>
@@ -965,9 +972,9 @@ Gunicorn works will be recycled. This can be helpful to avoid potential
 memory leaks.</p>
 </dd></dl>
 
-<dl class="envvar">
-<dt id="envvar-WEB_CONCURRENCY">
-<code class="sig-name descname">WEB_CONCURRENCY</code><a class="headerlink" href="#envvar-WEB_CONCURRENCY" title="Permalink to this definition">¶</a></dt>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-WEB_CONCURRENCY">
+<span class="sig-name descname"><span class="pre">WEB_CONCURRENCY</span></span><a class="headerlink" href="#envvar-WEB_CONCURRENCY" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Default</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p>
@@ -988,37 +995,29 @@ memory leaks.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../adrs/index.html" class="btn btn-neutral float-right" title="Architectural Decision Records" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Operations Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../adrs/index.html" class="btn btn-neutral float-right" title="Architectural Decision Records" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Operations Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2016-2018, Mozilla Foundation
+        &#169; Copyright 2016-2018, Mozilla Foundation.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
