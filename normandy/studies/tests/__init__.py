@@ -3,6 +3,7 @@ import json
 import tempfile
 import zipfile
 from factory.django import DjangoModelFactory
+from faker import Faker
 
 from normandy.base.tests import FuzzyUnicode
 from normandy.studies.models import Extension
@@ -61,7 +62,7 @@ class WebExtensionFileFactory(XPIFileFactory):
         super().__init__(signed=signed)
 
         if not gecko_id:
-            gecko_id = f"{factory.Faker('md5').generate({})}@normandy.mozilla.org"
+            gecko_id = f"{Faker().md5()}@normandy.mozilla.org"
 
         if from_file:
             self._manifest = json.load(from_file)
@@ -100,7 +101,8 @@ class LegacyAddonFileFactory(XPIFileFactory):
         super().__init__(signed=signed)
 
         if not addon_id:
-            addon_id = f"{factory.Faker('md5').generate({})}@normandy.mozilla.org"
+            name = Faker().md5()
+            addon_id = f"{name}@normandy.mozilla.org"
 
         if from_file:
             with open(from_file, "rb") as f:

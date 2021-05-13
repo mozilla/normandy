@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 
 
 class Color:
-    """ Color class
+    """Color class
     This class includes various helper functions that deal with manipulating colors
     for the Shield identicons.
     """

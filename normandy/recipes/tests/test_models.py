@@ -118,7 +118,8 @@ class TestArgumentValidation(object):
         def test_no_errors(self):
             action = ActionFactory(name="preference-experiment")
             arguments = PreferenceExperimentArgumentsFactory(
-                slug="a", branches=[{"slug": "a", "value": "a"}, {"slug": "b", "value": "b"}],
+                slug="a",
+                branches=[{"slug": "a", "value": "a"}, {"slug": "b", "value": "b"}],
             )
             # does not throw when saving the revision
             recipe = RecipeFactory(action=action, arguments=arguments)

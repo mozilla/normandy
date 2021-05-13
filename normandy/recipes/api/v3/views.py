@@ -145,7 +145,7 @@ class RecipeViewSet(CachingViewsetMixin, UpdateOrCreateModelViewSet):
     def history(self, request, pk=None):
         recipe = self.get_object()
         serializer = RecipeRevisionSerializer(
-            recipe.revisions.all(), many=True, context={"request": request}
+            recipe.revisions.all().order_by("-id"), many=True, context={"request": request}
         )
         return Response(serializer.data)
 
@@ -242,7 +242,10 @@ class ApprovalRequestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         ApprovalRequest.objects.all()
         # prefetch?
-        .select_related("revision", "revision__recipe",)
+        .select_related(
+            "revision",
+            "revision__recipe",
+        )
     )
     serializer_class = ApprovalRequestSerializer
     permission_classes = [AdminEnabledOrReadOnly, permissions.DjangoModelPermissionsOrAnonReadOnly]

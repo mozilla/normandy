@@ -134,7 +134,9 @@ class TestExtension(object):
         with pytest.raises(ValidationError) as exc:
             ExtensionFactory(xpi__from_func=xpi.open)
         assert len(exc.value.error_dict["xpi"]) == 1
-        assert exc.value.error_dict["xpi"][0].message == 'Legacy addon "install.rdf" is corrupt.'
+        assert exc.value.error_dict["xpi"][0].message.startswith(
+            'Legacy addon "install.rdf" is corrupt:'
+        )
 
     @pytest.mark.django_db()
     def test_legacy_no_id(self):

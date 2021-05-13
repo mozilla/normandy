@@ -7,6 +7,7 @@ from django.utils import timezone
 
 import factory
 from factory.django import DjangoModelFactory
+from faker import Faker
 
 from normandy.base.tests import FuzzyUnicode, UserFactory, FuzzySlug
 from normandy.base.utils import sri_hash
@@ -263,9 +264,7 @@ class PreferenceRolloutArgumentsFactory(DictFactory):
 class OptOutStudyArgumentsFactory(DictFactory):
     name = factory.fuzzy.FuzzyText()
     description = factory.faker.Faker("paragraph")
-    addonUrl = factory.lazy_attribute(
-        lambda x: f"https://example.com/{x}" + factory.faker.Faker("file_path").generate()
-    )
+    addonUrl = factory.lazy_attribute(lambda x: f"https://example.com/{x}" + Faker().file_path())
     extensionApiId = factory.fuzzy.FuzzyInteger(1, 1000)
 
 

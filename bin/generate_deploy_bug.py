@@ -6,7 +6,7 @@ import logging
 import logging.config
 import sys
 
-from pydriller import RepositoryMining
+from pydriller import Repository
 from pydriller.domain.commit import ModificationType
 
 # TODO Potential future improvements:
@@ -115,10 +115,10 @@ def main():
     dependency_updates = []
     migrations = []
 
-    mine = RepositoryMining(".", from_tag=args.from_tag, to_tag=args.to_tag)
+    repo = Repository(".", from_tag=args.from_tag, to_tag=args.to_tag)
     num_commits_processed = 0
-    for commit in mine.traverse_commits():
-        for mod in commit.modifications:
+    for commit in repo.traverse_commits():
+        for mod in commit.modified_files:
             if mod.change_type == ModificationType.ADD and "/migrations/" in mod.new_path:
                 migrations.append(get_migration_desc(mod))
 
@@ -171,7 +171,7 @@ def main():
 
     for commit in dependency_updates:
         for pr in commit.prs:
-            print(f"* [PR {pr}]({PR_URL_TMPL.format(pr)}): {get_pr_title(commit, pr)}")
+            output_line(f"* [PR {pr}]({PR_URL_TMPL.format(pr)}): {get_pr_title(commit, pr)}")
 
     output_line()
     output_line("## Migrations")
