@@ -1291,7 +1291,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pydriller"
-version = "1.15.5"
+version = "2.0"
 description = "Framework for MSR"
 category = "dev"
 optional = false
@@ -1927,7 +1927,7 @@ docs = ["Sphinx", "sphinx_rtd_theme", "sphinxcontrib-httpdomain"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "1cf028e438f4a42a130ad334d4c7efb1d1e6df7ea5f04284f4caf441b4805318"
+content-hash = "5bf0ef3fd9e9336c55a45eda7a5b80bd65d3ffb80b95d6c471a2e9e44a95542c"
 
 [metadata.files]
 aiohttp = [
@@ -2586,7 +2586,7 @@ pycparser = [
     {file = "pycparser-2.20.tar.gz", hash = "sha256:2d475327684562c3a96cc71adf7dc8c4f0565175cf86b6d7a404ff4c771f15f0"},
 ]
 pydriller = [
-    {file = "PyDriller-1.15.5-py3-none-any.whl", hash = "sha256:acbfb400fac97fd4dfba2faa6b4fe34a393aff43e516f8119471e2ac07da2020"},
+    {file = "PyDriller-2.0-py3-none-any.whl", hash = "sha256:3b0a037ffe6823da90e6f8fed17cc0717aaa87b415bae1860aa701f4c750906f"},
 ]
 pyflakes = [
     {file = "pyflakes-2.3.1-py2.py3-none-any.whl", hash = "sha256:7893783d01b8a89811dd72d7dfd4d84ff098e5eed95cfa8905b22bbffe52efc3"},
