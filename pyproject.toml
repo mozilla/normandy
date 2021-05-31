@@ -35,7 +35,7 @@ djangorestframework = "3.12.*"
 djangorestframework-yaml = "^2.0.0"
 dockerflow = "^2020.0.0"
 drf-yasg2 = "^1.19.2"
-ecdsa = "^0.16.0"
+ecdsa = "^0.17.0"
 factory_boy = "^3.0.0"
 fastecdsa = "^2.1.5"
 # Flake8 does not follow semver, and introduces backwards incompatible changes in minor updates
