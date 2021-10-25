@@ -109,6 +109,8 @@ class TestProfileCreationDateFilter(FilterTestsBase):
 
 
 class TestVersionFilter(FilterTestsBase):
+    should_be_baseline = False
+
     def create_basic_filter(self, versions=None):
         if versions is None:
             versions = [72, 74]

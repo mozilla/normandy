@@ -648,7 +648,7 @@ class VersionFilter(BaseFilter):
         )
 
     def get_capabilities(self):
-        return  {"jexl.context.env.version", "jexl.transform.versionCompare"}
+        return {"jexl.context.env.version", "jexl.transform.versionCompare"}
 
 
 class VersionRangeFilter(BaseFilter):
