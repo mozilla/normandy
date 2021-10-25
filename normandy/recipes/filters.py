@@ -621,26 +621,34 @@ class VersionFilter(BaseFilter):
     """Version's doc string"""
 
     def to_jexl(self, revision):
-        # This could be improved to generate more compact JEXL by noticing
-        # adjacent versions, and combining them into a single range. i.e. if
-        # `versions` is [55, 56, 57], this could generate
-        #
-        #   (normandy.version >= 55 && normandy.version < 58)
-        #
-        # instead of the current, more verbose
-        #
-        #   (normandy.version >= 55 && normandy.version < 56) ||
-        #   (normandy.version >= 56 && normandy.version < 57) ||
-        #   (normandy.version >= 57 && normandy.version < 58)
+        versions = self.initial_data["versions"]
+        versions.sort()
+        smallest_version = versions[0]
+        largest_version = versions[-1]
 
-        return "||".join(
-            f'(normandy.version>="{v}"&&normandy.version<"{v + 1}")'
-            for v in self.initial_data["versions"]
+        # check whether versions are non-continuous
+        if largest_version - smallest_version + 1 != len(versions):
+            result = [
+                "&&".join(
+                    [
+                        f'(env.version|versionCompare("{v}.!")>=0)',  # lowest v version
+                        f'(env.version|versionCompare("{v}.*")<0)',  # highest v version
+                    ]
+                )
+                for v in versions
+            ]
+
+            return "||".join(result)
+
+        return "&&".join(
+            [
+                f'(env.version|versionCompare("{smallest_version}.!")>=0)',
+                f'(env.version|versionCompare("{largest_version}.*")<0)',
+            ]
         )
 
     def get_capabilities(self):
-        # no special capabilities needed
-        return set()
+        return {"jexl.context.env.version", "jexl.transform.versionCompare"}
 
 
 class VersionRangeFilter(BaseFilter):

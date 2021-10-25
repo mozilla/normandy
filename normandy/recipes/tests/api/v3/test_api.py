@@ -1030,15 +1030,19 @@ class TestRecipeAPI(object):
 
         def test_version_works(self, api_client):
             res = self.make_recipe(
-                api_client, filter_object=[{"type": "version", "versions": [57, 58]}]
+                api_client, filter_object=[{"type": "version", "versions": [57, 58, 62]}]
             )
             assert res.status_code == 201, res.json()
             recipe_data = res.json()
 
             Recipe.objects.get(id=recipe_data["id"])
             assert recipe_data["latest_revision"]["filter_expression"] == (
-                '((normandy.version>="57"&&normandy.version<"58")||'
-                '(normandy.version>="58"&&normandy.version<"59")) && (true)'
+                '((env.version|versionCompare("57.!")>=0)&&'
+                '(env.version|versionCompare("57.*")<0)||'
+                '(env.version|versionCompare("58.!")>=0)&&'
+                '(env.version|versionCompare("58.*")<0)||'
+                '(env.version|versionCompare("62.!")>=0)&&'
+                '(env.version|versionCompare("62.*")<0)) && (true)'
             )
 
         def test_version_correct_fields(self, api_client):
@@ -2033,12 +2037,11 @@ class TestFilterObjects(object):
 
     def test_version_works(self, api_client):
         res = self.make_recipe(
-            api_client, filter_object=[{"type": "version", "versions": [57, 58]}]
+            api_client, filter_object=[{"type": "version", "versions": [57, 58, 59, 60]}]
         )
         assert res.status_code == 201, res.json()
         assert res.json()["latest_revision"]["filter_expression"] == (
-            '(normandy.version>="57"&&normandy.version<"58")||'
-            '(normandy.version>="58"&&normandy.version<"59")'
+            '(env.version|versionCompare("57.!")>=0)&&' '(env.version|versionCompare("60.*")<0)'
         )
 
     def test_version_correct_fields(self, api_client):

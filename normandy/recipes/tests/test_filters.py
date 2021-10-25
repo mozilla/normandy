@@ -109,6 +109,8 @@ class TestProfileCreationDateFilter(FilterTestsBase):
 
 
 class TestVersionFilter(FilterTestsBase):
+    should_be_baseline = False
+
     def create_basic_filter(self, versions=None):
         if versions is None:
             versions = [72, 74]
@@ -117,8 +119,8 @@ class TestVersionFilter(FilterTestsBase):
     def test_generates_jexl(self):
         filter = self.create_basic_filter(versions=[72, 74])
         assert set(filter.to_jexl(self.create_revision()).split("||")) == {
-            '(normandy.version>="72"&&normandy.version<"73")',
-            '(normandy.version>="74"&&normandy.version<"75")',
+            '(env.version|versionCompare("72.!")>=0)&&(env.version|versionCompare("72.*")<0)',
+            '(env.version|versionCompare("74.!")>=0)&&(env.version|versionCompare("74.*")<0)',
         }
 
 
