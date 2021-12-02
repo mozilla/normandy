@@ -122,10 +122,6 @@ class RemoteSettings:
         if "signer" in capabilities:
             signer_config = capabilities["signer"]
 
-            # Since we use the rollback feature, make sure it's available.
-            if signer_config["version"] < "5.1.0":
-                raise ImproperlyConfigured("kinto-signer 5.1.0+ is required")
-
             normandy_resource = [
                 r
                 for r in signer_config["resources"]
