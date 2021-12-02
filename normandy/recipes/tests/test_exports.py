@@ -152,18 +152,6 @@ class TestRemoteSettings:
         # restore write permissions
         requestsmock.get(collection_url, json=allow_write_payload)
 
-        # Signer version should be >= 5.1.0.
-        requestsmock.get(
-            f"{rs_settings.REMOTE_SETTINGS_URL}/",
-            json={
-                "user": {"id": f"account:{rs_settings.REMOTE_SETTINGS_USERNAME}"},
-                "capabilities": {"signer": {"version": "5.0.0"}},
-            },
-        )
-        with pytest.raises(ImproperlyConfigured) as exc:
-            exports.RemoteSettings().check_config()
-        assert "kinto-signer 5.1.0+ is required" in str(exc.value)
-
         # Capabilities collection review should be explicitly disabled.
         requestsmock.get(
             f"{rs_settings.REMOTE_SETTINGS_URL}/",
