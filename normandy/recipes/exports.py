@@ -127,14 +127,8 @@ class RemoteSettings:
                 for r in signer_config["resources"]
                 if r["source"]["bucket"] == bucket and r["source"]["collection"] == collection
             ]
-            review_disabled = (
-                len(normandy_resource) == 1
-                and not normandy_resource[0].get(
-                    "to_review_enabled", signer_config["to_review_enabled"]
-                )
-                and not normandy_resource[0].get(
-                    "group_check_enabled", signer_config["group_check_enabled"]
-                )
+            review_disabled = len(normandy_resource) == 1 and not normandy_resource[0].get(
+                "to_review_enabled", signer_config["to_review_enabled"]
             )
             if not review_disabled:
                 raise ImproperlyConfigured(
