@@ -191,7 +191,6 @@ class TestRemoteSettings:
                                     "collection": "normandy-recipes-capabilities",
                                 },
                                 "to_review_enabled": False,
-                                "group_check_enabled": False,
                             },
                         ],
                     }
