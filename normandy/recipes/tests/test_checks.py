@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import ProgrammingError
 
 import pytest
@@ -93,3 +94,12 @@ class TestActionSignatureAreCorrect:
         errors = checks.action_signatures_are_correct(None)
         assert len(errors) == 1
         assert errors[0].id == checks.WARNING_COULD_NOT_CHECK_SIGNATURES
+
+
+class TestRemoteSettingsConfigIsCorrect:
+    def test_it_warns_if_remote_settings_config_is_incorrect(self, mocker):
+        mock_check_config = mocker.patch("normandy.recipes.exports.RemoteSettings.check_config")
+        mock_check_config.side_effect = ImproperlyConfigured("error for testing")
+        errors = checks.remotesettings_config_is_correct(None)
+        assert len(errors) == 1
+        assert errors[0].id == checks.ERROR_REMOTE_SETTINGS_INCORRECT_CONFIG
