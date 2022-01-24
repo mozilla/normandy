@@ -9,7 +9,7 @@ from django.db.utils import OperationalError, ProgrammingError
 
 import requests.exceptions
 
-from normandy.recipes import signing, geolocation
+from normandy.recipes import exports, signing, geolocation
 
 
 INFO_COULD_NOT_RETRIEVE_ACTIONS = "normandy.recipes.I001"
@@ -23,6 +23,7 @@ ERROR_INVALID_ACTION_SIGNATURE = "normandy.recipes.E004"
 ERROR_COULD_NOT_VERIFY_CERTIFICATE = "normandy.recipes.E005"
 ERROR_GEOIP_DB_NOT_AVAILABLE = "normandy.recipes.E006"
 ERROR_GEOIP_DB_UNEXPECTED_RESULT = "normandy.recipes.E007"
+ERROR_REMOTE_SETTINGS_INCORRECT_CONFIG = "normandy.recipes.E008"
 
 
 def actions_have_consistent_hashes(app_configs, **kwargs):
@@ -187,9 +188,24 @@ def geoip_db_is_available(app_configs, **kwargs):
     return errors
 
 
+def remotesettings_config_is_correct(app_configs, **kwargs):
+    errors = []
+    try:
+        exports.RemoteSettings().check_config()
+    except ImproperlyConfigured as e:
+        errors.append(
+            Error(
+                f"Remote Settings config is incorrect: {e}",
+                id=ERROR_REMOTE_SETTINGS_INCORRECT_CONFIG,
+            )
+        )
+    return errors
+
+
 def register():
     register_check(actions_have_consistent_hashes)
     register_check(recipe_signatures_are_correct)
     register_check(action_signatures_are_correct)
     register_check(signatures_use_good_certificates)
     register_check(geoip_db_is_available)
+    register_check(remotesettings_config_is_correct)
