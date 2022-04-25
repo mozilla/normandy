@@ -132,7 +132,7 @@ jobs:
 
   docs-build:
     docker:
-      - image: circleci/python:3.9
+      - image: cimg/python:3.9
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -185,11 +185,11 @@ jobs:
 
   python-tests:
     docker:
-      - image: circleci/python:3.9-node-browsers
+      - image: cimg/python:3.9.12-node
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/postgres:9.6
+      - image: cimg/postgres:9.6.24
         environment:
           POSTGRES_HOST_AUTH_METHOD: trust
         auth:
