@@ -16,7 +16,7 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     apt-get update && apt-get install yarn
 
 # Install Poetry
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+RUN pip install --no-cache-dir --quiet poetry
 ENV PATH "/root/.poetry/bin:${PATH}"
 
 # Make and activate a Python virtualenv
