@@ -29,7 +29,7 @@ class APIRootView(APIView):
     exclude_from_schema = True
     urlconf = None
 
-    @api_cache_control(max_age=settings.API_CACHE_TIME)
+    @api_cache_control(max_age=settings.API_ROOT_CACHE_TIME)
     def get(self, request, *args, **kwargs):
         ret = {}
 

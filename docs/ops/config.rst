@@ -243,6 +243,13 @@ in other Django projects.
     set to 0 in non-production environments to ease testing. In production
     environments, setting this value too low can be a denial-of-service risk.
 
+.. envvar:: DJANGO_API_ROOT_CACHE_TIME
+
+    :default: ``86400`` (1 day)
+
+    The time in seconds to set in cache headers for cacheable API root
+    endpoints.
+
 .. envvar:: DJANGO_API_CACHE_ENABLED
 
     :default: ``True``
