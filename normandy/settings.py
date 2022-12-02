@@ -347,6 +347,7 @@ class Base(Core, CORS, OIDC, Metrics):
     ADMIN_ENABLED = values.BooleanValue(True)
     IMMUTABLE_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 365)
     NUM_PROXIES = values.IntegerValue(0)
+    API_ROOT_CACHE_TIME = values.IntegerValue(60 * 60 * 24)
     API_CACHE_TIME = values.IntegerValue(30)
     API_CACHE_ENABLED = values.BooleanValue(True)
     PERMANENT_REDIRECT_CACHE_TIME = values.IntegerValue(60 * 60 * 24 * 30)
@@ -440,6 +441,7 @@ class Development(InsecureAuthentication, Base):
     DEFAULT_FILE_STORAGE = values.Value("django.core.files.storage.FileSystemStorage")
 
     API_CACHE_ENABLED = values.BooleanValue(False)
+    API_ROOT_CACHE_TIME = values.IntegerValue(0)
     API_CACHE_TIME = values.IntegerValue(0)
 
     SILENCED_SYSTEM_CHECKS = values.ListValue(["normandy.recipes.E006"])  # geoip db not available
