@@ -225,18 +225,6 @@ jobs:
       - store_artifacts:
           path: test-reports
 
-  contract-tests:
-    machine:
-      docker_layer_caching: true
-      resource_class: large
-    steps:
-      - checkout
-      - run:
-          name: Run contract tests in containers
-          command: |
-            mkdir etc/ssl
-            chmod a+rwx etc/ssl
-            make contract_tests
 
 workflows:
   version: 2
@@ -254,10 +242,6 @@ workflows:
             tags:
               only: /.*/
       - lint:
-          filters:
-            tags:
-              only: /.*/
-      - contract-tests:
           filters:
             tags:
               only: /.*/
@@ -292,7 +276,6 @@ workflows:
       - docker-image-publish:
           requires:
             - python-tests
-            - contract-tests
             - lint
             - docker-image-build-save
           filters:
