@@ -102,11 +102,12 @@ class Core(Configuration):
         "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     }
 
-    GRAPHENE = {"SCHEMA": "normandy.schema.schema",
-                "MIDDLEWARE": [
-                    "normandy.schema.DisableIntrospectionMiddleware",
-                ],
-                }
+    GRAPHENE = {
+        "SCHEMA": "normandy.schema.schema",
+        "MIDDLEWARE": [
+            "normandy.schema.DisableIntrospectionMiddleware",
+        ],
+    }
 
     # Content Security Policy
     def CSP_DEFAULT_SRC(self):

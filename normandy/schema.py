@@ -11,12 +11,21 @@ class NormandyQuery(BaseQuery, RecipesQuery, StudiesQuery, graphene.ObjectType):
 
 class DisableIntrospectionMiddleware:
     """
-    This class hides the introspection.
+    This class hides the introspection. As it is best practice to not allow introspection queries
+    in production. ref: https://docs.graphene-python.org/en/latest/execution/queryvalidation/#disable-introspection
     """
 
     def resolve(self, next, root, info, **kwargs):
-
-        if info.field_name.lower() in ['__schema', '_introspection']:
+        # introspection fields taken from https://graphql.org/learn/introspection/
+        if info.field_name.lower() in [
+            "__Schema",
+            "__Type",
+            "__TypeKind",
+            "__Field",
+            "__InputValue",
+            "__EnumValue",
+            "__Directive",
+        ]:
             return None
         return next(root, info, **kwargs)
 
