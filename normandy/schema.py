@@ -9,4 +9,16 @@ class NormandyQuery(BaseQuery, RecipesQuery, StudiesQuery, graphene.ObjectType):
     pass
 
 
+class DisableIntrospectionMiddleware:
+    """
+    This class hides the introspection.
+    """
+
+    def resolve(self, next, root, info, **kwargs):
+
+        if info.field_name.lower() in ['__schema', '_introspection']:
+            return None
+        return next(root, info, **kwargs)
+
+
 schema = graphene.Schema(query=NormandyQuery)
