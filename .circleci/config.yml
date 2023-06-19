@@ -38,7 +38,7 @@ jobs:
           command: pip install -U poetry
       - run:
           name: Install python dependencies
-          command: poetry install --no-dev --no-interaction --verbose
+          command: poetry install --no-dev --no-interaction --verbose --no-ansi
       - restore_cache:
           keys:
             - v2-dependencies-{{ checksum "yarn.lock" }}
@@ -145,7 +145,7 @@ jobs:
             echo "source ~/venv/bin/activate" >> $BASH_ENV
       - run:
           name: Install requirements
-          command: poetry install --extras docs --no-interaction --verbose
+          command: poetry install --extras docs --no-interaction --verbose --no-ansi
       - run:
           name: Build docs
           command: |
@@ -209,7 +209,7 @@ jobs:
             echo "source ~/venv/bin/activate" >> $BASH_ENV
       - run:
           name: Install python dependencies
-          command: poetry install --no-dev --no-interaction --verbose
+          command: poetry install --no-dev --no-interaction --verbose --no-ansi
       - run:
           name: Install node dependencies
           command: yarn install --frozen-lockfile
