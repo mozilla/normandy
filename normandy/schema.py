@@ -18,13 +18,13 @@ class DisableIntrospectionMiddleware:
     def resolve(self, next, root, info, **kwargs):
         # introspection fields taken from https://graphql.org/learn/introspection/
         if info.field_name.lower() in [
-            "__Schema",
-            "__Type",
-            "__TypeKind",
-            "__Field",
-            "__InputValue",
-            "__EnumValue",
-            "__Directive",
+            "__schema",
+            "__type",
+            "__typeKind",
+            "__field",
+            "__inputValue",
+            "__enumValue",
+            "__directive",
         ]:
             return None
         return next(root, info, **kwargs)
