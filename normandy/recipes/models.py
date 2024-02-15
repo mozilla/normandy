@@ -707,6 +707,7 @@ class Action(DirtyFieldsMixin, models.Model):
 
         Raises `ValidationError` if any rules are violated.
         """
+
         # Make a default dict that always returns a default dict
         def default():
             return defaultdict(default)

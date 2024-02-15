@@ -277,14 +277,14 @@ class TestVerifyX5u(object):
 
         if not_before:
             fake_cert["tbsCertificate"]["validity"]["notBefore"] = rfc5280.Time()
-            fake_cert["tbsCertificate"]["validity"]["notBefore"][
-                "utcTime"
-            ] = pyasn1_useful.UTCTime.fromDateTime(not_before)
+            fake_cert["tbsCertificate"]["validity"]["notBefore"]["utcTime"] = (
+                pyasn1_useful.UTCTime.fromDateTime(not_before)
+            )
         if not_after:
             fake_cert["tbsCertificate"]["validity"]["notAfter"] = rfc5280.Time()
-            fake_cert["tbsCertificate"]["validity"]["notAfter"][
-                "utcTime"
-            ] = pyasn1_useful.UTCTime.fromDateTime(not_after)
+            fake_cert["tbsCertificate"]["validity"]["notAfter"]["utcTime"] = (
+                pyasn1_useful.UTCTime.fromDateTime(not_after)
+            )
 
         return fake_cert
 
