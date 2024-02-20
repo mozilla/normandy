@@ -9,7 +9,7 @@ def fraction_to_key(frac):
     if frac < 0 or frac > 1:
         raise ValueError("frac must be between 0 and 1 inclusive (got {})".format(frac))
 
-    mult = 2 ** 256 - 1
+    mult = 2**256 - 1
     in_decimal = int(frac * mult)
 
     assert in_decimal >= 0

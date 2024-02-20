@@ -144,6 +144,9 @@ jobs:
             python3 -m venv ~/venv
             echo "source ~/venv/bin/activate" >> $BASH_ENV
       - run:
+          name: Install Poetry
+          command: pip install -U poetry
+      - run:
           name: Install requirements
           command: poetry install --extras docs --no-interaction --verbose --no-ansi
       - run:
@@ -207,6 +210,9 @@ jobs:
           command: |
             python3 -m venv ~/venv
             echo "source ~/venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Install Poetry
+          command: pip install -U poetry
       - run:
           name: Install python dependencies
           command: poetry install --no-dev --no-interaction --verbose --no-ansi

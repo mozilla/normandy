@@ -1561,7 +1561,7 @@ class TestApprovalRequestAPI(object):
             (["false", "0", "rejected"], rejected.id),
             (["null", "pending"], pending.id),
         ]
-        for (aliases, expected_id) in patterns:
+        for aliases, expected_id in patterns:
             for alias in aliases:
                 res = api_client.get(f"/api/v3/approval_request/?approved={alias}")
                 assert res.status_code == 200, f"Expected {alias} to give a 200 status"
