@@ -371,6 +371,7 @@ class Base(Core, CORS, OIDC, Metrics):
     AUTOGRAPH_HAWK_SECRET_KEY = values.Value()
     AUTOGRAPH_SIGNATURE_MAX_AGE = values.IntegerValue(60 * 60 * 24 * 7)
     AUTOGRAPH_X5U_CACHE_BUST = values.Value(None)
+    AUTOGRAPH_KEYID = values.Value(None)
 
     # Remote Settings connection configuration
     REMOTE_SETTINGS_URL = values.Value()
@@ -547,6 +548,7 @@ class Test(InsecureAuthentication, Base):
     AUTOGRAPH_URL = None
     AUTOGRAPH_HAWK_ID = None
     AUTOGRAPH_HAWK_SECRET_KEY = None
+    AUTOGRAPH_KEYID = None
     OIDC_USER_ENDPOINT = "https://auth.example.com/userinfo"
 
 
