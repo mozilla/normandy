@@ -63,6 +63,7 @@ class TestAutographer(object):
         settings.AUTOGRAPH_URL = "https://autograph.example.com"
         settings.AUTOGRAPH_HAWK_ID = "hawk id"
         settings.AUTOGRAPH_HAWK_SECRET_KEY = "hawk secret key"
+        settings.AUTOGRAPH_KEYID = "hello autograph"
 
         autographer = signing.Autographer()
         autographer.session = MagicMock()
@@ -120,8 +121,16 @@ class TestAutographer(object):
             [
                 url,
                 [
-                    {"template": "content-signature", "input": foo_base64},
-                    {"template": "content-signature", "input": bar_base64},
+                    {
+                        "template": "content-signature",
+                        "input": foo_base64,
+                        "keyid": "hello autograph",
+                    },
+                    {
+                        "template": "content-signature",
+                        "input": bar_base64,
+                        "keyid": "hello autograph",
+                    },
                 ],
             ]
         )

@@ -69,7 +69,10 @@ class Autographer(object):
             # base64 works in bytes. requests work in UTF-8.
             # Convert to bytes, and then back.
             encoded_implementation = base64.b64encode(item).decode("utf8")
-            signing_request.append({"input": encoded_implementation})
+            request = {"input": encoded_implementation}
+            if settings.AUTOGRAPH_KEYID:
+                request["keyid"] = settings.AUTOGRAPH_KEYID
+            signing_request.append(request)
 
         res = self.session.post(url, json=signing_request)
         res.raise_for_status()
