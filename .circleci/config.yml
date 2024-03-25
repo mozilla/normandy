@@ -35,7 +35,7 @@ jobs:
             echo "source ~/venv/bin/activate" >> $BASH_ENV
       - run:
           name: Install Poetry
-          command: pip install -U poetry
+          command: pip install poetry==1.5.0
       - run:
           name: Install python dependencies
           command: poetry install --no-dev --no-interaction --verbose --no-ansi
