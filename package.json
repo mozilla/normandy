@@ -11,6 +11,6 @@
     "@mozilla/normandy-action-argument-schemas": "0.10.1"
   },
   "devDependencies": {
-    "gh-pages": "3.1.0"
+    "gh-pages": "5.0.0"
   }
 }
