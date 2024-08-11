@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: 3.9
       - id: pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
       - name: Install requirements
         run: |
           python -m venv .venv
