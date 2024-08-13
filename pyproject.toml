@@ -7,7 +7,7 @@ line-length = 99
 
 [tool.poetry]
 name = "normandy"
-version = "1.146.1"
+version = "1.147.0"
 description = "Firefox recipe server"
 authors = ["Your Name <you@example.com>"]
 license = "MPL-2.0"
