@@ -1,3 +1,5 @@
+# This repo is now replaced by the [Nimbus Project](https://github.com/mozilla/experimenter)
+
 # Normandy Recipe Server
 
 Normandy manages recipes of changes to make to Firefox, including temporary
